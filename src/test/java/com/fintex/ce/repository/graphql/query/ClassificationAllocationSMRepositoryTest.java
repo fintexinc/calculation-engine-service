@@ -1,0 +1,160 @@
+package com.fintex.ce.repository.graphql.query;
+
+import com.fintex.smclient.service.GraphqlTransportComponent;
+import com.fintex.ce.config.enumeration.DataProvider;
+import com.fintex.ce.dto.holding.StockHolding;
+import com.fintex.ce.dto.holding.UsMutualFundHolding;
+import com.fintex.ce.model.redis.RClassificationAllocation;
+import com.fintex.ce.repository.graphql.query.endpoint.classificationallocation.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
+
+class ClassificationAllocationSMRepositoryTest {
+
+    @Test
+    void queryBenchOfFundCanada_verifyDoQuery() {
+        //SETUP
+        final var graphqlTransport = mock(GraphqlTransportComponent.class);
+        final var classificationAllocationSMRepository = mock(ClassificationAllocationSMRepository.class,
+                withSettings().useConstructor(graphqlTransport));
+
+        final var holdings = mock(List.class);
+        final var provider = mock(List.class);
+
+        doCallRealMethod().when(classificationAllocationSMRepository).queryBenchOfFundCanada(any(), any());
+
+        //ACT
+        final Map map = classificationAllocationSMRepository.queryBenchOfFundCanada(holdings, provider);
+
+        //VERIFY
+        verify(classificationAllocationSMRepository).doQuery(same(holdings),
+                argThat(arg -> arg.getClass() == ClassificationAllocationFundCanadaEndpoint.class), same(provider));
+    }
+
+    @Test
+    void queryBenchOfEtfCanada() {
+        //SETUP
+        final var graphqlTransport = mock(GraphqlTransportComponent.class);
+        final var classificationAllocationSMRepository = mock(ClassificationAllocationSMRepository.class,
+                withSettings().useConstructor(graphqlTransport));
+
+        final var holdings = mock(List.class);
+        final var provider = mock(List.class);
+
+        doCallRealMethod().when(classificationAllocationSMRepository).queryBenchOfEtfCanada(any(), any());
+
+        //ACT
+        final Map map = classificationAllocationSMRepository.queryBenchOfEtfCanada(holdings, provider);
+
+        //VERIFY
+        verify(classificationAllocationSMRepository).doQuery(same(holdings),
+                argThat(arg -> arg.getClass() == ClassificationAllocationEtfCanadaEndpoint.class), same(provider));
+    }
+
+    @Test
+    void queryBenchOfOfEtfUs() {
+        //SETUP
+        final var graphqlTransport = mock(GraphqlTransportComponent.class);
+        final var classificationAllocationSMRepository = mock(ClassificationAllocationSMRepository.class,
+                withSettings().useConstructor(graphqlTransport));
+
+        final var holdings = mock(List.class);
+        final var provider = mock(List.class);
+
+        doCallRealMethod().when(classificationAllocationSMRepository).queryBenchOfOfEtfUs(any(), any());
+
+        //ACT
+        final Map map = classificationAllocationSMRepository.queryBenchOfOfEtfUs(holdings, provider);
+
+        //VERIFY
+        verify(classificationAllocationSMRepository).doQuery(same(holdings),
+                argThat(arg -> arg.getClass() == ClassificationAllocationEtfUsEndpoint.class), same(provider));
+    }
+
+    @Test
+    void queryBenchOfFixedIncome() {
+        //SETUP
+        final var graphqlTransport = mock(GraphqlTransportComponent.class);
+        final var classificationAllocationSMRepository = mock(ClassificationAllocationSMRepository.class,
+                withSettings().useConstructor(graphqlTransport));
+
+        final var holdings = mock(List.class);
+        final var provider = mock(List.class);
+
+        doCallRealMethod().when(classificationAllocationSMRepository).queryBenchOfFixedIncomes(any(), any());
+
+        //ACT
+        final Map map = classificationAllocationSMRepository.queryBenchOfFixedIncomes(holdings, provider);
+
+        //VERIFY
+        verify(classificationAllocationSMRepository).doQuery(same(holdings),
+                argThat(arg -> arg.getClass() == ClassificationAllocationFixedIncomeEndpoint.class), same(provider));
+    }
+
+    @Test
+    void queryBenchOfStock_verifyDoQuery() {
+        //SETUP
+        final ClassificationAllocationSMRepository m = mock(ClassificationAllocationSMRepository.class);
+        final List<StockHolding> holdings = List.of(mock(StockHolding.class));
+        final List<DataProvider> providers = List.of(DataProvider.EAGLE);
+
+        doCallRealMethod().when(m).queryBenchOfStock(any(), anyList());
+        //ACT
+        m.queryBenchOfStock(holdings, providers);
+
+        //VERIFY
+        verify(m).doQuery(eq(holdings), argThat(argument -> argument.getClass() == ClassificationAllocationStockEndpoint.class),
+                eq(providers));
+    }
+
+    @Test
+    void queryBenchOfStock_checkResult() {
+        //SETUP
+        final ClassificationAllocationSMRepository m = mock(ClassificationAllocationSMRepository.class);
+        final List<StockHolding> holdings = List.of();
+
+        final HashMap<Object, Object> expected = new HashMap<>();
+        when(m.doQuery(any(), any(), any())).thenReturn(expected);
+
+        final List<DataProvider> providers = List.of(DataProvider.EAGLE);
+
+        doCallRealMethod().when(m).queryBenchOfStock(any(), anyList());
+        //ACT
+        final Map<StockHolding, RClassificationAllocation> actual = m.queryBenchOfStock(holdings, providers);
+
+        //VERIFY
+        Assertions.assertSame(expected, actual);
+    }
+
+    @Test
+    void queryUsMutualFunds_verifyDoQuery() {
+        //SETUP
+        final ClassificationAllocationSMRepository m = mock(ClassificationAllocationSMRepository.class);
+        final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
+        final List<DataProvider> providers = List.of(DataProvider.EAGLE);
+
+        doCallRealMethod().when(m).queryUsMutualFunds(any(), anyList());
+        //ACT
+        m.queryUsMutualFunds(holdings, providers);
+
+        //VERIFY
+        verify(m).doQuery(eq(holdings), argThat(argument -> argument.getClass() == ClassificationAllocationUsMutualFundEndpoint.class),
+                eq(providers));
+    }
+
+}

@@ -1,0 +1,22 @@
+package com.fintex.ce.dto.response;
+
+import com.fintex.ce.dto.calculation.InflationDTO;
+import com.fintex.ce.dto.response.core.WarningDTO;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+import java.util.Map;
+
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+@NoArgsConstructor
+public class InflationResDTO extends WarningDTO {
+
+    private Map<String, InflationDTO> inflationData;
+
+}

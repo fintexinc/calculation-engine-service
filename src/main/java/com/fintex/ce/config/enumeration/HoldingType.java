@@ -1,0 +1,21 @@
+package com.fintex.ce.config.enumeration;
+
+public enum HoldingType {
+
+    CANADA_MUTUAL_FUNDS,
+    US_ETF,
+    CANADA_ETF,
+    CANADA_STOCKS,
+    US_STOCKS,
+    CASH,
+    BENCHMARK_INDEX,
+    GIC,
+    US_MUTUAL_FUNDS,
+    CANADA_HEDGE_FUNDS,
+    CANADA_POOLED_FUNDS,
+    SEGREGATED_FUND_CANADA,
+    FIXED_INCOME,
+    SEPARATELY_MANAGED_ACCOUNT,
+    PAG_GUIDED_PORTFOLIO
+
+}

@@ -1,0 +1,252 @@
+package com.fintex.ce.service.impl.cache;
+
+import com.fintex.ce.config.enumeration.HoldingType;
+import com.fintex.ce.config.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.dto.ParamHolderDTO;
+import com.fintex.ce.dto.holding.BenchmarkIndexHolding;
+import com.fintex.ce.dto.holding.EtfHolding;
+import com.fintex.ce.dto.holding.FundSeriesHolding;
+import com.fintex.ce.dto.holding.GicHolding;
+import com.fintex.ce.dto.holding.Holding;
+import com.fintex.ce.dto.holding.FixedIncomeHolding;
+import com.fintex.ce.dto.response.core.Warning;
+import com.fintex.ce.model.redis.RCountryExposure;
+import com.fintex.ce.service.interfaces.CountryAllocationMappingService;
+import com.fintex.ce.util.ComparisonUtils;
+import com.fintex.ce.util.FilterUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.fintex.ce.config.enumeration.ExceptionCode.WRN_FICQ_BCE_001;
+import static com.fintex.ce.util.FilterUtils.*;
+import static com.fintex.ce.util.TestConstants.GREATER_THAN_YEAR;
+import static com.fintex.ce.util.TestConstants.LESS_THAN_YEAR;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+class CountryExposureCacheStorageTest {
+
+    CountryExposureCacheStorage countryExposureCacheStorage;
+    Holding holding;
+    List<Holding> holdings;
+    List<Warning> warnings;
+    RCountryExposure rCountryExposure ;
+    CountryAllocationMappingService mappingService;
+
+    @BeforeEach
+    void setUp() {
+        countryExposureCacheStorage = mock(CountryExposureCacheStorage.class);
+        holding = mock(Holding.class);
+        holdings = List.of(holding);
+        warnings = List.of(mock(Warning.class));
+        rCountryExposure = mock(RCountryExposure.class);
+        mappingService = mock(CountryAllocationMappingService.class);
+
+    }
+
+    @Test
+    void load_verifyFilters() {
+        try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
+            //SETUP
+            doCallRealMethod().when(countryExposureCacheStorage).load(any(), any(), any(), any());
+
+            //ACT
+            countryExposureCacheStorage.load(holdings, List.of(), warnings, new ParamHolderDTO());
+
+            //VERIFY
+            mockedFilterUtils.verify(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE)));
+            mockedFilterUtils.verify(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE)));
+            mockedFilterUtils.verify(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE)));
+            mockedFilterUtils.verify(() -> FilterUtils.filterHoldings(eq(holdings), eq(FIXED_INCOME_PREDICATE)));
+        }
+    }
+
+    @Test
+    void load_verifyLoadBenchOfFundCanada() {
+        //SETUP
+        try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
+            final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+            mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(filtered);
+            doCallRealMethod().when(countryExposureCacheStorage).load(any(), any(), any(), any());
+
+            //ACT
+            final List<Warning> warnings = List.of(mock(Warning.class));
+            countryExposureCacheStorage.load(holdings, List.of(), warnings, new ParamHolderDTO());
+
+            //VERIFY
+            verify(countryExposureCacheStorage).loadBenchOfFundCanada(filtered, List.of());
+        }
+    }
+
+    @Test
+    void load_verifyLoadForBenchOfBenchmarks() {
+        //SETUP
+        try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
+            final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+            mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(filtered);
+            doCallRealMethod().when(countryExposureCacheStorage).load(any(), any(), any(), any());
+
+            //ACT
+            final List<Warning> warnings = List.of(mock(Warning.class));
+            countryExposureCacheStorage.load(holdings, List.of(), warnings, new ParamHolderDTO());
+
+            //VERIFY
+            verify(countryExposureCacheStorage).loadForBenchOfBenchmarks(filtered, List.of());
+        }
+    }
+
+    @Test
+    void load_verifyLoadForBenchOfEtfUs() {
+        //SETUP
+        try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
+            final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+            mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
+            doCallRealMethod().when(countryExposureCacheStorage).load(any(), any(), any(), any());
+
+            //ACT
+            final List<Warning> warnings = List.of(mock(Warning.class));
+            countryExposureCacheStorage.load(holdings, List.of(), warnings, new ParamHolderDTO());
+
+            //VERIFY
+            verify(countryExposureCacheStorage).loadForBenchOfEtfUs(filtered, List.of());
+        }
+    }
+
+    @Test
+    void load_verifyLoadForBenchOfEtfCanada() {
+        //SETUP
+        try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
+            final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+            mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(filtered);
+            doCallRealMethod().when(countryExposureCacheStorage).load(any(), any(), any(), any());
+
+            //ACT
+            final List<Warning> warnings = List.of(mock(Warning.class));
+            countryExposureCacheStorage.load(holdings, List.of(), warnings, new ParamHolderDTO());
+
+            //VERIFY
+            verify(countryExposureCacheStorage).loadForBenchOfEtfCanada(filtered, List.of());
+        }
+    }
+
+    @Test
+    void load_verifyAddGics() {
+        try (final var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
+            //SETUP
+
+            final List<Holding> filtered = List.of(mock(GicHolding.class));
+            mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(GIC_PREDICATE))).thenReturn(filtered);
+
+            doCallRealMethod().when(countryExposureCacheStorage).load(any(), any(), any(), any());
+            //ACT
+            final List<Warning> warnings = List.of(mock(Warning.class));
+            countryExposureCacheStorage.load(holdings, List.of(), warnings, new ParamHolderDTO());
+
+            //VERIFY
+            verify(countryExposureCacheStorage).addGics(filtered);
+        }
+    }
+
+    @Test
+    void addGics_ifGicIsLessThanAYearThanMapContainsAAA() {
+        //SETUP
+        final GicHolding gic = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+        gic.setTerm(GREATER_THAN_YEAR);
+        final List<Holding> holdings = List.of(gic);
+        final HashMap<Holding, Map<CountryRegionType, BigDecimal>> expected = new HashMap<>();
+        expected.put(gic, Map.of(CountryRegionType.CANADA, BigDecimal.ONE));
+        doCallRealMethod().when(countryExposureCacheStorage).addGics(any());
+
+        //ACT
+        final Map<Holding, Map<CountryRegionType, BigDecimal>> actual = countryExposureCacheStorage.addGics(holdings);
+
+        //VERIFY
+        Assertions.assertNotNull(actual);
+        ComparisonUtils.compareMaps(expected, actual);
+    }
+
+    @Test
+    void addGics_ifGicIsLessThanAYearThanMapContainsNothing() {
+        //SETUP
+        final GicHolding gic = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+        gic.setTerm(LESS_THAN_YEAR);
+        final List<Holding> holdings = List.of(gic);
+        final HashMap<Holding, Map<CountryRegionType, BigDecimal>> expected = new HashMap<>();
+        doCallRealMethod().when(countryExposureCacheStorage).addGics(any());
+
+        //ACT
+        final Map<Holding, Map<CountryRegionType, BigDecimal>> actual = countryExposureCacheStorage.addGics(holdings);
+
+        //VERIFY
+        Assertions.assertNotNull(actual);
+        ComparisonUtils.compareMaps(expected, actual);
+    }
+
+    @Test
+    void load_verifyLoadBenchOfFixedIncomes() {
+        //SETUP
+        try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
+            final List<FixedIncomeHolding> filtered = List.of(mock(FixedIncomeHolding.class));
+            mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(FIXED_INCOME_PREDICATE))).thenReturn(filtered);
+            doCallRealMethod().when(countryExposureCacheStorage).load(any(), any(), any(), any());
+
+            //ACT
+            final List<Warning> warnings = List.of(mock(Warning.class));
+            countryExposureCacheStorage.load(holdings, List.of(), warnings, new ParamHolderDTO());
+
+            //VERIFY
+            verify(countryExposureCacheStorage).loadBenchOfFixedIncomes(filtered, List.of());
+        }
+    }
+
+    @Test
+    void mapper_verifyMapToCountryRegions() {
+        //SETUP
+        final CountryAllocationMappingService mappingService = mock(CountryAllocationMappingService.class);
+        final CountryExposureCacheStorage c = mock(CountryExposureCacheStorage.class,
+                withSettings().useConstructor(null, null, null, null, null, mappingService));
+        final Map<String, BigDecimal> map = Map.of(CountryRegionType.CANADA.getRegion(), BigDecimal.ONE);
+        when(holding.generateUserIdentifier()).thenReturn("Test");
+        when(rCountryExposure.getAllocations()).thenReturn(map);
+        doCallRealMethod().when(c).mapper(any(), any());
+
+        //ACT
+        final List<Warning> warnings = new ArrayList<>();
+        final Map<Holding, Map<CountryRegionType, BigDecimal>> actual = c.mapper(Map.of(holding, rCountryExposure), warnings);
+
+        //VERIFY
+        verify(mappingService).mapToCountryRegions(Map.of(holding, map), warnings, WRN_FICQ_BCE_001);
+    }
+
+    @Test
+    void mapper_checkResult() {
+        //SETUP
+        final CountryExposureCacheStorage c = mock(CountryExposureCacheStorage.class,
+                withSettings().useConstructor(null, null, null, null, null, mappingService));
+        final Map<String, BigDecimal> map = Map.of(CountryRegionType.CANADA.getRegion(), BigDecimal.ONE);
+        final Map<Holding, Map<CountryRegionType, BigDecimal>> expected = Map.of(holding, Map.of());
+        when(holding.generateUserIdentifier()).thenReturn("Test");
+        when(rCountryExposure.getAllocations()).thenReturn(map);
+        when(mappingService.mapToCountryRegions(any(), any(), any()))
+                .thenReturn(expected);
+        doCallRealMethod().when(c).mapper(any(), any());
+
+        //ACT
+        final List<Warning> warnings = new ArrayList<>();
+        final Map<Holding, Map<CountryRegionType, BigDecimal>> actual = c.mapper(Map.of(holding, rCountryExposure), warnings);
+
+        //VERIFY
+        assertSame(expected, actual);
+    }
+
+}
