@@ -7,7 +7,7 @@ import api.util.CommonTools;
 import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.equitysector.REquitySector;
-import com.fintex.ce.repository.graphql.query.EquitySectorFDSRepository;
+import com.fintex.ce.repository.graphql.query.EquitySectorSMRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,11 +22,11 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class EquitySectorFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-    private static final EquitySectorFDSRepository EQUITY_SECTOR_FDS = iniEquitySectorFDS();
+    private static final EquitySectorSMRepository EQUITY_SECTOR_FDS = iniEquitySectorFDS();
     private static final String TAB_NAME = "EquitySector_FDS";
 
-    private static EquitySectorFDSRepository iniEquitySectorFDS() {
-        return new EquitySectorFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static EquitySectorSMRepository iniEquitySectorFDS() {
+        return new EquitySectorSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     @Override

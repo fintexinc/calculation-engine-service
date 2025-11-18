@@ -7,7 +7,7 @@ import com.fintex.ce.dto.holding.FundSeriesHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.REquityStyleboxExposure;
-import com.fintex.ce.repository.graphql.query.EquityStyleboxAllocationFDSRepository;
+import com.fintex.ce.repository.graphql.query.EquityStyleboxAllocationSMRepository;
 import com.fintex.ce.repository.redis.EquityStyleboxAllocationRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.FilterUtils;
@@ -50,7 +50,7 @@ class EquityStyleboxExposureCacheStorageTest {
     void load_verifyFilters() {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
-            final var fdsRepo = mock(EquityStyleboxAllocationFDSRepository.class);
+            final var fdsRepo = mock(EquityStyleboxAllocationSMRepository.class);
             final var fundCanadaCacheRepo = mock(EquityStyleboxAllocationRepository.class);
             final var etfCanadaCacheRepo = mock(EquityStyleboxAllocationRepository.class);
             final var etfUsCacheRepo = mock(EquityStyleboxAllocationRepository.class);

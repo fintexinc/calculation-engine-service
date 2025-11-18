@@ -7,7 +7,7 @@ import api.util.CommonTools;
 import com.fintex.ce.dto.holding.FundSeriesHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.RSalesCharge;
-import com.fintex.ce.repository.graphql.query.SalesChargeFDSRepository;
+import com.fintex.ce.repository.graphql.query.SalesChargeSMRepository;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -24,11 +24,11 @@ import static java.util.stream.Collectors.toMap;
 
 public class SalesChargeFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
 
-    private static final SalesChargeFDSRepository EQUITY_SECTOR_FDS = iniEquitySectorFDS();
+    private static final SalesChargeSMRepository EQUITY_SECTOR_FDS = iniEquitySectorFDS();
     private static final String TAB_NAME = "Data";
 
-    private static SalesChargeFDSRepository iniEquitySectorFDS() {
-        return new SalesChargeFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static SalesChargeSMRepository iniEquitySectorFDS() {
+        return new SalesChargeSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     @Override

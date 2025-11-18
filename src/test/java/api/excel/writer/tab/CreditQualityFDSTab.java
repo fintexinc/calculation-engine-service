@@ -10,7 +10,7 @@ import com.fintex.ce.config.enumeration.calculation.CreditQualityRating;
 import com.fintex.ce.dto.holding.GicHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.RCreditQuality;
-import com.fintex.ce.repository.graphql.query.CreditQualityFDSRepository;
+import com.fintex.ce.repository.graphql.query.CreditQualitySMRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -26,11 +26,11 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class CreditQualityFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-    private static final CreditQualityFDSRepository CREDIT_QUALITY_FDS = initCreditQualityFDS();
+    private static final CreditQualitySMRepository CREDIT_QUALITY_FDS = initCreditQualityFDS();
     private static final String TAB_NAME = "CreditQuality_FDS";
 
-    private static CreditQualityFDSRepository initCreditQualityFDS() {
-        return new CreditQualityFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static CreditQualitySMRepository initCreditQualityFDS() {
+        return new CreditQualitySMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     @Override

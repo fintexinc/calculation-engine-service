@@ -7,7 +7,7 @@ import api.util.CommonTools;
 import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.RFixedIncomeBondSecurities;
-import com.fintex.ce.repository.graphql.query.FixedIncomeBondSectorFDSRepository;
+import com.fintex.ce.repository.graphql.query.FixedIncomeBondSectorSMRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,11 +22,11 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class BondSectorFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-    private static final FixedIncomeBondSectorFDSRepository ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
+    private static final FixedIncomeBondSectorSMRepository ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
     private static final String TAB_NAME = "BondSector_FDS";
 
-    private static FixedIncomeBondSectorFDSRepository initAssetAllocationsFDS() {
-        return new FixedIncomeBondSectorFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static FixedIncomeBondSectorSMRepository initAssetAllocationsFDS() {
+        return new FixedIncomeBondSectorSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     @Override

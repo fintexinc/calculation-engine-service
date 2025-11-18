@@ -7,7 +7,7 @@ import api.util.CommonTools;
 import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.equitymarketcapitalization.REquityMarketCapitalization;
-import com.fintex.ce.repository.graphql.query.EquityMarketCapitalizationFDSRepository;
+import com.fintex.ce.repository.graphql.query.EquityMarketCapitalizationSMRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,11 +22,11 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class EquityMarketCapFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-    private static final EquityMarketCapitalizationFDSRepository EQUITY_MARKET_CAP_FDS = initEquityMarketCapFDS();
+    private static final EquityMarketCapitalizationSMRepository EQUITY_MARKET_CAP_FDS = initEquityMarketCapFDS();
     private static final String TAB_NAME = "EquityMarketCapital_FDS";
 
-    private static EquityMarketCapitalizationFDSRepository initEquityMarketCapFDS() {
-        return new EquityMarketCapitalizationFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static EquityMarketCapitalizationSMRepository initEquityMarketCapFDS() {
+        return new EquityMarketCapitalizationSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     @Override

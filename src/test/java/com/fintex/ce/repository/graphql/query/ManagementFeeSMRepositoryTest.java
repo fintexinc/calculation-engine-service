@@ -28,13 +28,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class ManagementFeeFDSRepositoryTest {
+class ManagementFeeSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final var managementFeeFDSRepository = mock(ManagementFeeFDSRepository.class,
+        final var managementFeeFDSRepository = mock(ManagementFeeSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
 
         final var holdings = mock(List.class);
@@ -54,7 +54,7 @@ class ManagementFeeFDSRepositoryTest {
     void queryBenchOfEtfCanada() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final var managementFeeFDSRepository = mock(ManagementFeeFDSRepository.class,
+        final var managementFeeFDSRepository = mock(ManagementFeeSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
 
         final var holdings = mock(List.class);
@@ -74,7 +74,7 @@ class ManagementFeeFDSRepositoryTest {
     void queryBenchOfOfEtfUs() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final var managementFeeFDSRepository = mock(ManagementFeeFDSRepository.class,
+        final var managementFeeFDSRepository = mock(ManagementFeeSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
 
         final var holdings = mock(List.class);
@@ -93,7 +93,7 @@ class ManagementFeeFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final ManagementFeeFDSRepository m = mock(ManagementFeeFDSRepository.class);
+        final ManagementFeeSMRepository m = mock(ManagementFeeSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -109,7 +109,7 @@ class ManagementFeeFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final ManagementFeeFDSRepository m = mock(ManagementFeeFDSRepository.class);
+        final ManagementFeeSMRepository m = mock(ManagementFeeSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -125,7 +125,7 @@ class ManagementFeeFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final ManagementFeeFDSRepository m = mock(ManagementFeeFDSRepository.class);
+        final ManagementFeeSMRepository m = mock(ManagementFeeSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();

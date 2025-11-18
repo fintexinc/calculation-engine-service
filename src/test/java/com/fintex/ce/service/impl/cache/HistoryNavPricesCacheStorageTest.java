@@ -6,7 +6,7 @@ import com.fintex.ce.dto.holding.FundSeriesHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.RHistoricalNavPrices;
-import com.fintex.ce.repository.graphql.query.HistoricalNavPricesFDSRepository;
+import com.fintex.ce.repository.graphql.query.HistoricalNavPricesSMRepository;
 import com.fintex.ce.repository.redis.HistoricalNavPricesRedisRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.FilterUtils;
@@ -32,7 +32,7 @@ class HistoryNavPricesCacheStorageTest {
     @Test
     void loadFxRates_checkResultWhenRedisCacheFxRates() {
         //SETUP
-        final var historicalNavPricesFDSRepository = mock(HistoricalNavPricesFDSRepository.class);
+        final var historicalNavPricesFDSRepository = mock(HistoricalNavPricesSMRepository.class);
         final var historicalNavPricesRedisRepository = mock(HistoricalNavPricesRedisRepository.class);
         final var cacheStatisticService = mock(CacheStatisticService.class);
         final var sut = mock(HistoryNavPricesCacheStorage.class,

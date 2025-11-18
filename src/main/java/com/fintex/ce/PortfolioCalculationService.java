@@ -1,6 +1,6 @@
 package com.fintex.ce;
 
-import com.fintex.smclient.config.EnableFasClientLibrary;
+import com.fintex.smclient.config.EnableSmClientLibrary;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,8 +9,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import static com.fintex.ce.util.validation.startup.LogRequestCheckerForPortfolioController.checkPortfolioControllerMethodsHavingHttpServletRequestParameterIfClassIsAnnotatedWithLogRequest;
 
-@EnableFasClientLibrary
 @EnableScheduling
+@EnableSmClientLibrary
 @EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class PortfolioCalculationService {

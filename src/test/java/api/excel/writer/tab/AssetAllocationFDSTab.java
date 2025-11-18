@@ -7,7 +7,7 @@ import api.util.CommonTools;
 import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.RAssetAllocation;
-import com.fintex.ce.repository.graphql.query.AssetAllocationFDSRepository;
+import com.fintex.ce.repository.graphql.query.AssetAllocationSMRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,13 +22,13 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class AssetAllocationFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-    private static final AssetAllocationFDSRepository ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
+    private static final AssetAllocationSMRepository ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
     private static final String TAB_NAME = "AssetAllocation_FDS";
 
     private List<DataProvider> dataProviders = List.of(DataProvider.EAGLE, DataProvider.MORNINGSTAR);
 
-    private static AssetAllocationFDSRepository initAssetAllocationsFDS() {
-        return new AssetAllocationFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static AssetAllocationSMRepository initAssetAllocationsFDS() {
+        return new AssetAllocationSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     public AssetAllocationFDSTab() {

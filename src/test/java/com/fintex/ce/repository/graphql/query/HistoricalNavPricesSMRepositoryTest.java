@@ -22,13 +22,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class HistoricalNavPricesFDSRepositoryTest {
+class HistoricalNavPricesSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final HistoricalNavPricesFDSRepository m = mock(HistoricalNavPricesFDSRepository.class,
+        final HistoricalNavPricesSMRepository m = mock(HistoricalNavPricesSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
@@ -45,7 +45,7 @@ class HistoricalNavPricesFDSRepositoryTest {
     @Test
     void queryBenchOfFundCanada_checkResult() {
         //SETUP
-        final HistoricalNavPricesFDSRepository m = mock(HistoricalNavPricesFDSRepository.class);
+        final HistoricalNavPricesSMRepository m = mock(HistoricalNavPricesSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();

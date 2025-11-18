@@ -12,7 +12,7 @@ import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.holding.StockHolding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.RFixedIncomeBondSecurities;
-import com.fintex.ce.repository.graphql.query.FixedIncomeBondSectorFDSRepository;
+import com.fintex.ce.repository.graphql.query.FixedIncomeBondSectorSMRepository;
 import com.fintex.ce.repository.redis.fixedincomebondsector.FixedIncomeBondSectorRedisRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.FilterUtils;
@@ -56,7 +56,7 @@ class FixedIncomeBondSectorCacheStorageTest {
     void load_verifyFilters() {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
-            final var queryRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+            final var queryRepository = mock(FixedIncomeBondSectorSMRepository.class);
             final var fixedIncomeBondSectorRepository = mock(FixedIncomeBondSectorRedisRepository.class);
             final var cacheStatisticService = mock(CacheStatisticService.class);
 

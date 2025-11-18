@@ -15,13 +15,13 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-class SalesChargeFDSRepositoryTest {
+class SalesChargeSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final SalesChargeFDSRepository sut = mock(SalesChargeFDSRepository.class, withSettings().useConstructor(graphqlTransport));
+        final SalesChargeSMRepository sut = mock(SalesChargeSMRepository.class, withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of(mock(FundSeriesHolding.class));
         final List<DataProvider> providers = mock(List.class);
 
@@ -38,7 +38,7 @@ class SalesChargeFDSRepositoryTest {
     @Test
     void queryBenchOfStock_checkResult() {
         //SETUP
-        final SalesChargeFDSRepository sut = mock(SalesChargeFDSRepository.class);
+        final SalesChargeSMRepository sut = mock(SalesChargeSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();

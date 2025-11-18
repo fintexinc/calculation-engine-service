@@ -56,8 +56,8 @@
     <dependencies>
         <dependency>
             <groupId>com.fintex</groupId>
-            <artifactId>smclientjar</artifactId>
-            <version>1.0.0</version>
+            <artifactId>smclient</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -67,6 +67,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

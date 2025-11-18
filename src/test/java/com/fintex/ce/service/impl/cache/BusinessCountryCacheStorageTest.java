@@ -7,7 +7,7 @@ import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.holding.StockHolding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.RBusinessCountry;
-import com.fintex.ce.repository.graphql.query.BusinessCountryFDSRepository;
+import com.fintex.ce.repository.graphql.query.BusinessCountrySMRepository;
 import com.fintex.ce.repository.redis.businesscountry.BusinessCountryRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.FilterUtils;
@@ -232,7 +232,7 @@ class BusinessCountryCacheStorageTest {
     @Test
     void getRBusinessCountrySetValueFunction_checkResult() {
         //SETUP
-        final var queryRepository = mock(BusinessCountryFDSRepository.class);
+        final var queryRepository = mock(BusinessCountrySMRepository.class);
         final var businessCountryRepository = mock(BusinessCountryRepository.class);
         final var cacheStatisticService = mock(CacheStatisticService.class);
 

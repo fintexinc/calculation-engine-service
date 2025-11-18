@@ -36,13 +36,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class EquitySectorFDSRepositoryTest {
+class EquitySectorSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class,
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
@@ -59,7 +59,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfFundCanada_checkResult() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -77,7 +77,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_verifyDoQuery() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -93,7 +93,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_checkResult() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -111,7 +111,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_verifyDoQuery() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -127,7 +127,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_checkResult() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -146,7 +146,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfStock_verifyDoQuery() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<StockHolding> holdings = List.of(mock(StockHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -162,7 +162,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfStock_checkResult() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<StockHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -181,7 +181,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_verifyDoQuery() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of(mock(BenchmarkIndexHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -197,7 +197,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_checkResult() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -216,7 +216,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -232,7 +232,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -248,7 +248,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -267,7 +267,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_verifyDoQuery() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of(mock(CanadaPooledFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -283,7 +283,7 @@ class EquitySectorFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_checkResult() {
         //SETUP
-        final EquitySectorFDSRepository m = mock(EquitySectorFDSRepository.class);
+        final EquitySectorSMRepository m = mock(EquitySectorSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();

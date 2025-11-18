@@ -9,7 +9,7 @@ import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.holding.StockHolding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.RClassificationAllocation;
-import com.fintex.ce.repository.graphql.query.ClassificationAllocationFDSRepository;
+import com.fintex.ce.repository.graphql.query.ClassificationAllocationSMRepository;
 import com.fintex.ce.repository.redis.ClassificationAllocationRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.FilterUtils;
@@ -51,7 +51,7 @@ class ClassificationAllocationCacheStorageTest {
     void load_verifyFilters() {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
-            final var fdsRepo = mock(ClassificationAllocationFDSRepository.class);
+            final var fdsRepo = mock(ClassificationAllocationSMRepository.class);
             final var fundCanadaCacheRepo = mock(ClassificationAllocationRepository.class);
             final var etfCanadaCacheRepo = mock(ClassificationAllocationRepository.class);
             final var etfUsCacheRepo = mock(ClassificationAllocationRepository.class);

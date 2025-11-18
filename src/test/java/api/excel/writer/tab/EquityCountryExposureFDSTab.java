@@ -7,7 +7,7 @@ import api.util.CommonTools;
 import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.REquityCountryAllocation;
-import com.fintex.ce.repository.graphql.query.EquityCountryAllocationFDSRepository;
+import com.fintex.ce.repository.graphql.query.EquityCountryAllocationSMRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -24,12 +24,12 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toMap;
 
 public class EquityCountryExposureFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-    private static final EquityCountryAllocationFDSRepository EQUITY_COUNTRY_EXPOSURE_FDS = initEquityCountryExposureFDS();
+    private static final EquityCountryAllocationSMRepository EQUITY_COUNTRY_EXPOSURE_FDS = initEquityCountryExposureFDS();
     private static final String TAB_NAME = "EquityCountryExposure_FDS";
     private final boolean needToCheckDataProvidersFromResponse;
 
-    private static EquityCountryAllocationFDSRepository initEquityCountryExposureFDS() {
-        return new EquityCountryAllocationFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static EquityCountryAllocationSMRepository initEquityCountryExposureFDS() {
+        return new EquityCountryAllocationSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     public EquityCountryExposureFDSTab(final boolean needToCheckDataProvidersFromResponse) {

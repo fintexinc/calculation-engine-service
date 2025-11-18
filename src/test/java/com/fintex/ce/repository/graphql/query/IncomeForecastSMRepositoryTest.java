@@ -34,13 +34,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class IncomeForecastFDSRepositoryTest {
+class IncomeForecastSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final var incomeForecastFDSRepository = mock(IncomeForecastFDSRepository.class,
+        final var incomeForecastFDSRepository = mock(IncomeForecastSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
 
         final var holdings = mock(List.class);
@@ -60,7 +60,7 @@ class IncomeForecastFDSRepositoryTest {
     void queryBenchOfEtfCanada() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final var incomeForecastFDSRepository = mock(IncomeForecastFDSRepository.class,
+        final var incomeForecastFDSRepository = mock(IncomeForecastSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
 
         final var holdings = mock(List.class);
@@ -80,7 +80,7 @@ class IncomeForecastFDSRepositoryTest {
     void queryBenchOfOfEtfUs() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final var incomeForecastFDSRepository = mock(IncomeForecastFDSRepository.class,
+        final var incomeForecastFDSRepository = mock(IncomeForecastSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
 
         final var holdings = mock(List.class);
@@ -99,7 +99,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryBenchOfFixedIncomes_verifyDoQuery() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -115,7 +115,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryBenchOfFixedIncomes_checkResult() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -134,7 +134,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryBenchOfStock_verifyDoQuery() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<StockHolding> holdings = List.of(mock(StockHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -150,7 +150,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryBenchOfStock_checkResult() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<StockHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -169,7 +169,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -185,7 +185,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -204,7 +204,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_verifyDoQuery() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of(mock(CanadaPooledFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -220,7 +220,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_checkResult() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -239,7 +239,7 @@ class IncomeForecastFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final IncomeForecastFDSRepository m = mock(IncomeForecastFDSRepository.class);
+        final IncomeForecastSMRepository m = mock(IncomeForecastSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 

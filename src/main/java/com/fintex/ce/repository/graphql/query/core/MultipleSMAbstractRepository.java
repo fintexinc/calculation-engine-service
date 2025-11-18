@@ -35,7 +35,7 @@ public abstract class MultipleSMAbstractRepository<F, C, U, S> implements Multip
                                                             final AbstractSMEndpoint<H, QId, QReq, QEntity, Res> endpoint,
                                                             final List<DataProvider> providers) {
         final QueryQuery queryQuery = endpoint.setUserEnteredProviders(providers).makeQuery(holdings);
-        final List<QEntity> responses = graphqlTransport.query(queryQuery, endpoint.getSMEntityFunction());
+        final List<QEntity> responses = graphqlTransport.query(queryQuery, endpoint.getGetSMEntityFunction());
         return endpoint.collectResultToMap(holdings, responses);
     }
 }

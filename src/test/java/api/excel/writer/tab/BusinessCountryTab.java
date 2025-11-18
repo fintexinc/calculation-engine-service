@@ -8,7 +8,7 @@ import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.holding.StockHolding;
 import com.fintex.ce.model.redis.RBusinessCountry;
-import com.fintex.ce.repository.graphql.query.BusinessCountryFDSRepository;
+import com.fintex.ce.repository.graphql.query.BusinessCountrySMRepository;
 import com.fintex.ce.util.FilterUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,11 +26,11 @@ import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
 
 @Log4j2
 public class BusinessCountryTab implements WritableSpreadsheet {
-    private static final BusinessCountryFDSRepository BUSINESS_COUNTRY_FDS = initAssetAllocationsFDS();
+    private static final BusinessCountrySMRepository BUSINESS_COUNTRY_FDS = initAssetAllocationsFDS();
     private static final String TAB_NAME = "BusinessCountry_FDS";
 
-    private static BusinessCountryFDSRepository initAssetAllocationsFDS() {
-        return new BusinessCountryFDSRepository(GRAPHQL_TRANSPORT_COMPONENT);
+    private static BusinessCountrySMRepository initAssetAllocationsFDS() {
+        return new BusinessCountrySMRepository(GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     @Override

@@ -10,7 +10,7 @@ import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.FundSeriesHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.RHistoricalDistributions;
-import com.fintex.ce.repository.graphql.query.HistoricalDistributionsFDSRepository;
+import com.fintex.ce.repository.graphql.query.HistoricalDistributionsSMRepository;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -29,13 +29,13 @@ import static com.fintex.ce.util.FilterUtils.CANADA_MUTUAL_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.filterHoldings;
 
 public class CapitalGainTab implements WritableSpreadsheet {
-    private static final HistoricalDistributionsFDSRepository CapitalGain_FDS = initHistoricalDistributionPricesFDS();
+    private static final HistoricalDistributionsSMRepository CapitalGain_FDS = initHistoricalDistributionPricesFDS();
     private static final String Capital_Gain_FundServ_Code_1 = "Capital gain FundServ Code 1";
     private static final String Capital_Gain_FundServ_Code_2 = "Capital gain FundServ Code 2";
     private static final String Capital_Gain_FundServ_Code_3 = "Capital gain FundServ Code 3";
 
-    private static HistoricalDistributionsFDSRepository initHistoricalDistributionPricesFDS() {
-        return new HistoricalDistributionsFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static HistoricalDistributionsSMRepository initHistoricalDistributionPricesFDS() {
+        return new HistoricalDistributionsSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     @Override
