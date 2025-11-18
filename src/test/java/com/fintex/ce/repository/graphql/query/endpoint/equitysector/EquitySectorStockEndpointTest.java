@@ -1,22 +1,21 @@
 package com.fintex.ce.repository.graphql.query.endpoint.equitysector;
 
+import com.fintex.ce.config.enumeration.HoldingType;
+import com.fintex.ce.dto.holding.StockHolding;
+import com.fintex.ce.model.redis.equitysector.REquitySectorStock;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.Stock;
 import com.fintex.smclient.graphql.StockQuery;
 import com.fintex.smclient.graphql.StringDatapoint;
-import com.fintex.ce.config.enumeration.HoldingType;
-import com.fintex.ce.dto.holding.StockHolding;
-import com.fintex.ce.model.redis.equitysector.REquitySectorStock;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static com.fintex.smclient.graphql.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.STRING_WITH_DATA_PROVIDER_DEFINITION;
+import static com.fintex.smclient.graphql.DataProvider.MORNINGSTAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +37,7 @@ class EquitySectorStockEndpointTest {
         when(q.getGetStocksByTickersAndExchangeIds()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<Stock>> actual = m.getGetFDSEntityFunction();
+        final Function<Query, List<Stock>> actual = m.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

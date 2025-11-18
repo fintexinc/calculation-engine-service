@@ -15,18 +15,20 @@ import com.fintex.smclient.graphql.QueryQuery;
 import com.fintex.smclient.graphql.QueryQueryDefinition;
 import com.fintex.smclient.graphql.Stock;
 import com.fintex.smclient.graphql.StockQuery;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class MonthlyReturnsStockEndpointTest {
 
@@ -41,7 +43,7 @@ class MonthlyReturnsStockEndpointTest {
         when(q.getGetStocksByTickersAndExchangeIds()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<Stock>> actual = m.getGetFDSEntityFunction();
+        final Function<Query, List<Stock>> actual = m.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

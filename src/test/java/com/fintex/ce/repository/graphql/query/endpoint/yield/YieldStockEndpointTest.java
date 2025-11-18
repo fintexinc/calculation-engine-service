@@ -1,19 +1,18 @@
 package com.fintex.ce.repository.graphql.query.endpoint.yield;
 
+import com.fintex.ce.dto.holding.StockHolding;
+import com.fintex.ce.model.redis.RYield;
 import com.fintex.smclient.graphql.FloatDatapoint;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.Stock;
 import com.fintex.smclient.graphql.StockQuery;
-import com.fintex.ce.dto.holding.StockHolding;
-import com.fintex.ce.model.redis.RYield;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.FLOAT_WITH_DATA_PROVIDER_QUERY_DEFINITION;
@@ -36,7 +35,7 @@ public class YieldStockEndpointTest {
 		when(q.getGetStocksByTickersAndExchangeIds()).thenReturn(expected);
 
 		//ACT
-		final Function<Query, List<Stock>> actual = sut.getGetFDSEntityFunction();
+		final Function<Query, List<Stock>> actual = sut.getGetSMEntityFunction();
 
 		//VERIFY
 		Assertions.assertSame(actual.apply(q), expected);

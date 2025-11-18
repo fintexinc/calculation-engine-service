@@ -1,24 +1,23 @@
 package com.fintex.ce.repository.graphql.query.endpoint.commonholdings;
 
+import com.fintex.ce.dto.holding.StockHolding;
+import com.fintex.ce.model.redis.topcommonholdings.RCommonHoldingsStock;
 import com.fintex.smclient.graphql.ExternalIdentifierTypeValue;
 import com.fintex.smclient.graphql.ExternalIdentifiers;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.Stock;
 import com.fintex.smclient.graphql.StockQuery;
 import com.fintex.smclient.graphql.StringDatapoint;
-import com.fintex.ce.dto.holding.StockHolding;
-import com.fintex.ce.model.redis.topcommonholdings.RCommonHoldingsStock;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
-import static com.fintex.smclient.graphql.ExternalIdentifierType.EXCHANGE_ID;
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.STRING_DATAPOINT_QUERY_DEFINITION;
+import static com.fintex.smclient.graphql.ExternalIdentifierType.EXCHANGE_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -38,7 +37,7 @@ class CommonHoldingsStockEndpointTest {
         when(q.getGetStocksByTickersAndExchangeIds()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<Stock>> actual = sut.getGetFDSEntityFunction();
+        final Function<Query, List<Stock>> actual = sut.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

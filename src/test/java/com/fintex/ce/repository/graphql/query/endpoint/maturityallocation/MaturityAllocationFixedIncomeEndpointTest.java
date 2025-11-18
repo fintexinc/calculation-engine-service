@@ -1,9 +1,19 @@
 package com.fintex.ce.repository.graphql.query.endpoint.maturityallocation;
 
-import com.fintex.smclient.graphql.*;
 import com.fintex.ce.config.enumeration.calculation.MaturityAllocationType;
 import com.fintex.ce.dto.holding.FixedIncomeHolding;
 import com.fintex.ce.model.redis.RMaturityAllocation;
+import com.fintex.smclient.graphql.FixedIncome;
+import com.fintex.smclient.graphql.FixedIncomeQuery;
+import com.fintex.smclient.graphql.Query;
+import com.fintex.smclient.graphql.StringDatapoint;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.joda.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,18 +24,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class MaturityAllocationFixedIncomeEndpointTest {
 
@@ -54,7 +59,7 @@ class MaturityAllocationFixedIncomeEndpointTest {
         when(query.getGetFixedIncomeByBroadridgeAdpNumbers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<FixedIncome>> actual = maturityAllocationFixedIncomeEndpoint.getGetFDSEntityFunction();
+        final Function<Query, List<FixedIncome>> actual = maturityAllocationFixedIncomeEndpoint.getGetSMEntityFunction();
 
         //VERIFY
         assertEquals(expected, actual.apply(query));

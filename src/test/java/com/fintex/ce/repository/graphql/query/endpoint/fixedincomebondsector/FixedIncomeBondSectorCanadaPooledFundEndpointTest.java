@@ -1,19 +1,18 @@
 package com.fintex.ce.repository.graphql.query.endpoint.fixedincomebondsector;
 
+import com.fintex.ce.dto.holding.CanadaPooledFundHolding;
+import com.fintex.ce.model.redis.RFixedIncomeBondSecurities;
+import com.fintex.ce.util.graphql.GraphQlMapperUtils;
 import com.fintex.smclient.graphql.FixedIncomeSecuritiesAllocation;
 import com.fintex.smclient.graphql.PooledFund;
 import com.fintex.smclient.graphql.PooledFundQuery;
 import com.fintex.smclient.graphql.Query;
-import com.fintex.ce.dto.holding.CanadaPooledFundHolding;
-import com.fintex.ce.model.redis.RFixedIncomeBondSecurities;
-import com.fintex.ce.util.graphql.GraphQlMapperUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -36,7 +35,7 @@ class FixedIncomeBondSectorCanadaPooledFundEndpointTest {
         when(q.getGetCanadaPooledFundsByMorningstarIds()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<PooledFund>> actual = FixedIncomeBondSectorCanadaPooledFundEndpoint.getGetFDSEntityFunction();
+        final Function<Query, List<PooledFund>> actual = FixedIncomeBondSectorCanadaPooledFundEndpoint.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

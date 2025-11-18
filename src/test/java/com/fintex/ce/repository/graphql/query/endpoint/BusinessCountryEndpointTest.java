@@ -1,5 +1,10 @@
 package com.fintex.ce.repository.graphql.query.endpoint;
 
+import com.fintex.ce.config.enumeration.Country;
+import com.fintex.ce.config.enumeration.HoldingType;
+import com.fintex.ce.dto.holding.StockHolding;
+import com.fintex.ce.exception.SystemException;
+import com.fintex.ce.model.redis.RBusinessCountry;
 import com.fintex.smclient.graphql.DataProvider;
 import com.fintex.smclient.graphql.EquityIdentifiers;
 import com.fintex.smclient.graphql.Query;
@@ -8,18 +13,12 @@ import com.fintex.smclient.graphql.QueryQueryDefinition;
 import com.fintex.smclient.graphql.Stock;
 import com.fintex.smclient.graphql.StockQuery;
 import com.fintex.smclient.graphql.StringDatapoint;
-import com.fintex.ce.config.enumeration.Country;
-import com.fintex.ce.config.enumeration.HoldingType;
-import com.fintex.ce.dto.holding.StockHolding;
-import com.fintex.ce.exception.SystemException;
-import com.fintex.ce.model.redis.RBusinessCountry;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.STRING_WITH_DATA_PROVIDER_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +43,7 @@ class BusinessCountryEndpointTest {
         when(q.getGetStocksByTickersAndExchangeIds()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<Stock>> actual = m.getGetFDSEntityFunction();
+        final Function<Query, List<Stock>> actual = m.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

@@ -4,13 +4,12 @@ import com.fintex.smclient.graphql.Etf;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.QueryQuery;
 import com.fintex.smclient.graphql.QueryQueryDefinition;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -31,7 +30,7 @@ class CommonHoldingsEtfUsEndpointTest {
         when(query.getGetUsEtfsByTickers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<Etf>> actual = UsEtfFDSEndpoint.getGetFDSEntityFunction();
+        final Function<Query, List<Etf>> actual = UsEtfFDSEndpoint.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(query), expected);

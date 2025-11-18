@@ -1,6 +1,5 @@
 package com.fintex.ce.repository.graphql.query;
 
-import com.fintex.smclient.service.GraphqlTransportComponent;
 import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.BenchmarkIndexHolding;
 import com.fintex.ce.dto.holding.CanadaHedgeFundHolding;
@@ -18,13 +17,13 @@ import com.fintex.ce.repository.graphql.query.endpoint.commonholdings.CommonHold
 import com.fintex.ce.repository.graphql.query.endpoint.commonholdings.CommonHoldingsFundCanadaEndpoint;
 import com.fintex.ce.repository.graphql.query.endpoint.commonholdings.CommonHoldingsStockEndpoint;
 import com.fintex.ce.repository.graphql.query.endpoint.commonholdings.CommonHoldingsUsMutualFundEndpoint;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.smclient.service.GraphqlTransportComponent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.any;
@@ -71,7 +70,7 @@ class CommonHoldingsSMRepositoryTest {
 
         doCallRealMethod().when(smRepo).queryBenchOfEtfCanada(any(), anyList());
         //ACT
-        final var actual = fdsRepo.queryBenchOfEtfCanada(holdings, providers);
+        final var actual = smRepo.queryBenchOfEtfCanada(holdings, providers);
 
         //VERIFY
         assertSame(expected, actual);
@@ -108,7 +107,7 @@ class CommonHoldingsSMRepositoryTest {
 
         doCallRealMethod().when(smRepo).queryBenchOfOfEtfUs(anyList(), anyList());
         //ACT
-        final var actual = fdsRepo.queryBenchOfOfEtfUs(holdings, providers);
+        final var actual = smRepo.queryBenchOfOfEtfUs(holdings, providers);
 
         //VERIFY
         assertSame(expected, actual);
@@ -145,7 +144,7 @@ class CommonHoldingsSMRepositoryTest {
 
         doCallRealMethod().when(smRepo).queryBenchOfFundCanada(anyList(), anyList());
         //ACT
-        final var actual = fdsRepo.queryBenchOfFundCanada(holdings, providers);
+        final var actual = smRepo.queryBenchOfFundCanada(holdings, providers);
 
         //VERIFY
         assertSame(expected, actual);
@@ -182,7 +181,7 @@ class CommonHoldingsSMRepositoryTest {
 
         doCallRealMethod().when(smRepo).queryBenchOfStock(anyList(), anyList());
         //ACT
-        final var actual = fdsRepo.queryBenchOfStock(holdings, providers);
+        final var actual = smRepo.queryBenchOfStock(holdings, providers);
 
         //VERIFY
         assertSame(expected, actual);
@@ -219,7 +218,7 @@ class CommonHoldingsSMRepositoryTest {
 
         doCallRealMethod().when(smRepo).queryBenchOfBenchmarks(anyList(), anyList());
         //ACT
-        final var actual = fdsRepo.queryBenchOfBenchmarks(holdings, providers);
+        final var actual = smRepo.queryBenchOfBenchmarks(holdings, providers);
 
         //VERIFY
         assertSame(expected, actual);

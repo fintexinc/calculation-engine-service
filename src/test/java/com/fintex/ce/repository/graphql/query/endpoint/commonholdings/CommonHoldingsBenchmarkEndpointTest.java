@@ -1,19 +1,18 @@
 package com.fintex.ce.repository.graphql.query.endpoint.commonholdings;
 
+import com.fintex.ce.dto.holding.BenchmarkIndexHolding;
+import com.fintex.ce.model.redis.topcommonholdings.RCommonHoldings;
+import com.fintex.ce.util.graphql.GraphQlMapperUtils;
 import com.fintex.smclient.graphql.Holdings;
 import com.fintex.smclient.graphql.Index;
 import com.fintex.smclient.graphql.IndexQuery;
 import com.fintex.smclient.graphql.Query;
-import com.fintex.ce.dto.holding.BenchmarkIndexHolding;
-import com.fintex.ce.model.redis.topcommonholdings.RCommonHoldings;
-import com.fintex.ce.util.graphql.GraphQlMapperUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -35,7 +34,7 @@ class CommonHoldingsBenchmarkEndpointTest {
         when(query.getGetIndexesByMorningstarIds()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<Index>> actual = fundCanadaFDSEndpoint.getGetFDSEntityFunction();
+        final Function<Query, List<Index>> actual = fundCanadaFDSEndpoint.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(query), expected);

@@ -1,22 +1,21 @@
 package com.fintex.ce.repository.graphql.query.endpoint.creditquality;
 
+import com.fintex.ce.dto.holding.CanadaHedgeFundHolding;
+import com.fintex.ce.model.redis.RCreditQuality;
+import com.fintex.ce.util.graphql.GraphQlMapperUtils;
 import com.fintex.smclient.graphql.CountryAllocation;
 import com.fintex.smclient.graphql.CreditQualityRatings;
 import com.fintex.smclient.graphql.HedgeFund;
 import com.fintex.smclient.graphql.HedgeFundQuery;
 import com.fintex.smclient.graphql.Query;
-import com.fintex.ce.dto.holding.CanadaHedgeFundHolding;
-import com.fintex.ce.model.redis.RCreditQuality;
-import com.fintex.ce.util.graphql.GraphQlMapperUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.enumeration.HoldingType.CASH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +38,7 @@ class CreditQualityCanadaHedgeFundEndpointTest {
         when(q.getGetCanadaHedgeFundsByMorningstarIds()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<HedgeFund>> actual = m.getGetFDSEntityFunction();
+        final Function<Query, List<HedgeFund>> actual = m.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

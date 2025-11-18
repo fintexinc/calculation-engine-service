@@ -7,19 +7,21 @@ import com.fintex.smclient.graphql.FundSeries;
 import com.fintex.smclient.graphql.FundSeriesQuery;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.SalesCharge;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.config.enumeration.ExceptionCode.ERR_SC_SC_001;
 import static com.fintex.smclient.graphql.SalesChargeType.DEFERRED_SALES_CHARGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class SalesChargeEndpointTest {
 
@@ -34,7 +36,7 @@ class SalesChargeEndpointTest {
         when(q.getGetFundSeriesByHoldingCodes()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<FundSeries>> actual = sut.getGetFDSEntityFunction();
+        final Function<Query, List<FundSeries>> actual = sut.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);
