@@ -23,7 +23,7 @@ public class HistoricalNavPricesSMRepository
     @Override
     public Map<FundSeriesHolding, RHistoricalNavPrices> queryBenchOfFundCanada(final List<FundSeriesHolding> holdings,
                                                                                 final List<DataProvider> providers) {
-        // TODO: Implement proper GraphQL query endpoint when available
+        // TODO: TODO: clarify to either remove the logic entirely or finish it
         return Map.of();
     }
 }

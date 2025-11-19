@@ -23,7 +23,7 @@ public class HistoricalDistributionsSMRepository
     @Override
     public Map<FundSeriesHolding, RHistoricalDistributions> queryBenchOfFundCanada(final List<FundSeriesHolding> holdings,
                                                                                     final List<DataProvider> providers) {
-        // TODO: Implement proper GraphQL query endpoint when available
+        // TODO: clarify to either remove the logic entirely or finish it
         return new HashMap<>();
     }
 }
