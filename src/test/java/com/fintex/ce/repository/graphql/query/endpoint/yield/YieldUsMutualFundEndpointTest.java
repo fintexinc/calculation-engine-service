@@ -1,18 +1,17 @@
 package com.fintex.ce.repository.graphql.query.endpoint.yield;
 
+import com.fintex.ce.dto.holding.UsMutualFundHolding;
+import com.fintex.ce.model.redis.RYield;
 import com.fintex.smclient.graphql.FloatDatapoint;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.UsFund;
 import com.fintex.smclient.graphql.UsFundQuery;
-import com.fintex.ce.dto.holding.UsMutualFundHolding;
-import com.fintex.ce.model.redis.RYield;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +35,7 @@ class YieldUsMutualFundEndpointTest {
         when(q.getGetUsFundsByTickers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<UsFund>> actual = m.getGetFDSEntityFunction();
+        final Function<Query, List<UsFund>> actual = m.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

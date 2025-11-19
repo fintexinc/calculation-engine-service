@@ -1,20 +1,19 @@
 package com.fintex.ce.repository.graphql.query.endpoint.incomeforecast;
 
+import com.fintex.ce.dto.holding.UsMutualFundHolding;
+import com.fintex.ce.model.redis.RIncomeForecast;
 import com.fintex.smclient.graphql.FloatDatapoint;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.StringsDatapoint;
 import com.fintex.smclient.graphql.UsFund;
 import com.fintex.smclient.graphql.UsFundQuery;
-import com.fintex.ce.dto.holding.UsMutualFundHolding;
-import com.fintex.ce.model.redis.RIncomeForecast;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.FLOAT_WITH_DATA_PROVIDER_QUERY_DEFINITION;
@@ -37,7 +36,7 @@ class IncomeForecastCanadaUsMutualFundEndpointTest {
         when(q.getGetUsFundsByTickers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<UsFund>> actual = sut.getGetFDSEntityFunction();
+        final Function<Query, List<UsFund>> actual = sut.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

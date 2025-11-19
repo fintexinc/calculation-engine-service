@@ -3,7 +3,7 @@ package com.fintex.ce.service.impl.cache;
 import com.fintex.ce.dto.ParamHolderDTO;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.response.core.Warning;
-import com.fintex.ce.repository.graphql.query.HistoricalDistributionsFDSRepository;
+import com.fintex.ce.repository.graphql.query.HistoricalDistributionsSMRepository;
 import com.fintex.ce.repository.redis.HistoricalDistributionsRedisRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.FilterUtils;
@@ -25,7 +25,7 @@ class HistoricalDistributionsCacheStorageTest {
     void load_verifyFilters() {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
-            final var queryRepository = mock(HistoricalDistributionsFDSRepository.class);
+            final var queryRepository = mock(HistoricalDistributionsSMRepository.class);
             final var fixedIncomeBondSectorRepository = mock(HistoricalDistributionsRedisRepository.class);
             final var cacheStatisticService = mock(CacheStatisticService.class);
 

@@ -7,7 +7,7 @@ import api.util.CommonTools;
 import com.fintex.ce.config.enumeration.DataProvider;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.model.redis.RCountryExposure;
-import com.fintex.ce.repository.graphql.query.CountryExposureFDSRepository;
+import com.fintex.ce.repository.graphql.query.CountryExposureSMRepository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,11 +22,11 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class FixedCountryExposureFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-    private static final CountryExposureFDSRepository Fixed_Income_FDS = initFixedCountryFDS();
+    private static final CountryExposureSMRepository Fixed_Income_FDS = initFixedCountryFDS();
     private static final String TAB_NAME = "FICountryExposure_FDS";
 
-    private static CountryExposureFDSRepository initFixedCountryFDS() {
-        return new CountryExposureFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+    private static CountryExposureSMRepository initFixedCountryFDS() {
+        return new CountryExposureSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
     }
 
     @Override

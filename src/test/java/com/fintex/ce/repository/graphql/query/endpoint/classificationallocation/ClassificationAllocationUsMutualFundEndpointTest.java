@@ -1,5 +1,7 @@
 package com.fintex.ce.repository.graphql.query.endpoint.classificationallocation;
 
+import com.fintex.ce.dto.holding.UsMutualFundHolding;
+import com.fintex.ce.model.redis.RClassificationAllocation;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.QueryQuery;
 import com.fintex.smclient.graphql.QueryQueryDefinition;
@@ -11,16 +13,13 @@ import com.fintex.smclient.graphql.SecurityClassificationLevelTwo;
 import com.fintex.smclient.graphql.SecurityClassificationTypeValue;
 import com.fintex.smclient.graphql.UsFund;
 import com.fintex.smclient.graphql.UsFundQuery;
-import com.fintex.ce.dto.holding.UsMutualFundHolding;
-import com.fintex.ce.model.redis.RClassificationAllocation;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,7 +42,7 @@ class ClassificationAllocationUsMutualFundEndpointTest {
         when(q.getGetUsFundsByTickers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<UsFund>> actual = sut.getGetFDSEntityFunction();
+        final Function<Query, List<UsFund>> actual = sut.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

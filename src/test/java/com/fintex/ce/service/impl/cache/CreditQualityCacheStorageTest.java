@@ -11,7 +11,7 @@ import com.fintex.ce.dto.holding.GicHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.RCreditQuality;
-import com.fintex.ce.repository.graphql.query.CreditQualityFDSRepository;
+import com.fintex.ce.repository.graphql.query.CreditQualitySMRepository;
 import com.fintex.ce.repository.redis.CreditQualityRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.ComparisonUtils;
@@ -50,7 +50,7 @@ class CreditQualityCacheStorageTest {
     void load_verifyFilters() {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
-            final var fdsRepo = mock(CreditQualityFDSRepository.class);
+            final var fdsRepo = mock(CreditQualitySMRepository.class);
             final var creditQualityRepository = mock(CreditQualityRepository.class);
             final var cacheStatisticService = mock(CacheStatisticService.class);
 

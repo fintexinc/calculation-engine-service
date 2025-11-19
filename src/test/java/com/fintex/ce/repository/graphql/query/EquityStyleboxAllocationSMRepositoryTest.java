@@ -33,13 +33,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class EquityStyleboxAllocationFDSRepositoryTest {
+class EquityStyleboxAllocationSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class,
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
@@ -56,7 +56,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryBenchOfFundCanada_checkResult() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -74,7 +74,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_verifyDoQuery() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -90,7 +90,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_checkResult() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -108,7 +108,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_verifyDoQuery() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -124,7 +124,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_checkResult() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -143,7 +143,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_verifyDoQuery() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of(mock(BenchmarkIndexHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -159,7 +159,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_checkResult() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -178,7 +178,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -194,7 +194,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -210,7 +210,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -229,7 +229,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_verifyDoQuery() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of(mock(CanadaPooledFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -245,7 +245,7 @@ class EquityStyleboxAllocationFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_checkResult() {
         //SETUP
-        final EquityStyleboxAllocationFDSRepository m = mock(EquityStyleboxAllocationFDSRepository.class);
+        final EquityStyleboxAllocationSMRepository m = mock(EquityStyleboxAllocationSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();

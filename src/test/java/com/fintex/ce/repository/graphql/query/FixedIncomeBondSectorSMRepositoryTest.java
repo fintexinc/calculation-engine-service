@@ -35,39 +35,39 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class FixedIncomeBondSectorFDSRepositoryTest {
+class FixedIncomeBondSectorSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class,
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfFundCanada(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfFundCanada(any(), anyList());
         //ACT
-        fixedIncomeBondSectorFDSRepository.queryBenchOfFundCanada(holdings, providers);
+        fixedIncomeBondSectorSMRepository.queryBenchOfFundCanada(holdings, providers);
 
         //VERIFY
-        verify(fixedIncomeBondSectorFDSRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorFundCanadaEndpoint.class),
+        verify(fixedIncomeBondSectorSMRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorFundCanadaEndpoint.class),
                 eq(providers));
     }
 
     @Test
     void queryBenchOfFundCanada_checkResult() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
-        when(fixedIncomeBondSectorFDSRepository.doQuery(any(), any(), any())).thenReturn(expected);
+        when(fixedIncomeBondSectorSMRepository.doQuery(any(), any(), any())).thenReturn(expected);
 
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfFundCanada(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfFundCanada(any(), anyList());
         //ACT
-        final Map<FundSeriesHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorFDSRepository.queryBenchOfFundCanada(holdings, providers);
+        final Map<FundSeriesHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorSMRepository.queryBenchOfFundCanada(holdings, providers);
 
         //VERIFY
         Assertions.assertSame(expected, actual);
@@ -76,32 +76,32 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_verifyDoQuery() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfOfEtfUs(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfOfEtfUs(any(), anyList());
         //ACT
-        fixedIncomeBondSectorFDSRepository.queryBenchOfOfEtfUs(holdings, providers);
+        fixedIncomeBondSectorSMRepository.queryBenchOfOfEtfUs(holdings, providers);
 
         //VERIFY
-        verify(fixedIncomeBondSectorFDSRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorEtfUsEndpoint.class),
+        verify(fixedIncomeBondSectorSMRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorEtfUsEndpoint.class),
                 eq(providers));
     }
 
     @Test
     void queryBenchOfOfEtfUs_checkResult() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
-        when(fixedIncomeBondSectorFDSRepository.doQuery(any(), any(), any())).thenReturn(expected);
+        when(fixedIncomeBondSectorSMRepository.doQuery(any(), any(), any())).thenReturn(expected);
 
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfOfEtfUs(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfOfEtfUs(any(), anyList());
         //ACT
-        final Map<EtfHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorFDSRepository.queryBenchOfOfEtfUs(holdings, providers);
+        final Map<EtfHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorSMRepository.queryBenchOfOfEtfUs(holdings, providers);
 
         //VERIFY
         Assertions.assertSame(expected, actual);
@@ -110,33 +110,33 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_verifyDoQuery() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfEtfCanada(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfEtfCanada(any(), anyList());
         //ACT
-        fixedIncomeBondSectorFDSRepository.queryBenchOfEtfCanada(holdings, providers);
+        fixedIncomeBondSectorSMRepository.queryBenchOfEtfCanada(holdings, providers);
 
         //VERIFY
-        verify(fixedIncomeBondSectorFDSRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorEtfCanadaEndpoint.class),
+        verify(fixedIncomeBondSectorSMRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorEtfCanadaEndpoint.class),
                 eq(providers));
     }
 
     @Test
     void queryBenchOfEtfCanada_checkResult() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
-        when(fixedIncomeBondSectorFDSRepository.doQuery(any(), any(), any())).thenReturn(expected);
+        when(fixedIncomeBondSectorSMRepository.doQuery(any(), any(), any())).thenReturn(expected);
 
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfEtfCanada(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfEtfCanada(any(), anyList());
         //ACT
-        final Map<EtfHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorFDSRepository.queryBenchOfEtfCanada(holdings, providers);
+        final Map<EtfHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorSMRepository.queryBenchOfEtfCanada(holdings, providers);
 
         //VERIFY
         Assertions.assertSame(expected, actual);
@@ -145,33 +145,33 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_verifyDoQuery() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfBenchmarks(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfBenchmarks(any(), anyList());
         //ACT
-        fixedIncomeBondSectorFDSRepository.queryBenchOfBenchmarks(holdings, providers);
+        fixedIncomeBondSectorSMRepository.queryBenchOfBenchmarks(holdings, providers);
 
         //VERIFY
-        verify(fixedIncomeBondSectorFDSRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorBenchmarkEndpoint.class),
+        verify(fixedIncomeBondSectorSMRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorBenchmarkEndpoint.class),
                 eq(providers));
     }
 
     @Test
     void queryBenchOfBenchmarks_checkResult() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
-        when(fixedIncomeBondSectorFDSRepository.doQuery(any(), any(), any())).thenReturn(expected);
+        when(fixedIncomeBondSectorSMRepository.doQuery(any(), any(), any())).thenReturn(expected);
 
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfBenchmarks(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfBenchmarks(any(), anyList());
         //ACT
-        final Map<BenchmarkIndexHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorFDSRepository.queryBenchOfBenchmarks(holdings, providers);
+        final Map<BenchmarkIndexHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorSMRepository.queryBenchOfBenchmarks(holdings, providers);
 
         //VERIFY
         Assertions.assertSame(expected, actual);
@@ -180,33 +180,33 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryBenchOfFixedIncomes_verifyDoQuery() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfFixedIncomes(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfFixedIncomes(any(), anyList());
         //ACT
-        fixedIncomeBondSectorFDSRepository.queryBenchOfFixedIncomes(holdings, providers);
+        fixedIncomeBondSectorSMRepository.queryBenchOfFixedIncomes(holdings, providers);
 
         //VERIFY
-        verify(fixedIncomeBondSectorFDSRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorFixedIncomeEndpoint.class),
+        verify(fixedIncomeBondSectorSMRepository).doQuery(eq(holdings), argThat(argument -> argument.getClass() == FixedIncomeBondSectorFixedIncomeEndpoint.class),
                 eq(providers));
     }
 
     @Test
     void queryBenchOfFixedIncomes_checkResult() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository fixedIncomeBondSectorFDSRepository = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository fixedIncomeBondSectorSMRepository = mock(FixedIncomeBondSectorSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
-        when(fixedIncomeBondSectorFDSRepository.doQuery(any(), any(), any())).thenReturn(expected);
+        when(fixedIncomeBondSectorSMRepository.doQuery(any(), any(), any())).thenReturn(expected);
 
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
-        doCallRealMethod().when(fixedIncomeBondSectorFDSRepository).queryBenchOfFixedIncomes(any(), anyList());
+        doCallRealMethod().when(fixedIncomeBondSectorSMRepository).queryBenchOfFixedIncomes(any(), anyList());
         //ACT
-        final Map<FixedIncomeHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorFDSRepository
+        final Map<FixedIncomeHolding, RFixedIncomeBondSecurities> actual = fixedIncomeBondSectorSMRepository
                 .queryBenchOfFixedIncomes(holdings, providers);
 
         //VERIFY
@@ -216,7 +216,7 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository m = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository m = mock(FixedIncomeBondSectorSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -232,7 +232,7 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository m = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository m = mock(FixedIncomeBondSectorSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -248,7 +248,7 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository m = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository m = mock(FixedIncomeBondSectorSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -267,7 +267,7 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_verifyDoQuery() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository m = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository m = mock(FixedIncomeBondSectorSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of(mock(CanadaPooledFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -283,7 +283,7 @@ class FixedIncomeBondSectorFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_checkResult() {
         //SETUP
-        final FixedIncomeBondSectorFDSRepository m = mock(FixedIncomeBondSectorFDSRepository.class);
+        final FixedIncomeBondSectorSMRepository m = mock(FixedIncomeBondSectorSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();

@@ -11,7 +11,7 @@ import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.exception.DataErrorException;
 import com.fintex.ce.model.redis.equitysector.REquitySector;
 import com.fintex.ce.model.redis.equitysector.REquitySectorStock;
-import com.fintex.ce.repository.graphql.query.EquitySectorFDSRepository;
+import com.fintex.ce.repository.graphql.query.EquitySectorSMRepository;
 import com.fintex.ce.repository.redis.equitysector.EquitySectorRepository;
 import com.fintex.ce.repository.redis.equitysector.EquitySectorStockRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
@@ -51,7 +51,7 @@ class EquitySectorCacheStorageTest {
     void load_verifyFilters() {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
-            final var fdsRepo = mock(EquitySectorFDSRepository.class);
+            final var fdsRepo = mock(EquitySectorSMRepository.class);
             final var sectorRepo = mock(EquitySectorRepository.class);
             final var stockRepository = mock(EquitySectorStockRepository.class);
             final var cacheStatisticService = mock(CacheStatisticService.class);

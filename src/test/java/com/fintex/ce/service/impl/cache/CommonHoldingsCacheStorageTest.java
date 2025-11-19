@@ -10,7 +10,7 @@ import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.exception.notification.pattern.Notification;
 import com.fintex.ce.model.redis.topcommonholdings.RCommonHoldings;
 import com.fintex.ce.model.redis.topcommonholdings.RCommonHoldingsStock;
-import com.fintex.ce.repository.graphql.query.CommonHoldingsFDSRepository;
+import com.fintex.ce.repository.graphql.query.CommonHoldingsSMRepository;
 import com.fintex.ce.repository.redis.commonholdings.CommonHoldingsRepository;
 import com.fintex.ce.repository.redis.commonholdings.CommonHoldingsStockRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
@@ -55,7 +55,7 @@ class CommonHoldingsCacheStorageTest {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
             var set = mock(Set.class);
-            var fdsRepo = mock(CommonHoldingsFDSRepository.class);
+            var fdsRepo = mock(CommonHoldingsSMRepository.class);
             var holdingRepository = mock(CommonHoldingsRepository.class);
             var stockRepository = mock(CommonHoldingsStockRepository.class);
             var statisticService = mock(CacheStatisticService.class);

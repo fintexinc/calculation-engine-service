@@ -10,7 +10,7 @@ import com.fintex.ce.dto.holding.StockHolding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.equitymarketcapitalization.REquityMarketCapitalization;
 import com.fintex.ce.model.redis.equitymarketcapitalization.REquityMarketCapitalizationStock;
-import com.fintex.ce.repository.graphql.query.EquityMarketCapitalizationFDSRepository;
+import com.fintex.ce.repository.graphql.query.EquityMarketCapitalizationSMRepository;
 import com.fintex.ce.repository.redis.equitymarketcapitalization.EquityMarketCapitalizationRepository;
 import com.fintex.ce.repository.redis.equitymarketcapitalization.EquityMarketCapitalizationStockRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
@@ -54,7 +54,7 @@ class EquityMarketCapitalizationCacheStorageTest {
     void load_verifyFilters() {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
-            final var fdsRepo = mock(EquityMarketCapitalizationFDSRepository.class);
+            final var fdsRepo = mock(EquityMarketCapitalizationSMRepository.class);
             final var capitalizationRepository = mock(EquityMarketCapitalizationRepository.class);
             final var stockRepository = mock(EquityMarketCapitalizationStockRepository.class);
             final var cacheStatistic = mock(CacheStatisticService.class);

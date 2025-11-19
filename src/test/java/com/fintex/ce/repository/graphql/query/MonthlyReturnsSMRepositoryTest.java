@@ -39,13 +39,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class MonthlyReturnsFDSRepositoryTest {
+class MonthlyReturnsSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class,
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of();
 
@@ -63,7 +63,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfFundCanada_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -82,7 +82,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_verifyDoQuery() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
@@ -98,7 +98,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -117,7 +117,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_verifyDoQuery() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
@@ -134,7 +134,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
@@ -153,7 +153,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfStock_verifyDoQuery() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<StockHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -169,7 +169,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfStock_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<StockHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -187,7 +187,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_verifyDoQuery() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -203,7 +203,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -221,7 +221,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfFixedIncome_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -238,7 +238,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfSeparatelyManagedAccount_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<SmaHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -255,7 +255,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -271,7 +271,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -287,7 +287,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -306,7 +306,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_verifyDoQuery() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of(mock(CanadaPooledFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -322,7 +322,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -341,7 +341,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfPagGuidedPortfolio_verifyDoQuery() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<PagHolding> holdings = List.of(mock(PagHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.PAG);
 
@@ -357,7 +357,7 @@ class MonthlyReturnsFDSRepositoryTest {
     @Test
     void queryBenchOfPagGuidedPortfolio_checkResult() {
         //SETUP
-        final MonthlyReturnsFDSRepository m = mock(MonthlyReturnsFDSRepository.class);
+        final MonthlyReturnsSMRepository m = mock(MonthlyReturnsSMRepository.class);
         final List<PagHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();

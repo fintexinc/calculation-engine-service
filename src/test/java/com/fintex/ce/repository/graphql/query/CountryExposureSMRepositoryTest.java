@@ -35,13 +35,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class CountryExposureFDSRepositoryTest {
+class CountryExposureSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class,
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
@@ -58,7 +58,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryBenchOfFundCanada_checkResult() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -76,7 +76,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_verifyDoQuery() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
 
@@ -92,7 +92,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_checkResult() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -110,7 +110,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_verifyDoQuery() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
 
@@ -126,7 +126,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_checkResult() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -145,7 +145,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_verifyDoQuery() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
 
@@ -161,7 +161,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryBenchOfBenchmarks_checkResult() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<BenchmarkIndexHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -180,7 +180,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -196,7 +196,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -212,7 +212,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -231,7 +231,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_verifyDoQuery() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of(mock(CanadaPooledFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -247,7 +247,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_checkResult() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -266,7 +266,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryFixedIncome_verifyDoQuery() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of(mock(FixedIncomeHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.BROADRIDGE);
         doCallRealMethod().when(m).queryBenchOfFixedIncomes(any(), anyList());
@@ -282,7 +282,7 @@ class CountryExposureFDSRepositoryTest {
     @Test
     void queryFixedIncome_checkResult() {
         //SETUP
-        final CountryExposureFDSRepository m = mock(CountryExposureFDSRepository.class);
+        final CountryExposureSMRepository m = mock(CountryExposureSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of();
         final HashMap<Object, Object> expected = new HashMap<>();
         final List<DataProvider> providers = List.of(DataProvider.BROADRIDGE);

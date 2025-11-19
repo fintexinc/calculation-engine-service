@@ -1,26 +1,33 @@
 package com.fintex.ce.repository.graphql.query.endpoint.countryexposure;
 
-import com.fintex.smclient.graphql.*;
 import com.fintex.ce.dto.holding.FixedIncomeHolding;
 import com.fintex.ce.model.redis.RCountryExposure;
 import com.fintex.ce.util.graphql.GraphQlMapperUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
+import com.fintex.smclient.graphql.CountryAllocation;
+import com.fintex.smclient.graphql.FixedIncome;
+import com.fintex.smclient.graphql.FixedIncomeQuery;
+import com.fintex.smclient.graphql.Query;
+import com.fintex.smclient.graphql.QueryQuery;
+import com.fintex.smclient.graphql.QueryQueryDefinition;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.enumeration.HoldingType.FIXED_INCOME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CountryExposureFixedIncomeEndpointTest {
 
@@ -40,7 +47,7 @@ class CountryExposureFixedIncomeEndpointTest {
         when(q.getGetFixedIncomeByBroadridgeAdpNumbers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<FixedIncome>> actual = countryExposureFixedIncomeEndpoint.getGetFDSEntityFunction();
+        final Function<Query, List<FixedIncome>> actual = countryExposureFixedIncomeEndpoint.getGetSMEntityFunction();
 
         //VERIFY
         assertEquals(actual.apply(q), expected);

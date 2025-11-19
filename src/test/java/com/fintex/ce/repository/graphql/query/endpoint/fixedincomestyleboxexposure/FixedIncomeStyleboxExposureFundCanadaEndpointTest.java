@@ -1,23 +1,22 @@
 package com.fintex.ce.repository.graphql.query.endpoint.fixedincomestyleboxexposure;
 
+import com.fintex.ce.dto.holding.FundSeriesHolding;
+import com.fintex.ce.model.redis.RFixedIncomeStyleboxExposure;
+import com.fintex.ce.util.graphql.GraphQlMapperUtils;
 import com.fintex.smclient.graphql.FixedIncomeStyleBoxType;
 import com.fintex.smclient.graphql.FixedIncomeStyleBoxValue;
 import com.fintex.smclient.graphql.FixedIncomeStyleBoxes;
 import com.fintex.smclient.graphql.FundSeries;
 import com.fintex.smclient.graphql.FundSeriesQuery;
 import com.fintex.smclient.graphql.Query;
-import com.fintex.ce.dto.holding.FundSeriesHolding;
-import com.fintex.ce.model.redis.RFixedIncomeStyleboxExposure;
-import com.fintex.ce.util.graphql.GraphQlMapperUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +40,7 @@ class FixedIncomeStyleboxExposureFundCanadaEndpointTest {
         when(q.getGetFundSeriesByHoldingCodes()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<FundSeries>> actual = m.getGetFDSEntityFunction();
+        final Function<Query, List<FundSeries>> actual = m.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

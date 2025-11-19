@@ -1,21 +1,20 @@
 package com.fintex.ce.repository.graphql.query.endpoint.equitymarketcapitalization;
 
+import com.fintex.ce.dto.holding.EtfHolding;
+import com.fintex.ce.model.redis.equitymarketcapitalization.REquityMarketCapitalization;
+import com.fintex.ce.util.graphql.GraphQlMapperUtils;
 import com.fintex.smclient.graphql.EquityMarketCapitalization;
 import com.fintex.smclient.graphql.EquityMarketCapitalizationQuery;
 import com.fintex.smclient.graphql.EquityMarketCapitalizationQueryDefinition;
 import com.fintex.smclient.graphql.Etf;
 import com.fintex.smclient.graphql.EtfQuery;
 import com.fintex.smclient.graphql.Query;
-import com.fintex.ce.dto.holding.EtfHolding;
-import com.fintex.ce.model.redis.equitymarketcapitalization.REquityMarketCapitalization;
-import com.fintex.ce.util.graphql.GraphQlMapperUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.STRING_WITH_DATA_PROVIDER_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -38,7 +37,7 @@ class EquityMarketCapitalizationEtfCanadaEndpointTest {
         when(q.getGetCanadaEtfsByTickers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<Etf>> actual = m.getGetFDSEntityFunction();
+        final Function<Query, List<Etf>> actual = m.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

@@ -22,16 +22,15 @@ import com.fintex.ce.repository.jdbc.FASUsageStatisticsRepo;
 import com.fintex.ce.repository.redis.CacheWarmUpSchedulerDateRedisRepository;
 import com.fintex.ce.service.impl.cache.core.MultipleCacheStorageAbstract;
 import com.fintex.ce.service.impl.cache.statistic.CacheWarmUpServiceImpl.SchedulerRunInfoDto;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.cache.CacheKeyPrefix;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
 
 import static com.fintex.ce.config.constant.GeneralConstants.DELIMITER;
 import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
@@ -468,14 +467,14 @@ class CacheWarmUpServiceImplTest {
                         coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
 
         final SMUsageStatistics sm = new SMUsageStatistics().setDay0Count(1);
-        when(fasUsageStatisticsRepo.findAll()).thenReturn(List.of(fds));
+        when(fasUsageStatisticsRepo.findAll()).thenReturn(List.of(sm));
 
         doCallRealMethod().when(sut).selectRecords();
         //ACT
         sut.selectRecords();
 
         //VERIFY
-        verify(sut).mapToCacheRecord(fds);
+        verify(sut).mapToCacheRecord(sm);
     }
 
     @Test
@@ -495,7 +494,7 @@ class CacheWarmUpServiceImplTest {
         final SMUsageStatistics sm = new SMUsageStatistics().setDay0Count(1);
         final CacheRecordDTO record = new CacheRecordDTO().setNumberOfUsages(23);
 
-        when(fasUsageStatisticsRepo.findAll()).thenReturn(List.of(fds));
+        when(fasUsageStatisticsRepo.findAll()).thenReturn(List.of(sm));
         when(sut.mapToCacheRecord(any())).thenReturn(record);
 
         doCallRealMethod().when(sut).selectRecords();
@@ -523,7 +522,7 @@ class CacheWarmUpServiceImplTest {
         final SMUsageStatistics sm = new SMUsageStatistics().setDay0Count(1);
         final CacheRecordDTO record = new CacheRecordDTO().setNumberOfUsages(23);
 
-        when(fasUsageStatisticsRepo.findAll()).thenReturn(List.of(fds));
+        when(fasUsageStatisticsRepo.findAll()).thenReturn(List.of(sm));
         when(sut.mapToCacheRecord(any())).thenReturn(record);
         when(sut.limitRecords(any())).thenReturn(List.of(record));
 

@@ -29,13 +29,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class AverageMERFDSRepositoryTest {
+class AverageMERSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final AverageMERFDSRepository a = mock(AverageMERFDSRepository.class, withSettings().useConstructor(graphqlTransport));
+        final AverageMERSMRepository a = mock(AverageMERSMRepository.class, withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of();
 
         doCallRealMethod().when(a).queryBenchOfFundCanada(any(), any());
@@ -54,7 +54,7 @@ class AverageMERFDSRepositoryTest {
     @Test
     void queryBenchOfFundCanada_checkResult() {
         //SETUP
-        final AverageMERFDSRepository a = mock(AverageMERFDSRepository.class);
+        final AverageMERSMRepository a = mock(AverageMERSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -73,7 +73,7 @@ class AverageMERFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_verifyDoQuery() {
         //SETUP
-        final AverageMERFDSRepository a = mock(AverageMERFDSRepository.class);
+        final AverageMERSMRepository a = mock(AverageMERSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         doCallRealMethod().when(a).queryBenchOfEtfCanada(any(), any());
@@ -88,7 +88,7 @@ class AverageMERFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_checkResult() {
         //SETUP
-        final AverageMERFDSRepository a = mock(AverageMERFDSRepository.class);
+        final AverageMERSMRepository a = mock(AverageMERSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -106,7 +106,7 @@ class AverageMERFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_verifyDoQuery() {
         //SETUP
-        final AverageMERFDSRepository a = mock(AverageMERFDSRepository.class);
+        final AverageMERSMRepository a = mock(AverageMERSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         doCallRealMethod().when(a).queryBenchOfOfEtfUs(any(), any());
@@ -121,7 +121,7 @@ class AverageMERFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_checkResult() {
         //SETUP
-        final AverageMERFDSRepository a = mock(AverageMERFDSRepository.class);
+        final AverageMERSMRepository a = mock(AverageMERSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -139,7 +139,7 @@ class AverageMERFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final AverageMERFDSRepository m = mock(AverageMERFDSRepository.class);
+        final AverageMERSMRepository m = mock(AverageMERSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -155,7 +155,7 @@ class AverageMERFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final AverageMERFDSRepository m = mock(AverageMERFDSRepository.class);
+        final AverageMERSMRepository m = mock(AverageMERSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -174,7 +174,7 @@ class AverageMERFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final AverageMERFDSRepository m = mock(AverageMERFDSRepository.class);
+        final AverageMERSMRepository m = mock(AverageMERSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 

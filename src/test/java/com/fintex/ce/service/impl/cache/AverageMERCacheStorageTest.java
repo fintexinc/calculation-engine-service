@@ -5,7 +5,7 @@ import com.fintex.ce.dto.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.dto.holding.EtfHolding;
 import com.fintex.ce.dto.holding.FundSeriesHolding;
 import com.fintex.ce.model.redis.averagemer.RAverageMer;
-import com.fintex.ce.repository.graphql.query.AverageMERFDSRepository;
+import com.fintex.ce.repository.graphql.query.AverageMERSMRepository;
 import com.fintex.ce.repository.redis.averagemer.AverageMerRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.validation.DataProviderRequestHandlingValidator;
@@ -31,7 +31,7 @@ class AverageMERCacheStorageTest {
     @Test
     void mapperForCanadaMutualFund_verifyPreBuildAverageMerDto() {
         //SETUP
-        final var queryRepository = mock(AverageMERFDSRepository.class);
+        final var queryRepository = mock(AverageMERSMRepository.class);
         final var fundCanadaRepo = mock(AverageMerRepository.class);
         final var etfCanadaRepo = mock(AverageMerRepository.class);
         final var etfUsRepo = mock(AverageMerRepository.class);

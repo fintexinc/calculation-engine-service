@@ -8,7 +8,7 @@ import com.fintex.ce.dto.holding.FundSeriesHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.RMaturityAllocation;
-import com.fintex.ce.repository.graphql.query.MaturityAllocationFDSRepository;
+import com.fintex.ce.repository.graphql.query.MaturityAllocationSMRepository;
 import com.fintex.ce.repository.redis.MaturityAllocationRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.FilterUtils;
@@ -69,7 +69,7 @@ class MaturityAllocationCacheStorageTest {
     void load_verifyFilters() {
         //SETUP
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-            final var fdsRepo = mock(MaturityAllocationFDSRepository.class);
+            final var fdsRepo = mock(MaturityAllocationSMRepository.class);
             final var fundCanadaCacheRepo = mock(MaturityAllocationRepository.class);
             final var etfCanadaCacheRepo = mock(MaturityAllocationRepository.class);
             final var etfUsCacheRepo = mock(MaturityAllocationRepository.class);

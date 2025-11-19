@@ -8,7 +8,7 @@ import com.fintex.ce.dto.holding.FundSeriesHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.response.core.Warning;
 import com.fintex.ce.model.redis.RIncomeForecast;
-import com.fintex.ce.repository.graphql.query.IncomeForecastFDSRepository;
+import com.fintex.ce.repository.graphql.query.IncomeForecastSMRepository;
 import com.fintex.ce.repository.redis.IncomeForecastRepository;
 import com.fintex.ce.service.interfaces.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.FilterUtils;
@@ -51,7 +51,7 @@ class IncomeForecastCacheStorageTest {
     void load_verifyFilters() {
         try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
             //SETUP
-            final var fdsRepo = mock(IncomeForecastFDSRepository.class);
+            final var fdsRepo = mock(IncomeForecastSMRepository.class);
             final var fundCanadaCacheRepo = mock(IncomeForecastRepository.class);
             final var etfCanadaCacheRepo = mock(IncomeForecastRepository.class);
             final var etfUsCacheRepo = mock(IncomeForecastRepository.class);

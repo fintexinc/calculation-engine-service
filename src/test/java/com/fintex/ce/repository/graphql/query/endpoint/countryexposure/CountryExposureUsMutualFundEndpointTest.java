@@ -1,22 +1,21 @@
 package com.fintex.ce.repository.graphql.query.endpoint.countryexposure;
 
+import com.fintex.ce.dto.holding.UsMutualFundHolding;
+import com.fintex.ce.model.redis.RCountryExposure;
+import com.fintex.ce.util.graphql.GraphQlMapperUtils;
 import com.fintex.smclient.graphql.CountryAllocation;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.UsFund;
 import com.fintex.smclient.graphql.UsFundQuery;
-import com.fintex.ce.dto.holding.UsMutualFundHolding;
-import com.fintex.ce.model.redis.RCountryExposure;
-import com.fintex.ce.util.graphql.GraphQlMapperUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.enumeration.HoldingType.CASH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +38,7 @@ class CountryExposureUsMutualFundEndpointTest {
         when(q.getGetUsFundsByTickers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<UsFund>> actual = m.getGetFDSEntityFunction();
+        final Function<Query, List<UsFund>> actual = m.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

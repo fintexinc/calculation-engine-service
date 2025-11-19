@@ -1,5 +1,8 @@
 package com.fintex.ce.repository.graphql.query.endpoint.fixedincomebondsector;
 
+import com.fintex.ce.dto.holding.EtfHolding;
+import com.fintex.ce.model.redis.RFixedIncomeBondSecurities;
+import com.fintex.ce.util.graphql.GraphQlMapperUtils;
 import com.fintex.smclient.graphql.Etf;
 import com.fintex.smclient.graphql.EtfQuery;
 import com.fintex.smclient.graphql.FixedIncomeSectorAllocation;
@@ -7,17 +10,13 @@ import com.fintex.smclient.graphql.FixedIncomeSecuritiesAllocation;
 import com.fintex.smclient.graphql.Query;
 import com.fintex.smclient.graphql.QueryQuery;
 import com.fintex.smclient.graphql.QueryQueryDefinition;
-import com.fintex.ce.dto.holding.EtfHolding;
-import com.fintex.ce.model.redis.RFixedIncomeBondSecurities;
-import com.fintex.ce.util.graphql.GraphQlMapperUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.STRING_WITH_DATA_PROVIDER_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -41,7 +40,7 @@ class FixedIncomeBondSectorEtfCanadaEndpointTest {
         when(q.getGetCanadaEtfsByTickers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<Etf>> actual = fixedIncomeBondSectorEtfCanadaEndpoint.getGetFDSEntityFunction();
+        final Function<Query, List<Etf>> actual = fixedIncomeBondSectorEtfCanadaEndpoint.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

@@ -37,13 +37,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class YieldFDSRepositoryTest {
+class YieldSMRepositoryTest {
 
     @Test
     void queryBenchOfFundCanada_verifyDoQuery() {
         //SETUP
         final var graphqlTransport = mock(GraphqlTransportComponent.class);
-        final YieldFDSRepository m = mock(YieldFDSRepository.class,
+        final YieldSMRepository m = mock(YieldSMRepository.class,
                 withSettings().useConstructor(graphqlTransport));
         final List<FundSeriesHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
@@ -60,7 +60,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfFundCanada_checkResult() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<FundSeriesHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -78,7 +78,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_verifyDoQuery() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -94,7 +94,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfOfEtfUs_checkResult() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -112,7 +112,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_verifyDoQuery() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<EtfHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -128,7 +128,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfEtfCanada_checkResult() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<EtfHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -147,7 +147,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryUsMutualFunds_verifyDoQuery() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<UsMutualFundHolding> holdings = List.of(mock(UsMutualFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -163,7 +163,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_verifyDoQuery() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of(mock(CanadaHedgeFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -179,7 +179,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryCanadaHedgeFunds_checkResult() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<CanadaHedgeFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -198,7 +198,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_verifyDoQuery() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of(mock(CanadaPooledFundHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.EAGLE);
 
@@ -214,7 +214,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryCanadaPooledFunds_checkResult() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<CanadaPooledFundHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -233,7 +233,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryFixedIncomes_verifyDoQuery() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of(mock(FixedIncomeHolding.class));
         final List<DataProvider> providers = List.of(DataProvider.BROADRIDGE);
 
@@ -249,7 +249,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryFixedIncomes_checkResult() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<FixedIncomeHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -268,7 +268,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfSeparatelyManagedAccount_verifyDoQuery() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<SmaHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.ENVESTNET);
 
@@ -284,7 +284,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfSeparatelyManagedAccount_checkResult() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<SmaHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();
@@ -303,7 +303,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfStock_verifyDoQuery() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<StockHolding> holdings = List.of();
         final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
 
@@ -319,7 +319,7 @@ class YieldFDSRepositoryTest {
     @Test
     void queryBenchOfStock_checkResult() {
         //SETUP
-        final YieldFDSRepository m = mock(YieldFDSRepository.class);
+        final YieldSMRepository m = mock(YieldSMRepository.class);
         final List<StockHolding> holdings = List.of();
 
         final HashMap<Object, Object> expected = new HashMap<>();

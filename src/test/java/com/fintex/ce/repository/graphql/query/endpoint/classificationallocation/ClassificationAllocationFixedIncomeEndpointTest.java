@@ -1,5 +1,7 @@
 package com.fintex.ce.repository.graphql.query.endpoint.classificationallocation;
 
+import com.fintex.ce.dto.holding.FixedIncomeHolding;
+import com.fintex.ce.model.redis.RClassificationAllocation;
 import com.fintex.smclient.graphql.FixedIncome;
 import com.fintex.smclient.graphql.FixedIncomeQuery;
 import com.fintex.smclient.graphql.Query;
@@ -9,16 +11,13 @@ import com.fintex.smclient.graphql.SecurityClassification;
 import com.fintex.smclient.graphql.SecurityClassificationLevelOne;
 import com.fintex.smclient.graphql.SecurityClassificationLevelThree;
 import com.fintex.smclient.graphql.SecurityClassificationLevelTwo;
-import com.fintex.ce.dto.holding.FixedIncomeHolding;
-import com.fintex.ce.model.redis.RClassificationAllocation;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.config.constant.graphql.GraphQlResolverConstants.EXTERNAL_IDENTIFIERS_QUERY_DEFINITION;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,7 +40,7 @@ class ClassificationAllocationFixedIncomeEndpointTest {
         when(q.getGetFixedIncomeByBroadridgeAdpNumbers()).thenReturn(expected);
 
         //ACT
-        final Function<Query, List<FixedIncome>> actual = sut.getGetFDSEntityFunction();
+        final Function<Query, List<FixedIncome>> actual = sut.getGetSMEntityFunction();
 
         //VERIFY
         Assertions.assertSame(actual.apply(q), expected);

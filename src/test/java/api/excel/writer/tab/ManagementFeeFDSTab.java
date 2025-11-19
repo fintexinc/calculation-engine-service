@@ -12,7 +12,7 @@ import com.fintex.ce.dto.holding.EtfHolding;
 import com.fintex.ce.dto.holding.FundSeriesHolding;
 import com.fintex.ce.dto.holding.Holding;
 import com.fintex.ce.dto.holding.UsMutualFundHolding;
-import com.fintex.ce.repository.graphql.query.ManagementFeeFDSRepository;
+import com.fintex.ce.repository.graphql.query.ManagementFeeSMRepository;
 import com.fintex.ce.util.CollectorUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -27,11 +27,11 @@ import java.util.Objects;
 import static com.fintex.ce.util.FilterUtils.*;
 
 public class ManagementFeeFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-	private static final ManagementFeeFDSRepository ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
+	private static final ManagementFeeSMRepository ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
 	private static final String TAB_NAME = "Master_Sheet";
 
-	private static ManagementFeeFDSRepository initAssetAllocationsFDS() {
-		return new ManagementFeeFDSRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+	private static ManagementFeeSMRepository initAssetAllocationsFDS() {
+		return new ManagementFeeSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
 	}
 
 	@Override
