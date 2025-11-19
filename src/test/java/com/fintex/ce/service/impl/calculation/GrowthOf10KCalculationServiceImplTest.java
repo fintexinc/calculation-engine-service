@@ -8,19 +8,16 @@ import com.fintex.ce.domain.monthlyreturns.Returns;
 import com.fintex.ce.dto.CommonDates;
 import com.fintex.ce.dto.calculation.CalculationDTO;
 import com.fintex.ce.dto.holding.Holding;
-import com.fintex.ce.dto.request.GrowthOf10KReqDTO;
 import com.fintex.ce.dto.request.ReturnReqDTO;
 import com.fintex.ce.dto.response.Growth10KResDTO;
 import com.fintex.ce.dto.response.core.Warning;
-import com.fintex.ce.service.impl.cache.HistoricalDistributionsCacheStorage;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.ce.util.validation.request.ReturnReqDtoValidator;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,12 +38,10 @@ class GrowthOf10KCalculationServiceImplTest {
         //SETUP
         final var monthlyReturnsService = mock(MonthlyReturnsService.class);
         final var requestValidator = mock(ReturnReqDtoValidator.class);
-        final var dailyPerformanceCalculationService = mock(DailyPerformanceCalculationServiceImpl.class);
-        final var historicalDistributionsCacheStorage = mock(HistoricalDistributionsCacheStorage.class);
         final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
-                .useConstructor(monthlyReturnsService, requestValidator, dailyPerformanceCalculationService, historicalDistributionsCacheStorage));
+                .useConstructor(monthlyReturnsService, requestValidator));
 
-        final var returnReqDTO = mock(GrowthOf10KReqDTO.class);
+        final var returnReqDTO = mock(ReturnReqDTO.class);
         final var holdings = List.of(mock(Holding.class));
         final Growth10KCalculation calculation = mock(Growth10KCalculation.class);
         final var calculationDTO = mock(CalculationDTO.class);
@@ -69,12 +64,10 @@ class GrowthOf10KCalculationServiceImplTest {
         //SETUP
         final var monthlyReturnsService = mock(MonthlyReturnsService.class);
         final var requestValidator = mock(ReturnReqDtoValidator.class);
-        final var dailyPerformanceCalculationService = mock(DailyPerformanceCalculationServiceImpl.class);
-        final var historicalDistributionsCacheStorage = mock(HistoricalDistributionsCacheStorage.class);
         final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
-                .useConstructor(monthlyReturnsService, requestValidator, dailyPerformanceCalculationService, historicalDistributionsCacheStorage));
+                .useConstructor(monthlyReturnsService, requestValidator));
 
-        final var returnReqDTO = mock(GrowthOf10KReqDTO.class);
+        final var returnReqDTO = mock(ReturnReqDTO.class);
         final var holdings = List.of(mock(Holding.class));
         final var calculationDTO = mock(CalculationDTO.class);
         final var calculation = mock(Growth10KCalculation.class);
@@ -98,12 +91,10 @@ class GrowthOf10KCalculationServiceImplTest {
         //SETUP
         final var monthlyReturnsService = mock(MonthlyReturnsService.class);
         final var requestValidator = mock(ReturnReqDtoValidator.class);
-        final var dailyPerformanceCalculationService = mock(DailyPerformanceCalculationServiceImpl.class);
-        final var historicalDistributionsCacheStorage = mock(HistoricalDistributionsCacheStorage.class);
         final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
-                .useConstructor(monthlyReturnsService, requestValidator, dailyPerformanceCalculationService, historicalDistributionsCacheStorage));
+                .useConstructor(monthlyReturnsService, requestValidator));
 
-        final var returnReqDTO = mock(GrowthOf10KReqDTO.class);
+        final var returnReqDTO = mock(ReturnReqDTO.class);
         final var holdings = List.of(mock(Holding.class));
         when(returnReqDTO.getHoldings()).thenReturn(holdings);
         when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
@@ -134,10 +125,8 @@ class GrowthOf10KCalculationServiceImplTest {
         //SETUP
         final var monthlyReturnsService = mock(MonthlyReturnsService.class);
         final var requestValidator = mock(ReturnReqDtoValidator.class);
-        final var dailyPerformanceCalculationService = mock(DailyPerformanceCalculationServiceImpl.class);
-        final var historicalDistributionsCacheStorage = mock(HistoricalDistributionsCacheStorage.class);
         final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
-                .useConstructor(monthlyReturnsService, requestValidator, dailyPerformanceCalculationService, historicalDistributionsCacheStorage));
+                .useConstructor(monthlyReturnsService, requestValidator));
 
         final List<Holding> holdings = List.of(mock(Holding.class));
 
@@ -168,10 +157,8 @@ class GrowthOf10KCalculationServiceImplTest {
         //SETUP
         final var monthlyReturnsService = mock(MonthlyReturnsService.class);
         final var requestValidator = mock(ReturnReqDtoValidator.class);
-        final var dailyPerformanceCalculationService = mock(DailyPerformanceCalculationServiceImpl.class);
-        final var historicalDistributionsCacheStorage = mock(HistoricalDistributionsCacheStorage.class);
         final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
-                .useConstructor(monthlyReturnsService, requestValidator, dailyPerformanceCalculationService, historicalDistributionsCacheStorage));
+                .useConstructor(monthlyReturnsService, requestValidator));
         final var holdings = List.of(mock(Holding.class));
         final Returns monthlyReturns = mock(Returns.class);
 
@@ -201,10 +188,8 @@ class GrowthOf10KCalculationServiceImplTest {
         //SETUP
         final var monthlyReturnsService = mock(MonthlyReturnsService.class);
         final var requestValidator = mock(ReturnReqDtoValidator.class);
-        final var dailyPerformanceCalculationService = mock(DailyPerformanceCalculationServiceImpl.class);
-        final var historicalDistributionsCacheStorage = mock(HistoricalDistributionsCacheStorage.class);
         final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
-                .useConstructor(monthlyReturnsService, requestValidator, dailyPerformanceCalculationService, historicalDistributionsCacheStorage));
+                .useConstructor(monthlyReturnsService, requestValidator));
         final var holdings = List.of(mock(Holding.class));
         final Returns monthlyReturns = mock(Returns.class);
         final var warnings = List.of(mock(Warning.class));
@@ -236,10 +221,8 @@ class GrowthOf10KCalculationServiceImplTest {
         //SETUP
         final var monthlyReturnsService = mock(MonthlyReturnsService.class);
         final var requestValidator = mock(ReturnReqDtoValidator.class);
-        final var dailyPerformanceCalculationService = mock(DailyPerformanceCalculationServiceImpl.class);
-        final var historicalDistributionsCacheStorage = mock(HistoricalDistributionsCacheStorage.class);
         final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
-                .useConstructor(monthlyReturnsService, requestValidator, dailyPerformanceCalculationService, historicalDistributionsCacheStorage));
+                .useConstructor(monthlyReturnsService, requestValidator));
 
         final var holdings = List.of(mock(Holding.class));
         final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
@@ -268,10 +251,8 @@ class GrowthOf10KCalculationServiceImplTest {
         //SETUP
         final var monthlyReturnsService = mock(MonthlyReturnsService.class);
         final var requestValidator = mock(ReturnReqDtoValidator.class);
-        final var dailyPerformanceCalculationService = mock(DailyPerformanceCalculationServiceImpl.class);
-        final var historicalDistributionsCacheStorage = mock(HistoricalDistributionsCacheStorage.class);
         final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
-                .useConstructor(monthlyReturnsService, requestValidator, dailyPerformanceCalculationService, historicalDistributionsCacheStorage));
+                .useConstructor(monthlyReturnsService, requestValidator));
 
         final var holdings = List.of(mock(Holding.class));
         final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);

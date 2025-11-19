@@ -6,7 +6,6 @@ import api.dto.tab.CoreTestCaseModel;
 import api.excel.reader.HoldingReaderTab;
 import api.excel.reader.TestCaseReaderTab;
 import api.excel.writer.WritableSpreadsheet;
-import api.excel.writer.tab.MonthlyReturnTab;
 import api.model.HoldingDataDTO;
 import api.testcases.core.dto.ExpectedResultWrapper;
 import api.testcases.core.dto.Results;
@@ -17,19 +16,10 @@ import api.util.RestUtils;
 import api.util.TestProperties;
 import api.util.excel.ExcelUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.io.Closeables;
 import com.fintex.ce.config.enumeration.HoldingType;
 import com.fintex.ce.dto.holding.GicHolding;
 import com.fintex.ce.dto.holding.Holding;
-import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellAddress;
-import org.junit.jupiter.params.provider.Arguments;
-import org.springframework.http.HttpStatus;
-
+import com.google.common.io.Closeables;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,6 +33,14 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.io.FileUtils;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellAddress;
+import org.junit.jupiter.params.provider.Arguments;
+import org.springframework.http.HttpStatus;
 
 import static api.util.HoldingUtils.createAppSpecificHoldingBasedOnType;
 
@@ -175,7 +173,6 @@ public abstract class CoreApiTest<T extends CoreTestCaseModel, H extends Holding
                 .map(e -> createAppSpecificHoldingBasedOnType(e.getKey(), BigDecimal.ZERO, e.getValue()))
                 .collect(Collectors.toList());
         // populate data for tabs which have to be populated at the beginning
-        this.writableTabs.stream().filter(t -> !t.isBeforeEachTest()).map(TabInfoDTO::getTab).filter(t -> t instanceof MonthlyReturnTab).forEach(t -> ((MonthlyReturnTab) t).setDefaultHoldings(defaultHoldings));
         this.writableTabs.stream().filter(t -> !t.isBeforeEachTest()).forEach(t -> populateDataForTabs(t, defaultHoldings));
     }
 
@@ -324,7 +321,6 @@ public abstract class CoreApiTest<T extends CoreTestCaseModel, H extends Holding
         List<Holding> appHoldings = formatHoldingsForTestCase(holdings);
         RequestParamsSupplier params = new RequestParamsSupplier(testCaseBody.getDataProviders(), testCaseBody.getCurrency());
         addMoreParams(params, testCaseBody);
-        tabs.stream().filter(tab -> tab instanceof MonthlyReturnTab).forEach(tab -> ((MonthlyReturnTab) tab).setDefaultHoldings(defaultHoldings));
         tabs.forEach(tab -> tab.write(appHoldings, params, this.workbook));
     }
 
