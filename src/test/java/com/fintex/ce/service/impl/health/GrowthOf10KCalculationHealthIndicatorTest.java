@@ -1,16 +1,17 @@
 package com.fintex.ce.service.impl.health;
 
 import com.fintex.ce.config.enumeration.Currency;
-import com.fintex.ce.dto.request.GrowthOf10KReqDTO;
 import com.fintex.ce.dto.request.ReturnReqDTO;
 import com.fintex.ce.service.impl.calculation.GrowthOf10KCalculationServiceImpl;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.withSettings;
 
 class GrowthOf10KCalculationHealthIndicatorTest {
 
@@ -19,9 +20,9 @@ class GrowthOf10KCalculationHealthIndicatorTest {
         //SETUP
         final var growthOf10KCalculationService = mock(GrowthOf10KCalculationServiceImpl.class);
         final var sut = mock(GrowthOf10kCalculationHealthIndicator.class, withSettings().useConstructor(growthOf10KCalculationService));
-        final var returnReqDTO = mock(GrowthOf10KReqDTO.class);
+        final var returnReqDTO = mock(ReturnReqDTO.class);
 
-        doCallRealMethod().when(sut).calculateResponse(any(GrowthOf10KReqDTO.class));
+        doCallRealMethod().when(sut).calculateResponse(any(ReturnReqDTO.class));
 
         //ACT
         sut.calculateResponse(returnReqDTO);

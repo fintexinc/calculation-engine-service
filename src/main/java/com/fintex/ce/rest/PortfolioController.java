@@ -1,12 +1,97 @@
 package com.fintex.ce.rest;
 
 import com.fintex.ce.aop.annotation.LogRequest;
-import com.fintex.ce.config.enumeration.calculation.*;
+import com.fintex.ce.config.enumeration.calculation.AssetAllocationRegion;
+import com.fintex.ce.config.enumeration.calculation.AssetAllocationRegionEmType;
+import com.fintex.ce.config.enumeration.calculation.ClassificationAllocationType;
+import com.fintex.ce.config.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.config.enumeration.calculation.EquityMarketCapType;
+import com.fintex.ce.config.enumeration.calculation.EquitySectorAllocationType;
+import com.fintex.ce.config.enumeration.calculation.EquityStyleboxType;
+import com.fintex.ce.config.enumeration.calculation.FixedIncomeSectorType;
+import com.fintex.ce.config.enumeration.calculation.FixedIncomeStyleboxType;
+import com.fintex.ce.config.enumeration.calculation.GeographicRegionType;
+import com.fintex.ce.config.enumeration.calculation.MaturityAllocationType;
 import com.fintex.ce.dto.RSquaredResDTO;
-import com.fintex.ce.dto.request.*;
-import com.fintex.ce.dto.response.*;
+import com.fintex.ce.dto.request.AverageMerRequestDTO;
+import com.fintex.ce.dto.request.BestWorstPeriodsReqDTO;
+import com.fintex.ce.dto.request.CorrelationReqDTO;
+import com.fintex.ce.dto.request.DistributionOfReturnsReqDTO;
+import com.fintex.ce.dto.request.IncomeForecastReqDTO;
+import com.fintex.ce.dto.request.LeadingTotalReturnPeriodsReqDTO;
+import com.fintex.ce.dto.request.MultiplePortfoliosReqDTO;
+import com.fintex.ce.dto.request.PeriodsReqDTO;
+import com.fintex.ce.dto.request.PortfolioHoldingsReqDTO;
+import com.fintex.ce.dto.request.ReturnReqDTO;
+import com.fintex.ce.dto.request.RollingCalculationReqDTO;
+import com.fintex.ce.dto.request.RollingCorrelationCalculationReqDTO;
+import com.fintex.ce.dto.request.TopCommonHoldingsReqDTO;
+import com.fintex.ce.dto.request.YieldReqDTO;
+import com.fintex.ce.dto.response.AlphaResDTO;
+import com.fintex.ce.dto.response.AnnualReturnResDTO;
+import com.fintex.ce.dto.response.AssetAllocationEMResDTO;
+import com.fintex.ce.dto.response.AssetAllocationResDTO;
+import com.fintex.ce.dto.response.AverageMerResponse;
+import com.fintex.ce.dto.response.BestWorstPeriodsResponseDTO;
+import com.fintex.ce.dto.response.BetaResDTO;
+import com.fintex.ce.dto.response.ClassificationAllocationResDto;
+import com.fintex.ce.dto.response.CommonPerformanceDatesResDTO;
+import com.fintex.ce.dto.response.CorrelationResDTO;
+import com.fintex.ce.dto.response.CountryExposureResDTO;
+import com.fintex.ce.dto.response.CreditQualityResDTO;
+import com.fintex.ce.dto.response.DownsideCaptureResDTO;
+import com.fintex.ce.dto.response.DownsideDeviationResDTO;
+import com.fintex.ce.dto.response.EquityCountryExposureResDTO;
+import com.fintex.ce.dto.response.EquityMarketCapResDTO;
+import com.fintex.ce.dto.response.EquitySectorResDTO;
+import com.fintex.ce.dto.response.EquityStyleboxExposureResDto;
+import com.fintex.ce.dto.response.ExcessReturnsResDTO;
+import com.fintex.ce.dto.response.FixedIncomeSectorResDTO;
+import com.fintex.ce.dto.response.FixedIncomeStyleboxExposureResDto;
+import com.fintex.ce.dto.response.GeographicExposureResDTO;
+import com.fintex.ce.dto.response.Growth10KResDTO;
+import com.fintex.ce.dto.response.IncomeForecastResDto;
+import com.fintex.ce.dto.response.InformationRatioResDTO;
+import com.fintex.ce.dto.response.LeadingTotalReturnsResDTO;
+import com.fintex.ce.dto.response.MARRatioResDTO;
+import com.fintex.ce.dto.response.ManagementFeeResponse;
+import com.fintex.ce.dto.response.MaturityAllocationResDto;
+import com.fintex.ce.dto.response.MaxDrawdownResDTO;
+import com.fintex.ce.dto.response.MeanResDTO;
+import com.fintex.ce.dto.response.RollingCorrelationResDTO;
+import com.fintex.ce.dto.response.RollingSharpeRatioResDTO;
+import com.fintex.ce.dto.response.RollingStandardDeviationResDTO;
+import com.fintex.ce.dto.response.RollingTotalReturnsResDTO;
+import com.fintex.ce.dto.response.SalesChargeResDtos;
+import com.fintex.ce.dto.response.SharpeRatioResDTO;
+import com.fintex.ce.dto.response.SortinoRatioResDTO;
+import com.fintex.ce.dto.response.StandardDeviationResDTO;
+import com.fintex.ce.dto.response.TopCommonHoldingsResDTO;
+import com.fintex.ce.dto.response.TrackingErrorResDTO;
+import com.fintex.ce.dto.response.TrailingTotalReturnsResDTO;
+import com.fintex.ce.dto.response.TreynorRatioResDTO;
+import com.fintex.ce.dto.response.UpsideCaptureResDTO;
+import com.fintex.ce.dto.response.YieldResDto;
 import com.fintex.ce.dto.response.distributionofreturns.DistributionOfReturnsResDTO;
-import com.fintex.ce.service.impl.calculation.*;
+import com.fintex.ce.service.impl.calculation.AssetAllocationEMServiceImpl;
+import com.fintex.ce.service.impl.calculation.AssetAllocationServiceImpl;
+import com.fintex.ce.service.impl.calculation.ClassificationAllocationCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.CommonHoldingsServiceImpl;
+import com.fintex.ce.service.impl.calculation.CountryExposureCalculationImpl;
+import com.fintex.ce.service.impl.calculation.EquityCountryExposureCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.EquityGeographicExposureCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.EquityMarketCapCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.EquitySectorCalculationImpl;
+import com.fintex.ce.service.impl.calculation.EquityStyleboxExposureCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.FixedIncomeBondSectorCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.FixedIncomeGeographicExposureCalculationImpl;
+import com.fintex.ce.service.impl.calculation.FixedIncomeStyleboxExposureCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.IncomeForecastCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.MERCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.ManagementFeeCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.MaturityAllocationCalculationServiceImpl;
+import com.fintex.ce.service.impl.calculation.SalesChargeServiceImpl;
+import com.fintex.ce.service.impl.calculation.YieldCalculationServiceImpl;
 import com.fintex.ce.service.impl.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.service.impl.calculation.period.AlphaCalculationServiceImpl;
 import com.fintex.ce.service.impl.calculation.period.BetaCalculationServiceImpl;
@@ -34,7 +119,17 @@ import com.fintex.ce.service.impl.calculation.period.UpsideCaptureCalculationSer
 import com.fintex.ce.service.impl.calculation.period.core.PeriodAbstractService;
 import com.fintex.ce.service.impl.calculation.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.service.interfaces.ExceptionHandlingService;
-import com.fintex.ce.service.interfaces.calculation.*;
+import com.fintex.ce.service.interfaces.calculation.AnnualReturnService;
+import com.fintex.ce.service.interfaces.calculation.AverageManagementExpenseCalculationService;
+import com.fintex.ce.service.interfaces.calculation.BestWorstPeriodsCalculationService;
+import com.fintex.ce.service.interfaces.calculation.CommonHoldingsService;
+import com.fintex.ce.service.interfaces.calculation.CommonPerformanceDateService;
+import com.fintex.ce.service.interfaces.calculation.CreditQualityService;
+import com.fintex.ce.service.interfaces.calculation.DistributionOfReturnsService;
+import com.fintex.ce.service.interfaces.calculation.GrowthOf10KCalculationService;
+import com.fintex.ce.service.interfaces.calculation.IncomeForecastService;
+import com.fintex.ce.service.interfaces.calculation.SalesChargeService;
+import com.fintex.ce.service.interfaces.calculation.YieldService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,7 +157,7 @@ public class PortfolioController {
     private final PeriodAbstractService<SortinoRatioResDTO, PeriodsReqDTO> sortinoRatioService;
     private final PeriodAbstractService<BetaResDTO, PeriodsReqDTO> betaCalculationService;
     private final PeriodAbstractService<AlphaResDTO, PeriodsReqDTO> alphaCalculationService;
-    private final PeriodAbstractService<RSquaredResDTO,PeriodsReqDTO> rSquaredCalculationService;
+    private final PeriodAbstractService<RSquaredResDTO, PeriodsReqDTO> rSquaredCalculationService;
     private final PeriodAbstractService<CorrelationResDTO, PeriodsReqDTO> correlationService;
     private final AverageManagementExpenseCalculationService<AverageMerResponse> merCalculationService;
     private final AverageManagementExpenseCalculationService<ManagementFeeResponse> managementFeeCalculationService;
@@ -94,8 +189,6 @@ public class PortfolioController {
     private final PeriodAbstractService<TreynorRatioResDTO, PeriodsReqDTO> treynorRatioService;
     private final PeriodBenchmarkAbstractService<RollingCorrelationResDTO, RollingCalculationReqDTO> rollingCorrelationCalculationService;
     private final SalesChargeService salesChargeService;
-    private final DailyPerformanceCalculationServiceImpl dailyPerformanceCalculationService;
-    private final DistributionServiceImpl distributionService;
     private final ExceptionHandlingService exceptionHandlingService;
     //private final InflationServiceImpl inflationService;
 
@@ -146,8 +239,6 @@ public class PortfolioController {
                                TreynorRatioServiceImpl treynorRatioService,
                                RollingCorrelationCalculationServiceImpl rollingCorrelationCalculationService,
                                SalesChargeServiceImpl salesChargeService,
-                               DailyPerformanceCalculationServiceImpl dailyPerformanceCalculationService,
-                               DistributionServiceImpl distributionService,
                                ExceptionHandlingService exceptionHandlingService
                                //InflationServiceImpl inflationService
     ) {
@@ -199,8 +290,6 @@ public class PortfolioController {
         this.treynorRatioService = treynorRatioService;
         this.rollingCorrelationCalculationService = rollingCorrelationCalculationService;
         this.salesChargeService = salesChargeService;
-        this.dailyPerformanceCalculationService = dailyPerformanceCalculationService;
-        this.distributionService = distributionService;
         this.exceptionHandlingService = exceptionHandlingService;
         //this.inflationService = inflationService;
     }
@@ -326,7 +415,7 @@ public class PortfolioController {
     }
 
     @PostMapping(value = "/growth-of-10k/calculation")
-    public Growth10KResDTO getGrowthOf10KCalculation(@RequestBody GrowthOf10KReqDTO reqDTO, HttpServletRequest request) {
+    public Growth10KResDTO getGrowthOf10KCalculation(@RequestBody ReturnReqDTO reqDTO, HttpServletRequest request) {
         return exceptionHandlingService.returnObjectWithListOfErrors(() -> growthOf10KCalculationService.perform(reqDTO), Growth10KResDTO::new, request);
     }
 
@@ -446,16 +535,6 @@ public class PortfolioController {
     @PostMapping(value = "/sales-charge/calculation")
     public SalesChargeResDtos getSalesCharge(@RequestBody PortfolioHoldingsReqDTO reqDTO, HttpServletRequest request) {
         return exceptionHandlingService.returnObjectWithListOfErrors(() -> salesChargeService.perform(reqDTO), SalesChargeResDtos::new, request);
-    }
-
-    @PostMapping(value = "/daily-performance/calculation")
-    public DailyPerformanceResDTO getDailyPerformance(@RequestBody DailyPerformanceReqDTO reqDTO, HttpServletRequest request) {
-        return exceptionHandlingService.returnObjectWithListOfErrors(() -> dailyPerformanceCalculationService.perform(reqDTO), DailyPerformanceResDTO::new, request);
-    }
-
-    @PostMapping(value = "/distribution/calculation")
-    public DistributionResDTO getDistribution(@RequestBody DailyPerformanceReqDTO reqDTO, HttpServletRequest request) {
-        return exceptionHandlingService.returnObjectWithListOfErrors(() -> distributionService.perform(reqDTO), DistributionResDTO::new, request);
     }
 
 //    @PostMapping(value = "/inflation/calculation")

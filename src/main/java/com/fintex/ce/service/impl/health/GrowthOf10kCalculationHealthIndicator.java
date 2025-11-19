@@ -1,16 +1,15 @@
 package com.fintex.ce.service.impl.health;
 
 import com.fintex.ce.config.enumeration.Currency;
-import com.fintex.ce.dto.request.GrowthOf10KReqDTO;
+import com.fintex.ce.dto.request.ReturnReqDTO;
 import com.fintex.ce.dto.response.Growth10KResDTO;
 import com.fintex.ce.service.interfaces.calculation.GrowthOf10KCalculationService;
 import com.fintex.ce.service.interfaces.health.CalculationHeathIndicator;
+import java.time.LocalDate;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
 @Component
-public class GrowthOf10kCalculationHealthIndicator extends CalculationHeathIndicator<GrowthOf10KReqDTO> {
+public class GrowthOf10kCalculationHealthIndicator extends CalculationHeathIndicator<ReturnReqDTO> {
 
     private final GrowthOf10KCalculationService growthOf10KCalculationService;
 
@@ -19,13 +18,13 @@ public class GrowthOf10kCalculationHealthIndicator extends CalculationHeathIndic
     }
 
     @Override
-    protected Growth10KResDTO calculateResponse(final GrowthOf10KReqDTO request) {
+    protected Growth10KResDTO calculateResponse(final ReturnReqDTO request) {
         return growthOf10KCalculationService.perform(request);
     }
 
     @Override
-    protected GrowthOf10KReqDTO buildInput() {
-        final GrowthOf10KReqDTO request = new GrowthOf10KReqDTO();
+    protected ReturnReqDTO buildInput() {
+        final ReturnReqDTO request = new ReturnReqDTO();
         request.setHoldings(getHoldings());
         request.setCurrency(Currency.CAD);
         request.setCustomPerformanceStartDate(LocalDate.of(2015, 6, 30));
