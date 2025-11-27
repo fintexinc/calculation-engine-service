@@ -57,8 +57,8 @@ security-master-graphql-transport:
 
 flyway:
   datasource:
-    username: ${POSTGRES_DBO_USERNAME}
-    password: ${POSTGRES_DBO_PASSWORD}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PWD}
   locations: classpath:db/migration
   sql-migration-prefix: V
   sql-migration-suffixes: .sql

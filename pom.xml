@@ -53,6 +53,13 @@
         </sonar.inclusions>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>azure-artifacts</id>
+            <url>https://pkgs.dev.azure.com/fintexincorporated/_packaging/fintexincorporated/maven/v1</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.fintex</groupId>
@@ -400,6 +407,21 @@
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
                 <version>${allure-maven.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <extraDirectories>
+                        <paths>
+                            <path>
+                                <from>src/main/resources</from>
+                                <into>/app/resources</into>
+                            </path>
+                        </paths>
+                    </extraDirectories>
+                </configuration>
             </plugin>
         </plugins>
     </build>
