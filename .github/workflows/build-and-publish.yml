@@ -1,106 +1,64 @@
-name: Build and push to Azure Container Registry
-
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-  push:
-    branches:
+trigger:
+  branches:
+    include:
       - main
-  workflow_dispatch:
 
-jobs:
-  # ------------------ Job 1: Unit tests ------------------
-  build-and-test:
-    runs-on: ubuntu-latest
+pr:
+  branches:
+    include:
+      - main
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+pool:
+  vmImage: ubuntu-latest
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
+variables:
+  ACR_NAME: crfintexfndservdevcc01
+  IMAGE_NAME: calculation-engine-service
+  RESOURCE_GROUP: rg-fintex-fndserv-dev-cc-01
+  CONTAINER_APP_NAME: calculation-engine-service
 
-      - name: Configure Maven to use Azure Artifacts
-        run: |
-          mkdir -p ~/.m2
-          cat <<EOF > ~/.m2/settings.xml
-          <settings>
-            <servers>
-              <server>
-                <id>azure-artifacts</id>
-                <username>${{ secrets.AZURE_DEVOPS_USERNAME }}</username>
-                <password>${{ secrets.AZURE_DEVOPS_PAT }}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
+stages:
+  - stage: BuildAndPush
+    displayName: Build & Push Image
+    jobs:
+      - job: Build
+        displayName: Build and Push
+        steps:
+          - task: DownloadSecureFile@1
+            name: GetMavenSettings
+            displayName: Get maven settings
+            inputs:
+              secureFile: 'settings.xml'
 
-      - name: Run Maven tests
-        run: mvn clean test
+          - script: |
+              mkdir -p ~/.m2
+              cp "$(GetMavenSettings.secureFilePath)" ~/.m2/settings.xml
+            displayName: 'Apply Maven settings'
 
-  # ------------------ Job 2: Build and Push Docker ------------------
-  push-to-acr:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-#    if: github.ref == 'refs/heads/main'
+          - task: Maven@4
+            displayName: Jib build & push
+            inputs:
+              mavenPomFile: 'pom.xml'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '17'
+              goals: |
+                jib:build
+              options: >
+                -Djib.to.image=$(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(Build.BuildId) \
+                -Djib.to.auth.username=$(ACR_NAME) \
+                -Djib.to.auth.password=$(ACR_PASSWORD)
 
-    env:
-      ACR_NAME: crfintexfndservdevcc01
-      IMAGE_NAME: calculation-engine-service
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-
-      - name: Configure Maven to use Azure Artifacts
-        run: |
-          mkdir -p ~/.m2
-          cat <<EOF > ~/.m2/settings.xml
-          <settings>
-            <servers>
-              <server>
-                <id>azure-artifacts</id>
-                <username>${{ secrets.AZURE_DEVOPS_USERNAME }}</username>
-                <password>${{ secrets.AZURE_DEVOPS_PAT }}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
-
-      - name: Log in to Azure Container Registry
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ env.ACR_NAME }}.azurecr.io
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
-
-      - name: Build and push Docker image with Jib
-        run: |
-          mvn compile jib:build \
-          -Djib.from.image=mcr.microsoft.com/openjdk/jdk:21-azurelinux \
-          -Djib.from.auth.username=anonymous \
-          -Djib.from.auth.password= \
-          -Djib.to.image=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-          -Djib.to.auth.username=${{ secrets.ACR_USERNAME }} \
-          -Djib.to.auth.password=${{ secrets.ACR_PASSWORD }}
-
-      - name: Deploy new image to Azure Container Apps
-        uses: azure/container-apps-deploy-action@v1
-        with:
-          acrName: ${{ env.ACR_NAME }}
-          imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          containerAppName: calculation-engine-service
-          resourceGroup: rg-fintex-fndserv-dev-cc-01
+  - stage: Deploy
+    displayName: Deploy to Azure Container Apps
+    dependsOn: BuildAndPush
+    jobs:
+      - job: Deploy
+        displayName: Deploy
+        steps:
+          - task: AzureContainerApps@1
+            inputs:
+              azureSubscription: '7395443c-24f1-4f3e-8b05-e6cd06a64e0b'  # service connection к подписке Azure
+              acrName: $(ACR_NAME)
+              resourceGroup: $(RESOURCE_GROUP)
+              containerAppName: $(CONTAINER_APP_NAME)
+              imageToDeploy: '$(ACR_NAME).azurecr.io/$(IMAGE_NAME):$(Build.BuildId)'
