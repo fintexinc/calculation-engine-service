@@ -1,13 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://fintex.ce.com:34532/ce
+    url: ${POSTGRES_URL}
   redis:
     use-key-prefix: true
     key-prefix: pcs-dev
 
 redis:
-  host: localhost.com
-  port: 13901
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
 
 fas-graphql-transport:
-  location: https://security-master-service.fintex.com/graphql
+  location: ${SECURITY_MASTER_SERVICE_URL}/graphql
