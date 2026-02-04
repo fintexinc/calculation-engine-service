@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://fintex.ce.qat.com:34532/ce
+  redis:
+    use-key-prefix: true
+    key-prefix: pcs-qat
+
+redis:
+  host: localhost.com
+  port: 13901
+
+sm-graphql-transport:
+  location: https://security-master-service.fintex.qat.com/graphql
+

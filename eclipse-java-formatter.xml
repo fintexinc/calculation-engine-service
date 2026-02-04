@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles version="23">
+  <profile kind="CodeFormatterProfile" name="GoogleLike" version="23">
+
+    <!-- Indentation: Google uses 2 spaces -->
+    <setting id="org.eclipse.jdt.core.formatter.indentation.size" value="2"/>
+    <setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="space"/>
+    <setting id="org.eclipse.jdt.core.formatter.tabulation.size" value="2"/>
+
+    <!-- Line width -->
+    <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="120"/>
+
+    <!-- Braces: Google places braces on same line -->
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_type_declaration" value="end_of_line"/>
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_method_declaration" value="end_of_line"/>
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_array_initializer" value="end_of_line"/>
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_block" value="end_of_line"/>
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_enum_declaration" value="end_of_line"/>
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_enum_constant" value="end_of_line"/>
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_switch" value="end_of_line"/>
+
+    <!-- Wrapping behavior -->
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_parameters_in_method_declaration" value="16"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_arguments_in_method_invocation" value="16"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_binary_expression" value="16"/>
+    <setting id="org.eclipse.jdt.core.formatter.keep_simple_if_on_one_line" value="true"/>
+    <setting id="org.eclipse.jdt.core.formatter.keep_simple_for_on_one_line" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.keep_simple_while_on_one_line" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.keep_then_statement_on_same_line" value="true"/>
+    <setting id="org.eclipse.jdt.core.formatter.keep_else_statement_on_same_line" value="true"/>
+
+    <!-- Method call chain: wrap only when necessary, do not force -->
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_selector_in_method_invocation" value="16"/>
+    <setting id="org.eclipse.jdt.core.formatter.wrap_outer_expressions_when_nested" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.join_wrapped_lines" value="false"/>
+
+    <!-- Spaces -->
+    <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_method_declaration" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_constructor_declaration" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_annotation_type_declaration" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_enum_declaration" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_block" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_switch" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_array_initializer" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_new_line_after_comma_in_enum_declarations" value="insert"/>
+
+    <!-- Enum constants formatting: force each constant on a new line -->
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="49"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_new_line_before_closing_brace_in_enum_declaration" value="insert"/>
+
+    <!-- Annotations formatting -->
+    <setting id="org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_type" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_method" value="insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_field" value="insert"/>
+
+    <!-- Comments -->
+    <setting id="org.eclipse.jdt.core.formatter.comment.format_javadoc_comments" value="true"/>
+    <setting id="org.eclipse.jdt.core.formatter.comment.format_block_comments" value="true"/>
+    <setting id="org.eclipse.jdt.core.formatter.comment.format_line_comments" value="true"/>
+    <setting id="org.eclipse.jdt.core.formatter.comment.line_length" value="120"/>
+
+  </profile>
+</profiles>

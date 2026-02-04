@@ -1,0 +1,56 @@
+package com.fintex.ce.domain.exception.notification.pattern;
+
+import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.exception.DataErrorException;
+import com.fintex.ce.domain.exception.FdsDataValidationException;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
+/**
+ * A Notification collect together errors
+ */
+@Data
+public class Notification {
+
+  List<DataErrorException> errors = new ArrayList<>();
+
+  public boolean hasErrors() {
+    return !errors.isEmpty();
+  }
+
+  public void addError(DataErrorException e) {
+    errors.add(e);
+  }
+
+  public void addErrors(List<DataErrorException> errors) {
+    this.errors.addAll(errors);
+  }
+
+  public <T> T tryCatch(Supplier<T> supplier) {
+    try {
+      return supplier.get();
+    } catch (FdsDataValidationException e) {
+      e.getExceptionList().forEach(this::addError);
+      return null;
+    }
+  }
+
+  public void ifAnyErrorThrowException() {
+    if (hasErrors()) {
+      throw new FdsDataValidationException(getErrors());
+    }
+  }
+
+  public void ifAnyNonAllowedErrorThrowException(List<ExceptionCode> allowedErrors) {
+    if (hasErrors() && hasNonAllowedErrors(allowedErrors)) {
+      throw new FdsDataValidationException(getErrors());
+    }
+  }
+
+  private boolean hasNonAllowedErrors(List<ExceptionCode> allowedErrors) {
+    return errors.stream().anyMatch(error -> !allowedErrors.contains(error.getCode()));
+  }
+}

@@ -1,0 +1,13 @@
+spring:
+  lettuce:
+    pool:
+      max-idle: 5
+      min-idle: 2
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    com: INFO
+    org.hibernate: INFO
+

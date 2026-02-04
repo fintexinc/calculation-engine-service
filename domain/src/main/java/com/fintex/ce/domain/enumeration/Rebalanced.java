@@ -1,0 +1,10 @@
+package com.fintex.ce.domain.enumeration;
+
+public enum Rebalanced {
+
+  MONTHLY,
+  QUARTERLY,
+  SEMI_ANNUALLY,
+  ANNUALLY
+
+}

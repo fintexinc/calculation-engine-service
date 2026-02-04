@@ -1,0 +1,119 @@
+spring:
+  flyway:
+    enabled: false
+  datasource:
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PWD}
+    driver-class-name: org.postgresql.Driver
+    maximum-pool-size: 5
+    minimum-pool-size: 2
+    hikari:
+      max-lifetime: 600000
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  application:
+    name: calculation-engine
+    config:
+      fail-fast: true
+      enabled: false
+    discovery:
+      client:
+        composite-indicator:
+          enabled: false
+  lettuce:
+    pool:
+      max-idle: 10
+      max-wait: 5000
+      min-idle: 3
+      max-active: 15
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      group:
+        calculations:
+          include: merCalculation,growthOf10kCalculation,upsideCaptureCalculation
+          show-components: always
+          show-details: always
+          status:
+            http-mapping:
+              down: 400
+              fatal: 400
+              out-of-service: 400
+
+  endpoints:
+    web:
+      exposure:
+        include: env, health, configprops, caches, httptrace, loggers, metrics, mappings, threaddump
+
+security-master-graphql-transport:
+  headers:
+    Content-Type: application/x-www-form-urlencoded
+
+flyway:
+  datasource:
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PWD}
+  locations: classpath:db/migration
+  sql-migration-prefix: V
+  sql-migration-suffixes: .sql
+  table: schema_version
+  schemas: public
+
+rest-template:
+  rest-template-pool:
+    size-per-route: 50
+    size: 100
+  rest-template:
+    read-timeout: 90000 # time in millis
+    connection-request-timeout: 90000 # time in millis, 1 * 60 * 1000
+    connect-timeout: 90000 # time in millis
+
+application:
+  graphql-enabled: true
+  rest-template-enabled: true
+
+default:
+  periods:
+    trailing-total-returns: "1,3,6,12,36,60,120,YEAR_TO_DATE,SINCE_PERFORMANCE_START_DATE"
+    leading-total-returns: "1,3,6,12,36,60,120"
+    rolling-calculations: "12, 36, 60, 120"
+    information-ratio-returns: "12, 36, 60, 120"
+    risk-calculations: "12,36,60,120"
+    best-worst-periods: 12,36,60,120
+  top-common-holdings:
+    accumulate-types: "E,ER,B,BC,BD,BT"
+    recursion-types: "FO,FE,FS,EX"
+
+redis:
+  timeout: 300000
+  password: ${REDIS_PASSWORD}
+  username: ${REDIS_USERNAME}
+
+ssl:
+
+
+exception:
+  show-stack-trace: true
+
+proxy:
+  useProxy: false
+
+job:
+  cache-warm-up:
+    min-number-of-records: 30
+    max-number-of-records: 30000
+    min-number-of-record-usages: 1
+    percentage-factor: 35
+
+logging:
+  level:
+    root: INFO
+
+performance-monitor-duration:
+  info-threshold: 59000 #59 seconds

@@ -1,0 +1,108 @@
+package com.fintex.ce.adapter.graphqlclient.endpoint;
+
+import com.fintex.ce.adapter.graphqlclient.endpoint.SalesChargeEndpoint;
+import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.holding.FundSeriesHolding;
+import com.fintex.smclient.graphql.FundSeries;
+import com.fintex.smclient.graphql.FundSeriesQuery;
+import com.fintex.smclient.graphql.Query;
+import com.fintex.smclient.graphql.SalesCharge;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_SC_SC_001;
+import static com.fintex.smclient.graphql.SalesChargeType.DEFERRED_SALES_CHARGE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class SalesChargeEndpointTest {
+
+  @Test
+  void getGetStocksByTickersAndExchangeIds_isPresent() {
+    // SETUP
+    final SalesChargeEndpoint sut = new SalesChargeEndpoint();
+
+    final Query q = mock(Query.class);
+    final ArrayList<FundSeries> expected = new ArrayList<>();
+
+    when(q.getGetFundSeriesByHoldingCodes()).thenReturn(expected);
+
+    // ACT
+    final Function<Query, List<FundSeries>> actual = sut.getGetSMEntityFunction();
+
+    // VERIFY
+    Assertions.assertSame(actual.apply(q), expected);
+  }
+
+  @Test
+  void requestMapper_verify() {
+    // SETUP
+    final SalesChargeEndpoint sut = mock(SalesChargeEndpoint.class);
+
+    final FundSeriesQuery fundSeriesQuery = mock(FundSeriesQuery.class);
+    when(fundSeriesQuery.salesCharge(any())).thenReturn(fundSeriesQuery);
+    when(fundSeriesQuery.externalIdentifiers(any())).thenReturn(fundSeriesQuery);
+
+    doCallRealMethod().when(sut).requestMapper(any());
+
+    // ACT
+    final FundSeriesQuery actual = sut.requestMapper(fundSeriesQuery);
+
+    // VERIFY
+    verify(actual).salesCharge(any());
+    verify(actual).externalIdentifiers(any());
+  }
+
+  @Test
+  void responseMapper_checkResult() {
+    // SETUP
+    final SalesChargeEndpoint sut = mock(SalesChargeEndpoint.class);
+
+    final FundSeries fundSeries = mock(FundSeries.class);
+    final SalesCharge salesCharge = mock(SalesCharge.class);
+    when(fundSeries.getSalesCharge()).thenReturn(salesCharge);
+
+    final FundSeriesHolding holding = mock(FundSeriesHolding.class);
+    final HoldingType type = HoldingType.CANADA_MUTUAL_FUNDS;
+    when(holding.getType()).thenReturn(type);
+
+    doCallRealMethod().when(sut).responseMapper(any(), any());
+    // ACT
+    var actual = sut.responseMapper(fundSeries, holding);
+
+    // VERIFY
+    assertTrue(actual.getErrors().stream().anyMatch(e -> e.getCode().equals(ERR_SC_SC_001.name())));
+  }
+
+  @Test
+  void responseMapper_checkResult2() {
+
+    // SETUP
+    final SalesChargeEndpoint sut = mock(SalesChargeEndpoint.class);
+
+    final FundSeries fundSeries = mock(FundSeries.class);
+    final SalesCharge salesCharge = mock(SalesCharge.class);
+    when(fundSeries.getSalesCharge()).thenReturn(salesCharge);
+    when(salesCharge.getType()).thenReturn(DEFERRED_SALES_CHARGE);
+
+    final FundSeriesHolding holding = mock(FundSeriesHolding.class);
+    final HoldingType type = HoldingType.CANADA_MUTUAL_FUNDS;
+    when(holding.getType()).thenReturn(type);
+
+    doCallRealMethod().when(sut).responseMapper(any(), any());
+    // ACT
+    final com.fintex.ce.domain.model.SalesCharge actual = sut.responseMapper(fundSeries, holding);
+
+    // VERIFY
+    assertEquals(DEFERRED_SALES_CHARGE.name(), actual.getValue());
+  }
+
+}
