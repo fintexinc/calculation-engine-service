@@ -1,0 +1,122 @@
+package com.fintex.ce.monthlyreturns;
+
+import com.fintex.ce.application.validation.CpsdDataValidation;
+import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+
+import java.time.LocalDate;
+
+import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_CPED_002;
+import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_CPED_003;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class CpsdDataValidationTest {
+
+  @Test
+  void validate_cpsdIsNulLThenNothingShouldHappen() {
+    // SETUP
+    final var sut = mock(CpsdDataValidation.class);
+    var notification = new Notification();
+
+    final LocalDate cpsd = null;
+    final var psd = LocalDate.now().minusMonths(1);
+    final var ped = LocalDate.now().minusMonths(2);
+
+    doCallRealMethod().when(sut).validate(any(), any(), any(), any());
+    // ACT
+    sut.validate(cpsd, psd, ped, notification);
+
+    // VERIFY
+    verify(sut, never()).getCpsdIsAfterPedExceptionCode();
+    verify(sut, never()).getCpsdIsBeforePsdExceptionCode();
+  }
+
+  @Test
+  void validate_cpsdIsBeforePedNothingShouldHappen() {
+    // SETUP
+    final var sut = mock(CpsdDataValidation.class);
+    var notification = new Notification();
+
+    final var cpsd = LocalDate.now();
+    final var psd = LocalDate.now().minusMonths(1);
+    final var ped = LocalDate.now().plusMonths(10);
+
+    when(sut.getCpsdIsAfterPedExceptionCode()).thenReturn(ERR_RRC_CPED_002);
+
+    doCallRealMethod().when(sut).validate(any(), any(), any(), any());
+    // ACT
+    sut.validate(cpsd, psd, ped, notification);
+
+    // VERIFY
+    verify(sut, never()).getCpsdIsAfterPedExceptionCode();
+  }
+
+  @Test
+  void validate_cpsdIsAfterPedErrorShouldBeThrown() {
+    // SETUP
+    final var sut = mock(CpsdDataValidation.class);
+    var notification = new Notification();
+
+    final var cpsd = LocalDate.now();
+    final var psd = LocalDate.now().plusMonths(1);
+    final var ped = LocalDate.now().minusMonths(2);
+
+    when(sut.getCpsdIsAfterPedExceptionCode()).thenReturn(ERR_RRC_CPED_002);
+    when(sut.getCpsdIsBeforePsdExceptionCode()).thenReturn(ERR_RRC_CPED_003);
+
+    doCallRealMethod().when(sut).validate(any(), any(), any(), any());
+    // ACT
+    sut.validate(cpsd, psd, ped, notification);
+
+    // VERIFY
+    assertTrue(notification.getErrors().contains(ERR_RRC_CPED_002.error(HttpStatus.BAD_REQUEST)));
+  }
+
+  @Test
+  void validate_cpsdIsAfterPsdNothingShouldHappen() {
+    // SETUP
+    final var sut = mock(CpsdDataValidation.class);
+    var notification = new Notification();
+
+    final var cpsd = LocalDate.now();
+    final var psd = LocalDate.now().minusMonths(1);
+    final var ped = LocalDate.now().plusMonths(2);
+
+    when(sut.getCpsdIsBeforePsdExceptionCode()).thenReturn(ERR_RRC_CPED_003);
+
+    doCallRealMethod().when(sut).validate(any(), any(), any(), any());
+    // ACT
+    sut.validate(cpsd, psd, ped, notification);
+
+    // VERIFY
+    verify(sut, never()).getCpsdIsBeforePsdExceptionCode();
+  }
+
+  @Test
+  void validate_cpsdIsBeforePsdErrorShouldBeThrown() {
+    // SETUP
+    final var sut = mock(CpsdDataValidation.class);
+    var notification = new Notification();
+
+    final var cpsd = LocalDate.now();
+    final var psd = LocalDate.now().plusMonths(1);
+    final var ped = LocalDate.now().plusMonths(10);
+
+    when(sut.getCpsdIsBeforePsdExceptionCode()).thenReturn(ERR_RRC_CPED_003);
+
+    doCallRealMethod().when(sut).validate(any(), any(), any(), any());
+    // ACT
+    sut.validate(cpsd, psd, ped, notification);
+
+    // VERIFY
+    assertTrue(notification.getErrors().contains(ERR_RRC_CPED_003.error(HttpStatus.BAD_REQUEST)));
+  }
+
+}

@@ -1,0 +1,9 @@
+manual:
+  fds-url: https://security-master-service.fintex.com/graphql
+
+  rest:
+    application-url: https://calculation-engine.fintex.com
+    content-type: application/json
+
+  versions:
+    enable-ce-1.0: true

@@ -1,0 +1,18 @@
+package com.fintex.ce.service;
+
+import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.core.Warning;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+public interface CountryAllocationMappingService {
+
+  Map<Holding, Map<CountryRegionType, BigDecimal>> mapToCountryRegions(
+      final Map<Holding, Map<String, BigDecimal>> holdingAllocations,
+      final List<Warning> warnings, final ExceptionCode errorCode);
+
+}

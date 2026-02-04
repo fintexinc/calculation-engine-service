@@ -54,26 +54,26 @@ stages:
   - stage: Validate
     displayName: Check code style and run unit tests
     jobs:
-#      - job: CheckCodeStyle
-#        displayName: Check code style
-#        pool:
-#          vmImage: ubuntu-latest
-#        steps:
-#          - task: Maven@4
-#            displayName: Run Spotless Check
-#            inputs:
-#              mavenPomFile: '$(mavenPomFile)'
-#              goals: 'spotless:check'
-#              options: ''
-#              javaHomeOption: 'JDKVersion'
-#              jdkVersionOption: '1.21'
-#              jdkArchitectureOption: 'x64'
-#              mavenVersionOption: 'Default'
+      - job: CheckCodeStyle
+        displayName: Check code style
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: Maven@4
+            displayName: Run Spotless Check
+            inputs:
+              mavenPomFile: '$(mavenPomFile)'
+              goals: 'spotless:check'
+              options: ''
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.21'
+              jdkArchitectureOption: 'x64'
+              mavenVersionOption: 'Default'
 
       - job: UnitTests
         displayName: Run unit tests
-#        dependsOn: CheckCodeStyle
-#        condition: succeeded()
+        dependsOn: CheckCodeStyle
+        condition: succeeded()
         pool:
           vmImage: ubuntu-latest
         steps:
@@ -114,17 +114,23 @@ stages:
               artifactsFeeds: fintexincorporated
 
           - task: Maven@4
-            displayName: Maven package
+            displayName: Maven install
             inputs:
-              mavenPomFile: 'pom.xml'
-              goals: 'compile jib:dockerBuild'
+              mavenPomFile: '$(mavenPomFile)'
+              goals: 'install'
+              options: '-DskipTests'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '1.21'
               jdkArchitectureOption: 'x64'
+
+          - task: Maven@4
+            displayName: Build Docker Image
+            inputs:
+              mavenPomFile: 'bootstrap/pom.xml'
+              goals: 'jib:dockerBuild'
               options: >
                 -Djib.from.image=mcr.microsoft.com/openjdk/jdk:21-azurelinux
                 -Djib.from.auth.username=anonymous
-                -Djib.from.auth.password=
                 -Djib.to.image=crfintexfndservdevcc01.azurecr.io/calculation-engine-service:$(tag)
 
           - task: AzureCLI@2
