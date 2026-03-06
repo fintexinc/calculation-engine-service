@@ -26,33 +26,20 @@ import com.fintex.ce.adapter.jdbc.entity.SMUsageStatistics;
 import com.fintex.ce.adapter.cache.entity.RCacheWarmUpDate;
 import com.fintex.ce.adapter.jdbc.repository.FASUsageStatisticsRepo;
 import com.fintex.ce.adapter.cache.repository.CacheWarmUpSchedulerDateRedisRepository;
-import com.fintex.ce.adapter.cache.repository.core.CoreRedisCacheRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
+import com.fintex.ce.port.output.cache.CacheCleanupPort;
+import com.fintex.ce.port.output.cache.CacheWarmUpPort;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.CacheManager;
-import org.springframework.data.redis.cache.CacheKeyPrefix;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisConnectionUtils;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
@@ -63,35 +50,26 @@ import static java.math.BigDecimal.ONE;
 public class CacheWarmUpServiceImpl implements CacheWarmUpService {
   public static final int TEN = 10;
   private final FASUsageStatisticsRepo statisticsRepo;
-  private final List<MultipleCacheStorageAbstract> cacheStorages;
-  private final List<CoreRedisCacheRepository> repositories;
+  private final List<CacheStorageAbstract> cacheStorages;
   private final CacheWarmUpProperties cacheWarmUpProperties;
   private final CacheWarmUpSchedulerDateRedisRepository cacheWarmUpSchedulerDateRedisRepository;
-  private final CacheManager redis5DaysCacheManager;
-  private final RedisConnectionFactory redisConnectionFactory;
-  private final CacheKeyPrefix cacheKeyPrefix;
+  private final CacheCleanupPort cacheCleanupPort;
 
   public CacheWarmUpServiceImpl(FASUsageStatisticsRepo statisticsRepo,
-      List<MultipleCacheStorageAbstract> cacheStorages,
+      List<CacheStorageAbstract> cacheStorages,
       CacheWarmUpProperties cacheWarmUpProperties,
       CacheWarmUpSchedulerDateRedisRepository cacheWarmUpSchedulerDateRedisRepository,
-      List<CoreRedisCacheRepository> repositories,
-      @Qualifier("redis5DaysCacheManager") CacheManager redis5DaysCacheManager,
-      RedisConnectionFactory redisConnectionFactory,
-      final CacheKeyPrefix cacheKeyPrefix) {
+      CacheCleanupPort cacheCleanupPort) {
     this.statisticsRepo = statisticsRepo;
-    this.repositories = repositories;
     this.cacheStorages = cacheStorages;
     this.cacheWarmUpProperties = cacheWarmUpProperties;
     this.cacheWarmUpSchedulerDateRedisRepository = cacheWarmUpSchedulerDateRedisRepository;
-    this.redis5DaysCacheManager = redis5DaysCacheManager;
-    this.redisConnectionFactory = redisConnectionFactory;
-    this.cacheKeyPrefix = cacheKeyPrefix;
+    this.cacheCleanupPort = cacheCleanupPort;
   }
 
   @Override
   public void run() {
-    clearCache();
+    cacheCleanupPort.clearCache();
     reloadCache();
     statisticsRepo.updateDayCountToZeroForDayOfWeek(LocalDate.now().getDayOfWeek().ordinal());
     cacheWarmUpSchedulerDateRedisRepository.save(new RCacheWarmUpDate().setZonedDateTime(ZonedDateTime.now()));
@@ -113,74 +91,9 @@ public class CacheWarmUpServiceImpl implements CacheWarmUpService {
     log.info("Finish reloading the cache");
   }
 
-  @Override
-  public void clearCache() {
-    log.info("Start clearing the Redis cache");
-    for (var repository : repositories) {
-      var redisIds = repository.findAllByPrefixEnv();
-      repository.deleteAll(redisIds);
-    }
-    evictCacheForAllRedisCacheManagers();
-    log.info("Finish clearing the Redis cache");
-  }
-
-  private void evictCacheForAllRedisCacheManagers() {
-    List.of(redis5DaysCacheManager)
-        .forEach(this::evictCacheForCacheManager);
-  }
-
-  private void evictCacheForCacheManager(final CacheManager cacheManager) {
-    final Collection<String> cacheNames = cacheManager.getCacheNames();
-    log.info("Clear all caches '{}'", cacheNames);
-    cacheNames.forEach(this::evictCacheName);
-  }
-
-  private void evictCacheName(final String cacheName) {
-    final RedisConnection connection = RedisConnectionUtils.getConnection(redisConnectionFactory);
-    try {
-      evictCacheName(cacheName, connection);
-    } finally {
-      RedisConnectionUtils.releaseConnection(connection, redisConnectionFactory);
-    }
-  }
-
-  private void evictCacheName(final String cacheName, final RedisConnection connection) {
-    final StopWatch timer = new StopWatch("RedisCacheEvictService.evictCache()");
-
-    final String redisCacheName = cacheKeyPrefix.compute(cacheName);
-    log.info("Cache to evict: {};", redisCacheName);
-
-    timer.start("scan for keys");
-    final Set<String> keys = getKeys(connection, redisCacheName);
-    timer.stop();
-
-    final Set<String> keysToDelete = keys.stream().filter(key -> key.startsWith(redisCacheName)).collect(Collectors
-        .toSet());
-    log.info("Keys were found: {}; Keys to be deleted: {}", keys.size(), keysToDelete.size());
-    if (!keysToDelete.isEmpty()) {
-      timer.start("cache eviction");
-      connection.del(keysToDelete.stream().map(String::getBytes).toArray(byte[][]::new));
-      timer.stop();
-    }
-    log.info("Execution time: {}ms", timer.getTotalTimeMillis());
-  }
-
-  private Set<String> getKeys(final RedisConnection connection, final String cacheName) {
-    final Set<String> keys = new HashSet<>();
-    final String pattern = cacheName + "*";
-    log.info("Scan keys pattern: {};", pattern);
-    final ScanOptions options = ScanOptions.scanOptions().match(pattern).build();
-    final Cursor<?> c = connection.scan(options);
-    while (c.hasNext()) {
-      keys.add(new String((byte[]) c.next()));
-    }
-    log.debug("Scan returned keys: {}", keys);
-    return keys;
-  }
-
   public void reloadCache(final CacheNameEntity cacheNameEntity, final List<CacheRecordDTO> cacheRecords) {
     try {
-      final MultipleCacheStorageAbstract storage = cacheStorages.stream().filter(s -> s.getCacheNameEntity().equals(
+      final CacheStorageAbstract storage = cacheStorages.stream().filter(s -> s.getCacheNameEntity().equals(
           cacheNameEntity)).findFirst().orElseThrow();
       final List<Holding> holdings = cacheRecords.stream().map(CacheRecordDTO::getHolding).distinct().collect(Collectors
           .toList());
@@ -304,28 +217,19 @@ public class CacheWarmUpServiceImpl implements CacheWarmUpService {
   }
 
   @Override
-  public SchedulerRunInfoDto cacheWarmUpSchedulerRunCheck() {
+  public CacheWarmUpPort.SchedulerRunInfo cacheWarmUpSchedulerRunCheck() {
     final RCacheWarmUpDate rCacheWarmUpDate = cacheWarmUpSchedulerDateRedisRepository.findAllByPrefixEnv()
         .stream()
         .findFirst()
         .orElse(new RCacheWarmUpDate());
 
     final boolean wasRunInLast24Hours = lastRunOfCacheWarmUpWasLessThan24HoursAgo(rCacheWarmUpDate);
-    return new SchedulerRunInfoDto()
-        .setLastTimeRun(rCacheWarmUpDate.getZonedDateTime())
-        .setRunInLast24Hours(wasRunInLast24Hours);
+    return new CacheWarmUpPort.SchedulerRunInfo(wasRunInLast24Hours, rCacheWarmUpDate.getZonedDateTime());
   }
 
   private boolean lastRunOfCacheWarmUpWasLessThan24HoursAgo(final RCacheWarmUpDate rCacheWarmUpDate) {
     return Objects.nonNull(rCacheWarmUpDate.getZonedDateTime())
         && Duration.between(ZonedDateTime.now(), rCacheWarmUpDate.getZonedDateTime()).toHours() > -24;
-  }
-
-  @Data
-  @Accessors(chain = true)
-  public static class SchedulerRunInfoDto {
-    private boolean runInLast24Hours;
-    private ZonedDateTime lastTimeRun;
   }
 
 }

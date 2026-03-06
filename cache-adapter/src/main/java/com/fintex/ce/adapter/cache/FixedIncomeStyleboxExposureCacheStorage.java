@@ -8,9 +8,9 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RFixedIncomeStyleboxExposure;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.FixedIncomeStyleboxAllocationRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -35,8 +35,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class FixedIncomeStyleboxExposureCacheStorage
-    extends
-      MultipleCacheStorageAbstract<FixedIncomeStyleboxExposure, FixedIncomeStyleboxExposure, FixedIncomeStyleboxExposure, FixedIncomeStyleboxExposure, RFixedIncomeStyleboxExposure> {
+    extends CacheStorageAbstract<FixedIncomeStyleboxExposure, RFixedIncomeStyleboxExposure, Map<Holding, Map<FixedIncomeStyleboxType, BigDecimal>>> {
   public static final Map<FixedIncomeStyleboxType, BigDecimal> DEFAULT_MAP;
 
   static {
@@ -45,20 +44,15 @@ public class FixedIncomeStyleboxExposureCacheStorage
   }
 
   public FixedIncomeStyleboxExposureCacheStorage(
-      MultipleSMRepository<FixedIncomeStyleboxExposure, FixedIncomeStyleboxExposure, FixedIncomeStyleboxExposure, FixedIncomeStyleboxExposure> smRepo,
+      SecurityDataPort<FixedIncomeStyleboxExposure> securityDataPort,
       CacheEntityMapper<FixedIncomeStyleboxExposure, RFixedIncomeStyleboxExposure> mapper,
-      FixedIncomeStyleboxAllocationRepository fundCanadaCacheRepo,
-      FixedIncomeStyleboxAllocationRepository etfCanadaCacheRepo,
-      FixedIncomeStyleboxAllocationRepository etfUsCacheRepo,
+      FixedIncomeStyleboxAllocationRepository fixedIncomeStyleboxAllocationRepository,
       CacheStatisticService cacheStatisticService) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        null, cacheStatisticService, FIXED_INCOME_STYLEBOX_ALLOCATION);
+    super(securityDataPort, mapper, fixedIncomeStyleboxAllocationRepository, cacheStatisticService, FIXED_INCOME_STYLEBOX_ALLOCATION);
   }
 
   @Override
-  public Map<Holding, Map<FixedIncomeStyleboxType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<FixedIncomeStyleboxType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
 

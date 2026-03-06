@@ -8,9 +8,9 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.FixedIncomeSectorResult;
-import com.fintex.ce.adapter.cache.AssetAllocationCacheStorage;
-import com.fintex.ce.adapter.cache.FixedIncomeBondSectorCacheStorage;
+import com.fintex.ce.port.input.result.FixedIncomeSectorResult;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   void calculate_verifyAreAllValuesZerosInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var fixedIncomeBondSectorCacheStorage = mock(FixedIncomeBondSectorCacheStorage.class);
-      final AssetAllocationCacheStorage assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
+      final AssetAllocationCachePort assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final AssetAllocationDataValidator assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
 
@@ -58,8 +58,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var fixedIncomeBondSectorCacheStorage = mock(FixedIncomeBondSectorCacheStorage.class);
-      final AssetAllocationCacheStorage assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
+      final AssetAllocationCachePort assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final AssetAllocationDataValidator assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
 
@@ -87,8 +87,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   void getLoadFromCacheStorage_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var fixedIncomeBondSectorCacheStorage = mock(FixedIncomeBondSectorCacheStorage.class);
-      final AssetAllocationCacheStorage assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
+      final AssetAllocationCachePort assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final AssetAllocationDataValidator assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
 
@@ -113,8 +113,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   void calculate_verifyResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var fixedIncomeBondSectorCacheStorage = mock(FixedIncomeBondSectorCacheStorage.class);
-      final AssetAllocationCacheStorage assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
+      final AssetAllocationCachePort assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final AssetAllocationDataValidator assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
       final FundSeriesHolding fundSeriesHolding = mock(FundSeriesHolding.class);

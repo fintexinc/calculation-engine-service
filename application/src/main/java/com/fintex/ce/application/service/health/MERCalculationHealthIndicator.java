@@ -1,8 +1,8 @@
 package com.fintex.ce.application.service.health;
 
 import com.fintex.ce.domain.enumeration.ParameterType;
-import com.fintex.ce.application.command.AverageMerCommand;
-import com.fintex.ce.application.result.AverageMerResult;
+import com.fintex.ce.port.input.command.AverageMerCommand;
+import com.fintex.ce.port.input.result.AverageMerResult;
 import com.fintex.ce.application.service.calculation.MERCalculationServiceImpl;
 import org.springframework.stereotype.Component;
 

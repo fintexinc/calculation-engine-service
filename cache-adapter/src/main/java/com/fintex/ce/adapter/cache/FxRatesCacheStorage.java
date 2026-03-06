@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.entity.RFxRates;
 import com.fintex.ce.adapter.cache.repository.FxRatesRepository;
+import com.fintex.ce.port.output.cache.FxRatesProvider;
 import com.fintex.smclient.dto.FxRatesDTO;
 import com.fintex.smclient.service.CommonEndpointsComponent;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import static com.fintex.ce.adapter.cache.config.CacheConfig.GET_FX_RATES;
 
 @Slf4j
 @Service
-public class FxRatesCacheStorage {
+public class FxRatesCacheStorage implements FxRatesProvider {
 
   private final CommonEndpointsComponent commonEndpointsComponent;
   private final FxRatesRepository fxRatesRepository;

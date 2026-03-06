@@ -1,12 +1,12 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.MaturityAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.mapper.response.MaturityAllocationResponseMapper;
 import com.fintex.ce.application.service.calculation.MaturityAllocationCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.calculation.MaturityAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.MaturityAllocationResult;
+import com.fintex.ce.port.input.result.MaturityAllocationResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.util.PortfolioUtils;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +29,7 @@ class MaturityAllocationCalculationServiceImplTest {
   @Test
   void getLoadFromCacheStorage_checkResult() {
     // SETUP
-    final var cacheStorage = mock(MaturityAllocationCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
     final var sut = mock(MaturityAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor( cacheStorage, responseMapper));
@@ -49,7 +49,7 @@ class MaturityAllocationCalculationServiceImplTest {
   @Test
   void calculate_verifyCalculateNetProducts() {
     // SETUP
-    final var cacheStorage = mock(MaturityAllocationCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
     final var sut = mock(MaturityAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor( cacheStorage, responseMapper));
@@ -69,7 +69,7 @@ class MaturityAllocationCalculationServiceImplTest {
   @Test
   void calculate_verifyFromNetProducts() {
     // SETUP
-    final var cacheStorage = mock(MaturityAllocationCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
     final var sut = mock(MaturityAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor( cacheStorage, responseMapper));
@@ -92,7 +92,7 @@ class MaturityAllocationCalculationServiceImplTest {
   @Test
   void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
     // SETUP
-    final var cacheStorage = mock(MaturityAllocationCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
     final var sut = mock(MaturityAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor( cacheStorage, responseMapper));
@@ -112,7 +112,7 @@ class MaturityAllocationCalculationServiceImplTest {
   void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(MaturityAllocationCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(MaturityAllocationResponseMapper.class);
       final var sut = mock(MaturityAllocationCalculationServiceImpl.class, withSettings()
           .useConstructor( cacheStorage, responseMapper));

@@ -4,9 +4,9 @@ import com.fintex.ce.domain.enumeration.calculation.ClassificationAllocationType
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.ClassificationAllocationResult;
+import com.fintex.ce.port.input.result.ClassificationAllocationResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.ClassificationAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.PortfolioUtils;
 import org.springframework.stereotype.Service;
@@ -31,9 +31,9 @@ public class ClassificationAllocationCalculationServiceImpl
     Stream.of(ClassificationAllocationType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
   }
 
-  private final ClassificationAllocationCacheStorage cacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<ClassificationAllocationType, BigDecimal>>> cacheStorage;
 
-  public ClassificationAllocationCalculationServiceImpl(      final ClassificationAllocationCacheStorage cacheStorage) {
+  public ClassificationAllocationCalculationServiceImpl(      final HoldingDataLoader<Map<Holding, Map<ClassificationAllocationType, BigDecimal>>> cacheStorage) {
     super();
     this.cacheStorage = cacheStorage;
   }

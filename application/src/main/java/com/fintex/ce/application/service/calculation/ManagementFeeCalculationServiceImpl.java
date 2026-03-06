@@ -6,11 +6,12 @@ import com.fintex.ce.domain.enumeration.ParameterType;
 import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.AverageMerCommand;
-import com.fintex.ce.application.result.ManagementFeeResult;
+import com.fintex.ce.port.input.command.AverageMerCommand;
+import com.fintex.ce.port.input.result.ManagementFeeResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.adapter.cache.ManagementFeeCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -32,11 +33,11 @@ public class ManagementFeeCalculationServiceImpl
     extends
       AverageManagementExpenseCalculationService<ManagementFeeResult> {
 
-  private final ManagementFeeCacheStorage managementFeeCacheStorage;
+  private final HoldingDataLoader<Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>>> managementFeeCachePort;
 
-  public ManagementFeeCalculationServiceImpl(final ManagementFeeCacheStorage managementFeeCacheStorage) {
+  public ManagementFeeCalculationServiceImpl(@Qualifier("managementFee") final HoldingDataLoader<Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>>> managementFeeCachePort) {
     super();
-    this.managementFeeCacheStorage = managementFeeCacheStorage;
+    this.managementFeeCachePort = managementFeeCachePort;
   }
 
   @Override
@@ -48,7 +49,7 @@ public class ManagementFeeCalculationServiceImpl
   @Override
   public Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> loadDataFromCacheStorage(
       final AverageMerCommand reqDTO) {
-    return managementFeeCacheStorage.load(reqDTO.getHoldings(),
+    return managementFeeCachePort.load(reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS), List.of(),
         new ParamHolderDTO());
   }

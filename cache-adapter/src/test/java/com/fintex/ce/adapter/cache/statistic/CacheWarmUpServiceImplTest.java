@@ -6,11 +6,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.fintex.ce.adapter.cache.config.properties.CacheWarmUpProperties;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.dto.CacheRecordDTO;
 import com.fintex.ce.adapter.cache.entity.RCacheWarmUpDate;
 import com.fintex.ce.adapter.cache.repository.CacheWarmUpSchedulerDateRedisRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheWarmUpServiceImpl;
+import com.fintex.ce.port.output.cache.CacheCleanupPort;
+import com.fintex.ce.port.output.cache.CacheWarmUpPort;
 import com.fintex.ce.adapter.jdbc.entity.SMUsageStatistics;
 import com.fintex.ce.adapter.jdbc.repository.FASUsageStatisticsRepo;
 import com.fintex.ce.constant.CacheCategory;
@@ -29,9 +30,6 @@ import com.fintex.ce.domain.model.holding.SmaHolding;
 import com.fintex.ce.domain.model.holding.StockHolding;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.cache.CacheManager;
-import org.springframework.data.redis.cache.CacheKeyPrefix;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import static com.fintex.ce.constant.GeneralConstants.DELIMITER;
 import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
@@ -287,18 +285,13 @@ class CacheWarmUpServiceImplTest {
   @Test
   void getLimit_checkResult() {
     // SETUP
-    final MultipleCacheStorageAbstract storage = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract storage = mock(CacheStorageAbstract.class);
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, List.of(storage), cacheWarmUpProperties,
-            cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            cacheWarmUpSchedulerDateRedisRepository, null));
 
     final List list = mock(List.class);
 
@@ -320,13 +313,8 @@ class CacheWarmUpServiceImplTest {
     // SETUP
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final CacheWarmUpProperties cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
-        .useConstructor(null, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+        .useConstructor(null, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository, null));
 
     final List list = mock(List.class);
 
@@ -348,13 +336,8 @@ class CacheWarmUpServiceImplTest {
     // SETUP
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final CacheWarmUpProperties cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
-        .useConstructor(null, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+        .useConstructor(null, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository, null));
 
     final CacheRecordDTO r1 = new CacheRecordDTO().setNumberOfUsages(2);
 
@@ -374,13 +357,8 @@ class CacheWarmUpServiceImplTest {
     // SETUP
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final CacheWarmUpProperties cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
-        .useConstructor(null, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+        .useConstructor(null, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository, null));
 
     final CacheRecordDTO r = new CacheRecordDTO().setNumberOfUsages(1);
     final CacheRecordDTO r1 = new CacheRecordDTO().setNumberOfUsages(2);
@@ -405,13 +383,8 @@ class CacheWarmUpServiceImplTest {
     // SETUP
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final CacheWarmUpProperties cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
-        .useConstructor(null, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+        .useConstructor(null, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository, null));
 
     final CacheRecordDTO r = new CacheRecordDTO().setNumberOfUsages(1);
     final CacheRecordDTO r1 = new CacheRecordDTO().setNumberOfUsages(2);
@@ -437,13 +410,9 @@ class CacheWarmUpServiceImplTest {
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            null));
 
     when(fasUsageStatisticsRepo.findAll()).thenReturn(List.of());
 
@@ -461,13 +430,9 @@ class CacheWarmUpServiceImplTest {
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            null));
 
     final SMUsageStatistics sm = new SMUsageStatistics().setDay0Count(1);
     when(fasUsageStatisticsRepo.findAll()).thenReturn(List.of(sm));
@@ -486,13 +451,9 @@ class CacheWarmUpServiceImplTest {
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            null));
 
     final SMUsageStatistics sm = new SMUsageStatistics().setDay0Count(1);
     final CacheRecordDTO record = new CacheRecordDTO().setNumberOfUsages(23);
@@ -514,13 +475,9 @@ class CacheWarmUpServiceImplTest {
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, null, cacheWarmUpProperties, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            null));
 
     final SMUsageStatistics sm = new SMUsageStatistics().setDay0Count(1);
     final CacheRecordDTO record = new CacheRecordDTO().setNumberOfUsages(23);
@@ -540,18 +497,13 @@ class CacheWarmUpServiceImplTest {
   @Test
   void reloadCache_verifyLoad() {
     // SETUP
-    final MultipleCacheStorageAbstract storage = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract storage = mock(CacheStorageAbstract.class);
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, List.of(storage), cacheWarmUpProperties,
-            cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            cacheWarmUpSchedulerDateRedisRepository, null));
 
     final Holding h1 = new StockHolding().setTicker("23").setValue(BigDecimal.ONE);
     final Holding h2 = new FundSeriesHolding().setFundServCode("F23").setValue(BigDecimal.ONE);
@@ -572,18 +524,14 @@ class CacheWarmUpServiceImplTest {
   @Test
   void run_verifySelectRecords() {
     // SETUP
-    final MultipleCacheStorageAbstract storage = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract storage = mock(CacheStorageAbstract.class);
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
+    final var cacheCleanupPort = mock(CacheCleanupPort.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, List.of(storage), cacheWarmUpProperties,
-            cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            cacheWarmUpSchedulerDateRedisRepository, cacheCleanupPort));
 
     doCallRealMethod().when(sut).reloadCache();
     when(sut.selectRecords()).thenReturn(List.of());
@@ -597,20 +545,39 @@ class CacheWarmUpServiceImplTest {
   }
 
   @Test
-  void run_verifyUpdateDayCountToZeroForDayOfWeek() {
+  void run_verifyClearCache() {
     // SETUP
-    final MultipleCacheStorageAbstract storage = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract storage = mock(CacheStorageAbstract.class);
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
+    final var cacheCleanupPort = mock(CacheCleanupPort.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, List.of(storage), cacheWarmUpProperties,
-            cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            cacheWarmUpSchedulerDateRedisRepository, cacheCleanupPort));
+
+    doCallRealMethod().when(sut).reloadCache();
+    when(sut.selectRecords()).thenReturn(List.of());
+
+    doCallRealMethod().when(sut).run();
+    // ACT
+    sut.run();
+
+    // VERIFY
+    verify(cacheCleanupPort).clearCache();
+  }
+
+  @Test
+  void run_verifyUpdateDayCountToZeroForDayOfWeek() {
+    // SETUP
+    final CacheStorageAbstract storage = mock(CacheStorageAbstract.class);
+    final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
+    final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
+    final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
+    final var cacheCleanupPort = mock(CacheCleanupPort.class);
+    final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
+        .useConstructor(fasUsageStatisticsRepo, List.of(storage), cacheWarmUpProperties,
+            cacheWarmUpSchedulerDateRedisRepository, cacheCleanupPort));
 
     when(sut.selectRecords()).thenReturn(List.of());
 
@@ -625,18 +592,14 @@ class CacheWarmUpServiceImplTest {
   @Test
   void run_verifyReloadCache() {
     // SETUP
-    final MultipleCacheStorageAbstract storage = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract storage = mock(CacheStorageAbstract.class);
     final var fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
     final var cacheWarmUpProperties = mock(CacheWarmUpProperties.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
+    final var cacheCleanupPort = mock(CacheCleanupPort.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
         .useConstructor(fasUsageStatisticsRepo, List.of(storage), cacheWarmUpProperties,
-            cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+            cacheWarmUpSchedulerDateRedisRepository, cacheCleanupPort));
 
     final CacheRecordDTO r = new CacheRecordDTO().setCacheNameEntity(CacheNameEntity.ASSET_ALLOCATION);
     final CacheRecordDTO r1 = new CacheRecordDTO().setNumberOfUsages(2).setCacheNameEntity(
@@ -658,24 +621,18 @@ class CacheWarmUpServiceImplTest {
   void cacheWarmUpSchedulerRunCheck_checkResultSchedulerRunLessThan10HoursAgo() {
     // SETUP
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
-        .useConstructor(null, null, null, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+        .useConstructor(null, null, null, cacheWarmUpSchedulerDateRedisRepository, null));
 
     final ZonedDateTime nowMinus10Hours = ZonedDateTime.now().minusHours(10);
     final RCacheWarmUpDate rCacheWarmUpDate = new RCacheWarmUpDate().setZonedDateTime(nowMinus10Hours);
-    final var expected = new CacheWarmUpServiceImpl.SchedulerRunInfoDto().setLastTimeRun(nowMinus10Hours)
-        .setRunInLast24Hours(true);
+    final var expected = new CacheWarmUpPort.SchedulerRunInfo(true, nowMinus10Hours);
 
     doReturn(List.of(rCacheWarmUpDate)).when(cacheWarmUpSchedulerDateRedisRepository).findAllByPrefixEnv();
 
     doCallRealMethod().when(sut).cacheWarmUpSchedulerRunCheck();
     // ACT
-    final CacheWarmUpServiceImpl.SchedulerRunInfoDto actual = sut.cacheWarmUpSchedulerRunCheck();
+    final CacheWarmUpPort.SchedulerRunInfo actual = sut.cacheWarmUpSchedulerRunCheck();
 
     // VERIFY
     assertEquals(expected, actual);
@@ -685,20 +642,15 @@ class CacheWarmUpServiceImplTest {
   void cacheWarmUpSchedulerRunCheck_checkResultSchedulerDidntRun() {
     // SETUP
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
-        .useConstructor(null, null, null, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
-    final var expected = new CacheWarmUpServiceImpl.SchedulerRunInfoDto().setRunInLast24Hours(false);
+        .useConstructor(null, null, null, cacheWarmUpSchedulerDateRedisRepository, null));
+    final var expected = new CacheWarmUpPort.SchedulerRunInfo(false, null);
 
     doReturn(List.of()).when(cacheWarmUpSchedulerDateRedisRepository).findAll();
 
     doCallRealMethod().when(sut).cacheWarmUpSchedulerRunCheck();
     // ACT
-    final CacheWarmUpServiceImpl.SchedulerRunInfoDto actual = sut.cacheWarmUpSchedulerRunCheck();
+    final CacheWarmUpPort.SchedulerRunInfo actual = sut.cacheWarmUpSchedulerRunCheck();
 
     // VERIFY
     assertEquals(expected, actual);
@@ -708,24 +660,18 @@ class CacheWarmUpServiceImplTest {
   void cacheWarmUpSchedulerRunCheck_checkResultSchedulerDidntRunIn24Hours() {
     // SETUP
     final var cacheWarmUpSchedulerDateRedisRepository = mock(CacheWarmUpSchedulerDateRedisRepository.class);
-    final var cacheManager = mock(CacheManager.class);
-    final var coreRedisCacheRepositories = mock(List.class);
-    final var redisConnectionFactory = mock(RedisConnectionFactory.class);
-    final var cacheKeyPrefix = mock(CacheKeyPrefix.class);
     final var sut = mock(CacheWarmUpServiceImpl.class, withSettings()
-        .useConstructor(null, null, null, cacheWarmUpSchedulerDateRedisRepository,
-            coreRedisCacheRepositories, cacheManager, redisConnectionFactory, cacheKeyPrefix));
+        .useConstructor(null, null, null, cacheWarmUpSchedulerDateRedisRepository, null));
 
     final ZonedDateTime zonedDateTime = ZonedDateTime.now().minusHours(25);
     final RCacheWarmUpDate rCacheWarmUpDate = new RCacheWarmUpDate().setZonedDateTime(zonedDateTime);
-    final var expected = new CacheWarmUpServiceImpl.SchedulerRunInfoDto().setLastTimeRun(zonedDateTime)
-        .setRunInLast24Hours(false);
+    final var expected = new CacheWarmUpPort.SchedulerRunInfo(false, zonedDateTime);
 
     doReturn(List.of(rCacheWarmUpDate)).when(cacheWarmUpSchedulerDateRedisRepository).findAllByPrefixEnv();
 
     doCallRealMethod().when(sut).cacheWarmUpSchedulerRunCheck();
     // ACT
-    final CacheWarmUpServiceImpl.SchedulerRunInfoDto actual = sut.cacheWarmUpSchedulerRunCheck();
+    final CacheWarmUpPort.SchedulerRunInfo actual = sut.cacheWarmUpSchedulerRunCheck();
 
     // VERIFY
     assertEquals(expected, actual);

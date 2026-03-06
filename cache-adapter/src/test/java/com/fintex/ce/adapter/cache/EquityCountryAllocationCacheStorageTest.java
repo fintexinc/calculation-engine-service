@@ -56,8 +56,8 @@ class EquityCountryAllocationCacheStorageTest {
     // SETUP
     final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-    final List<Warning> warnings = List.of(mock(Warning.class));
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+    final List<Holding> holdings = List.of(new Holding());
     final List<DataProvider> providers = mock(List.class);
     final var needToCheckDataProviders = false;
     final var expected = mock(Map.class);
@@ -77,8 +77,8 @@ class EquityCountryAllocationCacheStorageTest {
     // SETUP
     final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-    final List<Warning> warnings = List.of(mock(Warning.class));
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+    final List<Holding> holdings = List.of(new Holding());
     final List<DataProvider> providers = mock(List.class);
 
     doCallRealMethod().when(sut).loadWithDataProvidersCheck(any(), any(), any());
@@ -94,8 +94,8 @@ class EquityCountryAllocationCacheStorageTest {
     // SETUP
     final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-    final List<Warning> warnings = List.of(mock(Warning.class));
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+    final List<Holding> holdings = List.of(new Holding());
     final List<DataProvider> providers = mock(List.class);
     final var needToCheckDataProviders = false;
     final var expected = mock(Map.class);
@@ -115,8 +115,8 @@ class EquityCountryAllocationCacheStorageTest {
     // SETUP
     final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-    final List<Warning> warnings = List.of(mock(Warning.class));
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+    final List<Holding> holdings = List.of(new Holding());
     final List<DataProvider> providers = mock(List.class);
 
     doCallRealMethod().when(sut).load(anyList(), anyList(), anyList(), any(ParamHolderDTO.class));
@@ -132,8 +132,8 @@ class EquityCountryAllocationCacheStorageTest {
     // SETUP
     final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-    final List<Warning> warnings = List.of(mock(Warning.class));
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+    final List<Holding> holdings = List.of(new Holding());
     final List<DataProvider> providers = mock(List.class);
     final var needToCheckDataProviders = false;
     final var mutualFunds = mock(Map.class);
@@ -161,8 +161,8 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-      final List<Warning> warnings = List.of(mock(Warning.class));
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = true;
       final var mutualFunds = mock(Map.class);
@@ -202,8 +202,8 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final EquityCountryAllocationCacheStorage m = mock(EquityCountryAllocationCacheStorage.class);
 
-      final List<Warning> warnings = List.of(mock(Warning.class));
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = false;
 
@@ -225,12 +225,12 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-      final List<Warning> warnings = List.of(mock(Warning.class));
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = false;
 
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final List<FundSeriesHolding> filtered = List.of(new FundSeriesHolding().setFundServCode("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
 
@@ -249,12 +249,12 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-      final List<Warning> warnings = List.of(mock(Warning.class));
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = false;
 
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(sut).load(anyList(), anyList(), anyList(), anyBoolean());
@@ -272,12 +272,12 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final EquityCountryAllocationCacheStorage m = mock(EquityCountryAllocationCacheStorage.class);
 
-      final List<Warning> warnings = List.of(mock(Warning.class));
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = false;
 
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
@@ -296,12 +296,12 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final EquityCountryAllocationCacheStorage m = mock(EquityCountryAllocationCacheStorage.class);
 
-      final List<Warning> warnings = List.of(mock(Warning.class));
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = false;
 
-      final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+      final List<BenchmarkIndexHolding> filtered = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(
           filtered);
 
@@ -320,9 +320,9 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
       final var sut = mock(EquityCountryAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
 
       final var needToCheckDataProviders = false;
@@ -342,13 +342,13 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(EquityCountryAllocationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = false;
 
       doCallRealMethod().when(sut).load(anyList(), anyList(), anyList(), anyBoolean());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       sut.load(holdings, providers, warnings, needToCheckDataProviders);
 
       // VERIFY
@@ -362,9 +362,9 @@ class EquityCountryAllocationCacheStorageTest {
     final CountryAllocationMappingService c = mock(CountryAllocationMappingService.class);
 
     final EquityCountryAllocationCacheStorage m = mock(EquityCountryAllocationCacheStorage.class,
-        withSettings().useConstructor(null, null, null, null, null, c, null, null));
+        withSettings().useConstructor(null, null, null, c, null, null));
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final EquityCountryAllocation v1 = mock(EquityCountryAllocation.class);
     final Map<String, BigDecimal> allocations = Map.of("T", BigDecimal.TEN);
     when(v1.getAllocations()).thenReturn(allocations);
@@ -372,7 +372,7 @@ class EquityCountryAllocationCacheStorageTest {
 
     doCallRealMethod().when(m).mapForNoneStock(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     m.mapForNoneStock(holdings, warnings);
 
     // VERIFY
@@ -385,9 +385,9 @@ class EquityCountryAllocationCacheStorageTest {
     final CountryAllocationMappingService c = mock(CountryAllocationMappingService.class);
 
     final EquityCountryAllocationCacheStorage m = mock(EquityCountryAllocationCacheStorage.class,
-        withSettings().useConstructor(null, null, null, null, null, c, null, null));
+        withSettings().useConstructor(null, null, null, c, null, null));
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final EquityCountryAllocation v1 = mock(EquityCountryAllocation.class);
     final Map<String, BigDecimal> allocations = Map.of("T", BigDecimal.TEN);
     when(v1.getAllocations()).thenReturn(allocations);
@@ -398,7 +398,7 @@ class EquityCountryAllocationCacheStorageTest {
 
     doCallRealMethod().when(m).mapForNoneStock(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     final Map<Holding, Map<CountryRegionType, BigDecimal>> actual = m.mapForNoneStock(holdings, warnings);
 
     // VERIFY
@@ -410,8 +410,7 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
 
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -433,10 +432,9 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
 
-      final Holding holding = mock(Holding.class);
+      final Holding holding = new Holding();
       final Map<Holding, Country> countries = Map.of(holding, CAN);
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -462,10 +460,9 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
 
-      final Holding holding = mock(Holding.class);
+      final Holding holding = new Holding();
       final Map<Holding, Country> countries = Map.of(holding, USA);
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -492,10 +489,9 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
 
-      final Holding holding = mock(Holding.class);
+      final Holding holding = new Holding();
       final Map<Holding, Country> countries = Map.of(holding, EMPTY);
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -521,10 +517,9 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
 
-      final Holding holding = mock(Holding.class);
+      final Holding holding = new Holding();
       final Map<Holding, Country> countries = Map.of(holding, Country.OTHER);
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);

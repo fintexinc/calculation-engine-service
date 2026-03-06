@@ -8,6 +8,7 @@ import com.fintex.ce.constant.CacheCategory;
 import com.fintex.ce.constant.CacheNameEntity;
 import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import org.junit.jupiter.api.Test;
 
@@ -88,10 +89,10 @@ class CacheStatisticServiceImplTest {
     final CacheNameEntity mer = CacheNameEntity.MER;
     final CacheCategory stocks = CacheCategory.STOCKS;
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
-    when(h.getType()).thenReturn(HoldingType.US_STOCKS);
-    when(h.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    final Holding h = new FundSeriesHolding();
+    h.setType(HoldingType.US_STOCKS);
+    h.setHoldingIdentifier(HoldingIdentifierType.FUNDSERV);
+    ((FundSeriesHolding) h).setFundServCode("ID");
     final RedisId r = mock(RedisId.class);
     when(r.getProvider()).thenReturn("PROVIDER");
 
@@ -119,9 +120,9 @@ class CacheStatisticServiceImplTest {
     final CacheStatisticServiceImpl c = mock(CacheStatisticServiceImpl.class,
         withSettings().useConstructor(repo));
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
-    when(h.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    final FundSeriesHolding h = new FundSeriesHolding();
+    h.setFundServCode("ID");
+    h.setHoldingIdentifier(HoldingIdentifierType.FUNDSERV);
     final RedisId r = mock(RedisId.class);
     when(r.getProvider()).thenReturn("PROVIDER");
 
@@ -144,9 +145,9 @@ class CacheStatisticServiceImplTest {
     final CacheStatisticServiceImpl c = mock(CacheStatisticServiceImpl.class,
         withSettings().useConstructor(repo));
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
-    when(h.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    final FundSeriesHolding h = new FundSeriesHolding();
+    h.setFundServCode("ID");
+    h.setHoldingIdentifier(HoldingIdentifierType.FUNDSERV);
     final RedisId r = mock(RedisId.class);
     when(r.getProvider()).thenReturn("PROVIDER");
 
@@ -171,9 +172,9 @@ class CacheStatisticServiceImplTest {
     final CacheStatisticServiceImpl c = mock(CacheStatisticServiceImpl.class,
         withSettings().useConstructor(repo));
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
-    when(h.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    final FundSeriesHolding h = new FundSeriesHolding();
+    h.setFundServCode("ID");
+    h.setHoldingIdentifier(HoldingIdentifierType.FUNDSERV);
     final RedisId r = mock(RedisId.class);
     when(r.getProvider()).thenReturn("PROVIDER");
 
@@ -244,9 +245,9 @@ class CacheStatisticServiceImplTest {
     final Function func = mock(Function.class);
     when(c.dayOfWeekMap.get(any())).thenReturn(func);
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
-    when(h.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    final FundSeriesHolding h = new FundSeriesHolding();
+    h.setFundServCode("ID");
+    h.setHoldingIdentifier(HoldingIdentifierType.FUNDSERV);
     final RedisId r = mock(RedisId.class);
     when(r.getProvider()).thenReturn("PROVIDER");
 

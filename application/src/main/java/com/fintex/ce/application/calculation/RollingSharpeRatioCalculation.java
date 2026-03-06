@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.application.calculation.core.RollingAbstractCalculation;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.application.result.RollingSharpeRatioResult;
+import com.fintex.ce.port.input.result.RollingSharpeRatioResult;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;

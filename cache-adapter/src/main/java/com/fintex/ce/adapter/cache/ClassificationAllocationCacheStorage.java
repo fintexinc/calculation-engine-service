@@ -13,9 +13,9 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RClassificationAllocation;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.ClassificationAllocationRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -44,8 +44,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class ClassificationAllocationCacheStorage
-    extends
-      MultipleCacheStorageAbstract<ClassificationAllocation, ClassificationAllocation, ClassificationAllocation, ClassificationAllocation, RClassificationAllocation> {
+    extends CacheStorageAbstract<ClassificationAllocation, RClassificationAllocation, Map<Holding, Map<ClassificationAllocationType, BigDecimal>>> {
   public static final Map<ClassificationAllocationType, BigDecimal> DEFAULT_MAP;
 
   static final Map<HoldingType, ClassificationAllocationType> UNCLASSIFIED_MAP;
@@ -66,21 +65,15 @@ public class ClassificationAllocationCacheStorage
   }
 
   public ClassificationAllocationCacheStorage(
-      final MultipleSMRepository<ClassificationAllocation, ClassificationAllocation, ClassificationAllocation, ClassificationAllocation> smRepo,
+      final SecurityDataPort<ClassificationAllocation> securityDataPort,
       final CacheEntityMapper<ClassificationAllocation, RClassificationAllocation> mapper,
-      final ClassificationAllocationRepository fundCanadaCacheRepo,
-      final ClassificationAllocationRepository etfCanadaCacheRepo,
-      final ClassificationAllocationRepository etfUsCacheRepo,
-      final ClassificationAllocationRepository stockCacheRepo,
+      final ClassificationAllocationRepository classificationAllocationRepository,
       final CacheStatisticService cacheStatisticService) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        stockCacheRepo, cacheStatisticService, CacheNameEntity.CLASSIFICATION_ALLOCATION);
+    super(securityDataPort, mapper, classificationAllocationRepository, cacheStatisticService, CacheNameEntity.CLASSIFICATION_ALLOCATION);
   }
 
   @Override
-  public Map<Holding, Map<ClassificationAllocationType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<ClassificationAllocationType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     Map<Holding, Map<ClassificationAllocationType, BigDecimal>> map = new HashMap<>();
@@ -109,8 +102,8 @@ public class ClassificationAllocationCacheStorage
       final Function<T, Currency> getCurrencyFunction,
       final Currency currency,
       final ClassificationAllocationType allocationType) {
-    return filterHoldings(holdings, holding -> Objects.equals(getCurrencyFunction.apply(holding), currency))
-        .stream()
+    return holdings.stream()
+        .filter(holding -> Objects.equals(getCurrencyFunction.apply(holding), currency))
         .collect(Collectors.toMap(Function.identity(), h -> Map.of(allocationType, BigDecimal.ONE)));
   }
 

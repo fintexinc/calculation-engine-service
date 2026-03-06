@@ -4,10 +4,11 @@ import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.GeographicExposureResult;
+import com.fintex.ce.port.input.result.GeographicExposureResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.FixedIncomeGeographicExposureCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ public class FixedIncomeGeographicExposureCalculationImpl
     extends
       BreakdownAbstractService<GeographicExposureResult, GeographicRegionType> {
 
-  private final FixedIncomeGeographicExposureCacheStorage exposureCacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<GeographicRegionType, BigDecimal>>> exposureCacheStorage;
 
   public static final Map<GeographicRegionType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
@@ -33,7 +34,7 @@ public class FixedIncomeGeographicExposureCalculationImpl
     Stream.of(GeographicRegionType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
   }
 
-  public FixedIncomeGeographicExposureCalculationImpl(FixedIncomeGeographicExposureCacheStorage exposureCacheStorage) {
+  public FixedIncomeGeographicExposureCalculationImpl(@Qualifier("fiGeographic") HoldingDataLoader<Map<Holding, Map<GeographicRegionType, BigDecimal>>> exposureCacheStorage) {
     super();
     this.exposureCacheStorage = exposureCacheStorage;
   }

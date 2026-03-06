@@ -32,8 +32,8 @@ class ManagementExpenseAbstractCacheStorageTest {
       // SETUP
       final var sut = mock(AverageMERCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<Holding> filtered = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<Holding> filtered = List.of(new Holding());
 
       final Map benchFunds = new HashMap<>();
       when(sut.loadBenchOfFundCanada(anyList(), any())).thenReturn(benchFunds);
@@ -66,8 +66,8 @@ class ManagementExpenseAbstractCacheStorageTest {
       // SETUP
       final var sut = mock(AverageMERCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<Holding> filtered = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<Holding> filtered = List.of(new Holding());
 
       final Map benchFunds = new HashMap<>();
       when(sut.loadForBenchOfEtfCanada(anyList(), any())).thenReturn(benchFunds);
@@ -100,8 +100,8 @@ class ManagementExpenseAbstractCacheStorageTest {
       // SETUP
       final var sut = mock(AverageMERCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<Holding> filtered = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<Holding> filtered = List.of(new Holding());
 
       final Map benchFunds = new HashMap<>();
       when(sut.loadForBenchOfEtfUs(anyList(), any())).thenReturn(benchFunds);
@@ -133,8 +133,8 @@ class ManagementExpenseAbstractCacheStorageTest {
       // SETUP
       final var sut = mock(AverageMERCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<Holding> filtered = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<Holding> filtered = List.of(new Holding());
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CASH_PREDICATE))).thenReturn(filtered);
 
@@ -155,8 +155,8 @@ class ManagementExpenseAbstractCacheStorageTest {
       // SETUP
       final var sut = mock(AverageMERCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<Holding> filtered = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<Holding> filtered = List.of(new Holding());
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_STOCKS_PREDICATE))).thenReturn(
           filtered);
@@ -178,8 +178,8 @@ class ManagementExpenseAbstractCacheStorageTest {
       // SETUP
       final var sut = mock(AverageMERCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<Holding> filtered = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<Holding> filtered = List.of(new Holding());
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_STOCKS_PREDICATE))).thenReturn(
           filtered);
@@ -203,8 +203,8 @@ class ManagementExpenseAbstractCacheStorageTest {
     final AverageManagementExpenseCalculationDTO merDTO = mock(AverageManagementExpenseCalculationDTO.class);
     when(sut.mapperForHolding(any())).thenReturn(merDTO);
 
-    final Holding h = mock(Holding.class);
-    when(h.getType()).thenReturn(HoldingType.CASH);
+    final Holding h = new Holding();
+    h.setType(HoldingType.CASH);
 
     doCallRealMethod().when(sut).addHoldingsToResult(any(), any());
     // ACT
@@ -224,8 +224,8 @@ class ManagementExpenseAbstractCacheStorageTest {
     final AverageManagementExpenseCalculationDTO merDTO = mock(AverageManagementExpenseCalculationDTO.class);
     when(sut.mapperForHolding(any())).thenReturn(merDTO);
 
-    final Holding h = mock(Holding.class);
-    when(h.getType()).thenReturn(HoldingType.CASH);
+    final Holding h = new Holding();
+    h.setType(HoldingType.CASH);
 
     final BiFunction fdsCall = mock(BiFunction.class);
     final RedisId redisId = mock(RedisId.class);
@@ -260,8 +260,8 @@ class ManagementExpenseAbstractCacheStorageTest {
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
     when(sut.mapperForHolding(any())).thenReturn(merDTO);
 
-    final var holding = mock(Holding.class);
-    when(holding.getType()).thenReturn(HoldingType.CASH);
+    final var holding = new Holding();
+    holding.setType(HoldingType.CASH);
 
     final var fdsCall = mock(BiFunction.class);
     final var redisId = mock(RedisId.class);
@@ -292,8 +292,8 @@ class ManagementExpenseAbstractCacheStorageTest {
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
     when(sut.mapperForHolding(any())).thenReturn(merDTO);
 
-    final var holding = mock(Holding.class);
-    when(holding.getType()).thenReturn(HoldingType.CASH);
+    final var holding = new Holding();
+    holding.setType(HoldingType.CASH);
 
     final var fdsCall = mock(BiFunction.class);
     final var redisId = mock(RedisId.class);
@@ -318,9 +318,9 @@ class ManagementExpenseAbstractCacheStorageTest {
     // SETUP
     final var sut = mock(AverageMERCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
-    when(h.getType()).thenReturn(HoldingType.CASH);
-    when(h.getValue()).thenReturn(BigDecimal.TEN);
+    final Holding h = new Holding();
+    h.setType(HoldingType.CASH);
+    h.setValue(BigDecimal.TEN);
 
     doCallRealMethod().when(sut).preBuildAverageMerDto(any());
     // ACT
@@ -339,7 +339,7 @@ class ManagementExpenseAbstractCacheStorageTest {
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
     when(sut.preBuildAverageMerDto(any())).thenReturn(merDTO);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
 
     doCallRealMethod().when(sut).mapperForHolding(any());
     // ACT
@@ -358,7 +358,7 @@ class ManagementExpenseAbstractCacheStorageTest {
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
     when(sut.preBuildAverageMerDto(any())).thenReturn(merDTO);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
 
     doCallRealMethod().when(sut).mapperForHolding(any());
     // ACT

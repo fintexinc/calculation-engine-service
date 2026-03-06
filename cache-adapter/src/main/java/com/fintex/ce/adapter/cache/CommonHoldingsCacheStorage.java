@@ -15,11 +15,10 @@ import com.fintex.ce.domain.exception.GeneralRuntimeException;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.adapter.cache.entity.topcommonholdings.RCommonHoldings;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.commonholdings.CommonHoldingsRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -49,8 +48,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class CommonHoldingsCacheStorage
-    extends
-      MultipleCacheStorageAbstract<CommonHoldings, CommonHoldings, CommonHoldings, CommonHoldingsStock, RCommonHoldings> {
+    extends CacheStorageAbstract<CommonHoldings, RCommonHoldings, Map<Holding, List<CommonHoldingsDTO>>> {
 
   public Set<String> firstLvlRecursionTypes;
   private static final String ABSENT_STOCK_HOLDING = "There is no corresponding stock holding for that holding:";
@@ -58,26 +56,18 @@ public class CommonHoldingsCacheStorage
   private static final String CASH_NAME = "Cash";
   private static final String EQUITY_TYPE = "E";
 
-  @Autowired
-  @SuppressWarnings("unchecked")
   public CommonHoldingsCacheStorage(
       @Value("#{'${default.top-common-holdings.recursion-types}'.split(',')}") Set<String> firstLvlRecursionTypes,
-      MultipleSMRepository<CommonHoldings, CommonHoldings, CommonHoldings, CommonHoldingsStock> smRepo,
+      SecurityDataPort<CommonHoldings> securityDataPort,
       CacheEntityMapper<CommonHoldings, RCommonHoldings> mapper,
-      CommonHoldingsRepository fundCanadaCacheRepo,
-      CommonHoldingsRepository etfCanadaCacheRepo,
-      CommonHoldingsRepository etfUsCacheRepo,
-      CommonHoldingsRepository stockRepository,
+      CommonHoldingsRepository commonHoldingsRepository,
       CacheStatisticService cacheStatisticService) {
-    super(
-        smRepo, mapper, mapper, mapper, (CacheEntityMapper) mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        stockRepository, cacheStatisticService, CacheNameEntity.TOP_COMMON_HOLDINGS);
+    super(securityDataPort, mapper, commonHoldingsRepository, cacheStatisticService, CacheNameEntity.TOP_COMMON_HOLDINGS);
     this.firstLvlRecursionTypes = firstLvlRecursionTypes;
   }
 
   @Override
-  public Map<Holding, List<CommonHoldingsDTO>> load(List<Holding> holdings, List<DataProvider> providers,
+  public Map<Holding, List<CommonHoldingsDTO>> load(List<? extends Holding> holdings, List<DataProvider> providers,
       List<Warning> warnings, ParamHolderDTO paramHolderDTO) {
     var notification = new Notification();
     Map<Holding, List<CommonHoldingsDTO>> result = new HashMap<>();
@@ -106,14 +96,16 @@ public class CommonHoldingsCacheStorage
     result.putAll(mapForNoneStock(canadaPooledFunds));
     result.putAll(mapForNoneStock(canadaHedgeFunds));
     result.putAll(mapForNoneStock(usMutualFunds));
-    result.putAll(mapForStock(loadForBenchOfStock(filterHoldings(holdings, STOCK_PREDICATE), List.of()),
-        paramHolderDTO));
+    @SuppressWarnings("unchecked")
+    Map<Holding, CommonHoldingsStock> stockData = (Map<Holding, CommonHoldingsStock>) (Map<?, ?>)
+        loadForBenchOfStock(filterHoldings(holdings, STOCK_PREDICATE), List.of());
+    result.putAll(mapForStock(stockData, paramHolderDTO));
     result.putAll(mapForCash(holdings));
     result.putAll(mapForGic(holdings));
     return result;
   }
 
-  Map<Holding, List<CommonHoldingsDTO>> mapForCash(final List<Holding> holdings) {
+  Map<Holding, List<CommonHoldingsDTO>> mapForCash(final List<? extends Holding> holdings) {
     Map<Holding, List<CommonHoldingsDTO>> result = new HashMap<>();
     final List<CashHolding> cashHoldings = filterHoldings(holdings, CASH_PREDICATE);
     if (cashHoldings.isEmpty()) {
@@ -132,7 +124,7 @@ public class CommonHoldingsCacheStorage
     return result;
   }
 
-  Map<Holding, List<CommonHoldingsDTO>> mapForGic(final List<Holding> holdings) {
+  Map<Holding, List<CommonHoldingsDTO>> mapForGic(final List<? extends Holding> holdings) {
     Map<Holding, List<CommonHoldingsDTO>> result = new HashMap<>();
     final List<GicHolding> gicHoldings = filterHoldings(holdings, GIC_PREDICATE);
     if (gicHoldings.isEmpty()) {

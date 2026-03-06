@@ -5,7 +5,7 @@ import com.fintex.ce.application.service.calculation.period.DistributionOfReturn
 import com.fintex.ce.domain.constant.BigDecimalConstants;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.application.command.DistributionOfReturnsCommand;
+import com.fintex.ce.port.input.command.DistributionOfReturnsCommand;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.junit.jupiter.api.Test;

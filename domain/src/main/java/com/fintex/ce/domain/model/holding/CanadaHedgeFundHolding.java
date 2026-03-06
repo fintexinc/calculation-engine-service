@@ -1,6 +1,8 @@
 package com.fintex.ce.domain.model.holding;
 
 import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -24,6 +26,7 @@ public class CanadaHedgeFundHolding extends Holding {
   public CanadaHedgeFundHolding(BigDecimal amount, String morningstarId) {
     super(amount, HoldingType.CANADA_HEDGE_FUNDS);
     this.morningstarId = morningstarId;
+    setSecurityIdentifier(new SecurityIdentifier(morningstarId, FiIdentifierType.MORNINGSTAR_ID));
   }
 
   @Override

@@ -55,11 +55,10 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<FundSeriesHolding> filtered = List.of(new FundSeriesHolding().setFundServCode("TEST"));
 
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
@@ -69,7 +68,7 @@ class EquityGeographicAllocationCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -87,21 +86,20 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<CanadaPooledFundHolding> filtered = List.of(mock(CanadaPooledFundHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<CanadaPooledFundHolding> filtered = List.of(new CanadaPooledFundHolding().setMorningstarId("TEST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_POOLED_FUND_PREDICATE)))
           .thenReturn(filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -119,21 +117,20 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<UsMutualFundHolding> filtered = List.of(mock(UsMutualFundHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<UsMutualFundHolding> filtered = List.of(new UsMutualFundHolding().setTicker("TEST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_MUTUAL_FUND_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -151,21 +148,20 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<CanadaHedgeFundHolding> filtered = List.of(mock(CanadaHedgeFundHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<CanadaHedgeFundHolding> filtered = List.of(new CanadaHedgeFundHolding().setMorningstarId("TEST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_HEDGE_FUND_PREDICATE)))
           .thenReturn(filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -183,20 +179,19 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -214,21 +209,20 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -246,18 +240,17 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<BenchmarkIndexHolding> filtered = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -275,13 +268,12 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final Map allocations = mock(Map.class);
       final Map nonStockResult = mock(Map.class);
-      final FundSeriesHolding fundSeries = mock(FundSeriesHolding.class);
+      final FundSeriesHolding fundSeries = new FundSeriesHolding().setFundServCode("TEST");
       final EquityCountryAllocation equityCountryAllocation = mock(EquityCountryAllocation.class);
       final List<FundSeriesHolding> filtered = List.of(fundSeries);
 
@@ -296,7 +288,7 @@ class EquityGeographicAllocationCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       final Map<Holding, Map<GeographicRegionType, BigDecimal>> result = sut.load(
           holdings,
@@ -321,13 +313,12 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, geographicAllocationMappingService,
-              null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final Map allocations = mock(Map.class);
       final Map nonStockResult = mock(Map.class);
-      final StockHolding stockHolding = mock(StockHolding.class);
+      final StockHolding stockHolding = new StockHolding().setTicker("TEST").setExchangeCode("TST");
       final EquityCountryAllocation equityCountryAllocation = mock(EquityCountryAllocation.class);
       final List<StockHolding> filtered = List.of(stockHolding);
 
@@ -344,7 +335,7 @@ class EquityGeographicAllocationCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       final Map<Holding, Map<GeographicRegionType, BigDecimal>> result = sut.load(
           holdings,

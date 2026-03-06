@@ -10,11 +10,10 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RFixedIncomeBondSecurities;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.fixedincomebondsector.FixedIncomeBondSectorRedisRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -44,8 +43,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class FixedIncomeBondSectorCacheStorage
-    extends
-      MultipleCacheStorageAbstract<FixedIncomeBondSecurities, FixedIncomeBondSecurities, FixedIncomeBondSecurities, FixedIncomeBondSecurities, RFixedIncomeBondSecurities> {
+    extends CacheStorageAbstract<FixedIncomeBondSecurities, RFixedIncomeBondSecurities, Map<Holding, Map<FixedIncomeSectorType, BigDecimal>>> {
 
   static final Map<FixedIncomeSectorType, BigDecimal> DEFAULT_MAP;
 
@@ -54,20 +52,17 @@ public class FixedIncomeBondSectorCacheStorage
         Stream.of(FixedIncomeSectorType.values()).collect(toMap(type -> type, type -> ZERO)));
   }
 
-  @Autowired
   public FixedIncomeBondSectorCacheStorage(
-      final MultipleSMRepository<FixedIncomeBondSecurities, FixedIncomeBondSecurities, FixedIncomeBondSecurities, FixedIncomeBondSecurities> smRepo,
+      final SecurityDataPort<FixedIncomeBondSecurities> securityDataPort,
       final CacheEntityMapper<FixedIncomeBondSecurities, RFixedIncomeBondSecurities> mapper,
       final FixedIncomeBondSectorRedisRepository fixedIncomeBondSectorRedisRepository,
       final CacheStatisticService cacheStatisticService) {
-    super(smRepo, mapper, mapper, mapper, mapper,
-        fixedIncomeBondSectorRedisRepository, fixedIncomeBondSectorRedisRepository,
-        fixedIncomeBondSectorRedisRepository, fixedIncomeBondSectorRedisRepository, cacheStatisticService,
-        CacheNameEntity.ASSET_ALLOCATION);
+    super(securityDataPort, mapper, fixedIncomeBondSectorRedisRepository, cacheStatisticService,
+        CacheNameEntity.FIXED_INCOME_BOND_SECURITIES);
   }
 
   @Override
-  public Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> dataProviders,
       final List<Warning> warnings, final ParamHolderDTO paramHolder) {
     final Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> map = new HashMap<>();
@@ -90,7 +85,7 @@ public class FixedIncomeBondSectorCacheStorage
     return map;
   }
 
-  private Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> addGics(final List<Holding> holdings) {
+  private Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> addGics(final List<? extends Holding> holdings) {
     final HashMap<Holding, Map<FixedIncomeSectorType, BigDecimal>> result = new HashMap<>();
     for (final Holding holding : holdings) {
       final GicHolding gic = (GicHolding) holding;
@@ -103,7 +98,7 @@ public class FixedIncomeBondSectorCacheStorage
     return result;
   }
 
-  public Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> getCashHoldingValues(final List<Holding> holdings) {
+  public Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> getCashHoldingValues(final List<? extends Holding> holdings) {
     return filterHoldings(holdings, CASH_PREDICATE).stream().collect(toMap(h -> h, h -> Map.of(ST_INVESTMENTS, ONE)));
   }
 

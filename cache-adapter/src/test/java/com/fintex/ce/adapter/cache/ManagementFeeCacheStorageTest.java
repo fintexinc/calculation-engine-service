@@ -25,7 +25,7 @@ class ManagementFeeCacheStorageTest {
     // SETUP
     var sut = mock(ManagementFeeCacheStorage.class);
 
-    var holding = mock(FundSeriesHolding.class);
+    var holding = new FundSeriesHolding();
     var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
 
     when(merDTO.setActualManagementFee(any())).thenReturn(merDTO);
@@ -45,7 +45,7 @@ class ManagementFeeCacheStorageTest {
     // SETUP
     var sut = mock(ManagementFeeCacheStorage.class);
 
-    var holding = mock(EtfHolding.class);
+    var holding = new EtfHolding();
     var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
 
     when(merDTO.setActualManagementFee(any())).thenReturn(merDTO);
@@ -65,7 +65,7 @@ class ManagementFeeCacheStorageTest {
     // SETUP
     var sut = mock(ManagementFeeCacheStorage.class);
 
-    var holding = mock(EtfHolding.class);
+    var holding = new EtfHolding();
     var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
 
     when(merDTO.setActualManagementFee(any())).thenReturn(merDTO);
@@ -85,7 +85,7 @@ class ManagementFeeCacheStorageTest {
     // SETUP
     var sut = mock(ManagementFeeCacheStorage.class);
 
-    var holding = mock(EtfHolding.class);
+    var holding = new EtfHolding();
     var merRes = mock(ManagementFee.class);
     var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
 
@@ -106,7 +106,7 @@ class ManagementFeeCacheStorageTest {
     // SETUP
     var sut = mock(ManagementFeeCacheStorage.class);
 
-    var holding = mock(EtfHolding.class);
+    var holding = new EtfHolding();
     var merRes = mock(ManagementFee.class);
     var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
 
@@ -127,7 +127,7 @@ class ManagementFeeCacheStorageTest {
     // SETUP
     var sut = mock(ManagementFeeCacheStorage.class);
 
-    var holding = mock(FundSeriesHolding.class);
+    var holding = new FundSeriesHolding();
     var merRes = mock(ManagementFee.class);
     var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
 

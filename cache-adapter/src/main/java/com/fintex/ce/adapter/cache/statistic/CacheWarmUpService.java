@@ -1,11 +1,7 @@
 package com.fintex.ce.adapter.cache.statistic;
 
-public interface CacheWarmUpService {
+import com.fintex.ce.port.output.cache.CacheWarmUpPort;
 
-  void run();
-
-  void clearCache();
-
-  CacheWarmUpServiceImpl.SchedulerRunInfoDto cacheWarmUpSchedulerRunCheck();
+public interface CacheWarmUpService extends CacheWarmUpPort {
 
 }

@@ -1,6 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.IncomeForecastCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.IncomeForecastCalculationServiceImpl;
 import com.fintex.ce.domain.model.IncomeForecast;
 import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
@@ -11,8 +11,8 @@ import com.fintex.ce.domain.model.holding.FixedIncomeHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.smclient.graphql.PaymentFrequencyType;
-import com.fintex.ce.application.command.IncomeForecastCommand;
-import com.fintex.ce.application.result.IncomeForecastResult;
+import com.fintex.ce.port.input.command.IncomeForecastCommand;
+import com.fintex.ce.port.input.result.IncomeForecastResult;
 import com.fintex.ce.util.DecimalUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 class IncomeForecastCalculationServiceImplTest {
 
   @Mock
-  private IncomeForecastCacheStorage incomeForecastCacheStorage;
+  private HoldingDataLoader incomeForecastCacheStorage;
 
   @InjectMocks
   private IncomeForecastCalculationServiceImpl sut;

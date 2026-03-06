@@ -7,8 +7,8 @@ import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.ReturnCommand;
-import com.fintex.ce.application.result.AnnualReturnResult;
+import com.fintex.ce.port.input.command.ReturnCommand;
+import com.fintex.ce.port.input.result.AnnualReturnResult;
 import com.fintex.ce.monthlyreturns.Returns;
 import org.junit.jupiter.api.Test;
 

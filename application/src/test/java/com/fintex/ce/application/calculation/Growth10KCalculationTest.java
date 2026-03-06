@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.application.calculation.Growth10KCalculation;
 import com.fintex.ce.domain.model.CommonDates;
-import com.fintex.ce.application.result.core.KeyValueResult;
+import com.fintex.ce.port.input.result.core.KeyValueResult;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

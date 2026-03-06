@@ -1,6 +1,6 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.adapter.cache.TBillsCacheStorage;
+import com.fintex.ce.port.output.cache.TBillsProvider;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.application.service.calculation.period.DownsideDeviationCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.Currency;
@@ -26,7 +26,7 @@ class DownsideDeviationCalculationServiceImplTest {
   @Test
   void defineCalculationMethod_verifyDefineCalculationMethod() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsCacheStorage.class);
+    final var tBillsCacheStorage = mock(TBillsProvider.class);
     final var sut = mock(DownsideDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsCacheStorage, Set.of()));
 

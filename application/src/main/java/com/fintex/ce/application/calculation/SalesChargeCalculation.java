@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.domain.enumeration.calculation.SalesCharge;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.result.SalesChargeResult;
+import com.fintex.ce.port.input.result.SalesChargeResult;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;

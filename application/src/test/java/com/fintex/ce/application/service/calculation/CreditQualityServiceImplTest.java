@@ -1,7 +1,7 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.AssetAllocationCacheStorage;
-import com.fintex.ce.adapter.cache.CreditQualityCacheStorage;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapper.response.CreditQualityResponseMapper;
 import com.fintex.ce.application.service.calculation.CreditQualityServiceImpl;
@@ -15,7 +15,7 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.CreditQualityResult;
+import com.fintex.ce.port.input.result.CreditQualityResult;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
@@ -59,8 +59,8 @@ class CreditQualityServiceImplTest {
   @Test
   void perform_verifyLoad() {
     // SETUP
-    final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -88,8 +88,8 @@ class CreditQualityServiceImplTest {
   void perform_verifyAreAllValuesInMapEmpty() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -121,8 +121,8 @@ class CreditQualityServiceImplTest {
   void perform_verifyGetFixedIncomeCreditQuality() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -154,8 +154,8 @@ class CreditQualityServiceImplTest {
   void perform_verifyCalculate() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -189,8 +189,8 @@ class CreditQualityServiceImplTest {
   @Test
   void perform_verifyResponseMapperFromCalculatedValues() {
     // SETUP
-    final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -217,8 +217,8 @@ class CreditQualityServiceImplTest {
   @Test
   void perform_checkResult() {
     // SETUP
-    final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -248,8 +248,8 @@ class CreditQualityServiceImplTest {
   @Test
   void getFixedIncomeCreditQuality_verifyLoad() {
     // SETUP
-    final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -280,8 +280,8 @@ class CreditQualityServiceImplTest {
   void getFixedIncomeCreditQuality_verifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -311,8 +311,8 @@ class CreditQualityServiceImplTest {
   @Test
   void getFixedIncomeCreditQuality_verifyValidate() {
     // SETUP
-    final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -337,8 +337,8 @@ class CreditQualityServiceImplTest {
   @Test
   void getFixedIncomeCreditQuality_verifyMapForAA() {
     // SETUP
-    final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
@@ -363,8 +363,8 @@ class CreditQualityServiceImplTest {
   @Test
   void getFixedIncomeCreditQuality_checkResult() {
     // SETUP
-    final var creditQualityCacheStorage = mock(CreditQualityCacheStorage.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);

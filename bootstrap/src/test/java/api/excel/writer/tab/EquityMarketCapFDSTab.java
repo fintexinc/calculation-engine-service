@@ -4,7 +4,7 @@ import api.dto.RequestParamsSupplier;
 import api.excel.writer.SMDataWriter;
 import api.excel.writer.WritableSpreadsheet;
 import api.util.CommonTools;
-import com.fintex.ce.adapter.graphqlclient.repository.EquityMarketCapitalizationSMRepository;
+import com.fintex.ce.adapter.graphqlclient.repository.EquityMarketCapGraphqlDataFetcher;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.EquityMarketCapitalization;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -22,11 +22,11 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class EquityMarketCapFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-  private static final EquityMarketCapitalizationSMRepository EQUITY_MARKET_CAP_FDS = initEquityMarketCapFDS();
+  private static final EquityMarketCapGraphqlDataFetcher EQUITY_MARKET_CAP_FDS = initEquityMarketCapFDS();
   private static final String TAB_NAME = "EquityMarketCapital_FDS";
 
-  private static EquityMarketCapitalizationSMRepository initEquityMarketCapFDS() {
-    return new EquityMarketCapitalizationSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+  private static EquityMarketCapGraphqlDataFetcher initEquityMarketCapFDS() {
+    return new EquityMarketCapGraphqlDataFetcher(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
   }
 
   @Override

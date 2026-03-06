@@ -1,13 +1,13 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.YieldCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.mapper.response.YieldResponseMapper;
 import com.fintex.ce.application.service.calculation.YieldCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.Yield;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.YieldCommand;
-import com.fintex.ce.application.result.YieldResult;
+import com.fintex.ce.port.input.command.YieldCommand;
+import com.fintex.ce.port.input.result.YieldResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 class YieldCalculationServiceImplTest {
 
   @Mock
-  private YieldCacheStorage yieldCacheStorage;
+  private HoldingDataLoader yieldCacheStorage;
   @Mock
   private YieldResponseMapper responseMapper;
 

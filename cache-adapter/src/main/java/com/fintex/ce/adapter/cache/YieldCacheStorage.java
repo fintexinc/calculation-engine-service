@@ -8,9 +8,9 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.Yield;
 import com.fintex.ce.adapter.cache.entity.RYield;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.YieldRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 
@@ -38,23 +38,17 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 import static java.util.stream.Collectors.toMap;
 
 @Service
-public class YieldCacheStorage extends MultipleCacheStorageAbstract<Yield, Yield, Yield, Yield, RYield> {
+public class YieldCacheStorage extends CacheStorageAbstract<Yield, RYield, Map<Holding, Yield>> {
 
-  public YieldCacheStorage(final MultipleSMRepository<Yield, Yield, Yield, Yield> smRepo,
+  public YieldCacheStorage(final SecurityDataPort<Yield> securityDataPort,
       final CacheEntityMapper<Yield, RYield> yieldMapper,
-      final YieldRepository fundCanadaCacheRepo,
-      final YieldRepository etfCanadaCacheRepo,
-      final YieldRepository etfUsCacheRepo,
-      final YieldRepository stockCacheRepo,
+      final YieldRepository yieldRepository,
       final CacheStatisticService cacheStatisticService) {
-    super(
-        smRepo, yieldMapper, yieldMapper, yieldMapper, yieldMapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        stockCacheRepo, cacheStatisticService, YIELD);
+    super(securityDataPort, yieldMapper, yieldRepository, cacheStatisticService, YIELD);
   }
 
   @Override
-  public Map<Holding, Yield> load(final List<Holding> holdings, final List<DataProvider> providers,
+  public Map<Holding, Yield> load(final List<? extends Holding> holdings, final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     final Map<Holding, Yield> map = new HashMap<>();
     map.putAll(verify(loadForBenchOfEtfUs(filterHoldings(holdings, US_ETF_PREDICATE), List.of()), warnings));

@@ -10,10 +10,10 @@ import com.fintex.ce.domain.model.holding.StockHolding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.equitymarketcapitalization.REquityMarketCapitalization;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.equitymarketcapitalization.EquityMarketCapitalizationRepository;
 import com.fintex.ce.adapter.cache.repository.equitymarketcapitalization.EquityMarketCapitalizationStockRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -46,8 +46,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class EquityMarketCapitalizationCacheStorage
-    extends
-      MultipleCacheStorageAbstract<EquityMarketCapitalization, EquityMarketCapitalization, EquityMarketCapitalization, EquityMarketCapitalizationStock, REquityMarketCapitalization> {
+    extends CacheStorageAbstract<EquityMarketCapitalization, REquityMarketCapitalization, Map<Holding, Map<EquityMarketCapType, BigDecimal>>> {
 
   static final Map<EquityMarketCapType, BigDecimal> DEFAULT_MAP;
 
@@ -59,22 +58,17 @@ public class EquityMarketCapitalizationCacheStorage
   private final EquityMarketCapitalizationStockRepository stockRepository;
 
   public EquityMarketCapitalizationCacheStorage(
-      MultipleSMRepository<EquityMarketCapitalization, EquityMarketCapitalization, EquityMarketCapitalization, EquityMarketCapitalizationStock> smRepo,
+      SecurityDataPort<EquityMarketCapitalization> securityDataPort,
       CacheEntityMapper<EquityMarketCapitalization, REquityMarketCapitalization> mapper,
-      EquityMarketCapitalizationRepository fundCanadaCacheRepo,
-      EquityMarketCapitalizationRepository etfCanadaCacheRepo,
-      EquityMarketCapitalizationRepository etfUsCacheRepo,
+      EquityMarketCapitalizationRepository equityMarketCapitalizationRepository,
       EquityMarketCapitalizationStockRepository stockRepository,
       CacheStatisticService cacheStatisticService) {
-    super(
-        smRepo, mapper, mapper, mapper, null,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        null, cacheStatisticService, EQUITY_MARKET_CAPITALIZATION);
+    super(securityDataPort, mapper, equityMarketCapitalizationRepository, cacheStatisticService, EQUITY_MARKET_CAPITALIZATION);
     this.stockRepository = stockRepository;
   }
 
   @Override
-  public Map<Holding, Map<EquityMarketCapType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<EquityMarketCapType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     final Map<Holding, Map<EquityMarketCapType, BigDecimal>> map = new HashMap<>();
@@ -95,7 +89,7 @@ public class EquityMarketCapitalizationCacheStorage
     return map;
   }
 
-  public Map<Holding, Map<EquityMarketCapType, BigDecimal>> mapForStocks(final List<Holding> holdings,
+  public Map<Holding, Map<EquityMarketCapType, BigDecimal>> mapForStocks(final List<? extends Holding> holdings,
       final List<Warning> warnings) {
     final List<StockHolding> stockHoldings = filterHoldings(holdings, STOCK_PREDICATE);
     final Map<StockHolding, EquityMarketCapitalization> responseMap = loadStockCapitalizations(stockHoldings);

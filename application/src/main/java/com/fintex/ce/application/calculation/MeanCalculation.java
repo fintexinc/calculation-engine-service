@@ -2,9 +2,9 @@ package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.application.result.MeanResult;
+import com.fintex.ce.port.input.result.MeanResult;
 import com.fintex.ce.port.input.result.PeriodResult;
-import com.fintex.ce.application.result.core.TimeIntervalResult;
+import com.fintex.ce.port.input.result.core.TimeIntervalResult;
 import com.fintex.ce.util.CalculationUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;

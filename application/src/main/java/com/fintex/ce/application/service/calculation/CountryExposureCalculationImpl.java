@@ -5,10 +5,11 @@ import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.CountryExposureResult;
+import com.fintex.ce.port.input.result.CountryExposureResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.CountryExposureCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,12 +22,12 @@ import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
 @Service
 public class CountryExposureCalculationImpl extends BreakdownAbstractService<CountryExposureResult, CountryRegionType> {
 
-  private final CountryExposureCacheStorage exposureCacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<CountryRegionType, BigDecimal>>> exposureCacheStorage;
   private final CountryExposureResponseMapper responseMapper;
 
   public static final Map<CountryRegionType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
-  public CountryExposureCalculationImpl(CountryExposureCacheStorage exposureCacheStorage,
+  public CountryExposureCalculationImpl(@Qualifier("countryExposure") HoldingDataLoader<Map<Holding, Map<CountryRegionType, BigDecimal>>> exposureCacheStorage,
       CountryExposureResponseMapper responseMapper) {
     super();
     this.exposureCacheStorage = exposureCacheStorage;

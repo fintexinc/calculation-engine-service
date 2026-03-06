@@ -5,7 +5,7 @@ import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.LeadingTotalReturnsCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.application.command.LeadingTotalReturnCommand;
+import com.fintex.ce.port.input.command.LeadingTotalReturnCommand;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ComparisonUtils;
 import org.junit.jupiter.api.Test;

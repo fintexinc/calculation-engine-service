@@ -7,12 +7,12 @@ import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.AssetAllocationEMResult;
+import com.fintex.ce.port.input.result.AssetAllocationEMResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.adapter.cache.AssetAllocationCacheStorage;
-import com.fintex.ce.adapter.cache.EquityCountryAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
@@ -55,20 +55,20 @@ public class AssetAllocationEMServiceImpl
     extends
       BreakdownAbstractService<AssetAllocationEMResult, AssetAllocationRegionEmType> {
 
-  private final EquityCountryAllocationCacheStorage countryAllocationCacheStorage;
-  private final AssetAllocationCacheStorage assetAllocationCacheStorage;
+  private final EquityCountryAllocationCachePort countryAllocationCachePort;
+  private final AssetAllocationCachePort assetAllocationCachePort;
   private final AssetAllocationDataValidator assetAllocationDataValidator;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
   private final DataProviderChecker dataProviderChecker;
 
-  public AssetAllocationEMServiceImpl(final EquityCountryAllocationCacheStorage countryAllocationCacheStorage,
-      final AssetAllocationCacheStorage assetAllocationCacheStorage,
+  public AssetAllocationEMServiceImpl(final EquityCountryAllocationCachePort countryAllocationCachePort,
+      final AssetAllocationCachePort assetAllocationCachePort,
       final AssetAllocationDataValidator assetAllocationDataValidator,
       final AssetAllocationDataMapper assetAllocationDataMapper,
       final DataProviderChecker dataProviderChecker) {
     super();
-    this.countryAllocationCacheStorage = countryAllocationCacheStorage;
-    this.assetAllocationCacheStorage = assetAllocationCacheStorage;
+    this.countryAllocationCachePort = countryAllocationCachePort;
+    this.assetAllocationCachePort = assetAllocationCachePort;
     this.assetAllocationDataValidator = assetAllocationDataValidator;
     this.assetAllocationDataMapper = assetAllocationDataMapper;
     this.dataProviderChecker = dataProviderChecker;
@@ -90,7 +90,7 @@ public class AssetAllocationEMServiceImpl
   public Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> getLoadFromCacheStorage(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    final var assetAllocationDataDto = assetAllocationCacheStorage.loadWithDataProvidesCheck(
+    final var assetAllocationDataDto = assetAllocationCachePort.loadWithDataProvidersCheck(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS),
         warnings);
@@ -115,7 +115,7 @@ public class AssetAllocationEMServiceImpl
       final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> assetAllocations,
       final List<DataProvider> providers,
       final List<Warning> warnings) {
-    final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = countryAllocationCacheStorage
+    final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = countryAllocationCachePort
         .loadWithDataProvidersCheck(holdings, providers, warnings);
     final Map<Holding, BigDecimal> equityDifference = calculateEquityDifference(
         holdings, countryAllocationsMap, retrieveAssetAllocations(assetAllocations));

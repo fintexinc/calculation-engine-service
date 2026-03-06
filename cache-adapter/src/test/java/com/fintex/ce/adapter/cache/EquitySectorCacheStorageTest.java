@@ -6,8 +6,9 @@ import com.fintex.ce.adapter.cache.entity.equitysector.REquitySectorStock;
 import com.fintex.ce.adapter.cache.repository.equitysector.EquitySectorRepository;
 import com.fintex.ce.adapter.cache.repository.equitysector.EquitySectorStockRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
+import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.model.EquitySector;
@@ -55,7 +56,7 @@ class EquitySectorCacheStorageTest {
   void load_verifyFilters() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var fdsRepo = mock(SecurityDataPort.class);
       final var mapper = mock(CacheEntityMapper.class);
       final var stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
@@ -63,14 +64,14 @@ class EquitySectorCacheStorageTest {
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, sectorRepo, sectorRepo, stockRepository,
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
               cacheStatisticService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -87,15 +88,15 @@ class EquitySectorCacheStorageTest {
       // SETUP
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
 
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final List<FundSeriesHolding> filtered = List.of(new FundSeriesHolding().setFundServCode("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -109,15 +110,15 @@ class EquitySectorCacheStorageTest {
       // SETUP
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
 
-      final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+      final List<BenchmarkIndexHolding> filtered = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -131,14 +132,14 @@ class EquitySectorCacheStorageTest {
       // SETUP
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
 
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -152,15 +153,15 @@ class EquitySectorCacheStorageTest {
       // SETUP
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
 
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -172,7 +173,7 @@ class EquitySectorCacheStorageTest {
   void mapForStocks_verifyFilterHoldingsForStocks() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var fdsRepo = mock(SecurityDataPort.class);
       final var mapper = mock(CacheEntityMapper.class);
       final var stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
@@ -180,10 +181,10 @@ class EquitySectorCacheStorageTest {
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, sectorRepo, sectorRepo, stockRepository,
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
               cacheStatisticService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final List<Warning> warnings = new ArrayList<>();
 
       final List<StockHolding> filtered = List.of();
@@ -204,11 +205,11 @@ class EquitySectorCacheStorageTest {
       // SETUP
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -220,7 +221,7 @@ class EquitySectorCacheStorageTest {
   void mapForStocks_checkResultWithInvalidSectorThrowsException() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var fdsRepo = mock(SecurityDataPort.class);
       final CacheEntityMapper<EquitySector, REquitySector> mapper = mock(CacheEntityMapper.class);
       final CacheEntityMapper<EquitySectorStock, REquitySectorStock> stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
@@ -228,12 +229,12 @@ class EquitySectorCacheStorageTest {
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, sectorRepo, sectorRepo, stockRepository,
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
               cacheStatisticService));
 
       final List<Warning> warnings = new ArrayList<>();
-      final StockHolding h = mock(StockHolding.class);
-      when(h.generateUserIdentifier()).thenReturn("test-id");
+      final var h = new StockHolding().setTicker("TEST").setExchangeCode("TST");
+      h.setType(HoldingType.US_STOCKS);
 
       final List<Holding> holdings = List.of(h);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(STOCK_PREDICATE))).thenReturn(List.of(
@@ -256,7 +257,7 @@ class EquitySectorCacheStorageTest {
   void mapForStocks_checkResultWithValidSector() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var fdsRepo = mock(SecurityDataPort.class);
       final CacheEntityMapper<EquitySector, REquitySector> mapper = mock(CacheEntityMapper.class);
       final CacheEntityMapper<EquitySectorStock, REquitySectorStock> stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
@@ -264,11 +265,11 @@ class EquitySectorCacheStorageTest {
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, sectorRepo, sectorRepo, stockRepository,
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
               cacheStatisticService));
 
-      final StockHolding h = mock(StockHolding.class);
-      when(h.generateUserIdentifier()).thenReturn("test-id");
+      final var h = new StockHolding().setTicker("TEST").setExchangeCode("TST");
+      h.setType(HoldingType.US_STOCKS);
       final List<Warning> warnings = new ArrayList<>();
 
       final List<Holding> holdings = List.of(h);
@@ -296,7 +297,7 @@ class EquitySectorCacheStorageTest {
   void mapForStocks_checkResultWithNullSectorNameAddsWarning() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var fdsRepo = mock(SecurityDataPort.class);
       final CacheEntityMapper<EquitySector, REquitySector> mapper = mock(CacheEntityMapper.class);
       final CacheEntityMapper<EquitySectorStock, REquitySectorStock> stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
@@ -304,11 +305,11 @@ class EquitySectorCacheStorageTest {
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, sectorRepo, sectorRepo, stockRepository,
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
               cacheStatisticService));
 
-      final StockHolding h = mock(StockHolding.class);
-      when(h.generateUserIdentifier()).thenReturn("test-id");
+      final var h = new StockHolding().setTicker("TEST").setExchangeCode("TST");
+      h.setType(HoldingType.US_STOCKS);
       final List<Warning> warnings = new ArrayList<>();
 
       final List<Holding> holdings = List.of(h);
@@ -350,13 +351,13 @@ class EquitySectorCacheStorageTest {
     // SETUP
     final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final EquitySector rEquitySector = mock(EquitySector.class);
     final Map<Holding, EquitySector> sectorMap = Map.of(h, rEquitySector);
 
     doCallRealMethod().when(m).mapForNoneStock(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     m.mapForNoneStock(sectorMap, warnings);
 
     // VERIFY
@@ -370,7 +371,7 @@ class EquitySectorCacheStorageTest {
     // SETUP
     final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final EquitySector rEquitySector = mock(EquitySector.class);
     final Map<Holding, EquitySector> sectorMap = Map.of(h, rEquitySector);
 
@@ -380,7 +381,7 @@ class EquitySectorCacheStorageTest {
 
     doCallRealMethod().when(m).mapForNoneStock(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     final Map<Holding, Map<EquitySectorAllocationType, BigDecimal>> actual = m.mapForNoneStock(sectorMap, warnings);
 
     // VERIFY
@@ -392,7 +393,7 @@ class EquitySectorCacheStorageTest {
     // SETUP
     final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
 
     final Map.Entry entry = mock(Map.Entry.class);
     when(entry.getKey()).thenReturn(h);
@@ -419,7 +420,7 @@ class EquitySectorCacheStorageTest {
     // SETUP
     final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
 
     final Map.Entry entry = mock(Map.Entry.class);
     when(entry.getKey()).thenReturn(h);
@@ -445,7 +446,7 @@ class EquitySectorCacheStorageTest {
     // SETUP
     final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
 
     final Map.Entry entry = mock(Map.Entry.class);
     when(entry.getKey()).thenReturn(h);

@@ -5,9 +5,9 @@ import com.fintex.ce.domain.enumeration.calculation.MaturityAllocationType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.MaturityAllocationResult;
+import com.fintex.ce.port.input.result.MaturityAllocationResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.MaturityAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.PortfolioUtils;
 import org.springframework.stereotype.Service;
@@ -22,11 +22,11 @@ public class MaturityAllocationCalculationServiceImpl
     extends
       BreakdownAbstractService<MaturityAllocationResult, MaturityAllocationType> {
 
-  private final MaturityAllocationCacheStorage cacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<MaturityAllocationType, BigDecimal>>> cacheStorage;
   private final MaturityAllocationResponseMapper responseMapper;
   public static final Map<MaturityAllocationType, BigDecimal> DEFAULT_MAP = new EnumMap<>(MaturityAllocationType.class);
 
-  public MaturityAllocationCalculationServiceImpl(      final MaturityAllocationCacheStorage cacheStorage,
+  public MaturityAllocationCalculationServiceImpl(      final HoldingDataLoader<Map<Holding, Map<MaturityAllocationType, BigDecimal>>> cacheStorage,
       final MaturityAllocationResponseMapper responseMapper) {
     super();
     this.cacheStorage = cacheStorage;

@@ -8,9 +8,9 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RMaturityAllocation;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.MaturityAllocationRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -35,8 +35,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class MaturityAllocationCacheStorage
-    extends
-      MultipleCacheStorageAbstract<MaturityAllocation, MaturityAllocation, MaturityAllocation, MaturityAllocation, RMaturityAllocation> {
+    extends CacheStorageAbstract<MaturityAllocation, RMaturityAllocation, Map<Holding, Map<MaturityAllocationType, BigDecimal>>> {
 
   public static final Map<MaturityAllocationType, BigDecimal> DEFAULT_MAP;
 
@@ -46,20 +45,15 @@ public class MaturityAllocationCacheStorage
   }
 
   public MaturityAllocationCacheStorage(
-      MultipleSMRepository<MaturityAllocation, MaturityAllocation, MaturityAllocation, MaturityAllocation> smRepo,
+      SecurityDataPort<MaturityAllocation> securityDataPort,
       CacheEntityMapper<MaturityAllocation, RMaturityAllocation> mapper,
-      MaturityAllocationRepository fundCanadaCacheRepo,
-      MaturityAllocationRepository etfCanadaCacheRepo,
-      MaturityAllocationRepository etfUsCacheRepo,
+      MaturityAllocationRepository maturityAllocationRepository,
       CacheStatisticService cacheStatisticService) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        null, cacheStatisticService, MATURITY_ALLOCATION);
+    super(securityDataPort, mapper, maturityAllocationRepository, cacheStatisticService, MATURITY_ALLOCATION);
   }
 
   @Override
-  public Map<Holding, Map<MaturityAllocationType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<MaturityAllocationType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
 

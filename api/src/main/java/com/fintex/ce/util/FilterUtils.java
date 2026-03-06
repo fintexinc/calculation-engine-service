@@ -52,9 +52,9 @@ public class FilterUtils {
   private FilterUtils() {
   }
 
-  @SuppressWarnings("all")
-  public static <H extends Holding, H2 extends Holding> List<H> filterHoldings(final List<H2> holdings,
-      final Predicate<H2> predicate) {
+  @SuppressWarnings("unchecked")
+  public static <H extends Holding> List<H> filterHoldings(final List<? extends Holding> holdings,
+      final Predicate<? super Holding> predicate) {
     return (List<H>) holdings.stream().filter(predicate).toList();
   }
 

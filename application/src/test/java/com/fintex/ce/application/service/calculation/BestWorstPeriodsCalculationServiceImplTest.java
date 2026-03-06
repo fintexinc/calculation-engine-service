@@ -6,8 +6,8 @@ import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.BestWorstPeriodsCommand;
-import com.fintex.ce.application.result.BestWorstPeriodsResult;
+import com.fintex.ce.port.input.command.BestWorstPeriodsCommand;
+import com.fintex.ce.port.input.result.BestWorstPeriodsResult;
 import com.fintex.ce.monthlyreturns.Returns;
 import org.junit.jupiter.api.Test;
 

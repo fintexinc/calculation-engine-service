@@ -4,7 +4,7 @@ import api.dto.RequestParamsSupplier;
 import api.excel.writer.SMDataWriter;
 import api.excel.writer.WritableSpreadsheet;
 import api.util.CommonTools;
-import com.fintex.ce.adapter.graphqlclient.repository.EquityCountryAllocationSMRepository;
+import com.fintex.ce.adapter.graphqlclient.repository.EquityCountryAllocationGraphqlDataFetcher;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -26,12 +26,12 @@ import static java.util.stream.Collectors.toMap;
 public class EquityCountryExposureFDSTab extends SMDataWriter<Holding, String, BigDecimal>
     implements
       WritableSpreadsheet {
-  private static final EquityCountryAllocationSMRepository EQUITY_COUNTRY_EXPOSURE_FDS = initEquityCountryExposureFDS();
+  private static final EquityCountryAllocationGraphqlDataFetcher EQUITY_COUNTRY_EXPOSURE_FDS = initEquityCountryExposureFDS();
   private static final String TAB_NAME = "EquityCountryExposure_FDS";
   private final boolean needToCheckDataProvidersFromResponse;
 
-  private static EquityCountryAllocationSMRepository initEquityCountryExposureFDS() {
-    return new EquityCountryAllocationSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+  private static EquityCountryAllocationGraphqlDataFetcher initEquityCountryExposureFDS() {
+    return new EquityCountryAllocationGraphqlDataFetcher(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
   }
 
   public EquityCountryExposureFDSTab(final boolean needToCheckDataProvidersFromResponse) {

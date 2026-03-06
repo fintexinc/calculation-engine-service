@@ -1,11 +1,10 @@
 package com.fintex.ce.adapter.cache;
 
-import com.fintex.ce.adapter.cache.AssetAllocationCacheStorage;
-import com.fintex.ce.adapter.cache.BusinessCountryCacheStorage;
 import com.fintex.ce.domain.enumeration.Country;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.holding.BenchmarkIndexHolding;
 import com.fintex.ce.domain.model.holding.EtfHolding;
@@ -54,7 +53,8 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(AssetAllocationCacheStorage.class);
 
-      final var holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final var holdings = List.of(holding);
       final var providers = List.of(EAGLE);
       final var expected = new AssetAllocationDataDTO();
 
@@ -109,7 +109,8 @@ class AssetAllocationCacheStorageTest {
     // SETUP
     final var sut = mock(AssetAllocationCacheStorage.class);
 
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+    final List<Holding> holdings = List.of(holding);
     final List<DataProvider> providers = List.of(EAGLE);
     final var needToCheckDataProviders = false;
     final var warnings = mock(List.class);
@@ -128,7 +129,8 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(AssetAllocationCacheStorage.class);
 
-      final var holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final var holdings = List.of(holding);
       final var providers = mock(List.class);
       final var needToCheckDataProviders = false;
       final var warnings = mock(List.class);
@@ -151,10 +153,12 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(AssetAllocationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
       final List<DataProvider> providers = List.of(EAGLE);
       final var needToCheckDataProviders = false;
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final var fundSeriesHolding = new FundSeriesHolding().setFundServCode("TEST");
+      final List<FundSeriesHolding> filtered = List.of(fundSeriesHolding);
       final var warnings = mock(List.class);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
@@ -175,11 +179,13 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(AssetAllocationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
       final List<DataProvider> providers = List.of(EAGLE);
       final var needToCheckDataProviders = false;
-      final List<Warning> warnings = List.of(mock(Warning.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
+      var etfHolding = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etfHolding);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
@@ -198,10 +204,12 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(AssetAllocationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
       final List<DataProvider> providers = List.of(EAGLE);
       final var needToCheckDataProviders = false;
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      var etfHolding = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etfHolding);
       final var warnings = mock(List.class);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
@@ -222,12 +230,14 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var sut = mock(AssetAllocationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
       final List<DataProvider> providers = List.of(EAGLE);
       final var needToCheckDataProviders = false;
       final var warnings = mock(List.class);
 
-      final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+      final var benchmarkHolding = new BenchmarkIndexHolding().setMrStarId("TEST");
+      final List<BenchmarkIndexHolding> filtered = List.of(benchmarkHolding);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(
           filtered);
 
@@ -246,8 +256,9 @@ class AssetAllocationCacheStorageTest {
     final var sut = mock(AssetAllocationCacheStorage.class);
 
     final List<DataProvider> providers = List.of(EAGLE);
-    final List<Holding> holdings = List.of(mock(Holding.class));
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+    final List<Holding> holdings = List.of(holding);
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
     doCallRealMethod().when(sut).load(any(), any(), any(), any());
     // ACT
@@ -263,8 +274,9 @@ class AssetAllocationCacheStorageTest {
     final var sut = mock(AssetAllocationCacheStorage.class);
 
     final List<DataProvider> providers = List.of(EAGLE);
-    final List<Holding> holdings = List.of(mock(Holding.class));
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+    final List<Holding> holdings = List.of(holding);
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     final var expected = mock(AssetAllocationDataDTO.class);
 
     when(sut.load(anyList(), anyList(), anyBoolean(), anyList())).thenReturn(expected);
@@ -282,32 +294,34 @@ class AssetAllocationCacheStorageTest {
     final var sut = mock(AssetAllocationCacheStorage.class);
 
     final List<DataProvider> providers = List.of(EAGLE);
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+    final List<Holding> holdings = List.of(holding);
     final var warnings = mock(List.class);
 
-    doCallRealMethod().when(sut).loadWithDataProvidesCheck(any(), any(), anyList());
+    doCallRealMethod().when(sut).loadWithDataProvidersCheck(any(), any(), anyList());
     // ACT
-    sut.loadWithDataProvidesCheck(holdings, providers, warnings);
+    sut.loadWithDataProvidersCheck(holdings, providers, warnings);
 
     // VERIFY
     verify(sut).load(holdings, providers, true, warnings);
   }
 
   @Test
-  void loadWithDataProvidesCheck_checkResult() {
+  void loadWithDataProvidersCheck_checkResult() {
     // SETUP
     final var sut = mock(AssetAllocationCacheStorage.class);
 
     final List<DataProvider> providers = List.of(EAGLE);
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+    final List<Holding> holdings = List.of(holding);
     final var expected = mock(AssetAllocationDataDTO.class);
     final var warnings = mock(List.class);
 
     when(sut.load(anyList(), anyList(), anyBoolean(), anyList())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).loadWithDataProvidesCheck(any(), any(), anyList());
+    doCallRealMethod().when(sut).loadWithDataProvidersCheck(any(), any(), anyList());
     // ACT
-    final var actual = sut.loadWithDataProvidesCheck(holdings, providers, warnings);
+    final var actual = sut.loadWithDataProvidersCheck(holdings, providers, warnings);
 
     // VERIFY
     Assertions.assertEquals(expected, actual);
@@ -321,7 +335,8 @@ class AssetAllocationCacheStorageTest {
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
           businessCountryCacheStorage, null));
 
-      final var holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final var holdings = List.of(holding);
       final var providers = List.of(EAGLE);
       final var needToCheckDataProviders = false;
       final var warnings = mock(List.class);
@@ -366,7 +381,7 @@ class AssetAllocationCacheStorageTest {
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
           businessCountryCacheStorage, null));
 
-      final Holding holding = mock(Holding.class);
+      final var holding = new Holding().setType(HoldingType.CANADA_STOCKS).setValue(BigDecimal.ONE);
       final Map<Holding, Country> countries = Map.of(holding, CAN);
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -396,7 +411,7 @@ class AssetAllocationCacheStorageTest {
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
           businessCountryCacheStorage, null));
 
-      final Holding holding = mock(Holding.class);
+      final var holding = new Holding().setType(HoldingType.US_STOCKS).setValue(BigDecimal.ONE);
       final Map<Holding, Country> countries = Map.of(holding, USA);
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -426,7 +441,7 @@ class AssetAllocationCacheStorageTest {
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
           businessCountryCacheStorage, null));
 
-      final Holding holding = mock(Holding.class);
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
       final Map<Holding, Country> countries = Map.of(holding, EMPTY);
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -456,7 +471,7 @@ class AssetAllocationCacheStorageTest {
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
           businessCountryCacheStorage, null));
 
-      final Holding holding = mock(Holding.class);
+      final var holding = new Holding().setType(HoldingType.BENCHMARK_INDEX).setValue(BigDecimal.ONE);
       final Map<Holding, Country> countries = Map.of(holding, Country.OTHER);
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);

@@ -4,7 +4,7 @@ import api.dto.RequestParamsSupplier;
 import api.excel.writer.SMDataWriter;
 import api.excel.writer.WritableSpreadsheet;
 import api.util.CommonTools;
-import com.fintex.ce.adapter.graphqlclient.repository.AssetAllocationSMRepository;
+import com.fintex.ce.adapter.graphqlclient.repository.AssetAllocationGraphqlDataFetcher;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -22,13 +22,13 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class AssetAllocationFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-  private static final AssetAllocationSMRepository ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
+  private static final AssetAllocationGraphqlDataFetcher ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
   private static final String TAB_NAME = "AssetAllocation_FDS";
 
   private List<DataProvider> dataProviders = List.of(DataProvider.EAGLE, DataProvider.MORNINGSTAR);
 
-  private static AssetAllocationSMRepository initAssetAllocationsFDS() {
-    return new AssetAllocationSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+  private static AssetAllocationGraphqlDataFetcher initAssetAllocationsFDS() {
+    return new AssetAllocationGraphqlDataFetcher(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
   }
 
   public AssetAllocationFDSTab() {

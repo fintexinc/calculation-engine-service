@@ -37,6 +37,7 @@
 
         <!-- Internal dependencies -->
         <smclient.version>1.0.0-SNAPSHOT</smclient.version>
+        <sm-domain.version>2.0.0-SNAPSHOT</sm-domain.version>
 
         <!-- External dependencies -->
         <spring-openapi.version>2.1.0</spring-openapi.version>
@@ -88,6 +89,9 @@
         <repository>
             <id>fintexincorporated</id>
             <url>https://pkgs.dev.azure.com/fintexincorporated/_packaging/fintexincorporated/maven/v1</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 

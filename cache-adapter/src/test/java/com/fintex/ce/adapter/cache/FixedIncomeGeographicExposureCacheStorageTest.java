@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.FixedIncomeGeographicExposureCacheStorage;
+import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.BenchmarkIndexHolding;
@@ -49,10 +50,11 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etf);
 
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_FICQ_BCE_001)))
@@ -61,7 +63,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -78,10 +80,11 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var fsh = new FundSeriesHolding().setFundServCode("TEST");
+      final List<FundSeriesHolding> filtered = List.of(fsh);
 
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_FICQ_BCE_001)))
@@ -91,7 +94,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -108,10 +111,11 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etf);
 
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_FICQ_BCE_001)))
@@ -121,7 +125,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -138,10 +142,10 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      final List<BenchmarkIndexHolding> filtered = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
 
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_FICQ_BCE_001)))
@@ -151,7 +155,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -168,10 +172,10 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<CanadaPooledFundHolding> filtered = List.of(mock(CanadaPooledFundHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      final List<CanadaPooledFundHolding> filtered = List.of(new CanadaPooledFundHolding().setMorningstarId("TEST"));
 
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_FICQ_BCE_001)))
@@ -181,7 +185,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -198,10 +202,10 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<CanadaHedgeFundHolding> filtered = List.of(mock(CanadaHedgeFundHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      final List<CanadaHedgeFundHolding> filtered = List.of(new CanadaHedgeFundHolding().setMorningstarId("TEST"));
 
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_FICQ_BCE_001)))
@@ -211,7 +215,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -228,10 +232,10 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<UsMutualFundHolding> filtered = List.of(mock(UsMutualFundHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      final List<UsMutualFundHolding> filtered = List.of(new UsMutualFundHolding().setTicker("TEST"));
 
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_FICQ_BCE_001)))
@@ -241,7 +245,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -258,13 +262,12 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
 
-      final GicHolding gicHolding = mock(GicHolding.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var gicHolding = new GicHolding();
+      gicHolding.setTerm(new BigDecimal(400));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       final List<GicHolding> filtered = List.of(gicHolding);
-
-      Mockito.when(gicHolding.isLessThanOneYearOld()).thenReturn(false);
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_FICQ_BCE_001)))
           .thenReturn(Map.of());
@@ -272,7 +275,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any(ParamHolderDTO.class));
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       final Map<Holding, Map<GeographicRegionType, BigDecimal>> result = sut.load(holdings, List.of(), warnings,
           new ParamHolderDTO());

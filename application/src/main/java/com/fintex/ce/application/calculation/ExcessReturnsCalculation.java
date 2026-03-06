@@ -2,8 +2,8 @@ package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.application.calculation.core.BenchmarkWeightedAverageCalculation;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.application.result.ExcessReturnsResult;
-import com.fintex.ce.application.result.core.TimeIntervalResult;
+import com.fintex.ce.port.input.result.ExcessReturnsResult;
+import com.fintex.ce.port.input.result.core.TimeIntervalResult;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
 import org.apache.commons.lang3.tuple.Pair;

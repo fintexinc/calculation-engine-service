@@ -1,17 +1,15 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.AssetAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapper.response.AssetAllocationResponseMapper;
-import com.fintex.ce.application.service.calculation.AssetAllocationServiceImpl;
-import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.AssetAllocationResult;
+import com.fintex.ce.port.input.result.AssetAllocationResult;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
@@ -44,7 +42,7 @@ class AssetAllocationServiceImplTest {
   @Test
   void getLoadFromCacheStorage_checkResult() {
     // SETUP
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var dataProviderChecker = mock(DataProviderChecker.class);
@@ -57,7 +55,7 @@ class AssetAllocationServiceImplTest {
     final var expected = mock(Map.class);
     when(assetAllocationDataMapper.mapForAA(assetAllocationDataDto)).thenReturn(expected);
 
-    when(assetAllocationCacheStorage.loadWithDataProvidesCheck(anyList(), anyList(), anyList())).thenReturn(
+    when(assetAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
         assetAllocationDataDto);
     doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
     // ACT
@@ -71,7 +69,7 @@ class AssetAllocationServiceImplTest {
   void getLoadFromCacheStorage_verifyMapForAA() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var dataProviderChecker = mock(DataProviderChecker.class);
@@ -83,7 +81,7 @@ class AssetAllocationServiceImplTest {
       final var req = mock(PortfolioHoldingsCommand.class);
       final List<Warning> warnings = List.of();
       final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
-      when(assetAllocationCacheStorage.loadWithDataProvidesCheck(anyList(), anyList(), anyList())).thenReturn(
+      when(assetAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
           assetAllocationDataDto);
 
       doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
@@ -98,7 +96,7 @@ class AssetAllocationServiceImplTest {
   @Test
   void getLoadFromCacheStorage_verifyValidate() {
     // SETUP
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var dataProviderChecker = mock(DataProviderChecker.class);
@@ -111,7 +109,7 @@ class AssetAllocationServiceImplTest {
     final var req = mock(PortfolioHoldingsCommand.class);
     final List<Warning> warnings = List.of();
     final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
-    when(assetAllocationCacheStorage.loadWithDataProvidesCheck(anyList(), anyList(), anyList())).thenReturn(
+    when(assetAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
         assetAllocationDataDto);
 
     doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
@@ -125,7 +123,7 @@ class AssetAllocationServiceImplTest {
   @Test
   void getLoadFromCacheStorage_verifyDtaProviderCheckerCheck() {
     // SETUP
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var dataProviderChecker = mock(DataProviderChecker.class);
@@ -137,7 +135,7 @@ class AssetAllocationServiceImplTest {
 
     final var req = mock(PortfolioHoldingsCommand.class);
     final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
-    when(assetAllocationCacheStorage.loadWithDataProvidesCheck(any(), any(), any())).thenReturn(assetAllocationDataDto);
+    when(assetAllocationCacheStorage.loadWithDataProvidersCheck(any(), any(), any())).thenReturn(assetAllocationDataDto);
 
     doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
     // ACT
@@ -151,7 +149,7 @@ class AssetAllocationServiceImplTest {
   void getLoadFromCacheStorage_verifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
       final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var dataProviderChecker = mock(DataProviderChecker.class);
@@ -181,7 +179,7 @@ class AssetAllocationServiceImplTest {
   @Test
   void getLoadFromCacheStorage_verifyLoadWithDataProvidesCheck1() {
     // SETUP
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var dataProviderChecker = mock(DataProviderChecker.class);
@@ -202,13 +200,13 @@ class AssetAllocationServiceImplTest {
     sut.getLoadFromCacheStorage(reqDTO, warnings);
 
     // VERIFY
-    verify(assetAllocationCacheStorage).loadWithDataProvidesCheck(eq(holdings), any(), eq(warnings));
+    verify(assetAllocationCacheStorage).loadWithDataProvidersCheck(eq(holdings), any(), eq(warnings));
   }
 
   @Test
   void calculate_verifyCalculateNetProducts() {
     // SETUP
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var dataProviderChecker = mock(DataProviderChecker.class);
@@ -233,7 +231,7 @@ class AssetAllocationServiceImplTest {
   @Test
   void calculate_verifyFromNetProducts() {
     // SETUP
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var dataProviderChecker = mock(DataProviderChecker.class);
@@ -261,7 +259,7 @@ class AssetAllocationServiceImplTest {
   @Test
   void calculate_checkResult() {
     // SETUP
-    final var assetAllocationCacheStorage = mock(AssetAllocationCacheStorage.class);
+    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
     final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var dataProviderChecker = mock(DataProviderChecker.class);

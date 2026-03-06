@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.cache;
 import com.fintex.ce.adapter.cache.CreditQualityCacheStorage;
 import com.fintex.ce.adapter.cache.repository.CreditQualityRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.CreditQuality;
@@ -51,19 +51,19 @@ class CreditQualityCacheStorageTest {
   void load_verifyFilters() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var securityDataPort = mock(SecurityDataPort.class);
       final var creditQualityRepository = mock(CreditQualityRepository.class);
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final CreditQualityCacheStorage m = mock(CreditQualityCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, null, creditQualityRepository, creditQualityRepository, creditQualityRepository,
-              cacheStatisticService));
+          .useConstructor(securityDataPort, null, creditQualityRepository, cacheStatisticService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -80,15 +80,17 @@ class CreditQualityCacheStorageTest {
       // SETUP
       final CreditQualityCacheStorage m = mock(CreditQualityCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
 
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final var fundSeriesHolding = new FundSeriesHolding().setFundServCode("TEST");
+      final List<FundSeriesHolding> filtered = List.of(fundSeriesHolding);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -102,15 +104,17 @@ class CreditQualityCacheStorageTest {
       // SETUP
       final CreditQualityCacheStorage m = mock(CreditQualityCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
 
-      final List<FixedIncomeHolding> filtered = List.of(mock(FixedIncomeHolding.class));
+      final var fixedIncomeHolding = new FixedIncomeHolding().setIdentifier("TEST");
+      final List<FixedIncomeHolding> filtered = List.of(fixedIncomeHolding);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(FIXED_INCOME_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -124,14 +128,16 @@ class CreditQualityCacheStorageTest {
       // SETUP
       final CreditQualityCacheStorage m = mock(CreditQualityCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
 
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      var etfHolding = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etfHolding);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -145,15 +151,17 @@ class CreditQualityCacheStorageTest {
       // SETUP
       final CreditQualityCacheStorage m = mock(CreditQualityCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
 
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      var etfHolding = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etfHolding);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -167,15 +175,17 @@ class CreditQualityCacheStorageTest {
       // SETUP
       final CreditQualityCacheStorage m = mock(CreditQualityCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
 
-      final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+      final var benchmarkHolding = new BenchmarkIndexHolding().setMrStarId("TEST");
+      final List<BenchmarkIndexHolding> filtered = List.of(benchmarkHolding);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -189,14 +199,19 @@ class CreditQualityCacheStorageTest {
       // SETUP
       final CreditQualityCacheStorage m = mock(CreditQualityCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(GicHolding.class));
+      final var gicHolding1 = new GicHolding();
+      gicHolding1.setType(HoldingType.GIC);
+      final List<Holding> holdings = List.of(gicHolding1);
 
-      final List<Holding> filtered = List.of(mock(GicHolding.class));
+      final var gicHolding2 = new GicHolding();
+      gicHolding2.setType(HoldingType.GIC);
+      gicHolding2.setName("filtered");
+      final List<Holding> filtered = List.of(gicHolding2);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(GIC_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -250,8 +265,7 @@ class CreditQualityCacheStorageTest {
     // SETUP
     final CreditQualityCacheStorage c = mock(CreditQualityCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
+    final var h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
 
     final CreditQuality rc = mock(CreditQuality.class);
     when(rc.getRatings()).thenReturn(null);
@@ -271,8 +285,7 @@ class CreditQualityCacheStorageTest {
     // SETUP
     final CreditQualityCacheStorage c = mock(CreditQualityCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
+    final var h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
 
     final CreditQuality rc = mock(CreditQuality.class);
     final Map<String, BigDecimal> map = Map.of("SDF", BigDecimal.ONE);
@@ -293,8 +306,7 @@ class CreditQualityCacheStorageTest {
     // SETUP
     final CreditQualityCacheStorage c = mock(CreditQualityCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
+    final var h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
 
     final CreditQuality rc = mock(CreditQuality.class);
     final Map<String, BigDecimal> map = Map.of(CreditQualityRating.A.name(), BigDecimal.ONE);
@@ -315,8 +327,7 @@ class CreditQualityCacheStorageTest {
     // SETUP
     final CreditQualityCacheStorage c = mock(CreditQualityCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
+    final var h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
 
     final CreditQuality rc = mock(CreditQuality.class);
     final Map<String, BigDecimal> map = Map.of(CreditQualityRating.A.name(), BigDecimal.ONE);

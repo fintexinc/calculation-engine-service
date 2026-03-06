@@ -4,9 +4,9 @@ import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.EquityMarketCapResult;
+import com.fintex.ce.port.input.result.EquityMarketCapResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.EquityMarketCapitalizationCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.PortfolioUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +50,10 @@ public class EquityMarketCapCalculationServiceImpl
     GROUPS.keySet().forEach(f -> DEFAULT_MAP.put(f, null));
   }
 
-  private final EquityMarketCapitalizationCacheStorage marketCapCacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<EquityMarketCapType, BigDecimal>>> marketCapCacheStorage;
 
   @Autowired
-  public EquityMarketCapCalculationServiceImpl(final EquityMarketCapitalizationCacheStorage marketCapCacheStorage) {
+  public EquityMarketCapCalculationServiceImpl(final HoldingDataLoader<Map<Holding, Map<EquityMarketCapType, BigDecimal>>> marketCapCacheStorage) {
     super();
     this.marketCapCacheStorage = marketCapCacheStorage;
   }

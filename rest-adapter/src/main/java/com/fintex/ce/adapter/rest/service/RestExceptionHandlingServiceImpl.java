@@ -9,8 +9,7 @@ import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.application.service.ExceptionHandlingServiceImpl;
-import com.fintex.ce.adapter.cache.repository.FxRatesRepository;
-import com.fintex.ce.adapter.cache.repository.core.CoreRedisCacheRepository;
+import com.fintex.ce.port.output.cache.CacheCleanupPort;
 import com.fintex.ce.util.JacksonUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
@@ -32,9 +31,8 @@ import static java.util.Objects.nonNull;
 public class RestExceptionHandlingServiceImpl extends ExceptionHandlingServiceImpl
     implements RestExceptionHandlingService {
 
-  public RestExceptionHandlingServiceImpl(final List<CoreRedisCacheRepository> coreRedisCacheRepositories,
-      final FxRatesRepository fxRatesRepository) {
-    super(coreRedisCacheRepositories, fxRatesRepository);
+  public RestExceptionHandlingServiceImpl(final CacheCleanupPort cacheCleanupPort) {
+    super(cacheCleanupPort);
   }
 
   @Override

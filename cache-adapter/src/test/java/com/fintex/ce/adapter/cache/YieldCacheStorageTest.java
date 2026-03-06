@@ -5,7 +5,7 @@ import com.fintex.ce.adapter.cache.entity.RYield;
 import com.fintex.ce.adapter.cache.repository.YieldRepository;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.Yield;
@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.fintex.ce.util.FilterUtils.CANADA_ETF_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.CANADA_HEDGE_FUND_PREDICATE;
@@ -51,28 +50,22 @@ class YieldCacheStorageTest {
   @Test
   void load_verifyFilters() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var securityDataPort = mock(SecurityDataPort.class);
       final CacheEntityMapper<Yield, RYield> mapper = mock(CacheEntityMapper.class);
-      final var fundCanadaCacheRepo = mock(YieldRepository.class);
-      final var etfCanadaCacheRepo = mock(YieldRepository.class);
-      final var etfUsCacheRepo = mock(YieldRepository.class);
-      final var stockCacheRepo = mock(YieldRepository.class);
+      final var yieldRepository = mock(YieldRepository.class);
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final YieldCacheStorage m = mock(YieldCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo, stockCacheRepo,
-              cacheStatisticService));
+          .useConstructor(securityDataPort, mapper, yieldRepository, cacheStatisticService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
-      Map<Holding, Yield> holdingExposureMap = holdings.stream()
-          .collect(Collectors.toMap(holding -> holding, holding -> mock(Yield.class)));
-
-      List<Holding> holdingsFromMap = new ArrayList<>(holdingExposureMap.keySet());
+      List<Holding> holdingsFromMap = new ArrayList<>(holdings);
 
       m.load(holdingsFromMap, List.of(), warnings, new ParamHolderDTO());
 
@@ -96,15 +89,17 @@ class YieldCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final YieldCacheStorage m = mock(YieldCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
+      final var fundSeriesHolding = new FundSeriesHolding().setFundServCode("TEST");
+      final List<FundSeriesHolding> filtered = List.of(fundSeriesHolding);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -118,14 +113,16 @@ class YieldCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final YieldCacheStorage m = mock(YieldCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
+      var etfHolding = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etfHolding);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -139,15 +136,17 @@ class YieldCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final YieldCacheStorage m = mock(YieldCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
+      var etfHolding = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etfHolding);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -161,18 +160,19 @@ class YieldCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final YieldCacheStorage m = mock(YieldCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final GicHolding gicHolding = mock(GicHolding.class);
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
+      final var gicHolding = new GicHolding();
+      gicHolding.setType(HoldingType.GIC);
+      gicHolding.setName("name");
+      gicHolding.setClientIntRate(BigDecimal.ONE);
       final List<GicHolding> filtered = List.of(gicHolding);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(GIC_PREDICATE))).thenReturn(filtered);
 
-      when(gicHolding.getType()).thenReturn(HoldingType.GIC);
-      when(gicHolding.getName()).thenReturn("name");
-      when(gicHolding.getClientIntRate()).thenReturn(BigDecimal.ONE);
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       final Map<Holding, Yield> result = m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -189,7 +189,7 @@ class YieldCacheStorageTest {
       // SETUP
       final YieldCacheStorage m = mock(YieldCacheStorage.class);
       final Yield rYield = mock(Yield.class);
-      final FundSeriesHolding fundSeriesHolding = mock(FundSeriesHolding.class);
+      final var fundSeriesHolding = new FundSeriesHolding().setFundServCode("TEST");
       final List<Holding> holdings = List.of();
       final List<FundSeriesHolding> filtered = List.of(fundSeriesHolding);
 
@@ -216,18 +216,19 @@ class YieldCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final YieldCacheStorage m = mock(YieldCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final GicHolding gicHolding = mock(GicHolding.class);
+      final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
+      final List<Holding> holdings = List.of(holding);
+      final var gicHolding = new GicHolding();
+      gicHolding.setType(HoldingType.GIC);
+      gicHolding.setName("name");
+      gicHolding.setClientIntRate(BigDecimal.ONE);
       final List<GicHolding> filtered = List.of(gicHolding);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(GIC_PREDICATE))).thenReturn(filtered);
 
-      when(gicHolding.getType()).thenReturn(HoldingType.GIC);
-      when(gicHolding.getName()).thenReturn("name");
-      when(gicHolding.getClientIntRate()).thenReturn(BigDecimal.ONE);
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       final Map<Holding, Yield> result = m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -244,7 +245,7 @@ class YieldCacheStorageTest {
       // SETUP
       final YieldCacheStorage m = mock(YieldCacheStorage.class);
       final Yield rYield = mock(Yield.class);
-      final FundSeriesHolding fundSeriesHolding = mock(FundSeriesHolding.class);
+      final var fundSeriesHolding = new FundSeriesHolding().setFundServCode("TEST");
       final List<Holding> holdings = List.of();
       final List<FundSeriesHolding> filtered = List.of(fundSeriesHolding);
 

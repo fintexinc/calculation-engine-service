@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.core;
 
-import com.fintex.ce.application.result.core.TimeIntervalResult;
+import com.fintex.ce.port.input.result.core.TimeIntervalResult;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.port.input.result.PeriodResult;
 import com.fintex.ce.domain.exception.ReqValidationException;

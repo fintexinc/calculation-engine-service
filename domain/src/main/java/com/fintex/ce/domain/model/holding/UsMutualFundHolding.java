@@ -1,6 +1,8 @@
 package com.fintex.ce.domain.model.holding;
 
 import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -24,6 +26,7 @@ public class UsMutualFundHolding extends Holding {
   public UsMutualFundHolding(BigDecimal amount, String ticker) {
     super(amount, HoldingType.US_MUTUAL_FUNDS);
     this.ticker = ticker;
+    setSecurityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
   }
 
   @Override

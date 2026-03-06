@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.command.DistributionOfReturnsCommand;
-import com.fintex.ce.application.result.DistributionOfReturnsResult;
-import com.fintex.ce.application.result.distributionofreturns.DistributionOfReturnsIntervalResult;
-import com.fintex.ce.application.result.distributionofreturns.DistributionRangeResult;
+import com.fintex.ce.port.input.command.DistributionOfReturnsCommand;
+import com.fintex.ce.port.input.result.DistributionOfReturnsResult;
+import com.fintex.ce.port.input.result.distributionofreturns.DistributionOfReturnsIntervalResult;
+import com.fintex.ce.port.input.result.distributionofreturns.DistributionRangeResult;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -8,10 +8,10 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.FixedIncomeSectorResult;
+import com.fintex.ce.port.input.result.FixedIncomeSectorResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.AssetAllocationCacheStorage;
-import com.fintex.ce.adapter.cache.FixedIncomeBondSectorCacheStorage;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
@@ -41,19 +41,19 @@ public class FixedIncomeBondSectorCalculationServiceImpl
     Stream.of(FixedIncomeSectorType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
   }
 
-  private final FixedIncomeBondSectorCacheStorage fixedIncomeBondSectorCacheStorage;
-  private final AssetAllocationCacheStorage assetAllocationCacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<FixedIncomeSectorType, BigDecimal>>> fixedIncomeBondSectorCachePort;
+  private final AssetAllocationCachePort assetAllocationCachePort;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
   private final AssetAllocationDataValidator assetAllocationDataValidator;
 
   @Autowired
   public FixedIncomeBondSectorCalculationServiceImpl(
-      FixedIncomeBondSectorCacheStorage fixedIncomeBondSectorCacheStorage,      AssetAllocationCacheStorage assetAllocationCacheStorage,
+      HoldingDataLoader<Map<Holding, Map<FixedIncomeSectorType, BigDecimal>>> fixedIncomeBondSectorCachePort,      AssetAllocationCachePort assetAllocationCachePort,
       AssetAllocationDataMapper assetAllocationDataMapper,
       AssetAllocationDataValidator assetAllocationDataValidator) {
     super();
-    this.fixedIncomeBondSectorCacheStorage = fixedIncomeBondSectorCacheStorage;
-    this.assetAllocationCacheStorage = assetAllocationCacheStorage;
+    this.fixedIncomeBondSectorCachePort = fixedIncomeBondSectorCachePort;
+    this.assetAllocationCachePort = assetAllocationCachePort;
     this.assetAllocationDataMapper = assetAllocationDataMapper;
     this.assetAllocationDataValidator = assetAllocationDataValidator;
   }
@@ -61,7 +61,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   @Override
   public Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> getLoadFromCacheStorage(PortfolioHoldingsCommand reqDTO,
       List<Warning> warnings) {
-    return fixedIncomeBondSectorCacheStorage.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
+    return fixedIncomeBondSectorCachePort.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
   }
 
   @Override
@@ -84,7 +84,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
 
   private Map<Holding, BigDecimal> getFixedIncomePlusCash(final List<Holding> holdings,
       final List<Warning> warnings) {
-    final AssetAllocationDataDTO assetAllocationDataDto = assetAllocationCacheStorage.load(
+    final AssetAllocationDataDTO assetAllocationDataDto = assetAllocationCachePort.load(
         holdings, List.of(MORNINGSTAR, EAGLE), warnings, new ParamHolderDTO());
     assetAllocationDataValidator.validate(assetAllocationDataDto, warnings);
     var assetAllocations = assetAllocationDataMapper.mapForAA(assetAllocationDataDto);

@@ -7,9 +7,9 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.AssetAllocationResult;
+import com.fintex.ce.port.input.result.AssetAllocationResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.AssetAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import com.fintex.ce.util.validation.data.DataProviderChecker;
@@ -27,20 +27,20 @@ import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 @Service
 public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAllocationResult, AssetAllocationRegion> {
 
-  private final AssetAllocationCacheStorage assetAllocationCacheStorage;
+  private final AssetAllocationCachePort assetAllocationCachePort;
   private final AssetAllocationDataValidator assetAllocationDataValidator;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
   private final DataProviderChecker dataProviderChecker;
   private final AssetAllocationResponseMapper responseMapper;
 
   @Autowired
-  public AssetAllocationServiceImpl(final AssetAllocationCacheStorage assetAllocationCacheStorage,
+  public AssetAllocationServiceImpl(final AssetAllocationCachePort assetAllocationCachePort,
       final AssetAllocationDataValidator assetAllocationDataValidator,
       final AssetAllocationDataMapper assetAllocationDataMapper,
       final DataProviderChecker dataProviderChecker,
       final AssetAllocationResponseMapper responseMapper) {
     super();
-    this.assetAllocationCacheStorage = assetAllocationCacheStorage;
+    this.assetAllocationCachePort = assetAllocationCachePort;
     this.assetAllocationDataValidator = assetAllocationDataValidator;
     this.assetAllocationDataMapper = assetAllocationDataMapper;
     this.dataProviderChecker = dataProviderChecker;
@@ -60,7 +60,7 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
   public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> getLoadFromCacheStorage(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    final AssetAllocationDataDTO assetAllocationDataDto = assetAllocationCacheStorage.loadWithDataProvidesCheck(
+    final AssetAllocationDataDTO assetAllocationDataDto = assetAllocationCachePort.loadWithDataProvidersCheck(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS),
         warnings);

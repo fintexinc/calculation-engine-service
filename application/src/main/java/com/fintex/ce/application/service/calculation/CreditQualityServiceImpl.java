@@ -9,10 +9,10 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.CreditQualityResult;
+import com.fintex.ce.port.input.result.CreditQualityResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.AssetAllocationCacheStorage;
-import com.fintex.ce.adapter.cache.CreditQualityCacheStorage;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.service.calculation.CalculationService;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import org.springframework.stereotype.Service;
@@ -34,19 +34,19 @@ import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
 @Service
 public class CreditQualityServiceImpl implements CalculationService<CreditQualityResult, PortfolioHoldingsCommand> {
 
-  private final CreditQualityCacheStorage creditQualityCacheStorage;
-  private final AssetAllocationCacheStorage assetAllocationCacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<CreditQualityRating, BigDecimal>>> creditQualityCachePort;
+  private final AssetAllocationCachePort assetAllocationCachePort;
   private final AssetAllocationDataValidator assetAllocationDataValidator;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
   private final CreditQualityResponseMapper responseMapper;
 
-  public CreditQualityServiceImpl(final CreditQualityCacheStorage creditQualityCacheStorage,
-      final AssetAllocationCacheStorage assetAllocationCacheStorage,
+  public CreditQualityServiceImpl(final HoldingDataLoader<Map<Holding, Map<CreditQualityRating, BigDecimal>>> creditQualityCachePort,
+      final AssetAllocationCachePort assetAllocationCachePort,
       final AssetAllocationDataValidator assetAllocationDataValidator,
       final AssetAllocationDataMapper assetAllocationDataMapper,
       final CreditQualityResponseMapper responseMapper) {
-    this.creditQualityCacheStorage = creditQualityCacheStorage;
-    this.assetAllocationCacheStorage = assetAllocationCacheStorage;
+    this.creditQualityCachePort = creditQualityCachePort;
+    this.assetAllocationCachePort = assetAllocationCachePort;
     this.assetAllocationDataValidator = assetAllocationDataValidator;
     this.assetAllocationDataMapper = assetAllocationDataMapper;
     this.responseMapper = responseMapper;
@@ -55,7 +55,7 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
   @Override
   public CreditQualityResult perform(final PortfolioHoldingsCommand reqDTO) {
     final ArrayList<Warning> warnings = new ArrayList<>();
-    final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality = creditQualityCacheStorage.load(reqDTO
+    final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality = creditQualityCachePort.load(reqDTO
         .getHoldings(), List.of(), warnings, new ParamHolderDTO());
     if (areAllValuesInMapEmpty(creditQuality)) {
       return responseMapper.toEmptyResponse(warnings);
@@ -77,7 +77,7 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
    */
   public Map<Holding, BigDecimal> getFixedIncomeCreditQuality(final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    final AssetAllocationDataDTO assetAllocationDataDto = assetAllocationCacheStorage.load(
+    final AssetAllocationDataDTO assetAllocationDataDto = assetAllocationCachePort.load(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR, EAGLE), warnings, new ParamHolderDTO());
     assetAllocationDataValidator.validate(assetAllocationDataDto, warnings);

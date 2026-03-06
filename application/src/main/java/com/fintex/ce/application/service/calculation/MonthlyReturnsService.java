@@ -15,8 +15,8 @@ import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.model.MonthlyReturns;
-import com.fintex.ce.adapter.cache.FxRatesCacheStorage;
-import com.fintex.ce.adapter.cache.MonthlyReturnsCacheStorage;
+import com.fintex.ce.port.output.cache.FxRatesProvider;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.springframework.stereotype.Service;
 
@@ -29,15 +29,15 @@ import java.util.NavigableMap;
 @Service
 public class MonthlyReturnsService {
 
-  private final MonthlyReturnsCacheStorage monthlyReturnsCacheStorage;
-  private final FxRatesCacheStorage fxRatesCacheStorage;
+  private final HoldingDataLoader<Map<Holding, MonthlyReturns>> monthlyReturnsCachePort;
+  private final FxRatesProvider fxRatesProvider;
   private final MonthlyReturnsGenerator monthlyReturnsGenerator;
 
-  public MonthlyReturnsService(MonthlyReturnsCacheStorage monthlyReturnsCacheStorage,
-      FxRatesCacheStorage fxRatesCacheStorage,
+  public MonthlyReturnsService(HoldingDataLoader<Map<Holding, MonthlyReturns>> monthlyReturnsCachePort,
+      FxRatesProvider fxRatesProvider,
       MonthlyReturnsGenerator monthlyReturnsGenerator) {
-    this.monthlyReturnsCacheStorage = monthlyReturnsCacheStorage;
-    this.fxRatesCacheStorage = fxRatesCacheStorage;
+    this.monthlyReturnsCachePort = monthlyReturnsCachePort;
+    this.fxRatesProvider = fxRatesProvider;
     this.monthlyReturnsGenerator = monthlyReturnsGenerator;
   }
 
@@ -65,7 +65,7 @@ public class MonthlyReturnsService {
   }
 
   public Returns<MonthlyReturns> getMonthlyReturns(List<Holding> holdings, Currency currency) {
-    Map<Holding, MonthlyReturns> originalMonthlyReturns = monthlyReturnsCacheStorage.load(holdings, List.of(), List
+    Map<Holding, MonthlyReturns> originalMonthlyReturns = monthlyReturnsCachePort.load(holdings, List.of(), List
         .of(), new ParamHolderDTO(currency));
     originalMonthlyReturns.putAll(monthlyReturnsGenerator.generateGicMonthlyReturns(holdings));
     return getMonthlyReturns(originalMonthlyReturns);
@@ -77,7 +77,7 @@ public class MonthlyReturnsService {
 
   public Returns<MonthlyReturns> getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(List<Holding> holdings,
       Currency currency) {
-    Map<Holding, MonthlyReturns> originalMonthlyReturns = monthlyReturnsCacheStorage.load(holdings, List.of(), List
+    Map<Holding, MonthlyReturns> originalMonthlyReturns = monthlyReturnsCachePort.load(holdings, List.of(), List
         .of(), new ParamHolderDTO(currency));
     return Returns.initOnlyWithReturnsDataValidation(originalMonthlyReturns);
   }
@@ -113,7 +113,7 @@ public class MonthlyReturnsService {
   }
 
   public Map<LocalDate, FxRatesDTO> getFxRates() {
-    return fxRatesCacheStorage.loadFxRates();
+    return fxRatesProvider.loadFxRates();
   }
 
 }

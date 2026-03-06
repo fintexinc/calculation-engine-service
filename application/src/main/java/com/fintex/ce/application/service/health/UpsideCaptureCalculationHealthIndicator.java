@@ -2,7 +2,7 @@ package com.fintex.ce.application.service.health;
 
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.application.result.UpsideCaptureResult;
+import com.fintex.ce.port.input.result.UpsideCaptureResult;
 import com.fintex.ce.application.service.calculation.period.UpsideCaptureCalculationServiceImpl;
 import org.springframework.stereotype.Component;
 

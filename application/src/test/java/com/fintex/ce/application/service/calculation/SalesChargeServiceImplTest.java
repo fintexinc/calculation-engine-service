@@ -1,10 +1,10 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.SalesChargeCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.calculation.SalesChargeCalculation;
 import com.fintex.ce.application.service.calculation.SalesChargeServiceImpl;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.SalesChargeResult;
+import com.fintex.ce.port.input.result.SalesChargeResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -18,7 +18,7 @@ class SalesChargeServiceImplTest {
   @Test
   void perform_verifyLoad() {
     // SETUP
-    final var cacheStorage = mock(SalesChargeCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(cacheStorage));
     final var reqDTO = mock(PortfolioHoldingsCommand.class);
 
@@ -37,7 +37,7 @@ class SalesChargeServiceImplTest {
   @Test
   void perform_verifyGetSalesChargeCalculation() {
     // SETUP
-    final var cacheStorage = mock(SalesChargeCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(cacheStorage));
     final var reqDTO = mock(PortfolioHoldingsCommand.class);
 
@@ -56,7 +56,7 @@ class SalesChargeServiceImplTest {
   @Test
   void perform_checkResult() {
     // SETUP
-    final var cacheStorage = mock(SalesChargeCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(cacheStorage));
     final var reqDTO = mock(PortfolioHoldingsCommand.class);
     final SalesChargeCalculation calculation = mock(SalesChargeCalculation.class);

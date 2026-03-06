@@ -5,9 +5,9 @@ import com.fintex.ce.domain.enumeration.calculation.FixedIncomeStyleboxType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.FixedIncomeStyleboxExposureResult;
+import com.fintex.ce.port.input.result.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.FixedIncomeStyleboxExposureCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.PortfolioUtils;
 import org.springframework.stereotype.Service;
@@ -21,10 +21,10 @@ public class FixedIncomeStyleboxExposureCalculationServiceImpl
     extends
       BreakdownAbstractService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleboxType> {
 
-  private final FixedIncomeStyleboxExposureCacheStorage cacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<FixedIncomeStyleboxType, BigDecimal>>> cacheStorage;
   private final FixedIncomeStyleboxExposureResponseMapper responseMapper;
 
-  public FixedIncomeStyleboxExposureCalculationServiceImpl(      final FixedIncomeStyleboxExposureCacheStorage cacheStorage,
+  public FixedIncomeStyleboxExposureCalculationServiceImpl(      final HoldingDataLoader<Map<Holding, Map<FixedIncomeStyleboxType, BigDecimal>>> cacheStorage,
       final FixedIncomeStyleboxExposureResponseMapper responseMapper) {
     super();
     this.cacheStorage = cacheStorage;

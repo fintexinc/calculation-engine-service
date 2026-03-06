@@ -1,6 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.application.command.AverageMerCommand;
+import com.fintex.ce.port.input.command.AverageMerCommand;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.ParameterType;
 import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;

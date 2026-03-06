@@ -4,7 +4,7 @@ import com.fintex.ce.adapter.cache.EquityMarketCapitalizationCacheStorage;
 import com.fintex.ce.adapter.cache.repository.equitymarketcapitalization.EquityMarketCapitalizationRepository;
 import com.fintex.ce.adapter.cache.repository.equitymarketcapitalization.EquityMarketCapitalizationStockRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.EquityMarketCapitalization;
 import com.fintex.ce.domain.model.ParamHolderDTO;
@@ -54,19 +54,18 @@ class EquityMarketCapitalizationCacheStorageTest {
   void load_verifyFilters() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var fdsRepo = mock(SecurityDataPort.class);
       final var capitalizationRepository = mock(EquityMarketCapitalizationRepository.class);
       final var stockRepository = mock(EquityMarketCapitalizationStockRepository.class);
       final var cacheStatistic = mock(CacheStatisticService.class);
 
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, null, capitalizationRepository, capitalizationRepository, capitalizationRepository,
-              stockRepository, cacheStatistic));
-      final List<Holding> holdings = List.of(mock(Holding.class));
+          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository, cacheStatistic));
+      final List<Holding> holdings = List.of(new Holding());
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -83,14 +82,14 @@ class EquityMarketCapitalizationCacheStorageTest {
       // SETUP
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<FundSeriesHolding> filtered = List.of(new FundSeriesHolding().setFundServCode("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -104,13 +103,13 @@ class EquityMarketCapitalizationCacheStorageTest {
       // SETUP
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -124,14 +123,14 @@ class EquityMarketCapitalizationCacheStorageTest {
       // SETUP
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -145,14 +144,14 @@ class EquityMarketCapitalizationCacheStorageTest {
       // SETUP
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<BenchmarkIndexHolding> filtered = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -165,11 +164,11 @@ class EquityMarketCapitalizationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -181,22 +180,21 @@ class EquityMarketCapitalizationCacheStorageTest {
   void mapForStocks_verifyFilterHoldings() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var fdsRepo = mock(SecurityDataPort.class);
       final var capitalizationRepository = mock(EquityMarketCapitalizationRepository.class);
       final var stockRepository = mock(EquityMarketCapitalizationStockRepository.class);
       final var cacheStatistic = mock(CacheStatisticService.class);
 
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, null, capitalizationRepository, capitalizationRepository, capitalizationRepository,
-              stockRepository, cacheStatistic));
+          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository, cacheStatistic));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      List<StockHolding> filtered = List.of(mock(StockHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      List<StockHolding> filtered = List.of(new StockHolding().setTicker("TEST").setExchangeCode("TST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(STOCK_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(m).mapForStocks(any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.mapForStocks(holdings, warnings);
 
       // VERIFY
@@ -208,21 +206,20 @@ class EquityMarketCapitalizationCacheStorageTest {
   void mapForStocks_verifyConvertRatingsForStocks() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var fdsRepo = mock(SecurityDataPort.class);
       final var capitalizationRepository = mock(EquityMarketCapitalizationRepository.class);
       final var stockRepository = mock(EquityMarketCapitalizationStockRepository.class);
       final var cacheStatistic = mock(CacheStatisticService.class);
 
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, null, capitalizationRepository, capitalizationRepository, capitalizationRepository,
-              stockRepository, cacheStatistic));
+          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository, cacheStatistic));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final Map<StockHolding, EquityMarketCapitalization> map = new HashMap<>();
 
       doCallRealMethod().when(m).mapForStocks(any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       m.mapForStocks(holdings, warnings);
 
       // VERIFY
@@ -274,7 +271,7 @@ class EquityMarketCapitalizationCacheStorageTest {
       final EquityMarketCapitalization stock = mock(EquityMarketCapitalization.class);
       final Map<EquityMarketCapType, BigDecimal> DEFAULT_MAP = Map.of(GIANT, ZERO, LARGE, ZERO, MEDIUM, ZERO, SMALL,
           ZERO, MICRO, ZERO);
-      final Map<StockHolding, EquityMarketCapitalization> responseMap = Map.of(mock(StockHolding.class), stock);
+      final Map<StockHolding, EquityMarketCapitalization> responseMap = Map.of(new StockHolding().setTicker("TEST").setExchangeCode("TST"), stock);
 
       when(stock.getRatings()).thenReturn(Map.of(GIANT.name(), ONE));
       when(m.getEquityMarketCapType(any(), any(), any())).thenReturn(GIANT);
@@ -294,7 +291,7 @@ class EquityMarketCapitalizationCacheStorageTest {
       // SETUP
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
       final EquityMarketCapitalization stock = mock(EquityMarketCapitalization.class);
-      final Map<StockHolding, EquityMarketCapitalization> responseMap = Map.of(mock(StockHolding.class), stock);
+      final Map<StockHolding, EquityMarketCapitalization> responseMap = Map.of(new StockHolding().setTicker("TEST").setExchangeCode("TST"), stock);
 
       when(stock.getRatings()).thenReturn(null);
       when(m.getEquityMarketCapType(any(), any(), any())).thenReturn(GIANT);
@@ -315,7 +312,7 @@ class EquityMarketCapitalizationCacheStorageTest {
     // SETUP
     final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final EquityMarketCapitalization r = mock(EquityMarketCapitalization.class);
 
     final Map<Holding, EquityMarketCapitalization> holdings = Map.of(h, r);
@@ -323,7 +320,7 @@ class EquityMarketCapitalizationCacheStorageTest {
 
     doCallRealMethod().when(m).mapForNonStock(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     m.mapForNonStock(holdings, warnings);
 
     // VERIFY
@@ -335,7 +332,7 @@ class EquityMarketCapitalizationCacheStorageTest {
     // SETUP
     final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-    final StockHolding h = mock(StockHolding.class);
+    final StockHolding h = new StockHolding().setTicker("TEST").setExchangeCode("TST");
     final EquityMarketCapitalization r = mock(EquityMarketCapitalization.class);
 
     final Map.Entry<Holding, EquityMarketCapitalization> entry = new AbstractMap.SimpleEntry<>(h, r);
@@ -355,13 +352,13 @@ class EquityMarketCapitalizationCacheStorageTest {
     final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
     final EquityMarketCapitalization r = new EquityMarketCapitalization(Map.of("test", ONE));
-    final Map.Entry<Holding, EquityMarketCapitalization> entry = new AbstractMap.SimpleEntry<>(mock(StockHolding.class),
+    final Map.Entry<Holding, EquityMarketCapitalization> entry = new AbstractMap.SimpleEntry<>(new StockHolding().setTicker("TEST").setExchangeCode("TST"),
         r);
     final Map<String, BigDecimal> ratingsRaw = entry.getValue().getRatings();
 
     doCallRealMethod().when(m).convertRatings(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     m.convertRatings(entry, warnings);
 
     // VERIFY
@@ -373,12 +370,12 @@ class EquityMarketCapitalizationCacheStorageTest {
     // SETUP
     final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final Map<String, BigDecimal> ratingsRaw = Map.of("GIANT", ONE);
 
     doCallRealMethod().when(m).mapRatingsToRequiredFormat(any(), any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     m.mapRatingsToRequiredFormat(h, ratingsRaw, warnings);
 
     // VERIFY
@@ -393,7 +390,7 @@ class EquityMarketCapitalizationCacheStorageTest {
 
       final Map<EquityMarketCapType, BigDecimal> DEFAULT_MAP = Map.of(GIANT, ZERO, LARGE, ZERO, MEDIUM, ZERO, SMALL,
           ZERO, MICRO, ZERO);
-      final Holding h = mock(Holding.class);
+      final Holding h = new Holding();
       final Map<String, BigDecimal> ratingsRaw = Map.of("GIANT", ONE);
       final Map<EquityMarketCapType, BigDecimal> ratings = Map.of(GIANT, ONE);
 
@@ -413,7 +410,7 @@ class EquityMarketCapitalizationCacheStorageTest {
     // SETUP
     final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final String s = "Large";
 
     doCallRealMethod().when(m).getEquityMarketCapType(any(), any(), any());
@@ -430,7 +427,7 @@ class EquityMarketCapitalizationCacheStorageTest {
     // SETUP
     final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final String s = "test";
 
     doCallRealMethod().when(m).getEquityMarketCapType(any(), any(), any());

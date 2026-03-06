@@ -1,5 +1,7 @@
 package com.fintex.ce.domain.model.holding;
 
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -24,6 +26,12 @@ public class BenchmarkIndexHolding extends Holding {
   private String mrStarId;
 
   public BenchmarkIndexHolding() {
+  }
+
+  public BenchmarkIndexHolding setMrStarId(String mrStarId) {
+    this.mrStarId = mrStarId;
+    setSecurityIdentifier(new SecurityIdentifier(mrStarId, FiIdentifierType.MORNINGSTAR_ID));
+    return this;
   }
 
   @Override

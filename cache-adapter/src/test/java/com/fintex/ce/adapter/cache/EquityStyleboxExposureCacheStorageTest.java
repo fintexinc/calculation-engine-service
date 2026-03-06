@@ -5,7 +5,7 @@ import com.fintex.ce.adapter.cache.entity.REquityStyleboxExposure;
 import com.fintex.ce.adapter.cache.repository.EquityStyleboxAllocationRepository;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.calculation.EquityStyleboxType;
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
 import com.fintex.ce.domain.model.ParamHolderDTO;
@@ -53,22 +53,19 @@ class EquityStyleboxExposureCacheStorageTest {
   void load_verifyFilters() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var securityDataPort = mock(SecurityDataPort.class);
       final CacheEntityMapper<EquityStyleboxExposure, REquityStyleboxExposure> mapper = mock(CacheEntityMapper.class);
-      final var fundCanadaCacheRepo = mock(EquityStyleboxAllocationRepository.class);
-      final var etfCanadaCacheRepo = mock(EquityStyleboxAllocationRepository.class);
-      final var etfUsCacheRepo = mock(EquityStyleboxAllocationRepository.class);
+      final var equityStyleboxAllocationRepository = mock(EquityStyleboxAllocationRepository.class);
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-              cacheStatisticService));
+          .useConstructor(securityDataPort, mapper, equityStyleboxAllocationRepository, cacheStatisticService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       Map<Holding, EquityStyleboxExposure> holdingExposureMap = holdings.stream()
           .collect(Collectors.toMap(holding -> holding, holding -> mock(EquityStyleboxExposure.class)));
@@ -94,15 +91,15 @@ class EquityStyleboxExposureCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<FundSeriesHolding> filtered = List.of(new FundSeriesHolding().setFundServCode("TEST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -116,14 +113,14 @@ class EquityStyleboxExposureCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -137,15 +134,15 @@ class EquityStyleboxExposureCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding());
+      final List<EtfHolding> filtered = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -158,13 +155,13 @@ class EquityStyleboxExposureCacheStorageTest {
   void mapForNoneStock_verifyEquityStyleboxExposureMapper() {
     // SETUP
     final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class);
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final EquityStyleboxExposure rEquityStyleboxExposure = mock(EquityStyleboxExposure.class);
     final Map<Holding, EquityStyleboxExposure> holdingEquityStyleboxExposureMap = Map.of(h, rEquityStyleboxExposure);
 
     doCallRealMethod().when(m).mapForNoneStock(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
     m.mapForNoneStock(holdingEquityStyleboxExposureMap, warnings);
 
@@ -178,7 +175,7 @@ class EquityStyleboxExposureCacheStorageTest {
   void mapForNoneStock_checkResult() {
     // SETUP
     final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class);
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final EquityStyleboxExposure rEquityStyleboxExposure = mock(EquityStyleboxExposure.class);
     final Map<Holding, EquityStyleboxExposure> holdingEquityStyleboxExposureMap = Map.of(h, rEquityStyleboxExposure);
     final Map<EquityStyleboxType, BigDecimal> actualValue = Map.of(EquityStyleboxType.LARGE_VALUE, BigDecimal.TEN);
@@ -187,7 +184,7 @@ class EquityStyleboxExposureCacheStorageTest {
 
     doCallRealMethod().when(m).mapForNoneStock(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     final Map<Holding, Map<EquityStyleboxType, BigDecimal>> actual = m.mapForNoneStock(holdingEquityStyleboxExposureMap,
         warnings);
 
@@ -199,7 +196,7 @@ class EquityStyleboxExposureCacheStorageTest {
   void equityStyleboxExposureMapper_checkResult() {
     // SETUP
     final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class);
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final Map.Entry<Holding, EquityStyleboxExposure> entry = mock(Map.Entry.class);
 
     when(entry.getKey()).thenReturn(h);
@@ -227,7 +224,7 @@ class EquityStyleboxExposureCacheStorageTest {
   void equityStyleboxExposureMapper_checkResult2() {
     // SETUP
     final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class);
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final Map.Entry<Holding, EquityStyleboxExposure> entry = mock(Map.Entry.class);
 
     when(entry.getKey()).thenReturn(h);
@@ -254,7 +251,7 @@ class EquityStyleboxExposureCacheStorageTest {
   void equityStyleboxExposureMapper_checkResult3() {
     // SETUP
     final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class);
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final Map.Entry<Holding, EquityStyleboxExposure> entry = mock(Map.Entry.class);
 
     when(entry.getKey()).thenReturn(h);

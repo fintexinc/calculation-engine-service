@@ -30,6 +30,13 @@
             <artifactId>jackson-annotations</artifactId>
         </dependency>
 
+        <!-- Security Master Domain (SecurityIdentifier, FiIdentifierType) -->
+        <dependency>
+            <groupId>com.fintex.wm</groupId>
+            <artifactId>sm-domain</artifactId>
+            <version>${sm-domain.version}</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

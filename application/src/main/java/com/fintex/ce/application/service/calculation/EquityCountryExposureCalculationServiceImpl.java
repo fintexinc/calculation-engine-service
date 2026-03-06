@@ -4,9 +4,9 @@ import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.EquityCountryExposureResult;
+import com.fintex.ce.port.input.result.EquityCountryExposureResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.EquityCountryAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class EquityCountryExposureCalculationServiceImpl
     extends
       BreakdownAbstractService<EquityCountryExposureResult, CountryRegionType> {
 
-  private final EquityCountryAllocationCacheStorage countryAllocationCacheStorage;
+  private final EquityCountryAllocationCachePort countryAllocationCachePort;
 
   public static final Map<CountryRegionType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
@@ -34,9 +34,9 @@ public class EquityCountryExposureCalculationServiceImpl
   }
 
   public EquityCountryExposureCalculationServiceImpl(
-      final EquityCountryAllocationCacheStorage countryAllocationCacheStorage) {
+      final EquityCountryAllocationCachePort countryAllocationCachePort) {
     super();
-    this.countryAllocationCacheStorage = countryAllocationCacheStorage;
+    this.countryAllocationCachePort = countryAllocationCachePort;
   }
 
   @Override
@@ -61,7 +61,7 @@ public class EquityCountryExposureCalculationServiceImpl
   @Override
   public Map<Holding, Map<CountryRegionType, BigDecimal>> getLoadFromCacheStorage(final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    return countryAllocationCacheStorage.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
+    return countryAllocationCachePort.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
   }
 
 }

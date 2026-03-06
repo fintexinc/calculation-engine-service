@@ -4,7 +4,7 @@ import api.dto.RequestParamsSupplier;
 import api.excel.writer.SMDataWriter;
 import api.excel.writer.WritableSpreadsheet;
 import api.util.CommonTools;
-import com.fintex.ce.adapter.graphqlclient.repository.CreditQualitySMRepository;
+import com.fintex.ce.adapter.graphqlclient.repository.CreditQualityGraphqlDataFetcher;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.CreditQualityRating;
@@ -26,11 +26,11 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class CreditQualityFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-  private static final CreditQualitySMRepository CREDIT_QUALITY_FDS = initCreditQualityFDS();
+  private static final CreditQualityGraphqlDataFetcher CREDIT_QUALITY_FDS = initCreditQualityFDS();
   private static final String TAB_NAME = "CreditQuality_FDS";
 
-  private static CreditQualitySMRepository initCreditQualityFDS() {
-    return new CreditQualitySMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+  private static CreditQualityGraphqlDataFetcher initCreditQualityFDS() {
+    return new CreditQualityGraphqlDataFetcher(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
   }
 
   @Override

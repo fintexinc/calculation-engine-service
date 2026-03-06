@@ -11,9 +11,9 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RMonthlyReturns;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.monthlyreturns.MonthlyReturnsRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 
@@ -44,29 +44,25 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 
 @Service
 public class MonthlyReturnsCacheStorage
-    extends
-      MultipleCacheStorageAbstract<MonthlyReturns, MonthlyReturns, MonthlyReturns, MonthlyReturns, RMonthlyReturns> {
+    extends CacheStorageAbstract<MonthlyReturns, RMonthlyReturns, Map<Holding, MonthlyReturns>> {
 
   private final TBillsCacheStorage tBillsCacheStorage;
   private final ReturnsGenerator monthlyReturnGenerator;
 
   public MonthlyReturnsCacheStorage(
-      final MultipleSMRepository<MonthlyReturns, MonthlyReturns, MonthlyReturns, MonthlyReturns> smRepo,
+      final SecurityDataPort<MonthlyReturns> securityDataPort,
       final CacheEntityMapper<MonthlyReturns, RMonthlyReturns> mapper,
       final MonthlyReturnsRepository monthlyReturnsRepository,
       final TBillsCacheStorage tBillsCacheStorage,
       final CacheStatisticService cacheStatisticService,
       final ReturnsGenerator monthlyReturnGenerator) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        monthlyReturnsRepository, monthlyReturnsRepository,
-        monthlyReturnsRepository, monthlyReturnsRepository, cacheStatisticService, MONTHLY_RETURNS);
+    super(securityDataPort, mapper, monthlyReturnsRepository, cacheStatisticService, MONTHLY_RETURNS);
     this.tBillsCacheStorage = tBillsCacheStorage;
     this.monthlyReturnGenerator = monthlyReturnGenerator;
   }
 
   @Override
-  public Map<Holding, MonthlyReturns> load(final List<Holding> holdings, final List<DataProvider> providers,
+  public Map<Holding, MonthlyReturns> load(final List<? extends Holding> holdings, final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     final Map<Holding, MonthlyReturns> map = new HashMap<>();
     map.putAll(loadBenchOfFundCanada(filterHoldings(holdings, CANADA_MUTUAL_PREDICATE), List.of()));
@@ -89,7 +85,7 @@ public class MonthlyReturnsCacheStorage
     return map;
   }
 
-  public void addCashReturns(final List<Holding> holdings, final Currency currencyFromRequest,
+  public void addCashReturns(final List<? extends Holding> holdings, final Currency currencyFromRequest,
       final Map<Holding, MonthlyReturns> map) {
     final List<CashHolding> cashes = filterHoldings(holdings, CASH_PREDICATE);
     if (!cashes.isEmpty()) {

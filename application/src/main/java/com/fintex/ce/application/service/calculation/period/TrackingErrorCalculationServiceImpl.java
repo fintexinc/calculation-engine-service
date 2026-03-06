@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.TrackingErrorCalculation;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.application.result.TrackingErrorResult;
+import com.fintex.ce.port.input.result.TrackingErrorResult;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;

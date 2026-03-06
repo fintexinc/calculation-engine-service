@@ -5,8 +5,8 @@ import com.fintex.ce.application.service.calculation.EquitySectorCalculationImpl
 import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.EquitySectorResult;
-import com.fintex.ce.adapter.cache.EquitySectorCacheStorage;
+import com.fintex.ce.port.input.result.EquitySectorResult;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class EquitySectorCalculationImplTest {
   void getLoadFromCacheStorage_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(EquitySectorCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(cacheStorage, responseMapper));
@@ -52,7 +52,7 @@ class EquitySectorCalculationImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
 
       // SETUP
-      final var cacheStorage = mock(EquitySectorCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(cacheStorage, responseMapper));
@@ -75,7 +75,7 @@ class EquitySectorCalculationImplTest {
   void calculate_verifyResponseMapperFromNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(EquitySectorCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(cacheStorage, responseMapper));
@@ -101,7 +101,7 @@ class EquitySectorCalculationImplTest {
   void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(EquitySectorCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(cacheStorage, responseMapper));
@@ -121,7 +121,7 @@ class EquitySectorCalculationImplTest {
   void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(EquitySectorCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(cacheStorage, responseMapper));

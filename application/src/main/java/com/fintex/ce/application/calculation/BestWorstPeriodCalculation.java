@@ -1,10 +1,10 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.result.BestWorstPeriodsResult;
-import com.fintex.ce.application.result.bestworstperiods.BestWorstPeriodData;
-import com.fintex.ce.application.result.bestworstperiods.IntervalResult;
-import com.fintex.ce.application.result.bestworstperiods.PeriodDateResult;
-import com.fintex.ce.application.result.bestworstperiods.PeriodValueResult;
+import com.fintex.ce.port.input.result.BestWorstPeriodsResult;
+import com.fintex.ce.port.input.result.bestworstperiods.BestWorstPeriodData;
+import com.fintex.ce.port.input.result.bestworstperiods.IntervalResult;
+import com.fintex.ce.port.input.result.bestworstperiods.PeriodDateResult;
+import com.fintex.ce.port.input.result.bestworstperiods.PeriodValueResult;
 import com.fintex.ce.util.DecimalUtils;
 import lombok.EqualsAndHashCode;
 import org.springframework.util.CollectionUtils;
