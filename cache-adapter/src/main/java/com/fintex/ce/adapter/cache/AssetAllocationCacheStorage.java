@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.cache;
 
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.domain.enumeration.Country;
 import com.fintex.ce.domain.enumeration.DataProvider;
@@ -21,10 +21,10 @@ import com.fintex.ce.domain.model.holding.UsMutualFundHolding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RAssetAllocation;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.assetallocation.AssetAllocationRepository;
 import com.fintex.ce.util.CollectorUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -46,37 +46,33 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 
 @Service
 public class AssetAllocationCacheStorage
-    extends
-      MultipleCacheStorageAbstract<AssetAllocation, AssetAllocation, AssetAllocation, AssetAllocation, RAssetAllocation> {
+    extends CacheStorageAbstract<AssetAllocation, RAssetAllocation, AssetAllocationDataDTO> implements AssetAllocationCachePort {
 
   private final BusinessCountryCacheStorage businessCountryCacheStorage;
 
-  @Autowired
   public AssetAllocationCacheStorage(
-      final MultipleSMRepository<AssetAllocation, AssetAllocation, AssetAllocation, AssetAllocation> smRepo,
+      final SecurityDataPort<AssetAllocation> securityDataPort,
       final CacheEntityMapper<AssetAllocation, RAssetAllocation> mapper,
       final AssetAllocationRepository assetAllocationRepository,
       final BusinessCountryCacheStorage businessCountryCacheStorage,
       final CacheStatisticService cacheStatisticService) {
-    super(smRepo, mapper, mapper, mapper, mapper,
-        assetAllocationRepository, assetAllocationRepository,
-        assetAllocationRepository, assetAllocationRepository, cacheStatisticService, CacheNameEntity.ASSET_ALLOCATION);
+    super(securityDataPort, mapper, assetAllocationRepository, cacheStatisticService, CacheNameEntity.ASSET_ALLOCATION);
     this.businessCountryCacheStorage = businessCountryCacheStorage;
   }
 
   @Override
-  public AssetAllocationDataDTO load(final List<Holding> holdings, final List<DataProvider> providers,
+  public AssetAllocationDataDTO load(final List<? extends Holding> holdings, final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     return load(holdings, providers, false, warnings);
   }
 
-  public AssetAllocationDataDTO loadWithDataProvidesCheck(final List<Holding> holdings,
-      final List<DataProvider> dataProviders,
-      final List<Warning> warnings) {
+  public AssetAllocationDataDTO loadWithDataProvidersCheck(final List<? extends Holding> holdings,
+                                                           final List<DataProvider> dataProviders,
+                                                           final List<Warning> warnings) {
     return load(holdings, dataProviders, true, warnings);
   }
 
-  public AssetAllocationDataDTO load(final List<Holding> holdings,
+  public AssetAllocationDataDTO load(final List<? extends Holding> holdings,
       final List<DataProvider> dataProviders,
       final boolean needToCheckDataProvidersFromResponse,
       final List<Warning> warnings) {
@@ -115,7 +111,7 @@ public class AssetAllocationCacheStorage
         .setSeparatelyManagedAccountFdsResponse(separatelyManagedAccounts);
   }
 
-  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> loadStocks(final List<Holding> holdings,
+  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> loadStocks(final List<? extends Holding> holdings,
       final List<DataProvider> dataProviders,
       final boolean needToCheckDataProvidersFromResponse,
       final List<Warning> warnings) {

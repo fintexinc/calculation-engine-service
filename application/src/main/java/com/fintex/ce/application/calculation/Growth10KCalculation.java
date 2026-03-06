@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.domain.model.CommonDates;
-import com.fintex.ce.application.result.Growth10KResult;
-import com.fintex.ce.application.result.core.KeyValueResult;
+import com.fintex.ce.port.input.result.Growth10KResult;
+import com.fintex.ce.port.input.result.core.KeyValueResult;
 import com.fintex.ce.domain.model.core.Warning;
 import org.springframework.util.CollectionUtils;
 

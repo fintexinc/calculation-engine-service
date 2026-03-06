@@ -3,7 +3,7 @@ package com.fintex.ce.application.service.calculation.period;
 import com.fintex.ce.application.calculation.TrailingTotalReturnsCalculation;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.application.result.TrailingTotalReturnsResult;
+import com.fintex.ce.port.input.result.TrailingTotalReturnsResult;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;

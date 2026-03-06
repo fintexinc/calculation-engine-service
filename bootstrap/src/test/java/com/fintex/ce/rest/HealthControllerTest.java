@@ -1,8 +1,8 @@
 package com.fintex.ce.rest;
 
-import com.fintex.ce.adapter.cache.statistic.CacheWarmUpServiceImpl;
 import com.fintex.ce.adapter.jdbc.repository.FASUsageStatisticsRepo;
 import com.fintex.ce.adapter.rest.controller.HealthController;
+import com.fintex.ce.port.output.cache.CacheWarmUpPort;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
@@ -22,16 +22,14 @@ class HealthControllerTest {
   void getF5HealthCheck_checkResult_whenAllAreHealthy() {
     // SETUP
     final var fdsStatistics = mock(FASUsageStatisticsRepo.class);
-    final var cacheWarmUpService = mock(CacheWarmUpServiceImpl.class);
-    final var schedulerRunInfoDto = mock(CacheWarmUpServiceImpl.SchedulerRunInfoDto.class);
+    final var cacheWarmUpPort = mock(CacheWarmUpPort.class);
     final var zonedDayTime = ZonedDateTime.of(LocalDateTime.MIN, ZoneId.of("UTC"));
 
     final var sut = mock(HealthController.class,
-        withSettings().useConstructor(fdsStatistics, cacheWarmUpService));
+        withSettings().useConstructor(fdsStatistics, cacheWarmUpPort));
 
-    when(schedulerRunInfoDto.getLastTimeRun()).thenReturn(zonedDayTime);
-    when(schedulerRunInfoDto.isRunInLast24Hours()).thenReturn(true);
-    when(cacheWarmUpService.cacheWarmUpSchedulerRunCheck()).thenReturn(schedulerRunInfoDto);
+    final var schedulerRunInfo = new CacheWarmUpPort.SchedulerRunInfo(true, zonedDayTime);
+    when(cacheWarmUpPort.cacheWarmUpSchedulerRunCheck()).thenReturn(schedulerRunInfo);
     doCallRealMethod().when(sut).cacheWarmupHealthCheck();
 
     // ACT
@@ -39,8 +37,7 @@ class HealthControllerTest {
 
     // VERIFY
     verify(fdsStatistics).isDbHealthy();
-    verify(cacheWarmUpService).cacheWarmUpSchedulerRunCheck();
-    verify(schedulerRunInfoDto).isRunInLast24Hours();
+    verify(cacheWarmUpPort).cacheWarmUpSchedulerRunCheck();
 
     final String expectedBody = HEALTHY_RESPONSE + ", last time cache warm-up scheduler run: " + zonedDayTime;
     assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -51,10 +48,10 @@ class HealthControllerTest {
   void getF5HealthCheck_checkResult_whenFdsRepositoryUnhealthy() {
     // SETUP
     final var fdsStatistics = mock(FASUsageStatisticsRepo.class);
-    final var cacheWarmUpService = mock(CacheWarmUpServiceImpl.class);
+    final var cacheWarmUpPort = mock(CacheWarmUpPort.class);
 
     final var sut = mock(HealthController.class,
-        withSettings().useConstructor(fdsStatistics, cacheWarmUpService));
+        withSettings().useConstructor(fdsStatistics, cacheWarmUpPort));
 
     when(fdsStatistics.isDbHealthy()).thenThrow(new RuntimeException());
     doCallRealMethod().when(sut).cacheWarmupHealthCheck();
@@ -73,14 +70,13 @@ class HealthControllerTest {
   void getF5HealthCheck_checkResult_whenCacheWarmUpServiceUnhealthy() {
     // SETUP
     final var fdsStatistics = mock(FASUsageStatisticsRepo.class);
-    final var cacheWarmUpService = mock(CacheWarmUpServiceImpl.class);
-    final var schedulerRunInfoDto = mock(CacheWarmUpServiceImpl.SchedulerRunInfoDto.class);
+    final var cacheWarmUpPort = mock(CacheWarmUpPort.class);
 
     final var sut = mock(HealthController.class,
-        withSettings().useConstructor(fdsStatistics, cacheWarmUpService));
+        withSettings().useConstructor(fdsStatistics, cacheWarmUpPort));
 
-    when(schedulerRunInfoDto.isRunInLast24Hours()).thenReturn(false);
-    when(cacheWarmUpService.cacheWarmUpSchedulerRunCheck()).thenReturn(schedulerRunInfoDto);
+    final var schedulerRunInfo = new CacheWarmUpPort.SchedulerRunInfo(false, null);
+    when(cacheWarmUpPort.cacheWarmUpSchedulerRunCheck()).thenReturn(schedulerRunInfo);
     doCallRealMethod().when(sut).cacheWarmupHealthCheck();
 
     // ACT

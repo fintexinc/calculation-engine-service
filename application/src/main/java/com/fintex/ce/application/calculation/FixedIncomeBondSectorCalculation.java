@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.domain.enumeration.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.result.FixedIncomeSectorResult;
+import com.fintex.ce.port.input.result.FixedIncomeSectorResult;
 import com.fintex.ce.domain.model.core.Warning;
 
 import java.math.BigDecimal;

@@ -4,10 +4,11 @@ import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.GeographicExposureResult;
+import com.fintex.ce.port.input.result.GeographicExposureResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.adapter.cache.EquityGeographicAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ public class EquityGeographicExposureCalculationServiceImpl
     extends
       BreakdownAbstractService<GeographicExposureResult, GeographicRegionType> {
 
-  private final EquityGeographicAllocationCacheStorage geographicAllocationCacheStorage;
+  private final HoldingDataLoader<Map<Holding, Map<GeographicRegionType, BigDecimal>>> geographicAllocationCacheStorage;
 
   static final Map<GeographicRegionType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
@@ -34,7 +35,7 @@ public class EquityGeographicExposureCalculationServiceImpl
   }
 
   public EquityGeographicExposureCalculationServiceImpl(
-      final EquityGeographicAllocationCacheStorage geographicAllocationCacheStorage) {
+      @Qualifier("equityGeographic") final HoldingDataLoader<Map<Holding, Map<GeographicRegionType, BigDecimal>>> geographicAllocationCacheStorage) {
     super();
     this.geographicAllocationCacheStorage = geographicAllocationCacheStorage;
   }

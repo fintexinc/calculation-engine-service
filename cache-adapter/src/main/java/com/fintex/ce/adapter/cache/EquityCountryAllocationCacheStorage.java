@@ -15,9 +15,10 @@ import com.fintex.ce.domain.model.holding.UsMutualFundHolding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.REquityCountryAllocation;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.EquityCountryAllocationRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.service.CountryAllocationMappingService;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.CollectorUtils;
@@ -50,43 +51,37 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class EquityCountryAllocationCacheStorage
-    extends
-      MultipleCacheStorageAbstract<EquityCountryAllocation, EquityCountryAllocation, EquityCountryAllocation, EquityCountryAllocation, REquityCountryAllocation> {
+    extends CacheStorageAbstract<EquityCountryAllocation, REquityCountryAllocation, Map<Holding, Map<CountryRegionType, BigDecimal>>> implements EquityCountryAllocationCachePort {
 
   private final CountryAllocationMappingService countryAllocationService;
   private final BusinessCountryCacheStorage businessCountryCacheStorage;
 
   public EquityCountryAllocationCacheStorage(
-      MultipleSMRepository<EquityCountryAllocation, EquityCountryAllocation, EquityCountryAllocation, EquityCountryAllocation> smRepo,
+      SecurityDataPort<EquityCountryAllocation> securityDataPort,
       CacheEntityMapper<EquityCountryAllocation, REquityCountryAllocation> mapper,
-      EquityCountryAllocationRepository fundCanadaCacheRepo,
-      EquityCountryAllocationRepository etfCanadaCacheRepo,
-      EquityCountryAllocationRepository etfUsCacheRepo,
+      EquityCountryAllocationRepository equityCountryAllocationRepository,
       CountryAllocationMappingService countryAllocationService,
       CacheStatisticService cacheStatisticService,
       BusinessCountryCacheStorage businessCountryCacheStorage) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        null, cacheStatisticService, EQUITY_COUNTRY_ALLOCATIONS);
+    super(securityDataPort, mapper, equityCountryAllocationRepository, cacheStatisticService, EQUITY_COUNTRY_ALLOCATIONS);
     this.countryAllocationService = countryAllocationService;
     this.businessCountryCacheStorage = businessCountryCacheStorage;
   }
 
   @Override
-  public Map<Holding, Map<CountryRegionType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<CountryRegionType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     return load(holdings, providers, warnings, false);
   }
 
-  public Map<Holding, Map<CountryRegionType, BigDecimal>> loadWithDataProvidersCheck(final List<Holding> holdings,
+  public Map<Holding, Map<CountryRegionType, BigDecimal>> loadWithDataProvidersCheck(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings) {
     return load(holdings, providers, warnings, true);
   }
 
-  public Map<Holding, Map<CountryRegionType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<CountryRegionType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final boolean needToCheckDataProvidersFromResponse) {
     final Map<Holding, Map<CountryRegionType, BigDecimal>> result = new HashMap<>();
@@ -141,7 +136,7 @@ public class EquityCountryAllocationCacheStorage
     };
   }
 
-  public Map<Holding, Map<CountryRegionType, BigDecimal>> mapForStocks(final List<Holding> holdings,
+  public Map<Holding, Map<CountryRegionType, BigDecimal>> mapForStocks(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final boolean needToCheckDataProvidersFromResponse,
       final List<Warning> warnings) {

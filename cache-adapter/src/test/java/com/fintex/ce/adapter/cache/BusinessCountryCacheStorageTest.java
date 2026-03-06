@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.cache;
 import com.fintex.ce.adapter.cache.BusinessCountryCacheStorage;
 import com.fintex.ce.adapter.cache.repository.businesscountry.BusinessCountryRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.Country;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.BusinessCountry;
@@ -45,7 +45,7 @@ class BusinessCountryCacheStorageTest {
     // SETUP
     final var sut = mock(BusinessCountryCacheStorage.class);
 
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<Holding> holdings = List.of(new Holding());
     final List<DataProvider> providers = mock(List.class);
 
     doCallRealMethod().when(sut).load(anyList(), anyList(), anyList(), any(ParamHolderDTO.class));
@@ -63,7 +63,7 @@ class BusinessCountryCacheStorageTest {
       // SETUP
       final var sut = mock(BusinessCountryCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = true;
       final var response = mock(Map.class);
@@ -89,7 +89,7 @@ class BusinessCountryCacheStorageTest {
       // SETUP
       final var sut = mock(BusinessCountryCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = false;
       final List<StockHolding> filtered = mock(List.class);
@@ -111,7 +111,7 @@ class BusinessCountryCacheStorageTest {
       // SETUP
       final var sut = mock(BusinessCountryCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
       final var needToCheckDataProviders = false;
 
@@ -134,7 +134,7 @@ class BusinessCountryCacheStorageTest {
 
     doCallRealMethod().when(b).getCountryForHolding(any(), any(), anyList());
     // ACT
-    final Country country = b.getCountryForHolding(mock(StockHolding.class), rb, mock(List.class));
+    final Country country = b.getCountryForHolding(new StockHolding(), rb, mock(List.class));
 
     // VERIFY
     assertEquals(CAN, country);
@@ -150,7 +150,7 @@ class BusinessCountryCacheStorageTest {
 
     doCallRealMethod().when(b).getCountryForHolding(any(), any(), anyList());
     // ACT
-    final Country country = b.getCountryForHolding(mock(StockHolding.class), rb, mock(List.class));
+    final Country country = b.getCountryForHolding(new StockHolding(), rb, mock(List.class));
 
     // VERIFY
     assertEquals(USA, country);
@@ -166,7 +166,7 @@ class BusinessCountryCacheStorageTest {
 
     doCallRealMethod().when(b).getCountryForHolding(any(), any(), anyList());
     // ACT
-    final Country e = b.getCountryForHolding(mock(StockHolding.class), rb, mock(List.class));
+    final Country e = b.getCountryForHolding(new StockHolding(), rb, mock(List.class));
 
     assertEquals(OTHER, e);
   }
@@ -182,7 +182,7 @@ class BusinessCountryCacheStorageTest {
 
     doCallRealMethod().when(sut).getCountryForHolding(any(), any(), anyList());
     // ACT
-    sut.getCountryForHolding(mock(StockHolding.class), businessCountry, warnings);
+    sut.getCountryForHolding(new StockHolding(), businessCountry, warnings);
 
     assertEquals(1, warnings.size());
     assertEquals(WRN_BCC_001.name(), warnings.get(0).getCode());
@@ -194,7 +194,7 @@ class BusinessCountryCacheStorageTest {
     // SETUP
     final BusinessCountryCacheStorage b = mock(BusinessCountryCacheStorage.class);
 
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<Holding> holdings = List.of(new Holding());
     final List<DataProvider> providers = mock(List.class);
     final var needToCheckDataProviders = false;
 
@@ -217,7 +217,7 @@ class BusinessCountryCacheStorageTest {
     when(rb.getValue()).thenReturn(USA.name());
     final List<DataProvider> providers = mock(List.class);
     final var needToCheckDataProviders = false;
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding();
     final List<Holding> holdings = List.of(h);
 
     when(sut.load(anyList(), anyList(), anyBoolean())).thenReturn(Map.of(h, rb));
@@ -235,7 +235,7 @@ class BusinessCountryCacheStorageTest {
   @Test
   void getBusinessCountrySetValueFunction_checkResult() {
     // SETUP
-    final var queryRepository = mock(MultipleSMRepository.class);
+    final var queryRepository = mock(SecurityDataPort.class);
     final var businessCountryRepository = mock(BusinessCountryRepository.class);
     final var cacheStatisticService = mock(CacheStatisticService.class);
 

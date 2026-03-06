@@ -23,14 +23,6 @@
             <artifactId>api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- Cache adapter (temporary coupling - existing code depends on cache implementations) -->
-        <dependency>
-            <groupId>com.fintex</groupId>
-            <artifactId>cache-adapter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -6,11 +6,12 @@ import com.fintex.ce.domain.enumeration.ParameterType;
 import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.AverageMerCommand;
-import com.fintex.ce.application.result.AverageMerResult;
+import com.fintex.ce.port.input.command.AverageMerCommand;
+import com.fintex.ce.port.input.result.AverageMerResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.adapter.cache.AverageMERCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,17 +28,17 @@ import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 @Service
 public class MERCalculationServiceImpl extends AverageManagementExpenseCalculationService<AverageMerResult> {
 
-  private final AverageMERCacheStorage averageMERCacheStorage;
+  private final HoldingDataLoader<Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>>> averageMERCachePort;
 
-  public MERCalculationServiceImpl(final AverageMERCacheStorage averageMERCacheStorage) {
+  public MERCalculationServiceImpl(@Qualifier("averageMer") final HoldingDataLoader<Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>>> averageMERCachePort) {
     super();
-    this.averageMERCacheStorage = averageMERCacheStorage;
+    this.averageMERCachePort = averageMERCachePort;
   }
 
   @Override
   public Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> loadDataFromCacheStorage(
       final AverageMerCommand reqDTO) {
-    return averageMERCacheStorage.load(reqDTO.getHoldings(), getSpecifiedIfEmpty(reqDTO.getDataProviders(),
+    return averageMERCachePort.load(reqDTO.getHoldings(), getSpecifiedIfEmpty(reqDTO.getDataProviders(),
         DataProvider.DEFAULT_PROVIDERS),
         List.of(), new ParamHolderDTO());
   }

@@ -1,6 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.AverageMERCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.MERCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.HoldingType;
@@ -8,8 +8,8 @@ import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.AverageMerCommand;
-import com.fintex.ce.application.result.AverageMerResult;
+import com.fintex.ce.port.input.command.AverageMerCommand;
+import com.fintex.ce.port.input.result.AverageMerResult;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.FilterUtils;
@@ -38,7 +38,7 @@ class MERCalculationServiceImplTest {
   @Test
   void perform_checkResult() {
     // SETUP
-    final var averageMERCacheStorage = mock(AverageMERCacheStorage.class);
+    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
 
     final var resDto = mock(AverageMerResult.class);
@@ -56,7 +56,7 @@ class MERCalculationServiceImplTest {
   @Test
   void perform_verifyLoad() {
     // SETUP
-    final var averageMERCacheStorage = mock(AverageMERCacheStorage.class);
+    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
 
     final var reqDTO = mock(AverageMerCommand.class);
@@ -80,7 +80,7 @@ class MERCalculationServiceImplTest {
   @Test
   void perform_verifyResDTOSetWarnings() {
     // SETUP
-    final var averageMERCacheStorage = mock(AverageMERCacheStorage.class);
+    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
 
     final var reqDTO = mock(AverageMerCommand.class);
@@ -102,7 +102,7 @@ class MERCalculationServiceImplTest {
   @Test
   void perform_verifySetInitialFeeAndModifiedFeeValues() {
     // SETUP
-    final var averageMERCacheStorage = mock(AverageMERCacheStorage.class);
+    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
 
     final var reqDTO = mock(AverageMerCommand.class);
@@ -125,7 +125,7 @@ class MERCalculationServiceImplTest {
   @Test
   void perform_verifyGetResultAndSetNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds() {
     // SETUP
-    final var averageMERCacheStorage = mock(AverageMERCacheStorage.class);
+    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
 
     final var resDto = mock(AverageMerResult.class);
@@ -149,7 +149,7 @@ class MERCalculationServiceImplTest {
   @Test
   void perform_verifyCalculateAverageMER() {
     // SETUP
-    final var averageMERCacheStorage = mock(AverageMERCacheStorage.class);
+    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
 
     final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
@@ -172,7 +172,7 @@ class MERCalculationServiceImplTest {
   void perform_verifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var averageMERCacheStorage = mock(AverageMERCacheStorage.class);
+      final var averageMERCacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
 
       final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
@@ -196,7 +196,7 @@ class MERCalculationServiceImplTest {
   void perform_verifyGetSpecifiedIfEmptyDEFAULT_DATAPROVIDERS() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var averageMERCacheStorage = mock(AverageMERCacheStorage.class);
+      final var averageMERCacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
 
       final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();

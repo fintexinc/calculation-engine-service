@@ -9,11 +9,11 @@ import com.fintex.ce.domain.model.IncomeForecastDto;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.IncomeForecastCommand;
-import com.fintex.ce.application.result.IncomeForecastResult;
+import com.fintex.ce.port.input.command.IncomeForecastCommand;
+import com.fintex.ce.port.input.result.IncomeForecastResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.IncomeForecast;
-import com.fintex.ce.adapter.cache.IncomeForecastCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.service.calculation.CalculationService;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
@@ -50,16 +50,16 @@ public class IncomeForecastCalculationServiceImpl
   private static final Set<InterestFreq> MONTHLY_FREQUENCY = Set.of(InterestFreq.DAILY, InterestFreq.WEEKLY,
       InterestFreq.BI_WEEKLY);
 
-  private final IncomeForecastCacheStorage incomeForecastCacheStorage;
+  private final HoldingDataLoader<Map<Holding, IncomeForecast>> incomeForecastCachePort;
 
-  public IncomeForecastCalculationServiceImpl(final IncomeForecastCacheStorage incomeForecastCacheStorage) {
-    this.incomeForecastCacheStorage = incomeForecastCacheStorage;
+  public IncomeForecastCalculationServiceImpl(final HoldingDataLoader<Map<Holding, IncomeForecast>> incomeForecastCachePort) {
+    this.incomeForecastCachePort = incomeForecastCachePort;
   }
 
   @Override
   public IncomeForecastResult perform(final IncomeForecastCommand reqDTO) {
     final ArrayList<Warning> warnings = new ArrayList<>();
-    final Map<Holding, IncomeForecast> incomeForecastDto = incomeForecastCacheStorage.load(
+    final Map<Holding, IncomeForecast> incomeForecastDto = incomeForecastCachePort.load(
         reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
 
     final Integer period = Optional.ofNullable(reqDTO.getTimeIntervalPeriods()).orElse(TWELVE_MONTH);

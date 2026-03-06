@@ -1,11 +1,11 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.ClassificationAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.ClassificationAllocationCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.ClassificationAllocationResult;
+import com.fintex.ce.port.input.result.ClassificationAllocationResult;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +28,7 @@ class ClassificationAllocationCalculationServiceImplTest {
   @Test
   void getLoadFromCacheStorage_checkResult() {
     // SETUP
-    final var cacheStorage = mock(ClassificationAllocationCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(ClassificationAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor( cacheStorage));
 
@@ -106,7 +106,7 @@ class ClassificationAllocationCalculationServiceImplTest {
   void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(ClassificationAllocationCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(ClassificationAllocationCalculationServiceImpl.class, withSettings()
           .useConstructor( cacheStorage));
 

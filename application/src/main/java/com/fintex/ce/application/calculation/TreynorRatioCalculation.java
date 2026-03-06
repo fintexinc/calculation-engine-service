@@ -2,8 +2,8 @@ package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.application.result.TreynorRatioResult;
-import com.fintex.ce.application.result.core.TimeIntervalResult;
+import com.fintex.ce.port.input.result.TreynorRatioResult;
+import com.fintex.ce.port.input.result.core.TimeIntervalResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 

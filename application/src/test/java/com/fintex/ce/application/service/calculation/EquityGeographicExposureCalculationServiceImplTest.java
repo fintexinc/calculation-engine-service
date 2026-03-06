@@ -1,6 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.EquityGeographicAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.service.calculation.EquityGeographicExposureCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -29,7 +29,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
   void getLoadFromCacheStorage_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(EquityGeographicAllocationCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(cacheStorage));
 
@@ -51,7 +51,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
 
       // SETUP
-      final var cacheStorage = mock(EquityGeographicAllocationCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(cacheStorage));
 
@@ -74,7 +74,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(EquityGeographicAllocationCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(cacheStorage));
 
@@ -101,7 +101,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class);
         var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(EquityGeographicAllocationCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(cacheStorage));
 

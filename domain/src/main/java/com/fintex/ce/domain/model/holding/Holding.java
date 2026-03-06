@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.sm.model.domain.EquitySecurityIdentifier;
+import com.fintex.sm.model.domain.SecurityIdentifier;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -40,7 +42,10 @@ public class Holding {
 
   private HoldingType type;
 
+  @Deprecated
   private HoldingIdentifierType holdingIdentifier;
+
+  private SecurityIdentifier securityIdentifier;
 
   public Holding() {
   }
@@ -56,7 +61,13 @@ public class Holding {
    * @return id of the entity
    */
   public String generateUserIdentifier() {
-    return type + DELIMITER + holdingIdentifier + DELIMITER + value;
+    if (securityIdentifier == null) {
+      return type + DELIMITER + value;
+    }
+    if (securityIdentifier instanceof EquitySecurityIdentifier eq) {
+      return type + DELIMITER + securityIdentifier.getId() + DELIMITER + eq.getExchangeId();
+    }
+    return type + DELIMITER + securityIdentifier.getId();
   }
 
 }

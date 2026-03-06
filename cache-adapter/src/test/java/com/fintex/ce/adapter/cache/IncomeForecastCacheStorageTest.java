@@ -5,7 +5,7 @@ import com.fintex.ce.adapter.cache.entity.RIncomeForecast;
 import com.fintex.ce.adapter.cache.repository.IncomeForecastRepository;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.IncomeForecast;
 import com.fintex.ce.domain.model.ParamHolderDTO;
@@ -54,23 +54,19 @@ class IncomeForecastCacheStorageTest {
   void load_verifyFilters() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var securityDataPort = mock(SecurityDataPort.class);
       final CacheEntityMapper<IncomeForecast, RIncomeForecast> mapper = mock(CacheEntityMapper.class);
-      final var fundCanadaCacheRepo = mock(IncomeForecastRepository.class);
-      final var etfCanadaCacheRepo = mock(IncomeForecastRepository.class);
-      final var etfUsCacheRepo = mock(IncomeForecastRepository.class);
-      final var stockCacheRepo = mock(IncomeForecastRepository.class);
+      final var incomeForecastRepository = mock(IncomeForecastRepository.class);
       final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo, stockCacheRepo,
-              cacheStatisticService));
+          .useConstructor(securityDataPort, mapper, incomeForecastRepository, cacheStatisticService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       Map<Holding, IncomeForecast> holdingExposureMap = holdings.stream()
           .collect(Collectors.toMap(holding -> holding, holding -> mock(IncomeForecast.class)));
@@ -96,15 +92,16 @@ class IncomeForecastCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var fsh = new FundSeriesHolding().setFundServCode("TEST");
+      final List<FundSeriesHolding> filtered = List.of(fsh);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -118,14 +115,15 @@ class IncomeForecastCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etf);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -139,15 +137,16 @@ class IncomeForecastCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etf);
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
 
       m.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
@@ -160,7 +159,7 @@ class IncomeForecastCacheStorageTest {
   void incomeForecastMapper_checkResult() {
     // SETUP
     final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class);
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
     final Map.Entry<Holding, IncomeForecast> entry = mock(Map.Entry.class);
 
     when(entry.getKey()).thenReturn(h);
@@ -183,9 +182,9 @@ class IncomeForecastCacheStorageTest {
   void incomeForecastMapper_checkResult_2() {
     // SETUP
     final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class);
-    final Holding holding = mock(Holding.class);
+    final Holding holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
     final Map.Entry<Holding, IncomeForecast> entry = mock(Map.Entry.class);
-    final BigDecimal dividendYield = mock(BigDecimal.class);
+    final BigDecimal dividendYield = BigDecimal.TEN;
 
     when(entry.getKey()).thenReturn(holding);
 
@@ -209,9 +208,9 @@ class IncomeForecastCacheStorageTest {
   void incomeForecastMapper_checkResult_3() {
     // SETUP
     final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class);
-    final Holding holding = mock(Holding.class);
+    final Holding holding = new Holding().setType(HoldingType.FIXED_INCOME).setValue(BigDecimal.ONE);
     final Map.Entry<Holding, IncomeForecast> entry = mock(Map.Entry.class);
-    final BigDecimal dividendYield = mock(BigDecimal.class);
+    final BigDecimal dividendYield = BigDecimal.TEN;
 
     when(entry.getKey()).thenReturn(holding);
 
@@ -219,7 +218,6 @@ class IncomeForecastCacheStorageTest {
     when(entry.getValue()).thenReturn(rIncomeForecast);
     when(rIncomeForecast.getDividendYield()).thenReturn(dividendYield);
     when(rIncomeForecast.getSchedule()).thenReturn(null);
-    when(holding.getType()).thenReturn(HoldingType.FIXED_INCOME);
 
     doCallRealMethod().when(m).incomeForecastMapper(any(), any());
     // ACT
@@ -238,20 +236,18 @@ class IncomeForecastCacheStorageTest {
   void incomeForecastMapper_checkResult_4() {
     // SETUP
     final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class);
-    final Holding holding = mock(Holding.class);
+    final Holding holding = new Holding().setType(HoldingType.FIXED_INCOME).setValue(BigDecimal.ONE);
     final Map.Entry<Holding, IncomeForecast> entry = mock(Map.Entry.class);
-    final BigDecimal dividendYield = mock(BigDecimal.class);
-    final List<String> schedule = mock(List.class);
+    final BigDecimal dividendYield = BigDecimal.TEN;
+    final List<String> schedule = List.of("2024-01-01");
 
     when(entry.getKey()).thenReturn(holding);
 
     final IncomeForecast rIncomeForecast = mock(IncomeForecast.class);
     when(entry.getValue()).thenReturn(rIncomeForecast);
-    when(schedule.isEmpty()).thenReturn(false);
     when(rIncomeForecast.getDividendYield()).thenReturn(dividendYield);
     when(rIncomeForecast.getSchedule()).thenReturn(schedule);
     when(rIncomeForecast.getPaymentFrequencyType()).thenReturn(PaymentFrequencyType.AT_MATURITY.name());
-    when(holding.getType()).thenReturn(HoldingType.FIXED_INCOME);
 
     doCallRealMethod().when(m).incomeForecastMapper(any(), any());
 

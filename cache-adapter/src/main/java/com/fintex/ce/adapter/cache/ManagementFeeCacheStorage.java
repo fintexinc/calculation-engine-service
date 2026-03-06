@@ -6,9 +6,10 @@ import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.cache.entity.managementfee.RManagementFee;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.managementfee.ManagementFeeRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -18,19 +19,16 @@ import static com.fintex.ce.constant.CacheNameEntity.MANAGEMENT_FEE;
 import static com.fintex.ce.util.validation.DataProviderRequestHandlingValidator.dataProviderCheckValidation;
 
 @Service
+@Qualifier("managementFee")
 public class ManagementFeeCacheStorage
-    extends
-      ManagementExpenseAbstractCacheStorage<ManagementFee, ManagementFee, ManagementFee, ManagementFee, RManagementFee> {
+    extends ManagementExpenseAbstractCacheStorage<ManagementFee, RManagementFee> {
 
   public ManagementFeeCacheStorage(
-      final MultipleSMRepository<ManagementFee, ManagementFee, ManagementFee, ManagementFee> smRepo,
+      final SecurityDataPort<ManagementFee> securityDataPort,
       final CacheEntityMapper<ManagementFee, RManagementFee> mapper,
-      final ManagementFeeRepository fundCanadaRepo,
-      final ManagementFeeRepository etfCanadaRepo,
-      final ManagementFeeRepository etfUsRepo,
+      final ManagementFeeRepository managementFeeRepository,
       final CacheStatisticService cacheStatisticService) {
-    super(smRepo, mapper, mapper, mapper, mapper, fundCanadaRepo, etfCanadaRepo, etfUsRepo, cacheStatisticService,
-        MANAGEMENT_FEE);
+    super(securityDataPort, mapper, managementFeeRepository, cacheStatisticService, MANAGEMENT_FEE);
   }
 
   @Override

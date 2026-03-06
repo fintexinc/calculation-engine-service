@@ -1,6 +1,8 @@
 package com.fintex.ce.domain.model.holding;
 
 import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -22,6 +24,7 @@ public class FundSeriesHolding extends Holding {
   public FundSeriesHolding(final BigDecimal amount, final String fundServCode) {
     super(amount, HoldingType.CANADA_MUTUAL_FUNDS);
     this.fundServCode = fundServCode;
+    setSecurityIdentifier(new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV));
   }
 
   @Override

@@ -6,14 +6,13 @@ import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.HoldingAggregator;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.StockHolding;
-import com.fintex.ce.application.command.TopCommonHoldingsCommand;
-import com.fintex.ce.application.result.TopCommonHoldingsResult;
-import com.fintex.ce.application.result.commonholdings.TopCommonHoldingData;
+import com.fintex.ce.port.input.command.TopCommonHoldingsCommand;
+import com.fintex.ce.port.input.result.TopCommonHoldingsResult;
+import com.fintex.ce.port.input.result.commonholdings.TopCommonHoldingData;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.application.result.correlation.HoldingsKeyResult;
-import com.fintex.ce.adapter.cache.CommonHoldingsCacheStorage;
+import com.fintex.ce.port.input.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.service.calculation.CalculationService;
-import com.fintex.ce.application.result.commonholdings.TopCommonHoldingData;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -43,11 +42,11 @@ public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHo
   private static final int DEFAULT_NUMBER_OF_FUNDS_MIN = 1;
   private static final int DEFAULT_NUMBER_OF_TOP_COMMON_HOLDINGS = 10;
   final Set<String> defaultAccumulateTypes;
-  private final CommonHoldingsCacheStorage commonHoldingsCacheStorage;
+  private final HoldingDataLoader<Map<Holding, List<CommonHoldingsDTO>>> commonHoldingsCachePort;
 
-  public CommonHoldingsServiceImpl(final CommonHoldingsCacheStorage commonHoldingsCacheStorage,
+  public CommonHoldingsServiceImpl(final HoldingDataLoader<Map<Holding, List<CommonHoldingsDTO>>> commonHoldingsCachePort,
       @Value("#{'${default.top-common-holdings.accumulate-types}'.split(',')}") final Set<String> defaultAccumulateTypes) {
-    this.commonHoldingsCacheStorage = commonHoldingsCacheStorage;
+    this.commonHoldingsCachePort = commonHoldingsCachePort;
     this.defaultAccumulateTypes = defaultAccumulateTypes;
   }
 
@@ -57,7 +56,7 @@ public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHo
     final List<Warning> warnings = new ArrayList<>();
     final Map<Holding, BigDecimal> allocations = calculateInitialPortfolioWeight(reqDTO.getHoldings());
 
-    final Map<Holding, List<CommonHoldingsDTO>> holdings = commonHoldingsCacheStorage.load(reqDTO.getHoldings(), List
+    final Map<Holding, List<CommonHoldingsDTO>> holdings = commonHoldingsCachePort.load(reqDTO.getHoldings(), List
         .of(), warnings, new ParamHolderDTO(allocations));
 
     final int numberOfMin = getNumOfFundsMin(reqDTO);

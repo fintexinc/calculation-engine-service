@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.cache;
 import com.fintex.ce.adapter.cache.AverageMERCacheStorage;
 import com.fintex.ce.adapter.cache.repository.averagemer.AverageMerRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.AverageMer;
 import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
@@ -32,17 +32,15 @@ class AverageMERCacheStorageTest {
   @Test
   void mapperForCanadaMutualFund_verifyPreBuildAverageMerDto() {
     // SETUP
-    final var queryRepository = mock(MultipleSMRepository.class);
-    final var fundCanadaRepo = mock(AverageMerRepository.class);
-    final var etfCanadaRepo = mock(AverageMerRepository.class);
-    final var etfUsRepo = mock(AverageMerRepository.class);
+    final var queryRepository = mock(SecurityDataPort.class);
+    final var averageMerRepository = mock(AverageMerRepository.class);
     final var cacheStatisticService = mock(CacheStatisticService.class);
 
     final var sut = mock(AverageMERCacheStorage.class, withSettings()
-        .useConstructor(queryRepository, null, fundCanadaRepo, etfCanadaRepo, etfUsRepo, cacheStatisticService));
+        .useConstructor(queryRepository, null, averageMerRepository, cacheStatisticService));
 
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
-    final var fundSeriesHolding = mock(FundSeriesHolding.class);
+    final var fundSeriesHolding = new FundSeriesHolding();
 
     when(merDTO.setActualManagementFee(any())).thenReturn(merDTO);
     when(merDTO.setManagementExpenseRatio(any())).thenReturn(merDTO);
@@ -64,7 +62,7 @@ class AverageMERCacheStorageTest {
     final var sut = mock(AverageMERCacheStorage.class);
 
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
-    final var etfHolding = mock(EtfHolding.class);
+    final var etfHolding = new EtfHolding();
 
     when(merDTO.setNetExpenseRatio(any())).thenReturn(merDTO);
     when(merDTO.setGrossExpenseRatio(any())).thenReturn(merDTO);
@@ -85,7 +83,7 @@ class AverageMERCacheStorageTest {
     final var sut = mock(AverageMERCacheStorage.class);
 
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
-    final var etfHolding = mock(EtfHolding.class);
+    final var etfHolding = new EtfHolding();
 
     when(merDTO.setManagementExpenseRatio(any())).thenReturn(merDTO);
     when(merDTO.setActualManagementFee(any())).thenReturn(merDTO);
@@ -106,7 +104,7 @@ class AverageMERCacheStorageTest {
     final var sut = mock(AverageMERCacheStorage.class);
 
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
-    final var etfHolding = mock(EtfHolding.class);
+    final var etfHolding = new EtfHolding();
     final var averageMerEtfCanada = mock(AverageMer.class);
 
     when(sut.preBuildAverageMerDto(any())).thenReturn(merDTO);
@@ -130,7 +128,7 @@ class AverageMERCacheStorageTest {
     final var sut = mock(AverageMERCacheStorage.class);
 
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
-    final var etfHolding = mock(EtfHolding.class);
+    final var etfHolding = new EtfHolding();
 
     when(merDTO.setNetExpenseRatio(any())).thenReturn(merDTO);
     when(merDTO.setGrossExpenseRatio(any())).thenReturn(merDTO);
@@ -160,7 +158,7 @@ class AverageMERCacheStorageTest {
 
     when(sut.preBuildAverageMerDto(any())).thenReturn(merDTO);
 
-    final var fundSeriesHolding = mock(FundSeriesHolding.class);
+    final var fundSeriesHolding = new FundSeriesHolding();
 
     final var averageMerFundCanada = mock(AverageMer.class);
     when(averageMerFundCanada.getActualManagementFee()).thenReturn(BigDecimal.TEN);

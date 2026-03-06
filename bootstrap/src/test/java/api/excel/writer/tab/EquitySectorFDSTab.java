@@ -4,7 +4,7 @@ import api.dto.RequestParamsSupplier;
 import api.excel.writer.SMDataWriter;
 import api.excel.writer.WritableSpreadsheet;
 import api.util.CommonTools;
-import com.fintex.ce.adapter.graphqlclient.repository.EquitySectorSMRepository;
+import com.fintex.ce.adapter.graphqlclient.repository.EquitySectorGraphqlDataFetcher;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -22,11 +22,11 @@ import static com.fintex.ce.util.FilterUtils.*;
 import static java.util.stream.Collectors.toMap;
 
 public class EquitySectorFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-  private static final EquitySectorSMRepository EQUITY_SECTOR_FDS = iniEquitySectorFDS();
+  private static final EquitySectorGraphqlDataFetcher EQUITY_SECTOR_FDS = iniEquitySectorFDS();
   private static final String TAB_NAME = "EquitySector_FDS";
 
-  private static EquitySectorSMRepository iniEquitySectorFDS() {
-    return new EquitySectorSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+  private static EquitySectorGraphqlDataFetcher iniEquitySectorFDS() {
+    return new EquitySectorGraphqlDataFetcher(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
   }
 
   @Override

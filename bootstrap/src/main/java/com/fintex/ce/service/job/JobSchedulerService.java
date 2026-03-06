@@ -1,9 +1,9 @@
 package com.fintex.ce.service.job;
 
-import com.fintex.ce.adapter.cache.statistic.CacheWarmUpService;
+import com.fintex.ce.port.output.cache.CacheCleanupPort;
+import com.fintex.ce.port.output.cache.CacheWarmUpPort;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 public class JobSchedulerService {
   public static final int TWENTY_SECONDS = 20000;
 
-  private final CacheWarmUpService cacheWarmUpService;
-  private final CaffeineCacheManager caffeine1HourCacheManager;
+  private final CacheWarmUpPort cacheWarmUpPort;
+  private final CacheCleanupPort cacheCleanupPort;
 
-  public JobSchedulerService(final CacheWarmUpService cacheWarmUpService,
-      final CaffeineCacheManager caffeine1HourCacheManager) {
-    this.cacheWarmUpService = cacheWarmUpService;
-    this.caffeine1HourCacheManager = caffeine1HourCacheManager;
+  public JobSchedulerService(final CacheWarmUpPort cacheWarmUpPort,
+      final CacheCleanupPort cacheCleanupPort) {
+    this.cacheWarmUpPort = cacheWarmUpPort;
+    this.cacheCleanupPort = cacheCleanupPort;
   }
 
   /**
@@ -27,8 +27,7 @@ public class JobSchedulerService {
   @Scheduled(cron = "0 0 3 * * *", zone = "EST")
   public void clearCaffeineCache() {
     log.info("Start clearing Caffeine cached");
-    caffeine1HourCacheManager.getCacheNames()
-        .forEach(cacheName -> caffeine1HourCacheManager.getCache(cacheName).invalidate());
+    cacheCleanupPort.evictLocalCaches();
     log.info("Stop clearing Caffeine cache");
   }
 
@@ -40,9 +39,9 @@ public class JobSchedulerService {
   @SchedulerLock(name = "warmUpRedisCache", lockAtLeastFor = "PT1M", lockAtMostFor = "PT1H")
   public void warmUpRedisCache() {
     log.info("Start warming Redis cache");
-    cacheWarmUpService.clearCache();
+    cacheCleanupPort.clearCache();
     sleepTwentySeconds();
-    cacheWarmUpService.run();
+    cacheWarmUpPort.run();
     log.info("Stop warming Redis cache");
   }
 

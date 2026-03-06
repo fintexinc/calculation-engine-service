@@ -4,7 +4,7 @@ import api.dto.RequestParamsSupplier;
 import api.excel.writer.WritableSpreadsheet;
 import api.util.IdentifierUtils;
 import api.util.excel.ExcelUtils;
-import com.fintex.ce.adapter.graphqlclient.repository.BusinessCountrySMRepository;
+import com.fintex.ce.adapter.graphqlclient.repository.BusinessCountryGraphqlDataFetcher;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.BusinessCountry;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -26,11 +26,11 @@ import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
 
 @Log4j2
 public class BusinessCountryTab implements WritableSpreadsheet {
-  private static final BusinessCountrySMRepository BUSINESS_COUNTRY_FDS = initAssetAllocationsFDS();
+  private static final BusinessCountryGraphqlDataFetcher BUSINESS_COUNTRY_FDS = initAssetAllocationsFDS();
   private static final String TAB_NAME = "BusinessCountry_FDS";
 
-  private static BusinessCountrySMRepository initAssetAllocationsFDS() {
-    return new BusinessCountrySMRepository(GRAPHQL_TRANSPORT_COMPONENT);
+  private static BusinessCountryGraphqlDataFetcher initAssetAllocationsFDS() {
+    return new BusinessCountryGraphqlDataFetcher(GRAPHQL_TRANSPORT_COMPONENT);
   }
 
   @Override

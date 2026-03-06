@@ -12,11 +12,10 @@ import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.adapter.cache.entity.RSalesCharge;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.SalesChargeRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -24,26 +23,23 @@ import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.constant.CacheNameEntity.BUSINESS_COUNTRY;
+import static com.fintex.ce.constant.CacheNameEntity.SALES_CHARGE;
 import static com.fintex.ce.util.FilterUtils.CANADA_MUTUAL_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.filterHoldings;
 
 @Service
 public class SalesChargeCacheStorage
-    extends
-      MultipleCacheStorageAbstract<SalesCharge, SalesCharge, SalesCharge, SalesCharge, RSalesCharge> {
+    extends CacheStorageAbstract<SalesCharge, RSalesCharge, Map<Holding, SalesCharge>> {
 
-  @Autowired
-  public SalesChargeCacheStorage(MultipleSMRepository<SalesCharge, SalesCharge, SalesCharge, SalesCharge> smRepo,
+  public SalesChargeCacheStorage(SecurityDataPort<SalesCharge> securityDataPort,
       CacheEntityMapper<SalesCharge, RSalesCharge> mapper,
       SalesChargeRepository salesChargeRepository,
       CacheStatisticService cacheStatisticService) {
-    super(smRepo, mapper, mapper, mapper, mapper,
-        salesChargeRepository, salesChargeRepository,
-        salesChargeRepository, salesChargeRepository, cacheStatisticService, BUSINESS_COUNTRY);
+    super(securityDataPort, mapper, salesChargeRepository, cacheStatisticService, SALES_CHARGE);
   }
 
   @Override
-  public Map<Holding, SalesCharge> load(List<Holding> holdings,
+  public Map<Holding, SalesCharge> load(List<? extends Holding> holdings,
       List<DataProvider> providers,
       List<Warning> warnings,
       ParamHolderDTO paramHolderDTO) {

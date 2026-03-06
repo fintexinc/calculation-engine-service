@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.cache;
 import com.fintex.ce.adapter.cache.CommonHoldingsCacheStorage;
 import com.fintex.ce.adapter.cache.repository.commonholdings.CommonHoldingsRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.CommonHoldings;
 import com.fintex.ce.domain.model.CommonHoldingsDTO;
@@ -56,16 +56,15 @@ class CommonHoldingsCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       var set = mock(Set.class);
-      var fdsRepo = mock(MultipleSMRepository.class);
+      var securityDataPort = mock(SecurityDataPort.class);
       var holdingRepository = mock(CommonHoldingsRepository.class);
       var cacheStatisticService = mock(CacheStatisticService.class);
 
       var cacheStorage = mock(CommonHoldingsCacheStorage.class, withSettings()
-          .useConstructor(set, fdsRepo, null, holdingRepository, holdingRepository, holdingRepository,
-              holdingRepository, cacheStatisticService));
+          .useConstructor(set, securityDataPort, null, holdingRepository, cacheStatisticService));
 
-      var holdings = List.of(mock(Holding.class));
-      var warnings = List.of(mock(Warning.class));
+      var holdings = List.of(new Holding());
+      var warnings = List.of(new Warning("id", "msg", "code"));
 
       doCallRealMethod().when(cacheStorage).load(any(), any(), any(), any());
       // ACT
@@ -83,9 +82,9 @@ class CommonHoldingsCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-      var holdings = List.of(mock(Holding.class));
-      var filteredHoldings = List.of(mock(FundSeriesHolding.class));
-      var warnings = List.of(mock(Warning.class));
+      var holdings = List.of(new Holding());
+      var filteredHoldings = List.of(new FundSeriesHolding().setFundServCode("TEST"));
+      var warnings = List.of(new Warning("id", "msg", "code"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filteredHoldings);
@@ -104,9 +103,9 @@ class CommonHoldingsCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-      var holdings = List.of(mock(Holding.class));
-      var filteredHoldings = List.of(mock(BenchmarkIndexHolding.class));
-      var warnings = List.of(mock(Warning.class));
+      var holdings = List.of(new Holding());
+      var filteredHoldings = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
+      var warnings = List.of(new Warning("id", "msg", "code"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(
           filteredHoldings);
@@ -125,9 +124,9 @@ class CommonHoldingsCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-      var holdings = List.of(mock(Holding.class));
-      var filteredHoldings = List.of(mock(EtfHolding.class));
-      var warnings = List.of(mock(Warning.class));
+      var holdings = List.of(new Holding());
+      var filteredHoldings = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
+      var warnings = List.of(new Warning("id", "msg", "code"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(
           filteredHoldings);
@@ -146,9 +145,9 @@ class CommonHoldingsCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-      var holdings = List.of(mock(Holding.class));
-      var filteredHoldings = List.of(mock(EtfHolding.class));
-      var warnings = List.of(mock(Warning.class));
+      var holdings = List.of(new Holding());
+      var filteredHoldings = List.of(new EtfHolding().setTicker("TEST").setExchangeCode("TST"));
+      var warnings = List.of(new Warning("id", "msg", "code"));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filteredHoldings);
@@ -167,7 +166,7 @@ class CommonHoldingsCacheStorageTest {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
     var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var stockHoldings = Map.of(holding, mock(CommonHoldingsStock.class));
     var paramHolderDTO = mock(ParamHolderDTO.class);
 
@@ -186,7 +185,7 @@ class CommonHoldingsCacheStorageTest {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
     var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldingsStock = mock(CommonHoldingsStock.class);
     var stockHoldings = Map.of(holding, commonHoldingsStock);
     var stockHolding = new AbstractMap.SimpleEntry<>(holding, commonHoldingsStock);
@@ -206,7 +205,7 @@ class CommonHoldingsCacheStorageTest {
   void initializeStockCommonHoldingsDTO_verifyCalculateStockHoldingValue() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldingsStock = mock(CommonHoldingsStock.class);
     var stockHolding = new AbstractMap.SimpleEntry<>(holding, commonHoldingsStock);
     var paramHolderDTO = mock(ParamHolderDTO.class);
@@ -214,7 +213,7 @@ class CommonHoldingsCacheStorageTest {
     when(commonHoldingsStock.getCompanyName()).thenReturn("Tesla");
     when(commonHoldingsStock.getTicker()).thenReturn("TICKER");
     when(commonHoldingsStock.getExchangeCode()).thenReturn("EXCHANGE_CODE");
-    when(holding.getValue()).thenReturn(TEN);
+    holding.setValue(TEN);
 
     var expected = new CommonHoldingsDTO("Tesla", EQUITY_TYPE, TEN, "TICKER", "EXCHANGE_CODE");
 
@@ -230,7 +229,7 @@ class CommonHoldingsCacheStorageTest {
   void initializeStockCommonHoldingsDTO_checkResult() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldingsStock = mock(CommonHoldingsStock.class);
     var stockHolding = new AbstractMap.SimpleEntry<>(holding, commonHoldingsStock);
     var paramHolderDTO = mock(ParamHolderDTO.class);
@@ -238,7 +237,7 @@ class CommonHoldingsCacheStorageTest {
     when(commonHoldingsStock.getCompanyName()).thenReturn("Tesla");
     when(commonHoldingsStock.getTicker()).thenReturn("TICKER");
     when(commonHoldingsStock.getExchangeCode()).thenReturn("EXCHANGE_CODE");
-    when(holding.getValue()).thenReturn(TEN);
+    holding.setValue(TEN);
     when(cacheStorage.calculateStockHoldingValue(any(), any())).thenReturn(ONE);
 
     var expected = new CommonHoldingsDTO("Tesla", EQUITY_TYPE, ONE, "TICKER", "EXCHANGE_CODE");
@@ -255,19 +254,18 @@ class CommonHoldingsCacheStorageTest {
   void calculateStockHoldingValue_checkResult() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldingsStock = mock(CommonHoldingsStock.class);
     var stockHolding = new AbstractMap.SimpleEntry<>(holding, commonHoldingsStock);
     var paramHolderDTO = mock(ParamHolderDTO.class);
     var allocations = Map.of(holding, TEN);
     var expected = TEN;
 
-    when(holding.generateUserIdentifier()).thenReturn("test");
     when(paramHolderDTO.getAllocations()).thenReturn(allocations);
     when(commonHoldingsStock.getCompanyName()).thenReturn("Tesla");
     when(commonHoldingsStock.getTicker()).thenReturn("TICKER");
     when(commonHoldingsStock.getExchangeCode()).thenReturn("EXCHANGE_CODE");
-    when(holding.getValue()).thenReturn(TEN);
+    holding.setValue(TEN);
 
     doCallRealMethod().when(cacheStorage).calculateStockHoldingValue(any(), any());
     // ACT
@@ -281,8 +279,8 @@ class CommonHoldingsCacheStorageTest {
   void mapForNoneStock_verifyMapNoneStock() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holdings = new HashMap<>(Map.of(mock(Holding.class), mock(CommonHoldings.class)));
-    var warnings = List.of(mock(Warning.class));
+    var holdings = new HashMap<>(Map.of(new Holding(), mock(CommonHoldings.class)));
+    var warnings = List.of(new Warning("id", "msg", "code"));
 
     var notification = new Notification();
     doNothing().when(cacheStorage).validate(anyMap(), anyList(), any());
@@ -300,7 +298,7 @@ class CommonHoldingsCacheStorageTest {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
     var holdings = new HashMap<Holding, CommonHoldings>();
-    var warnings = List.of(mock(Warning.class));
+    var warnings = List.of(new Warning("id", "msg", "code"));
     var expected = new HashMap<Holding, List<CommonHoldingsDTO>>();
     var notification = new Notification();
 
@@ -316,9 +314,9 @@ class CommonHoldingsCacheStorageTest {
   void mapForNoneStock_checkResult2() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var holdings = new HashMap<>(Map.of(holding, mock(CommonHoldings.class)));
-    var warnings = List.of(mock(Warning.class));
+    var warnings = List.of(new Warning("id", "msg", "code"));
     var expected = new HashMap<>(Map.of(holding, List.of(mock(CommonHoldingsDTO.class))));
     var notification = new Notification();
 
@@ -337,7 +335,7 @@ class CommonHoldingsCacheStorageTest {
   void mapNoneStock_checkResult() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldings = mock(CommonHoldings.class);
     var holdings = new HashMap<>(Map.of(holding, commonHoldings));
     var commonHolding = mock(CommonHoldings.CommonHolding.class);
@@ -358,10 +356,10 @@ class CommonHoldingsCacheStorageTest {
   void validate_checkResult() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldings = mock(CommonHoldings.class);
     var holdings = new HashMap<>(Map.of(holding, commonHoldings));
-    var warnings = List.of(mock(Warning.class));
+    var warnings = List.of(new Warning("id", "msg", "code"));
     var notification = new Notification();
 
     when(commonHoldings.getHoldings()).thenReturn(null);
@@ -378,10 +376,10 @@ class CommonHoldingsCacheStorageTest {
   void validate_verifyCheckWarnings() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldings = mock(CommonHoldings.class);
     var holdings = new HashMap<>(Map.of(holding, commonHoldings));
-    var warnings = List.of(mock(Warning.class));
+    var warnings = List.of(new Warning("id", "msg", "code"));
     var notification = new Notification();
     var commonHolding = mock(CommonHoldings.CommonHolding.class);
 
@@ -400,8 +398,8 @@ class CommonHoldingsCacheStorageTest {
   void checkWarnings_verifyIsWarningsPresent() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holdings = new HashMap<>(Map.of(mock(Holding.class), mock(CommonHoldings.class)));
-    var warnings = List.of(mock(Warning.class));
+    var holdings = new HashMap<>(Map.of(new Holding(), mock(CommonHoldings.class)));
+    var warnings = List.of(new Warning("id", "msg", "code"));
 
     when(cacheStorage.isWarningPresent(anyMap())).thenReturn(false);
 
@@ -417,13 +415,13 @@ class CommonHoldingsCacheStorageTest {
   void checkWarnings_verifyCheckResult() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
+    holding.setType(com.fintex.ce.domain.enumeration.HoldingType.CASH);
     var commonHoldings = mock(CommonHoldings.class);
     var holdings = new HashMap<>(Map.of(holding, commonHoldings));
     var warnings = new ArrayList<Warning>();
     var expected = List.of(new Warning("test_ID", WRN_TCH_MUH_001.getMessage(), WRN_TCH_MUH_001.name()));
 
-    when(holding.generateUserIdentifier()).thenReturn("test_ID");
     when(cacheStorage.isWarningPresent(anyMap())).thenReturn(true);
 
     doCallRealMethod().when(cacheStorage).checkWarnings(anyMap(), anyList());
@@ -438,7 +436,7 @@ class CommonHoldingsCacheStorageTest {
   void isWarningPresent_checkPositiveResult() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldings = mock(CommonHoldings.class);
     var holdings = new HashMap<>(Map.of(holding, commonHoldings));
     var commonHolding = mock(CommonHoldings.CommonHolding.class);
@@ -460,7 +458,7 @@ class CommonHoldingsCacheStorageTest {
   void isWarningPresent_checkNegativeResult() {
     // SETUP
     var cacheStorage = mock(CommonHoldingsCacheStorage.class);
-    var holding = mock(Holding.class);
+    var holding = new Holding();
     var commonHoldings = mock(CommonHoldings.class);
     var holdings = new HashMap<>(Map.of(holding, commonHoldings));
     var commonHolding = mock(CommonHoldings.CommonHolding.class);

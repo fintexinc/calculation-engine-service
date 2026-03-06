@@ -4,8 +4,8 @@ import com.fintex.ce.application.service.calculation.FixedIncomeGeographicExposu
 import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.GeographicExposureResult;
-import com.fintex.ce.adapter.cache.FixedIncomeGeographicExposureCacheStorage;
+import com.fintex.ce.port.input.result.GeographicExposureResult;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,7 +28,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(FixedIncomeGeographicExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
           withSettings().useConstructor(storage));
 
@@ -47,7 +47,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(FixedIncomeGeographicExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
           withSettings().useConstructor(storage));
 
@@ -71,7 +71,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   void getLoadFromCacheStorage_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(FixedIncomeGeographicExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
           withSettings().useConstructor(storage));
 
@@ -92,7 +92,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   void calculate_verifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(FixedIncomeGeographicExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
           withSettings().useConstructor(storage));
 

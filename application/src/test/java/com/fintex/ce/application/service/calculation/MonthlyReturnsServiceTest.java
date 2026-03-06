@@ -1,7 +1,9 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.FxRatesCacheStorage;
-import com.fintex.ce.adapter.cache.MonthlyReturnsCacheStorage;
+import com.fintex.ce.port.output.cache.FxRatesProvider;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
+
+import java.util.HashMap;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
 import com.fintex.ce.application.validation.BenchmarkCpsdDataValidation;
@@ -141,13 +143,14 @@ class MonthlyReturnsServiceTest {
   void getMonthlyReturns_verifyLoad() {
     // SETUP
     try (MockedConstruction<Returns> mocked = Mockito.mockConstruction(Returns.class)) {
-      final var monthlyReturnsCacheStorage = mock(MonthlyReturnsCacheStorage.class);
+      final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
       final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
       final var sut = mock(MonthlyReturnsService.class, withSettings()
-          .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesCacheStorage.class), gicMonthlyReturnsGenerator));
+          .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesProvider.class), gicMonthlyReturnsGenerator));
 
       final var holdings = mock(List.class);
 
+      when(monthlyReturnsCacheStorage.load(any(), any(), any(), any())).thenReturn(new HashMap<>());
       doCallRealMethod().when(sut).getMonthlyReturns(anyList(), any());
 
       // ACT
@@ -161,10 +164,10 @@ class MonthlyReturnsServiceTest {
   @Test
   void getMonthlyReturns_checkResult() {
     // SETUP
-    final var monthlyReturnsCacheStorage = mock(MonthlyReturnsCacheStorage.class);
+    final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesCacheStorage.class), gicMonthlyReturnsGenerator));
+        .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesProvider.class), gicMonthlyReturnsGenerator));
 
     final var originalMonthlyReturns = mock(Map.class);
     when(monthlyReturnsCacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(originalMonthlyReturns);
@@ -183,10 +186,10 @@ class MonthlyReturnsServiceTest {
   @Test
   void getMonthlyReturns_verifyGicWasGenerated() {
     // SETUP
-    final var monthlyReturnsCacheStorage = mock(MonthlyReturnsCacheStorage.class);
+    final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesCacheStorage.class), gicMonthlyReturnsGenerator));
+        .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesProvider.class), gicMonthlyReturnsGenerator));
 
     final var originalMonthlyReturns = mock(Map.class);
     when(monthlyReturnsCacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(originalMonthlyReturns);
@@ -337,10 +340,10 @@ class MonthlyReturnsServiceTest {
   @Test
   void getFxRates_checkResult() {
     // SETUP
-    final var fxRatesCacheStorage = mock(FxRatesCacheStorage.class);
+    final var fxRatesCacheStorage = mock(FxRatesProvider.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(mock(MonthlyReturnsCacheStorage.class), fxRatesCacheStorage, gicMonthlyReturnsGenerator));
+        .useConstructor(mock(HoldingDataLoader.class), fxRatesCacheStorage, gicMonthlyReturnsGenerator));
 
     final var fxRates = mock(Map.class);
     when(fxRatesCacheStorage.loadFxRates()).thenReturn(fxRates);

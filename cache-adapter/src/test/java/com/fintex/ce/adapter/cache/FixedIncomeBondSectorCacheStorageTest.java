@@ -62,11 +62,11 @@ class FixedIncomeBondSectorCacheStorageTest {
       final var sut = mock(FixedIncomeBondSectorCacheStorage.class, withSettings()
           .useConstructor(null, null, fixedIncomeBondSectorRepository, cacheStatisticService));
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -81,11 +81,11 @@ class FixedIncomeBondSectorCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final FixedIncomeBondSectorCacheStorage sut = mock(FixedIncomeBondSectorCacheStorage.class);
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -99,7 +99,7 @@ class FixedIncomeBondSectorCacheStorageTest {
       // SETUP
       final FixedIncomeBondSectorCacheStorage sut = mock(FixedIncomeBondSectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       final List<Holding> cacheHoldings = List.of(new CashHolding().setType(HoldingType.CASH));
 
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CASH_PREDICATE))).thenReturn(
@@ -121,14 +121,15 @@ class FixedIncomeBondSectorCacheStorageTest {
       // SETUP
       final FixedIncomeBondSectorCacheStorage sut = mock(FixedIncomeBondSectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var fsh = new FundSeriesHolding().setFundServCode("TEST");
+      final List<FundSeriesHolding> filtered = List.of(fsh);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -142,13 +143,14 @@ class FixedIncomeBondSectorCacheStorageTest {
       // SETUP
       final FixedIncomeBondSectorCacheStorage sut = mock(FixedIncomeBondSectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etf);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -162,14 +164,15 @@ class FixedIncomeBondSectorCacheStorageTest {
       // SETUP
       final FixedIncomeBondSectorCacheStorage sut = mock(FixedIncomeBondSectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etf);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -183,14 +186,14 @@ class FixedIncomeBondSectorCacheStorageTest {
       // SETUP
       final FixedIncomeBondSectorCacheStorage sut = mock(FixedIncomeBondSectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<BenchmarkIndexHolding> filtered = List.of(mock(BenchmarkIndexHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      final List<BenchmarkIndexHolding> filtered = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(BENCHMARKS_PREDICATE))).thenReturn(
           filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -204,14 +207,14 @@ class FixedIncomeBondSectorCacheStorageTest {
       // SETUP
       final FixedIncomeBondSectorCacheStorage sut = mock(FixedIncomeBondSectorCacheStorage.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
-      final List<FixedIncomeHolding> filtered = List.of(mock(FixedIncomeHolding.class));
+      final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
+      final List<FixedIncomeHolding> filtered = List.of(new FixedIncomeHolding().setIdentifier("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(FIXED_INCOME_PREDICATE)))
           .thenReturn(filtered);
 
       doCallRealMethod().when(sut).load(any(), any(), any(), any());
       // ACT
-      final List<Warning> warnings = List.of(mock(Warning.class));
+      final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
       sut.load(holdings, List.of(), warnings, new ParamHolderDTO());
 
       // VERIFY
@@ -225,7 +228,7 @@ class FixedIncomeBondSectorCacheStorageTest {
     final FixedIncomeBondSectorCacheStorage fixedIncomeBondSectorCacheStorage = mock(
         FixedIncomeBondSectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
     final FixedIncomeBondSecurities r = mock(FixedIncomeBondSecurities.class);
 
     final Map<Holding, FixedIncomeBondSecurities> holdings = Map.of(h, r);
@@ -233,7 +236,7 @@ class FixedIncomeBondSectorCacheStorageTest {
 
     doCallRealMethod().when(fixedIncomeBondSectorCacheStorage).mapResponse(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     fixedIncomeBondSectorCacheStorage.mapResponse(holdings, warnings);
 
     // VERIFY
@@ -246,7 +249,7 @@ class FixedIncomeBondSectorCacheStorageTest {
     final FixedIncomeBondSectorCacheStorage fixedIncomeBondSectorCacheStorage = mock(
         FixedIncomeBondSectorCacheStorage.class);
 
-    final StockHolding h = mock(StockHolding.class);
+    final StockHolding h = new StockHolding().setTicker("TEST").setExchangeCode("TST");
     final FixedIncomeBondSecurities r = mock(FixedIncomeBondSecurities.class);
 
     final Map.Entry<Holding, FixedIncomeBondSecurities> entry = new AbstractMap.SimpleEntry<>(h, r);
@@ -267,13 +270,13 @@ class FixedIncomeBondSectorCacheStorageTest {
         FixedIncomeBondSectorCacheStorage.class);
 
     final FixedIncomeBondSecurities r = new FixedIncomeBondSecurities().setFixedIncomeBondSectors(Map.of("test", ONE));
-    final Map.Entry<Holding, FixedIncomeBondSecurities> entry = new AbstractMap.SimpleEntry<>(mock(StockHolding.class),
+    final Map.Entry<Holding, FixedIncomeBondSecurities> entry = new AbstractMap.SimpleEntry<>(new StockHolding().setTicker("TEST").setExchangeCode("TST"),
         r);
     final Map<String, BigDecimal> ratingsRaw = entry.getValue().getFixedIncomeBondSectors();
 
     doCallRealMethod().when(fixedIncomeBondSectorCacheStorage).convertValues(any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     fixedIncomeBondSectorCacheStorage.convertValues(entry, warnings);
 
     // VERIFY
@@ -286,12 +289,12 @@ class FixedIncomeBondSectorCacheStorageTest {
     final FixedIncomeBondSectorCacheStorage fixedIncomeBondSectorCacheStorage = mock(
         FixedIncomeBondSectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
     final Map<String, BigDecimal> ratingsRaw = Map.of("GIANT", ONE);
 
     doCallRealMethod().when(fixedIncomeBondSectorCacheStorage).mapToRequiredFormat(any(), any(), any());
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Warning> warnings = List.of(new Warning("id", "msg", "code"));
     fixedIncomeBondSectorCacheStorage.mapToRequiredFormat(h, ratingsRaw, warnings);
 
     // VERIFY
@@ -306,7 +309,7 @@ class FixedIncomeBondSectorCacheStorageTest {
 
       final Map<FixedIncomeSectorType, BigDecimal> DEFAULT_MAP = Map.of(CORPORATE_BONDS, ZERO, GOVERNMENT_BONDS, ZERO,
           OTHER_BONDS, ZERO, MORTGAGE_BACKED_SECURITIES, ZERO, ST_INVESTMENTS, ZERO, ASSET_BACKED_SECURITIES, ZERO);
-      final Holding h = mock(Holding.class);
+      final Holding h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
       final Map<String, BigDecimal> ratingsRaw = Map.of("CORPORATE_BONDS", ONE);
       final Map<FixedIncomeSectorType, BigDecimal> ratings = Map.of(CORPORATE_BONDS, ONE);
 
@@ -327,7 +330,7 @@ class FixedIncomeBondSectorCacheStorageTest {
     final FixedIncomeBondSectorCacheStorage fixedIncomeBondSectorCacheStorage = mock(
         FixedIncomeBondSectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
     final String s = "CORPORATE_BONDS";
 
     doCallRealMethod().when(fixedIncomeBondSectorCacheStorage).getFixedIncomeSectorType(any(), any(), any());
@@ -345,7 +348,7 @@ class FixedIncomeBondSectorCacheStorageTest {
     final FixedIncomeBondSectorCacheStorage fixedIncomeBondSectorCacheStorage = mock(
         FixedIncomeBondSectorCacheStorage.class);
 
-    final Holding h = mock(Holding.class);
+    final Holding h = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
     final String s = "test";
 
     doCallRealMethod().when(fixedIncomeBondSectorCacheStorage).getFixedIncomeSectorType(any(), any(), any());

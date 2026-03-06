@@ -2,8 +2,8 @@ package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.application.calculation.core.RollingAbstractCalculation;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.application.result.RollingCorrelationResult;
-import com.fintex.ce.application.result.core.RollingIntervalResult;
+import com.fintex.ce.port.input.result.RollingCorrelationResult;
+import com.fintex.ce.port.input.result.core.RollingIntervalResult;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;

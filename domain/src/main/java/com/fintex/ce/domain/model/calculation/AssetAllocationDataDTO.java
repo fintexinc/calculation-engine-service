@@ -35,7 +35,7 @@ public class AssetAllocationDataDTO {
   Map<SmaHolding, AssetAllocation> separatelyManagedAccountFdsResponse;
   Map<Holding, Map<AssetAllocationRegion, BigDecimal>> stocksFdsResponse;
 
-  List<Holding> holdings;
+  List<? extends Holding> holdings;
 
   List<Warning> warnings = new ArrayList<>();
 }

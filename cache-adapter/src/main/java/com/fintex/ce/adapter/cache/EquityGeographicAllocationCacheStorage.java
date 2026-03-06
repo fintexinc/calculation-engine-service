@@ -15,12 +15,13 @@ import com.fintex.ce.domain.model.holding.UsMutualFundHolding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.REquityCountryAllocation;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.EquityCountryAllocationRepository;
 import com.fintex.ce.service.GeographicAllocationMappingService;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.CollectorUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -47,32 +48,27 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 import static java.util.stream.Collectors.toMap;
 
 @Service
+@Qualifier("equityGeographic")
 public class EquityGeographicAllocationCacheStorage
-    extends
-      MultipleCacheStorageAbstract<EquityCountryAllocation, EquityCountryAllocation, EquityCountryAllocation, EquityCountryAllocation, REquityCountryAllocation> {
+    extends CacheStorageAbstract<EquityCountryAllocation, REquityCountryAllocation, Map<Holding, Map<GeographicRegionType, BigDecimal>>> {
 
   private final GeographicAllocationMappingService geographicAllocationService;
   private final BusinessCountryCacheStorage businessCountryCacheStorage;
 
   public EquityGeographicAllocationCacheStorage(
-      MultipleSMRepository<EquityCountryAllocation, EquityCountryAllocation, EquityCountryAllocation, EquityCountryAllocation> smRepo,
+      SecurityDataPort<EquityCountryAllocation> securityDataPort,
       CacheEntityMapper<EquityCountryAllocation, REquityCountryAllocation> mapper,
-      EquityCountryAllocationRepository fundCanadaCacheRepo,
-      EquityCountryAllocationRepository etfCanadaCacheRepo,
-      EquityCountryAllocationRepository etfUsCacheRepo,
+      EquityCountryAllocationRepository equityCountryAllocationRepository,
       GeographicAllocationMappingService geographicAllocationService,
       CacheStatisticService cacheStatisticService,
       BusinessCountryCacheStorage businessCountryCacheStorage) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        null, cacheStatisticService, EQUITY_COUNTRY_ALLOCATIONS);
+    super(securityDataPort, mapper, equityCountryAllocationRepository, cacheStatisticService, EQUITY_COUNTRY_ALLOCATIONS);
     this.geographicAllocationService = geographicAllocationService;
     this.businessCountryCacheStorage = businessCountryCacheStorage;
   }
 
   @Override
-  public Map<Holding, Map<GeographicRegionType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<GeographicRegionType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     final Map<Holding, Map<GeographicRegionType, BigDecimal>> result = new HashMap<>();
@@ -103,7 +99,7 @@ public class EquityGeographicAllocationCacheStorage
     return result;
   }
 
-  private Map<Holding, Map<GeographicRegionType, BigDecimal>> mapForStocks(final List<Holding> holdings,
+  private Map<Holding, Map<GeographicRegionType, BigDecimal>> mapForStocks(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings) {
     final Map<Holding, Country> countries = businessCountryCacheStorage.loadBusinessCountries(filterHoldings(holdings,

@@ -6,7 +6,7 @@ import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.RollingCorrelationCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.RollingCalculationCommand;
+import com.fintex.ce.port.input.command.RollingCalculationCommand;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,8 @@
 package com.fintex.ce.domain.model.holding;
 
 import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.sm.model.domain.EquitySecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -26,6 +28,11 @@ public class StockHolding extends Holding {
     super(amount, type);
     this.exchangeCode = exchangeCode;
     this.ticker = ticker;
+    EquitySecurityIdentifier eqId = new EquitySecurityIdentifier();
+    eqId.setId(ticker);
+    eqId.setIdType(FiIdentifierType.TICKER_MIC);
+    eqId.setExchangeId(exchangeCode);
+    setSecurityIdentifier(eqId);
   }
 
   @Override

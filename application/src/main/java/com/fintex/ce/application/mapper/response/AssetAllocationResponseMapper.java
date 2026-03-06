@@ -4,7 +4,7 @@ import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.result.AssetAllocationResult;
+import com.fintex.ce.port.input.result.AssetAllocationResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.port.mapper.ResponseMapper;
 import org.springframework.stereotype.Component;

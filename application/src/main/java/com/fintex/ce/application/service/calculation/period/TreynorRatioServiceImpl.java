@@ -5,8 +5,8 @@ import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.TreynorRatioCalculation;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.application.result.TreynorRatioResult;
-import com.fintex.ce.adapter.cache.TBillsCacheStorage;
+import com.fintex.ce.port.input.result.TreynorRatioResult;
+import com.fintex.ce.port.output.cache.TBillsProvider;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -23,28 +23,28 @@ import static com.fintex.ce.application.calculation.core.PeriodCalculationAbstra
 @Service
 public class TreynorRatioServiceImpl extends PeriodBenchmarkAbstractService<TreynorRatioResult, PeriodCommand> {
 
-  private final TBillsCacheStorage tBillsCacheStorage;
+  private final TBillsProvider tBillsProvider;
 
   public TreynorRatioServiceImpl(
       MonthlyReturnsService monthlyReturnsService,
-      TBillsCacheStorage tBillsCacheStorage,
+      TBillsProvider tBillsProvider,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
-    this.tBillsCacheStorage = tBillsCacheStorage;
+    this.tBillsProvider = tBillsProvider;
   }
 
   @Override
   public PeriodCalculationAbstract<TreynorRatioResult, ?> defineCalculationMethod(PeriodCommand reqDTO) {
     BenchmarkCalculationDTO betaInput = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
-    BenchmarkCalculationDTO treynorRationInput = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_ONE);
-    var tBills = tBillsCacheStorage.loadTBillsFor(reqDTO.getCurrency());
-    NavigableMap<LocalDate, BigDecimal> portfolioExccessReturn = calculateExcessReturn(betaInput
+    BenchmarkCalculationDTO treynorRatioInput = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_ONE);
+    var tBills = tBillsProvider.loadTBillsFor(reqDTO.getCurrency());
+    NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = calculateExcessReturn(betaInput
         .getWeightedAveragePortfolioReturns(), tBills);
-    NavigableMap<LocalDate, BigDecimal> benchmarkExccessReturn = calculateExcessReturn(betaInput
+    NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn = calculateExcessReturn(betaInput
         .getWeightedAverageBenchmarkReturns(), tBills);
-    var betaCalculation = new BetaCalculation(betaInput, defaultPeriods, portfolioExccessReturn,
-        benchmarkExccessReturn);
-    return new TreynorRatioCalculation(treynorRationInput, defaultPeriods, tBills, betaCalculation);
+    var betaCalculation = new BetaCalculation(betaInput, defaultPeriods, portfolioExcessReturn,
+        benchmarkExcessReturn);
+    return new TreynorRatioCalculation(treynorRatioInput, defaultPeriods, tBills, betaCalculation);
   }
 
 }

@@ -1,14 +1,14 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.ManagementFeeCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.ParameterType;
 import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.AverageMerCommand;
-import com.fintex.ce.application.result.ManagementFeeResult;
+import com.fintex.ce.port.input.command.AverageMerCommand;
+import com.fintex.ce.port.input.result.ManagementFeeResult;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.util.FilterUtils;
@@ -40,7 +40,7 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void perform_checkResult() {
     // SETUP
-    final var managementFeeCacheStorage = mock(ManagementFeeCacheStorage.class);
+    final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
         .useConstructor(managementFeeCacheStorage));
 
@@ -60,7 +60,7 @@ class ManagementFeeCalculationServiceImplTest {
   void perform_verifyLoad() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeCacheStorage = mock(ManagementFeeCacheStorage.class);
+      final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(managementFeeCacheStorage));
 
@@ -86,7 +86,7 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void perform_verifySetNullForScaledIfHoldingContainsNoFunds() {
     // SETUP
-    final var managementFeeCacheStorage = mock(ManagementFeeCacheStorage.class);
+    final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
         .useConstructor(managementFeeCacheStorage));
 
@@ -112,7 +112,7 @@ class ManagementFeeCalculationServiceImplTest {
   void perform_verifyCalculateAverageValue() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeCacheStorage = mock(ManagementFeeCacheStorage.class);
+      final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(managementFeeCacheStorage));
 
@@ -138,7 +138,7 @@ class ManagementFeeCalculationServiceImplTest {
   void perform_verifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeCacheStorage = mock(ManagementFeeCacheStorage.class);
+      final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(managementFeeCacheStorage));
 
@@ -163,7 +163,7 @@ class ManagementFeeCalculationServiceImplTest {
   void perform_verifyGetSpecifiedIfEmptyDEFAULT_DATAPROVIDERS() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeCacheStorage = mock(ManagementFeeCacheStorage.class);
+      final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(managementFeeCacheStorage));
 

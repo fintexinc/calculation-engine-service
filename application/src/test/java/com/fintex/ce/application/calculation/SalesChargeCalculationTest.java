@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.SalesChargeCalculation;
 import com.fintex.ce.domain.enumeration.calculation.SalesCharge;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.result.SalesChargeResult;
+import com.fintex.ce.port.input.result.SalesChargeResult;
 import com.fintex.smclient.graphql.SalesChargeType;
 import org.junit.jupiter.api.Test;
 

@@ -5,8 +5,8 @@ import com.fintex.ce.application.service.calculation.EquityStyleboxExposureCalcu
 import com.fintex.ce.domain.enumeration.calculation.EquityStyleboxType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.EquityStyleboxExposureResult;
-import com.fintex.ce.adapter.cache.EquityStyleboxExposureCacheStorage;
+import com.fintex.ce.port.input.result.EquityStyleboxExposureResult;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
   @Test
   void getLoadFromCacheStorage_checkResult() {
     // SETUP
-    final var cacheStorage = mock(EquityStyleboxExposureCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
     final var sut = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor( cacheStorage, responseMapper));
@@ -48,7 +48,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
   @Test
   void calculate_verifyCalculateNetProducts() {
     // SETUP
-    final var cacheStorage = mock(EquityStyleboxExposureCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
     final var sut = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor( cacheStorage, responseMapper));
@@ -68,7 +68,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
   @Test
   void calculate_verifyResponseMapperFromNetProducts() {
     // SETUP
-    final var cacheStorage = mock(EquityStyleboxExposureCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
     final var sut = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor( cacheStorage, responseMapper));
@@ -91,7 +91,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
   void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
     // SETUP
     try (final var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final var cacheStorage = mock(EquityStyleboxExposureCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
       final var sut = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()
           .useConstructor( cacheStorage, responseMapper));
@@ -110,7 +110,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
   void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(EquityStyleboxExposureCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
       final var sut = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()
           .useConstructor( cacheStorage, responseMapper));

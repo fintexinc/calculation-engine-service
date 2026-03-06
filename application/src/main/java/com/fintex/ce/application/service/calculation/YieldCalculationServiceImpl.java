@@ -3,11 +3,11 @@ package com.fintex.ce.application.service.calculation;
 import com.fintex.ce.application.mapper.response.YieldResponseMapper;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.YieldCommand;
-import com.fintex.ce.application.result.YieldResult;
+import com.fintex.ce.port.input.command.YieldCommand;
+import com.fintex.ce.port.input.result.YieldResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.Yield;
-import com.fintex.ce.adapter.cache.YieldCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.service.calculation.CalculationService;
 import org.springframework.stereotype.Service;
 
@@ -18,19 +18,19 @@ import java.util.Map;
 @Service
 public class YieldCalculationServiceImpl implements CalculationService<YieldResult, YieldCommand> {
 
-  private final YieldCacheStorage yieldCacheStorage;
+  private final HoldingDataLoader<Map<Holding, Yield>> yieldCachePort;
   private final YieldResponseMapper responseMapper;
 
-  public YieldCalculationServiceImpl(final YieldCacheStorage yieldCacheStorage,
+  public YieldCalculationServiceImpl(final HoldingDataLoader<Map<Holding, Yield>> yieldCachePort,
       final YieldResponseMapper responseMapper) {
-    this.yieldCacheStorage = yieldCacheStorage;
+    this.yieldCachePort = yieldCachePort;
     this.responseMapper = responseMapper;
   }
 
   @Override
   public YieldResult perform(final YieldCommand reqDTO) {
     final ArrayList<Warning> warnings = new ArrayList<>();
-    final Map<Holding, Yield> yieldData = yieldCacheStorage.load(
+    final Map<Holding, Yield> yieldData = yieldCachePort.load(
         reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
     return responseMapper.toResponse(yieldData, warnings);
   }

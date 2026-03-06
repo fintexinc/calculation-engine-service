@@ -7,7 +7,7 @@ import com.fintex.ce.application.service.calculation.period.RollingStandardDevia
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.command.RollingCalculationCommand;
+import com.fintex.ce.port.input.command.RollingCalculationCommand;
 import com.fintex.ce.monthlyreturns.Returns;
 import org.junit.jupiter.api.Test;
 

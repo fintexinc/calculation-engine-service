@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.UpsideCaptureCalculation;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.application.result.UpsideCaptureResult;
+import com.fintex.ce.port.input.result.UpsideCaptureResult;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodBenchmarkAbstractService;
 import org.springframework.beans.factory.annotation.Value;

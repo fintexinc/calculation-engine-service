@@ -3,7 +3,7 @@ package com.fintex.ce.application.service.health;
 import com.fintex.ce.application.service.calculation.MERCalculationServiceImpl;
 import com.fintex.ce.application.service.health.MERCalculationHealthIndicator;
 import com.fintex.ce.domain.enumeration.ParameterType;
-import com.fintex.ce.application.command.AverageMerCommand;
+import com.fintex.ce.port.input.command.AverageMerCommand;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

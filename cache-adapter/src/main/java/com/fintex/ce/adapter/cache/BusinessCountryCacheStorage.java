@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.cache;
 
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.domain.enumeration.Country;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.ExceptionCode;
@@ -12,7 +12,7 @@ import com.fintex.ce.domain.model.holding.StockHolding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RBusinessCountry;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.businesscountry.BusinessCountryRepository;
 import com.fintex.ce.util.validation.DataProviderRequestHandlingValidator;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
@@ -32,26 +32,24 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 @Service
 public class BusinessCountryCacheStorage
     extends
-      MultipleCacheStorageAbstract<BusinessCountry, BusinessCountry, BusinessCountry, BusinessCountry, RBusinessCountry> {
+      CacheStorageAbstract<BusinessCountry, RBusinessCountry, Map<Holding, BusinessCountry>> {
 
   @Autowired
   public BusinessCountryCacheStorage(
-      MultipleSMRepository<BusinessCountry, BusinessCountry, BusinessCountry, BusinessCountry> smRepo,
+      SecurityDataPort<BusinessCountry> securityDataPort,
       CacheEntityMapper<BusinessCountry, RBusinessCountry> mapper,
       BusinessCountryRepository businessCountryRepository,
       CacheStatisticService cacheStatisticService) {
-    super(smRepo, mapper, mapper, mapper, mapper,
-        businessCountryRepository, businessCountryRepository,
-        businessCountryRepository, businessCountryRepository, cacheStatisticService, CacheNameEntity.BUSINESS_COUNTRY);
+    super(securityDataPort, mapper, businessCountryRepository, cacheStatisticService, CacheNameEntity.BUSINESS_COUNTRY);
   }
 
   @Override
-  public Map<Holding, BusinessCountry> load(final List<Holding> holdings, final List<DataProvider> providers,
+  public Map<Holding, BusinessCountry> load(final List<? extends Holding> holdings, final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     return load(holdings, providers, false);
   }
 
-  public Map<Holding, BusinessCountry> load(final List<Holding> holdings, final List<DataProvider> providers,
+  public Map<Holding, BusinessCountry> load(final List<? extends Holding> holdings, final List<DataProvider> providers,
       final boolean needToCheckDataProvidersFromResponse) {
     final Map<StockHolding, BusinessCountry> response = loadForBenchOfStock(filterHoldings(holdings, STOCK_PREDICATE),
         List.of());
@@ -70,7 +68,7 @@ public class BusinessCountryCacheStorage
     return BusinessCountry::setValue;
   }
 
-  public Map<Holding, Country> loadBusinessCountries(final List<Holding> holdings, final List<DataProvider> providers,
+  public Map<Holding, Country> loadBusinessCountries(final List<? extends Holding> holdings, final List<DataProvider> providers,
       final boolean needToCheckDataProvidersFromResponse,
       final List<Warning> warnings) {
     final Map<Holding, BusinessCountry> responseMap = load(holdings, providers, needToCheckDataProvidersFromResponse);

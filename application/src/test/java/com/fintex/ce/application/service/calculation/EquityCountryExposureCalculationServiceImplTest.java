@@ -1,12 +1,12 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.EquityCountryAllocationCacheStorage;
+import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
 import com.fintex.ce.application.service.calculation.EquityCountryExposureCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.EquityCountryExposureResult;
+import com.fintex.ce.port.input.result.EquityCountryExposureResult;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
@@ -32,7 +32,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   @Test
   void perform_verifyValidateHoldings() {
     // SETUP
-    final var storage = mock(EquityCountryAllocationCacheStorage.class);
+    final var storage = mock(EquityCountryAllocationCachePort.class);
     final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
         withSettings().useConstructor(storage));
 
@@ -97,7 +97,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(EquityCountryAllocationCacheStorage.class);
+      final var storage = mock(EquityCountryAllocationCachePort.class);
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
           withSettings().useConstructor(storage));
 
@@ -116,7 +116,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(EquityCountryAllocationCacheStorage.class);
+      final var storage = mock(EquityCountryAllocationCachePort.class);
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
           withSettings().useConstructor(storage));
 
@@ -140,7 +140,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   void getLoadFromCacheStorage_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(EquityCountryAllocationCacheStorage.class);
+      final var storage = mock(EquityCountryAllocationCachePort.class);
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
           withSettings().useConstructor(storage));
 

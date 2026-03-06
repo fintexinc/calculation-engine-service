@@ -5,7 +5,8 @@ import com.fintex.ce.adapter.cache.entity.RMaturityAllocation;
 import com.fintex.ce.adapter.cache.repository.MaturityAllocationRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
+import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.MaturityAllocationType;
 import com.fintex.ce.domain.model.MaturityAllocation;
 import com.fintex.ce.domain.model.ParamHolderDTO;
@@ -61,9 +62,9 @@ class MaturityAllocationCacheStorageTest {
   @BeforeEach
   void setUp() {
     maturityAllocationCacheStorage = mock(MaturityAllocationCacheStorage.class);
-    holding = mock(Holding.class);
+    holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
     holdings = List.of(holding);
-    warnings = List.of(mock(Warning.class));
+    warnings = List.of(new Warning("id", "msg", "code"));
     rMaturityAllocation = mock(MaturityAllocation.class);
     entry = mock(Map.Entry.class);
   }
@@ -72,15 +73,12 @@ class MaturityAllocationCacheStorageTest {
   void load_verifyFilters() {
     // SETUP
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-      final var fdsRepo = mock(MultipleSMRepository.class);
+      final var securityDataPort = mock(SecurityDataPort.class);
       final CacheEntityMapper<MaturityAllocation, RMaturityAllocation> mapper = mock(CacheEntityMapper.class);
-      final var fundCanadaCacheRepo = mock(MaturityAllocationRepository.class);
-      final var etfCanadaCacheRepo = mock(MaturityAllocationRepository.class);
-      final var etfUsCacheRepo = mock(MaturityAllocationRepository.class);
+      final var maturityAllocationRepository = mock(MaturityAllocationRepository.class);
       final var cacheStatisticService = mock(CacheStatisticService.class);
       final MaturityAllocationCacheStorage m = mock(MaturityAllocationCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-              cacheStatisticService));
+          .useConstructor(securityDataPort, mapper, maturityAllocationRepository, cacheStatisticService));
       doCallRealMethod().when(m).load(any(), any(), any(), any());
 
       // ACT
@@ -105,7 +103,8 @@ class MaturityAllocationCacheStorageTest {
   void load_verifyLoadBenchOfFundCanada() {
     // SETUP
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-      final List<FundSeriesHolding> filtered = List.of(mock(FundSeriesHolding.class));
+      var fsh = new FundSeriesHolding().setFundServCode("TEST");
+      final List<FundSeriesHolding> filtered = List.of(fsh);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_MUTUAL_PREDICATE))).thenReturn(
           filtered);
       doCallRealMethod().when(maturityAllocationCacheStorage).load(any(), any(), any(), any());
@@ -122,7 +121,8 @@ class MaturityAllocationCacheStorageTest {
   void load_verifyLoadForBenchOfEtfUs() {
     // SETUP
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etf);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(US_ETF_PREDICATE))).thenReturn(filtered);
       doCallRealMethod().when(maturityAllocationCacheStorage).load(any(), any(), any(), any());
 
@@ -138,7 +138,8 @@ class MaturityAllocationCacheStorageTest {
   void load_verifyLoadForBenchOfEtfCanada() {
     // SETUP
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-      final List<EtfHolding> filtered = List.of(mock(EtfHolding.class));
+      var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
+      final List<EtfHolding> filtered = List.of(etf);
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(CANADA_ETF_PREDICATE))).thenReturn(
           filtered);
       doCallRealMethod().when(maturityAllocationCacheStorage).load(any(), any(), any(), any());
@@ -155,7 +156,7 @@ class MaturityAllocationCacheStorageTest {
   void load_verifyLoadBenchOfFixedIncomes() {
     // SETUP
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-      final List<FixedIncomeHolding> filtered = List.of(mock(FixedIncomeHolding.class));
+      final List<FixedIncomeHolding> filtered = List.of(new FixedIncomeHolding().setIdentifier("TEST"));
       mockedFilterUtils.when(() -> FilterUtils.filterHoldings(eq(holdings), eq(FIXED_INCOME_PREDICATE))).thenReturn(
           filtered);
       doCallRealMethod().when(maturityAllocationCacheStorage).load(any(), any(), any(), any());

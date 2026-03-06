@@ -9,9 +9,9 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RCreditQuality;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.CreditQualityRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -39,24 +39,18 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class CreditQualityCacheStorage
-    extends
-      MultipleCacheStorageAbstract<CreditQuality, CreditQuality, CreditQuality, CreditQuality, RCreditQuality> {
+    extends CacheStorageAbstract<CreditQuality, RCreditQuality, Map<Holding, Map<CreditQualityRating, BigDecimal>>> {
 
   public CreditQualityCacheStorage(
-      MultipleSMRepository<CreditQuality, CreditQuality, CreditQuality, CreditQuality> smRepo,
+      SecurityDataPort<CreditQuality> securityDataPort,
       CacheEntityMapper<CreditQuality, RCreditQuality> mapper,
-      CreditQualityRepository fundCanadaCacheRepo,
-      CreditQualityRepository etfCanadaCacheRepo,
-      CreditQualityRepository etfUsCacheRepo,
+      CreditQualityRepository creditQualityRepository,
       CacheStatisticService cacheStatisticService) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        null, cacheStatisticService, CREDIT_QUALITY);
+    super(securityDataPort, mapper, creditQualityRepository, cacheStatisticService, CREDIT_QUALITY);
   }
 
   @Override
-  public Map<Holding, Map<CreditQualityRating, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<CreditQualityRating, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     Map<Holding, Map<CreditQualityRating, BigDecimal>> map = new HashMap<>();

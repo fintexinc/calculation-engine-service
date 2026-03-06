@@ -3,7 +3,7 @@ package com.fintex.ce.application.service.health;
 import com.fintex.ce.application.service.calculation.GrowthOf10KCalculationServiceImpl;
 import com.fintex.ce.application.service.health.GrowthOf10kCalculationHealthIndicator;
 import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.application.command.ReturnCommand;
+import com.fintex.ce.port.input.command.ReturnCommand;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 

@@ -9,11 +9,12 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.RCountryExposure;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.CountryExposureRepository;
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.service.CountryAllocationMappingService;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,29 +37,24 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 import static java.util.stream.Collectors.toMap;
 
 @Service
+@Qualifier("countryExposure")
 public class CountryExposureCacheStorage
-    extends
-      MultipleCacheStorageAbstract<CountryExposure, CountryExposure, CountryExposure, CountryExposure, RCountryExposure> {
+    extends CacheStorageAbstract<CountryExposure, RCountryExposure, Map<Holding, Map<CountryRegionType, BigDecimal>>> {
 
   private final CountryAllocationMappingService countryAllocationMappingService;
 
   public CountryExposureCacheStorage(
-      MultipleSMRepository<CountryExposure, CountryExposure, CountryExposure, CountryExposure> smRepo,
+      SecurityDataPort<CountryExposure> securityDataPort,
       CacheEntityMapper<CountryExposure, RCountryExposure> mapper,
-      CountryExposureRepository fundCanadaCacheRepo,
-      CountryExposureRepository etfCanadaCacheRepo,
-      CountryExposureRepository etfUsCacheRepo,
+      CountryExposureRepository countryExposureRepository,
       CacheStatisticService cacheStatisticService,
       CountryAllocationMappingService countryAllocationMappingService) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        null, cacheStatisticService, COUNTRY_EXPOSURE);
+    super(securityDataPort, mapper, countryExposureRepository, cacheStatisticService, COUNTRY_EXPOSURE);
     this.countryAllocationMappingService = countryAllocationMappingService;
   }
 
   @Override
-  public Map<Holding, Map<CountryRegionType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<CountryRegionType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
     Map<Holding, Map<CountryRegionType, BigDecimal>> map = new HashMap<>();

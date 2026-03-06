@@ -4,8 +4,8 @@ import com.fintex.ce.application.calculation.RollingStandardDeviationCalculation
 import com.fintex.ce.application.calculation.StandardDeviationCalculation;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.application.command.RollingCalculationCommand;
-import com.fintex.ce.application.result.RollingStandardDeviationResult;
+import com.fintex.ce.port.input.command.RollingCalculationCommand;
+import com.fintex.ce.port.input.result.RollingStandardDeviationResult;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;

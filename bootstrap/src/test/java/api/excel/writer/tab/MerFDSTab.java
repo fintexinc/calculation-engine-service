@@ -5,7 +5,7 @@ import api.excel.writer.SMDataWriter;
 import api.excel.writer.WritableSpreadsheet;
 import api.util.CommonTools;
 import api.util.excel.ExcelUtils;
-import com.fintex.ce.adapter.graphqlclient.repository.AverageMERSMRepository;
+import com.fintex.ce.adapter.graphqlclient.repository.AverageMerGraphqlDataFetcher;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.domain.model.holding.CanadaHedgeFundHolding;
@@ -27,11 +27,11 @@ import java.util.Objects;
 import static com.fintex.ce.util.FilterUtils.*;
 
 public class MerFDSTab extends SMDataWriter<Holding, String, BigDecimal> implements WritableSpreadsheet {
-  private static final AverageMERSMRepository ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
+  private static final AverageMerGraphqlDataFetcher ASSET_ALLOCATION_FDS = initAssetAllocationsFDS();
   private static final String TAB_NAME = "Master_Sheet";
 
-  private static AverageMERSMRepository initAssetAllocationsFDS() {
-    return new AverageMERSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+  private static AverageMerGraphqlDataFetcher initAssetAllocationsFDS() {
+    return new AverageMerGraphqlDataFetcher(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
   }
 
   @Override

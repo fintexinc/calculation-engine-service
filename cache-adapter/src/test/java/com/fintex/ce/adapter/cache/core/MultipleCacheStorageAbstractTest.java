@@ -5,21 +5,17 @@ import com.fintex.ce.adapter.cache.repository.core.CoreRedisCacheRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.constant.CacheCategory;
 import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.model.holding.BenchmarkIndexHolding;
-import com.fintex.ce.domain.model.holding.FixedIncomeHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.SmaHolding;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 import static com.fintex.ce.domain.enumeration.DataProvider.EAGLE;
 import static com.fintex.ce.domain.enumeration.DataProvider.MORNINGSTAR;
@@ -31,117 +27,100 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class MultipleCacheStorageAbstractTest {
+@SuppressWarnings({"unchecked", "rawtypes"})
+class CacheStorageAbstractTest {
+
+  private static int holdingCounter = 0;
+
+  private static Holding newHolding() {
+    holdingCounter++;
+    return new Holding().setType(CASH).setValue(BigDecimal.valueOf(holdingCounter));
+  }
+
+  private CacheStorageAbstract createMockWithConstructor(SecurityDataPort securityDataPort, CacheEntityMapper mapper,
+      CoreRedisCacheRepository cacheRepo, CacheStatisticService cacheStatisticService) {
+    return mock(CacheStorageAbstract.class,
+        withSettings().useConstructor(securityDataPort, mapper, cacheRepo, cacheStatisticService, null));
+  }
+
+  // ---- synchronizeAndLoad tests ----
 
   @Test
-  void synchronizeAndLoadForMultipleHoldings_verifyLoadCachesForHoldings() {
+  void synchronizeAndLoad_verifyLoadCachesForHoldings() {
     // SETUP
     final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(null, null, null, null, null, null, null, null, null, cacheS, null));
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, cacheS);
 
-    final List<Holding> holdings = List.of(mock(Holding.class));
-
-    doCallRealMethod().when(m).synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any());
-    // ACT
+    final List<Holding> holdings = List.of(newHolding());
     final List<DataProvider> providers = List.of(EAGLE);
-    final CoreRedisCacheRepository cacheRepository = mock(CoreRedisCacheRepository.class);
-    m.synchronizeAndLoadForMultipleHoldings(holdings, providers, cacheRepository, null, null, null);
+
+    doCallRealMethod().when(m).synchronizeAndLoad(any(), any(), any());
+    // ACT
+    m.synchronizeAndLoad(holdings, providers, CacheCategory.STOCKS);
 
     // VERIFY
-    verify(m).loadCachesForHoldings(holdings, providers, cacheRepository);
+    verify(m).loadCachesForHoldings(holdings, providers);
   }
 
   @Test
-  void synchronizeAndLoadForMultipleHoldings_verifyGetCachedResponses() {
+  void synchronizeAndLoad_verifyFilterCachedResponses() {
     // SETUP
     final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(null, null, null, null, null, null, null, null, null, cacheS, null));
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, cacheS);
 
-    final List<Object> holdings = List.of(mock(Holding.class));
+    final List<Holding> holdings = List.of(newHolding());
     final HashMap map = new HashMap();
-    when(m.loadCachesForHoldings(any(), any(), any())).thenReturn(map);
+    when(m.loadCachesForHoldings(any(), any())).thenReturn(map);
 
-    doCallRealMethod().when(m).synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any());
+    doCallRealMethod().when(m).synchronizeAndLoad(any(), any(), any());
     // ACT
     final List<DataProvider> providers = List.of(EAGLE);
-    final CoreRedisCacheRepository cacheRepository = mock(CoreRedisCacheRepository.class);
-    m.synchronizeAndLoadForMultipleHoldings(holdings, providers, cacheRepository, null, null, null);
+    m.synchronizeAndLoad(holdings, providers, CacheCategory.STOCKS);
 
     // VERIFY
     verify(m).filterCachedResponses(argThat(arg -> arg == map));
   }
 
   @Test
-  void synchronizeAndLoadForMultipleHoldings_verifyCacheHoldings() {
+  void synchronizeAndLoad_verifyFetchUncachedHoldings() {
     // SETUP
     final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(null, null, null, null, null, null, null, null, null, cacheS, null));
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, cacheS);
 
-    final List<Object> holdings = List.of(mock(Holding.class));
+    final List<Holding> holdings = List.of(newHolding());
 
-    final Holding h = mock(Holding.class);
+    final Holding h = newHolding();
     when(m.filterCachedResponses(any())).thenReturn(Map.of(h, mock(RedisId.class)));
-    when(m.convertToDomainMap(any(), any())).thenReturn(Map.of(h, new Object()));
+    when(m.convertToDomainMap(any())).thenReturn(Map.of(h, new Object()));
 
-    doCallRealMethod().when(m).synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any());
+    doCallRealMethod().when(m).synchronizeAndLoad(any(), any(), any());
     // ACT
     final List<DataProvider> providers = List.of(EAGLE);
-    final CoreRedisCacheRepository cacheRepository = mock(CoreRedisCacheRepository.class);
-    final BiFunction biFunction = mock(BiFunction.class);
-    final CacheEntityMapper mapper = mock(CacheEntityMapper.class);
-    m.synchronizeAndLoadForMultipleHoldings(holdings, providers, cacheRepository, biFunction, mapper, null);
+    m.synchronizeAndLoad(holdings, providers, CacheCategory.STOCKS);
 
     // VERIFY
-    verify(m).cacheHoldings(argThat(arg -> arg == holdings), eq(providers), eq(List.of(h)), eq(biFunction), eq(
-        cacheRepository), eq(mapper));
+    verify(m).fetchUncachedHoldings(argThat(arg -> arg == holdings), eq(providers), eq(List.of(h)));
   }
 
-  // @Test
-  // void synchronizeAndLoadForMultipleHoldings_verifyAnalyse() {
-  // //SETUP
-  // final FASUsageStatisticsRepo fasUsageStatisticsRepo = mock(FASUsageStatisticsRepo.class);
-  // final CacheStatisticServiceImpl cacheS = mock(CacheStatisticServiceImpl.class,
-  // withSettings().useConstructor(fasUsageStatisticsRepo));
-  // final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-  // withSettings().useConstructor(null, null, null, null, null, cacheS, CacheNameEntity.MER));
-  //
-  // final List<Holding> holdings = List.of(mock(Holding.class));
-  //
-  // final HashMap all = new HashMap();
-  // when(m.cacheHoldings(any(), any(), any(), any(), any(), any())).thenReturn(all);
-  //
-  // doCallRealMethod().when(m).synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any());
-  // //ACT
-  // final List<DataProvider> providers = List.of(EAGLE);
-  // final CoreRedisCacheRepository cacheRepository = mock(CoreRedisCacheRepository.class);
-  // m.synchronizeAndLoadForMultipleHoldings(holdings, providers, cacheRepository, null, null, CacheCategory.STOCKS);
-  //
-  // //VERIFY
-  // verify(cacheS).analyse(argThat(arg -> arg == all), eq(CacheNameEntity.MER), eq(CacheCategory.STOCKS));
-  //
-  // }
-
   @Test
-  void synchronizeAndLoadForMultipleHoldings_checkResults() {
+  void synchronizeAndLoad_checkResults() {
     // SETUP
     final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(null, null, null, null, null, null, null, null, null, cacheS, null));
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, cacheS);
 
     final HashMap cachedDomainModels = new HashMap();
     cachedDomainModels.put("1", "1");
@@ -149,144 +128,42 @@ class MultipleCacheStorageAbstractTest {
     fetchedDomainModels.put("12", "12");
 
     when(m.filterCachedResponses(any())).thenReturn(new HashMap<>());
-    when(m.convertToDomainMap(any(), any())).thenReturn(cachedDomainModels);
-    when(m.cacheHoldings(any(), any(), any(), any(), any(), any())).thenReturn(fetchedDomainModels);
+    when(m.convertToDomainMap(any())).thenReturn(cachedDomainModels);
+    when(m.fetchUncachedHoldings(any(), any(), any())).thenReturn(fetchedDomainModels);
 
-    doCallRealMethod().when(m).synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any());
+    doCallRealMethod().when(m).synchronizeAndLoad(any(), any(), any());
     // ACT
-    final Map actual = m.synchronizeAndLoadForMultipleHoldings(List.of(mock(Holding.class)), List.of(), null, null,
-        null, CacheCategory.STOCKS);
+    final Map actual = m.synchronizeAndLoad(List.of(newHolding()), List.of(), CacheCategory.STOCKS);
 
     // VERIFY
     assertEquals(Map.of("1", "1", "12", "12"), actual);
   }
 
   @Test
-  void synchronizeAndLoadForMultipleHoldings_checkResult_whenHoldingsIsEmpty() {
+  void synchronizeAndLoad_checkResult_whenHoldingsIsEmpty() {
     // SETUP
-    final var sut = mock(MultipleCacheStorageAbstract.class);
+    final var sut = mock(CacheStorageAbstract.class);
     final var holdings = mock(List.class);
 
     when(holdings.isEmpty()).thenReturn(true);
-    doCallRealMethod().when(sut).synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any());
+    doCallRealMethod().when(sut).synchronizeAndLoad(any(), any(), any());
 
     // ACT
-    final Map actual = sut.synchronizeAndLoadForMultipleHoldings(holdings, mock(List.class),
-        mock(CoreRedisCacheRepository.class), mock(BiFunction.class), mock(CacheEntityMapper.class), CacheCategory.ETF);
+    final Map actual = sut.synchronizeAndLoad(holdings, mock(List.class), CacheCategory.ETF);
 
     // VERIFY
     assertTrue(actual.isEmpty());
-    verify(sut).synchronizeAndLoadForMultipleHoldings(same(holdings), any(), any(), any(), any(), any());
+    verify(sut).synchronizeAndLoad(any(), any(), any());
     verifyNoMoreInteractions(sut);
   }
 
-  @Test
-  void cacheHoldings_verifyFilterHoldingsBy() {
-    // SETUP
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(null, null, null, null, null, null, null, null, null, cacheS, null));
-
-    final List<Object> holdings = new ArrayList<>();
-
-    doCallRealMethod().when(m).cacheHoldings(any(), any(), any(), any(), any(), any());
-    // ACT
-    m.cacheHoldings(holdings, null, List.of(), null, null, null);
-
-    // VERIFY
-    verify(m).filterHoldingsBy(argThat(h -> h == holdings), any());
-  }
-
-  @Test
-  void cacheHoldings_verifyFunctionInvocation() {
-    // SETUP
-    final MultipleCacheStorageAbstract sut = mock(MultipleCacheStorageAbstract.class);
-
-    final BiFunction fdsCall = mock(BiFunction.class);
-    final List<Object> holdings = List.of(mock(Holding.class));
-
-    when(sut.filterHoldingsBy(any(), any())).thenReturn(holdings);
-
-    doCallRealMethod().when(sut).cacheHoldings(any(), any(), any(), any(), any(), any());
-    // ACT
-    final List<DataProvider> providers = List.of(EAGLE);
-    sut.cacheHoldings(null, providers, null, fdsCall, null, null);
-
-    // VERIFY
-    verify(fdsCall).apply(holdings, providers);
-  }
-
-  @Test
-  void cacheHoldings_verifySaveToCacheIsEmpty() {
-    // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
-
-    final BiFunction fdsCall = mock(BiFunction.class);
-
-    final Map<Holding, Object> map = Map.of(mock(Holding.class), new Object());
-    when(fdsCall.apply(any(), any())).thenReturn(map);
-    when(m.filterHoldingsBy(any(), any())).thenReturn(List.of());
-
-    doCallRealMethod().when(m).cacheHoldings(any(), any(), any(), any(), any(), any());
-    // ACT
-    final CoreRedisCacheRepository cacheRepository = mock(CoreRedisCacheRepository.class);
-    m.cacheHoldings(null, List.of(EAGLE), List.of(), fdsCall, cacheRepository, null);
-
-    // VERIFY
-    verify(m).saveToCache(argThat(arg -> arg == cacheRepository), argThat(Map::isEmpty), eq(List.of(EAGLE)));
-  }
-
-  @Test
-  void cacheHoldings_verifySaveToCacheNotEmpty() {
-    // SETUP
-    final MultipleCacheStorageAbstract sut = mock(MultipleCacheStorageAbstract.class);
-
-    final BiFunction fdsCall = mock(BiFunction.class);
-
-    final Map<Holding, Object> allResponses = Map.of(mock(Holding.class), new Object());
-    final HashMap<Holding, RedisId> responsesWithoutAnyErrors = new HashMap<>(Map.of(mock(Holding.class),
-        mock(RedisId.class)));
-
-    when(sut.filterResponsesWithoutAnyErrors(any())).thenReturn(responsesWithoutAnyErrors);
-    when(fdsCall.apply(any(), any())).thenReturn(allResponses);
-    when(sut.filterHoldingsBy(any(), any())).thenReturn(List.of(mock(Holding.class)));
-
-    doCallRealMethod().when(sut).cacheHoldings(any(), any(), any(), any(), any(), any());
-    // ACT
-    final CoreRedisCacheRepository cacheRepository = mock(CoreRedisCacheRepository.class);
-    sut.cacheHoldings(null, List.of(EAGLE), List.of(), fdsCall, cacheRepository, null);
-
-    // VERIFY
-    verify(sut).saveToCache(argThat(arg -> arg == cacheRepository), argThat(arg -> arg == responsesWithoutAnyErrors),
-        eq(List.of(EAGLE)));
-  }
-
-  @Test
-  void cacheHoldings_resultList() {
-    // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
-
-    final BiFunction fdsCall = mock(BiFunction.class);
-    final Map<Holding, Object> map = Map.of(mock(Holding.class), new Object());
-    when(fdsCall.apply(any(), any())).thenReturn(map);
-    when(m.filterHoldingsBy(any(), any())).thenReturn(List.of(mock(Holding.class)));
-
-    doCallRealMethod().when(m).cacheHoldings(any(), any(), any(), any(), any(), any());
-    // ACT
-    final CoreRedisCacheRepository cacheRepository = mock(CoreRedisCacheRepository.class);
-    final Map actual = m.cacheHoldings(null, null, List.of(), fdsCall, cacheRepository, null);
-
-    // VERIFY
-    assertEquals(map, actual);
-  }
+  // ---- saveToCache tests ----
 
   @Test
   void saveToCache_verifySave() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
-
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    when(repo.findOneByHoldingIdAndProvider(any(), any())).thenReturn(Optional.empty());
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
     final DataProvider eagle = EAGLE;
     final String providersId = buildIdBasedOnProviders(List.of(eagle));
@@ -295,71 +172,70 @@ class MultipleCacheStorageAbstractTest {
     when(res.getProvider()).thenReturn(eagle.name());
     when(res.getProviders()).thenReturn(providersId);
     when(res.getHoldingId()).thenReturn("ID");
-    final Map<Object, Object> map = Map.of(mock(Holding.class), res);
+    final Map<Object, Object> map = Map.of(newHolding(), res);
 
-    doCallRealMethod().when(m).saveToCache(any(), anyMap(), any());
+    doCallRealMethod().when(m).saveToCache(anyMap(), any());
     // ACT
-    m.saveToCache(repo, map, List.of(eagle));
+    m.saveToCache(map, List.of(eagle));
 
     // VERIFY
-    verify(repo).save(res);
+    verify(cacheRepo).save(res);
   }
 
   @Test
   void saveToCache_verifySaveWhenProvidersAreAllNull() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
-
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    when(repo.findOneByHoldingIdAndProvider(any(), any())).thenReturn(Optional.empty());
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
     final RedisId res = mock(RedisId.class);
     when(res.getProvider()).thenReturn("");
     when(res.getProviders()).thenReturn("");
     when(res.getHoldingId()).thenReturn("ID");
 
-    final Map<Object, Object> map = Map.of(mock(Holding.class), res);
+    final Map<Object, Object> map = Map.of(newHolding(), res);
 
-    doCallRealMethod().when(m).saveToCache(any(), anyMap(), any());
+    doCallRealMethod().when(m).saveToCache(anyMap(), any());
     // ACT
-    m.saveToCache(repo, map, null);
+    m.saveToCache(map, null);
 
     // VERIFY
-    verify(repo).save(res);
+    verify(cacheRepo).save(res);
   }
 
   @Test
   void saveToCache_verifySaveWhenProvidersAreEmpty() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
-
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    when(repo.findOneByHoldingIdAndProvider(any(), any())).thenReturn(Optional.empty());
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
     final RedisId res = mock(RedisId.class);
     when(res.getProvider()).thenReturn("");
     when(res.getProviders()).thenReturn("");
     when(res.getHoldingId()).thenReturn("ID");
 
-    final Map<Object, Object> map = Map.of(mock(Holding.class), res);
+    final Map<Object, Object> map = Map.of(newHolding(), res);
 
-    doCallRealMethod().when(m).saveToCache(any(), anyMap(), any());
+    doCallRealMethod().when(m).saveToCache(anyMap(), any());
     // ACT
-    m.saveToCache(repo, map, List.of());
+    m.saveToCache(map, List.of());
 
     // VERIFY
-    verify(repo).save(res);
+    verify(cacheRepo).save(res);
   }
 
+  // ---- filterCachedResponses tests ----
+
   @Test
-  void getCachedResponses_verify() {
+  void filterCachedResponses_verify() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
 
     final Holding h = new Holding().setType(CASH);
     final Optional<RedisId> res = Optional.of(mock(RedisId.class));
 
-    final Map<Holding, Optional<RedisId>> of = Map.of(h, res, mock(Holding.class), Optional.empty());
+    final Holding h2 = new Holding().setType(US_ETF).setValue(BigDecimal.valueOf(-1));
+    final Map<Holding, Optional<RedisId>> of = Map.of(h, res, h2, Optional.empty());
 
     doCallRealMethod().when(m).filterCachedResponses(anyMap());
     // ACT
@@ -369,10 +245,12 @@ class MultipleCacheStorageAbstractTest {
     assertEquals(Map.of(h, res.orElseThrow()), actual);
   }
 
+  // ---- filterHoldingsBy tests ----
+
   @Test
   void filterHoldingsBy_verify() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
 
     final Holding h = new Holding().setType(CASH);
     final List<Holding> holdings = List.of(h, new Holding().setType(US_ETF));
@@ -385,299 +263,84 @@ class MultipleCacheStorageAbstractTest {
     assertEquals(List.of(h), set);
   }
 
-  @Test
-  void loadBenchOfFundCanada_resultList() {
-    // SETUP
-    final CoreRedisCacheRepository fundCanada = mock(CoreRedisCacheRepository.class);
-    final MultipleSMRepository fdsRepo = mock(MultipleSMRepository.class);
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(fdsRepo, null, null, null, null, fundCanada, null, null, null, cacheS, null));
-
-    final FundSeriesHolding h = mock(FundSeriesHolding.class);
-
-    final List<FundSeriesHolding> holdings = List.of(h);
-
-    final Map<Object, Object> map = Map.of();
-    when(fdsRepo.queryBenchOfFundCanada(any(), anyList())).thenReturn(map);
-
-    final HashMap expected = new HashMap();
-    when(m.synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(m).loadBenchOfFundCanada(any(), anyList());
-    // ACT
-    final List<DataProvider> providers = List.of(EAGLE);
-    final Map actual = m.loadBenchOfFundCanada(holdings, providers);
-
-    // VERIFY
-    assertSame(expected, actual);
-    verify(m).synchronizeAndLoadForMultipleHoldings(
-        eq(holdings), eq(providers), eq(fundCanada), argThat(arg -> arg.apply(null, providers) == map), any(), eq(
-            CacheCategory.CANADA_MUTUAL_FUNDS));
-  }
-
-  @Test
-  void loadBenchOfFixedIncome_resultList() {
-    // SETUP
-    final CoreRedisCacheRepository fixedIncomeCacheRepository = mock(CoreRedisCacheRepository.class);
-    final MultipleSMRepository fdsRepo = mock(MultipleSMRepository.class);
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(fdsRepo, null, null, null, null, fixedIncomeCacheRepository, null, null, null, cacheS, null));
-
-    final FixedIncomeHolding h = mock(FixedIncomeHolding.class);
-
-    final List<FixedIncomeHolding> holdings = List.of(h);
-
-    final Map<Object, Object> map = Map.of();
-    when(fdsRepo.queryBenchOfFixedIncomes(any(), anyList())).thenReturn(map);
-
-    final HashMap expected = new HashMap();
-    when(m.synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(m).loadBenchOfFixedIncomes(any(), anyList());
-    // ACT
-    final List<DataProvider> providers = List.of(EAGLE);
-    final Map actual = m.loadBenchOfFixedIncomes(holdings, providers);
-
-    // VERIFY
-    assertSame(expected, actual);
-    verify(m).synchronizeAndLoadForMultipleHoldings(
-        eq(holdings), eq(providers), eq(fixedIncomeCacheRepository), argThat(arg -> arg.apply(null, providers) == map),
-        any(), eq(CacheCategory.FIXED_INCOME));
-  }
-
-  @Test
-  void loadBenchOfSeparatelyManaged_resultList() {
-    // SETUP
-    final CoreRedisCacheRepository smaCacheRepository = mock(CoreRedisCacheRepository.class);
-    final MultipleSMRepository fdsRepo = mock(MultipleSMRepository.class);
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(fdsRepo, null, null, null, null, smaCacheRepository, null, null, null, cacheS, null));
-
-    final SmaHolding h = mock(SmaHolding.class);
-
-    final List<SmaHolding> holdings = List.of(h);
-
-    final Map<Object, Object> map = Map.of();
-    when(fdsRepo.queryBenchOfSeparatelyManagedAccounts(any(), anyList())).thenReturn(map);
-
-    final HashMap expected = new HashMap();
-    when(m.synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(m).loadBenchOfSeparatelyManagedAccounts(any(), anyList());
-    // ACT
-    final List<DataProvider> providers = List.of(EAGLE);
-    final Map actual = m.loadBenchOfSeparatelyManagedAccounts(holdings, providers);
-
-    // VERIFY
-    assertSame(expected, actual);
-    verify(m).synchronizeAndLoadForMultipleHoldings(
-        eq(holdings), eq(providers), eq(smaCacheRepository),
-        argThat(arg -> arg.apply(null, providers) == map), any(), eq(CacheCategory.SEPARATELY_MANAGED_ACCOUNT));
-  }
-
-  @Test
-  void loadForBenchOfStock_resultList() {
-    // SETUP
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    final MultipleSMRepository fdsRepo = mock(MultipleSMRepository.class);
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(fdsRepo, null, null, null, null, null, null, null, repo, cacheS, null));
-
-    final FundSeriesHolding h = mock(FundSeriesHolding.class);
-
-    final List<FundSeriesHolding> holdings = List.of(h);
-
-    final Map<Object, Object> map = Map.of();
-    when(fdsRepo.queryBenchOfStock(any(), anyList())).thenReturn(map);
-
-    final HashMap expected = new HashMap();
-    when(m.synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(m).loadForBenchOfStock(any(), anyList());
-    // ACT
-    final List<DataProvider> providers = List.of(EAGLE);
-    final Map actual = m.loadForBenchOfStock(holdings, providers);
-
-    // VERIFY
-    assertSame(expected, actual);
-    verify(m).synchronizeAndLoadForMultipleHoldings(
-        eq(holdings), eq(providers), eq(repo), argThat(arg -> arg.apply(null, providers) == map), any(), eq(
-            CacheCategory.STOCKS));
-  }
-
-  @Test
-  void loadForBenchOfEtfCanada_resultList() {
-    // SETUP
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    final MultipleSMRepository fdsRepo = mock(MultipleSMRepository.class);
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(fdsRepo, null, null, null, null, null, repo, null, null, cacheS, null));
-
-    final FundSeriesHolding h = mock(FundSeriesHolding.class);
-
-    final List<FundSeriesHolding> holdings = List.of(h);
-
-    final Map<Object, Object> map = Map.of();
-    when(fdsRepo.queryBenchOfEtfCanada(any(), anyList())).thenReturn(map);
-
-    final HashMap expected = new HashMap();
-    when(m.synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(m).loadForBenchOfEtfCanada(any(), anyList());
-    // ACT
-    final List<DataProvider> providers = List.of(EAGLE);
-    final Map actual = m.loadForBenchOfEtfCanada(holdings, providers);
-
-    // VERIFY
-    assertSame(expected, actual);
-    verify(m).synchronizeAndLoadForMultipleHoldings(
-        eq(holdings), eq(providers), eq(repo), argThat(arg -> arg.apply(null, providers) == map), any(), eq(
-            CacheCategory.CANADA_ETF));
-  }
-
-  @Test
-  void loadForBenchOfEtfUs_resultList() {
-    // SETUP
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    final MultipleSMRepository fdsRepo = mock(MultipleSMRepository.class);
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(fdsRepo, null, null, null, null, null, null, repo, null, cacheS, null));
-
-    final FundSeriesHolding h = mock(FundSeriesHolding.class);
-
-    final List<FundSeriesHolding> holdings = List.of(h);
-
-    final Map<Object, Object> map = Map.of();
-    when(fdsRepo.queryBenchOfOfEtfUs(any(), anyList())).thenReturn(map);
-
-    final HashMap expected = new HashMap();
-    when(m.synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(m).loadForBenchOfEtfUs(any(), anyList());
-    // ACT
-    final List<DataProvider> providers = List.of(EAGLE);
-    final Map actual = m.loadForBenchOfEtfUs(holdings, providers);
-
-    // VERIFY
-    assertSame(expected, actual);
-    verify(m).synchronizeAndLoadForMultipleHoldings(
-        eq(holdings), eq(providers), eq(repo), argThat(arg -> arg.apply(null, providers) == map), any(), eq(
-            CacheCategory.US_ETF));
-  }
-
-  @Test
-  void loadForBenchOfBenchmarks_resultList() {
-    // SETUP
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    final MultipleSMRepository fdsRepo = mock(MultipleSMRepository.class);
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class,
-        withSettings().useConstructor(fdsRepo, null, null, null, null, repo, null, null, null, cacheS, null));
-
-    final BenchmarkIndexHolding h = mock(BenchmarkIndexHolding.class);
-    final List<BenchmarkIndexHolding> holdings = List.of(h);
-
-    final Map<Object, Object> map = Map.of();
-    when(fdsRepo.queryBenchOfBenchmarks(any(), anyList())).thenReturn(map);
-
-    final HashMap expected = new HashMap();
-    when(m.synchronizeAndLoadForMultipleHoldings(any(), any(), any(), any(), any(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(m).loadForBenchOfBenchmarks(any(), anyList());
-    // ACT
-    final List<DataProvider> providers = List.of(EAGLE);
-    final Map actual = m.loadForBenchOfBenchmarks(holdings, providers);
-
-    // VERIFY
-    assertSame(expected, actual);
-    verify(m).synchronizeAndLoadForMultipleHoldings(
-        eq(holdings), eq(providers), eq(repo), argThat(arg -> arg.apply(null, providers) == map), any(), eq(
-            CacheCategory.BENCHMARK_INDEXES));
-  }
+  // ---- queryCacheForEnteredDataProviders tests ----
 
   @Test
   void queryCacheForEnteredDataProviders_notExists() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    when(repo.findOneByHoldingIdAndProvider(any(), any())).thenReturn(Optional.empty());
+    when(cacheRepo.findOneByHoldingIdAndProvider(any(), any())).thenReturn(Optional.empty());
+    when(cacheRepo.findOneByHoldingIdAndProviders(any(), any())).thenReturn(Optional.empty());
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
+    final Holding h = newHolding();
 
     final List<DataProvider> eagle = List.of(EAGLE);
 
-    doCallRealMethod().when(m).queryCacheForEnteredDataProviders(any(), any(), any());
+    doCallRealMethod().when(m).queryCacheForEnteredDataProviders(any(), any());
     // ACT
-    final Optional actual = m.queryCacheForEnteredDataProviders(repo, eagle, h);
+    final Optional actual = m.queryCacheForEnteredDataProviders(eagle, h);
 
     // VERIFY
-    verify(repo).findOneByHoldingIdAndProviders(h.generateUserIdentifier(), buildIdBasedOnProviders(eagle));
+    verify(cacheRepo).findOneByHoldingIdAndProviders(h.generateUserIdentifier(), buildIdBasedOnProviders(eagle));
     assertEquals(Optional.empty(), actual);
   }
 
   @Test
   void queryCacheForEnteredDataProviders_exists() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
     final RedisId res = mock(RedisId.class);
-    when(repo.findOneByHoldingIdAndProviders(any(), any())).thenReturn(Optional.of(res));
+    when(cacheRepo.findOneByHoldingIdAndProviders(any(), any())).thenReturn(Optional.of(res));
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
+    final Holding h = newHolding();
 
     final List<DataProvider> eagle = List.of(EAGLE);
 
-    doCallRealMethod().when(m).queryCacheForEnteredDataProviders(any(), any(), any());
+    doCallRealMethod().when(m).queryCacheForEnteredDataProviders(any(), any());
     // ACT
-    final Optional actual = m.queryCacheForEnteredDataProviders(repo, eagle, h);
+    final Optional actual = m.queryCacheForEnteredDataProviders(eagle, h);
 
     // VERIFY
-    verify(repo).findOneByHoldingIdAndProviders(h.generateUserIdentifier(), buildIdBasedOnProviders(eagle));
-    verify(repo, times(0)).findOneByHoldingIdAndProvider(h.generateUserIdentifier(), eagle.get(0).name());
+    verify(cacheRepo).findOneByHoldingIdAndProviders(h.generateUserIdentifier(), buildIdBasedOnProviders(eagle));
+    verify(cacheRepo, times(0)).findOneByHoldingIdAndProvider(h.generateUserIdentifier(), eagle.get(0).name());
     assertEquals(Optional.of(res), actual);
   }
 
   @Test
-  void queryCacheForEnteredDataProviders_exists2() {
+  void queryCacheForEnteredDataProviders_fallbackToSingleProvider() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
     final RedisId res = mock(RedisId.class);
 
-    when(repo.findOneByHoldingIdAndProviders(any(), any())).thenReturn(Optional.empty());
-    when(repo.findOneByHoldingIdAndProvider(any(), any())).thenReturn(Optional.of(res));
+    when(cacheRepo.findOneByHoldingIdAndProviders(any(), any())).thenReturn(Optional.empty());
+    when(cacheRepo.findOneByHoldingIdAndProvider(any(), any())).thenReturn(Optional.of(res));
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("ID");
+    final Holding h = newHolding();
 
     final List<DataProvider> providers = List.of(EAGLE, MORNINGSTAR);
-    final String providersId = buildIdBasedOnProviders(providers);
 
-    doCallRealMethod().when(m).queryCacheForEnteredDataProviders(any(), any(), any());
+    doCallRealMethod().when(m).queryCacheForEnteredDataProviders(any(), any());
     // ACT
-    final Optional actual = m.queryCacheForEnteredDataProviders(repo, providers, h);
+    final Optional actual = m.queryCacheForEnteredDataProviders(providers, h);
 
     // VERIFY
-    verify(repo).findOneByHoldingIdAndProvider(h.generateUserIdentifier(), providers.get(0).name());
-    verify(repo, times(0)).findOneByHoldingIdAndProvider(h.generateUserIdentifier(), providers.get(1).name());
+    verify(cacheRepo).findOneByHoldingIdAndProvider(h.generateUserIdentifier(), providers.get(0).name());
+    verify(cacheRepo, times(0)).findOneByHoldingIdAndProvider(h.generateUserIdentifier(), providers.get(1).name());
     assertEquals(Optional.of(res), actual);
   }
+
+  // ---- pickUpProviderBasedOnPriority tests ----
 
   @Test
   void pickUpProviderBasedOnPriority_checkResult() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
 
     final RedisId res = mock(RedisId.class);
     when(res.getProvider()).thenReturn(EAGLE.name());
@@ -695,7 +358,7 @@ class MultipleCacheStorageAbstractTest {
   @Test
   void pickUpProviderBasedOnPriority_checkResult2() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
 
     final RedisId res2 = mock(RedisId.class);
     when(res2.getProvider()).thenReturn("");
@@ -708,82 +371,60 @@ class MultipleCacheStorageAbstractTest {
     assertEquals(Optional.of(res2), actual);
   }
 
+  // ---- queryCacheForHolding tests ----
+
   @Test
   void queryCacheForHolding_verifyQueryCacheForEnteredDataProviders() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
     final List<DataProvider> eagle = List.of(EAGLE);
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-    final Holding h = mock(Holding.class);
+    final Holding h = newHolding();
 
-    doCallRealMethod().when(m).queryCacheForHolding(any(), any(), any());
+    doCallRealMethod().when(m).queryCacheForHolding(any(), any());
     // ACT
-    m.queryCacheForHolding(h, eagle, repo);
+    m.queryCacheForHolding(h, eagle);
 
     // VERIFY
-    verify(m).queryCacheForEnteredDataProviders(repo, eagle, h);
-  }
-
-  @Test
-  void loadCachesForHoldings_checkResult() {
-    // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
-
-    final List<DataProvider> eagle = List.of(EAGLE);
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
-
-    final Holding h = mock(Holding.class);
-
-    when(m.queryCacheForHolding(any(), any(), any())).thenReturn(Optional.empty());
-
-    doCallRealMethod().when(m).loadCachesForHoldings(any(), any(), any());
-    // ACT
-    final Map map = m.loadCachesForHoldings(List.of(h), eagle, repo);
-
-    // VERIFY
-    assertEquals(Map.of(h, Optional.empty()), map);
+    verify(m).queryCacheForEnteredDataProviders(eagle, h);
   }
 
   @Test
   void queryCacheForHolding_verifyFindAllByHoldingIdEmpty() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
     final List<DataProvider> eagle = List.of();
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
+    final Holding h = newHolding();
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("SDF");
+    when(cacheRepo.findAllByHoldingId(any())).thenReturn(List.of());
 
-    when(repo.findAllByHoldingId(any())).thenReturn(List.of());
-
-    doCallRealMethod().when(m).queryCacheForHolding(any(), any(), any());
+    doCallRealMethod().when(m).queryCacheForHolding(any(), any());
     // ACT
-    final Optional actual = m.queryCacheForHolding(h, eagle, repo);
+    final Optional actual = m.queryCacheForHolding(h, eagle);
 
     // VERIFY
-    verify(repo).findAllByHoldingId(h.generateUserIdentifier());
+    verify(cacheRepo).findAllByHoldingId(h.generateUserIdentifier());
     assertEquals(Optional.empty(), actual);
   }
 
   @Test
   void queryCacheForHolding_verifyPickUpProviderBasedOnPriority() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
     final List<DataProvider> eagle = List.of();
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
+    final Holding h = newHolding();
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("SDF");
+    final List<RedisId> all = List.of(mock(RedisId.class));
+    when(cacheRepo.findAllByHoldingId(any())).thenReturn(all);
 
-    final List<Holding> all = List.of(mock(Holding.class));
-    when(repo.findAllByHoldingId(any())).thenReturn(all);
-
-    doCallRealMethod().when(m).queryCacheForHolding(any(), any(), any());
+    doCallRealMethod().when(m).queryCacheForHolding(any(), any());
     // ACT
-    final Optional actual = m.queryCacheForHolding(h, eagle, repo);
+    m.queryCacheForHolding(h, eagle);
 
     // VERIFY
     verify(m).pickUpProviderBasedOnPriority(all);
@@ -792,26 +433,187 @@ class MultipleCacheStorageAbstractTest {
   @Test
   void queryCacheForHolding_checkResult() {
     // SETUP
-    final MultipleCacheStorageAbstract m = mock(MultipleCacheStorageAbstract.class);
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
 
     final List<DataProvider> eagle = List.of();
-    final CoreRedisCacheRepository repo = mock(CoreRedisCacheRepository.class);
+    final Holding h = newHolding();
 
-    final Holding h = mock(Holding.class);
-    when(h.generateUserIdentifier()).thenReturn("SDF");
-
-    final List<Holding> all = List.of(mock(Holding.class));
-    when(repo.findAllByHoldingId(any())).thenReturn(all);
+    final List<RedisId> all = List.of(mock(RedisId.class));
+    when(cacheRepo.findAllByHoldingId(any())).thenReturn(all);
 
     final Optional<Object> expected = Optional.of(mock(Object.class));
     when(m.pickUpProviderBasedOnPriority(any())).thenReturn(expected);
 
-    doCallRealMethod().when(m).queryCacheForHolding(any(), any(), any());
+    doCallRealMethod().when(m).queryCacheForHolding(any(), any());
     // ACT
-    final Optional actual = m.queryCacheForHolding(h, eagle, repo);
+    final Optional actual = m.queryCacheForHolding(h, eagle);
 
     // VERIFY
     assertSame(expected, actual);
+  }
+
+  // ---- loadCachesForHoldings tests ----
+
+  @Test
+  void loadCachesForHoldings_checkResult() {
+    // SETUP
+    final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+
+    final List<DataProvider> eagle = List.of(EAGLE);
+    final Holding h = newHolding();
+
+    when(m.queryCacheForHolding(any(), any())).thenReturn(Optional.empty());
+
+    doCallRealMethod().when(m).loadCachesForHoldings(any(), any());
+    // ACT
+    final Map map = m.loadCachesForHoldings(List.of(h), eagle);
+
+    // VERIFY
+    assertEquals(Map.of(h, Optional.empty()), map);
+  }
+
+  // ---- convenience method tests ----
+
+  @Test
+  void loadBenchOfFundCanada_delegatesToSynchronizeAndLoad() {
+    // SETUP
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
+
+    final List<Holding> holdings = List.of(newHolding());
+    final List<DataProvider> providers = List.of(EAGLE);
+
+    final HashMap expected = new HashMap();
+    when(m.synchronizeAndLoad(any(), any(), any())).thenReturn(expected);
+
+    doCallRealMethod().when(m).loadBenchOfFundCanada(any(), any());
+    // ACT
+    final Map actual = m.loadBenchOfFundCanada(holdings, providers);
+
+    // VERIFY
+    assertSame(expected, actual);
+    verify(m).synchronizeAndLoad(eq(holdings), eq(providers), eq(CacheCategory.CANADA_MUTUAL_FUNDS));
+  }
+
+  @Test
+  void loadBenchOfFixedIncomes_delegatesToSynchronizeAndLoad() {
+    // SETUP
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
+
+    final List<Holding> holdings = List.of(newHolding());
+    final List<DataProvider> providers = List.of(EAGLE);
+
+    final HashMap expected = new HashMap();
+    when(m.synchronizeAndLoad(any(), any(), any())).thenReturn(expected);
+
+    doCallRealMethod().when(m).loadBenchOfFixedIncomes(any(), any());
+    // ACT
+    final Map actual = m.loadBenchOfFixedIncomes(holdings, providers);
+
+    // VERIFY
+    assertSame(expected, actual);
+    verify(m).synchronizeAndLoad(eq(holdings), eq(providers), eq(CacheCategory.FIXED_INCOME));
+  }
+
+  @Test
+  void loadBenchOfSeparatelyManagedAccounts_delegatesToSynchronizeAndLoad() {
+    // SETUP
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
+
+    final List<Holding> holdings = List.of(newHolding());
+    final List<DataProvider> providers = List.of(EAGLE);
+
+    final HashMap expected = new HashMap();
+    when(m.synchronizeAndLoad(any(), any(), any())).thenReturn(expected);
+
+    doCallRealMethod().when(m).loadBenchOfSeparatelyManagedAccounts(any(), any());
+    // ACT
+    final Map actual = m.loadBenchOfSeparatelyManagedAccounts(holdings, providers);
+
+    // VERIFY
+    assertSame(expected, actual);
+    verify(m).synchronizeAndLoad(eq(holdings), eq(providers), eq(CacheCategory.SEPARATELY_MANAGED_ACCOUNT));
+  }
+
+  @Test
+  void loadForBenchOfStock_delegatesToSynchronizeAndLoad() {
+    // SETUP
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
+
+    final List<Holding> holdings = List.of(newHolding());
+    final List<DataProvider> providers = List.of(EAGLE);
+
+    final HashMap expected = new HashMap();
+    when(m.synchronizeAndLoad(any(), any(), any())).thenReturn(expected);
+
+    doCallRealMethod().when(m).loadForBenchOfStock(any(), any());
+    // ACT
+    final Map actual = m.loadForBenchOfStock(holdings, providers);
+
+    // VERIFY
+    assertSame(expected, actual);
+    verify(m).synchronizeAndLoad(eq(holdings), eq(providers), eq(CacheCategory.STOCKS));
+  }
+
+  @Test
+  void loadForBenchOfEtfCanada_delegatesToSynchronizeAndLoad() {
+    // SETUP
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
+
+    final List<Holding> holdings = List.of(newHolding());
+    final List<DataProvider> providers = List.of(EAGLE);
+
+    final HashMap expected = new HashMap();
+    when(m.synchronizeAndLoad(any(), any(), any())).thenReturn(expected);
+
+    doCallRealMethod().when(m).loadForBenchOfEtfCanada(any(), any());
+    // ACT
+    final Map actual = m.loadForBenchOfEtfCanada(holdings, providers);
+
+    // VERIFY
+    assertSame(expected, actual);
+    verify(m).synchronizeAndLoad(eq(holdings), eq(providers), eq(CacheCategory.CANADA_ETF));
+  }
+
+  @Test
+  void loadForBenchOfEtfUs_delegatesToSynchronizeAndLoad() {
+    // SETUP
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
+
+    final List<Holding> holdings = List.of(newHolding());
+    final List<DataProvider> providers = List.of(EAGLE);
+
+    final HashMap expected = new HashMap();
+    when(m.synchronizeAndLoad(any(), any(), any())).thenReturn(expected);
+
+    doCallRealMethod().when(m).loadForBenchOfEtfUs(any(), any());
+    // ACT
+    final Map actual = m.loadForBenchOfEtfUs(holdings, providers);
+
+    // VERIFY
+    assertSame(expected, actual);
+    verify(m).synchronizeAndLoad(eq(holdings), eq(providers), eq(CacheCategory.US_ETF));
+  }
+
+  @Test
+  void loadForBenchOfBenchmarks_delegatesToSynchronizeAndLoad() {
+    // SETUP
+    final CacheStorageAbstract m = mock(CacheStorageAbstract.class);
+
+    final List<Holding> holdings = List.of(newHolding());
+    final List<DataProvider> providers = List.of(EAGLE);
+
+    final HashMap expected = new HashMap();
+    when(m.synchronizeAndLoad(any(), any(), any())).thenReturn(expected);
+
+    doCallRealMethod().when(m).loadForBenchOfBenchmarks(any(), any());
+    // ACT
+    final Map actual = m.loadForBenchOfBenchmarks(holdings, providers);
+
+    // VERIFY
+    assertSame(expected, actual);
+    verify(m).synchronizeAndLoad(eq(holdings), eq(providers), eq(CacheCategory.BENCHMARK_INDEXES));
   }
 
 }

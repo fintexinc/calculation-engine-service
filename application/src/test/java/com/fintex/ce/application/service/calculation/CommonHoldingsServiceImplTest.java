@@ -1,15 +1,15 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.CommonHoldingsCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.domain.model.CommonHoldingsDTO;
 import com.fintex.ce.domain.model.HoldingAggregator;
 import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.StockHolding;
-import com.fintex.ce.application.command.TopCommonHoldingsCommand;
-import com.fintex.ce.application.result.TopCommonHoldingsResult;
-import com.fintex.ce.application.result.commonholdings.TopCommonHoldingData;
-import com.fintex.ce.application.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.port.input.command.TopCommonHoldingsCommand;
+import com.fintex.ce.port.input.result.TopCommonHoldingsResult;
+import com.fintex.ce.port.input.result.commonholdings.TopCommonHoldingData;
+import com.fintex.ce.port.input.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class CommonHoldingsServiceImplTest {
   void perform_verifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -70,7 +70,7 @@ class CommonHoldingsServiceImplTest {
   void perform_verifyLoad() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -95,7 +95,7 @@ class CommonHoldingsServiceImplTest {
   void perform_verifyGetNumOfFundsMin() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -120,7 +120,7 @@ class CommonHoldingsServiceImplTest {
   void perform_verifyverifyGetAccumulativeTypes() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -146,7 +146,7 @@ class CommonHoldingsServiceImplTest {
   void perform_verifyCalculateCalculateTopCommonHoldings() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -179,7 +179,7 @@ class CommonHoldingsServiceImplTest {
   void perform_verifyCalculateFilterTop10Common() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -213,7 +213,7 @@ class CommonHoldingsServiceImplTest {
   void perform_verifytoFinalResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -248,7 +248,7 @@ class CommonHoldingsServiceImplTest {
   void perform_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -284,7 +284,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void toFinalResult_verifyMapToFinalResult() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -306,7 +306,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void toFinalResult_checkResult() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -328,7 +328,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void getNumOfFundsMin_checkResult() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -349,7 +349,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void getNumOfFundsMin_checkResult2() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -371,7 +371,7 @@ class CommonHoldingsServiceImplTest {
   void getAccumulativeTypes_checkResult() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulativeTypes));
 
@@ -391,7 +391,7 @@ class CommonHoldingsServiceImplTest {
   void getAccumulativeTypes_checkResult2() {
     // SETUP
     final var accumulativeTypes = Set.of();
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulativeTypes));
 
@@ -412,7 +412,7 @@ class CommonHoldingsServiceImplTest {
   void secondLevelLeaves_checkResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulateTypes));
 
@@ -432,7 +432,7 @@ class CommonHoldingsServiceImplTest {
   void secondLevelLeaves_checkResult2() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulateTypes));
 
@@ -455,7 +455,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void filterTop10Common_checkResult() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -478,7 +478,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void setParentAndCalculateWeight_verifyIsLeafStock() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -504,7 +504,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void setParentAndCalculateWeight_checkResult() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -532,7 +532,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void setParentAndCalculateWeight_checkResult2() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -563,7 +563,7 @@ class CommonHoldingsServiceImplTest {
   void calculateWeightWithinSameLeaves_verifyToUserScale() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -589,7 +589,7 @@ class CommonHoldingsServiceImplTest {
   @Test
   void calculateWeightWithinSameLeaves_checkResult() {
     // SETUP
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, defaultPeriods));
@@ -615,7 +615,7 @@ class CommonHoldingsServiceImplTest {
   void mapToFinalResult_verifyBuildDTO() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -646,7 +646,7 @@ class CommonHoldingsServiceImplTest {
   void mapToFinalResult_verifyCalculateWeightWithinSameLeaves() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -676,7 +676,7 @@ class CommonHoldingsServiceImplTest {
   void mapToFinalResult_checkResult() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -709,7 +709,7 @@ class CommonHoldingsServiceImplTest {
   void mapToFinalResult_checkResult2() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));
@@ -743,7 +743,7 @@ class CommonHoldingsServiceImplTest {
   void calculateTopCommonHoldings_verifyFirstLevelLeaves() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulativeTypes));
 
@@ -764,7 +764,7 @@ class CommonHoldingsServiceImplTest {
   void calculateTopCommonHoldings_verifySecondLevelLeaves() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulativeTypes));
 
@@ -787,7 +787,7 @@ class CommonHoldingsServiceImplTest {
   void firstLevelLeaves_verifySetParentAndCalculateWeight() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulateTypes));
@@ -814,7 +814,7 @@ class CommonHoldingsServiceImplTest {
   void firstLevelLeaves_checkResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulateTypes));
 
@@ -843,7 +843,7 @@ class CommonHoldingsServiceImplTest {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       // SETUP
       final var accumulateTypes = Set.of("FE");
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, accumulateTypes));
 
@@ -869,7 +869,7 @@ class CommonHoldingsServiceImplTest {
   void isLeafStock_checkResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulateTypes));
 
@@ -891,7 +891,7 @@ class CommonHoldingsServiceImplTest {
   void isLeafStock_checkResult2() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulateTypes));
 
@@ -913,7 +913,7 @@ class CommonHoldingsServiceImplTest {
   void getTopCommonHoldingsNumber_returnDefault10WhenGetNumOfTopCommonHoldingsIsNull() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulateTypes));
 
@@ -933,7 +933,7 @@ class CommonHoldingsServiceImplTest {
   void getTopCommonHoldingsNumber_returnProvidedNumberIfNotNull() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+    final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(cacheStorage, accumulateTypes));
 
@@ -953,7 +953,7 @@ class CommonHoldingsServiceImplTest {
   void perform_verifyGetTopCommonHoldingsNumber() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(CommonHoldingsCacheStorage.class);
+      final var cacheStorage = mock(HoldingDataLoader.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(cacheStorage, defaultPeriods));

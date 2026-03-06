@@ -4,7 +4,7 @@ import api.dto.RequestParamsSupplier;
 import api.excel.writer.SMDataWriter;
 import api.excel.writer.WritableSpreadsheet;
 import api.util.CommonTools;
-import com.fintex.ce.adapter.graphqlclient.repository.CountryExposureSMRepository;
+import com.fintex.ce.adapter.graphqlclient.repository.CountryExposureGraphqlDataFetcher;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.CountryExposure;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -24,11 +24,11 @@ import static java.util.stream.Collectors.toMap;
 public class FixedCountryExposureFDSTab extends SMDataWriter<Holding, String, BigDecimal>
     implements
       WritableSpreadsheet {
-  private static final CountryExposureSMRepository Fixed_Income_FDS = initFixedCountryFDS();
+  private static final CountryExposureGraphqlDataFetcher Fixed_Income_FDS = initFixedCountryFDS();
   private static final String TAB_NAME = "FICountryExposure_FDS";
 
-  private static CountryExposureSMRepository initFixedCountryFDS() {
-    return new CountryExposureSMRepository(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
+  private static CountryExposureGraphqlDataFetcher initFixedCountryFDS() {
+    return new CountryExposureGraphqlDataFetcher(CommonTools.GRAPHQL_TRANSPORT_COMPONENT);
   }
 
   @Override

@@ -5,7 +5,7 @@ import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.InformationRatioCalculationServiceImpl;
 import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.application.result.InformationRatioResult;
+import com.fintex.ce.port.input.result.InformationRatioResult;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.junit.jupiter.api.Test;
 

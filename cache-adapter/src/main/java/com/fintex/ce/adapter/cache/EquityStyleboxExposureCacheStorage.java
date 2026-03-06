@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.cache;
 
-import com.fintex.ce.adapter.cache.core.MultipleCacheStorageAbstract;
+import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.calculation.EquityStyleboxType;
@@ -10,7 +10,7 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.cache.entity.REquityStyleboxExposure;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.EquityStyleboxAllocationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -38,8 +38,7 @@ import static java.util.stream.Collectors.toMap;
 
 @Service
 public class EquityStyleboxExposureCacheStorage
-    extends
-      MultipleCacheStorageAbstract<EquityStyleboxExposure, EquityStyleboxExposure, EquityStyleboxExposure, EquityStyleboxExposure, REquityStyleboxExposure> {
+    extends CacheStorageAbstract<EquityStyleboxExposure, REquityStyleboxExposure, Map<Holding, Map<EquityStyleboxType, BigDecimal>>> {
 
   public static final Map<EquityStyleboxType, BigDecimal> DEFAULT_MAP;
 
@@ -49,20 +48,15 @@ public class EquityStyleboxExposureCacheStorage
   }
 
   public EquityStyleboxExposureCacheStorage(
-      MultipleSMRepository<EquityStyleboxExposure, EquityStyleboxExposure, EquityStyleboxExposure, EquityStyleboxExposure> smRepo,
+      SecurityDataPort<EquityStyleboxExposure> securityDataPort,
       CacheEntityMapper<EquityStyleboxExposure, REquityStyleboxExposure> mapper,
-      EquityStyleboxAllocationRepository fundCanadaCacheRepo,
-      EquityStyleboxAllocationRepository etfCanadaCacheRepo,
-      EquityStyleboxAllocationRepository etfUsCacheRepo,
+      EquityStyleboxAllocationRepository equityStyleboxAllocationRepository,
       CacheStatisticService cacheStatisticService) {
-    super(
-        smRepo, mapper, mapper, mapper, mapper,
-        fundCanadaCacheRepo, etfCanadaCacheRepo, etfUsCacheRepo,
-        null, cacheStatisticService, EQUITY_STYLEBOX_ALLOCATION);
+    super(securityDataPort, mapper, equityStyleboxAllocationRepository, cacheStatisticService, EQUITY_STYLEBOX_ALLOCATION);
   }
 
   @Override
-  public Map<Holding, Map<EquityStyleboxType, BigDecimal>> load(final List<Holding> holdings,
+  public Map<Holding, Map<EquityStyleboxType, BigDecimal>> load(final List<? extends Holding> holdings,
       final List<DataProvider> providers,
       final List<Warning> warnings, final ParamHolderDTO paramHolderDTO) {
 

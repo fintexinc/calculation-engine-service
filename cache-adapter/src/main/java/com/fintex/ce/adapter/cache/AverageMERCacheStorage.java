@@ -6,9 +6,10 @@ import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.cache.entity.averagemer.RAverageMer;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.port.output.graphql.MultipleSMRepository;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.averagemer.AverageMerRepository;
 import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -18,17 +19,15 @@ import static com.fintex.ce.constant.CacheNameEntity.MER;
 import static com.fintex.ce.util.validation.DataProviderRequestHandlingValidator.dataProviderCheckValidation;
 
 @Service
+@Qualifier("averageMer")
 public class AverageMERCacheStorage
-    extends
-      ManagementExpenseAbstractCacheStorage<AverageMer, AverageMer, AverageMer, AverageMer, RAverageMer> {
+    extends ManagementExpenseAbstractCacheStorage<AverageMer, RAverageMer> {
 
-  public AverageMERCacheStorage(final MultipleSMRepository<AverageMer, AverageMer, AverageMer, AverageMer> smRepo,
+  public AverageMERCacheStorage(final SecurityDataPort<AverageMer> securityDataPort,
       final CacheEntityMapper<AverageMer, RAverageMer> mapper,
-      final AverageMerRepository fundCanadaRepo,
-      final AverageMerRepository etfCanadaRepo,
-      final AverageMerRepository etfUsRepo,
+      final AverageMerRepository averageMerRepository,
       final CacheStatisticService cacheStatisticService) {
-    super(smRepo, mapper, mapper, mapper, null, fundCanadaRepo, etfCanadaRepo, etfUsRepo, cacheStatisticService, MER);
+    super(securityDataPort, mapper, averageMerRepository, cacheStatisticService, MER);
   }
 
   @Override

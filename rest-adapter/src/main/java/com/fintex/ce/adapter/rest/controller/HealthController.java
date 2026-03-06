@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.controller;
 
 import com.fintex.ce.adapter.jdbc.repository.FASUsageStatisticsRepo;
-import com.fintex.ce.adapter.cache.statistic.CacheWarmUpServiceImpl;
+import com.fintex.ce.port.output.cache.CacheWarmUpPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +14,13 @@ public class HealthController {
   private static final String HEALTHY_RESPONSE = "healthy";
   private static final String ERROR_RESPONSE = "error";
   private final FASUsageStatisticsRepo FASUsageStatisticsRepo;
-  private final CacheWarmUpServiceImpl cacheWarmUpService;
+  private final CacheWarmUpPort cacheWarmUpPort;
 
   @Autowired
   public HealthController(final FASUsageStatisticsRepo FASUsageStatisticsRepo,
-      final CacheWarmUpServiceImpl cacheWarmUpService) {
+      final CacheWarmUpPort cacheWarmUpPort) {
     this.FASUsageStatisticsRepo = FASUsageStatisticsRepo;
-    this.cacheWarmUpService = cacheWarmUpService;
+    this.cacheWarmUpPort = cacheWarmUpPort;
   }
 
   @GetMapping(value = "/liveness")
@@ -42,14 +42,14 @@ public class HealthController {
   public ResponseEntity<String> cacheWarmupHealthCheck() {
     try {
       FASUsageStatisticsRepo.isDbHealthy();
-      final CacheWarmUpServiceImpl.SchedulerRunInfoDto schedulerRunInfoDto = cacheWarmUpService
+      final CacheWarmUpPort.SchedulerRunInfo schedulerRunInfo = cacheWarmUpPort
           .cacheWarmUpSchedulerRunCheck();
-      if (!schedulerRunInfoDto.isRunInLast24Hours()) {
+      if (!schedulerRunInfo.runInLast24Hours()) {
         return new ResponseEntity<>(ERROR_RESPONSE + ", cache warm-up scheduler didn't run in past 24 hours",
             HttpStatus.INTERNAL_SERVER_ERROR);
       }
-      return new ResponseEntity<>(HEALTHY_RESPONSE + ", last time cache warm-up scheduler run: " + schedulerRunInfoDto
-          .getLastTimeRun(), HttpStatus.OK);
+      return new ResponseEntity<>(HEALTHY_RESPONSE + ", last time cache warm-up scheduler run: " + schedulerRunInfo
+          .lastTimeRun(), HttpStatus.OK);
     } catch (final Exception e) {
       return new ResponseEntity<>(ERROR_RESPONSE, HttpStatus.INTERNAL_SERVER_ERROR);
     }

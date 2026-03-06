@@ -1,12 +1,12 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.adapter.cache.CountryExposureCacheStorage;
+import com.fintex.ce.port.output.cache.HoldingDataLoader;
 import com.fintex.ce.application.mapper.response.CountryExposureResponseMapper;
 import com.fintex.ce.application.service.calculation.CountryExposureCalculationImpl;
 import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.application.result.CountryExposureResult;
+import com.fintex.ce.port.input.result.CountryExposureResult;
 import com.fintex.ce.util.PortfolioUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,7 +29,7 @@ class CountryExposureCalculationImplTest {
   void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(CountryExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var sut = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper));
@@ -49,7 +49,7 @@ class CountryExposureCalculationImplTest {
   void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(CountryExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var sut = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper));
@@ -74,7 +74,7 @@ class CountryExposureCalculationImplTest {
   @Test
   void getLoadFromCacheStorage_checkResult() {
     // SETUP
-    final var storage = mock(CountryExposureCacheStorage.class);
+    final var storage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(CountryExposureResponseMapper.class);
     final var sut = mock(CountryExposureCalculationImpl.class,
         withSettings().useConstructor(storage, responseMapper));
@@ -95,7 +95,7 @@ class CountryExposureCalculationImplTest {
   void calculate_verifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(CountryExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var sut = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper));
@@ -118,7 +118,7 @@ class CountryExposureCalculationImplTest {
   void calculate_verifyReScale() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(CountryExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var sut = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper));
@@ -144,7 +144,7 @@ class CountryExposureCalculationImplTest {
   void calculate_verifyResponseMapperFromNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var storage = mock(CountryExposureCacheStorage.class);
+      final var storage = mock(HoldingDataLoader.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var sut = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper));
