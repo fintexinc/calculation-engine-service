@@ -1,10 +1,9 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapper.response.CreditQualityResponseMapper;
-import com.fintex.ce.application.service.calculation.CreditQualityServiceImpl;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;

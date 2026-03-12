@@ -11,7 +11,7 @@ import com.fintex.ce.port.input.result.TopCommonHoldingsResult;
 import com.fintex.ce.port.input.result.commonholdings.TopCommonHoldingData;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.port.input.result.correlation.HoldingsKeyResult;
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.service.calculation.CalculationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

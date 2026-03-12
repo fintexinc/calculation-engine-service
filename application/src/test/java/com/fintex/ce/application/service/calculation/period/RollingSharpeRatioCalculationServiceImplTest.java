@@ -1,10 +1,9 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.calculation.RollingSharpeRatioCalculation;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.application.service.calculation.period.RollingSharpeRatioCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -34,7 +33,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   void perform_verifyDefineCalculationMethod() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsCacheStorage, defaultPeriods));
@@ -59,7 +58,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   void perform_verifyCalculate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsCacheStorage, defaultPeriods));
@@ -85,7 +84,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   void defineCalculationMethod_verifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsCacheStorage, defaultPeriods));
@@ -110,7 +109,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, mock(TBillsProvider.class), Set.of()));
+        .useConstructor(monthlyReturnsService, mock(TBillsPort.class), Set.of()));
 
     final TreeMap portfolioBaseTotalReturn = mock(TreeMap.class);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
@@ -131,7 +130,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, mock(TBillsProvider.class), Set.of()));
+        .useConstructor(monthlyReturnsService, mock(TBillsPort.class), Set.of()));
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
 
@@ -153,7 +152,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, mock(TBillsProvider.class), Set.of()));
+        .useConstructor(monthlyReturnsService, mock(TBillsPort.class), Set.of()));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
     final var holdings = mock(List.class);

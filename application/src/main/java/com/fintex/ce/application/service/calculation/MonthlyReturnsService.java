@@ -15,8 +15,8 @@ import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.model.MonthlyReturns;
-import com.fintex.ce.port.output.cache.FxRatesProvider;
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.FxRatesPort;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +30,11 @@ import java.util.NavigableMap;
 public class MonthlyReturnsService {
 
   private final HoldingDataLoader<Map<Holding, MonthlyReturns>> monthlyReturnsCachePort;
-  private final FxRatesProvider fxRatesProvider;
+  private final FxRatesPort fxRatesProvider;
   private final MonthlyReturnsGenerator monthlyReturnsGenerator;
 
   public MonthlyReturnsService(HoldingDataLoader<Map<Holding, MonthlyReturns>> monthlyReturnsCachePort,
-      FxRatesProvider fxRatesProvider,
+      FxRatesPort fxRatesProvider,
       MonthlyReturnsGenerator monthlyReturnsGenerator) {
     this.monthlyReturnsCachePort = monthlyReturnsCachePort;
     this.fxRatesProvider = fxRatesProvider;

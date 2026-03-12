@@ -10,7 +10,7 @@ import com.fintex.ce.port.input.command.AverageMerCommand;
 import com.fintex.ce.port.input.result.ManagementFeeResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

@@ -1,12 +1,11 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.response.FixedIncomeStyleboxExposureResponseMapper;
-import com.fintex.ce.application.service.calculation.FixedIncomeStyleboxExposureCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.calculation.FixedIncomeStyleboxType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.FixedIncomeStyleboxExposureResult;
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

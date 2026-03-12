@@ -4,6 +4,7 @@ import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.port.output.HoldingDataLoader;
 
 import java.math.BigDecimal;
 import java.util.List;

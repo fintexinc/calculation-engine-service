@@ -1,7 +1,6 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.cache.TBillsProvider;
-import com.fintex.ce.application.service.calculation.period.SharpeRatioCalculationServiceImpl;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.port.input.command.PeriodCommand;
@@ -18,7 +17,7 @@ class SharpeRatioCalculationServiceImplTest {
   @Test
   void defineCalculationMethod_verifyBuildCalculationDto() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsCacheStorage, null));
 
@@ -39,7 +38,7 @@ class SharpeRatioCalculationServiceImplTest {
   @Test
   void defineCalculationMethod_verifyLoadTBillsFor() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsCacheStorage, null));
 

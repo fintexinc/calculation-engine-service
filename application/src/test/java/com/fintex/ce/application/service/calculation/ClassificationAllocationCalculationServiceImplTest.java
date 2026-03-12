@@ -1,7 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
-import com.fintex.ce.application.service.calculation.ClassificationAllocationCalculationServiceImpl;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.domain.enumeration.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;

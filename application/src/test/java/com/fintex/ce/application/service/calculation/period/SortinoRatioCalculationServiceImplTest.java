@@ -1,9 +1,8 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.application.service.calculation.period.SortinoRatioCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.port.input.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -23,7 +22,7 @@ class SortinoRatioCalculationServiceImplTest {
   @Test
   void defineCalculationMethod_verifyBuildCalculationDto() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(SortinoRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsCacheStorage, Set.of()));
