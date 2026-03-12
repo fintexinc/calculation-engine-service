@@ -5,7 +5,7 @@ import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.port.input.command.PeriodCommand;
 import com.fintex.ce.port.input.result.AlphaResult;
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -23,11 +23,11 @@ import static com.fintex.ce.application.calculation.core.PeriodCalculationAbstra
 @Service
 public class AlphaCalculationServiceImpl extends PeriodBenchmarkAbstractService<AlphaResult, PeriodCommand> {
 
-  private final TBillsProvider tBillsProvider;
+  private final TBillsPort tBillsProvider;
 
   public AlphaCalculationServiceImpl(
       @Autowired final MonthlyReturnsService monthlyReturnsService,
-      @Autowired final TBillsProvider tBillsProvider,
+      @Autowired final TBillsPort tBillsProvider,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
     this.tBillsProvider = tBillsProvider;

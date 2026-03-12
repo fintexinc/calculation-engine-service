@@ -13,7 +13,7 @@ import com.fintex.ce.port.input.command.IncomeForecastCommand;
 import com.fintex.ce.port.input.result.IncomeForecastResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.IncomeForecast;
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.service.calculation.CalculationService;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;

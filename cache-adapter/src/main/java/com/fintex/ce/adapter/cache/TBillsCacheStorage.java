@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.cache;
 
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.smclient.service.CommonEndpointsComponent;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.adapter.cache.entity.RTBills;
@@ -18,7 +18,7 @@ import static com.fintex.ce.adapter.cache.config.CacheConfig.LOAD_TBILLS;
 
 @Slf4j
 @Service
-public class TBillsCacheStorage implements TBillsProvider {
+public class TBillsCacheStorage implements TBillsPort {
 
   private final CommonEndpointsComponent commonEndpointsComponent;
   private final TBillsRepository tBillsRepository;

@@ -1,8 +1,7 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.application.mapper.response.CountryExposureResponseMapper;
-import com.fintex.ce.application.service.calculation.CountryExposureCalculationImpl;
 import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;

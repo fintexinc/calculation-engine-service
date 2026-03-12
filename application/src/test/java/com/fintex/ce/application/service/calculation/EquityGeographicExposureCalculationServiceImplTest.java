@@ -1,7 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
-import com.fintex.ce.application.service.calculation.EquityGeographicExposureCalculationServiceImpl;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;

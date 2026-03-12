@@ -1,7 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
-import com.fintex.ce.application.service.calculation.FixedIncomeBondSectorCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.enumeration.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
@@ -10,7 +9,7 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.FixedIncomeSectorResult;
 import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import org.junit.jupiter.api.Test;

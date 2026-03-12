@@ -1,6 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.ParameterType;

@@ -1,9 +1,8 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.application.service.calculation.period.AlphaCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.port.input.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -24,7 +23,7 @@ class AlphaCalculationServiceImplTest {
   @Test
   void defineCalculationMethod_verifyBuildCalculationDto() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(AlphaCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsCacheStorage, null));
     final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
@@ -48,7 +47,7 @@ class AlphaCalculationServiceImplTest {
   @Test
   void defineCalculationMethod_verifyLoadTBillsFor() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(AlphaCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsCacheStorage, null));
     final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
@@ -73,7 +72,7 @@ class AlphaCalculationServiceImplTest {
   void defineCalculationMethod_verifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
-      final var tBillsCacheStorage = mock(TBillsProvider.class);
+      final var tBillsCacheStorage = mock(TBillsPort.class);
       final var sut = mock(AlphaCalculationServiceImpl.class, withSettings()
           .useConstructor(null, tBillsCacheStorage, null));
 

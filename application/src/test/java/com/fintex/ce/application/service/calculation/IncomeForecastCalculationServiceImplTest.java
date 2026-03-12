@@ -1,7 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
-import com.fintex.ce.application.service.calculation.IncomeForecastCalculationServiceImpl;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.domain.model.IncomeForecast;
 import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;

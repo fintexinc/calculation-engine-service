@@ -1,10 +1,9 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.application.service.calculation.period.TreynorRatioServiceImpl;
 import com.fintex.ce.port.input.command.PeriodCommand;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -33,7 +32,7 @@ class TreynorRatioServiceImplTest {
   void defineCalculationMethod_verifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsCacheStorage, Set.of()));
 
@@ -59,7 +58,7 @@ class TreynorRatioServiceImplTest {
   void defineCalculationMethod_verifyLoadTBillsFor() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsCacheStorage, Set.of()));
 
@@ -86,7 +85,7 @@ class TreynorRatioServiceImplTest {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
       final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-      final var tBillsCacheStorage = mock(TBillsProvider.class);
+      final var tBillsCacheStorage = mock(TBillsPort.class);
       final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
           .useConstructor(monthlyReturnsService, tBillsCacheStorage, Set.of()));
 

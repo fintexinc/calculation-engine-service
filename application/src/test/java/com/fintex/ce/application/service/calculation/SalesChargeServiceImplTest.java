@@ -1,8 +1,7 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.application.calculation.SalesChargeCalculation;
-import com.fintex.ce.application.service.calculation.SalesChargeServiceImpl;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.SalesChargeResult;
 import org.junit.jupiter.api.Test;

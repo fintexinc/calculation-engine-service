@@ -4,6 +4,7 @@ import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.port.output.HoldingDataLoader;
 
 import java.util.List;
 

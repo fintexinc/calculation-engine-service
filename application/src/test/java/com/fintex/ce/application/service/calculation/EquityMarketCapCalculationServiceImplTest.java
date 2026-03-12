@@ -5,7 +5,7 @@ import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.EquityMarketCapResult;
-import com.fintex.ce.port.output.cache.HoldingDataLoader;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.DecimalUtils;

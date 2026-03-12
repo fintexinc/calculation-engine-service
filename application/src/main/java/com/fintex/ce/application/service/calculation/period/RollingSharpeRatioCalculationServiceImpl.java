@@ -8,7 +8,7 @@ import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.port.input.command.RollingCalculationCommand;
 import com.fintex.ce.port.input.result.RollingSharpeRatioResult;
 import com.fintex.ce.port.input.result.SharpeRatioResult;
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -25,11 +25,11 @@ public class RollingSharpeRatioCalculationServiceImpl
     extends
       PeriodAbstractService<RollingSharpeRatioResult, RollingCalculationCommand> {
 
-  private final TBillsProvider tBillsProvider;
+  private final TBillsPort tBillsProvider;
 
   public RollingSharpeRatioCalculationServiceImpl(
       final MonthlyReturnsService monthlyReturnsService,
-      final TBillsProvider tBillsProvider,
+      final TBillsPort tBillsProvider,
       @Value("#{'${default.periods.rolling-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
     this.tBillsProvider = tBillsProvider;

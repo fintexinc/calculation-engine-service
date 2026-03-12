@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.DownsideDeviationCalculation;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.port.input.command.PeriodCommand;
 import com.fintex.ce.port.input.result.DownsideDeviationResult;
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -19,11 +19,11 @@ public class DownsideDeviationCalculationServiceImpl
     extends
       PeriodAbstractService<DownsideDeviationResult, PeriodCommand> {
 
-  private final TBillsProvider tBillsProvider;
+  private final TBillsPort tBillsProvider;
 
   public DownsideDeviationCalculationServiceImpl(
       @Autowired final MonthlyReturnsService monthlyReturnsService,
-      @Autowired final TBillsProvider tBillsProvider,
+      @Autowired final TBillsPort tBillsProvider,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
     this.tBillsProvider = tBillsProvider;

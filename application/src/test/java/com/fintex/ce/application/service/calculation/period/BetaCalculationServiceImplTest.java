@@ -1,9 +1,8 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.cache.TBillsProvider;
+import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.application.service.calculation.period.BetaCalculationServiceImpl;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.port.input.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -29,7 +28,7 @@ class BetaCalculationServiceImplTest {
   @Test
   void defineCalculationMethod_verifyBuildCalculationDto() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsCacheStorage, null));
 
     final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
@@ -53,7 +52,7 @@ class BetaCalculationServiceImplTest {
   @Test
   void defineCalculationMethod_verifyLoadTBillsFor() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsProvider.class);
+    final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(BetaCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsCacheStorage, null));
 
@@ -79,7 +78,7 @@ class BetaCalculationServiceImplTest {
   void defineCalculationMethod_verifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
-      final var tBillsCacheStorage = mock(TBillsProvider.class);
+      final var tBillsCacheStorage = mock(TBillsPort.class);
       final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsCacheStorage,
           null));
 
