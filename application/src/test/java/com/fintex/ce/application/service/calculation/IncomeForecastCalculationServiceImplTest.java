@@ -49,14 +49,14 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void testPerform() {
+  void shouldTestPerform_whenConditionIsMet() {
     IncomeForecastCommand reqDTO = new IncomeForecastCommand(); // Initialize with some mock data if needed
     when(incomeForecastCacheStorage.load(any(), any(), any(), any())).thenReturn(new HashMap<>());
     IncomeForecastResult response = sut.perform(reqDTO);
     assertNotNull(response);
   }
   @Test
-  void testCalculateIncome() {
+  void shouldTestCalculate_whenIncome() {
     BigDecimal dividendYield = new BigDecimal("0.05");
     List<String> dates = List.of("1-30", "3-15", "6-20", "10-12");
     BigDecimal amount = BigDecimal.TEN;
@@ -66,7 +66,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void testCalculateIncomeWithNoDividendDates() {
+  void shouldTestCalculate_whenIncomeWithNoDividendDates() {
     BigDecimal dividendYield = new BigDecimal("0.05");
     List<String> dates = List.of(); // Empty array
     BigDecimal amount = BigDecimal.TEN;
@@ -77,7 +77,7 @@ class IncomeForecastCalculationServiceImplTest {
 
 
   @Test
-  void performFundSeries_verify() {
+  void shouldPerformFundSeries_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final FundSeriesHolding fundSeriesHolding = Mockito.mock(FundSeriesHolding.class);
@@ -125,7 +125,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performFundSeries_verify2() {
+  void shouldPerformFundSeries_whenVerify2() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final FundSeriesHolding fundSeriesHolding = Mockito.mock(FundSeriesHolding.class);
@@ -171,7 +171,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performFixedIncome_verify() {
+  void shouldPerformFixedIncome_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final FixedIncomeHolding fixedIncomeHolding = Mockito.mock(FixedIncomeHolding.class);
@@ -221,7 +221,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performFixedIncomeAtMaturity_verify() {
+  void shouldPerformFixedIncomeAtMaturity_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final FixedIncomeHolding fixedIncomeHolding = Mockito.mock(FixedIncomeHolding.class);
@@ -257,7 +257,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performGic_verify() {
+  void shouldPerformGic_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
@@ -297,7 +297,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performGic_verify2() {
+  void shouldPerformGic_whenVerify2() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
@@ -331,7 +331,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performGic_verify3() {
+  void shouldPerformGic_whenVerify3() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
@@ -368,7 +368,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performGic_verify4() {
+  void shouldPerformGic_whenVerify4() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
@@ -405,7 +405,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performGic_verify5() {
+  void shouldPerformGic_whenVerify5() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
@@ -442,7 +442,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performGic_verify6() {
+  void shouldPerformGic_whenVerify6() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
@@ -479,7 +479,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performGic_verify7() {
+  void shouldPerformGic_whenVerify7() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
@@ -512,7 +512,7 @@ class IncomeForecastCalculationServiceImplTest {
   }
 
   @Test
-  void performGic_verify8() {
+  void shouldPerformGic_whenVerify8() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);

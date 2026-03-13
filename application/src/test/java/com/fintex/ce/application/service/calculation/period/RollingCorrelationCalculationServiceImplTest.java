@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 class RollingCorrelationCalculationServiceImplTest {
 
   @Test
-  void perform_verifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -51,7 +51,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -77,7 +77,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -98,7 +98,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyGetBaseTotalReturns() {
+  void shouldDefineCalculationMethod_whenVerifyGetBaseTotalReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -120,7 +120,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -144,7 +144,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetBenchmarkMonthlyReturns() {
+  void shouldBuildCalculationDto_whenVerifyGetBenchmarkMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -168,7 +168,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verify_portfolioMonthlyReturns_cutArgumentToTheSameEndDateWhenPedIsGreater() {
+  void shouldBuildCalculationDto_whenVerifyPortfolioMonthlyReturnsCutArgumentToTheSameEndDateWhenPedIsGreater() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -195,7 +195,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verify_benchmarkMonthlyReturns_cutArgumentToTheSameEndDateWhenPedIsGreater() {
+  void shouldBuildCalculationDto_whenVerifyBenchmarkMonthlyReturnsCutArgumentToTheSameEndDateWhenPedIsGreater() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -222,7 +222,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verify_portfolioMonthlyReturns_getWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildCalculationDto_whenVerifyPortfolioMonthlyReturnsGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -252,7 +252,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verify_benchmarkMonthlyReturns_getWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildCalculationDto_whenVerifyBenchmarkMonthlyReturnsGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -282,7 +282,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_checkResult() {
+  void shouldBuildCalculationDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -328,7 +328,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void getBaseTotalReturns_verifyGetPortfolioMonthlyReturns() {
+  void shouldGetBaseTotalReturns_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -353,7 +353,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void getBaseTotalReturns_verifyGetMonthlyReturns() {
+  void shouldGetBaseTotalReturns_whenVerifyGetMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -378,7 +378,7 @@ class RollingCorrelationCalculationServiceImplTest {
   }
 
   @Test
-  void getBaseTotalReturns_checkResult() {
+  void shouldGetBaseTotalReturns_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();

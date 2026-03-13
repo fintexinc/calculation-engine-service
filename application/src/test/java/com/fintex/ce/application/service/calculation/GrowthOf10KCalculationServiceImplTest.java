@@ -35,7 +35,7 @@ import static org.mockito.Mockito.withSettings;
 class GrowthOf10KCalculationServiceImplTest {
 
   @Test
-  void perform_verifyBuildWeightedAverageInputDto() {
+  void shouldPerform_whenVerifyBuildWeightedAverageInputDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
@@ -61,7 +61,7 @@ class GrowthOf10KCalculationServiceImplTest {
   }
 
   @Test
-  void growth10KCalculation_calculateCheckResult() {
+  void shouldGrowth10KCalculation_whenCalculateCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
@@ -94,7 +94,7 @@ class GrowthOf10KCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
@@ -125,7 +125,7 @@ class GrowthOf10KCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_checkResult() {
+  void shouldBuildWeightedAverageInputDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
@@ -157,7 +157,7 @@ class GrowthOf10KCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_checkResultWithWarnings() {
+  void shouldBuildWeightedAverageInputDto_whenCheckResultWithWarnings() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
@@ -191,7 +191,7 @@ class GrowthOf10KCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
@@ -220,7 +220,7 @@ class GrowthOf10KCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyMonthlyReturnsSetValidation() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyMonthlyReturnsSetValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
@@ -249,7 +249,7 @@ class GrowthOf10KCalculationServiceImplTest {
   }
 
   @Test
-  void buildGrowth10kCalculation_verifyConstructionGrowth10KCalculation() {
+  void shouldBuildGrowth10kCalculation_whenVerifyConstructionGrowth10KCalculation() {
     try (var mockedGrowth10KCalculation = Mockito.mockConstruction(Growth10KCalculation.class);
         var mockedCommonDates = Mockito.mockConstruction(CommonDates.class)) {
       // SETUP
@@ -273,7 +273,7 @@ class GrowthOf10KCalculationServiceImplTest {
   }
 
   @Test
-  void buildGrowth10kCalculation_verifyConstructionCommonDates() {
+  void shouldBuildGrowth10kCalculation_whenVerifyConstructionCommonDates() {
     try (var mockedCommonDates = Mockito.mockConstruction(CommonDates.class)) {
       // SETUP
       final var sut = mock(GrowthOf10KCalculationServiceImpl.class);

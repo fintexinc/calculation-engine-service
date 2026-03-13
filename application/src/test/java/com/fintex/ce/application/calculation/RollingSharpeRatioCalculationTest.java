@@ -45,8 +45,7 @@ class RollingSharpeRatioCalculationTest {
   }
 
   @Test
-  void calculateRollingValue_checkResult() {
-    // SETUP
+  void shouldReturnSharpeRatioValue_whenCalculatingRollingValue() {
     final var calculationDTO = mock(CalculationDTO.class);
     final var sharpeRatioCalculation = mock(SharpeRatioCalculation.class);
     final var sut = mock(RollingSharpeRatioCalculation.class, withSettings().useConstructor(calculationDTO, Set.of(),
@@ -56,30 +55,24 @@ class RollingSharpeRatioCalculationTest {
     when(sharpeRatioCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculateRollingValue(numberOfMonths, portfolioReturns);
-    // ACT
     final BigDecimal actual = sut.calculateRollingValue(numberOfMonths, portfolioReturns);
 
-    // VERIFY
     Assertions.assertEquals(TEN, actual);
   }
 
   @Test
-  void defineResponseType_verifyGetRollingIntervalResultS() {
-    // SETUP
+  void shouldDelegateToRollingIntervalResults_whenDefiningResponseType() {
     final var sut = mock(RollingSharpeRatioCalculation.class);
     final var result = Set.of(Pair.of("12", portfolioReturns));
 
     doCallRealMethod().when(sut).defineResponseType(result);
-    // ACT
     sut.defineResponseType(result);
 
-    // VERIFY
     verify(sut).getRollingIntervalResults(result);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldMapRollingSharpeRatioResult_whenDefiningResponseType() {
     final var sut = mock(RollingSharpeRatioCalculation.class);
     final var result = Set.of(Pair.of("12", portfolioReturns));
 
@@ -91,10 +84,8 @@ class RollingSharpeRatioCalculationTest {
     when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(resDTO));
 
     doCallRealMethod().when(sut).defineResponseType(result);
-    // ACT
     final RollingSharpeRatioResult actual = sut.defineResponseType(result);
 
-    // VERIFY
     Assertions.assertEquals(expected.getRollingSharpeRatio(), actual.getRollingSharpeRatio());
   }
 

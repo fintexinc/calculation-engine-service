@@ -23,7 +23,7 @@ import static org.mockito.Mockito.withSettings;
 class TrackingErrorCalculationServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(TrackingErrorCalculationServiceImpl.class, withSettings()

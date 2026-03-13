@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class CountryAllocationMappingServiceImplTest {
 
   @Test
-  void initCountryAllocationMapping_checkResult() {
+  void shouldInitCountryAllocationMapping_whenCheckResult() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -42,7 +42,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void initCountryAllocationMapping_verifyGetCountryAllocationInputStream() {
+  void shouldInitCountryAllocationMapping_whenVerifyGetCountryAllocationInputStream() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -58,7 +58,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void initCountryAllocationMapping_verifyException() {
+  void shouldInitCountryAllocationMapping_whenVerifyException() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -70,7 +70,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void sumAllocations_checkResult() {
+  void shouldSumAllocations_whenCheckResult() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -88,7 +88,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToRegions_verifyAllocationEmpty() {
+  void shouldMapToRegions_whenVerifyAllocationEmpty() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -108,7 +108,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToRegions_verifyGetAllocationNotFound() {
+  void shouldMapToRegions_whenVerifyGetAllocationNotFound() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -128,7 +128,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToRegions_verifyGetRegionIsNull() {
+  void shouldMapToRegions_whenVerifyGetRegionIsNull() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -149,7 +149,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToRegions_checkResult() {
+  void shouldMapToRegions_whenCheckResult() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -170,7 +170,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToCountryRegions_verifyMapToRegions() {
+  void shouldMapToCountryRegions_whenVerifyMapToRegions() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 
@@ -188,7 +188,7 @@ class CountryAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToCountryRegions_checkResult() {
+  void shouldMapToCountryRegions_whenCheckResult() {
     // SETUP
     final var sut = mock(CountryAllocationMappingServiceImpl.class);
 

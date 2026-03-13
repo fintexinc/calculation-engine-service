@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class RollingStandardDeviationCalculationServiceImplTest {
 
   @Test
-  void perform_verifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -46,7 +46,7 @@ class RollingStandardDeviationCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -71,7 +71,7 @@ class RollingStandardDeviationCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -92,7 +92,7 @@ class RollingStandardDeviationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_checkResult() {
+  void shouldBuildCalculationDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -114,7 +114,7 @@ class RollingStandardDeviationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -136,7 +136,7 @@ class RollingStandardDeviationCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();

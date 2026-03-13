@@ -43,7 +43,7 @@ import static org.mockito.Mockito.withSettings;
 class CommonHoldingsServiceImplTest {
 
   @Test
-  void perform_verifyCalculateInitialPortfolioWeight() {
+  void shouldPerform_whenVerifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -67,7 +67,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void perform_verifyLoad() {
+  void shouldPerform_whenVerifyLoad() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -92,7 +92,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetNumOfFundsMin() {
+  void shouldPerform_whenVerifyGetNumOfFundsMin() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -117,7 +117,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void perform_verifyverifyGetAccumulativeTypes() {
+  void shouldPerform_whenVerifyverifyGetAccumulativeTypes() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -143,7 +143,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculateCalculateTopCommonHoldings() {
+  void shouldPerform_whenVerifyCalculateCalculateTopCommonHoldings() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -176,7 +176,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculateFilterTop10Common() {
+  void shouldPerform_whenVerifyCalculateFilterTop10Common() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -210,7 +210,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void perform_verifytoFinalResult() {
+  void shouldPerform_whenVerifytoFinalResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -245,7 +245,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void perform_checkResult() {
+  void shouldPerform_whenCheckResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -282,7 +282,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void toFinalResult_verifyMapToFinalResult() {
+  void shouldToFinalResult_whenVerifyMapToFinalResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -304,7 +304,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void toFinalResult_checkResult() {
+  void shouldToFinalResult_whenCheckResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -326,7 +326,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void getNumOfFundsMin_checkResult() {
+  void shouldGetNumOfFundsMin_whenCheckResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -347,7 +347,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void getNumOfFundsMin_checkResult2() {
+  void shouldGetNumOfFundsMin_whenCheckResult2() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -368,7 +368,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void getAccumulativeTypes_checkResult() {
+  void shouldGetAccumulativeTypes_whenCheckResult() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -388,7 +388,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void getAccumulativeTypes_checkResult2() {
+  void shouldGetAccumulativeTypes_whenCheckResult2() {
     // SETUP
     final var accumulativeTypes = Set.of();
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -409,7 +409,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void secondLevelLeaves_checkResult() {
+  void shouldSecondLevelLeaves_whenCheckResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -429,7 +429,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void secondLevelLeaves_checkResult2() {
+  void shouldSecondLevelLeaves_whenCheckResult2() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -453,7 +453,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void filterTop10Common_checkResult() {
+  void shouldFilterTop10Common_whenCheckResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -476,7 +476,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void setParentAndCalculateWeight_verifyIsLeafStock() {
+  void shouldSetParentAndCalculateWeight_whenVerifyIsLeafStock() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -502,7 +502,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void setParentAndCalculateWeight_checkResult() {
+  void shouldSetParentAndCalculateWeight_whenCheckResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -530,7 +530,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void setParentAndCalculateWeight_checkResult2() {
+  void shouldSetParentAndCalculateWeight_whenCheckResult2() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -560,7 +560,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void calculateWeightWithinSameLeaves_verifyToUserScale() {
+  void shouldCalculateWeightWithinSameLeaves_whenVerifyToUserScale() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -587,7 +587,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void calculateWeightWithinSameLeaves_checkResult() {
+  void shouldCalculateWeightWithinSameLeaves_whenCheckResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var defaultPeriods = Set.of();
@@ -612,7 +612,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void mapToFinalResult_verifyBuildDTO() {
+  void shouldMapToFinalResult_whenVerifyBuildDTO() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -643,7 +643,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void mapToFinalResult_verifyCalculateWeightWithinSameLeaves() {
+  void shouldMapToFinalResult_whenVerifyCalculateWeightWithinSameLeaves() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -673,7 +673,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void mapToFinalResult_checkResult() {
+  void shouldMapToFinalResult_whenCheckResult() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -706,7 +706,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void mapToFinalResult_checkResult2() {
+  void shouldMapToFinalResult_whenCheckResult2() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -740,7 +740,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void calculateTopCommonHoldings_verifyFirstLevelLeaves() {
+  void shouldCalculateTopCommonHoldings_whenVerifyFirstLevelLeaves() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -761,7 +761,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void calculateTopCommonHoldings_verifySecondLevelLeaves() {
+  void shouldCalculateTopCommonHoldings_whenVerifySecondLevelLeaves() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -784,7 +784,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void firstLevelLeaves_verifySetParentAndCalculateWeight() {
+  void shouldFirstLevelLeaves_whenVerifySetParentAndCalculateWeight() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -811,7 +811,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void firstLevelLeaves_checkResult() {
+  void shouldFirstLevelLeaves_whenCheckResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -839,7 +839,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void setParentAndCalculateWeightSecondLvlLeaf_checkResult() {
+  void shouldSetParentAndCalculateWeightSecondLvlLeaf_whenCheckResult() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       // SETUP
       final var accumulateTypes = Set.of("FE");
@@ -866,7 +866,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void isLeafStock_checkResult() {
+  void shouldIsLeafStock_whenCheckResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -888,7 +888,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void isLeafStock_checkResult2() {
+  void shouldIsLeafStock_whenCheckResult2() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -910,7 +910,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void getTopCommonHoldingsNumber_returnDefault10WhenGetNumOfTopCommonHoldingsIsNull() {
+  void shouldGetTopCommonHoldingsNumber_whenReturnDefault10WhenGetNumOfTopCommonHoldingsIsNull() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -930,7 +930,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void getTopCommonHoldingsNumber_returnProvidedNumberIfNotNull() {
+  void shouldGetTopCommonHoldingsNumber_whenReturnProvidedNumberIfNotNull() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var cacheStorage = mock(HoldingDataLoader.class);
@@ -950,7 +950,7 @@ class CommonHoldingsServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetTopCommonHoldingsNumber() {
+  void shouldPerform_whenVerifyGetTopCommonHoldingsNumber() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);

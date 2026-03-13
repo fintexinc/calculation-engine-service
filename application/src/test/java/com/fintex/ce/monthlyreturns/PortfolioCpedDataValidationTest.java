@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PortfolioCpedDataValidationTest {
 
   @Test
-  void getCpedIsAfterPedExceptionCode_checkResult() {
+  void shouldGetCpedIsAfterPedExceptionCode_whenCheckResult() {
     // SETUP
     final PortfolioCpedDataValidation sut = new PortfolioCpedDataValidation();
 
@@ -23,7 +23,7 @@ class PortfolioCpedDataValidationTest {
   }
 
   @Test
-  void getCpedIsBeforePsdExceptionCode_checkResult() {
+  void shouldGetCpedIsBeforePsdExceptionCode_whenCheckResult() {
     // SETUP
     final PortfolioCpedDataValidation sut = new PortfolioCpedDataValidation();
 

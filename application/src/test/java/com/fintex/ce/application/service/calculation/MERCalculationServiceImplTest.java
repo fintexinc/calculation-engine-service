@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 class MERCalculationServiceImplTest {
 
   @Test
-  void perform_checkResult() {
+  void shouldPerform_whenCheckResult() {
     // SETUP
     final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
@@ -53,7 +53,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyLoad() {
+  void shouldPerform_whenVerifyLoad() {
     // SETUP
     final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
@@ -77,7 +77,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyResDTOSetWarnings() {
+  void shouldPerform_whenVerifyResDTOSetWarnings() {
     // SETUP
     final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
@@ -99,7 +99,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifySetInitialFeeAndModifiedFeeValues() {
+  void shouldPerform_whenVerifySetInitialFeeAndModifiedFeeValues() {
     // SETUP
     final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
@@ -122,7 +122,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetResultAndSetNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds() {
+  void shouldPerform_whenVerifyGetResultAndSetNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds() {
     // SETUP
     final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
@@ -146,7 +146,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculateAverageMER() {
+  void shouldPerform_whenVerifyCalculateAverageMER() {
     // SETUP
     final var averageMERCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
@@ -168,7 +168,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetSpecifiedIfEmpty() {
+  void shouldPerform_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var averageMERCacheStorage = mock(HoldingDataLoader.class);
@@ -192,7 +192,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetSpecifiedIfEmptyDEFAULT_DATAPROVIDERS() {
+  void shouldPerform_whenVerifyGetSpecifiedIfEmptyDEFAULTDATAPROVIDERS() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var averageMERCacheStorage = mock(HoldingDataLoader.class);
@@ -217,7 +217,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setInitialFeeAndModifiedFeeValues_callsSetForCanadaEtfAndCanadaMutualFunds_WithCanadaEtfType() {
+  void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForCanadaEtfAndCanadaMutualFundsWithCanadaEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -234,7 +234,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setInitialFeeAndModifiedFeeValues_callsSetForCanadaEtfAndCanadaMutualFunds_WithUsEtfType() {
+  void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForCanadaEtfAndCanadaMutualFundsWithUsEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -251,7 +251,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setInitialFeeAndModifiedFeeValues_callsSetForUsEtfType() {
+  void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForUsEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -268,7 +268,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setInitialFeeAndModifiedFeeValues_checkResult() {
+  void shouldSetInitialFeeAndModifiedFeeValues_whenCheckResult() {
     // SETUP
     final MERCalculationServiceImpl m = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -297,7 +297,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setForCanadaEtfAndCanadaMutualFundTypes_callsFillFeeValues_withManagementExpenseRation() {
+  void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenCallsFillFeeValuesWithManagementExpenseRation() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -319,7 +319,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setForCanadaEtfAndCanadaMutualFundTypes_throwsException() {
+  void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenThrowsException() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -337,7 +337,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setForUsEtfType_throwsException() {
+  void shouldSetForUsEtfType_whenThrowsException() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -356,7 +356,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setForCanadaEtfAndCanadaMutualFundTypes_merIsPresent() {
+  void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenMerIsPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -376,7 +376,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setForCanadaEtfAndCanadaMutualFundTypes_merIsNotPresent() {
+  void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenMerIsNotPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -399,7 +399,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setForUsEtfType_netIsPresent() {
+  void shouldSetForUsEtfType_whenNetIsPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -418,7 +418,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setForUsEtfType_netIsNotPresent() {
+  void shouldSetForUsEtfType_whenNetIsNotPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -439,7 +439,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void setForCanadaEtfAndCanadaMutualFundTypes_callsFillFeeValues_withActualManagementFee() {
+  void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenCallsFillFeeValuesWithActualManagementFee() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -458,7 +458,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageMER_verifyGetScaledAverageMer() {
+  void shouldCalculateAverageMER_whenVerifyGetScaledAverageMer() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -477,7 +477,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageMER_verifyGetAbsoluteAverageMer() {
+  void shouldCalculateAverageMER_whenVerifyGetAbsoluteAverageMer() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
 
@@ -495,7 +495,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageMER_verifyGetForceReportFeeAverageMer() {
+  void shouldCalculateAverageMER_whenVerifyGetForceReportFeeAverageMer() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
 
@@ -513,7 +513,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageMER_checkResult1() {
+  void shouldCalculateAverageMER_whenCheckResult1() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
 
@@ -540,7 +540,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageMER_checkResult2() {
+  void shouldCalculateAverageMER_whenCheckResult2() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
 
@@ -565,7 +565,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageMER_checkResult3() {
+  void shouldCalculateAverageMER_whenCheckResult3() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
 
@@ -588,7 +588,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void handleFeesForUsEtf_verifySetFeeValues() {
+  void shouldHandleFeesForUsEtf_whenVerifySetFeeValues() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -610,7 +610,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void handleFeesForUsEtf_checkResult() {
+  void shouldHandleFeesForUsEtf_whenCheckResult() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
@@ -632,7 +632,7 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void handleFeesForCanadaMutualHedgeFundsAndEtf_returnsTwoWarningsInCaseOfAbsentDataForCanadaHedgeFund() {
+  void shouldHandleFeesForCanadaMutualHedgeFundsAndEtf_whenReturnsTwoWarningsInCaseOfAbsentDataForCanadaHedgeFund() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 class CpedDataValidationTest {
 
   @Test
-  void validate_verifyValidateCpedIsAfterPed() {
+  void shouldValidate_whenVerifyValidateCpedIsAfterPed() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
     var notification = new Notification();
@@ -38,7 +38,7 @@ class CpedDataValidationTest {
   }
 
   @Test
-  void validate_verifyValidateCpedIsBeforePsd() {
+  void shouldValidate_whenVerifyValidateCpedIsBeforePsd() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
     var notification = new Notification();
@@ -56,7 +56,7 @@ class CpedDataValidationTest {
   }
 
   @Test
-  void validateCpedIsBeforePsd_cpedIsNulLThenNothingShouldHappen() {
+  void shouldValidateCpedIsBeforePsd_whenCpedIsNulLThenNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
     var notification = new Notification();
@@ -74,7 +74,7 @@ class CpedDataValidationTest {
   }
 
   @Test
-  void validateCpedIsBeforePsd_cpedIsAfterPsdNothingShouldHappen() {
+  void shouldValidateCpedIsBeforePsd_whenCpedIsAfterPsdNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
     var notification = new Notification();
@@ -94,7 +94,7 @@ class CpedDataValidationTest {
   }
 
   @Test
-  void validateCpedIsBeforePsd_cpedIsBeforePsdErrorShouldBeThrown() {
+  void shouldValidateCpedIsBeforePsd_whenCpedIsBeforePsdErrorShouldBeThrown() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
     var notification = new Notification();
@@ -114,7 +114,7 @@ class CpedDataValidationTest {
   }
 
   @Test
-  void validateCpedIsAfterPed_cpedIsNulLThenNothingShouldHappen() {
+  void shouldValidateCpedIsAfterPed_whenCpedIsNulLThenNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
     final Notification notification = new Notification();
@@ -132,7 +132,7 @@ class CpedDataValidationTest {
   }
 
   @Test
-  void validateCpedIsAfterPed_cpedIsBeforePedNothingShouldHappen() {
+  void shouldValidateCpedIsAfterPed_whenCpedIsBeforePedNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
     final Notification notification = new Notification();
@@ -152,7 +152,7 @@ class CpedDataValidationTest {
   }
 
   @Test
-  void validateCpedIsAfterPed_cpedIsAfterPedErrorShouldBeThrown() {
+  void shouldValidateCpedIsAfterPed_whenCpedIsAfterPedErrorShouldBeThrown() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
     final Notification notification = new Notification();

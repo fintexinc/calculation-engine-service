@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -23,10 +22,8 @@ import static org.mockito.Mockito.when;
 class MeanCalculationTest {
 
   @Test
-  void getPeriodStartDateWithOneMonthOffset_verifyGetPeriodStartDate() {
+  void shouldCalculateAverageForPeriod_whenReturnsContainEnoughData() {
     try (var util = Mockito.mockStatic(CalculationUtils.class)) {
-      // SETUP
-      final var growth10K = mock(TreeMap.class);
       final var sut = mock(MeanCalculation.class);
       final var returns = mock(NavigableMap.class);
       final var periodStartDate = mock(LocalDate.class);
@@ -44,18 +41,14 @@ class MeanCalculationTest {
       util.when(() -> CalculationUtils.average(Mockito.any())).thenReturn(BigDecimal.ONE);
       doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
 
-      // ACT
       final BigDecimal result = sut.calculatePeriodForNumberOfMonths(numberOfMonths);
 
-      // VERIFY
-      Assertions.assertNotNull(result);
       Assertions.assertEquals(BigDecimal.ONE, result);
     }
   }
 
   @Test
-  void defineResponseType() {
-    // SETUP
+  void shouldMapIntervalsToMeanResult_whenDefineResponseTypeIsCalled() {
     final MeanCalculation<MeanResult> sut = mock(MeanCalculation.class);
     final var results = mock(Set.class);
     final var timeIntervals = mock(Set.class);
@@ -64,11 +57,8 @@ class MeanCalculationTest {
 
     doCallRealMethod().when(sut).defineResponseType(any());
 
-    // ACT
     final MeanResult result = sut.defineResponseType(results);
 
-    // VERIFY
-    Assertions.assertNotNull(result);
     Assertions.assertEquals(timeIntervals, result.getMean());
 
   }

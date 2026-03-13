@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 class WeightedAverageInputDtoTest {
 
   @Test
-  void makeCopy_checkResult() {
+  void shouldMakeCopy_whenCheckResult() {
     // SETUP
     final var expected = new WeightedAverageInputDTO();
     final var fxRates = Map.of(LocalDate.MIN, mock(FxRates.FxRate.class));

@@ -17,24 +17,20 @@ import static org.mockito.Mockito.*;
 class RSquaredCalculationTest {
 
   @Test
-  void defineResponseType_verifyFormTimeIntervalResult() {
-    // SETUP
+  void shouldDefineResponseType_whenVerifyFormTimeIntervalResult() {
     final RSquaredCalculation alpha = mock(RSquaredCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
 
     doCallRealMethod().when(alpha).defineResponseType(anySet());
-    // ACT
     alpha.defineResponseType(pairs);
 
-    // VERIFY
     verify(alpha).formTimeIntervalResult(pairs);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldDefineResponseType_whenCheckResult() {
     final RSquaredCalculation rSquaredCalculation = mock(RSquaredCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2020-01-05", BigDecimal.ONE), Pair.of("2000-01-12",
@@ -46,10 +42,8 @@ class RSquaredCalculationTest {
     when(rSquaredCalculation.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(rSquaredCalculation).defineResponseType(anySet());
-    // ACT
     final RSquaredResult actual = rSquaredCalculation.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, actual.getRSquared());
   }
 

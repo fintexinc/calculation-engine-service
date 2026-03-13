@@ -30,8 +30,7 @@ class AlphaBetaCalculationAbstractTest {
   final int TWELVE = 12;
 
   @Test
-  void calculatePeriodForNumberOfMonths_numberOfMonthGreaterThanPortfolioExcessReturnsResultNull() {
-    // SETUP
+  void shouldReturnNull_whenPeriodExceedsPortfolioExcessReturnsSize() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var portfolioExcessReturns = mock(TreeMap.class);
@@ -49,16 +48,13 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.calculateBeta(any(), any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(100);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_numberOfMonthGreaterThanBenchmarkExcessReturnsResultNull() {
-    // SETUP
+  void shouldReturnNull_whenPeriodExceedsBenchmarkExcessReturnsSize() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var portfolioExcessReturns = mock(TreeMap.class);
@@ -76,16 +72,13 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.calculateBeta(any(), any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(100);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldResolvePeriodStartDate_whenCalculatingPeriod() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -98,16 +91,13 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut).getPeriodStartDate(12, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetSubMapByPeriodStartDate() {
-    // SETUP
+  void shouldGetExcessReturnSubMaps_whenCalculatingPeriod() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var periodStartDate = LocalDate.now();
@@ -124,16 +114,13 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut, times(2)).getSubMapByPeriodStartDate(periodStartDate, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateBeta() {
-    // SETUP
+  void shouldCalculateBeta_whenCalculatingPeriod() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -147,16 +134,13 @@ class AlphaBetaCalculationAbstractTest {
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
     doCallRealMethod().when(sut).calculatePeriod(any(), any(), any());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut).calculateBeta(eq(treeMap), eq(treeMap), any(), any());
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldReturnCalculatedBeta_whenInputDataIsValid() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -171,16 +155,13 @@ class AlphaBetaCalculationAbstractTest {
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
     doCallRealMethod().when(sut).calculatePeriod(any(), any(), any());
-    // ACT
     final BigDecimal result = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     assertEquals(TEN, result);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenBenchmarkTotalReturnsSizeLessThenPeriod() {
-    // SETUP
+  void shouldReturnNull_whenBenchmarkReturnsSizeIsLessThanPeriod() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
 
@@ -191,16 +172,13 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.calculateBeta(any(), any(), any(), any())).thenReturn(BigDecimal.TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal result = sut.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     assertNull(result);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenPeriodIsLessThanTwelve() {
-    // SETUP
+  void shouldReturnNull_whenPeriodIsLessThanTwelve() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -213,16 +191,13 @@ class AlphaBetaCalculationAbstractTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal result = sut.calculatePeriodForNumberOfMonths(6);
 
-    // VERIFY
     assertNull(result);
   }
 
   @Test
-  void calculateBeta_verifyCalculateNumerator() {
-    // SETUP
+  void shouldUseNumerator_whenCalculatingBeta() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var bigDecimal = mock(BigDecimal.class);
@@ -231,16 +206,13 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.calculateDenominator(any(), any())).thenReturn(ONE);
 
     doCallRealMethod().when(sut).calculateBeta(any(), any(), any(), any());
-    // ACT
     sut.calculateBeta(treeMap, treeMap, bigDecimal, bigDecimal);
 
-    // VERIFY
     verify(sut).calculateNumerator(treeMap, treeMap, bigDecimal, bigDecimal);
   }
 
   @Test
-  void calculateBeta_verifyCalculateDenominator() {
-    // SETUP
+  void shouldUseDenominator_whenCalculatingBeta() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var bigDecimal = mock(BigDecimal.class);
@@ -249,16 +221,13 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.calculateDenominator(any(), any())).thenReturn(ONE);
 
     doCallRealMethod().when(sut).calculateBeta(any(), any(), any(), any());
-    // ACT
     sut.calculateBeta(treeMap, treeMap, bigDecimal, bigDecimal);
 
-    // VERIFY
     verify(sut).calculateDenominator(treeMap, bigDecimal);
   }
 
   @Test
-  void calculateBeta_checkResult() {
-    // SETUP
+  void shouldReturnBetaValue_whenNumeratorAndDenominatorProvided() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var bigDecimal = mock(BigDecimal.class);
@@ -267,16 +236,13 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.calculateDenominator(any(), any())).thenReturn(BigDecimal.valueOf(0.994895485347306));
 
     doCallRealMethod().when(sut).calculateBeta(any(), any(), any(), any());
-    // ACT
     final BigDecimal result = sut.calculateBeta(treeMap, treeMap, bigDecimal, bigDecimal);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(1.01613004148954)), result);
   }
 
   @Test
-  void calculateNumerator_checkResult() {
-    // SETUP
+  void shouldCalculateNumeratorValue_whenExcessReturnsProvided() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
 
     final var portfolioExcessReturnByPeriod = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.valueOf(
@@ -288,17 +254,14 @@ class AlphaBetaCalculationAbstractTest {
     final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 
     doCallRealMethod().when(sut).calculateNumerator(any(), any(), any(), any());
-    // ACT
     final BigDecimal result = sut.calculateNumerator(portfolioExcessReturnByPeriod, benchmarkExcessReturnByPeriod,
         portfolioExcessAverage, benchmarkExcessAverage);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(0.995047103096247)), toUserScale(result));
   }
 
   @Test
-  void calculateDenominator_checkResult() {
-    // SETUP
+  void shouldCalculateDenominatorValue_whenExcessReturnsProvided() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
 
     final var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.valueOf(
@@ -306,16 +269,13 @@ class AlphaBetaCalculationAbstractTest {
     final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 
     doCallRealMethod().when(sut).calculateDenominator(any(), any());
-    // ACT
     final BigDecimal result = sut.calculateDenominator(benchmarkExcessReturnByPeriod, benchmarkExcessAverage);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(0.974940892337108)), toUserScale(result));
   }
 
   @Test
-  void overrideTotalReturns_checkResult() {
-    // SETUP
+  void shouldOverrideTotalReturnsToMonthlyChange_whenTotalReturnsProvided() {
     final var sut = mock(AlphaBetaCalculationAbstract.class);
     final var date = LocalDate.of(2020, 12, 1);
     final var portfolioTotalReturns = new TreeMap<>(Map.of(toLastDayOfMonth(date), BigDecimal.valueOf(1.01094319080371),
@@ -324,10 +284,8 @@ class AlphaBetaCalculationAbstractTest {
     when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).overrideTotalReturns(any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> totalReturns = sut.overrideTotalReturns(portfolioTotalReturns);
 
-    // VERIFY
     assertEquals(2, totalReturns.size());
     assertEquals(toUserScale(BigDecimal.valueOf(0.02297440154456)), toUserScale(totalReturns.firstEntry().getValue()));
     assertEquals(toUserScale(BigDecimal.valueOf(0.01094319080371)), toUserScale(totalReturns.lastEntry().getValue()));

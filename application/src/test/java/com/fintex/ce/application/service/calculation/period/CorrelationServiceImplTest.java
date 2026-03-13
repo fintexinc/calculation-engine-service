@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class CorrelationServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyGetPortfolioMonthlyReturns() {
+  void shouldDefineCalculationMethod_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CorrelationServiceImpl.class,
@@ -60,7 +60,7 @@ class CorrelationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_checkResult() {
+  void shouldDefineCalculationMethod_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CorrelationServiceImpl.class,
@@ -101,7 +101,7 @@ class CorrelationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyReqDtoSetReqCurrencyToCashHolding() {
+  void shouldDefineCalculationMethod_whenVerifyReqDtoSetReqCurrencyToCashHolding() {
     // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CorrelationServiceImpl.class,
@@ -124,7 +124,7 @@ class CorrelationServiceImplTest {
   }
 
   @Test
-  void perform_verifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var sut = mock(CorrelationServiceImpl.class, withSettings().useConstructor(Set.of(), null));
 
@@ -141,7 +141,7 @@ class CorrelationServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var sut = mock(CorrelationServiceImpl.class, withSettings().useConstructor(Set.of(), null));
 

@@ -38,8 +38,7 @@ class SharpeRatioCalculationTest {
   final int TWELVE = 12;
 
   @Test
-  void calculatePeriodForNumberOfMonths_numberOfMonthGreaterThanTBillsResultNull() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenNumberOfMonthGreaterThanTBillsResultNull() {
     final var sut = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var tBills = mock(TreeMap.class);
@@ -50,16 +49,13 @@ class SharpeRatioCalculationTest {
     when(sut.calculateSharpeRatio(any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(100, returns);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeriodStartDate() {
     final var sut = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var tBills = mock(TreeMap.class);
@@ -69,16 +65,13 @@ class SharpeRatioCalculationTest {
     when(returns.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    // VERIFY
     verify(sut).getPeriodStartDate(TWELVE, returns);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateAverageArithmeticAnnualizedReturn() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateAverageArithmeticAnnualizedReturn() {
     final var sut = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var date = LocalDate.now();
@@ -90,16 +83,13 @@ class SharpeRatioCalculationTest {
     when(returns.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    // VERIFY
     verify(sut).calculateAverageArithmeticAnnualizedReturn(returns, date, TWELVE);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculationOfAnnualizedRiskFreeRate() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculationOfAnnualizedRiskFreeRate() {
     final var sut = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var date = LocalDate.now();
@@ -113,16 +103,13 @@ class SharpeRatioCalculationTest {
     when(sut.restrictTBillsRange(any(), any())).thenReturn(restrictedTBills);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    // VERIFY
     verify(sut).calculateAverageArithmeticAnnualizedReturn(restrictedTBills, date, TWELVE);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetStandardDeviation() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetStandardDeviation() {
     final var sut = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var date = LocalDate.now();
@@ -134,16 +121,13 @@ class SharpeRatioCalculationTest {
     when(returns.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    // VERIFY
     verify(sut).getStandardDeviation(TWELVE, returns);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateSharpeRatio() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateSharpeRatio() {
     final var sut = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var date = LocalDate.now();
@@ -158,16 +142,13 @@ class SharpeRatioCalculationTest {
     when(returns.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    // VERIFY
     verify(sut).calculateSharpeRatio(one, one, one);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenPortfolioSizeIsLessThanTwelve() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenPortfolioSizeIsLessThanTwelve() {
     final var sut = mock(SharpeRatioCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
@@ -175,16 +156,13 @@ class SharpeRatioCalculationTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal resultValue = sut.calculatePeriodForNumberOfMonths(ONE.intValue());
 
-    // VERIFY
     assertNull(resultValue);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenCheckResult() {
     final var sut = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var tBills = mock(TreeMap.class);
@@ -194,44 +172,35 @@ class SharpeRatioCalculationTest {
     when(returns.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(ONE.intValue(), returns);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculateSharpeRatio_checkResult() {
-    // SETUP
+  void shouldCalculateSharpeRatio_whenCheckResult() {
     final var sut = mock(SharpeRatioCalculation.class);
 
     doCallRealMethod().when(sut).calculateSharpeRatio(any(), any(), any());
 
-    // ACT
     final BigDecimal returnValue = sut.calculateSharpeRatio(TEN, TWO, TEN);
 
-    // VERIFY
     assertEquals(toUserScale(valueOf(0.8)), toUserScale(returnValue));
   }
 
   @Test
-  void calculateSharpeRatio_checkResult2() {
-    // SETUP
+  void shouldCalculateSharpeRatio_whenCheckResult2() {
     final var sut = mock(SharpeRatioCalculation.class);
 
     doCallRealMethod().when(sut).calculateSharpeRatio(any(), any(), any());
 
-    // ACT
     final BigDecimal returnValue = sut.calculateSharpeRatio(TEN, TWO, ZERO);
 
-    // VERIFY
     assertNull(returnValue);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(SharpeRatioCalculation.class);
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
@@ -241,17 +210,14 @@ class SharpeRatioCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     final SharpeRatioResult sharpeRatioResDTO = sut.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, sharpeRatioResDTO.getSharpeRatio());
   }
 
   @Test
-  void getStandardDeviation_verifyCalculateExcessReturn() {
+  void shouldGetStandardDeviation_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      // SETUP
       final var sut = mock(SharpeRatioCalculation.class);
       final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
       returns.put(LocalDate.now().minusMonths(1), ONE);
@@ -264,19 +230,16 @@ class SharpeRatioCalculationTest {
       when(sut.standardDeviationCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(ONE);
 
       doCallRealMethod().when(sut).getStandardDeviation(anyInt(), any());
-      // ACT
       sut.getStandardDeviation(TWELVE, returns);
 
-      // VERIFY
       mockedPeriodCalculationAbstract.verify(() -> PeriodCalculationAbstract.calculateExcessReturn(returns,
           sut.tBills));
     }
   }
 
   @Test
-  void getStandardDeviation_verifyPeriodForNumberOfMonths() {
+  void shouldGetStandardDeviation_whenVerifyPeriodForNumberOfMonths() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      // SETUP
       final var sut = mock(SharpeRatioCalculation.class);
       final var periodCalculationAbstract = mock(PeriodCalculationAbstract.class);
 
@@ -293,10 +256,8 @@ class SharpeRatioCalculationTest {
       when(sut.standardDeviationCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(ONE);
 
       doCallRealMethod().when(sut).getStandardDeviation(anyInt(), any());
-      // ACT
       sut.getStandardDeviation(TWELVE, returns);
 
-      // VERIFY
       verify(sut.standardDeviationCalculation).calculatePeriodForNumberOfMonths(eq(TWELVE), any());
     }
   }

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.withSettings;
 class CountryExposureCalculationImplTest {
 
   @Test
-  void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
+  void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);
@@ -44,7 +44,7 @@ class CountryExposureCalculationImplTest {
   }
 
   @Test
-  void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
+  void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);
@@ -70,7 +70,7 @@ class CountryExposureCalculationImplTest {
   }
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     // SETUP
     final var storage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(CountryExposureResponseMapper.class);
@@ -90,7 +90,7 @@ class CountryExposureCalculationImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);
@@ -113,7 +113,7 @@ class CountryExposureCalculationImplTest {
   }
 
   @Test
-  void calculate_verifyReScale() {
+  void shouldCalculate_whenVerifyReScale() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);
@@ -139,7 +139,7 @@ class CountryExposureCalculationImplTest {
   }
 
   @Test
-  void calculate_verifyResponseMapperFromNetProducts() {
+  void shouldCalculate_whenVerifyResponseMapperFromNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);

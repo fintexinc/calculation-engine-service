@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class DistributionOfReturnsServiceImplTest {
 
   @Test
-  void buildCalculationDto_verifyGetPortfolioTotalReturns() {
+  void shouldBuildCalculationDto_whenVerifyGetPortfolioTotalReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
@@ -43,7 +43,7 @@ class DistributionOfReturnsServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
@@ -70,7 +70,7 @@ class DistributionOfReturnsServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_checkResult() {
+  void shouldBuildCalculationDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()

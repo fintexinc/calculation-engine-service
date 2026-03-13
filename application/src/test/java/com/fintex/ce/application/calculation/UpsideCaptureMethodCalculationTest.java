@@ -25,8 +25,7 @@ import static org.mockito.Mockito.*;
 class UpsideCaptureMethodCalculationTest {
 
   @Test
-  void defineResponseType_verifyFormTimeIntervalResult() {
-    // SETUP
+  void shouldDefineResponseType_whenVerifyFormTimeIntervalResult() {
     final BenchmarkCalculationDTO calculationDTO = mock(BenchmarkCalculationDTO.class);
     when(calculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
@@ -36,16 +35,13 @@ class UpsideCaptureMethodCalculationTest {
         BigDecimal.ONE));
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     sut.defineResponseType(pairs);
 
-    // VERIFY
     verify(sut).formTimeIntervalResult(pairs);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(UpsideCaptureCalculation.class);
 
     final var pairs = Set.of(Pair.of("2009-01-01", ONE), Pair.of("2013-01-05", TEN));
@@ -56,16 +52,13 @@ class UpsideCaptureMethodCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     final UpsideCaptureResult actual = sut.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, actual.getUpsideCapture());
   }
 
   @Test
-  void filterCaptureExpression_checkResult() {
-    // SETUP
+  void shouldFilterCaptureExpression_whenCheckResult() {
     final BenchmarkCalculationDTO calculationDTO = mock(BenchmarkCalculationDTO.class);
     when(calculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
@@ -74,16 +67,13 @@ class UpsideCaptureMethodCalculationTest {
     final var entry = new AbstractMap.SimpleEntry<>(LocalDate.now(), new BigDecimal(String.valueOf(BigDecimal.ONE)));
 
     doCallRealMethod().when(sut).filterCaptureExpression(any());
-    // ACT
     final boolean actual = sut.filterCaptureExpression(entry);
 
-    // VERIFY
     assertTrue(actual);
   }
 
   @Test
-  void filterCaptureExpression_checkResult1() {
-    // SETUP
+  void shouldFilterCaptureExpression_whenCheckResult1() {
     final BenchmarkCalculationDTO calculationDTO = mock(BenchmarkCalculationDTO.class);
     when(calculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
@@ -93,10 +83,8 @@ class UpsideCaptureMethodCalculationTest {
         LocalDate.now(), new BigDecimal(String.valueOf(BigDecimal.ONE.subtract(HUNDRED))));
 
     doCallRealMethod().when(sut).filterCaptureExpression(any());
-    // ACT
     final boolean actual = sut.filterCaptureExpression(entry);
 
-    // VERIFY
     assertFalse(actual);
   }
 

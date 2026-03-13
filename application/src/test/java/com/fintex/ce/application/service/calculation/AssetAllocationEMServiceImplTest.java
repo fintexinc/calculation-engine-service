@@ -61,7 +61,7 @@ import static org.mockito.Mockito.withSettings;
 class AssetAllocationEMServiceImplTest {
 
   @Test
-  void calculateEquityDiff_checkResult() {
+  void shouldCalculateEquityDiff_whenCheckResult() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -92,7 +92,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculateEquityDiff_checkResult2() {
+  void shouldCalculateEquityDiff_whenCheckResult2() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -115,7 +115,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculateEquityDifference_checkResult1() {
+  void shouldCalculateEquityDifference_whenCheckResult1() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -145,7 +145,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void selectEmergingValueForDataProvider_checkResult() {
+  void shouldSelectEmergingValueForDataProvider_whenCheckResult() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -165,7 +165,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void selectEmergingValueForDataProvider_checkResult2() {
+  void shouldSelectEmergingValueForDataProvider_whenCheckResult2() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -185,7 +185,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void selectEmergingValueForDataProvider_checkResult3() {
+  void shouldSelectEmergingValueForDataProvider_whenCheckResult3() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -203,7 +203,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void emForInternationalEquity_verifySelectEmergingValueForDataProvider_eagle() {
+  void shouldEmForInternationalEquity_whenVerifySelectEmergingValueForDataProviderEagle() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -232,7 +232,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void emForInternationalEquity_checkResult() {
+  void shouldEmForInternationalEquity_whenCheckResult() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -260,7 +260,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_checkResult_CASH() {
+  void shouldGetEmergingMarketValue_whenCheckResultCASH() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -287,7 +287,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_checkResult_FIXED_INCOME() {
+  void shouldGetEmergingMarketValue_whenCheckResultFIXEDINCOME() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -314,7 +314,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_checkResult_CANADIAN_EQUITY() {
+  void shouldGetEmergingMarketValue_whenCheckResultCANADIANEQUITY() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -342,7 +342,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_checkResult_US_EQUITY() {
+  void shouldGetEmergingMarketValue_whenCheckResultUSEQUITY() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -370,7 +370,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verify_INTERNATIONAL_EQUITY() {
+  void shouldGetEmergingMarketValue_whenVerifyINTERNATIONALEQUITY() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -399,7 +399,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verify_CANADA_EQUITY_fromCountryAllocations() {
+  void shouldGetEmergingMarketValue_whenVerifyCANADAEQUITYFromCountryAllocations() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
 
@@ -424,7 +424,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verify_CANADA_EQUITY_fromAssetAllocation() {
+  void shouldGetEmergingMarketValue_whenVerifyCANADAEQUITYFromAssetAllocation() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
 
@@ -448,7 +448,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verify_US_EQUITY_fromCountryAllocations() {
+  void shouldGetEmergingMarketValue_whenVerifyUSEQUITYFromCountryAllocations() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
 
@@ -473,7 +473,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verify_US_EQUITY_fromAssetAllocation() {
+  void shouldGetEmergingMarketValue_whenVerifyUSEQUITYFromAssetAllocation() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
 
@@ -497,7 +497,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verify_EMERGING_MARKET_EQUITY() {
+  void shouldGetEmergingMarketValue_whenVerifyEMERGINGMARKETEQUITY() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -526,7 +526,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verify_EMERGING_MARKET_EQUITY_2() {
+  void shouldGetEmergingMarketValue_whenVerifyEMERGINGMARKETEQUITY2() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -554,7 +554,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verify_OTHER() {
+  void shouldGetEmergingMarketValue_whenVerifyOTHER() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -583,7 +583,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_verifyUNCLASSIFIED() {
+  void shouldGetEmergingMarketValue_whenVerifyUNCLASSIFIED() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
     final var unclassifiedRegion = AssetAllocationRegionEmType.UNCLASSIFIED;
@@ -604,7 +604,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getEmergingMarketValue_checkResult() {
+  void shouldGetEmergingMarketValue_whenCheckResult() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
     final var map = new HashMap<>();
@@ -621,7 +621,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculateEmergingMarket_verifyGetEmergingMarketValue() {
+  void shouldCalculateEmergingMarket_whenVerifyGetEmergingMarketValue() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -659,7 +659,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculateEmergingMarket_checkResult() {
+  void shouldCalculateEmergingMarket_whenCheckResult() {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
@@ -696,7 +696,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculateAssetAllocationEMarketMap_verifyLoadWithDataProvidersCheck() {
+  void shouldCalculateAssetAllocationEMarketMap_whenVerifyLoadWithDataProvidersCheck() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -729,7 +729,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculateAssetAllocationEMarketMap_verifyCalculateEquityDifference() {
+  void shouldCalculateAssetAllocationEMarketMap_whenVerifyCalculateEquityDifference() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -768,7 +768,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculateAssetAllocationEMarketMap_verifyCalculateEmergingMarket() {
+  void shouldCalculateAssetAllocationEMarketMap_whenVerifyCalculateEmergingMarket() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -811,7 +811,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void retrieveAssetAllocations_checkResult() {
+  void shouldRetrieveAssetAllocations_whenCheckResult() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -839,7 +839,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void perform_verifyValidateHoldings() {
+  void shouldPerform_whenVerifyValidateHoldings() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -863,7 +863,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
@@ -889,7 +889,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void fetchExposures_verifyMapForAAEM() {
+  void shouldGetLoadFromCacheStorage_whenVerifyMapForAAEM() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
@@ -918,7 +918,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void fetchExposures_verifyValidate() {
+  void shouldGetLoadFromCacheStorage_whenVerifyValidate() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
@@ -947,7 +947,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void fetchExposures_verifyCheck() {
+  void shouldGetLoadFromCacheStorage_whenVerifyCheck() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -974,7 +974,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void fetchExposures_verifyLoadWithDataProvidesCheck() {
+  void shouldGetLoadFromCacheStorage_whenVerifyLoadWithDataProvidesCheck() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -1005,7 +1005,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void fetchExposures_verifyCalculateAssetAllocationEMarketMap() {
+  void shouldGetLoadFromCacheStorage_whenVerifyCalculateAssetAllocationEMarketMap() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -1039,7 +1039,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void fetchExposures_verifyGetSpecifiedIfEmpty() {
+  void shouldGetLoadFromCacheStorage_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
@@ -1072,7 +1072,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
 
@@ -1089,7 +1089,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void calculate_verifyToUserScale() {
+  void shouldCalculate_whenVerifyToUserScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class);
         var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {

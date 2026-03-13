@@ -29,7 +29,7 @@ class TreynorRatioServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsCacheStorage = mock(TBillsPort.class);
@@ -55,7 +55,7 @@ class TreynorRatioServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyLoadTBillsFor() {
+  void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsCacheStorage = mock(TBillsPort.class);
@@ -81,7 +81,7 @@ class TreynorRatioServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyCalculateExcessReturn() {
+  void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
       final var monthlyReturnsService = mock(MonthlyReturnsService.class);

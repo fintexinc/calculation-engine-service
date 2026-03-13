@@ -34,7 +34,7 @@ import static org.mockito.Mockito.withSettings;
 class WeightedAverageComponentTest {
 
   @Test
-  void collectMonthlyWeightEntries_checkResult() {
+  void shouldCollectMonthlyWeightEntries_whenCheckResult() {
     // SETUP
     final var sut = mock(WeightedAverageComponent.class);
     final var holding = mock(Holding.class);
@@ -58,7 +58,7 @@ class WeightedAverageComponentTest {
   }
 
   @Test
-  void calculateEndingPortfolioWeight_vefiryCalculateInitialPortfolioWeight() {
+  void shouldCalculateEndingPortfolioWeight_whenVefiryCalculateInitialPortfolioWeight() {
     try (var portfolioUtilsMock = mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var sut = mock(WeightedAverageComponent.class);
@@ -79,7 +79,7 @@ class WeightedAverageComponentTest {
   }
 
   @Test
-  void calculateEndingPortfolioWeight_verifyCollectMonthlyWeightEntries() {
+  void shouldCalculateEndingPortfolioWeight_whenVerifyCollectMonthlyWeightEntries() {
     try (var portfolioUtilsMock = mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var sut = mock(WeightedAverageComponent.class);
@@ -100,7 +100,7 @@ class WeightedAverageComponentTest {
   }
 
   @Test
-  void calculateTotalPortfolioReturnFactor_verifyCalculate() {
+  void shouldCalculateTotalPortfolioReturnFactor_whenVerifyCalculate() {
     // SETUP
     try (var sumProductMockedConstruction = mockConstruction(SumProduct.class,
         (sumProductMock, setting) -> {
@@ -126,7 +126,7 @@ class WeightedAverageComponentTest {
   }
 
   @Test
-  void calculateTotalPortfolioReturnFactor_checkResult() {
+  void shouldCalculateTotalPortfolioReturnFactor_whenCheckResult() {
     // SETUP
     final var map = new TreeMap<>(Map.of(LOCAL_DATE_NOW, new BigDecimal(20)));
 
@@ -154,7 +154,7 @@ class WeightedAverageComponentTest {
   }
 
   @Test
-  void calculateWeightedAverage_verifyCalculateEndingPortfolioWeight() {
+  void shouldCalculateWeightedAverage_whenVerifyCalculateEndingPortfolioWeight() {
     // SETUP
     final var sut = mock(WeightedAverageComponent.class);
     final var returns = mock(Map.class);
@@ -169,7 +169,7 @@ class WeightedAverageComponentTest {
   }
 
   @Test
-  void calculateWeightedAverage_verifyCalculateTotalPortfolioReturnFacto() {
+  void shouldCalculateWeightedAverage_whenVerifyCalculateTotalPortfolioReturnFacto() {
     // SETUP
     final var sut = mock(WeightedAverageComponent.class);
     final var returns = mock(Map.class);

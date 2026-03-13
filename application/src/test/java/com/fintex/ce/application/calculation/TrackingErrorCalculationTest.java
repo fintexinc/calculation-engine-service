@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class TrackingErrorCalculationTest {
 
   @Test
-  void defineResponseType_checkResult() {
+  void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var pairs = Set.of(
         Pair.of("2010-01-01", ONE),
@@ -36,16 +36,13 @@ class TrackingErrorCalculationTest {
     final var expected = Set.of(intervalResDto1, intervalResDto);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     final TrackingErrorResult actual = sut.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, actual.getTrackingError());
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenCheckResult() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var benchmarkTotalReturns = mock(TreeMap.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
@@ -57,16 +54,13 @@ class TrackingErrorCalculationTest {
     when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
 
-    // ACT
     BigDecimal actual = sut.calculatePeriodForNumberOfMonths(2);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult1() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenCheckResult1() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var benchmarkTotalReturns = mock(TreeMap.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
@@ -76,16 +70,13 @@ class TrackingErrorCalculationTest {
     when(sut.getBenchmarkTotalReturns()).thenReturn(benchmarkTotalReturns);
     when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(-1);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeriodStartDate() {
     final var sut = mock(TrackingErrorCalculation.class);
 
     final var benchmarkTotalReturns = mock(TreeMap.class);
@@ -99,16 +90,13 @@ class TrackingErrorCalculationTest {
     when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     verify(sut).getPeriodStartDate(eq(24), argThat(argument -> argument == sut.portfolioReturnOverBenchmark));
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetSubMap() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetSubMap() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var benchmarkTotalReturns = mock(TreeMap.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
@@ -123,17 +111,14 @@ class TrackingErrorCalculationTest {
     when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     BigDecimal actual = sut.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     verify(sut).getSubMapByPeriodStartDate(eq(periodStartDate), argThat(
         argument -> argument == sut.portfolioReturnOverBenchmark));
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateAverageExcessPortfolioReturnsByPeriod() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateAverageExcessPortfolioReturnsByPeriod() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var benchmarkTotalReturns = mock(TreeMap.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
@@ -150,16 +135,13 @@ class TrackingErrorCalculationTest {
     when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(subMapByPeriodStartDate);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     verify(sut).calculateAverageByPeriod(subMapByPeriodStartDate);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateDiffExcessPortfolioAndAVGExcessPortfolio() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateDiffExcessPortfolioAndAVGExcessPortfolio() {
     final var sut = mock(TrackingErrorCalculation.class);
 
     final var benchmarkTotalReturns = mock(TreeMap.class);
@@ -179,16 +161,13 @@ class TrackingErrorCalculationTest {
     when(sut.calculateAverageByPeriod(any())).thenReturn(averageExcessPortfolioReturns);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     verify(sut).calculateAverageByPeriod(subMapByPeriodStartDate);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateTrackingError() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateTrackingError() {
     final var var = mock(TrackingErrorCalculation.class);
 
     final var benchmarkTotalReturns = mock(TreeMap.class);
@@ -210,16 +189,13 @@ class TrackingErrorCalculationTest {
     when(var.calculateDiffPortfolioAndAVGPortfolio(any(), any())).thenReturn(diff);
 
     doCallRealMethod().when(var).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     var.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     verify(var).calculateTrackingError(24, diff);
   }
 
   @Test
-  void calculateAverageExcessPortfolioReturnsByPeriod_checkResult() {
-    // SETUP
+  void shouldCalculateAverageExcessPortfolioReturnsByPeriod_whenCheckResult() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var subMapByPeriodStartDate = new TreeMap();
 
@@ -227,16 +203,13 @@ class TrackingErrorCalculationTest {
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(3), TEN);
 
     doCallRealMethod().when(sut).calculateAverageByPeriod(subMapByPeriodStartDate);
-    // ACT
     final BigDecimal actual = sut.calculateAverageByPeriod(subMapByPeriodStartDate);
 
-    // VERIFY
     assertEquals(6.0, actual.doubleValue());
   }
 
   @Test
-  void calculateAverageExcessPortfolioReturnsByPeriod_checkResult1() {
-    // SETUP
+  void shouldCalculateAverageExcessPortfolioReturnsByPeriod_whenCheckResult1() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var subMapByPeriodStartDate = new TreeMap();
 
@@ -245,17 +218,14 @@ class TrackingErrorCalculationTest {
 
     doCallRealMethod().when(sut)
         .calculateAverageByPeriod(subMapByPeriodStartDate);
-    // ACT
     final BigDecimal actual = sut
         .calculateAverageByPeriod(subMapByPeriodStartDate);
 
-    // VERIFY
     assertEquals(11.0, actual.doubleValue());
   }
 
   @Test
-  void calculateAverageExcessPortfolioReturnsByPeriod_checkResult3() {
-    // SETUP
+  void shouldCalculateAverageExcessPortfolioReturnsByPeriod_whenCheckResult3() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var subMapByPeriodStartDate = new TreeMap();
 
@@ -264,17 +234,14 @@ class TrackingErrorCalculationTest {
 
     doCallRealMethod().when(sut)
         .calculateAverageByPeriod(subMapByPeriodStartDate);
-    // ACT
     final BigDecimal actual = sut
         .calculateAverageByPeriod(subMapByPeriodStartDate);
 
-    // VERIFY
     assertEquals(1.000000000000000, actual.doubleValue());
   }
 
   @Test
-  void calculateTrackingError_checkResult() {
-    // SETUP
+  void shouldCalculateTrackingError_whenCheckResult() {
     final var sut = mock(TrackingErrorCalculation.class);
     final TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
 
@@ -283,17 +250,14 @@ class TrackingErrorCalculationTest {
 
     doCallRealMethod().when(sut)
         .calculateTrackingError(25, subMapByPeriodStartDate);
-    // ACT
     final BigDecimal actual = sut
         .calculateTrackingError(25, subMapByPeriodStartDate);
 
-    // VERIFY
     assertEquals(BigDecimal.valueOf(2.4494897428), actual);
   }
 
   @Test
-  void calculateTrackingError_checkResult1() {
-    // SETUP
+  void shouldCalculateTrackingError_whenCheckResult1() {
     final var sut = mock(TrackingErrorCalculation.class);
     final var subMapByPeriodStartDate = new TreeMap();
 
@@ -301,16 +265,13 @@ class TrackingErrorCalculationTest {
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(4), TWELVE);
 
     doCallRealMethod().when(sut).calculateTrackingError(60, subMapByPeriodStartDate);
-    // ACT
     final BigDecimal actual = sut.calculateTrackingError(60, subMapByPeriodStartDate);
 
-    // VERIFY
     assertEquals(BigDecimal.valueOf(2.1153194253), actual);
   }
 
   @Test
-  void calculateDiffExcessPortfolioAndAVGExcessPortfolio_checkResult() {
-    // SETUP
+  void shouldCalculateDiffExcessPortfolioAndAVGExcessPortfolio_whenCheckResult() {
     final var sut = mock(TrackingErrorCalculation.class);
 
     final var subMapByPeriodStartDate = new TreeMap();
@@ -322,17 +283,14 @@ class TrackingErrorCalculationTest {
     expected.put(LocalDate.now().minusMonths(5), BigDecimal.valueOf(100.0));
 
     doCallRealMethod().when(sut).calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, TWO);
-    // ACT
     final TreeMap<LocalDate, BigDecimal> actual = sut.calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate,
         TWO);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculateDiffExcessPortfolioAndAVGExcessPortfolio_checkResult2() {
-    // SETUP
+  void shouldCalculateDiffExcessPortfolioAndAVGExcessPortfolio_whenCheckResult2() {
     final var sut = mock(TrackingErrorCalculation.class);
 
     final var subMapByPeriodStartDate = new TreeMap();
@@ -344,16 +302,13 @@ class TrackingErrorCalculationTest {
     expected.put(LocalDate.now().minusMonths(11), BigDecimal.valueOf(81.0));
 
     doCallRealMethod().when(sut).calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, ONE);
-    // ACT
     final var actual = sut.calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, ONE);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculateDiffExcessPortfolioAndAVGExcessPortfolio_checkResult3() {
-    // SETUP
+  void shouldCalculateDiffExcessPortfolioAndAVGExcessPortfolio_whenCheckResult3() {
     final var sut = mock(TrackingErrorCalculation.class);
 
     final var subMapByPeriodStartDate = new TreeMap();
@@ -365,16 +320,13 @@ class TrackingErrorCalculationTest {
     expected.put(LocalDate.now().minusMonths(2), BigDecimal.valueOf(100.0));
 
     doCallRealMethod().when(sut).calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, TEN);
-    // ACT
     final var actual = sut.calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, TEN);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculateExcessPortfolioReturnOverBenchmark_checkResult() {
-    // SETUP
+  void shouldCalculateExcessPortfolioReturnOverBenchmark_whenCheckResult() {
     final var sut = mock(TrackingErrorCalculation.class);
 
     final TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>();
@@ -393,16 +345,13 @@ class TrackingErrorCalculationTest {
     when(sut.getBenchmarkTotalReturns()).thenReturn(benchmarkTotalReturns);
 
     doCallRealMethod().when(sut).calculateExcessPortfolioReturnOverBenchmark();
-    // ACT
     NavigableMap<LocalDate, BigDecimal> actual = sut.calculateExcessPortfolioReturnOverBenchmark();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculateExcessPortfolioReturnOverBenchmark_checkResult1() {
-    // SETUP
+  void shouldCalculateExcessPortfolioReturnOverBenchmark_whenCheckResult1() {
     final var sut = mock(TrackingErrorCalculation.class);
 
     final TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>();
@@ -421,10 +370,8 @@ class TrackingErrorCalculationTest {
     when(sut.getBenchmarkTotalReturns()).thenReturn(benchmarkTotalReturns);
 
     doCallRealMethod().when(sut).calculateExcessPortfolioReturnOverBenchmark();
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.calculateExcessPortfolioReturnOverBenchmark();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 

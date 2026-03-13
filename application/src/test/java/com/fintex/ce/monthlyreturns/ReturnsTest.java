@@ -32,7 +32,7 @@ import static org.mockito.Mockito.mock;
 class ReturnsTest {
 
   @Test
-  void initForNavPrices() {
+  void shouldInitFor_whenNavPrices() {
     // SETUP
     final Holding holding = mock(Holding.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
@@ -48,7 +48,7 @@ class ReturnsTest {
   }
 
   @Test
-  void initOnlyWithReturnsDataValidation() {
+  void shouldInitOnly_whenWithReturnsDataValidation() {
     // SETUP
     final Holding holding = mock(Holding.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
@@ -64,7 +64,7 @@ class ReturnsTest {
   }
 
   @Test
-  void initOnlyWithReturnsDataValidation_monthlyReturnsError() {
+  void shouldInitOnlyWithReturnsDataValidation_whenMonthlyReturnsError() {
     // SETUP
     final Holding holding = mock(Holding.class);
     final Holding holdingMissingReturns = mock(Holding.class);
@@ -85,7 +85,7 @@ class ReturnsTest {
   }
 
   @Test
-  void initOnlyWithReturnsDataValidation_nonAllowedMonthlyReturnsError() {
+  void shouldInitOnlyWithReturnsDataValidation_whenNonAllowedMonthlyReturnsError() {
     // SETUP
     final Holding holding = mock(Holding.class);
     final Holding holdingMissingReturns = mock(Holding.class);
@@ -107,7 +107,7 @@ class ReturnsTest {
   }
 
   @Test
-  void validateAndUpdateCpsdAndCped() {
+  void shouldValidateAnd_whenUpdateCpsdAndCped() {
     // SETUP
     final Holding holding = mock(Holding.class);
     final DailyPerformanceCommand dailyPerformanceReqDTO = mock(DailyPerformanceCommand.class);
@@ -136,7 +136,7 @@ class ReturnsTest {
   }
 
   @Test
-  void validateMonthlyDataMissing() {
+  void shouldValidateMonthly_whenDataMissing() {
     // SETUP
     final Holding holding = mock(Holding.class);
     final DailyPerformanceCommand dailyPerformanceReqDTO = mock(DailyPerformanceCommand.class);
@@ -164,13 +164,13 @@ class ReturnsTest {
   }
 
   @Test
-  void getErrors_returnsEmptyList_whenNoErrors() {
+  void shouldGetErrors_whenReturnsEmptyListWhenNoErrors() {
     Returns<MonthlyReturns> sut = new Returns<>();
     assertTrue(sut.getErrors().isEmpty());
   }
 
   @Test
-  void getErrors_returnsListOfErrors_whenErrorsExist() {
+  void shouldGetErrors_whenReturnsListOfErrorsWhenErrorsExist() {
     Returns<MonthlyReturns> sut = new Returns<>();
     DataErrorException error = new DataErrorException("message", "id", ExceptionCode.ERR_RRC_MR_002);
     sut.notification.addError(error);
@@ -180,7 +180,7 @@ class ReturnsTest {
   }
 
   @Test
-  void getErrors_returnsMultipleErrors_whenMultipleErrorsExist() {
+  void shouldGetErrors_whenReturnsMultipleErrorsWhenMultipleErrorsExist() {
     Returns<MonthlyReturns> sut = new Returns<>();
     DataErrorException error1 = new DataErrorException("message", "id", ExceptionCode.ERR_RRC_MR_002);
     DataErrorException error2 = new DataErrorException("message", "id2", ExceptionCode.ERR_RRC_MR_002);
@@ -193,7 +193,7 @@ class ReturnsTest {
   }
 
   @Test
-  void validateReturns_removesEntriesWithInvalidDates() {
+  void shouldValidateReturns_whenRemovesEntriesWithInvalidDates() {
     Returns<MonthlyReturns> sut = new Returns<>();
     Holding holding1 = mock(Holding.class);
     Holding holding2 = mock(Holding.class);
@@ -217,14 +217,14 @@ class ReturnsTest {
   }
 
   @Test
-  void getErrorsAsWarnings_returnsEmptyList_whenNoErrors() {
+  void shouldGetErrorsAsWarnings_whenReturnsEmptyListWhenNoErrors() {
     Returns<MonthlyReturns> sut = new Returns<>();
     List<Warning> warnings = sut.getErrorsAsWarnings();
     assertTrue(warnings.isEmpty());
   }
 
   @Test
-  void getErrorsAsWarnings_returnsListOfWarnings_whenErrorsExist() {
+  void shouldGetErrorsAsWarnings_whenReturnsListOfWarningsWhenErrorsExist() {
     Returns<MonthlyReturns> sut = new Returns<>();
     DataErrorException error = new DataErrorException("message", "id", ExceptionCode.ERR_RRC_MR_002);
     sut.notification.addError(error);

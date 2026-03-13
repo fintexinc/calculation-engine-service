@@ -29,7 +29,7 @@ import static org.mockito.Mockito.withSettings;
 class FixedIncomeBondSectorCalculationServiceImplTest {
 
   @Test
-  void calculate_verifyAreAllValuesZerosInMapOfExposure() {
+  void shouldCalculate_whenVerifyAreAllValuesZerosInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
@@ -53,7 +53,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
+  void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
@@ -82,7 +82,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   }
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
@@ -108,7 +108,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyResult() {
+  void shouldCalculate_whenVerifyResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);

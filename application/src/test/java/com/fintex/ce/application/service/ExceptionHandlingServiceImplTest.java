@@ -12,7 +12,7 @@ import static org.mockito.Mockito.withSettings;
 class ExceptionHandlingServiceImplTest {
 
   @Test
-  void removeFxRatesFromRedisCache_verifyCacheCleanupPortRemoveFxRatesFromCache() {
+  void shouldRemoveFxRatesFromRedisCache_whenVerifyCacheCleanupPortRemoveFxRatesFromCache() {
     // SETUP
     final CacheCleanupPort cacheCleanupPort = mock(CacheCleanupPort.class);
     final var sut = mock(ExceptionHandlingServiceImpl.class,
@@ -27,7 +27,7 @@ class ExceptionHandlingServiceImplTest {
   }
 
   @Test
-  void removeDataFromRepositoriesByHoldingId_verifyRemoveByHoldingId() {
+  void shouldRemoveDataFromRepositoriesByHoldingId_whenVerifyRemoveByHoldingId() {
     // SETUP
     final String id = "id";
     final CacheCleanupPort cacheCleanupPort = mock(CacheCleanupPort.class);

@@ -27,23 +27,19 @@ import static org.mockito.Mockito.when;
 class TrailingTotalReturnsCalculationTest {
 
   @Test
-  void defineResponseType_verifyFormTimeIntervalResult() {
-    // SETUP
+  void shouldDelegateToFormTimeIntervalResult_whenDefiningResponseType() {
     final var sut = mock(TrailingTotalReturnsCalculation.class);
 
     final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", BigDecimal.ONE));
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     sut.defineResponseType(pairs);
 
-    // VERIFY
     verify(sut).formTimeIntervalResult(pairs);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_periodIsGreater() {
-    // SETUP
+  void shouldReturnNull_whenPeriodExceedsPortfolioSize() {
     final var sut = mock(TrailingTotalReturnsCalculation.class);
 
     final var treeMap = mock(TreeMap.class);
@@ -51,32 +47,26 @@ class TrailingTotalReturnsCalculationTest {
     when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(2);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldReturnNull_whenPeriodExceedsProvidedReturnsSize() {
     final var sut = mock(TrailingTotalReturnsCalculation.class);
 
     final var totalReturns = mock(TreeMap.class);
     when(totalReturns.size()).thenReturn(1);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(2, totalReturns);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculateForNPeriods_periodEqualsTo12() {
-    // SETUP
+  void shouldCalculateTrailingTotalReturn_whenPeriodEqualsTwelveMonths() {
     final var sut = mock(TrailingTotalReturnsCalculation.class);
 
     when(sut.calculateProductForPeriod(eq(12), any())).thenReturn(TEN);
@@ -87,16 +77,13 @@ class TrailingTotalReturnsCalculationTest {
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(12);
 
-    // VERIFY
     assertEquals(0, BigDecimal.valueOf(9).compareTo(actual));
   }
 
   @Test
-  void calculateForNPeriods_periodIsLessThan12() {
-    // SETUP
+  void shouldCalculateTrailingTotalReturn_whenPeriodIsLessThanTwelveMonths() {
     final var t = mock(TrailingTotalReturnsCalculation.class);
 
     when(t.calculateProductForPeriod(eq(11), any())).thenReturn(TEN);
@@ -107,16 +94,13 @@ class TrailingTotalReturnsCalculationTest {
 
     doCallRealMethod().when(t).calculatePeriodForNumberOfMonths(anyInt(), any());
     doCallRealMethod().when(t).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = t.calculatePeriodForNumberOfMonths(11);
 
-    // VERIFY
     assertEquals(0, BigDecimal.valueOf(9).compareTo(actual));
   }
 
   @Test
-  void calculateForNPeriods_periodEqualsTo24() {
-    // SETUP
+  void shouldCalculateAnnualizedTrailingTotalReturn_whenPeriodExceedsTwelveMonths() {
     final var t = mock(TrailingTotalReturnsCalculation.class);
     doCallRealMethod().when(t).calculatePeriodForNumberOfMonths(24);
     when(t.calculateProductForPeriod(eq(24), any())).thenReturn(TEN);
@@ -127,16 +111,13 @@ class TrailingTotalReturnsCalculationTest {
 
     doCallRealMethod().when(t).calculatePeriodForNumberOfMonths(anyInt(), any());
     doCallRealMethod().when(t).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = t.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     assertEquals(0, new BigDecimal("2.1622776601683795").compareTo(actual));
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldMapIntervalResults_whenDefiningResponseType() {
     final var sut = mock(TrailingTotalReturnsCalculation.class);
 
     final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
@@ -147,10 +128,8 @@ class TrailingTotalReturnsCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     final TrailingTotalReturnsResult actual = sut.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, actual.getTrailingTotalReturn());
   }
 

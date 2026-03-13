@@ -23,7 +23,7 @@ import static org.mockito.Mockito.withSettings;
 class FixedIncomeGeographicExposureCalculationImplTest {
 
   @Test
-  void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
+  void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);
@@ -42,7 +42,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   }
 
   @Test
-  void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
+  void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);
@@ -66,7 +66,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   }
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);
@@ -87,7 +87,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);

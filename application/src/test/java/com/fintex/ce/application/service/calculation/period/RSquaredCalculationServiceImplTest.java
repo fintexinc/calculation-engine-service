@@ -26,7 +26,7 @@ class RSquaredCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsCacheStorage,
@@ -51,7 +51,7 @@ class RSquaredCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyLoadTBillsFor() {
+  void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(RSquaredCalculationServiceImpl.class, withSettings()
@@ -76,7 +76,7 @@ class RSquaredCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyCalculateExcessReturn() {
+  void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
       final var tBillsCacheStorage = mock(TBillsPort.class);

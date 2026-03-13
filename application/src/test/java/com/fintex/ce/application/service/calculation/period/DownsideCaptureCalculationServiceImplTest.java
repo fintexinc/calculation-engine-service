@@ -22,7 +22,7 @@ import static org.mockito.Mockito.withSettings;
 class DownsideCaptureCalculationServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyDefineCalculationMethod() {
+  void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var sut = mock(DownsideCaptureCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of()));

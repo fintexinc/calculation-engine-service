@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class MeanCalculationServiceImplTest {
 
   @Test
-  void calculationSpecificChecks_checkResult() {
+  void shouldCalculationSpecificChecks_whenCheckResult() {
     // SETUP
     final MeanCalculationServiceImpl meanCalculationService = mock(MeanCalculationServiceImpl.class);
 
@@ -39,7 +39,7 @@ class MeanCalculationServiceImplTest {
   }
 
   @Test
-  void calculationSpecificChecks_checkResult2() {
+  void shouldCalculationSpecificChecks_whenCheckResult2() {
     // SETUP
     final MeanCalculationServiceImpl meanCalculationService = mock(MeanCalculationServiceImpl.class);
 
@@ -56,7 +56,7 @@ class MeanCalculationServiceImplTest {
   }
 
   @Test
-  void calculationSpecificChecks_checkResult3() {
+  void shouldCalculationSpecificChecks_whenCheckResult3() {
     // SETUP
     final MeanCalculationServiceImpl meanCalculationService = mock(MeanCalculationServiceImpl.class);
 
@@ -72,7 +72,7 @@ class MeanCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_checkResult() {
+  void shouldDefineCalculationMethod_whenCheckResult() {
     // SETUP
     final var sut = mock(MeanCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of("12", "36", "60", "120")));

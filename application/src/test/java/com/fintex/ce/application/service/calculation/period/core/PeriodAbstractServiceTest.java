@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class PeriodAbstractServiceTest {
 
   @Test
-  void perform_verifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
@@ -41,7 +41,7 @@ class PeriodAbstractServiceTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
@@ -63,7 +63,7 @@ class PeriodAbstractServiceTest {
   }
 
   @Test
-  void perform_checkResult() {
+  void shouldPerform_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
@@ -88,7 +88,7 @@ class PeriodAbstractServiceTest {
   }
 
   @Test
-  void buildCalculationDto_checkResult() {
+  void shouldBuildCalculationDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
@@ -122,7 +122,7 @@ class PeriodAbstractServiceTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
@@ -157,7 +157,7 @@ class PeriodAbstractServiceTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetWeightedAverageWithCpedValidation() {
+  void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()

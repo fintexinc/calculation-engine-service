@@ -25,7 +25,7 @@ import static org.mockito.Mockito.withSettings;
 class MaturityAllocationCalculationServiceImplTest {
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
@@ -45,7 +45,7 @@ class MaturityAllocationCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
@@ -65,7 +65,7 @@ class MaturityAllocationCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyFromNetProducts() {
+  void shouldCalculate_whenVerifyFromNetProducts() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
@@ -88,7 +88,7 @@ class MaturityAllocationCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
+  void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
@@ -107,7 +107,7 @@ class MaturityAllocationCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
+  void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);

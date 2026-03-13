@@ -1,6 +1,5 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.ExcessReturnsCalculation;
 import com.fintex.ce.port.input.result.ExcessReturnsResult;
 import com.fintex.ce.port.input.result.core.TimeIntervalResult;
 import com.fintex.ce.util.DecimalUtils;
@@ -33,40 +32,33 @@ class ExcessReturnsCalculationTest {
   final int TWELVE = 12;
 
   @Test
-  void defineResponseType_verifyFormTimeIntervalResult() {
-    // SETUP
+  void shouldDefineResponseType_whenVerifyFormTimeIntervalResult() {
     final ExcessReturnsCalculation alpha = mock(ExcessReturnsCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
 
     doCallRealMethod().when(alpha).defineResponseType(anySet());
-    // ACT
     alpha.defineResponseType(pairs);
 
-    // VERIFY
     verify(alpha).formTimeIntervalResult(pairs);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateAnnualizedReturnsByPeriod() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateAnnualizedReturnsByPeriod() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     final TreeMap treeMap = mock(TreeMap.class);
     when(excessReturnsCalculation.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(excessReturnsCalculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(12);
     doCallRealMethod().when(excessReturnsCalculation).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     excessReturnsCalculation.calculatePeriodForNumberOfMonths(12);
 
-    // VERIFY
     verify(excessReturnsCalculation, times(2)).calculateAnnualizedReturnsByPeriod(12, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenCheckResult() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     final TreeMap portfolioTreeMap = mock(TreeMap.class);
     final TreeMap benchmarkTreeMap = mock(TreeMap.class);
@@ -79,16 +71,13 @@ class ExcessReturnsCalculationTest {
     when(excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE, benchmarkTreeMap)).thenReturn(
         BigDecimal.ONE);
     doCallRealMethod().when(excessReturnsCalculation).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal returnValue = excessReturnsCalculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(9)), returnValue);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenPeriodIsLargerThenTotalReturnsSize() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenPeriodIsLargerThenTotalReturnsSize() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     final TreeMap portfolioTreeMap = mock(TreeMap.class);
     final TreeMap benchmarkTreeMap = mock(TreeMap.class);
@@ -101,16 +90,13 @@ class ExcessReturnsCalculationTest {
     when(excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE, benchmarkTreeMap)).thenReturn(
         BigDecimal.ONE);
     doCallRealMethod().when(excessReturnsCalculation).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal returnValue = excessReturnsCalculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     assertNull(returnValue);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenAnnualizedReturnsAreNull() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenAnnualizedReturnsAreNull() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     final TreeMap portfolioTreeMap = mock(TreeMap.class);
     final TreeMap benchmarkTreeMap = mock(TreeMap.class);
@@ -119,16 +105,13 @@ class ExcessReturnsCalculationTest {
     when(excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE, portfolioTreeMap)).thenReturn(null);
     when(excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE, benchmarkTreeMap)).thenReturn(null);
     doCallRealMethod().when(excessReturnsCalculation).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal returnValue = excessReturnsCalculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     assertNull(returnValue);
   }
 
   @Test
-  void calculateAnnualizedReturnsByPeriod_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldCalculateAnnualizedReturnsByPeriod_whenVerifyGetPeriodStartDate() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     final TreeMap portfolioTreeMap = mock(TreeMap.class);
     doCallRealMethod().when(excessReturnsCalculation).calculateAnnualizedReturnsByPeriod(anyInt(), any());
@@ -136,17 +119,13 @@ class ExcessReturnsCalculationTest {
     when(excessReturnsCalculation.getPeriodStartDate(anyInt(), any())).thenReturn(LocalDate.now().minusMonths(TWELVE));
     when(excessReturnsCalculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(portfolioTreeMap);
     when(excessReturnsCalculation.getPower(anyInt())).thenReturn(ONE);
-    // ACT
-    final BigDecimal returnValue = excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE,
-        portfolioTreeMap);
+    excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE, portfolioTreeMap);
 
-    // VERIFY
     verify(excessReturnsCalculation).getPeriodStartDate(TWELVE, portfolioTreeMap);
   }
 
   @Test
-  void calculateAnnualizedReturnsByPeriod_verifyGetSubMap() {
-    // SETUP
+  void shouldCalculateAnnualizedReturnsByPeriod_whenVerifyGetSubMap() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     final TreeMap portfolioTreeMap = mock(TreeMap.class);
     doCallRealMethod().when(excessReturnsCalculation).calculateAnnualizedReturnsByPeriod(anyInt(), any());
@@ -155,17 +134,13 @@ class ExcessReturnsCalculationTest {
     when(excessReturnsCalculation.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
     when(excessReturnsCalculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(portfolioTreeMap);
     when(excessReturnsCalculation.getPower(anyInt())).thenReturn(ONE);
-    // ACT
-    final BigDecimal returnValue = excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE,
-        portfolioTreeMap);
+    excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE, portfolioTreeMap);
 
-    // VERIFY
     verify(excessReturnsCalculation).getSubMapByPeriodStartDate(periodStartDate, portfolioTreeMap);
   }
 
   @Test
-  void calculateAnnualizedReturnsByPeriod_verifyGetPower() {
-    // SETUP
+  void shouldCalculateAnnualizedReturnsByPeriod_whenVerifyGetPower() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     final TreeMap portfolioTreeMap = mock(TreeMap.class);
     doCallRealMethod().when(excessReturnsCalculation).calculateAnnualizedReturnsByPeriod(anyInt(), any());
@@ -174,46 +149,36 @@ class ExcessReturnsCalculationTest {
     when(excessReturnsCalculation.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
     when(excessReturnsCalculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(portfolioTreeMap);
     when(excessReturnsCalculation.getPower(anyInt())).thenReturn(ONE);
-    // ACT
-    final BigDecimal returnValue = excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE,
-        portfolioTreeMap);
+    excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE, portfolioTreeMap);
 
-    // VERIFY
     verify(excessReturnsCalculation).getPower(TWELVE);
   }
 
   @Test
-  void calculateAnnualizedReturnsByPeriod_checkResult() {
-    // SETUP
+  void shouldCalculateAnnualizedReturnsByPeriod_whenCheckResult() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     doCallRealMethod().when(excessReturnsCalculation).calculateAnnualizedReturnsByPeriod(anyInt(), any());
     final LocalDate periodStartDate = LocalDate.now();
     when(excessReturnsCalculation.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
     when(excessReturnsCalculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(getPortfolioReturns());
     when(excessReturnsCalculation.getPower(anyInt())).thenReturn(ONE);
-    // ACT
     final BigDecimal returnValue = excessReturnsCalculation.calculateAnnualizedReturnsByPeriod(TWELVE,
         getPortfolioReturns());
 
-    // VERIFY
     assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(0.15944968044217)), returnValue);
   }
 
   @Test
-  void getPower_checkResult() {
-    // SETUP
+  void shouldGetPower_whenCheckResult() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     doCallRealMethod().when(excessReturnsCalculation).getPower(anyInt());
-    // ACT
     final BigDecimal power = excessReturnsCalculation.getPower(23);
 
-    // VERIFY
     assertEquals(BigDecimal.valueOf(0.521739130434783), power);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldDefineResponseType_whenCheckResult() {
     final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
@@ -224,10 +189,8 @@ class ExcessReturnsCalculationTest {
     when(excessReturnsCalculation.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(excessReturnsCalculation).defineResponseType(anySet());
-    // ACT
     final ExcessReturnsResult actual = excessReturnsCalculation.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, actual.getExcessReturns());
   }
 

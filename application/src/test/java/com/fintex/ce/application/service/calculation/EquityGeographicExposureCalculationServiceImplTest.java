@@ -24,7 +24,7 @@ import static org.mockito.Mockito.withSettings;
 class EquityGeographicExposureCalculationServiceImplTest {
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -45,7 +45,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
 
       // SETUP
@@ -68,7 +68,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyReScale() {
+  void shouldCalculate_whenVerifyReScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
@@ -94,7 +94,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyToUserScale() {
+  void shouldCalculate_whenVerifyToUserScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class);
         var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {

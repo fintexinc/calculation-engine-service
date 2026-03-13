@@ -55,7 +55,7 @@ class YieldCalculationServiceImplTest {
   }
 
   @Test
-  void testPerform() {
+  void shouldTestPerform_whenConditionIsMet() {
     // SETUP
     YieldCommand reqDTO = mock(YieldCommand.class);
     Map<Holding, Yield> mockData = createMockData();
@@ -75,7 +75,7 @@ class YieldCalculationServiceImplTest {
   }
 
   @Test
-  void testPerform_verifyCacheStorageLoad() {
+  void shouldTestPerform_whenVerifyCacheStorageLoad() {
     // SETUP
     YieldCommand reqDTO = mock(YieldCommand.class);
     when(yieldCacheStorage.load(any(), any(), any(), any())).thenReturn(new HashMap<>());
@@ -89,7 +89,7 @@ class YieldCalculationServiceImplTest {
   }
 
   @Test
-  void testPerform_verifyResponseMapperCalled() {
+  void shouldTestPerform_whenVerifyResponseMapperCalled() {
     // SETUP
     YieldCommand reqDTO = mock(YieldCommand.class);
     Map<Holding, Yield> mockData = createMockData();

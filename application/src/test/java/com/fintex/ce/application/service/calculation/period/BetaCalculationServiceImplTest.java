@@ -26,7 +26,7 @@ class BetaCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsCacheStorage, null));
@@ -50,7 +50,7 @@ class BetaCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyLoadTBillsFor() {
+  void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(BetaCalculationServiceImpl.class, withSettings()
@@ -75,7 +75,7 @@ class BetaCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyCalculateExcessReturn() {
+  void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
       final var tBillsCacheStorage = mock(TBillsPort.class);

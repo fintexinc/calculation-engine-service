@@ -1,6 +1,5 @@
-package com.fintex.ce.dto.mapper;
+package com.fintex.ce.application.mapper;
 
-import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
@@ -40,7 +39,7 @@ import static org.mockito.Mockito.mock;
 class AssetAllocationDataMapperTest {
 
   @Test
-  void mapForAAEM_checkResult() {
+  void shouldMapForAAEM_whenCheckResult() {
     // SETUP
     final var sut = mock(AssetAllocationDataMapper.class);
 
@@ -96,7 +95,7 @@ class AssetAllocationDataMapperTest {
   }
 
   @Test
-  void mapForAA_checkResult() {
+  void shouldMapForAA_whenCheckResult() {
     // SETUP
     final var sut = mock(AssetAllocationDataMapper.class);
 
@@ -204,3 +203,4 @@ class AssetAllocationDataMapperTest {
     return result;
   }
 }
+

@@ -29,8 +29,7 @@ import static org.mockito.Mockito.when;
 class UpDownSideCalculationAbstractTest {
 
   @Test
-  void getPortfolioDetermination_checkResult() {
-    // SETUP
+  void shouldReturnPortfolioDetermination_whenCaptureConditionIsMet() {
     final var sut = mock(UpDownSideCalculationAbstract.class);
 
     final var benchmark = Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE.subtract(TEN));
@@ -41,16 +40,13 @@ class UpDownSideCalculationAbstractTest {
 
     when(sut.filterCaptureExpression(any())).thenReturn(true);
     doCallRealMethod().when(sut).getPortfolioDetermination();
-    // ACT
     final TreeMap<LocalDate, BigDecimal> actual = sut.getPortfolioDetermination();
 
-    // VERIFY
     assertEquals(Map.of(LOCAL_DATE_NOW.minusMonths(1), new BigDecimal("0.910000000000000")), actual);
   }
 
   @Test
-  void getBenchmarkDetermination() {
-    // SETUP
+  void shouldReturnBenchmarkDeterminationForPortfolioDates_whenBenchmarkDataExists() {
     final var sut = mock(UpDownSideCalculationAbstract.class);
 
     final var benchmark = Map.of(
@@ -62,16 +58,13 @@ class UpDownSideCalculationAbstractTest {
         Map.of(LOCAL_DATE_NOW.plusMonths(1), HUNDRED));
 
     doCallRealMethod().when(sut).getBenchmarkDetermination(any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.getBenchmarkDetermination(portfolio);
 
-    // VERIFY
     assertEquals(Map.of(LOCAL_DATE_NOW.plusMonths(1), new BigDecimal("1.010000000000000")), actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldReturnCaptureRatio_whenDeviationsAreCalculated() {
     final var sut = mock(UpDownSideCalculationAbstract.class);
 
     sut.portfolioDetermination = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE));
@@ -87,16 +80,13 @@ class UpDownSideCalculationAbstractTest {
     when(sut.calculateDeviationFor(12, sut.benchmarkDetermination)).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(12);
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(12);
 
-    // VERIFY
     assertEquals(0, TEN.compareTo(actual));
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_numberOfMonthIsLessThan12() {
-    // SETUP
+  void shouldReturnNull_whenPeriodIsLessThanTwelve() {
     final var sut = mock(UpDownSideCalculationAbstract.class);
 
     sut.portfolioDetermination = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE));
@@ -113,16 +103,13 @@ class UpDownSideCalculationAbstractTest {
     when(sut.calculateDeviationFor(months, sut.benchmarkDetermination)).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(months);
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(months);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult1() {
-    // SETUP
+  void shouldReturnNull_whenPeriodExceedsPortfolioSize() {
     final var sut = mock(UpDownSideCalculationAbstract.class);
 
     final var treeMap = mock(TreeMap.class);
@@ -132,16 +119,13 @@ class UpDownSideCalculationAbstractTest {
     when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(60);
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(60);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult2() {
-    // SETUP
+  void shouldReturnZero_whenBenchmarkDeviationIsZero() {
     final var sut = mock(UpDownSideCalculationAbstract.class);
 
     sut.portfolioDetermination = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE));
@@ -158,16 +142,13 @@ class UpDownSideCalculationAbstractTest {
     when(sut.calculateDeviationFor(months, sut.benchmarkDetermination)).thenReturn(ZERO);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(months);
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(months);
 
-    // VERIFY
     assertEquals(ZERO, actual);
   }
 
   @Test
-  void calculateDeviationFor_checkResult() {
-    // SETUP
+  void shouldCalculateDeviation_whenRequiredMonthsExist() {
     final var sut = mock(UpDownSideCalculationAbstract.class);
 
     final int numberOfMonths = 2;
@@ -181,16 +162,13 @@ class UpDownSideCalculationAbstractTest {
     doCallRealMethod().when(sut).filterRequiredMonthsForPeriod(numberOfMonths, determination);
 
     doCallRealMethod().when(sut).calculateDeviationFor(eq(numberOfMonths), any());
-    // ACT
     final BigDecimal actual = sut.calculateDeviationFor(numberOfMonths, determination);
 
-    // VERIFY
     assertEquals(pow(TEN, BigDecimal.valueOf(0.5)).subtract(ONE), actual);
   }
 
   @Test
-  void calculateDeviationFor_checkResult1() {
-    // SETUP
+  void shouldReturnZeroDeviation_whenBenchmarkValuesAreMissing() {
     final var sut = mock(UpDownSideCalculationAbstract.class);
     final var periodCalculationAbstract = mock(PeriodCalculationAbstract.class);
 
@@ -200,10 +178,8 @@ class UpDownSideCalculationAbstractTest {
     when(periodCalculationAbstract.getBenchmarkValues(60, determination)).thenReturn(List.of());
 
     doCallRealMethod().when(sut).calculateDeviationFor(eq(60), any());
-    // ACT
     final BigDecimal actual = sut.calculateDeviationFor(60, determination);
 
-    // VERIFY
     assertEquals(ZERO, actual);
   }
 }

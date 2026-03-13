@@ -24,7 +24,7 @@ import static org.mockito.Mockito.withSettings;
 class ClassificationAllocationCalculationServiceImplTest {
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(ClassificationAllocationCalculationServiceImpl.class, withSettings()
@@ -44,7 +44,7 @@ class ClassificationAllocationCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     // SETUP
     final var sut = mock(ClassificationAllocationCalculationServiceImpl.class);
 
@@ -62,7 +62,7 @@ class ClassificationAllocationCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyReScale() {
+  void shouldCalculate_whenVerifyReScale() {
     // SETUP
     try (final var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       final var sut = mock(ClassificationAllocationCalculationServiceImpl.class);
@@ -85,7 +85,7 @@ class ClassificationAllocationCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
+  void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     // SETUP
     try (final var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var exposures = mock(Map.class);
@@ -101,7 +101,7 @@ class ClassificationAllocationCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
+  void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);

@@ -46,8 +46,7 @@ class RollingTotalReturnsCalculationTest {
   }
 
   @Test
-  void calculateRollingValue_checkResult() {
-    // SETUP
+  void shouldCalculateRollingValue_whenCheckResult() {
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var calculationDTO = mock(CalculationDTO.class);
     final var sut = mock(RollingTotalReturnsCalculation.class, withSettings().useConstructor(calculationDTO, Set.of(),
@@ -57,30 +56,24 @@ class RollingTotalReturnsCalculationTest {
     when(trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculateRollingValue(numberOfMonths, portfolioReturns);
-    // ACT
     final BigDecimal actual = sut.calculateRollingValue(numberOfMonths, portfolioReturns);
 
-    // VERIFY
     Assertions.assertEquals(TEN, actual);
   }
 
   @Test
-  void defineResponseType_verifyGetRollingIntervalResultS() {
-    // SETUP
+  void shouldDefineResponseType_whenVerifyGetRollingIntervalResultS() {
     final var sut = mock(RollingTotalReturnsCalculation.class);
     final var result = Set.of(Pair.of("12", portfolioReturns));
 
     doCallRealMethod().when(sut).defineResponseType(result);
-    // ACT
     sut.defineResponseType(result);
 
-    // VERIFY
     verify(sut).getRollingIntervalResults(result);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(RollingTotalReturnsCalculation.class);
     final var result = Set.of(Pair.of("12", portfolioReturns));
 
@@ -92,10 +85,8 @@ class RollingTotalReturnsCalculationTest {
     when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(resDTO));
 
     doCallRealMethod().when(sut).defineResponseType(result);
-    // ACT
     final RollingTotalReturnsResult actual = sut.defineResponseType(result);
 
-    // VERIFY
     Assertions.assertEquals(expected.getRollingTotalReturns(), actual.getRollingTotalReturns());
   }
 

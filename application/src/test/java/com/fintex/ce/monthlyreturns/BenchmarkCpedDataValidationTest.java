@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BenchmarkCpedDataValidationTest {
 
   @Test
-  void getCpedIsAfterPedExceptionCode_checkResult() {
+  void shouldGetCpedIsAfterPedExceptionCode_whenCheckResult() {
     // SETUP
     final BenchmarkCpedDataValidation sut = new BenchmarkCpedDataValidation();
 
@@ -23,7 +23,7 @@ class BenchmarkCpedDataValidationTest {
   }
 
   @Test
-  void getCpedIsBeforePsdExceptionCode_checkResult() {
+  void shouldGetCpedIsBeforePsdExceptionCode_whenCheckResult() {
     // SETUP
     final BenchmarkCpedDataValidation sut = new BenchmarkCpedDataValidation();
 

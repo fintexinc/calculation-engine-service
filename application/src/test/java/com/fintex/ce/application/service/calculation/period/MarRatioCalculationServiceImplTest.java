@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class MarRatioCalculationServiceImplTest {
 
   @Test
-  void perform_verifyValidateMarRatio() {
+  void shouldPerform_whenVerifyValidateMarRatio() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -44,7 +44,7 @@ class MarRatioCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -65,7 +65,7 @@ class MarRatioCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
@@ -88,7 +88,7 @@ class MarRatioCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();

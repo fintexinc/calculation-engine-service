@@ -42,7 +42,7 @@ import static org.mockito.Mockito.withSettings;
 class EquityMarketCapCalculationServiceImplTest {
 
   @Test
-  void staticFieldsInitialization_verifyGROUPS() {
+  void shouldStaticFieldsInitialization_whenVerifyGROUPS() {
     // SETUP
     final var groupsExpected = Map.of(
         LARGE, Set.of(LARGE, GIANT),
@@ -57,7 +57,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void staticFieldsInitialization_verifyDEFAULT_MAP() {
+  void shouldStaticFieldsInitialization_whenVerifyDEFAULTMAP() {
     // SETUP
     final Map<EquityMarketCapType, BigDecimal> defaultMapExpected = new HashMap<>();
     defaultMapExpected.put(LARGE, null);
@@ -72,7 +72,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyLoad() {
+  void shouldPerform_whenVerifyLoad() {
     // SETUP
     final var marketCapCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
@@ -92,7 +92,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyAreAllValuesZerosInMapOfExposure() {
+  void shouldPerform_whenVerifyAreAllValuesZerosInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var marketCapCacheStorage = mock(HoldingDataLoader.class);
@@ -111,7 +111,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void perform_checkResultWhenExposureIsAllZeroValuesMap() {
+  void shouldPerform_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var marketCapCacheStorage = mock(HoldingDataLoader.class);
@@ -135,7 +135,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
 
       // SETUP
@@ -156,7 +156,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyReScale() {
+  void shouldCalculate_whenVerifyReScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
@@ -180,7 +180,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyGroupedResults() {
+  void shouldCalculate_whenVerifyGroupedResults() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
@@ -205,7 +205,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyToUserScale() {
+  void shouldCalculate_whenVerifyToUserScale() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
@@ -228,7 +228,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_checkResult() {
+  void shouldCalculate_whenCheckResult() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
@@ -255,7 +255,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void groupedResults_verifyCalculateSumWithingTheSameGroupForEachOfGROUPS() {
+  void shouldGroupedResults_whenVerifyCalculateSumWithingTheSameGroupForEachOfGROUPS() {
     // SETUP
     final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
 
@@ -274,7 +274,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void groupedResults_checkResult() {
+  void shouldGroupedResults_whenCheckResult() {
     // SETUP
     final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
 
@@ -293,7 +293,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void calculateSumWithinTheSameGroup_checkResult1() {
+  void shouldCalculateSumWithinTheSameGroup_whenCheckResult1() {
     // SETUP
     final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
 
@@ -312,7 +312,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void calculateSumWithinTheSameGroup_checkResult2() {
+  void shouldCalculateSumWithinTheSameGroup_whenCheckResult2() {
     // SETUP
     final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
 
@@ -329,7 +329,7 @@ class EquityMarketCapCalculationServiceImplTest {
   }
 
   @Test
-  void calculateSumWithinTheSameGroup_checkResult3() {
+  void shouldCalculateSumWithinTheSameGroup_whenCheckResult3() {
     // SETUP
     final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
 
