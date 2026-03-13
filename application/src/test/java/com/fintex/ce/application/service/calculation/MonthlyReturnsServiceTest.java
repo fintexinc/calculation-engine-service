@@ -48,7 +48,7 @@ import static org.mockito.Mockito.withSettings;
 class MonthlyReturnsServiceTest {
 
   @Test
-  void getWeightedAverageWithCpsdAndCpedValidation_verifyGetWeightedAverage() {
+  void shouldGetWeightedAverageWithCpsdAndCpedValidation_whenVerifyGetWeightedAverage() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
     final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
@@ -70,7 +70,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getWeightedAverageWithCpsdAndCpedValidation_checkResult() {
+  void shouldGetWeightedAverageWithCpsdAndCpedValidation_whenCheckResult() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
     final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
@@ -95,7 +95,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getWeightedAverageWithCpedValidation_verifyGetWeightedAverage() {
+  void shouldGetWeightedAverageWithCpedValidation_whenVerifyGetWeightedAverage() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
     final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
@@ -116,7 +116,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getWeightedAverageWithCpedValidation_checkResult() {
+  void shouldGetWeightedAverageWithCpedValidation_whenCheckResult() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
     final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
@@ -140,7 +140,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getMonthlyReturns_verifyLoad() {
+  void shouldGetMonthlyReturns_whenVerifyLoad() {
     // SETUP
     try (MockedConstruction<Returns> mocked = Mockito.mockConstruction(Returns.class)) {
       final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
@@ -162,7 +162,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getMonthlyReturns_checkResult() {
+  void shouldGetMonthlyReturns_whenCheckResult() {
     // SETUP
     final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
@@ -184,7 +184,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getMonthlyReturns_verifyGicWasGenerated() {
+  void shouldGetMonthlyReturns_whenVerifyGicWasGenerated() {
     // SETUP
     final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
@@ -206,7 +206,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getPortfolioMonthlyReturns_verifyGetMonthlyReturns() {
+  void shouldGetPortfolioMonthlyReturns_whenVerifyGetMonthlyReturns() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
@@ -224,7 +224,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getPortfolioMonthlyReturns_verifyInit() {
+  void shouldGetPortfolioMonthlyReturns_whenVerifyInit() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
@@ -254,7 +254,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getPortfolioMonthlyReturns_checkResult() {
+  void shouldGetPortfolioMonthlyReturns_whenCheckResult() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
@@ -272,7 +272,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getBenchmarkMonthlyReturns_verifyGetMonthlyReturns() {
+  void shouldGetBenchmarkMonthlyReturns_whenVerifyGetMonthlyReturns() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
@@ -290,7 +290,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getBenchmarkMonthlyReturns_verifyInit() {
+  void shouldGetBenchmarkMonthlyReturns_whenVerifyInit() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
@@ -320,7 +320,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getBenchmarkMonthlyReturns_checkResult() {
+  void shouldGetBenchmarkMonthlyReturns_whenCheckResult() {
     // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
@@ -338,7 +338,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void getFxRates_checkResult() {
+  void shouldGetFxRates_whenCheckResult() {
     // SETUP
     final var fxRatesCacheStorage = mock(FxRatesPort.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);

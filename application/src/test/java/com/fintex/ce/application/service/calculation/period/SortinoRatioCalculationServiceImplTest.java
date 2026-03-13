@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 class SortinoRatioCalculationServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);

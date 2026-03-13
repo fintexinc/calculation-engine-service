@@ -53,7 +53,7 @@ class PeriodBenchmarkAbstractServiceTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodBenchmarkAbstractService.class);
@@ -82,7 +82,7 @@ class PeriodBenchmarkAbstractServiceTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetBenchmarkMonthlyReturns() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetBenchmarkMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodBenchmarkAbstractService.class, withSettings().useConstructor(monthlyReturnsService,

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class StandardDeviationCalculationServiceImplTest {
 
   @Test
-  void calculationSpecificChecks_checkResult() {
+  void shouldCalculationSpecificChecks_whenCheckResult() {
     // SETUP
     final StandardDeviationCalculationServiceImpl standardDeviationCalculationService = mock(
         StandardDeviationCalculationServiceImpl.class);
@@ -40,7 +40,7 @@ class StandardDeviationCalculationServiceImplTest {
   }
 
   @Test
-  void calculationSpecificChecks_checkResult2() {
+  void shouldCalculationSpecificChecks_whenCheckResult2() {
     // SETUP
     final StandardDeviationCalculationServiceImpl standardDeviationCalculationService = mock(
         StandardDeviationCalculationServiceImpl.class);
@@ -58,7 +58,7 @@ class StandardDeviationCalculationServiceImplTest {
   }
 
   @Test
-  void calculationSpecificChecks_checkResult3() {
+  void shouldCalculationSpecificChecks_whenCheckResult3() {
     // SETUP
     final StandardDeviationCalculationServiceImpl standardDeviationCalculationService = mock(
         StandardDeviationCalculationServiceImpl.class);
@@ -75,7 +75,7 @@ class StandardDeviationCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_checkResult() {
+  void shouldDefineCalculationMethod_whenCheckResult() {
     // SETUP
     final var sut = mock(StandardDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of("12", "36", "60", "120")));

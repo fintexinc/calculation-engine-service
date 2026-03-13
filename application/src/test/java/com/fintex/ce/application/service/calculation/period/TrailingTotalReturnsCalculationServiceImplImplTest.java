@@ -18,7 +18,7 @@ import static org.mockito.Mockito.withSettings;
 class TrailingTotalReturnsCalculationServiceImplImplTest {
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var set = mock(Set.class);

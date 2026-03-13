@@ -23,24 +23,20 @@ import static org.mockito.Mockito.*;
 class DownsideCaptureCalculationTest {
 
   @Test
-  void defineResponseType_verifyFormTimeIntervalResult() {
-    // SETUP
+  void shouldDefineResponseType_whenVerifyFormTimeIntervalResult() {
     final DownsideCaptureCalculation alpha = mock(DownsideCaptureCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
 
     doCallRealMethod().when(alpha).defineResponseType(anySet());
-    // ACT
     alpha.defineResponseType(pairs);
 
-    // VERIFY
     verify(alpha).formTimeIntervalResult(pairs);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldDefineResponseType_whenCheckResult() {
     final DownsideCaptureCalculation t = mock(DownsideCaptureCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2009-01-01", ONE), Pair.of("2013-01-05", TEN));
@@ -51,42 +47,34 @@ class DownsideCaptureCalculationTest {
     when(t.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(t).defineResponseType(anySet());
-    // ACT
     final DownsideCaptureResult actual = t.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, actual.getDownsideCapture());
   }
 
   @Test
-  void filterCaptureExpression_checkResult() {
-    // SETUP
+  void shouldFilterCaptureExpression_whenCheckResult() {
     final DownsideCaptureCalculation t = mock(DownsideCaptureCalculation.class);
 
     final Map.Entry<LocalDate, BigDecimal> entry = new AbstractMap.SimpleEntry<>(
         LocalDate.now(), new BigDecimal(String.valueOf(BigDecimal.ONE.subtract(TEN))));
 
     doCallRealMethod().when(t).filterCaptureExpression(any());
-    // ACT
     final boolean actual = t.filterCaptureExpression(entry);
 
-    // VERIFY
     assertTrue(actual);
   }
 
   @Test
-  void filterCaptureExpression_checkResult1() {
-    // SETUP
+  void shouldFilterCaptureExpression_whenCheckResult1() {
     final DownsideCaptureCalculation t = mock(DownsideCaptureCalculation.class);
 
     final Map.Entry<LocalDate, BigDecimal> entry = new AbstractMap.SimpleEntry<>(
         LocalDate.now(), new BigDecimal(String.valueOf(BigDecimal.ONE.subtract(ONE))));
 
     doCallRealMethod().when(t).filterCaptureExpression(any());
-    // ACT
     final boolean actual = t.filterCaptureExpression(entry);
 
-    // VERIFY
     assertFalse(actual);
   }
 }

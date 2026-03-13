@@ -28,7 +28,7 @@ import static org.mockito.Mockito.withSettings;
 class BreakdownAbstractServiceTest {
 
   @Test
-  void calculateNetProducts_verifyCalculateInitialPortfolioWeight() {
+  void shouldCalculateNetProducts_whenVerifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var sut = mock(BreakdownAbstractService.class);
@@ -46,7 +46,7 @@ class BreakdownAbstractServiceTest {
   }
 
   @Test
-  void calculateNetProducts_verifyCalculateNetProductForEachEquityMarketCapType() {
+  void shouldCalculateNetProducts_whenVerifyCalculateNetProductForEachEquityMarketCapType() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var sut = mock(BreakdownAbstractService.class);
@@ -69,7 +69,7 @@ class BreakdownAbstractServiceTest {
   }
 
   @Test
-  void calculateNetProducts_checkResult() {
+  void shouldCalculateNetProducts_whenCheckResult() {
     // SETUP
     final var sut = mock(BreakdownAbstractService.class);
 
@@ -89,7 +89,7 @@ class BreakdownAbstractServiceTest {
   }
 
   @Test
-  void calculateNetProduct_verifySumProduct() {
+  void shouldCalculateNetProduct_whenVerifySumProduct() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       // SETUP
       final var sut = mock(BreakdownAbstractService.class);
@@ -111,7 +111,7 @@ class BreakdownAbstractServiceTest {
   }
 
   @Test
-  void calculateNetProduct_checkResult() {
+  void shouldCalculateNetProduct_whenCheckResult() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       // SETUP
       final var sut = mock(BreakdownAbstractService.class);
@@ -132,7 +132,7 @@ class BreakdownAbstractServiceTest {
   }
 
   @Test
-  void perform_verifyGetLoadFromCacheStorage() {
+  void shouldPerform_whenVerifyGetLoadFromCacheStorage() {
     // SETUP
     final var sut = mock(BreakdownAbstractService.class, withSettings().useConstructor());
 
@@ -151,7 +151,7 @@ class BreakdownAbstractServiceTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var sut = mock(BreakdownAbstractService.class, withSettings().useConstructor());
 

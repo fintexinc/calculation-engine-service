@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 class SharpeRatioCalculationServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
@@ -36,7 +36,7 @@ class SharpeRatioCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyLoadTBillsFor() {
+  void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()

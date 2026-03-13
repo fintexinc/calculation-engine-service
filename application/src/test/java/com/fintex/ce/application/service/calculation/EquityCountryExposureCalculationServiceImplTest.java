@@ -28,7 +28,7 @@ import static org.mockito.Mockito.withSettings;
 class EquityCountryExposureCalculationServiceImplTest {
 
   @Test
-  void perform_verifyValidateHoldings() {
+  void shouldPerform_whenVerifyValidateHoldings() {
     // SETUP
     final var storage = mock(EquityCountryAllocationCachePort.class);
     final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
@@ -46,7 +46,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculateNetProduct_checkResult() {
+  void shouldCalculateNetProduct_whenCheckResult() {
     // SETUP
     final EquityCountryExposureCalculationServiceImpl e = mock(EquityCountryExposureCalculationServiceImpl.class);
 
@@ -69,7 +69,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculateNetProduct_checkResult2() {
+  void shouldCalculateNetProduct_whenCheckResult2() {
     // SETUP
     final EquityCountryExposureCalculationServiceImpl e = mock(EquityCountryExposureCalculationServiceImpl.class);
 
@@ -92,7 +92,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
+  void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(EquityCountryAllocationCachePort.class);
@@ -111,7 +111,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_checkResultWhenExposureIsAllZeroValuesMap() {
+  void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(EquityCountryAllocationCachePort.class);
@@ -135,7 +135,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(EquityCountryAllocationCachePort.class);
@@ -155,7 +155,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class);
@@ -175,7 +175,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyReScale() {
+  void shouldCalculate_whenVerifyReScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
@@ -199,7 +199,7 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyToUserScale() {
+  void shouldCalculate_whenVerifyToUserScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {

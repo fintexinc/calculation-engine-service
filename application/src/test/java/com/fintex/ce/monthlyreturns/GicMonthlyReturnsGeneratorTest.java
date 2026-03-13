@@ -31,7 +31,7 @@ class GicMonthlyReturnsGeneratorTest {
   static final BigDecimal RETURN_OF_5_PERCENT_DAILY = BigDecimal.valueOf(0.0041750727376082);
 
   @Test
-  void generateGicMonthlyReturns_2PercentAnnualFrequency() {
+  void shouldGenerateGicMonthlyReturns_when2PercentAnnualFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
@@ -49,7 +49,7 @@ class GicMonthlyReturnsGeneratorTest {
   }
 
   @Test
-  void generateGicMonthlyReturns_10PercentAnnualFrequency() {
+  void shouldGenerateGicMonthlyReturns_when10PercentAnnualFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
@@ -66,7 +66,7 @@ class GicMonthlyReturnsGeneratorTest {
   }
 
   @Test
-  void generateGicMonthlyReturns_5PercentSemiAnnualFrequency() {
+  void shouldGenerateGicMonthlyReturns_when5PercentSemiAnnualFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
@@ -85,7 +85,7 @@ class GicMonthlyReturnsGeneratorTest {
   }
 
   @Test
-  void generateGicMonthlyReturns_5PercentQuarterlyFrequency() {
+  void shouldGenerateGicMonthlyReturns_when5PercentQuarterlyFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
@@ -104,7 +104,7 @@ class GicMonthlyReturnsGeneratorTest {
   }
 
   @Test
-  void generateGicMonthlyReturns_5PercentMonthlyFrequency() {
+  void shouldGenerateGicMonthlyReturns_when5PercentMonthlyFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
@@ -123,7 +123,7 @@ class GicMonthlyReturnsGeneratorTest {
   }
 
   @Test
-  void generateGicMonthlyReturns_5PercentBiMonthlyFrequency() {
+  void shouldGenerateGicMonthlyReturns_when5PercentBiMonthlyFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
@@ -142,7 +142,7 @@ class GicMonthlyReturnsGeneratorTest {
   }
 
   @Test
-  void generateGicMonthlyReturns_5PercentWeeklyFrequency() {
+  void shouldGenerateGicMonthlyReturns_when5PercentWeeklyFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
@@ -161,7 +161,7 @@ class GicMonthlyReturnsGeneratorTest {
   }
 
   @Test
-  void generateGicMonthlyReturns_5PercentBiWeeklyFrequency() {
+  void shouldGenerateGicMonthlyReturns_when5PercentBiWeeklyFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
@@ -180,7 +180,7 @@ class GicMonthlyReturnsGeneratorTest {
   }
 
   @Test
-  void generateGicMonthlyReturns_5PercentDailyFrequency() {
+  void shouldGenerateGicMonthlyReturns_when5PercentDailyFrequency() {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();

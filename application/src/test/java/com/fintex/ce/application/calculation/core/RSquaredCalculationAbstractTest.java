@@ -18,15 +18,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class RSquaredCalculationAbstractTest {
 
   final int TWELVE = 12;
 
   @Test
-  void calculatePeriodForNumberOfMonths_numberOfMonthGreaterThanPortfolioExcessReturnsResultNull() {
-    // SETUP
+  void shouldReturnNull_whenPeriodExceedsPortfolioExcessReturnsSize() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var portfolioExcessReturns = mock(TreeMap.class);
@@ -44,16 +48,13 @@ class RSquaredCalculationAbstractTest {
     when(sut.calculateRSquared(any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(100);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_numberOfMonthGreaterThanBenchmarkExcessReturnsResultNull() {
-    // SETUP
+  void shouldReturnNull_whenPeriodExceedsBenchmarkExcessReturnsSize() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var portfolioExcessReturns = mock(TreeMap.class);
@@ -71,16 +72,13 @@ class RSquaredCalculationAbstractTest {
     when(sut.calculateRSquared(any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(100);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldResolvePeriodStartDate_whenCalculatingPeriod() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -93,16 +91,13 @@ class RSquaredCalculationAbstractTest {
     when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut).getPeriodStartDate(12, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetSubMapByPeriodStartDate() {
-    // SETUP
+  void shouldGetExcessReturnSubMaps_whenCalculatingPeriod() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var periodStartDate = LocalDate.now();
@@ -119,16 +114,13 @@ class RSquaredCalculationAbstractTest {
     when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut, times(2)).getSubMapByPeriodStartDate(periodStartDate, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateRSquared() {
-    // SETUP
+  void shouldCalculateRSquared_whenCalculatingPeriod() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -142,16 +134,13 @@ class RSquaredCalculationAbstractTest {
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
     doCallRealMethod().when(sut).calculatePeriod(any(), any(), any());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut).calculateRSquared(eq(treeMap), eq(treeMap), any());
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldReturnCalculatedRSquared_whenInputDataIsValid() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -166,16 +155,13 @@ class RSquaredCalculationAbstractTest {
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
     doCallRealMethod().when(sut).calculatePeriod(any(), any(), any());
-    // ACT
     final BigDecimal result = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     assertEquals(TEN, result);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenBenchmarkTotalReturnsSizeLessThenPeriod() {
-    // SETUP
+  void shouldReturnNull_whenBenchmarkReturnsSizeIsLessThanPeriod() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
 
@@ -186,16 +172,13 @@ class RSquaredCalculationAbstractTest {
     when(sut.calculateRSquared(any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal result = sut.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     assertNull(result);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenPeriodIsLessThanTwelve() {
-    // SETUP
+  void shouldReturnNull_whenPeriodIsLessThanTwelve() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -208,16 +191,13 @@ class RSquaredCalculationAbstractTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal result = sut.calculatePeriodForNumberOfMonths(6);
 
-    // VERIFY
     assertNull(result);
   }
 
   @Test
-  void calculateRSquared_verifyCalculateNumerator() {
-    // SETUP
+  void shouldUseSumSquaredRegression_whenCalculatingRSquared() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var bigDecimal = mock(BigDecimal.class);
@@ -226,16 +206,13 @@ class RSquaredCalculationAbstractTest {
     when(sut.calculateTotalSumOfSquares(any(), any())).thenReturn(ONE);
 
     doCallRealMethod().when(sut).calculateRSquared(any(), any(), any());
-    // ACT
     sut.calculateRSquared(treeMap, treeMap, bigDecimal);
 
-    // VERIFY
     verify(sut).calculateSumSquaredRegression(treeMap, treeMap);
   }
 
   @Test
-  void calculateRSquared_verifyCalculateTotalSumOfSquares() {
-    // SETUP
+  void shouldUseTotalSumOfSquares_whenCalculatingRSquared() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var bigDecimal = mock(BigDecimal.class);
@@ -244,16 +221,13 @@ class RSquaredCalculationAbstractTest {
     when(sut.calculateTotalSumOfSquares(any(), any())).thenReturn(ONE);
 
     doCallRealMethod().when(sut).calculateRSquared(any(), any(), any());
-    // ACT
     sut.calculateRSquared(treeMap, treeMap, bigDecimal);
 
-    // VERIFY
     verify(sut).calculateTotalSumOfSquares(treeMap, bigDecimal);
   }
 
   @Test
-  void calculateRSquared_checkResult() {
-    // SETUP
+  void shouldReturnRSquaredValue_whenRegressionAndTotalSumProvided() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
     final var bigDecimal = mock(BigDecimal.class);
@@ -262,16 +236,13 @@ class RSquaredCalculationAbstractTest {
     when(sut.calculateTotalSumOfSquares(any(), any())).thenReturn(BigDecimal.valueOf(0.994895485347306));
 
     doCallRealMethod().when(sut).calculateRSquared(any(), any(), any());
-    // ACT
     final BigDecimal result = sut.calculateRSquared(treeMap, treeMap, bigDecimal);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(-0.0161300415)), result);
   }
 
   @Test
-  void calculateNumerator_checkResult() {
-    // SETUP
+  void shouldCalculateSumSquaredRegression_whenReturnsProvided() {
     final var sut = mock(RSquaredCalculationAbstract.class);
 
     final var portfolioExcessReturnByPeriod = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.valueOf(
@@ -283,17 +254,14 @@ class RSquaredCalculationAbstractTest {
     final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 
     doCallRealMethod().when(sut).calculateSumSquaredRegression(any(), any());
-    // ACT
     final BigDecimal result = sut.calculateSumSquaredRegression(portfolioExcessReturnByPeriod,
         benchmarkExcessReturnByPeriod);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(0.0003004808)), toUserScale(result));
   }
 
   @Test
-  void calculateTotalSumofSquares_checkResult() {
-    // SETUP
+  void shouldCalculateTotalSumOfSquares_whenReturnsProvided() {
     final var sut = mock(RSquaredCalculationAbstract.class);
 
     final var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.valueOf(
@@ -301,16 +269,13 @@ class RSquaredCalculationAbstractTest {
     final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 
     doCallRealMethod().when(sut).calculateTotalSumOfSquares(any(), any());
-    // ACT
     final BigDecimal result = sut.calculateTotalSumOfSquares(benchmarkExcessReturnByPeriod, benchmarkExcessAverage);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(0.974940892337108)), toUserScale(result));
   }
 
   @Test
-  void overrideTotalReturns_checkResult() {
-    // SETUP
+  void shouldOverrideTotalReturnsToMonthlyChange_whenTotalReturnsProvided() {
     final var sut = mock(RSquaredCalculationAbstract.class);
     final var date = LocalDate.of(2020, 12, 1);
     final var portfolioTotalReturns = new TreeMap<>(Map.of(toLastDayOfMonth(date), BigDecimal.valueOf(1.01094319080371),
@@ -319,10 +284,8 @@ class RSquaredCalculationAbstractTest {
     when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).overrideTotalReturns(any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> totalReturns = sut.overrideTotalReturns(portfolioTotalReturns);
 
-    // VERIFY
     assertEquals(2, totalReturns.size());
     assertEquals(toUserScale(BigDecimal.valueOf(0.02297440154456)), toUserScale(totalReturns.firstEntry().getValue()));
     assertEquals(toUserScale(BigDecimal.valueOf(0.01094319080371)), toUserScale(totalReturns.lastEntry().getValue()));

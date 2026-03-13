@@ -5,8 +5,8 @@ import com.fintex.ce.application.calculation.MaxDrawdownCalculation;
 import com.fintex.ce.application.calculation.TrailingTotalReturnsCalculation;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.port.input.result.MARRatioResult;
-import com.fintex.ce.port.input.result.core.TimeIntervalResult;
 import com.fintex.ce.port.input.result.core.MaxDrawdownEntry;
+import com.fintex.ce.port.input.result.core.TimeIntervalResult;
 import com.fintex.ce.util.DecimalUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -21,13 +21,18 @@ import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 class MarRatioCalculationTest {
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculatePeriodForNumberOfMonthsForTrailingTRAndMaxDrawdown() {
-    // SETUP
+  void shouldDelegateToDependencies_whenCalculatingPeriod() {
     final var input = mock(CalculationDTO.class);
     final var trailingTTRCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var maxDrawdownCalculation = mock(MaxDrawdownCalculation.class);
@@ -40,17 +45,14 @@ class MarRatioCalculationTest {
     when(trailingTTRCalculation.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(new BigDecimal("0.111"));
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(numberOfMonths);
 
-    // VERIFY
     verify(trailingTTRCalculation).calculatePeriodForNumberOfMonths(numberOfMonths);
     verify(maxDrawdownCalculation).calculatePeriodForNumberOfMonths(numberOfMonths);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyStaticDivideAndAbs() {
-    // SETUP
+  void shouldUseAbsoluteMaxDrawdownAndDivide_whenBothInputsPresent() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       final var input = mock(CalculationDTO.class);
       final var trailingTTRCalculation = mock(TrailingTotalReturnsCalculation.class);
@@ -66,18 +68,15 @@ class MarRatioCalculationTest {
       mockedDecimalUtils.when(() -> DecimalUtils.abs(any())).thenReturn(new BigDecimal("0.1112"));
 
       doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-      // ACT
       sut.calculatePeriodForNumberOfMonths(numberOfMonths);
 
-      // VERIFY
       mockedDecimalUtils.verify(() -> DecimalUtils.abs(new BigDecimal("0.1112")));
       mockedDecimalUtils.verify(() -> DecimalUtils.divide(new BigDecimal("0.1113"), new BigDecimal("0.1112")));
     }
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldReturnNull_whenMaxDrawdownValueIsNull() {
     final var input = mock(CalculationDTO.class);
     final var trailingTTRCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var maxDrawdownCalculation = mock(MaxDrawdownCalculation.class);
@@ -90,16 +89,13 @@ class MarRatioCalculationTest {
     when(trailingTTRCalculation.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(new BigDecimal("0.111"));
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(numberOfMonths);
 
-    // VERIFY
     Assertions.assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult2() {
-    // SETUP
+  void shouldReturnMarRatio_whenTrailingReturnAndMaxDrawdownPresent() {
     final var input = mock(CalculationDTO.class);
     final var trailingTTRCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var maxDrawdownCalculation = mock(MaxDrawdownCalculation.class);
@@ -112,17 +108,14 @@ class MarRatioCalculationTest {
     when(trailingTTRCalculation.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(new BigDecimal("0.111"));
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(numberOfMonths);
 
-    // VERIFY
     final BigDecimal expected = new BigDecimal("0.991071428571429");
     Assertions.assertEquals(expected, actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult3() {
-    // SETUP
+  void shouldReturnNull_whenPeriodIsLessThanTwelve() {
     final var input = mock(CalculationDTO.class);
     final var trailingTTRCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var maxDrawdownCalculation = mock(MaxDrawdownCalculation.class);
@@ -131,16 +124,13 @@ class MarRatioCalculationTest {
     final var numberOfMonths = 10;
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(numberOfMonths);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void defineResponseType_verifyFormTimeIntervalResult() {
-    // SETUP
+  void shouldDelegateToFormTimeIntervalResult_whenDefiningResponseType() {
     final var sut = mock(MarRatioCalculation.class);
     final var result = Set.of(
         Pair.of("2000-01-12", ZERO),
@@ -150,16 +140,13 @@ class MarRatioCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(timeIntervals);
 
     doCallRealMethod().when(sut).defineResponseType(result);
-    // ACT
     sut.defineResponseType(result);
 
-    // VERIFY
     verify(sut).formTimeIntervalResult(result);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldMapIntervals_whenDefiningResponseType() {
     final var sut = mock(MarRatioCalculation.class);
     final var result = Set.of(
         Pair.of("2020-01-05", BigDecimal.ONE),
@@ -171,16 +158,13 @@ class MarRatioCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     final MARRatioResult actual = sut.defineResponseType(result);
 
-    // VERIFY
     assertEquals(expected, actual.getMarRatio());
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_returnNull_whenMaxDrawdownIsZero() {
-    // SETUP
+  void shouldReturnNull_whenMaxDrawdownIsZero() {
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var maxDrawdownCalculation = mock(MaxDrawdownCalculation.class);
 
@@ -192,16 +176,13 @@ class MarRatioCalculationTest {
     when(maxDrawdownCalculation.calculatePeriodForNumberOfMonths(12)).thenReturn(maxDrawdownDTO);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actualResult = sut.calculatePeriodForNumberOfMonths(12);
 
-    // VERIFY
     assertNull(actualResult);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_returnNull_whenMaxDrawdownIsNull() {
-    // SETUP
+  void shouldReturnNull_whenMaxDrawdownIsNull() {
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var maxDrawdownCalculation = mock(MaxDrawdownCalculation.class);
 
@@ -213,10 +194,8 @@ class MarRatioCalculationTest {
     when(maxDrawdownCalculation.calculatePeriodForNumberOfMonths(12)).thenReturn(maxDrawdownDTO);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actualResult = sut.calculatePeriodForNumberOfMonths(12);
 
-    // VERIFY
     assertNull(actualResult);
   }
 

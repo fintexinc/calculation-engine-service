@@ -21,7 +21,7 @@ class AlphaCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(AlphaCalculationServiceImpl.class, withSettings()
@@ -45,7 +45,7 @@ class AlphaCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyLoadTBillsFor() {
+  void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(AlphaCalculationServiceImpl.class, withSettings()
@@ -69,7 +69,7 @@ class AlphaCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyCalculateExcessReturn() {
+  void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
       final var tBillsCacheStorage = mock(TBillsPort.class);

@@ -4,8 +4,8 @@ import com.fintex.ce.application.calculation.CorrelationCalculation;
 import com.fintex.ce.application.calculation.RollingCorrelationCalculation;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.port.input.result.RollingCorrelationResult;
-import com.fintex.ce.port.input.result.core.RollingIntervalResult;
 import com.fintex.ce.port.input.result.core.IntervalResult;
+import com.fintex.ce.port.input.result.core.RollingIntervalResult;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -19,12 +19,25 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.*;
+import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.domain.constant.BigDecimalConstants.TEN_THOUSAND;
+import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 class RollingCorrelationCalculationTest {
 
@@ -49,8 +62,7 @@ class RollingCorrelationCalculationTest {
   }
 
   @Test
-  void calculateRollingValue_checkResult() {
-    // SETUP
+  void shouldReturnNull_whenBenchmarkReturnsSizeIsLessThanWindow() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = mock(TreeMap.class);
     final var calculationDTO = mock(CalculationDTO.class);
@@ -61,16 +73,13 @@ class RollingCorrelationCalculationTest {
     when(benchmarkTotalReturns.size()).thenReturn(1);
 
     doCallRealMethod().when(sut).calculateRollingValue(anyInt(), any());
-    // ACT
     final BigDecimal actual = sut.calculateRollingValue(numberOfMonths, portfolioReturns);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculateRollingValue_verifyInitializePortfilioReturns() {
-    // SETUP
+  void shouldInitializePortfolioReturns_whenCalculatingRollingValue() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -80,16 +89,13 @@ class RollingCorrelationCalculationTest {
     final int numberOfMonths = TWELVE;
 
     doCallRealMethod().when(sut).calculateRollingValue(anyInt(), any());
-    // ACT
     sut.calculateRollingValue(numberOfMonths, portfolioReturns);
 
-    // VERIFY
     verify(sut).initializePortfolioReturns(portfolioReturns);
   }
 
   @Test
-  void calculateRollingValue_verifyInitializeBanchmarkReturns() {
-    // SETUP
+  void shouldInitializeBenchmarkReturns_whenCalculatingRollingValue() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -100,16 +106,13 @@ class RollingCorrelationCalculationTest {
 
     when(sut.initializePortfolioReturns(any())).thenReturn(portfolioReturns);
     doCallRealMethod().when(sut).calculateRollingValue(anyInt(), any());
-    // ACT
     sut.calculateRollingValue(numberOfMonths, portfolioReturns);
 
-    // VERIFY
     verify(sut).initializeBenchmarkReturns(portfolioReturns);
   }
 
   @Test
-  void calculateRollingValue_verifyCalculateCorrelation() {
-    // SETUP
+  void shouldDelegateToCorrelationCalculation_whenCalculatingRollingValue() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -122,16 +125,13 @@ class RollingCorrelationCalculationTest {
     when(sut.initializeBenchmarkReturns(any())).thenReturn(benchmarkReturns);
 
     doCallRealMethod().when(sut).calculateRollingValue(anyInt(), any());
-    // ACT
     sut.calculateRollingValue(numberOfMonths, portfolioReturns);
 
-    // VERIFY
     verify(correlationCalculation).calculateCorrelation(portfolioReturns, benchmarkReturns);
   }
 
   @Test
-  void calculateRollingValue_checkResult2() {
-    // SETUP
+  void shouldReturnCorrelationValue_whenInputsArePrepared() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -145,16 +145,13 @@ class RollingCorrelationCalculationTest {
     when(correlationCalculation.calculateCorrelation(anyMap(), anyMap())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculateRollingValue(anyInt(), any());
-    // ACT
     final BigDecimal actual = sut.calculateRollingValue(numberOfMonths, portfolioReturns);
 
-    // VERIFY
     assertSame(TEN, actual);
   }
 
   @Test
-  void initializePortfolioReturns_verifyGetReturns() {
-    // SETUP
+  void shouldGetAdjustedPortfolioReturns_whenBenchmarkStartsLater() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -164,16 +161,13 @@ class RollingCorrelationCalculationTest {
     when(sut.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(true);
 
     doCallRealMethod().when(sut).initializePortfolioReturns(any());
-    // ACT
     sut.initializePortfolioReturns(portfolioReturns);
 
-    // VERIFY
     verify(sut).getReturns(any(), any());
   }
 
   @Test
-  void initializeBenchmarkReturns_verifyGetReturns() {
-    // SETUP
+  void shouldGetAdjustedBenchmarkReturns_whenBenchmarkStartsLater() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -183,16 +177,13 @@ class RollingCorrelationCalculationTest {
     when(sut.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(true);
 
     doCallRealMethod().when(sut).initializeBenchmarkReturns(any());
-    // ACT
     sut.initializeBenchmarkReturns(portfolioReturns);
 
-    // VERIFY
     verify(sut).getReturns(any(), any());
   }
 
   @Test
-  void initializePortfolioReturns_checkResult() {
-    // SETUP
+  void shouldReturnSamePortfolioReturns_whenBenchmarkDoesNotStartLater() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -202,16 +193,13 @@ class RollingCorrelationCalculationTest {
     when(sut.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(false);
 
     doCallRealMethod().when(sut).initializePortfolioReturns(any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.initializePortfolioReturns(portfolioReturns);
 
-    // VERIFY
     Assertions.assertEquals(portfolioReturns, actual);
   }
 
   @Test
-  void initializePortfolioReturns_checkResult2() {
-    // SETUP
+  void shouldReturnAdjustedPortfolioReturns_whenBenchmarkStartsLater() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -223,16 +211,13 @@ class RollingCorrelationCalculationTest {
     when(sut.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(true);
 
     doCallRealMethod().when(sut).initializePortfolioReturns(any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.initializePortfolioReturns(portfolioReturns);
 
-    // VERIFY
     Assertions.assertEquals(result, actual);
   }
 
   @Test
-  void initializeBenchmarkReturns_checkResult() {
-    // SETUP
+  void shouldReturnBenchmarkTail_whenBenchmarkDoesNotStartLater() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -242,16 +227,13 @@ class RollingCorrelationCalculationTest {
     when(sut.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(false);
 
     doCallRealMethod().when(sut).initializeBenchmarkReturns(any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.initializeBenchmarkReturns(portfolioReturns);
 
-    // VERIFY
     Assertions.assertEquals(TWELVE, actual.size());
   }
 
   @Test
-  void initializeBenchmarkReturns_checkResult2() {
-    // SETUP
+  void shouldReturnAdjustedBenchmarkReturns_whenBenchmarkStartsLater() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -263,16 +245,13 @@ class RollingCorrelationCalculationTest {
     when(sut.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(true);
 
     doCallRealMethod().when(sut).initializeBenchmarkReturns(any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.initializeBenchmarkReturns(portfolioReturns);
 
-    // VERIFY
     Assertions.assertEquals(result, actual);
   }
 
   @Test
-  void getReturns_checkResult() {
-    // SETUP
+  void shouldReturnBenchmarkRangeMatchingPortfolioSize_whenGettingReturns() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = new TreeMap<>();
     final var calculationDTO = mock(CalculationDTO.class);
@@ -287,17 +266,14 @@ class RollingCorrelationCalculationTest {
     when(portfolioReturns.size()).thenReturn(2);
 
     doCallRealMethod().when(sut).getReturns(any(), any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.getReturns(portfolioReturns,
         RollingCorrelationCalculationTest.portfolioReturns);
 
-    // VERIFY
     Assertions.assertEquals(TWO.intValue(), actual.size());
   }
 
   @Test
-  void isBenchmarkFirstKeyGreaterThanPortfolioFirstKey_checkResult() {
-    // SETUP
+  void shouldReturnFalse_whenBenchmarkStartsNotLaterThanPortfolio() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final var calculationDTO = mock(CalculationDTO.class);
@@ -305,16 +281,13 @@ class RollingCorrelationCalculationTest {
         correlationCalculation, benchmarkTotalReturns));
 
     doCallRealMethod().when(sut).isBenchmarkStartDateGreaterThanPortfolioStartDate(any());
-    // ACT
     final boolean actual = sut.isBenchmarkStartDateGreaterThanPortfolioStartDate(portfolioReturns);
 
-    // VERIFY
     assertFalse(actual);
   }
 
   @Test
-  void isBenchmarkFirstKeyGreaterThanPortfolioFirstKey_checkResult2() {
-    // SETUP
+  void shouldReturnTrue_whenBenchmarkStartsLaterThanPortfolio() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;
     final NavigableMap<LocalDate, BigDecimal> portfolioReturns = mock(NavigableMap.class);
@@ -325,32 +298,26 @@ class RollingCorrelationCalculationTest {
     when(portfolioReturns.firstKey()).thenReturn(LocalDate.now().minusMonths(13));
 
     doCallRealMethod().when(sut).isBenchmarkStartDateGreaterThanPortfolioStartDate(any());
-    // ACT
     final boolean actual = sut.isBenchmarkStartDateGreaterThanPortfolioStartDate(portfolioReturns);
 
-    // VERIFY
     assertTrue(actual);
   }
 
   @Test
-  void defineResponseType_verifyGetRollingIntervalResultS() {
-    // SETUP
+  void shouldDelegateToRollingIntervalResults_whenDefiningResponseType() {
     final var sut = mock(RollingCorrelationCalculation.class);
     final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
     returns.put(LocalDate.now().minusMonths(3), TEN);
     final var result = Set.of(Pair.of("12", returns));
 
     doCallRealMethod().when(sut).defineResponseType(result);
-    // ACT
     sut.defineResponseType(result);
 
-    // VERIFY
     verify(sut).getRollingIntervalResults(result);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldMapRollingCorrelationResult_whenDefiningResponseType() {
     final var sut = mock(RollingCorrelationCalculation.class);
     final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
     returns.put(LocalDate.now().minusMonths(3), TEN);
@@ -364,10 +331,8 @@ class RollingCorrelationCalculationTest {
     when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(resDTO));
 
     doCallRealMethod().when(sut).defineResponseType(result);
-    // ACT
     final RollingCorrelationResult actual = sut.defineResponseType(result);
 
-    // VERIFY
     Assertions.assertEquals(expected.getRollingCorrelation(), actual.getRollingCorrelation());
   }
 

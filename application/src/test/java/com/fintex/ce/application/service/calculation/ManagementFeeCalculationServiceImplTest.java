@@ -38,7 +38,7 @@ import static org.mockito.Mockito.*;
 class ManagementFeeCalculationServiceImplTest {
 
   @Test
-  void perform_checkResult() {
+  void shouldPerform_whenCheckResult() {
     // SETUP
     final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
@@ -57,7 +57,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyLoad() {
+  void shouldPerform_whenVerifyLoad() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
@@ -84,7 +84,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifySetNullForScaledIfHoldingContainsNoFunds() {
+  void shouldPerform_whenVerifySetNullForScaledIfHoldingContainsNoFunds() {
     // SETUP
     final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
@@ -109,7 +109,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculateAverageValue() {
+  void shouldPerform_whenVerifyCalculateAverageValue() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
@@ -135,7 +135,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetSpecifiedIfEmpty() {
+  void shouldPerform_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
@@ -160,7 +160,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetSpecifiedIfEmptyDEFAULT_DATAPROVIDERS() {
+  void shouldPerform_whenVerifyGetSpecifiedIfEmptyDEFAULTDATAPROVIDERS() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
@@ -186,7 +186,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void setInitialFeeAndModifiedFeeValues_checkResult() {
+  void shouldSetInitialFeeAndModifiedFeeValues_whenCheckResult() {
     // SETUP
     final var sut = mock(ManagementFeeCalculationServiceImpl.class);
 
@@ -217,7 +217,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageValue_checkResult() {
+  void shouldCalculateAverageValue_whenCheckResult() {
     // SETUP
     final var sut = mock(ManagementFeeCalculationServiceImpl.class);
 
@@ -238,7 +238,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageValue_verifyGetAbsoluteAverageMer() {
+  void shouldCalculateAverageValue_whenVerifyGetAbsoluteAverageMer() {
     // SETUP
     final var sut = mock(ManagementFeeCalculationServiceImpl.class);
 
@@ -256,7 +256,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void calculateAverageValue_verifyGetScaledAverageMer() {
+  void shouldCalculateAverageValue_whenVerifyGetScaledAverageMer() {
     // SETUP
     final var sut = mock(ManagementFeeCalculationServiceImpl.class);
 
@@ -296,7 +296,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void setInitialFeeAndModifiedFeeValues_expectExceptionWhenHoldingIsFundAndManagementFeeIsEmpty() {
+  void shouldSetInitialFeeAndModifiedFeeValues_whenExpectExceptionWhenHoldingIsFundAndManagementFeeIsEmpty() {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var holding = new Holding();
@@ -317,7 +317,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void setInitialFeeAndModifiedFeeValues_nothingHappensIfHoldingsIsOnlyCashAndStocks() {
+  void shouldSetInitialFeeAndModifiedFeeValues_whenNothingHappensIfHoldingsIsOnlyCashAndStocks() {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var notification = new Notification();
@@ -337,7 +337,7 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   @Test
-  void setInitialFeeAndModifiedFeeValues_nothingHappensIfHoldingsIsFundAndContainsManagementFee() {
+  void shouldSetInitialFeeAndModifiedFeeValues_whenNothingHappensIfHoldingsIsFundAndContainsManagementFee() {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var notification = new Notification();

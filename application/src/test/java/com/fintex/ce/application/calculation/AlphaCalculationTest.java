@@ -32,8 +32,7 @@ class AlphaCalculationTest {
   final int TWELVE = 12;
 
   @Test
-  void defineResponseType_verifyFormTimeIntervalResult() {
-    // SETUP
+  void shouldDelegateToFormTimeIntervalResult_whenDefiningResponseType() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
@@ -43,16 +42,13 @@ class AlphaCalculationTest {
     when(alpha.formTimeIntervalResult(anySet())).thenReturn(timeIntervals);
 
     doCallRealMethod().when(alpha).defineResponseType(anySet());
-    // ACT
     alpha.defineResponseType(pairs);
 
-    // VERIFY
     verify(alpha).formTimeIntervalResult(pairs);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldReturnAlphaResultWithMappedIntervals_whenDefiningResponseType() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2020-01-05", BigDecimal.ONE), Pair.of("2000-01-12",
@@ -64,16 +60,13 @@ class AlphaCalculationTest {
     when(alpha.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(alpha).defineResponseType(anySet());
-    // ACT
     final AlphaResult actual = alpha.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, actual.getAlpha());
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldResolvePeriodStartDate_whenCalculatingPeriodForNumberOfMonths() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     final TreeMap treeMap = mock(TreeMap.class);
@@ -85,16 +78,14 @@ class AlphaCalculationTest {
     when(alpha.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     alpha.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(alpha).getPeriodStartDate(12, treeMap);
   }
 
   @SuppressWarnings("unchecked")
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetSubMapByPeriodStartDate() {
+  void shouldBuildSubMapsFromResolvedStartDate_whenCalculatingPeriodForNumberOfMonths() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     final TreeMap<LocalDate, BigDecimal> portfolioBenchmarkPortfolioReturns = mock(TreeMap.class);
@@ -115,16 +106,13 @@ class AlphaCalculationTest {
     when(alpha.getSubMapByPeriodStartDate(any(), any())).thenReturn(portfolioBenchmarkExcessReturns);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     alpha.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     verify(alpha, times(2)).getSubMapByPeriodStartDate(periodStartDate, portfolioBenchmarkExcessReturns);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateAlpha() {
-    // SETUP
+  void shouldCallCalculateAlpha_whenCalculatingPeriodForNumberOfMonths() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     final TreeMap treeMap = mock(TreeMap.class);
@@ -136,16 +124,13 @@ class AlphaCalculationTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     alpha.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(alpha).calculateAlpha(eq(TWELVE), any(), any());
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldReturnCalculatedAlpha_whenPeriodAndDataSizeAreValid() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
     final TreeMap treeMap = mock(TreeMap.class);
     when(alpha.getBenchmarkTotalReturns()).thenReturn(treeMap);
@@ -156,16 +141,13 @@ class AlphaCalculationTest {
     when(alpha.calculateAlpha(anyInt(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal result = alpha.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     assertEquals(TEN, result);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenBenchmarkTotalReturnsSizeLessThenPeriod() {
-    // SETUP
+  void shouldReturnNull_whenBenchmarkSizeIsLessThanRequestedPeriod() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
     final TreeMap treeMap = mock(TreeMap.class);
 
@@ -176,16 +158,13 @@ class AlphaCalculationTest {
     when(alpha.calculateAlpha(anyInt(), any(), any())).thenReturn(BigDecimal.TEN);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal result = alpha.calculatePeriodForNumberOfMonths(24);
 
-    // VERIFY
     assertNull(result);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenPeriodIsLessThanTwelve() {
-    // SETUP
+  void shouldReturnNull_whenRequestedPeriodIsLessThanTwelveMonths() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     final TreeMap treeMap = mock(TreeMap.class);
@@ -197,55 +176,44 @@ class AlphaCalculationTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal result = alpha.calculatePeriodForNumberOfMonths(6);
 
-    // VERIFY
     assertNull(result);
   }
 
   @Test
-  void calculateAlpha_verifyCalculateBeta() {
-    // SETUP
+  void shouldCallCalculateBeta_whenCalculatingAlpha() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     when(alpha.calculateBeta(anyInt())).thenReturn(TEN);
 
     doCallRealMethod().when(alpha).calculateAlpha(anyInt(), any(), any());
-    // ACT
     alpha.calculateAlpha(10, TEN, BigDecimalConstants.TWELVE);
 
-    // VERIFY
     verify(alpha).calculateBeta(10);
   }
 
   @Test
-  void calculateAlpha_verifyResult() {
-    // SETUP
+  void shouldReturnExpectedAlphaValue_whenCalculatingAlphaWithBetaTen() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     when(alpha.calculateBeta(anyInt())).thenReturn(TEN);
 
     doCallRealMethod().when(alpha).calculateAlpha(anyInt(), any(), any());
-    // ACT
     final BigDecimal actual = alpha.calculateAlpha(10, TEN, BigDecimalConstants.TWELVE);
 
-    // VERIFY
     assertEquals(BigDecimal.valueOf(-1320), actual);
   }
 
   @Test
-  void calculateAlpha_verifyResult1() {
-    // SETUP
+  void shouldReturnExpectedAlphaValue_whenCalculatingAlphaWithBetaOne() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     when(alpha.calculateBeta(anyInt())).thenReturn(ONE);
 
     doCallRealMethod().when(alpha).calculateAlpha(anyInt(), any(), any());
-    // ACT
     final BigDecimal actual = alpha.calculateAlpha(10, HUNDRED, BigDecimalConstants.TWELVE);
 
-    // VERIFY
     assertEquals(BigDecimal.valueOf(1056), actual);
   }
 

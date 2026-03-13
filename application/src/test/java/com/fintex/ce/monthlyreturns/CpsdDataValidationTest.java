@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 class CpsdDataValidationTest {
 
   @Test
-  void validate_cpsdIsNulLThenNothingShouldHappen() {
+  void shouldValidate_whenCpsdIsNulLThenNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpsdDataValidation.class);
     var notification = new Notification();
@@ -39,7 +39,7 @@ class CpsdDataValidationTest {
   }
 
   @Test
-  void validate_cpsdIsBeforePedNothingShouldHappen() {
+  void shouldValidate_whenCpsdIsBeforePedNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpsdDataValidation.class);
     var notification = new Notification();
@@ -59,7 +59,7 @@ class CpsdDataValidationTest {
   }
 
   @Test
-  void validate_cpsdIsAfterPedErrorShouldBeThrown() {
+  void shouldValidate_whenCpsdIsAfterPedErrorShouldBeThrown() {
     // SETUP
     final var sut = mock(CpsdDataValidation.class);
     var notification = new Notification();
@@ -80,7 +80,7 @@ class CpsdDataValidationTest {
   }
 
   @Test
-  void validate_cpsdIsAfterPsdNothingShouldHappen() {
+  void shouldValidate_whenCpsdIsAfterPsdNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpsdDataValidation.class);
     var notification = new Notification();
@@ -100,7 +100,7 @@ class CpsdDataValidationTest {
   }
 
   @Test
-  void validate_cpsdIsBeforePsdErrorShouldBeThrown() {
+  void shouldValidate_whenCpsdIsBeforePsdErrorShouldBeThrown() {
     // SETUP
     final var sut = mock(CpsdDataValidation.class);
     var notification = new Notification();

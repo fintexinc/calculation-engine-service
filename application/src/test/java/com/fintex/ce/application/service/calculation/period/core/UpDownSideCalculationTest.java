@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 class UpDownSideCalculationTest {
 
   @Test
-  void calculationSpecificChecks_checkResult() {
+  void shouldCalculationSpecificChecks_whenCheckResult() {
     // SETUP
     final UpsideCaptureCalculationServiceImpl u = mock(UpsideCaptureCalculationServiceImpl.class);
 
@@ -34,7 +34,7 @@ class UpDownSideCalculationTest {
   }
 
   @Test
-  void calculationSpecificChecks_checkResult2() {
+  void shouldCalculationSpecificChecks_whenCheckResult2() {
     // SETUP
     final UpsideCaptureCalculationServiceImpl u = mock(UpsideCaptureCalculationServiceImpl.class);
 
@@ -50,7 +50,7 @@ class UpDownSideCalculationTest {
   }
 
   @Test
-  void calculationSpecificChecks_checkResult3() {
+  void shouldCalculationSpecificChecks_whenCheckResult3() {
     // SETUP
     final UpsideCaptureCalculationServiceImpl u = mock(UpsideCaptureCalculationServiceImpl.class);
 
@@ -65,7 +65,7 @@ class UpDownSideCalculationTest {
   }
 
   @Test
-  void calculationSpecificChecks_checkResult4() {
+  void shouldCalculationSpecificChecks_whenCheckResult4() {
     // SETUP
     final UpsideCaptureCalculationServiceImpl u = mock(UpsideCaptureCalculationServiceImpl.class);
 

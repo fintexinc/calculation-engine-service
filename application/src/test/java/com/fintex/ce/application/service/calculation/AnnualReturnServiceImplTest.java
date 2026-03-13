@@ -34,7 +34,7 @@ import static org.mockito.Mockito.withSettings;
 class AnnualReturnServiceImplTest {
 
   @Test
-  void perform_verifyBuildAnnualReturnCalculation() {
+  void shouldPerform_whenVerifyBuildAnnualReturnCalculation() {
     // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
@@ -57,7 +57,7 @@ class AnnualReturnServiceImplTest {
   }
 
   @Test
-  void calculate_verifyBuildWeightedAverageInputDto() {
+  void shouldCalculate_whenVerifyBuildWeightedAverageInputDto() {
     // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
@@ -87,7 +87,7 @@ class AnnualReturnServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyBuildCalculationDto() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyBuildCalculationDto() {
     // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
@@ -109,7 +109,7 @@ class AnnualReturnServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_checkResult() {
+  void shouldBuildWeightedAverageInputDto_whenCheckResult() {
     // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
@@ -137,7 +137,7 @@ class AnnualReturnServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
@@ -164,7 +164,7 @@ class AnnualReturnServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
@@ -189,7 +189,7 @@ class AnnualReturnServiceImplTest {
   }
 
   @Test
-  void buildAnnualReturnCalculation_verify() {
+  void shouldBuildAnnualReturnCalculation_whenVerify() {
     try (var mockedAnnualReturnCalculation = mockConstruction(AnnualReturnCalculation.class)) {
       // SETUP
       final var sut = mock(AnnualReturnServiceImpl.class);
@@ -212,7 +212,7 @@ class AnnualReturnServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_checkMonthlyReturnsWarnings() {
+  void shouldBuildWeightedAverageInputDto_whenCheckMonthlyReturnsWarnings() {
     // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));

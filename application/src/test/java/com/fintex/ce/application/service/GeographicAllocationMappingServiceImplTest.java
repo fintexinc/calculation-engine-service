@@ -34,7 +34,7 @@ class GeographicAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToGeographicRegions_returnsExpectedResults_whenValidDataProvided() {
+  void shouldMapToGeographicRegions_whenReturnsExpectedResultsWhenValidDataProvided() {
     Map<String, BigDecimal> allocations = new HashMap<>();
     allocations.put("countryId", BigDecimal.ONE);
     Map<Holding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
@@ -48,7 +48,7 @@ class GeographicAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToGeographicRegions_returnsWarningResults_whenNoDataProvided() {
+  void shouldMapToGeographicRegions_whenReturnsWarningResultsWhenNoDataProvided() {
     Map<Holding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
     holdingAllocations.put(holding, new HashMap<>());
 
@@ -61,7 +61,7 @@ class GeographicAllocationMappingServiceImplTest {
   }
 
   @Test
-  void mapToGeographicRegions_returnsWarningResults_whenUnknownCountryId() {
+  void shouldMapToGeographicRegions_whenReturnsWarningResultsWhenUnknownCountryId() {
     Map<String, BigDecimal> allocations = new HashMap<>();
     allocations.put("unknownCountryId", BigDecimal.ONE);
     Map<Holding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();

@@ -16,22 +16,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class SumProductTest {
 
   @Test
-  void sumProduct_oneItem() {
-    // SETUP
+  void shouldCalculateSumProduct_whenSingleItemProvided() {
     final SumProduct<Integer, Map<LocalDate, BigDecimal>> sumProduct = new SumProduct<>(Map.of(1, Map.of(LOCAL_DATE_NOW,
         ONE)), Map.of(1, Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE)))
         .setMap2KeyFinder(date -> date.minusMonths(1));
 
-    // ACT
     final Map<LocalDate, BigDecimal> actual = sumProduct.calculate();
 
-    // VERIFY
     assertEquals(Map.of(LOCAL_DATE_NOW, ONE), actual);
   }
 
   @Test
-  void sumProduct_twoItems() {
-    // SETUP
+  void shouldCalculateSumProduct_whenMultipleItemsProvided() {
     final SumProduct<Integer, Map<LocalDate, BigDecimal>> sumProduct = new SumProduct<>(
         Map.of(1,
             Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE, toLastDayOfMonth(LOCAL_DATE_NOW.plusMonths(1)), ONE),
@@ -43,10 +39,8 @@ class SumProductTest {
             Map.of(toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), TEN, toLastDayOfMonth(LOCAL_DATE_NOW), TEN)))
         .setMap2KeyFinder(date -> toLastDayOfMonth(date.minusMonths(1)));
 
-    // ACT
     final Map<LocalDate, BigDecimal> actual = sumProduct.calculate();
 
-    // VERIFY
     assertEquals(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), BigDecimal.valueOf(20), toLastDayOfMonth(LOCAL_DATE_NOW
         .plusMonths(1)), BigDecimal.valueOf(110)), actual);
   }

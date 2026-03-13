@@ -34,7 +34,7 @@ import static org.mockito.Mockito.withSettings;
 class LeadingTotalReturnsCalculationServiceImplTest {
 
   @Test
-  void perform_verifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
@@ -54,7 +54,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyLeadingTotalReturnCalculationCalculate() {
+  void shouldPerform_whenVerifyLeadingTotalReturnCalculationCalculate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
@@ -77,7 +77,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class);
 
@@ -95,7 +95,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyLeadingTotalReturnCalculationConstructor() {
+  void shouldDefineCalculationMethod_whenVerifyLeadingTotalReturnCalculationConstructor() {
     // SETUP
     final var defaultPeriods = Set.of("3", "6", "12", "24");
     final LeadingTotalReturnsCalculationServiceImpl sut = Mockito.spy(new LeadingTotalReturnsCalculationServiceImpl(
@@ -120,7 +120,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
@@ -145,7 +145,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetWeightedAverage() {
+  void shouldBuildCalculationDto_whenVerifyGetWeightedAverage() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
@@ -172,7 +172,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_checkResult() {
+  void shouldBuildCalculationDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()

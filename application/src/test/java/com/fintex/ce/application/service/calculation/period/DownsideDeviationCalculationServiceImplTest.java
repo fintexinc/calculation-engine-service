@@ -23,7 +23,7 @@ import static org.mockito.Mockito.withSettings;
 class DownsideDeviationCalculationServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyDefineCalculationMethod() {
+  void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var tBillsCacheStorage = mock(TBillsPort.class);
     final var sut = mock(DownsideDeviationCalculationServiceImpl.class, withSettings()

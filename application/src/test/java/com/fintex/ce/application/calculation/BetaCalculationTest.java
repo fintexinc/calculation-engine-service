@@ -20,24 +20,20 @@ import static org.mockito.Mockito.when;
 class BetaCalculationTest {
 
   @Test
-  void defineResponseType_verifyFormTimeIntervalResult() {
-    // SETUP
+  void shouldDefineResponseType_whenVerifyFormTimeIntervalResult() {
     final BetaCalculation alpha = mock(BetaCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
 
     doCallRealMethod().when(alpha).defineResponseType(anySet());
-    // ACT
     alpha.defineResponseType(pairs);
 
-    // VERIFY
     verify(alpha).formTimeIntervalResult(pairs);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldDefineResponseType_whenCheckResult() {
     final BetaCalculation beta = mock(BetaCalculation.class);
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2020-01-05", BigDecimal.ONE), Pair.of("2000-01-12",
@@ -49,10 +45,8 @@ class BetaCalculationTest {
     when(beta.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(beta).defineResponseType(anySet());
-    // ACT
     final BetaResult actual = beta.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, actual.getBeta());
   }
 

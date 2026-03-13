@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class MaxDrawdownServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
@@ -49,7 +49,7 @@ class MaxDrawdownServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyInitializeGrowthOf10KMap() {
+  void shouldDefineCalculationMethod_whenVerifyInitializeGrowthOf10KMap() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
@@ -73,7 +73,7 @@ class MaxDrawdownServiceImplTest {
   }
 
   @Test
-  void initializeGrowthOf10KMap_checkResult() {
+  void shouldInitializeGrowthOf10KMap_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
@@ -94,7 +94,7 @@ class MaxDrawdownServiceImplTest {
   }
 
   @Test
-  void initializeGrowthOf10KMap_checkResult2() {
+  void shouldInitializeGrowthOf10KMap_whenCheckResult2() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()

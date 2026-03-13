@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 class MonthlyReturnsCutComponentTest {
 
   @Test
-  void cutReturnsByEndDate_checkResult() {
+  void shouldCutReturnsByEndDate_whenCheckResult() {
     // SETUP
     final ReturnsCutComponent sut = new ReturnsCutComponent();
     final Holding h1 = mock(Holding.class);
@@ -46,7 +46,7 @@ class MonthlyReturnsCutComponentTest {
   }
 
   @Test
-  void cutReturnsByStartDate_checkResult() {
+  void shouldCutReturnsByStartDate_whenCheckResult() {
     // SETUP
     final ReturnsCutComponent sut = new ReturnsCutComponent();
     final Holding h1 = mock(Holding.class);

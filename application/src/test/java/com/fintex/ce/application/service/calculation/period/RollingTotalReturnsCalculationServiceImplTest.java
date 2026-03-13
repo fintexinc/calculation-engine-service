@@ -35,7 +35,7 @@ import static org.mockito.Mockito.withSettings;
 class RollingTotalReturnsCalculationServiceImplTest {
 
   @Test
-  void perform_checkResult() {
+  void shouldPerform_whenCheckResult() {
     // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
@@ -66,7 +66,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
@@ -95,7 +95,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
@@ -123,7 +123,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_checkResult() {
+  void shouldDefineCalculationMethod_whenCheckResult() {
     // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of("10", "20")));
@@ -147,7 +147,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyDefineCalculationMethod() {
+  void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
@@ -168,7 +168,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_checkResult() {
+  void shouldBuildWeightedAverageInputDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
@@ -194,7 +194,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
@@ -221,7 +221,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()

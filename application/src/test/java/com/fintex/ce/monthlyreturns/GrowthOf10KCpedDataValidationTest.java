@@ -11,7 +11,7 @@ import static org.mockito.Mockito.*;
 class GrowthOf10KCpedDataValidationTest {
 
   @Test
-  void validate_verify() {
+  void shouldValidate_whenVerify() {
     // SETUP
     final GrowthOf10KCpedDataValidation sut = mock(GrowthOf10KCpedDataValidation.class);
     var notification = new Notification();

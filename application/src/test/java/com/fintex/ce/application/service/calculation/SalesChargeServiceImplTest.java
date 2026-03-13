@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 class SalesChargeServiceImplTest {
 
   @Test
-  void perform_verifyLoad() {
+  void shouldPerform_whenVerifyLoad() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(cacheStorage));
@@ -34,7 +34,7 @@ class SalesChargeServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetSalesChargeCalculation() {
+  void shouldPerform_whenVerifyGetSalesChargeCalculation() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(cacheStorage));
@@ -53,7 +53,7 @@ class SalesChargeServiceImplTest {
   }
 
   @Test
-  void perform_checkResult() {
+  void shouldPerform_whenCheckResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(cacheStorage));

@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 class MonthlyReturnsTest {
 
   @Test
-  void cutArgumentToTheSameEndDateWhenPedIsGreater_veryfyNoAction_whenThisPedIsAfterOtherPed() {
+  void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVeryfyNoActionWhenThisPedIsAfterOtherPed() {
     // SETUP
     final var sut = mock(Returns.class);
     final var other = mock(Returns.class);
@@ -56,7 +56,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutArgumentToTheSameEndDateWhenPedIsGreater_checkResult_whenThisPedIsAfterOtherPed() {
+  void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenCheckResultWhenThisPedIsAfterOtherPed() {
     // SETUP
     final var sut = mock(Returns.class);
     final var other = mock(Returns.class);
@@ -75,7 +75,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutArgumentToTheSameEndDateWhenPedIsGreater_verifyCutReturnsByEndDate_whenThisPedIsBeforeOtherPed() {
+  void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVerifyCutReturnsByEndDateWhenThisPedIsBeforeOtherPed() {
     // SETUP
     final var sut = mock(Returns.class);
     final var other = mock(Returns.class);
@@ -101,7 +101,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutArgumentToTheSameEndDateWhenPedIsGreater_verifyInit_whenThisPedIsBeforeOtherPed() {
+  void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVerifyInitWhenThisPedIsBeforeOtherPed() {
     // SETUP
     final var sut = mock(Returns.class);
     final var other = mock(Returns.class);
@@ -127,7 +127,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutArgumentToTheSameEndDateWhenPedIsGreater_checkResult2_whenThisPedIsBeforeOtherPed() {
+  void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenCheckResult2WhenThisPedIsBeforeOtherPed() {
     // SETUP
     final var sut = mock(Returns.class);
     final var other = mock(Returns.class);
@@ -158,7 +158,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void fxRatesApplied_verifyConvert() {
+  void shouldFxRatesApplied_whenVerifyConvert() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -184,7 +184,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutByCpedIfCpedEmptyCutByPed_verifyCutReturnsByEndDate_whenCpedIsNotNull() {
+  void shouldCutByCpedIfCpedEmptyCutByPed_whenVerifyCutReturnsByEndDateWhenCpedIsNotNull() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -207,7 +207,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutByCpedIfCpedEmptyCutByPed_verifyCutReturnsByEndDate_whenCpedIsNull() {
+  void shouldCutByCpedIfCpedEmptyCutByPed_whenVerifyCutReturnsByEndDateWhenCpedIsNull() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -230,7 +230,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutByPed_verifyCutReturnsByEndDate() {
+  void shouldCutByPed_whenVerifyCutReturnsByEndDate() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -253,7 +253,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutByPsd_verifyCutReturnsByEndDate() {
+  void shouldCutByPsd_whenVerifyCutReturnsByEndDate() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -276,7 +276,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutByCpsdIfCpsdEmptyCutByPsd_verifyCutReturnsByEndDate_whenCpedIsNotNull() {
+  void shouldCutByCpsdIfCpsdEmptyCutByPsd_whenVerifyCutReturnsByEndDateWhenCpedIsNotNull() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -299,7 +299,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void cutByCpsdIfCpsdEmptyCutByPsd_verifyCutReturnsByEndDate_whenCpedIsNull() {
+  void shouldCutByCpsdIfCpsdEmptyCutByPsd_whenVerifyCutReturnsByEndDateWhenCpedIsNull() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -322,7 +322,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void getWeightedAverage_verifyGetWeightedAverage() {
+  void shouldGetWeightedAverage_whenVerifyGetWeightedAverage() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -344,7 +344,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void getWeightedAverage_checkResult() {
+  void shouldGetWeightedAverage_whenCheckResult() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -369,7 +369,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void validateCped_verifyValidatePortfolioCped() {
+  void shouldValidateCped_whenVerifyValidatePortfolioCped() {
     // SETUP
     final var sut = mock(Returns.class);
     Notification notification = mock(Notification.class);
@@ -396,7 +396,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void validateCpsd_verifyValidatePortfolioCped() {
+  void shouldValidateCpsd_whenVerifyValidatePortfolioCped() {
     // SETUP
     final var sut = mock(Returns.class);
     Notification notification = mock(Notification.class);
@@ -423,7 +423,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void validateMonthlyReturns_checkException_case1() {
+  void shouldValidateMonthlyReturns_whenCheckExceptionCase1() {
     // SETUP
     final var sut = new Returns();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
@@ -460,7 +460,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void validateMonthlyReturns_checkException_case2() {
+  void shouldValidateMonthlyReturns_whenCheckExceptionCase2() {
     // SETUP
     final var sut = new Returns();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
@@ -498,7 +498,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void validateMonthlyReturns_checkException_case3() {
+  void shouldValidateMonthlyReturns_whenCheckExceptionCase3() {
     // SETUP
     final var sut = new Returns();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
@@ -535,7 +535,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void validateMonthlyReturns_case4_noExceptionThrown() {
+  void shouldValidateMonthlyReturns_whenCase4NoExceptionThrown() {
     // SETUP
     final var sut = new Returns();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
@@ -566,7 +566,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void getMonthlyReturns_checkResult() {
+  void shouldGetMonthlyReturns_whenCheckResult() {
     // SETUP
     final var sut = mock(Returns.class);
     final var monthlyReturns = Map.of(mock(Holding.class), new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE)));
@@ -582,7 +582,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void getMonthlyReturns_verifyCopy() {
+  void shouldGetMonthlyReturns_whenVerifyCopy() {
     // SETUP
     try (var mapUtilsMock = mockStatic(MapUtils.class)) {
       final var sut = mock(Returns.class);
@@ -601,7 +601,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void findPsdAmongHoldings_checkResult() {
+  void shouldFindPsdAmongHoldings_whenCheckResult() {
     // SETUP
     final var holding = mock(Holding.class);
     final var sut = mock(Returns.class);
@@ -619,7 +619,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void findPedAmongHoldings_checkResult() {
+  void shouldFindPedAmongHoldings_whenCheckResult() {
     // SETUP
     final var holding = mock(Holding.class);
     final var sut = mock(Returns.class);
@@ -637,7 +637,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void retrieveHoldingCurrencies_checkResult() {
+  void shouldRetrieveHoldingCurrencies_whenCheckResult() {
     // SETUP
     final var sut = mock(Returns.class);
     sut.notification = new Notification();
@@ -664,7 +664,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void retrieveHoldingCurrencies_currencyIsNull() {
+  void shouldRetrieveHoldingCurrencies_whenCurrencyIsNull() {
     // SETUP
     final var sut = mock(Returns.class);
     sut.notification = new Notification();
@@ -693,7 +693,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void retrieveReturns_checkResult() {
+  void shouldRetrieveReturns_whenCheckResult() {
     // SETUP
     final var sut = mock(Returns.class);
 
@@ -721,7 +721,7 @@ class MonthlyReturnsTest {
   }
 
   @Test
-  void MonthlyReturns_checkResult() {
+  void shouldMonthlyReturns_whenCheckResult() {
     // SETUP
     final var rMonthlyReturns = mock(ReturnsData.class);
     final var monthlyReturns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));

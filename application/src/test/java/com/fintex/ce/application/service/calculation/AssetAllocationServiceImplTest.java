@@ -8,6 +8,7 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.AssetAllocationResult;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.port.output.sm.dto.AssetAllocationDto;
 import com.fintex.ce.util.ComparisonUtils;
@@ -16,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
+import com.fintex.ce.util.validation.data.DataProviderChecker;
 import org.junit.jupiter.api.Test;
 
 import static java.math.BigDecimal.TEN;
@@ -33,7 +37,7 @@ import static org.mockito.Mockito.withSettings;
 class AssetAllocationServiceImplTest {
 
   @Test
-  void fetchExposures_checkResult() {
+  void shouldGetLoadFromCacheStorage_whenCheckResult() {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
@@ -55,29 +59,6 @@ class AssetAllocationServiceImplTest {
 
     // VERIFY
     assertEquals(expected, actual);
-  }
-
-  @Test
-  void fetchExposures_verifySecurityDataPortFetch() {
-    // SETUP
-    final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var responseMapper = mock(AssetAllocationResponseMapper.class);
-    final var securityDataPort = mock(SecurityDataPort.class);
-
-    final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
-        assetAllocationDataMapper, responseMapper, securityDataPort));
-
-    final var reqDTO = mock(PortfolioHoldingsCommand.class);
-    final var holdings = List.of(mock(Holding.class));
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
-
-    // ACT
-    sut.fetchExposures(reqDTO, List.of());
-
-    // VERIFY
-    verify(securityDataPort).fetch(any(), anyList());
   }
 
   @Test
@@ -103,7 +84,7 @@ class AssetAllocationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateNetProducts() {
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
@@ -125,7 +106,7 @@ class AssetAllocationServiceImplTest {
   }
 
   @Test
-  void calculate_verifyFromNetProducts() {
+  void shouldCalculate_whenVerifyFromNetProducts() {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
@@ -150,7 +131,7 @@ class AssetAllocationServiceImplTest {
   }
 
   @Test
-  void calculate_checkResult() {
+  void shouldCalculate_whenCheckResult() {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
@@ -179,7 +160,7 @@ class AssetAllocationServiceImplTest {
   }
 
   @Test
-  void calculateAssetAllocationResponse_checkResult() {
+  void shouldCalculateAssetAllocationResponse_whenCheckResult() {
     // SETUP
     final AssetAllocationServiceImpl m = mock(AssetAllocationServiceImpl.class);
     final Map<AssetAllocationRegionType, BigDecimal> expected = Stream.of(AssetAllocationRegionType.values())

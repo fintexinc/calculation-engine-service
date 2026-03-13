@@ -1,6 +1,5 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.SalesChargeCalculation;
 import com.fintex.ce.domain.enumeration.calculation.SalesCharge;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -28,22 +27,18 @@ class SalesChargeCalculationTest {
   }
 
   @Test
-  void calculate_salesChargeIsEmptyReturnEmptyResult() {
-    // SETUP
+  void shouldReturnDefaultMap_whenSalesChargeDataIsEmpty() {
     final var sut = new SalesChargeCalculation(Map.of());
 
     final var expected = new SalesChargeResult().setSalesCharges(DEFAULT_MAP);
 
-    // ACT
     final var actual = sut.calculate();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculate_checkResultEachTypeContainOneHolding() {
-    // SETUP
+  void shouldCalculateWeightsPerType_whenEachTypeContainsOneHolding() {
     final Map<Holding, com.fintex.ce.domain.model.SalesCharge> dataFromFds = new HashMap<>();
     final FundSeriesHolding holding1 = getFundSeriesHolding("RBF605", 10_000);
     final FundSeriesHolding holding2 = getFundSeriesHolding("RBF606", 20_000);
@@ -72,10 +67,8 @@ class SalesChargeCalculationTest {
         SalesCharge.NO_LOAD_INITIAL_SALES_CHARGE, s2,
         SalesCharge.LOW_LOAD_SALES_CHARGE, s3));
 
-    // ACT
     final var actual = sut.calculate();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
@@ -87,9 +80,8 @@ class SalesChargeCalculationTest {
   }
 
   @Test
-  void calculate_checkResultTwoSalesChargesContainOneHoldingEach() {
+  void shouldCalculateWeights_whenTwoTypesContainOneHoldingEach() {
 
-    // SETUP
     final Map<Holding, com.fintex.ce.domain.model.SalesCharge> dataFromFds = new HashMap<>();
     final FundSeriesHolding holding2 = getFundSeriesHolding("RBF606", 51_000);
     final FundSeriesHolding holding3 = getFundSeriesHolding("RBF607", 49_000);
@@ -112,16 +104,13 @@ class SalesChargeCalculationTest {
         SalesCharge.NO_LOAD_INITIAL_SALES_CHARGE, s2,
         SalesCharge.DEFERRED_SALES_CHARGE, s3));
 
-    // ACT
     final var actual = sut.calculate();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculate_checkResultWhenEachSalesChargeHaveFewHoldings() {
-    // SETUP
+  void shouldAggregateHoldingsByType_whenEachTypeHasMultipleHoldings() {
     final Map<Holding, com.fintex.ce.domain.model.SalesCharge> dataFromFds = new HashMap<>();
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 10_000, FRONT_END_CHARGE);
     addHoldingAndRSalesCharge(dataFromFds, "RBF607", 15_000, VOLUME_SALES_CHARGE);
@@ -150,32 +139,26 @@ class SalesChargeCalculationTest {
         SalesCharge.LOW_LOAD_SALES_CHARGE, s2,
         SalesCharge.DEFERRED_SALES_CHARGE, s3));
 
-    // ACT
     final var actual = sut.calculate();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculate_checkResultWhenEachSalesChargeDontHaveHoldings() {
-    // SETUP
+  void shouldReturnDefaultMap_whenNoHoldingsProvided() {
     final Map<Holding, com.fintex.ce.domain.model.SalesCharge> dataFromFds = new HashMap<>();
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
     final var expected = new SalesChargeResult().setSalesCharges(DEFAULT_MAP);
 
-    // ACT
     final var actual = sut.calculate();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculate_checkResultWhenOneSalesChargeHaveThreeHoldings() {
-    // SETUP
+  void shouldCalculateFullWeightForSingleType_whenThreeHoldingsShareSameType() {
     final Map<Holding, com.fintex.ce.domain.model.SalesCharge> dataFromFds = new HashMap<>();
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 50_000, FRONT_END_CHARGE);
     addHoldingAndRSalesCharge(dataFromFds, "RBF607", 50_000, VOLUME_SALES_CHARGE);
@@ -194,16 +177,13 @@ class SalesChargeCalculationTest {
         SalesCharge.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
         SalesCharge.DEFERRED_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO));
 
-    // ACT
     final var actual = sut.calculate();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculate_checkResultWhenOneSalesChargeHaveOneHoldings() {
-    // SETUP
+  void shouldCalculateFullWeightForSingleType_whenOneHoldingSharesSameType() {
     final Map<Holding, com.fintex.ce.domain.model.SalesCharge> dataFromFds = new HashMap<>();
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 150_000, FRONT_END_CHARGE);
 
@@ -217,10 +197,8 @@ class SalesChargeCalculationTest {
         SalesCharge.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
         SalesCharge.DEFERRED_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO));
 
-    // ACT
     final var actual = sut.calculate();
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 

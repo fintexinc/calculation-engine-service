@@ -23,7 +23,7 @@ import static org.mockito.Mockito.withSettings;
 class InformationRatioCalculationServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriod = mock(Set.class);

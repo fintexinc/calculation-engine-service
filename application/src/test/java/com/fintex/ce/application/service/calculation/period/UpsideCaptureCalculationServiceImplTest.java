@@ -23,7 +23,7 @@ import static org.mockito.Mockito.withSettings;
 class UpsideCaptureCalculationServiceImplTest {
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(UpsideCaptureCalculationServiceImpl.class, withSettings()

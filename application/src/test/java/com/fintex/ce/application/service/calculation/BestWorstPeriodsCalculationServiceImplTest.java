@@ -33,7 +33,7 @@ import static org.mockito.Mockito.withSettings;
 class BestWorstPeriodsCalculationServiceImplTest {
 
   @Test
-  void perform_checkResult() {
+  void shouldPerform_whenCheckResult() {
     // SETUP
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
@@ -62,7 +62,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyBuildWeightedAverageInputDto() {
+  void shouldPerform_whenVerifyBuildWeightedAverageInputDto() {
     // SETUP
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
@@ -89,7 +89,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyBuildCalculation() {
+  void shouldPerform_whenVerifyBuildCalculation() {
     // SETUP
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
@@ -115,7 +115,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void buildBestWorstPeriodCalculation_verifyGetPeriods() {
+  void shouldBuildBestWorstPeriodCalculation_whenVerifyGetPeriods() {
     // SETUP
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class);
 
@@ -137,7 +137,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void buildBestWorstPeriodCalculation_checkResult() {
+  void shouldBuildBestWorstPeriodCalculation_whenCheckResult() {
     // SETUP
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class);
 
@@ -163,7 +163,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void getPeriods_CheckResultWithCustomPeriods() {
+  void shouldGetPeriods_whenCheckResultWithCustomPeriods() {
     // SETUP
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
@@ -182,7 +182,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void getPeriods_CheckResultWithoutCustomPeriods() {
+  void shouldGetPeriods_whenCheckResultWithoutCustomPeriods() {
     // SETUP
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
@@ -202,7 +202,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void bestWorstPeriodCalculation_calculateCheckResult() throws Exception {
+  void shouldBestWorstPeriodCalculation_whenCalculateCheckResult() throws Exception {
     // SETUP
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
@@ -233,7 +233,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
@@ -256,7 +256,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_verifyGetWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildWeightedAverageInputDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
@@ -285,7 +285,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void buildWeightedAverageInputDto_checkResult() {
+  void shouldBuildWeightedAverageInputDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()

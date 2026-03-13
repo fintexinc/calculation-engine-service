@@ -32,7 +32,7 @@ import static org.mockito.Mockito.withSettings;
 class CommonPerformanceDateServiceImplTest {
 
   @Test
-  void commonPerformanceDateFor_holdingsIsEmpty() {
+  void shouldCommonPerformanceDateFor_whenHoldingsIsEmpty() {
     // SETUP
     final var sut = mock(CommonPerformanceDateServiceImpl.class);
     final var expected = new CommonDates();
@@ -51,7 +51,7 @@ class CommonPerformanceDateServiceImplTest {
   }
 
   @Test
-  void commonPerformanceDate_verifyValidate() {
+  void shouldCommonPerformanceDate_whenVerifyValidate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CommonPerformanceDateServiceImpl.class,
@@ -73,7 +73,7 @@ class CommonPerformanceDateServiceImplTest {
   }
 
   @Test
-  void collectAllPortfolioHoldings_checkResultIsEmpty_whenPortfolioIsEmpty() {
+  void shouldCollectAllPortfolioHoldings_whenCheckResultIsEmptyWhenPortfolioIsEmpty() {
     // SETUP
     final var sut = mock(CommonPerformanceDateServiceImpl.class);
 
@@ -87,7 +87,7 @@ class CommonPerformanceDateServiceImplTest {
   }
 
   @Test
-  void collectAllPortfolioHoldings_checkResult() {
+  void shouldCollectAllPortfolioHoldings_whenCheckResult() {
     // SETUP
     final var sut = mock(CommonPerformanceDateServiceImpl.class);
     final var portfolio1 = mock(MultiplePortfoliosCommand.Portfolio.class);
@@ -113,7 +113,7 @@ class CommonPerformanceDateServiceImplTest {
   }
 
   @Test
-  void commonPerformanceDate_errorResponse() {
+  void shouldCommonPerformanceDate_whenErrorResponse() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CommonPerformanceDateServiceImpl.class,
@@ -140,7 +140,7 @@ class CommonPerformanceDateServiceImplTest {
   }
 
   @Test
-  void commonPerformanceDateFor_emptyMonthlyReturns() {
+  void shouldCommonPerformanceDateFor_whenEmptyMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CommonPerformanceDateServiceImpl.class,

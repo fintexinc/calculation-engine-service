@@ -19,8 +19,7 @@ import java.util.Map;
 class FixedIncomeBondSectorCalculationTest {
 
   @Test
-  void calculate_verifyAOM() {
-    // SETUP
+  void shouldCalculateFixedIncomeSector_whenPortfolioContainsOnlyAom() {
     final EtfHolding aom = new EtfHolding(BigDecimal.valueOf(50), HoldingType.US_ETF, "", "AOM");
 
     Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> exposures = new HashMap<>();
@@ -33,12 +32,10 @@ class FixedIncomeBondSectorCalculationTest {
 
     FixedIncomeSectorResult expected = getExpectedOfAom();
 
-    // ACT
     final FixedIncomeSectorResult actual = sut.calculate();
 
-    // VERIFY
-    Assertions.assertNotNull(actual);
     ComparisonUtils.compareMaps(expected.getFixedIncomeSector(), actual.getFixedIncomeSector());
+    Assertions.assertEquals(expected.getWarnings(), actual.getWarnings());
   }
 
   private FixedIncomeSectorResult getExpectedOfAom() {
@@ -78,8 +75,7 @@ class FixedIncomeBondSectorCalculationTest {
   }
 
   @Test
-  void calculate_verifyAomAndRbf605() {
-    // SETUP
+  void shouldCalculateFixedIncomeSector_whenPortfolioContainsAomAndRbf605() {
     final EtfHolding aom = new EtfHolding(BigDecimal.valueOf(50), HoldingType.US_ETF, "", "AOM");
     final FundSeriesHolding rbf605 = new FundSeriesHolding(BigDecimal.valueOf(50), "RBF605");
 
@@ -94,17 +90,14 @@ class FixedIncomeBondSectorCalculationTest {
 
     FixedIncomeSectorResult expected = getExpectedOfAomAndRbf605();
 
-    // ACT
     final FixedIncomeSectorResult actual = sut.calculate();
 
-    // VERIFY
-    Assertions.assertNotNull(actual);
     ComparisonUtils.compareMaps(expected.getFixedIncomeSector(), actual.getFixedIncomeSector());
+    Assertions.assertEquals(expected.getWarnings(), actual.getWarnings());
   }
 
   @Test
-  void calculate_verifyAamAndRbf605ButRbf605AAIsMissing() {
-    // SETUP
+  void shouldCalculateFixedIncomeSectorFromAomOnly_whenRbf605FixedIncomePlusCashIsZero() {
     final EtfHolding aom = new EtfHolding(BigDecimal.valueOf(50), HoldingType.US_ETF, "", "AOM");
     final FundSeriesHolding rbf605 = new FundSeriesHolding(BigDecimal.valueOf(50), "RBF605");
 
@@ -119,12 +112,10 @@ class FixedIncomeBondSectorCalculationTest {
 
     FixedIncomeSectorResult expected = getExpectedOfAom();
 
-    // ACT
     final FixedIncomeSectorResult actual = sut.calculate();
 
-    // VERIFY
-    Assertions.assertNotNull(actual);
     ComparisonUtils.compareMaps(expected.getFixedIncomeSector(), actual.getFixedIncomeSector());
+    Assertions.assertEquals(expected.getWarnings(), actual.getWarnings());
   }
 
   private FixedIncomeSectorResult getExpectedOfAomAndRbf605() {

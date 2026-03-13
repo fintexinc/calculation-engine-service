@@ -56,7 +56,7 @@ import static org.mockito.Mockito.withSettings;
 class CreditQualityServiceImplTest {
 
   @Test
-  void perform_verifyLoad() {
+  void shouldPerform_whenVerifyLoad() {
     // SETUP
     final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -84,7 +84,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void perform_verifyAreAllValuesInMapEmpty() {
+  void shouldPerform_whenVerifyAreAllValuesInMapEmpty() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
@@ -117,7 +117,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void perform_verifyGetFixedIncomeCreditQuality() {
+  void shouldPerform_whenVerifyGetFixedIncomeCreditQuality() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
@@ -150,7 +150,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
@@ -186,7 +186,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void perform_verifyResponseMapperFromCalculatedValues() {
+  void shouldPerform_whenVerifyResponseMapperFromCalculatedValues() {
     // SETUP
     final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -214,7 +214,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void perform_checkResult() {
+  void shouldPerform_whenCheckResult() {
     // SETUP
     final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -245,7 +245,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void getFixedIncomeCreditQuality_verifyLoad() {
+  void shouldGetFixedIncomeCreditQuality_whenVerifyLoad() {
     // SETUP
     final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -276,7 +276,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void getFixedIncomeCreditQuality_verifyGetSpecifiedIfEmpty() {
+  void shouldGetFixedIncomeCreditQuality_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
@@ -308,7 +308,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void getFixedIncomeCreditQuality_verifyValidate() {
+  void shouldGetFixedIncomeCreditQuality_whenVerifyValidate() {
     // SETUP
     final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -334,7 +334,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void getFixedIncomeCreditQuality_verifyMapForAA() {
+  void shouldGetFixedIncomeCreditQuality_whenVerifyMapForAA() {
     // SETUP
     final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -360,7 +360,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void getFixedIncomeCreditQuality_checkResult() {
+  void shouldGetFixedIncomeCreditQuality_whenCheckResult() {
     // SETUP
     final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -398,7 +398,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void getFixedIncomeValue_checkResult() {
+  void shouldGetFixedIncomeValue_whenCheckResult() {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
@@ -416,7 +416,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void getFixedIncomeValue_checkResult2() {
+  void shouldGetFixedIncomeValue_whenCheckResult2() {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
@@ -432,7 +432,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void calculateSumProductRating_checkResult() {
+  void shouldCalculateSumProductRating_whenCheckResult() {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
@@ -457,7 +457,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void calculateCreditQualityRatings_verifyCalculateInitialPortfolioWeight() {
+  void shouldCalculateCreditQualityRatings_whenVerifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
@@ -476,7 +476,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void calculateCreditQualityRatings_verifyCalculateSumProductRating() {
+  void shouldCalculateCreditQualityRatings_whenVerifyCalculateSumProductRating() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
@@ -506,7 +506,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void toFixedIncomeCreditQuality_checkResult() {
+  void shouldToFixedIncomeCreditQuality_whenCheckResult() {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
@@ -540,7 +540,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void calculate_verifyCalculateCreditQualityRatings() {
+  void shouldCalculate_whenVerifyCalculateCreditQualityRatings() {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
@@ -558,7 +558,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void calculate_verifyReScale() {
+  void shouldCalculate_whenVerifyReScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
@@ -583,7 +583,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void calculate_verifyToFixedIncomeCreditQuality() {
+  void shouldCalculate_whenVerifyToFixedIncomeCreditQuality() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
@@ -608,7 +608,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void calculate_checkResult() {
+  void shouldCalculate_whenCheckResult() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);

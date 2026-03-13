@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
 class AverageManagementExpenseCalculationServiceTest {
 
   @Test
-  void setFeeValues_checkResult() {
+  void shouldSetFeeValues_whenCheckResult() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final var req = mock(AverageManagementExpenseCalculationDTO.class);
@@ -63,7 +63,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getScaledAverageMer_CallsGetAbsoluteAndForceReportFeeHoldingList() {
+  void shouldGetScaledAverageMer_whenCallsGetAbsoluteAndForceReportFeeHoldingList() {
     // SETUP
     final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     final var sut = mock(AverageManagementExpenseCalculationService.class);
@@ -77,7 +77,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getScaledAverageMer_WhenParameterTypeAbsoluteCallsGetAverageMerByParameterTypeWithAllHoldingTypes() {
+  void shouldGetScaledAverageMer_whenWhenParameterTypeAbsoluteCallsGetAverageMerByParameterTypeWithAllHoldingTypes() {
     // SETUP
     final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     final var sut = mock(AverageManagementExpenseCalculationService.class);
@@ -100,7 +100,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getAbsoluteAndForceReportFeeHoldingList_IsPappedProperly() {
+  void shouldGetAbsoluteAndForceReportFeeHoldingList_whenIsPappedProperly() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
@@ -120,7 +120,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getAverageMerByParameterType_callsCalculateAverageManagementExpenseRatio() {
+  void shouldGetAverageMerByParameterType_whenCallsCalculateAverageManagementExpenseRatio() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final List<AverageManagementExpenseCalculationDTO> averageManagementExpenseCalculationDTOList = List.of(
@@ -135,7 +135,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getAverageMerByParameterType_callsCalculateMarketValueQualified() {
+  void shouldGetAverageMerByParameterType_whenCallsCalculateMarketValueQualified() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final List<AverageManagementExpenseCalculationDTO> averageManagementExpenseCalculationDTOList = List.of(
@@ -150,7 +150,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getAverageMerByParameterType_callsCalculatePercentageQualified() {
+  void shouldGetAverageMerByParameterType_whenCallsCalculatePercentageQualified() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final List<AverageManagementExpenseCalculationDTO> averageManagementExpenseCalculationDTOList = List.of(
@@ -165,7 +165,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getAverageMerByParameterType_callsGetAmountOfMarketValueQualified() {
+  void shouldGetAverageMerByParameterType_whenCallsGetAmountOfMarketValueQualified() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     doCallRealMethod().when(sut).getAverageMerByParameterType(anyList());
@@ -178,7 +178,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getScaledAverageMer_WhenParameterTypeScaledCallsGetAverageMerByParameterTypeWithCanadaMutualFundsUsEtfAndCanadaEtfHoldings() {
+  void shouldGetScaledAverageMer_whenWhenParameterTypeScaledCallsGetAverageMerByParameterTypeWithCanadaMutualFundsUsEtfAndCanadaEtfHoldings() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
 
@@ -198,7 +198,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getForceReportFeeAverageMer_WhenParameterTypeForceReportFeeCallsGetAbsoluteAndForceReportFeeHoldingList() {
+  void shouldGetForceReportFeeAverageMer_whenWhenParameterTypeForceReportFeeCallsGetAbsoluteAndForceReportFeeHoldingList() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
 
@@ -213,7 +213,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getForceReportFeeAverageMer_WhenParameterTypeForceReportFeeCallsGetAverageMerByParameterTypeWithCanadaMutualFundsUsEtfAndCanadaEtfHoldings() {
+  void shouldGetForceReportFeeAverageMer_whenWhenParameterTypeForceReportFeeCallsGetAverageMerByParameterTypeWithCanadaMutualFundsUsEtfAndCanadaEtfHoldings() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
@@ -232,7 +232,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getForceReportFeeAverageMer_CallsIsMerPresentForAHolding4Times() {
+  void shouldGetForceReportFeeAverageMer_whenCallsIsMerPresentForAHolding4Times() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
@@ -246,7 +246,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getForceReportFeeAverageMer_ReturnsNullWhenMerValueIsNull() {
+  void shouldGetForceReportFeeAverageMer_whenReturnsNullWhenMerValueIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
@@ -263,7 +263,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void isMerPresentForAHolding_ReturnsTrueIfMerIsAbsent() {
+  void shouldIsMerPresentForAHolding_whenReturnsTrueIfMerIsAbsent() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
 
@@ -280,7 +280,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void isMerPresentForAHolding_ReturnsFalseIfMerIsPresent() {
+  void shouldIsMerPresentForAHolding_whenReturnsFalseIfMerIsPresent() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
 
@@ -300,7 +300,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void calculateAverageManagementExpenseRatio_averageManagementExpenseRatioValueIsCalculatedProperly() {
+  void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperly() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculationDTO();
@@ -317,7 +317,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void calculateAverageManagementExpenseRatio_averageManagementExpenseRatioValueIsCalculatedProperlyWhenModifiedFeeIsNull() {
+  void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperlyWhenModifiedFeeIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculationDTO();
@@ -333,7 +333,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void calculateAverageManagementExpenseRatio_averageManagementExpenseRatioValueIsCalculatedProperlyWhenPercentageQualifiedIsNull() {
+  void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperlyWhenPercentageQualifiedIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculationDTO();
@@ -349,7 +349,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void calculatePercentageQualified_averageMerCalculationDTOisMappedProperly() {
+  void shouldCalculatePercentageQualified_whenAverageMerCalculationDTOisMappedProperly() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculationDTO();
@@ -364,7 +364,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void calculatePercentageQualified_averageMerCalculationDTOisMappedProperlyWhenMarketValueQualifiedIsNull() {
+  void shouldCalculatePercentageQualified_whenAverageMerCalculationDTOisMappedProperlyWhenMarketValueQualifiedIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculationDTO();
@@ -377,7 +377,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void calculatePercentageQualified_averageMerCalculationDTOisMappedProperlyWhenMarketValueQualifiedIsZero() {
+  void shouldCalculatePercentageQualified_whenAverageMerCalculationDTOisMappedProperlyWhenMarketValueQualifiedIsZero() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculationDTO();
@@ -391,7 +391,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void calculateMarketValueQualified_isMappedProperlyWhenModifiedFeeValueExists() {
+  void shouldCalculateMarketValueQualified_whenIsMappedProperlyWhenModifiedFeeValueExists() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculationDTO();
@@ -408,7 +408,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void calculateMarketValueQualified_isMappedProperlyWhenModifiedFeeValueIsNull() {
+  void shouldCalculateMarketValueQualified_whenIsMappedProperlyWhenModifiedFeeValueIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculationDTO();
@@ -422,7 +422,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void getAmountOfMarketValueQualified_returnsCorrectValue() {
+  void shouldGetAmountOfMarketValueQualified_whenReturnsCorrectValue() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO1 = new AverageManagementExpenseCalculationDTO();
@@ -445,7 +445,7 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds_checkResult2() {
+  void shouldSetNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds_whenCheckResult2() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
 

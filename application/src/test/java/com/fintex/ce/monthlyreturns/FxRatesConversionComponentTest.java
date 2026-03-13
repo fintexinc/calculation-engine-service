@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FxRatesConversionComponentTest {
 
   @Test
-  void convert_checkResultConvertUsdToCad() {
+  void shouldConvert_whenCheckResultConvertUsdToCad() {
     // SETUP
     Map<LocalDate, FxRates.FxRate> fxRates = getFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.CAD);
@@ -45,7 +45,7 @@ class FxRatesConversionComponentTest {
   }
 
   @Test
-  void convert_checkResultConvertCadToUsd() {
+  void shouldConvert_whenCheckResultConvertCadToUsd() {
     // SETUP
     Map<LocalDate, FxRates.FxRate> fxRates = getFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.USD);
@@ -69,7 +69,7 @@ class FxRatesConversionComponentTest {
   }
 
   @Test
-  void convert_fxRateIsNullThrowError() {
+  void shouldConvert_whenFxRateIsNullThrowError() {
     // SETUP
     Map<LocalDate, FxRates.FxRate> fxRates = getNotCompleteFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.USD);

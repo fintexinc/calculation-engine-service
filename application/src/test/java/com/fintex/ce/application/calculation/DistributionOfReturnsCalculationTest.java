@@ -39,8 +39,7 @@ import static org.mockito.Mockito.withSettings;
 class DistributionOfReturnsCalculationTest {
 
   @Test
-  void calculate_verifyCalculateDistributionOfReturnsFor_verifyCalculateDistributionOfReturnsFor() {
-    // SETUP
+  void shouldCalculateDistributionForMonthlyAndYearlyReturns_whenExecutingCalculate() {
     final var returns = getPortfolioTotalReturns();
     final var sut = mock(DistributionOfReturnsCalculation.class, withSettings().useConstructor(null, returns));
     final var rollingTotalReturnsCalculation = mock(RollingTotalReturnsCalculation.class);
@@ -51,16 +50,13 @@ class DistributionOfReturnsCalculationTest {
     when(sut.rollingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(returns);
 
     doCallRealMethod().when(sut).calculate(any());
-    // ACT
     sut.calculate(reqDTO);
 
-    // VERIFY
     verify(sut, times(2)).calculateDistributionOfReturnsFor(returns, reqDTO);
   }
 
   @Test
-  void calculate_expectNullWhenAnnualReturnsIsNull() {
-    // SETUP
+  void shouldCalculate_whenExpectNullWhenAnnualReturnsIsNull() {
     final var returns = getPortfolioTotalReturns();
     final var sut = mock(DistributionOfReturnsCalculation.class, withSettings().useConstructor(null, returns));
     final var rollingTotalReturnsCalculation = mock(RollingTotalReturnsCalculation.class);
@@ -74,16 +70,13 @@ class DistributionOfReturnsCalculationTest {
     when(sut.rollingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(null);
 
     doCallRealMethod().when(sut).calculate(any());
-    // ACT
     sut.calculate(reqDTO);
 
-    // VERIFY
     verify(sut).initializeResponseDTO(calculatedMonthlyReturns, null, returns);
   }
 
   @Test
-  void calculate_checkResultWhenAnnualReturnsIsNull() {
-    // SETUP
+  void shouldReturnInitializedResponse_whenAnnualReturnsAreNull() {
     final var returns = getPortfolioTotalReturns();
     final var sut = mock(DistributionOfReturnsCalculation.class, withSettings().useConstructor(null, returns));
     final var rollingTotalReturnsCalculation = mock(RollingTotalReturnsCalculation.class);
@@ -99,16 +92,13 @@ class DistributionOfReturnsCalculationTest {
     when(sut.initializeResponseDTO(calculatedMonthlyReturns, null, returns)).thenReturn(expected);
 
     doCallRealMethod().when(sut).calculate(any());
-    // ACT
     final DistributionOfReturnsResult actual = sut.calculate(reqDTO);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculate_verifyCalculateDistributionOfReturnsFor_verifyInitializeResponseDTO() {
-    // SETUP
+  void shouldInitializeResponseWithMonthlyAndYearlyDistributions_whenExecutingCalculate() {
     final var returns = getPortfolioTotalReturns();
     final var sut = mock(DistributionOfReturnsCalculation.class, withSettings().useConstructor(null, returns));
     final var rollingTotalReturnsCalculation = mock(RollingTotalReturnsCalculation.class);
@@ -123,17 +113,14 @@ class DistributionOfReturnsCalculationTest {
     when(sut.calculateDistributionOfReturnsFor(any(), any())).thenReturn(new DistributionOfReturnsIntervalResult());
 
     doCallRealMethod().when(sut).calculate(any());
-    // ACT
     sut.calculate(reqDTO);
 
-    // VERIFY
     verify(sut).initializeResponseDTO(calculatedMonthlyReturns, calculatedAnnualReturns, returns);
   }
 
   @Test
-  void calculateDistributionOfReturnsFor_verifyGetMinAndMaxValues() {
+  void shouldReadMinAndMaxValues_whenCalculatingDistributionOfReturns() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
-      // SETUP
       final var sut = mock(DistributionOfReturnsCalculation.class);
       final var returns = getPortfolioTotalReturns();
       final var reqDTO = mock(DistributionOfReturnsCommand.class);
@@ -144,19 +131,16 @@ class DistributionOfReturnsCalculationTest {
       mockedDecimalUtils.when(() -> DecimalUtils.getMaxValue(returns)).thenReturn(TEN_THOUSAND);
 
       doCallRealMethod().when(sut).calculateDistributionOfReturnsFor(any(), any());
-      // ACT
       sut.calculateDistributionOfReturnsFor(returns, reqDTO);
 
-      // VERIFY
       mockedDecimalUtils.verify(() -> DecimalUtils.getMinValue(returns));
       mockedDecimalUtils.verify(() -> DecimalUtils.getMaxValue(returns));
     }
   }
 
   @Test
-  void calculateDistributionOfReturnsFor_verifyCalculateNumberOfBins() {
+  void shouldCalculateNumberOfBins_whenCalculatingDistributionOfReturns() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
-      // SETUP
       final var sut = mock(DistributionOfReturnsCalculation.class);
       final var returns = getPortfolioTotalReturns();
       final var reqDTO = mock(DistributionOfReturnsCommand.class);
@@ -167,18 +151,15 @@ class DistributionOfReturnsCalculationTest {
       mockedDecimalUtils.when(() -> DecimalUtils.getMaxValue(returns)).thenReturn(TEN_THOUSAND);
 
       doCallRealMethod().when(sut).calculateDistributionOfReturnsFor(any(), any());
-      // ACT
       sut.calculateDistributionOfReturnsFor(returns, reqDTO);
 
-      // VERIFY
       verify(sut).calculateNumberOfBins(returns, 10);
     }
   }
 
   @Test
-  void calculateDistributionOfReturnsFor_verifyCalculateBinWidthIncrements() {
+  void shouldCalculateBinWidthIncrements_whenCalculatingDistributionOfReturns() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
-      // SETUP
       final var sut = mock(DistributionOfReturnsCalculation.class);
       final var returns = getPortfolioTotalReturns();
       final var reqDTO = mock(DistributionOfReturnsCommand.class);
@@ -190,18 +171,15 @@ class DistributionOfReturnsCalculationTest {
       mockedDecimalUtils.when(() -> DecimalUtils.getMaxValue(returns)).thenReturn(TEN_THOUSAND);
 
       doCallRealMethod().when(sut).calculateDistributionOfReturnsFor(any(), any());
-      // ACT
       sut.calculateDistributionOfReturnsFor(returns, reqDTO);
 
-      // VERIFY
       verify(sut).calculateBinWidthIncrements(ONE, TEN_THOUSAND, 10);
     }
   }
 
   @Test
-  void calculateDistributionOfReturnsFor_verifyCalculateDistributionOfReturns() {
+  void shouldBuildIntervalResult_whenCalculatingDistributionOfReturns() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
-      // SETUP
       final var sut = mock(DistributionOfReturnsCalculation.class);
       final var returns = getPortfolioTotalReturns();
       final var reqDTO = mock(DistributionOfReturnsCommand.class);
@@ -215,18 +193,15 @@ class DistributionOfReturnsCalculationTest {
       mockedDecimalUtils.when(() -> DecimalUtils.getMaxValue(returns)).thenReturn(TEN_THOUSAND);
 
       doCallRealMethod().when(sut).calculateDistributionOfReturnsFor(any(), any());
-      // ACT
       final DistributionOfReturnsIntervalResult actual = sut.calculateDistributionOfReturnsFor(returns, reqDTO);
 
-      // VERIFY
       assertEquals(expected.getDistributionBin(), actual.getDistributionBin());
     }
   }
 
   @Test
-  void calculateNumberOfBins_verifySquareRootAndSetInternalScale() {
+  void shouldUseSquareRootAndFloorScale_whenCustomBinsAreNotProvided() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
-      // SETUP
       final var sut = mock(DistributionOfReturnsCalculation.class);
       final var portfolioTotalReturns = getPortfolioTotalReturns();
 
@@ -234,64 +209,52 @@ class DistributionOfReturnsCalculationTest {
       mockedDecimalUtils.when(() -> DecimalUtils.setInternalScale(TWO, RoundingMode.FLOOR)).thenReturn(TWO);
 
       doCallRealMethod().when(sut).calculateNumberOfBins(portfolioTotalReturns, null);
-      // ACT
       sut.calculateNumberOfBins(portfolioTotalReturns, null);
 
-      // VERIFY
       mockedDecimalUtils.verify(() -> DecimalUtils.squareRoot(BigDecimal.valueOf(4)));
       mockedDecimalUtils.verify(() -> DecimalUtils.setInternalScale(TWO, RoundingMode.FLOOR));
     }
   }
 
   @Test
-  void calculateNumberOfBins_checkResult() {
-    // SETUP
+  void shouldReturnCustomNumberOfBins_whenCustomBinsProvided() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var portfolioTotalReturns = getPortfolioTotalReturns();
     final Integer expected = 10;
 
     doCallRealMethod().when(sut).calculateNumberOfBins(any(), anyInt());
-    // ACT
     final Integer actual = sut.calculateNumberOfBins(portfolioTotalReturns, 10);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculateNumberOfBins_checkResult2() {
-    // SETUP
+  void shouldCalculateDefaultNumberOfBins_whenCustomBinsAreNull() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = getPortfolioTotalReturns();
 
     doCallRealMethod().when(sut).calculateNumberOfBins(portfolioTotalReturns, null);
-    // ACT
     final Integer actual = sut.calculateNumberOfBins(portfolioTotalReturns, null);
 
-    // VERIFY
     assertEquals(2, actual);
   }
 
   @Test
-  void calculateBinWidthIncrements_checkResult() {
-    // SETUP
+  void shouldCalculateBinWidthIncrement_whenMinMaxAndBinCountAreProvided() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var MIN = new BigDecimal("5");
     final var MAX = new BigDecimal("20");
     final var numberOfBins = 5;
 
     doCallRealMethod().when(sut).calculateBinWidthIncrements(MIN, MAX, numberOfBins);
-    // ACT
     final BigDecimal actual = sut.calculateBinWidthIncrements(MIN, MAX, numberOfBins);
 
     final var expected = new BigDecimal("3.000000000000000");
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculateDistributionOfReturns_checkResult() {
-    // SETUP
+  void shouldReturnDistributionRanges_whenCalculatingDistribution() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var returnsMIN = new BigDecimal("5");
@@ -304,18 +267,15 @@ class DistributionOfReturnsCalculationTest {
         2L));
 
     doCallRealMethod().when(sut).calculateDistributionOfReturns(any(), any(), anyLong(), any());
-    // ACT
     final List<DistributionRangeResult> actual = sut.calculateDistributionOfReturns(returns, returnsMIN, numberOfBins,
         returnsBinWidthIncrements);
 
-    // VERIFY
     final var expected = List.of(new DistributionRangeResult(5, TEN, 2L));
     assertEquals(expected.get(0).getRange(), actual.get(0).getRange());
   }
 
   @Test
-  void calculateDistributionOfReturns_initializeDistributionRangeDTO() {
-    // SETUP
+  void shouldInitializeDistributionRangeDTO_whenCalculatingDistribution() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var returnsMIN = new BigDecimal("5");
@@ -326,16 +286,13 @@ class DistributionOfReturnsCalculationTest {
     when(sut.calculateFrequencyOfReturns(any(), any(), any(), anyList())).thenReturn(10L);
 
     doCallRealMethod().when(sut).calculateDistributionOfReturns(any(), any(), anyLong(), any());
-    // ACT
     sut.calculateDistributionOfReturns(returns, returnsMIN, numberOfBins, returnsBinWidthIncrements);
 
-    // VERIFY
     verify(sut).initializeDistributionRangeDTO(1, TEN, 10L);
   }
 
   @Test
-  void calculateDistributionOfReturns_verifyCalculateFrequencyOfReturns() {
-    // SETUP
+  void shouldCalculateFrequencyOfReturns_whenCalculatingDistribution() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var returnsMIN = new BigDecimal("5");
@@ -346,16 +303,13 @@ class DistributionOfReturnsCalculationTest {
     when(sut.calculateFrequencyOfReturns(any(), any(), any(), anyList())).thenReturn(10L);
 
     doCallRealMethod().when(sut).calculateDistributionOfReturns(any(), any(), anyLong(), any());
-    // ACT
     sut.calculateDistributionOfReturns(returns, returnsMIN, numberOfBins, returnsBinWidthIncrements);
 
-    // VERIFY
     verify(sut).calculateFrequencyOfReturns(eq(returns), eq(returnsMIN), eq(TEN), anyList());
   }
 
   @Test
-  void calculateDistributionOfReturns_verifyCalculateBinInterval() {
-    // SETUP
+  void shouldCalculateBinInterval_whenCalculatingDistribution() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var returnsMIN = new BigDecimal("5");
@@ -366,35 +320,28 @@ class DistributionOfReturnsCalculationTest {
     when(sut.calculateFrequencyOfReturns(any(), any(), any(), anyList())).thenReturn(10L);
 
     doCallRealMethod().when(sut).calculateDistributionOfReturns(any(), any(), anyLong(), any());
-    // ACT
-    final List<DistributionRangeResult> actual = sut.calculateDistributionOfReturns(returns, returnsMIN, numberOfBins,
+    sut.calculateDistributionOfReturns(returns, returnsMIN, numberOfBins,
         returnsBinWidthIncrements);
 
-    final var expected = new BigDecimal("45.0000000000");
-    // VERIFY
     verify(sut).calculateBinInterval(returnsMIN, 1, returnsBinWidthIncrements);
   }
 
   @Test
-  void calculateBinInterval_checkResult() {
-    // SETUP
+  void shouldCalculateBinIntervalValue_whenInputsAreProvided() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returnsMIN = new BigDecimal("5");
     final var binIndex = 2;
     final var returnsBinWidthIncrements = new BigDecimal("20");
 
     doCallRealMethod().when(sut).calculateBinInterval(returnsMIN, binIndex, returnsBinWidthIncrements);
-    // ACT
     final BigDecimal actual = sut.calculateBinInterval(returnsMIN, binIndex, returnsBinWidthIncrements);
 
     final var expected = new BigDecimal("45.0000000000");
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
-  void calculateFrequencyOfReturns_verifycalculateFrequencyIfBinIntervalEqualsMIN() {
-    // SETUP
+  void shouldUseNotEqualsMinBranch_whenBinIntervalDiffersFromMin() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var returnsMIN = ONE;
@@ -402,16 +349,13 @@ class DistributionOfReturnsCalculationTest {
     final List<DistributionRangeResult> rangeResDTOS = List.of();
 
     doCallRealMethod().when(sut).calculateFrequencyOfReturns(any(), any(), any(), anyList());
-    // ACT
     sut.calculateFrequencyOfReturns(returns, returnsMIN, binInterval, rangeResDTOS);
 
-    // VERIFY
     verify(sut).calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeResDTOS);
   }
 
   @Test
-  void calculateFrequencyOfReturns_verifycalculateFrequencyIfBinIntervalEqualsMIN2() {
-    // SETUP
+  void shouldUseEqualsMinBranch_whenBinIntervalEqualsMin() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var returnsMIN = TWO;
@@ -419,84 +363,69 @@ class DistributionOfReturnsCalculationTest {
     final List<DistributionRangeResult> rangeResDTOS = List.of();
 
     doCallRealMethod().when(sut).calculateFrequencyOfReturns(any(), any(), any(), anyList());
-    // ACT
     sut.calculateFrequencyOfReturns(returns, returnsMIN, binInterval, rangeResDTOS);
 
-    // VERIFY
     verify(sut).calculateFrequencyIfBinIntervalEqualsMin(returns, returnsMIN);
   }
 
   @Test
-  void initializeDistributionRangeDTO_checkResult() {
-    // SETUP
+  void shouldInitializeDistributionRangeDTO_whenInputsAreProvided() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var binIndex = 4;
     final var binInterval = TWO;
     final long frequencyOfReturns = 10L;
 
     doCallRealMethod().when(sut).initializeDistributionRangeDTO(anyInt(), any(), anyLong());
-    // ACT
     final DistributionRangeResult actual = sut.initializeDistributionRangeDTO(binIndex, binInterval,
         frequencyOfReturns);
 
-    // VERIFY
     final var expected = new DistributionRangeResult(binIndex, binInterval, frequencyOfReturns);
     assertEquals(expected, actual);
   }
 
   @Test
-  void initializeResponseDTO_checkResult() {
-    // SETUP
+  void shouldInitializeResponseDTO_whenMonthlyAndYearlyIntervalsProvided() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var calculatedMonthlyReturns = new DistributionOfReturnsIntervalResult(ONE, TWO, 10, TWELVE, List.of());
     final var calculatedAnnualReturns = new DistributionOfReturnsIntervalResult();
 
     doCallRealMethod().when(sut).initializeResponseDTO(any(), any(), any());
-    // ACT
     final DistributionOfReturnsResult actual = sut.initializeResponseDTO(calculatedMonthlyReturns,
         calculatedAnnualReturns, returns);
 
-    // VERIFY
     final var expected = new DistributionOfReturnsResult().setMonthlyReturns(calculatedMonthlyReturns).setYearlyReturns(calculatedAnnualReturns);
     assertEquals(expected.getMonthlyReturns().getDistributionIncrement(), actual.getMonthlyReturns()
         .getDistributionIncrement());
   }
 
   @Test
-  void calculateFrequencyIfBinIntervalEqualsMIN_checkResult() {
-    // SETUP
+  void shouldCalculateFrequencyForEqualsMin_whenBinIntervalEqualsMin() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var portfolioTotalReturns = getPortfolioTotalReturns();
     final var returnsMIN = HUNDRED;
 
     doCallRealMethod().when(sut).calculateFrequencyIfBinIntervalEqualsMin(portfolioTotalReturns, returnsMIN);
-    // ACT
     final long actual = sut.calculateFrequencyIfBinIntervalEqualsMin(portfolioTotalReturns, returnsMIN);
 
-    // VERIFY
     assertEquals(3, actual);
   }
 
   @Test
-  void calculateFrequencyIfBinIntervalNotEqualsMIN_verifyCalculateFrequencyIfBinIntervalNotEqualsMIN() {
-    // SETUP
+  void shouldDelegateToEqualsMinMethod_whenNoPreviousRangeExists() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var binInterval = HUNDRED;
     final List<DistributionRangeResult> rangeResDTOS = List.of();
 
     doCallRealMethod().when(sut).calculateFrequencyIfBinIntervalNotEqualsMin(any(), any(), anyList());
-    // ACT
     sut.calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeResDTOS);
 
-    // VERIFY
     verify(sut).calculateFrequencyIfBinIntervalEqualsMin(returns, binInterval);
   }
 
   @Test
-  void calculateFrequencyIfBinIntervalNotEqualsMIN_verifyCalculateFrequencyIfBinIntervalNotEqualsMIN2() {
-    // SETUP
+  void shouldDelegateToThreeArgOverload_whenPreviousRangeExists() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var binInterval = HUNDRED;
@@ -507,26 +436,21 @@ class DistributionOfReturnsCalculationTest {
     when(previousBin.getRange()).thenReturn(rangeOfPreviousBin);
 
     doCallRealMethod().when(sut).calculateFrequencyIfBinIntervalNotEqualsMin(any(), any(), anyList());
-    // ACT
     sut.calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeResDTOS);
 
-    // VERIFY
     verify(sut).calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeOfPreviousBin);
   }
 
   @Test
-  void calculateFrequencyIfBinIntervalNotEqualsMIN_checkResult2() {
-    // SETUP
+  void shouldCalculateFrequencyForOpenInterval_whenPreviousRangeIsProvided() {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var rangeOfPreviousBin = TWO;
     final var binInterval = HUNDRED;
 
     doCallRealMethod().when(sut).calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeOfPreviousBin);
-    // ACT
     final long actual = sut.calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeOfPreviousBin);
 
-    // VERIFY
     assertEquals(2, actual);
   }
 

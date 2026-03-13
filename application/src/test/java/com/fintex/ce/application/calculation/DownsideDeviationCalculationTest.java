@@ -31,8 +31,7 @@ class DownsideDeviationCalculationTest {
   final int TWELVE = 12;
 
   @Test
-  void calculatePeriodForNumberOfMonths_numberOfMonthGreaterThanExcessReturnsResultNull() {
-    // SETUP
+  void shouldReturnNull_whenPeriodExceedsExcessReturnsSize() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     final var excessReturns = mock(TreeMap.class);
@@ -44,16 +43,13 @@ class DownsideDeviationCalculationTest {
     when(sut.calculateDownsideDeviation(anyInt(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(100);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldResolvePeriodStartDate_whenCalculatingPeriod() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -62,15 +58,12 @@ class DownsideDeviationCalculationTest {
     when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
-    // VERIFY
     verify(sut).getPeriodStartDate(12, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetSubMapByPeriodStartDate() {
-    // SETUP
+  void shouldGetSubMapByStartDate_whenCalculatingPeriod() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
@@ -80,15 +73,12 @@ class DownsideDeviationCalculationTest {
     when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
-    // VERIFY
     verify(sut).getSubMapByPeriodStartDate(date, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateDownsideReturnSquared() {
-    // SETUP
+  void shouldCalculateDownsideReturnSquared_whenCalculatingPeriod() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
@@ -99,15 +89,12 @@ class DownsideDeviationCalculationTest {
     when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
-    // VERIFY
     verify(sut).calculateDownsideReturnSquared(treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateDownsideDeviation() {
-    // SETUP
+  void shouldCalculateDownsideDeviation_whenCalculatingPeriod() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     final LocalDate date = LocalDate.now();
@@ -119,15 +106,12 @@ class DownsideDeviationCalculationTest {
     when(sut.calculateDownsideReturnSquared(any())).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
-    // VERIFY
     verify(sut).calculateDownsideDeviation(TWELVE, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenGetPortfolioTotalReturnsSizeIsMoreThanPeriod() {
-    // SETUP
+  void shouldReturnNull_whenPortfolioReturnsSizeIsLessThanPeriod() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     sut.portfolioExcessReturn = treeMap;
@@ -135,47 +119,38 @@ class DownsideDeviationCalculationTest {
     when(treeMap.size()).thenReturn(BigDecimal.ONE.intValue());
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal result = sut.calculatePeriodForNumberOfMonths(TWELVE);
-    // VERIFY
     assertNull(result);
   }
 
   @Test
-  void calculateDownsideReturnSquared_checkResult() {
-    // SETUP
+  void shouldKeepOnlyNegativeExcessReturnsSquared_whenCalculatingDownsideReturnSquared() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var date = LocalDate.now();
     final var portfolioExcessReturnsInPeriod = new TreeMap(Map.of(date, ONE, date.plusMonths(1), BigDecimal.valueOf(
         -5.2222), date.plusMonths(2), TEN_THOUSAND));
 
     doCallRealMethod().when(sut).calculateDownsideReturnSquared(any());
-    // ACT
     final TreeMap downsideReturnSquared = sut.calculateDownsideReturnSquared(portfolioExcessReturnsInPeriod);
-    // VERIFY
     assertEquals(1, downsideReturnSquared.size());
     assertEquals(BigDecimal.valueOf(27.271372839999998), downsideReturnSquared.firstEntry().getValue());
     assertEquals(date.plusMonths(1), downsideReturnSquared.firstKey());
   }
 
   @Test
-  void calculateDownsideDeviation_checkResult() {
-    // SETUP
+  void shouldCalculateDownsideDeviationValue_whenSquaredReturnsProvided() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var date = LocalDate.now();
     final var downsideReturnSquared = new TreeMap(Map.of(date, BigDecimal.valueOf(2), date.plusMonths(1),
         BigDecimal.valueOf(3), date.plusMonths(2), BigDecimal.valueOf(4)));
 
     doCallRealMethod().when(sut).calculateDownsideDeviation(anyInt(), any());
-    // ACT
     final BigDecimal downsideDeviation = sut.calculateDownsideDeviation(TWELVE, downsideReturnSquared);
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(2.99999999999999725114029147225)), toUserScale(downsideDeviation));
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldMapIntervalResults_whenDefiningResponseType() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", BigDecimal.ONE));
     final var intervalResDto = new TimeIntervalResult("2000-01-12", ZERO);
@@ -184,9 +159,7 @@ class DownsideDeviationCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     final DownsideDeviationResult actual = (DownsideDeviationResult) sut.defineResponseType(pairs);
-    // VERIFY
     assertEquals(expected, actual.getDownsideDeviation());
   }
 }

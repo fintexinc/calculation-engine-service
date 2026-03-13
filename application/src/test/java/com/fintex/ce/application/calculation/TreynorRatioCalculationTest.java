@@ -22,15 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 class TreynorRatioCalculationTest {
 
   final int TWELVE = 12;
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldResolvePeriodStartDate_whenCalculatingPeriod() {
     final var beta = mock(BetaCalculation.class);
     final var tBills = mock(TreeMap.class);
     final var sut = mock(TreynorRatioCalculation.class,
@@ -40,16 +46,13 @@ class TreynorRatioCalculationTest {
     when(tBills.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut).getPeriodStartDate(TWELVE, tBills);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateAverageArithmeticAnnualizedReturn() {
-    // SETUP
+  void shouldCalculateAnnualizedReturnsForPortfolioAndRiskFree_whenCalculatingPeriod() {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
     final var sut = mock(TreynorRatioCalculation.class,
@@ -62,16 +65,13 @@ class TreynorRatioCalculationTest {
     when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut, times(2)).calculateAverageArithmeticAnnualizedReturn(any(), eq(date), eq(TWELVE));
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyBetaCalculatePerioForNumberOfMonths() {
-    // SETUP
+  void shouldDelegateToBetaCalculation_whenCalculatingPeriod() {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
     final var sut = mock(TreynorRatioCalculation.class,
@@ -84,16 +84,13 @@ class TreynorRatioCalculationTest {
     when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(beta).calculatePeriodForNumberOfMonths(TWELVE);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_returnNullWhenBetaReturnNull() {
-    // SETUP
+  void shouldReturnNull_whenBetaIsNull() {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
     final var sut = mock(TreynorRatioCalculation.class,
@@ -107,16 +104,13 @@ class TreynorRatioCalculationTest {
     when(beta.calculatePeriodForNumberOfMonths(TWELVE)).thenReturn(null);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final var actual = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateTreynorRatio() {
-    // SETUP
+  void shouldCalculateTreynorRatio_whenInputsAreAvailable() {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
     final var sut = mock(TreynorRatioCalculation.class,
@@ -131,16 +125,13 @@ class TreynorRatioCalculationTest {
     when(beta.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(ONE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut).calculateTreynorRatio(TEN, TEN, ONE);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResult() {
-    // SETUP
+  void shouldReturnNull_whenPortfolioSizeIsLessThanPeriod() {
     final var sut = mock(TreynorRatioCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
@@ -148,16 +139,13 @@ class TreynorRatioCalculationTest {
     when(treeMap.size()).thenReturn(10);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldMapIntervalResults_whenDefiningResponseType() {
     final var sut = mock(TreynorRatioCalculation.class);
     final var result = Set.of(Pair.of("2015-01-01", ZERO), Pair.of("2018-02-02", ONE));
 
@@ -168,23 +156,18 @@ class TreynorRatioCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
     doCallRealMethod().when(sut).defineResponseType(anySet());
 
-    // ACT
     final TreynorRatioResult sortinoRatioResDTO = sut.defineResponseType(result);
 
-    // VERIFY
     assertEquals(expected, sortinoRatioResDTO.getTreynorRatio());
   }
 
   @Test
-  void calculateTreynorRatio_checkResult() {
-    // SETUP
+  void shouldCalculateTreynorRatioValue_whenValuesProvided() {
     final var sut = mock(TreynorRatioCalculation.class);
 
     doCallRealMethod().when(sut).calculateTreynorRatio(any(), any(), any());
-    // ACT
     final BigDecimal returnValue = sut.calculateTreynorRatio(TEN, TWO, TEN);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(0.8)), toUserScale(returnValue));
   }
 

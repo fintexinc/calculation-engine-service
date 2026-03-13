@@ -30,7 +30,7 @@ import static org.mockito.Mockito.withSettings;
 class RollingSharpeRatioCalculationServiceImplTest {
 
   @Test
-  void perform_verifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsCacheStorage = mock(TBillsPort.class);
@@ -55,7 +55,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   }
 
   @Test
-  void perform_verifyCalculate() {
+  void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsCacheStorage = mock(TBillsPort.class);
@@ -81,7 +81,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   }
 
   @Test
-  void defineCalculationMethod_verifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsCacheStorage = mock(TBillsPort.class);
@@ -105,7 +105,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_checkResult() {
+  void shouldBuildCalculationDto_whenCheckResult() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
@@ -126,7 +126,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetPortfolioMonthlyReturns() {
+  void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
@@ -148,7 +148,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   }
 
   @Test
-  void buildCalculationDto_verifyGetWeightedAverageWithCpsdAndCpedValidation() {
+  void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()

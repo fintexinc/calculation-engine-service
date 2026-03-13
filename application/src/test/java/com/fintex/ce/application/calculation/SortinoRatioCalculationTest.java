@@ -28,8 +28,7 @@ class SortinoRatioCalculationTest {
   final int TWELVE = 12;
 
   @Test
-  void calculatePeriodForNumberOfMonths_numberOfMonthGreaterThanTBillsResultNull() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenNumberOfMonthGreaterThanTBillsResultNull() {
     final var sut = mock(SortinoRatioCalculation.class);
     final var treeMap = mock(TreeMap.class);
     final var tBills = mock(TreeMap.class);
@@ -41,16 +40,13 @@ class SortinoRatioCalculationTest {
     when(sut.calculateSortinoRatio(any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(100);
 
-    // VERIFY
     assertNull(actual);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetPeriodStartDate() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeriodStartDate() {
     final var sut = mock(SortinoRatioCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
@@ -60,16 +56,13 @@ class SortinoRatioCalculationTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut).getPeriodStartDate(TWELVE, treeMap);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateAverageArithmeticAnnualizedReturn() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateAverageArithmeticAnnualizedReturn() {
     final var sut = mock(SortinoRatioCalculation.class);
     final var downsideDeviationCalculation = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
@@ -83,16 +76,13 @@ class SortinoRatioCalculationTest {
     when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sut, times(2)).calculateAverageArithmeticAnnualizedReturn(any(), eq(date), eq(TWELVE));
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyGetDownsideDeviation() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetDownsideDeviation() {
     final var sortinoRatioCalculation = mock(SortinoRatioCalculation.class);
     final var downsideDeviationCalculation = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
@@ -108,16 +98,13 @@ class SortinoRatioCalculationTest {
         BigDecimal.ONE);
 
     doCallRealMethod().when(sortinoRatioCalculation).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     sortinoRatioCalculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sortinoRatioCalculation).getDownsideDeviation(TWELVE);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_verifyCalculateSortinoRatio() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateSortinoRatio() {
     final var sortinoRatioCalculation = mock(SortinoRatioCalculation.class);
     final var downsideDeviationCalculation = mock(DownsideDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
@@ -133,16 +120,13 @@ class SortinoRatioCalculationTest {
     when(sortinoRatioCalculation.getDownsideDeviation(anyInt())).thenReturn(TEN);
     doCallRealMethod().when(sortinoRatioCalculation).calculatePeriodForNumberOfMonths(anyInt());
 
-    // ACT
     sortinoRatioCalculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    // VERIFY
     verify(sortinoRatioCalculation).calculateSortinoRatio(ONE, ONE, TEN);
   }
 
   @Test
-  void calculatePeriodForNumberOfMonths_checkResultWhenPortfolioSizeIsLessThanTwelve() {
-    // SETUP
+  void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenPortfolioSizeIsLessThanTwelve() {
     final var sortinoRatioCalculation = mock(SortinoRatioCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
@@ -152,16 +136,13 @@ class SortinoRatioCalculationTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(sortinoRatioCalculation).calculatePeriodForNumberOfMonths(anyInt());
-    // ACT
     final BigDecimal resultValue = sortinoRatioCalculation.calculatePeriodForNumberOfMonths(ONE.intValue());
 
-    // VERIFY
     assertNull(resultValue);
   }
 
   @Test
-  void defineResponseType_checkResult() {
-    // SETUP
+  void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(SortinoRatioCalculation.class);
     final var pairs = Set.of(Pair.of("2015-01-01", ZERO), Pair.of("2018-02-02", ONE));
 
@@ -172,55 +153,43 @@ class SortinoRatioCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    // ACT
     final SortinoRatioResult sortinoRatioResDTO = sut.defineResponseType(pairs);
 
-    // VERIFY
     assertEquals(expected, sortinoRatioResDTO.getSortinoRatio());
   }
 
   @Test
-  void calculateSortinoRatio_checkResult() {
-    // SETUP
+  void shouldCalculateSortinoRatio_whenCheckResult() {
     final var sut = mock(SortinoRatioCalculation.class);
 
     doCallRealMethod().when(sut).calculateSortinoRatio(any(), any(), any());
-    // ACT
     final BigDecimal returnValue = sut.calculateSortinoRatio(TEN, TWO, TWO);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(4)), toUserScale(returnValue));
   }
 
   @Test
-  void calculateSortinoRatio_checkResult2() {
-    // SETUP
+  void shouldCalculateSortinoRatio_whenCheckResult2() {
     final var sut = mock(SortinoRatioCalculation.class);
 
     doCallRealMethod().when(sut).calculateSortinoRatio(any(), any(), any());
-    // ACT
     final BigDecimal returnValue = sut.calculateSortinoRatio(TEN, ONE, TEN);
 
-    // VERIFY
     assertEquals(toUserScale(BigDecimal.valueOf(0.9)), toUserScale(returnValue));
   }
 
   @Test
-  void calculateSortinoRatio_checkResult3() {
-    // SETUP
+  void shouldCalculateSortinoRatio_whenCheckResult3() {
     final var sut = mock(SortinoRatioCalculation.class);
 
     doCallRealMethod().when(sut).calculateSortinoRatio(any(), any(), any());
-    // ACT
     final BigDecimal returnValue = sut.calculateSortinoRatio(TEN, ONE, ZERO);
 
-    // VERIFY
     assertNull(returnValue);
   }
 
   @Test
-  void getDownsideDeviation_checkResult() {
-    // SETUP
+  void shouldGetDownsideDeviation_whenCheckResult() {
     final var downsideDeviationCalculation = mock(DownsideDeviationCalculation.class);
     final var calculationDTO = new CalculationDTO().setWeightedAveragePortfolioReturns(new TreeMap<>(Map.of(LocalDate
         .now(), TEN)));
@@ -231,10 +200,8 @@ class SortinoRatioCalculationTest {
     when(downsideDeviationCalculation.calculatePeriodForNumberOfMonths(TEN.intValue())).thenReturn(BigDecimal.ONE);
 
     doCallRealMethod().when(sut).getDownsideDeviation(anyInt());
-    // ACT
     final BigDecimal actual = sut.getDownsideDeviation(TEN.intValue());
 
-    // VERIFY
     assertEquals(ONE, actual);
   }
 }
