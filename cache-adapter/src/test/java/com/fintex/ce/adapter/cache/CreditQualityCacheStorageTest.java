@@ -2,7 +2,6 @@ package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.CreditQualityCacheStorage;
 import com.fintex.ce.adapter.cache.repository.CreditQualityRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.CreditQualityRating;
@@ -53,10 +52,9 @@ class CreditQualityCacheStorageTest {
       // SETUP
       final var securityDataPort = mock(SecurityDataPort.class);
       final var creditQualityRepository = mock(CreditQualityRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final CreditQualityCacheStorage m = mock(CreditQualityCacheStorage.class, withSettings()
-          .useConstructor(securityDataPort, null, creditQualityRepository, cacheStatisticService));
+          .useConstructor(securityDataPort, null, creditQualityRepository));
 
       final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
       final List<Holding> holdings = List.of(holding);

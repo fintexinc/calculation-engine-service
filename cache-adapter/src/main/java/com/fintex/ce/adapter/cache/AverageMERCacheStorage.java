@@ -8,7 +8,6 @@ import com.fintex.ce.adapter.cache.entity.averagemer.RAverageMer;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.averagemer.AverageMerRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +24,8 @@ public class AverageMERCacheStorage
 
   public AverageMERCacheStorage(final SecurityDataPort<AverageMer> securityDataPort,
       final CacheEntityMapper<AverageMer, RAverageMer> mapper,
-      final AverageMerRepository averageMerRepository,
-      final CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, averageMerRepository, cacheStatisticService, MER);
+      final AverageMerRepository averageMerRepository) {
+    super(securityDataPort, mapper, averageMerRepository, MER);
   }
 
   @Override

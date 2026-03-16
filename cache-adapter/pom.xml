@@ -24,12 +24,8 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- JDBC adapter (existing code coupling) -->
-        <dependency>
-            <groupId>com.fintex</groupId>
-            <artifactId>jdbc-adapter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
+
 
         <!-- Lombok -->
         <dependency>

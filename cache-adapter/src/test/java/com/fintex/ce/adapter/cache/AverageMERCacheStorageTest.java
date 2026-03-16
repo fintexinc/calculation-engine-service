@@ -2,7 +2,6 @@ package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.AverageMERCacheStorage;
 import com.fintex.ce.adapter.cache.repository.averagemer.AverageMerRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.AverageMer;
@@ -34,10 +33,9 @@ class AverageMERCacheStorageTest {
     // SETUP
     final var queryRepository = mock(SecurityDataPort.class);
     final var averageMerRepository = mock(AverageMerRepository.class);
-    final var cacheStatisticService = mock(CacheStatisticService.class);
 
     final var sut = mock(AverageMERCacheStorage.class, withSettings()
-        .useConstructor(queryRepository, null, averageMerRepository, cacheStatisticService));
+        .useConstructor(queryRepository, null, averageMerRepository));
 
     final var merDTO = mock(AverageManagementExpenseCalculationDTO.class);
     final var fundSeriesHolding = new FundSeriesHolding();

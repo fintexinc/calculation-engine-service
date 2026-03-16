@@ -3,7 +3,6 @@ package com.fintex.ce.adapter.cache;
 import com.fintex.ce.adapter.cache.MaturityAllocationCacheStorage;
 import com.fintex.ce.adapter.cache.entity.RMaturityAllocation;
 import com.fintex.ce.adapter.cache.repository.MaturityAllocationRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
@@ -76,9 +75,8 @@ class MaturityAllocationCacheStorageTest {
       final var securityDataPort = mock(SecurityDataPort.class);
       final CacheEntityMapper<MaturityAllocation, RMaturityAllocation> mapper = mock(CacheEntityMapper.class);
       final var maturityAllocationRepository = mock(MaturityAllocationRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
       final MaturityAllocationCacheStorage m = mock(MaturityAllocationCacheStorage.class, withSettings()
-          .useConstructor(securityDataPort, mapper, maturityAllocationRepository, cacheStatisticService));
+          .useConstructor(securityDataPort, mapper, maturityAllocationRepository));
       doCallRealMethod().when(m).load(any(), any(), any(), any());
 
       // ACT

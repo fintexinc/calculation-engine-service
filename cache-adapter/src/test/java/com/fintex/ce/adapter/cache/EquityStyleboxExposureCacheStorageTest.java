@@ -4,7 +4,6 @@ import com.fintex.ce.adapter.cache.EquityStyleboxExposureCacheStorage;
 import com.fintex.ce.adapter.cache.entity.REquityStyleboxExposure;
 import com.fintex.ce.adapter.cache.repository.EquityStyleboxAllocationRepository;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.calculation.EquityStyleboxType;
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
@@ -56,10 +55,9 @@ class EquityStyleboxExposureCacheStorageTest {
       final var securityDataPort = mock(SecurityDataPort.class);
       final CacheEntityMapper<EquityStyleboxExposure, REquityStyleboxExposure> mapper = mock(CacheEntityMapper.class);
       final var equityStyleboxAllocationRepository = mock(EquityStyleboxAllocationRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquityStyleboxExposureCacheStorage m = mock(EquityStyleboxExposureCacheStorage.class, withSettings()
-          .useConstructor(securityDataPort, mapper, equityStyleboxAllocationRepository, cacheStatisticService));
+          .useConstructor(securityDataPort, mapper, equityStyleboxAllocationRepository));
 
       final List<Holding> holdings = List.of(new Holding());
 

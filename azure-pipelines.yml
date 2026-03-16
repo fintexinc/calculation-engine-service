@@ -204,8 +204,6 @@ stages:
                         --parameters containerRegistryServer="$(containerRegistry)" \
                         --parameters containerRegistryUsername="$ACR_USERNAME" \
                         --parameters containerRegistryPassword="$ACR_PASSWORD" \
-                        --parameters postgresUsername="$(postgres-username)" \
-                        --parameters postgresPassword="$(postgres-password)" \
                         --parameters redisPassword="$(redis-password)" \
                         --verbose
                       

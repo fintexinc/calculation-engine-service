@@ -2,7 +2,6 @@ package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.FixedIncomeBondSectorCacheStorage;
 import com.fintex.ce.adapter.cache.repository.fixedincomebondsector.FixedIncomeBondSectorRedisRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
@@ -57,10 +56,9 @@ class FixedIncomeBondSectorCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var fixedIncomeBondSectorRepository = mock(FixedIncomeBondSectorRedisRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final var sut = mock(FixedIncomeBondSectorCacheStorage.class, withSettings()
-          .useConstructor(null, null, fixedIncomeBondSectorRepository, cacheStatisticService));
+          .useConstructor(null, null, fixedIncomeBondSectorRepository));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
 

@@ -16,7 +16,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.ClassificationAllocationRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -67,9 +66,8 @@ public class ClassificationAllocationCacheStorage
   public ClassificationAllocationCacheStorage(
       final SecurityDataPort<ClassificationAllocation> securityDataPort,
       final CacheEntityMapper<ClassificationAllocation, RClassificationAllocation> mapper,
-      final ClassificationAllocationRepository classificationAllocationRepository,
-      final CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, classificationAllocationRepository, cacheStatisticService, CacheNameEntity.CLASSIFICATION_ALLOCATION);
+      final ClassificationAllocationRepository classificationAllocationRepository) {
+    super(securityDataPort, mapper, classificationAllocationRepository, CacheNameEntity.CLASSIFICATION_ALLOCATION);
   }
 
   @Override

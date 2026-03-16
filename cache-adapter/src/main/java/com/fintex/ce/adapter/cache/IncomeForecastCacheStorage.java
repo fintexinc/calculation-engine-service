@@ -12,7 +12,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.IncomeForecastRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -47,9 +46,8 @@ public class IncomeForecastCacheStorage
   public IncomeForecastCacheStorage(
       final SecurityDataPort<IncomeForecast> securityDataPort,
       final CacheEntityMapper<IncomeForecast, RIncomeForecast> mapper,
-      final IncomeForecastRepository incomeForecastRepository,
-      final CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, incomeForecastRepository, cacheStatisticService, INCOME_FORECAST);
+      final IncomeForecastRepository incomeForecastRepository) {
+    super(securityDataPort, mapper, incomeForecastRepository, INCOME_FORECAST);
   }
 
   @Override

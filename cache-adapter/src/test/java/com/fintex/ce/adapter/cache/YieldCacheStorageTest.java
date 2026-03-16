@@ -4,7 +4,6 @@ import com.fintex.ce.adapter.cache.YieldCacheStorage;
 import com.fintex.ce.adapter.cache.entity.RYield;
 import com.fintex.ce.adapter.cache.repository.YieldRepository;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
@@ -53,10 +52,9 @@ class YieldCacheStorageTest {
       final var securityDataPort = mock(SecurityDataPort.class);
       final CacheEntityMapper<Yield, RYield> mapper = mock(CacheEntityMapper.class);
       final var yieldRepository = mock(YieldRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final YieldCacheStorage m = mock(YieldCacheStorage.class, withSettings()
-          .useConstructor(securityDataPort, mapper, yieldRepository, cacheStatisticService));
+          .useConstructor(securityDataPort, mapper, yieldRepository));
 
       final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
       final List<Holding> holdings = List.of(holding);

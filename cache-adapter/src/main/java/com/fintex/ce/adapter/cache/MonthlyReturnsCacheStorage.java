@@ -14,7 +14,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.monthlyreturns.MonthlyReturnsRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -54,9 +53,8 @@ public class MonthlyReturnsCacheStorage
       final CacheEntityMapper<MonthlyReturns, RMonthlyReturns> mapper,
       final MonthlyReturnsRepository monthlyReturnsRepository,
       final TBillsCacheStorage tBillsCacheStorage,
-      final CacheStatisticService cacheStatisticService,
       final ReturnsGenerator monthlyReturnGenerator) {
-    super(securityDataPort, mapper, monthlyReturnsRepository, cacheStatisticService, MONTHLY_RETURNS);
+    super(securityDataPort, mapper, monthlyReturnsRepository, MONTHLY_RETURNS);
     this.tBillsCacheStorage = tBillsCacheStorage;
     this.monthlyReturnGenerator = monthlyReturnGenerator;
   }

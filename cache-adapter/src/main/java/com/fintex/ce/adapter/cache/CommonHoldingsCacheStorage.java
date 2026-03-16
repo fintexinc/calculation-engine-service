@@ -18,7 +18,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.commonholdings.CommonHoldingsRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -60,9 +59,8 @@ public class CommonHoldingsCacheStorage
       @Value("#{'${default.top-common-holdings.recursion-types}'.split(',')}") Set<String> firstLvlRecursionTypes,
       SecurityDataPort<CommonHoldings> securityDataPort,
       CacheEntityMapper<CommonHoldings, RCommonHoldings> mapper,
-      CommonHoldingsRepository commonHoldingsRepository,
-      CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, commonHoldingsRepository, cacheStatisticService, CacheNameEntity.TOP_COMMON_HOLDINGS);
+      CommonHoldingsRepository commonHoldingsRepository) {
+    super(securityDataPort, mapper, commonHoldingsRepository, CacheNameEntity.TOP_COMMON_HOLDINGS);
     this.firstLvlRecursionTypes = firstLvlRecursionTypes;
   }
 

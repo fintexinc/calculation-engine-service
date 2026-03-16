@@ -11,7 +11,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.YieldRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -42,9 +41,8 @@ public class YieldCacheStorage extends CacheStorageAbstract<Yield, RYield, Map<H
 
   public YieldCacheStorage(final SecurityDataPort<Yield> securityDataPort,
       final CacheEntityMapper<Yield, RYield> yieldMapper,
-      final YieldRepository yieldRepository,
-      final CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, yieldMapper, yieldRepository, cacheStatisticService, YIELD);
+      final YieldRepository yieldRepository) {
+    super(securityDataPort, yieldMapper, yieldRepository, YIELD);
   }
 
   @Override

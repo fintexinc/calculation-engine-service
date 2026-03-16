@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.domain.enumeration.Country;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.constant.CacheNameEntity;
@@ -54,9 +53,8 @@ public class AssetAllocationCacheStorage
       final SecurityDataPort<AssetAllocation> securityDataPort,
       final CacheEntityMapper<AssetAllocation, RAssetAllocation> mapper,
       final AssetAllocationRepository assetAllocationRepository,
-      final BusinessCountryCacheStorage businessCountryCacheStorage,
-      final CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, assetAllocationRepository, cacheStatisticService, CacheNameEntity.ASSET_ALLOCATION);
+      final BusinessCountryCacheStorage businessCountryCacheStorage) {
+    super(securityDataPort, mapper, assetAllocationRepository, CacheNameEntity.ASSET_ALLOCATION);
     this.businessCountryCacheStorage = businessCountryCacheStorage;
   }
 

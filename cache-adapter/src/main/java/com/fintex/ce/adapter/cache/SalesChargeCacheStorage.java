@@ -15,7 +15,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.SalesChargeRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -33,9 +32,8 @@ public class SalesChargeCacheStorage
 
   public SalesChargeCacheStorage(SecurityDataPort<SalesCharge> securityDataPort,
       CacheEntityMapper<SalesCharge, RSalesCharge> mapper,
-      SalesChargeRepository salesChargeRepository,
-      CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, salesChargeRepository, cacheStatisticService, SALES_CHARGE);
+      SalesChargeRepository salesChargeRepository) {
+    super(securityDataPort, mapper, salesChargeRepository, SALES_CHARGE);
   }
 
   @Override

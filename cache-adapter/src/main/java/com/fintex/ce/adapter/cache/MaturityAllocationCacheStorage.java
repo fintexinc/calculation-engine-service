@@ -11,7 +11,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.MaturityAllocationRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -47,9 +46,8 @@ public class MaturityAllocationCacheStorage
   public MaturityAllocationCacheStorage(
       SecurityDataPort<MaturityAllocation> securityDataPort,
       CacheEntityMapper<MaturityAllocation, RMaturityAllocation> mapper,
-      MaturityAllocationRepository maturityAllocationRepository,
-      CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, maturityAllocationRepository, cacheStatisticService, MATURITY_ALLOCATION);
+      MaturityAllocationRepository maturityAllocationRepository) {
+    super(securityDataPort, mapper, maturityAllocationRepository, MATURITY_ALLOCATION);
   }
 
   @Override

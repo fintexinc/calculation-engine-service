@@ -3,7 +3,6 @@ package com.fintex.ce.adapter.cache;
 import com.fintex.ce.adapter.cache.EquityMarketCapitalizationCacheStorage;
 import com.fintex.ce.adapter.cache.repository.equitymarketcapitalization.EquityMarketCapitalizationRepository;
 import com.fintex.ce.adapter.cache.repository.equitymarketcapitalization.EquityMarketCapitalizationStockRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.EquityMarketCapitalization;
@@ -57,10 +56,9 @@ class EquityMarketCapitalizationCacheStorageTest {
       final var fdsRepo = mock(SecurityDataPort.class);
       final var capitalizationRepository = mock(EquityMarketCapitalizationRepository.class);
       final var stockRepository = mock(EquityMarketCapitalizationStockRepository.class);
-      final var cacheStatistic = mock(CacheStatisticService.class);
 
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository, cacheStatistic));
+          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository));
       final List<Holding> holdings = List.of(new Holding());
 
       doCallRealMethod().when(m).load(any(), any(), any(), any());
@@ -183,10 +181,9 @@ class EquityMarketCapitalizationCacheStorageTest {
       final var fdsRepo = mock(SecurityDataPort.class);
       final var capitalizationRepository = mock(EquityMarketCapitalizationRepository.class);
       final var stockRepository = mock(EquityMarketCapitalizationStockRepository.class);
-      final var cacheStatistic = mock(CacheStatisticService.class);
 
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository, cacheStatistic));
+          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository));
 
       final List<Holding> holdings = List.of(new Holding());
       List<StockHolding> filtered = List.of(new StockHolding().setTicker("TEST").setExchangeCode("TST"));
@@ -209,10 +206,9 @@ class EquityMarketCapitalizationCacheStorageTest {
       final var fdsRepo = mock(SecurityDataPort.class);
       final var capitalizationRepository = mock(EquityMarketCapitalizationRepository.class);
       final var stockRepository = mock(EquityMarketCapitalizationStockRepository.class);
-      final var cacheStatistic = mock(CacheStatisticService.class);
 
       final EquityMarketCapitalizationCacheStorage m = mock(EquityMarketCapitalizationCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository, cacheStatistic));
+          .useConstructor(fdsRepo, null, capitalizationRepository, stockRepository));
 
       final List<Holding> holdings = List.of(new Holding());
       final Map<StockHolding, EquityMarketCapitalization> map = new HashMap<>();

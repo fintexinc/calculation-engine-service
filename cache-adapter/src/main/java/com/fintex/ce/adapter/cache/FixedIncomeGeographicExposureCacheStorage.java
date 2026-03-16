@@ -13,7 +13,6 @@ import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.CountryExposureRepository;
 import com.fintex.ce.service.GeographicAllocationMappingService;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -46,9 +45,8 @@ public class FixedIncomeGeographicExposureCacheStorage
       SecurityDataPort<CountryExposure> securityDataPort,
       CacheEntityMapper<CountryExposure, RCountryExposure> mapper,
       CountryExposureRepository countryExposureRepository,
-      CacheStatisticService cacheStatisticService,
       GeographicAllocationMappingService geographicAllocationMappingService) {
-    super(securityDataPort, mapper, countryExposureRepository, cacheStatisticService, COUNTRY_EXPOSURE);
+    super(securityDataPort, mapper, countryExposureRepository, COUNTRY_EXPOSURE);
     this.geographicAllocationMappingService = geographicAllocationMappingService;
   }
 

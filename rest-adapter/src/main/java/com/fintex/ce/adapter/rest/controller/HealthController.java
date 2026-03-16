@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.jdbc.repository.FASUsageStatisticsRepo;
 import com.fintex.ce.port.output.cache.CacheWarmUpPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,13 +12,10 @@ public class HealthController {
 
   private static final String HEALTHY_RESPONSE = "healthy";
   private static final String ERROR_RESPONSE = "error";
-  private final FASUsageStatisticsRepo FASUsageStatisticsRepo;
   private final CacheWarmUpPort cacheWarmUpPort;
 
   @Autowired
-  public HealthController(final FASUsageStatisticsRepo FASUsageStatisticsRepo,
-      final CacheWarmUpPort cacheWarmUpPort) {
-    this.FASUsageStatisticsRepo = FASUsageStatisticsRepo;
+  public HealthController(final CacheWarmUpPort cacheWarmUpPort) {
     this.cacheWarmUpPort = cacheWarmUpPort;
   }
 
@@ -41,7 +37,6 @@ public class HealthController {
   @GetMapping(value = "/last-time-cache-warm-up-had-run")
   public ResponseEntity<String> cacheWarmupHealthCheck() {
     try {
-      FASUsageStatisticsRepo.isDbHealthy();
       final CacheWarmUpPort.SchedulerRunInfo schedulerRunInfo = cacheWarmUpPort
           .cacheWarmUpSchedulerRunCheck();
       if (!schedulerRunInfo.runInLast24Hours()) {

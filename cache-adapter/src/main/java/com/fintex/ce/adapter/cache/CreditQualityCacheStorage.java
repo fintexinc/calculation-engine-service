@@ -12,7 +12,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.CreditQualityRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -44,9 +43,8 @@ public class CreditQualityCacheStorage
   public CreditQualityCacheStorage(
       SecurityDataPort<CreditQuality> securityDataPort,
       CacheEntityMapper<CreditQuality, RCreditQuality> mapper,
-      CreditQualityRepository creditQualityRepository,
-      CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, creditQualityRepository, cacheStatisticService, CREDIT_QUALITY);
+      CreditQualityRepository creditQualityRepository) {
+    super(securityDataPort, mapper, creditQualityRepository, CREDIT_QUALITY);
   }
 
   @Override

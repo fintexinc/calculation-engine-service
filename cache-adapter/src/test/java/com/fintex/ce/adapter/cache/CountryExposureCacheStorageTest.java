@@ -227,7 +227,7 @@ class CountryExposureCacheStorageTest {
     // SETUP
     final CountryAllocationMappingService mappingService = mock(CountryAllocationMappingService.class);
     final CountryExposureCacheStorage c = mock(CountryExposureCacheStorage.class,
-        withSettings().useConstructor(null, null, null, null, mappingService));
+        withSettings().useConstructor(null, null, null, mappingService));
     final Map<String, BigDecimal> map = Map.of(CountryRegionType.CANADA.getRegion(), BigDecimal.ONE);
     when(countryExposure.getAllocations()).thenReturn(map);
     doCallRealMethod().when(c).mapper(any(), any());
@@ -245,7 +245,7 @@ class CountryExposureCacheStorageTest {
   void mapper_checkResult() {
     // SETUP
     final CountryExposureCacheStorage c = mock(CountryExposureCacheStorage.class,
-        withSettings().useConstructor(null, null, null, null, mappingService));
+        withSettings().useConstructor(null, null, null, mappingService));
     final Map<String, BigDecimal> map = Map.of(CountryRegionType.CANADA.getRegion(), BigDecimal.ONE);
     final Map<Holding, Map<CountryRegionType, BigDecimal>> expected = Map.of(holding, Map.of());
     when(countryExposure.getAllocations()).thenReturn(map);

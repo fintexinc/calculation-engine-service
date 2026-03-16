@@ -2,7 +2,6 @@ package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.BusinessCountryCacheStorage;
 import com.fintex.ce.adapter.cache.repository.businesscountry.BusinessCountryRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.Country;
 import com.fintex.ce.domain.enumeration.DataProvider;
@@ -237,10 +236,9 @@ class BusinessCountryCacheStorageTest {
     // SETUP
     final var queryRepository = mock(SecurityDataPort.class);
     final var businessCountryRepository = mock(BusinessCountryRepository.class);
-    final var cacheStatisticService = mock(CacheStatisticService.class);
 
     final var sut = mock(BusinessCountryCacheStorage.class, withSettings()
-        .useConstructor(queryRepository, null, businessCountryRepository, cacheStatisticService));
+        .useConstructor(queryRepository, null, businessCountryRepository));
 
     final var businessCountry = mock(BusinessCountry.class);
     final var expectedValue = "value";

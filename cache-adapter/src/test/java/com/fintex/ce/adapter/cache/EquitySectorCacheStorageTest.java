@@ -5,7 +5,6 @@ import com.fintex.ce.adapter.cache.entity.equitysector.REquitySector;
 import com.fintex.ce.adapter.cache.entity.equitysector.REquitySectorStock;
 import com.fintex.ce.adapter.cache.repository.equitysector.EquitySectorRepository;
 import com.fintex.ce.adapter.cache.repository.equitysector.EquitySectorStockRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.domain.enumeration.HoldingType;
@@ -61,11 +60,9 @@ class EquitySectorCacheStorageTest {
       final var stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
       final var stockRepository = mock(EquitySectorStockRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
-              cacheStatisticService));
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository));
 
       final List<Holding> holdings = List.of(new Holding());
 
@@ -178,11 +175,9 @@ class EquitySectorCacheStorageTest {
       final var stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
       final var stockRepository = mock(EquitySectorStockRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
-              cacheStatisticService));
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository));
 
       final List<Holding> holdings = List.of(new Holding());
       final List<Warning> warnings = new ArrayList<>();
@@ -226,11 +221,9 @@ class EquitySectorCacheStorageTest {
       final CacheEntityMapper<EquitySectorStock, REquitySectorStock> stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
       final var stockRepository = mock(EquitySectorStockRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
-              cacheStatisticService));
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository));
 
       final List<Warning> warnings = new ArrayList<>();
       final var h = new StockHolding().setTicker("TEST").setExchangeCode("TST");
@@ -262,11 +255,9 @@ class EquitySectorCacheStorageTest {
       final CacheEntityMapper<EquitySectorStock, REquitySectorStock> stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
       final var stockRepository = mock(EquitySectorStockRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
-              cacheStatisticService));
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository));
 
       final var h = new StockHolding().setTicker("TEST").setExchangeCode("TST");
       h.setType(HoldingType.US_STOCKS);
@@ -302,11 +293,9 @@ class EquitySectorCacheStorageTest {
       final CacheEntityMapper<EquitySectorStock, REquitySectorStock> stockMapper = mock(CacheEntityMapper.class);
       final var sectorRepo = mock(EquitySectorRepository.class);
       final var stockRepository = mock(EquitySectorStockRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final EquitySectorCacheStorage m = mock(EquitySectorCacheStorage.class, withSettings()
-          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository,
-              cacheStatisticService));
+          .useConstructor(fdsRepo, mapper, stockMapper, sectorRepo, stockRepository));
 
       final var h = new StockHolding().setTicker("TEST").setExchangeCode("TST");
       h.setType(HoldingType.US_STOCKS);

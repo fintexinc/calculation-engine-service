@@ -11,7 +11,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.core.CoreRedisCacheRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.util.CollectionUtils;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 
 import static com.fintex.ce.util.CacheUtils.buildIdBasedOnProviders;
@@ -46,19 +44,16 @@ public abstract class CacheStorageAbstract<T, R extends RedisId, L> implements H
   private final CacheEntityMapper<T, R> mapper;
   final CoreRedisCacheRepository<R> cacheRepo;
 
-  private final CacheStatisticService cacheStatisticService;
   @Getter
   private final CacheNameEntity cacheNameEntity;
 
   protected CacheStorageAbstract(SecurityDataPort<T> securityDataPort,
       CacheEntityMapper<T, R> mapper,
       CoreRedisCacheRepository<R> cacheRepo,
-      CacheStatisticService cacheStatisticService,
       CacheNameEntity cacheNameEntity) {
     this.securityDataPort = securityDataPort;
     this.mapper = mapper;
     this.cacheRepo = cacheRepo;
-    this.cacheStatisticService = cacheStatisticService;
     this.cacheNameEntity = cacheNameEntity;
   }
 
@@ -149,12 +144,6 @@ public abstract class CacheStorageAbstract<T, R extends RedisId, L> implements H
 
     // Merge cached and fetched results
     fetchedDomainModels.putAll(cachedDomainModels);
-
-    // Analytics
-    CompletableFuture.runAsync(() -> {
-      Map<H, R> forAnalytics = convertToEntityMap(fetchedDomainModels);
-      cacheStatisticService.analyse(forAnalytics, cacheNameEntity, cacheCategory);
-    });
 
     return fetchedDomainModels;
   }

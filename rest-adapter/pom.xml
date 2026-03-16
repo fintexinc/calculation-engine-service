@@ -31,12 +31,8 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- JDBC adapter (existing code uses repository directly) -->
-        <dependency>
-            <groupId>com.fintex</groupId>
-            <artifactId>jdbc-adapter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
+
 
         <!-- AspectJ for AOP -->
         <dependency>

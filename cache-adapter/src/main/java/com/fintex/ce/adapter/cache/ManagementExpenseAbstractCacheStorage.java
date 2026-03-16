@@ -12,7 +12,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.core.CoreRedisCacheRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -48,9 +47,8 @@ public abstract class ManagementExpenseAbstractCacheStorage<T, R extends RedisId
   protected ManagementExpenseAbstractCacheStorage(final SecurityDataPort<T> securityDataPort,
       final CacheEntityMapper<T, R> mapper,
       final CoreRedisCacheRepository<R> cacheRepo,
-      final CacheStatisticService cacheStatisticService,
       final CacheNameEntity cacheNameEntity) {
-    super(securityDataPort, mapper, cacheRepo, cacheStatisticService, cacheNameEntity);
+    super(securityDataPort, mapper, cacheRepo, cacheNameEntity);
   }
 
   @Override

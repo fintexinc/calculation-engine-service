@@ -15,7 +15,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.businesscountry.BusinessCountryRepository;
 import com.fintex.ce.util.validation.DataProviderRequestHandlingValidator;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,9 +37,8 @@ public class BusinessCountryCacheStorage
   public BusinessCountryCacheStorage(
       SecurityDataPort<BusinessCountry> securityDataPort,
       CacheEntityMapper<BusinessCountry, RBusinessCountry> mapper,
-      BusinessCountryRepository businessCountryRepository,
-      CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, businessCountryRepository, cacheStatisticService, CacheNameEntity.BUSINESS_COUNTRY);
+      BusinessCountryRepository businessCountryRepository) {
+    super(securityDataPort, mapper, businessCountryRepository, CacheNameEntity.BUSINESS_COUNTRY);
   }
 
   @Override

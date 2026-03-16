@@ -14,7 +14,6 @@ import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.equitymarketcapitalization.EquityMarketCapitalizationRepository;
 import com.fintex.ce.adapter.cache.repository.equitymarketcapitalization.EquityMarketCapitalizationStockRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -61,9 +60,8 @@ public class EquityMarketCapitalizationCacheStorage
       SecurityDataPort<EquityMarketCapitalization> securityDataPort,
       CacheEntityMapper<EquityMarketCapitalization, REquityMarketCapitalization> mapper,
       EquityMarketCapitalizationRepository equityMarketCapitalizationRepository,
-      EquityMarketCapitalizationStockRepository stockRepository,
-      CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, equityMarketCapitalizationRepository, cacheStatisticService, EQUITY_MARKET_CAPITALIZATION);
+      EquityMarketCapitalizationStockRepository stockRepository) {
+    super(securityDataPort, mapper, equityMarketCapitalizationRepository, EQUITY_MARKET_CAPITALIZATION);
     this.stockRepository = stockRepository;
   }
 
