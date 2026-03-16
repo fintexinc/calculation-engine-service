@@ -1,6 +1,4 @@
 spring:
-  datasource:
-    url: ${POSTGRES_URL}
   redis:
     use-key-prefix: true
     key-prefix: pcs-dev

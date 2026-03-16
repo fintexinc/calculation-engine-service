@@ -2,7 +2,6 @@ package com.fintex.ce.util;
 
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.Holding;
-
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -57,6 +56,7 @@ public class FilterUtils {
     return (List<H>) holdings.stream().filter(predicate).toList();
   }
 
+  @SafeVarargs
   public static <T> List<T> getSpecifiedIfEmpty(final List<T> list, final T... specified) {
     if (list == null || list.isEmpty()) {
       return List.of(specified);

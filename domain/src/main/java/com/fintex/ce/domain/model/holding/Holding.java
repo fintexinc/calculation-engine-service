@@ -1,16 +1,20 @@
 package com.fintex.ce.domain.model.holding;
 
+import static com.fintex.ce.domain.constant.ErrorMessage.NOT_NULL_MSG;
+
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, defaultImpl = Holding.class)
 @JsonSubTypes({
@@ -40,11 +44,17 @@ public class Holding {
   @EqualsAndHashCode.Exclude
   private BigDecimal value;
 
+  @NotNull(message = NOT_NULL_MSG)
+  private FinancialInstrumentType holdingType;
+
+  @Deprecated(forRemoval = true)  // use holdingType
   private HoldingType type;
 
-  @Deprecated
+  @Deprecated(forRemoval = true) // use securityIdentifier
   private HoldingIdentifierType holdingIdentifier;
 
+  @NotNull(message = NOT_NULL_MSG)
+  @Valid
   private SecurityIdentifier securityIdentifier;
 
   public Holding() {

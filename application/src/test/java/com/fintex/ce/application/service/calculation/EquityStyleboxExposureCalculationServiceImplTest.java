@@ -7,13 +7,12 @@ import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.EquityStyleboxExposureResult;
 import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -25,7 +24,7 @@ import static org.mockito.Mockito.withSettings;
 class EquityStyleboxExposureCalculationServiceImplTest {
 
   @Test
-  void getLoadFromCacheStorage_checkResult() {
+  void fetchExposures_checkResult() {
     // SETUP
     final var cacheStorage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
@@ -36,9 +35,9 @@ class EquityStyleboxExposureCalculationServiceImplTest {
     final var exposures = Map.of(holding, Map.of(EquityStyleboxType.LARGE_VALUE, BigDecimal.TEN));
 
     when(cacheStorage.load(any(), any(), any(), any())).thenReturn(exposures);
-    doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
-    final var actual = sut.getLoadFromCacheStorage(mock(PortfolioHoldingsCommand.class), List.of());
+    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
     // VERIFY
     Assertions.assertEquals(exposures, actual);

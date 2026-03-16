@@ -6,6 +6,3 @@ spring:
 redis:
   host: ${REDIS_HOST}
   port: ${REDIS_PORT}
-
-sm-graphql-transport:
-  location: https://security-master-service.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/graphql

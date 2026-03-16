@@ -10,24 +10,23 @@ import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import static com.fintex.ce.application.service.calculation.EquityMarketCapCalculationServiceImpl.DEFAULT_MAP;
+import static com.fintex.ce.application.service.calculation.EquityMarketCapCalculationServiceImpl.GROUPS;
 import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.GIANT;
 import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.LARGE;
 import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.MEDIUM;
 import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.MICRO;
 import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.SMALL;
-import static com.fintex.ce.application.service.calculation.EquityMarketCapCalculationServiceImpl.DEFAULT_MAP;
-import static com.fintex.ce.application.service.calculation.EquityMarketCapCalculationServiceImpl.GROUPS;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
@@ -84,9 +83,9 @@ class EquityMarketCapCalculationServiceImplTest {
 
     when(req.getHoldings()).thenReturn(holdings);
 
-    doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
-    sut.getLoadFromCacheStorage(req, List.of());
+    sut.fetchExposures(req, List.of());
 
     // VERIFY
     verify(marketCapCacheStorage).load(req.getHoldings(), List.of(), List.of(), new ParamHolderDTO());

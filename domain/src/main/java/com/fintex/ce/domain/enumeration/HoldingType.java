@@ -1,5 +1,6 @@
 package com.fintex.ce.domain.enumeration;
 
+@Deprecated // use FinancialInstrumentType
 public enum HoldingType {
 
   CANADA_MUTUAL_FUNDS,

@@ -1,19 +1,17 @@
 package com.fintex.ce.application.service.calculation.breakdown;
 
-import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static java.math.BigDecimal.TEN;
 import static java.util.Arrays.stream;
@@ -148,7 +146,7 @@ class BreakdownAbstractServiceTest {
     sut.perform(req);
 
     // VERIFY
-    verify(sut).getLoadFromCacheStorage(req, List.of());
+    verify(sut).fetchExposures(req, List.of());
 
   }
 
@@ -162,7 +160,7 @@ class BreakdownAbstractServiceTest {
     final Map exposures = mock(Map.class);
 
     when(req.getHoldings()).thenReturn(holdings);
-    when(sut.getLoadFromCacheStorage(any(), any())).thenReturn(exposures);
+    when(sut.fetchExposures(any(), any())).thenReturn(exposures);
 
     doCallRealMethod().when(sut).perform(any());
     // ACT

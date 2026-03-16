@@ -2,21 +2,22 @@ package com.fintex.ce.application.mapper;
 
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.AssetAllocation;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
+import com.fintex.ce.port.output.sm.dto.AssetAllocationDto;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.util.FilterUtils.CASH_PREDICATE;
@@ -36,13 +37,13 @@ public class AssetAllocationDataMapper {
         Stream.of(AssetAllocationRegion.values()).collect(toMap(e -> e, e -> BigDecimal.ZERO)));
   }
 
-  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForAA(final AssetAllocationDataDTO dto) {
+  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForAA(AssetAllocationDataDTO dto) {
     final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> result = map(dto);
     return removeLeftPairElement(result);
   }
 
   public Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> mapForAAEM(
-      final AssetAllocationDataDTO dto) {
+      AssetAllocationDataDTO dto) {
     return map(dto);
   }
 
@@ -120,5 +121,38 @@ public class AssetAllocationDataMapper {
       }
     });
     return Pair.of(pair.getKey(), overrideDefaultValues(DEFAULT_MAP, result));
+  }
+
+  /**
+   * Maps asset allocations directly from REST API response to region exposures.
+   *
+   * @param allocations map of holdings to their asset allocation data
+   * @return map of holdings to their region-based allocation breakdown
+   */
+  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> toRegionExposures(
+      Map<Holding, AssetAllocationDto> allocations) {
+    if (CollectionUtils.isEmpty(allocations)) {
+      return Collections.emptyMap();
+    }
+    return allocations.entrySet().stream()
+        .collect(toMap(
+            Map.Entry::getKey,
+            e -> mapAllocationToRegions(e.getValue())));
+  }
+
+  private Map<AssetAllocationRegion, BigDecimal> mapAllocationToRegions(AssetAllocationDto allocation) {
+    if (allocation == null || CollectionUtils.isEmpty(allocation.getAssetAllocation())) {
+      final var result = new EnumMap<>(DEFAULT_MAP);
+      result.put(UNCLASSIFIED, BigDecimal.ONE);
+      return result;
+    }
+    final Map<AssetAllocationRegion, BigDecimal> result = new EnumMap<>(AssetAllocationRegion.class);
+    allocation.getAssetAllocation().forEach((region, value) -> {
+      final var assetAllocationRegion = AssetAllocationRegion.of(region);
+      if (assetAllocationRegion != null && assetAllocationRegion.getName() != null) {
+        result.put(assetAllocationRegion, value);
+      }
+    });
+    return overrideDefaultValues(DEFAULT_MAP, result);
   }
 }

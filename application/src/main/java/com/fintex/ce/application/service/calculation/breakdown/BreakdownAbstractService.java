@@ -1,11 +1,10 @@
 package com.fintex.ce.application.service.calculation.breakdown;
 
+import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.port.input.result.WarningResult;
 import com.fintex.ce.service.calculation.BreakdownCalculationService;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,13 +32,16 @@ public abstract class BreakdownAbstractService<E extends WarningResult, T>
       final List<Holding> holdings,
       final List<Warning> warnings);
 
-  public abstract Map<Holding, Map<T, BigDecimal>> getLoadFromCacheStorage(PortfolioHoldingsCommand command,
+  /**
+   * Fetches exposure data for holdings. Implementation decides the data source (REST API, cache, etc.).
+   */
+  public abstract Map<Holding, Map<T, BigDecimal>> fetchExposures(PortfolioHoldingsCommand command,
       List<Warning> warnings);
 
   @Override
-  public E perform(final PortfolioHoldingsCommand command) {
-    final List<Warning> warnings = new ArrayList<>();
-    final Map<Holding, Map<T, BigDecimal>> exposures = getLoadFromCacheStorage(command, warnings);
+  public E perform(PortfolioHoldingsCommand command) {
+    List<Warning> warnings = new ArrayList<>();
+    Map<Holding, Map<T, BigDecimal>> exposures = fetchExposures(command, warnings);
     return calculate(exposures, command.getHoldings(), warnings);
   }
 
