@@ -1,21 +1,20 @@
 package com.fintex.ce.application.service.calculation;
 
+import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.enumeration.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.ClassificationAllocationResult;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.PortfolioUtils;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.util.CalculationUtils.reScale;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
@@ -61,7 +60,7 @@ public class ClassificationAllocationCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<ClassificationAllocationType, BigDecimal>> getLoadFromCacheStorage(
+  public Map<Holding, Map<ClassificationAllocationType, BigDecimal>> fetchExposures(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
     return cacheStorage.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());

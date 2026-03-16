@@ -26,5 +26,5 @@ public enum DataProvider {
     return null;
   }
 
-  public static final DataProvider[] DEFAULT_PROVIDERS = {EAGLE, MORNINGSTAR};
+  public static final DataProvider[] DEFAULT_PROVIDERS = {MORNINGSTAR};
 }

@@ -8,16 +8,15 @@ import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.FixedIncomeSectorResult;
-import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
 import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,7 +82,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   }
 
   @Test
-  void getLoadFromCacheStorage_checkResult() {
+  void fetchExposures_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
@@ -99,9 +98,9 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final var exposures = Map.of(holding, Map.of(FixedIncomeSectorType.CORPORATE_BONDS, TEN));
 
       when(fixedIncomeBondSectorCacheStorage.load(any(), any(), any(), any())).thenReturn(exposures);
-      doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+      doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
-      final var actual = sut.getLoadFromCacheStorage(mock(PortfolioHoldingsCommand.class), List.of());
+      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
       // VERIFY
       assertEquals(exposures, actual);

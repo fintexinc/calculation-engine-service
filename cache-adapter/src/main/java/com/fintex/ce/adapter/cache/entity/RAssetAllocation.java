@@ -1,15 +1,14 @@
 package com.fintex.ce.adapter.cache.entity;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.adapter.cache.entity.core.RedisId;
+import com.fintex.ce.domain.enumeration.HoldingType;
+import java.math.BigDecimal;
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.data.redis.core.RedisHash;
-
-import java.math.BigDecimal;
-import java.util.Map;
 
 @Data
 @ToString(callSuper = true)

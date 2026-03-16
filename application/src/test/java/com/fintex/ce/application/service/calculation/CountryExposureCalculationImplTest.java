@@ -1,17 +1,16 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.application.mapper.response.CountryExposureResponseMapper;
 import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.CountryExposureResult;
+import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,7 +70,7 @@ class CountryExposureCalculationImplTest {
   }
 
   @Test
-  void getLoadFromCacheStorage_checkResult() {
+  void fetchExposures_checkResult() {
     // SETUP
     final var storage = mock(HoldingDataLoader.class);
     final var responseMapper = mock(CountryExposureResponseMapper.class);
@@ -82,9 +81,9 @@ class CountryExposureCalculationImplTest {
     final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
 
     when(storage.load(any(), any(), any(), any())).thenReturn(exposures);
-    doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
-    final var actual = sut.getLoadFromCacheStorage(mock(PortfolioHoldingsCommand.class), List.of());
+    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
     // VERIFY
     assertEquals(exposures, actual);

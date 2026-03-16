@@ -1,21 +1,20 @@
 package com.fintex.ce.application.service.calculation;
 
+import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.GeographicExposureResult;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
@@ -60,7 +59,7 @@ public class EquityGeographicExposureCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<GeographicRegionType, BigDecimal>> getLoadFromCacheStorage(
+  public Map<Holding, Map<GeographicRegionType, BigDecimal>> fetchExposures(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
     return geographicAllocationCacheStorage.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());

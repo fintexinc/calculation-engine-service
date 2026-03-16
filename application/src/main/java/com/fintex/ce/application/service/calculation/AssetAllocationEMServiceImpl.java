@@ -1,25 +1,22 @@
 package com.fintex.ce.application.service.calculation;
 
+import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
+import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.AssetAllocationEMResult;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
+import com.fintex.ce.port.input.result.AssetAllocationEMResult;
 import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
 import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
-import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import com.fintex.ce.util.validation.data.DataProviderChecker;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.domain.enumeration.DataProvider.BROADRIDGE;
 import static com.fintex.ce.domain.enumeration.DataProvider.DEFAULT_PROVIDERS;
@@ -87,7 +86,7 @@ public class AssetAllocationEMServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> getLoadFromCacheStorage(
+  public Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> fetchExposures(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
     final var assetAllocationDataDto = assetAllocationCachePort.loadWithDataProvidersCheck(

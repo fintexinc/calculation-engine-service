@@ -6,11 +6,10 @@ import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.GeographicExposureResult;
 import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,7 +66,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   }
 
   @Test
-  void getLoadFromCacheStorage_checkResult() {
+  void fetchExposures_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var storage = mock(HoldingDataLoader.class);
@@ -78,9 +77,9 @@ class FixedIncomeGeographicExposureCalculationImplTest {
       final var exposures = Map.of(holding, Map.of(GeographicRegionType.CANADA, TEN));
 
       when(storage.load(any(), any(), any(), any())).thenReturn(exposures);
-      doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+      doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
-      final var actual = sut.getLoadFromCacheStorage(mock(PortfolioHoldingsCommand.class), List.of());
+      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
       // VERIFY
       assertEquals(exposures, actual);

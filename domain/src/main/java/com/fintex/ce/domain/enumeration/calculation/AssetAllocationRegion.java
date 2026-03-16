@@ -1,5 +1,8 @@
 package com.fintex.ce.domain.enumeration.calculation;
 
+import lombok.Getter;
+
+@Getter
 public enum AssetAllocationRegion {
   CASH("Cash", AssetAllocationRegionType.CASH),
   FIXED_INCOME("Fixed Income", AssetAllocationRegionType.FIXED_INCOME),
@@ -13,8 +16,8 @@ public enum AssetAllocationRegion {
   REAL_ESTATE("Real Estate", AssetAllocationRegionType.OTHER),
   UNCLASSIFIED("Unclassified", AssetAllocationRegionType.UNCLASSIFIED);
 
-  private String name;
-  private AssetAllocationRegionType assetAllocationRegionType;
+  private final String name;
+  private final AssetAllocationRegionType assetAllocationRegionType;
 
   AssetAllocationRegion(String name, AssetAllocationRegionType assetAllocationRegionType) {
     this.name = name;
@@ -30,11 +33,4 @@ public enum AssetAllocationRegion {
     return null;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public AssetAllocationRegionType getAssetAllocationRegionType() {
-    return assetAllocationRegionType;
-  }
 }

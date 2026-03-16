@@ -3,10 +3,9 @@ package com.fintex.ce.adapter.cache.mapper;
 import com.fintex.ce.adapter.cache.entity.RAssetAllocation;
 import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AssetAllocationMapper implements CacheEntityMapper<AssetAllocation, RAssetAllocation> {

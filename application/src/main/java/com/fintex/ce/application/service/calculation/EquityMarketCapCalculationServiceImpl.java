@@ -1,23 +1,22 @@
 package com.fintex.ce.application.service.calculation;
 
+import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.EquityMarketCapResult;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.util.PortfolioUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.GIANT;
 import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.LARGE;
@@ -59,7 +58,7 @@ public class EquityMarketCapCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<EquityMarketCapType, BigDecimal>> getLoadFromCacheStorage(
+  public Map<Holding, Map<EquityMarketCapType, BigDecimal>> fetchExposures(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
     return marketCapCacheStorage.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());

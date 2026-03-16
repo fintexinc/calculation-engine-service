@@ -7,12 +7,11 @@ import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.EquitySectorResult;
 import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.util.PortfolioUtils;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.List;
-import java.util.Map;
 
 import static java.math.BigDecimal.TEN;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,7 +24,7 @@ import static org.mockito.Mockito.withSettings;
 class EquitySectorCalculationImplTest {
 
   @Test
-  void getLoadFromCacheStorage_checkResult() {
+  void fetchExposures_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var cacheStorage = mock(HoldingDataLoader.class);
@@ -37,9 +36,9 @@ class EquitySectorCalculationImplTest {
       final var exposures = Map.of(holding, Map.of(EquitySectorAllocationType.CONSUMER_DEFENSIVE, TEN));
 
       when(cacheStorage.load(any(), any(), any(), any())).thenReturn(exposures);
-      doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+      doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
-      final var actual = sut.getLoadFromCacheStorage(mock(PortfolioHoldingsCommand.class), List.of());
+      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
       // VERIFY
       Assertions.assertEquals(exposures, actual);

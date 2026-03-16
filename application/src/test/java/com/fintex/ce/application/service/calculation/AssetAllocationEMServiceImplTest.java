@@ -1,7 +1,5 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
-import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.HoldingType;
@@ -12,17 +10,14 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
+import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import com.fintex.ce.util.validation.data.DataProviderChecker;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.domain.enumeration.DataProvider.DEFAULT_PROVIDERS;
 import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
@@ -864,7 +863,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getLoadFromCacheStorage_checkResult() {
+  void fetchExposures_checkResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
@@ -880,9 +879,9 @@ class AssetAllocationEMServiceImplTest {
       final var holding = mock(Holding.class);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
       when(sut.calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList())).thenReturn(exposures);
-      doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+      doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
-      final var actual = sut.getLoadFromCacheStorage(mock(PortfolioHoldingsCommand.class), List.of());
+      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
       // VERIFY
       assertEquals(exposures, actual);
@@ -890,7 +889,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getLoadFromCacheStorage_verifyMapForAAEM() {
+  void fetchExposures_verifyMapForAAEM() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
@@ -909,9 +908,9 @@ class AssetAllocationEMServiceImplTest {
       when(assetAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
           assetAllocationDataDto);
 
-      doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+      doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
-      sut.getLoadFromCacheStorage(req, warnings);
+      sut.fetchExposures(req, warnings);
 
       // VERIFY
       verify(assetAllocationDataMapper).mapForAAEM(assetAllocationDataDto);
@@ -919,7 +918,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getLoadFromCacheStorage_verifyValidate() {
+  void fetchExposures_verifyValidate() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
@@ -938,9 +937,9 @@ class AssetAllocationEMServiceImplTest {
       when(assetAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
           assetAllocationDataDto);
 
-      doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+      doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
-      sut.getLoadFromCacheStorage(req, warnings);
+      sut.fetchExposures(req, warnings);
 
       // VERIFY
       verify(assetAllocationDataValidator).validate(assetAllocationDataDto, warnings);
@@ -948,7 +947,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getLoadFromCacheStorage_verifyCheck() {
+  void fetchExposures_verifyCheck() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -966,16 +965,16 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
     when(assetAllocationCacheStorage.loadWithDataProvidersCheck(any(), any(), any())).thenReturn(assetAllocationDataDto);
 
-    doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
-    sut.getLoadFromCacheStorage(req, List.of());
+    sut.fetchExposures(req, List.of());
 
     // VERIFY
     verify(dataProviderChecker).check(eq(providers), eq(assetAllocationDataDto));
   }
 
   @Test
-  void getLoadFromCacheStorage_verifyLoadWithDataProvidesCheck() {
+  void fetchExposures_verifyLoadWithDataProvidesCheck() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -996,17 +995,17 @@ class AssetAllocationEMServiceImplTest {
     when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
     when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
     when(sut.calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList())).thenReturn(exposures);
-    doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
 
     // ACT
-    sut.getLoadFromCacheStorage(portfolioHoldingsReqDTO, warnings);
+    sut.fetchExposures(portfolioHoldingsReqDTO, warnings);
 
     // VERIFY
     verify(assetAllocationCacheStorage).loadWithDataProvidersCheck(eq(List.of(holding)), eq(providers), eq(warnings));
   }
 
   @Test
-  void getLoadFromCacheStorage_verifyCalculateAssetAllocationEMarketMap() {
+  void fetchExposures_verifyCalculateAssetAllocationEMarketMap() {
     // SETUP
     final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
     final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
@@ -1030,9 +1029,9 @@ class AssetAllocationEMServiceImplTest {
     when(assetAllocationCacheStorage.loadWithDataProvidersCheck(any(), any(), any())).thenReturn(assetAllocations);
     when(sut.calculateAssetAllocationEMarketMap(any(), any(), any(), any())).thenReturn(exposures);
     when(assetAllocationDataMapper.mapForAAEM(assetAllocations)).thenReturn(mappedResult);
-    doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
-    sut.getLoadFromCacheStorage(portfolioHoldingsReqDTO, List.of());
+    sut.fetchExposures(portfolioHoldingsReqDTO, List.of());
 
     // VERIFY
     verify(sut).calculateAssetAllocationEMarketMap(eq(List.of(holding)), eq(mappedResult), eq(providers), eq(List
@@ -1040,7 +1039,7 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void getLoadFromCacheStorage_verifyGetSpecifiedIfEmpty() {
+  void fetchExposures_verifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
@@ -1063,9 +1062,9 @@ class AssetAllocationEMServiceImplTest {
       when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
       when(assetAllocationCacheStorage.loadWithDataProvidersCheck(any(), any(), any())).thenReturn(assetAllocations);
       when(sut.calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList())).thenReturn(exposures);
-      doCallRealMethod().when(sut).getLoadFromCacheStorage(any(), any());
+      doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
-      sut.getLoadFromCacheStorage(portfolioHoldingsReqDTO, List.of());
+      sut.fetchExposures(portfolioHoldingsReqDTO, List.of());
 
       // VERIFY
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, DEFAULT_PROVIDERS), Mockito.times(3));

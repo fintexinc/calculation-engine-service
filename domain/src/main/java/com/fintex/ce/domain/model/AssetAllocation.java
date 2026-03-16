@@ -2,16 +2,19 @@ package com.fintex.ce.domain.model;
 
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.core.ProviderAware;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+/**
+ * @deprecated Use domain models with FinancialInstrumentType instead
+ */
+@Deprecated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
