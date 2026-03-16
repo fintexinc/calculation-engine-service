@@ -2,7 +2,6 @@ package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.ClassificationAllocationCacheStorage;
 import com.fintex.ce.adapter.cache.repository.ClassificationAllocationRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.ClassificationAllocationType;
@@ -55,10 +54,9 @@ class ClassificationAllocationCacheStorageTest {
       // SETUP
       final var securityDataPort = mock(SecurityDataPort.class);
       final var classificationAllocationRepository = mock(ClassificationAllocationRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final ClassificationAllocationCacheStorage m = mock(ClassificationAllocationCacheStorage.class, withSettings()
-          .useConstructor(securityDataPort, null, classificationAllocationRepository, cacheStatisticService));
+          .useConstructor(securityDataPort, null, classificationAllocationRepository));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
 

@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.enumeration.calculation.EquityStyleboxType;
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
@@ -50,9 +49,8 @@ public class EquityStyleboxExposureCacheStorage
   public EquityStyleboxExposureCacheStorage(
       SecurityDataPort<EquityStyleboxExposure> securityDataPort,
       CacheEntityMapper<EquityStyleboxExposure, REquityStyleboxExposure> mapper,
-      EquityStyleboxAllocationRepository equityStyleboxAllocationRepository,
-      CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, equityStyleboxAllocationRepository, cacheStatisticService, EQUITY_STYLEBOX_ALLOCATION);
+      EquityStyleboxAllocationRepository equityStyleboxAllocationRepository) {
+    super(securityDataPort, mapper, equityStyleboxAllocationRepository, EQUITY_STYLEBOX_ALLOCATION);
   }
 
   @Override

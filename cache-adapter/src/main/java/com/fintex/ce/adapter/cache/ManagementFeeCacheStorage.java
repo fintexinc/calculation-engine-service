@@ -8,7 +8,6 @@ import com.fintex.ce.adapter.cache.entity.managementfee.RManagementFee;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.managementfee.ManagementFeeRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +25,8 @@ public class ManagementFeeCacheStorage
   public ManagementFeeCacheStorage(
       final SecurityDataPort<ManagementFee> securityDataPort,
       final CacheEntityMapper<ManagementFee, RManagementFee> mapper,
-      final ManagementFeeRepository managementFeeRepository,
-      final CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, managementFeeRepository, cacheStatisticService, MANAGEMENT_FEE);
+      final ManagementFeeRepository managementFeeRepository) {
+    super(securityDataPort, mapper, managementFeeRepository, MANAGEMENT_FEE);
   }
 
   @Override

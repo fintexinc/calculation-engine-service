@@ -94,7 +94,7 @@ class MonthlyReturnsCacheStorageTest {
       final var tBillsCacheStorage = mock(TBillsCacheStorage.class);
       final var sut = mock(MonthlyReturnsCacheStorage.class,
           withSettings()
-              .useConstructor(null, null, null, tBillsCacheStorage, null, mock(ReturnsGenerator.class)));
+              .useConstructor(null, null, null, tBillsCacheStorage, mock(ReturnsGenerator.class)));
 
       final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
       final var holdings = List.of(holding);
@@ -123,7 +123,7 @@ class MonthlyReturnsCacheStorageTest {
       final var tBillsCacheStorage = mock(TBillsCacheStorage.class);
       final var sut = mock(MonthlyReturnsCacheStorage.class,
           withSettings()
-              .useConstructor(null, null, null, tBillsCacheStorage, null, mock(ReturnsGenerator.class)));
+              .useConstructor(null, null, null, tBillsCacheStorage, mock(ReturnsGenerator.class)));
 
       final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
       final var holdings = List.of(holding);
@@ -152,7 +152,7 @@ class MonthlyReturnsCacheStorageTest {
       final var tBillsCacheStorage = mock(TBillsCacheStorage.class);
       final var sut = mock(MonthlyReturnsCacheStorage.class,
           withSettings()
-              .useConstructor(null, null, null, tBillsCacheStorage, null, mock(ReturnsGenerator.class)));
+              .useConstructor(null, null, null, tBillsCacheStorage, mock(ReturnsGenerator.class)));
 
       final var cashHolding = new CashHolding();
       cashHolding.setType(HoldingType.CASH);
@@ -186,7 +186,7 @@ class MonthlyReturnsCacheStorageTest {
       var returnsGenerator = mock(ReturnsGenerator.class);
       final var sut = mock(MonthlyReturnsCacheStorage.class,
           withSettings()
-              .useConstructor(null, null, null, tBillsCacheStorage, null, returnsGenerator));
+              .useConstructor(null, null, null, tBillsCacheStorage, returnsGenerator));
 
       final var cashHolding = new CashHolding();
       cashHolding.setType(HoldingType.CASH);

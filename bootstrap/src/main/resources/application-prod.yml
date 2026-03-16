@@ -1,12 +1,1 @@
-spring:
-  datasource:
-    jdbc-url: jdbc:sqlserver://ce.fintex.com:34532/ce
-    username: ''
-    password: ''
-  flyway:
-    enabled: false
-  jpa:
-    properties:
-      hibernate:
-        show_sql: false
-
+# Production profile overrides

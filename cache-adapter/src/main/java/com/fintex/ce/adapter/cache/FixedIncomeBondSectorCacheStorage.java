@@ -13,7 +13,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.fixedincomebondsector.FixedIncomeBondSectorRedisRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -55,9 +54,8 @@ public class FixedIncomeBondSectorCacheStorage
   public FixedIncomeBondSectorCacheStorage(
       final SecurityDataPort<FixedIncomeBondSecurities> securityDataPort,
       final CacheEntityMapper<FixedIncomeBondSecurities, RFixedIncomeBondSecurities> mapper,
-      final FixedIncomeBondSectorRedisRepository fixedIncomeBondSectorRedisRepository,
-      final CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, fixedIncomeBondSectorRedisRepository, cacheStatisticService,
+      final FixedIncomeBondSectorRedisRepository fixedIncomeBondSectorRedisRepository) {
+    super(securityDataPort, mapper, fixedIncomeBondSectorRedisRepository,
         CacheNameEntity.FIXED_INCOME_BOND_SECURITIES);
   }
 

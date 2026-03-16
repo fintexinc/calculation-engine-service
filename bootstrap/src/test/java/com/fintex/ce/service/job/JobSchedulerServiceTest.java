@@ -1,10 +1,10 @@
 package com.fintex.ce.service.job;
 
-import com.fintex.ce.adapter.cache.statistic.CacheWarmUpService;
+import com.fintex.ce.port.output.cache.CacheCleanupPort;
+import com.fintex.ce.port.output.cache.CacheWarmUpPort;
 import com.fintex.ce.util.SchedulerUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.scheduling.support.CronExpression;
 
 import java.time.LocalDate;
@@ -31,11 +31,11 @@ class JobSchedulerServiceTest {
   @Test
   void cacheWarmUp_verifyCacheWarmUpServiceRun() {
     // SETUP
-    final var cacheWarmUpService = mock(CacheWarmUpService.class);
-    final var caffeineCacheManager = mock(CaffeineCacheManager.class);
+    final var cacheWarmUpPort = mock(CacheWarmUpPort.class);
+    final var cacheCleanupPort = mock(CacheCleanupPort.class);
     final var sut = mock(
         JobSchedulerService.class,
-        withSettings().useConstructor(cacheWarmUpService, caffeineCacheManager));
+        withSettings().useConstructor(cacheWarmUpPort, cacheCleanupPort));
 
     doCallRealMethod().when(sut).warmUpRedisCache();
 
@@ -43,7 +43,7 @@ class JobSchedulerServiceTest {
     sut.warmUpRedisCache();
 
     // VERIFY
-    verify(cacheWarmUpService).run();
+    verify(cacheWarmUpPort).run();
   }
 
   @Test

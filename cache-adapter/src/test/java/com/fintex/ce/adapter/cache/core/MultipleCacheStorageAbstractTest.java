@@ -2,7 +2,6 @@ package com.fintex.ce.adapter.cache.core;
 
 import com.fintex.ce.adapter.cache.entity.core.RedisId;
 import com.fintex.ce.adapter.cache.repository.core.CoreRedisCacheRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.constant.CacheCategory;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -48,9 +47,9 @@ class CacheStorageAbstractTest {
   }
 
   private CacheStorageAbstract createMockWithConstructor(SecurityDataPort securityDataPort, CacheEntityMapper mapper,
-      CoreRedisCacheRepository cacheRepo, CacheStatisticService cacheStatisticService) {
+      CoreRedisCacheRepository cacheRepo) {
     return mock(CacheStorageAbstract.class,
-        withSettings().useConstructor(securityDataPort, mapper, cacheRepo, cacheStatisticService, null));
+        withSettings().useConstructor(securityDataPort, mapper, cacheRepo, null));
   }
 
   // ---- synchronizeAndLoad tests ----
@@ -58,9 +57,8 @@ class CacheStorageAbstractTest {
   @Test
   void synchronizeAndLoad_verifyLoadCachesForHoldings() {
     // SETUP
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, cacheS);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final List<Holding> holdings = List.of(newHolding());
     final List<DataProvider> providers = List.of(EAGLE);
@@ -76,9 +74,8 @@ class CacheStorageAbstractTest {
   @Test
   void synchronizeAndLoad_verifyFilterCachedResponses() {
     // SETUP
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, cacheS);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final List<Holding> holdings = List.of(newHolding());
     final HashMap map = new HashMap();
@@ -96,9 +93,8 @@ class CacheStorageAbstractTest {
   @Test
   void synchronizeAndLoad_verifyFetchUncachedHoldings() {
     // SETUP
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, cacheS);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final List<Holding> holdings = List.of(newHolding());
 
@@ -118,9 +114,8 @@ class CacheStorageAbstractTest {
   @Test
   void synchronizeAndLoad_checkResults() {
     // SETUP
-    final CacheStatisticService cacheS = mock(CacheStatisticService.class);
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, cacheS);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final HashMap cachedDomainModels = new HashMap();
     cachedDomainModels.put("1", "1");
@@ -163,7 +158,7 @@ class CacheStorageAbstractTest {
   void saveToCache_verifySave() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final DataProvider eagle = EAGLE;
     final String providersId = buildIdBasedOnProviders(List.of(eagle));
@@ -186,7 +181,7 @@ class CacheStorageAbstractTest {
   void saveToCache_verifySaveWhenProvidersAreAllNull() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final RedisId res = mock(RedisId.class);
     when(res.getProvider()).thenReturn("");
@@ -207,7 +202,7 @@ class CacheStorageAbstractTest {
   void saveToCache_verifySaveWhenProvidersAreEmpty() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final RedisId res = mock(RedisId.class);
     when(res.getProvider()).thenReturn("");
@@ -269,7 +264,7 @@ class CacheStorageAbstractTest {
   void queryCacheForEnteredDataProviders_notExists() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     when(cacheRepo.findOneByHoldingIdAndProvider(any(), any())).thenReturn(Optional.empty());
     when(cacheRepo.findOneByHoldingIdAndProviders(any(), any())).thenReturn(Optional.empty());
@@ -291,7 +286,7 @@ class CacheStorageAbstractTest {
   void queryCacheForEnteredDataProviders_exists() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final RedisId res = mock(RedisId.class);
     when(cacheRepo.findOneByHoldingIdAndProviders(any(), any())).thenReturn(Optional.of(res));
@@ -314,7 +309,7 @@ class CacheStorageAbstractTest {
   void queryCacheForEnteredDataProviders_fallbackToSingleProvider() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final RedisId res = mock(RedisId.class);
 
@@ -377,7 +372,7 @@ class CacheStorageAbstractTest {
   void queryCacheForHolding_verifyQueryCacheForEnteredDataProviders() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final List<DataProvider> eagle = List.of(EAGLE);
     final Holding h = newHolding();
@@ -394,7 +389,7 @@ class CacheStorageAbstractTest {
   void queryCacheForHolding_verifyFindAllByHoldingIdEmpty() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final List<DataProvider> eagle = List.of();
     final Holding h = newHolding();
@@ -414,7 +409,7 @@ class CacheStorageAbstractTest {
   void queryCacheForHolding_verifyPickUpProviderBasedOnPriority() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final List<DataProvider> eagle = List.of();
     final Holding h = newHolding();
@@ -434,7 +429,7 @@ class CacheStorageAbstractTest {
   void queryCacheForHolding_checkResult() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final List<DataProvider> eagle = List.of();
     final Holding h = newHolding();
@@ -459,7 +454,7 @@ class CacheStorageAbstractTest {
   void loadCachesForHoldings_checkResult() {
     // SETUP
     final CoreRedisCacheRepository cacheRepo = mock(CoreRedisCacheRepository.class);
-    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo, null);
+    final CacheStorageAbstract m = createMockWithConstructor(null, null, cacheRepo);
 
     final List<DataProvider> eagle = List.of(EAGLE);
     final Holding h = newHolding();

@@ -11,7 +11,6 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.FixedIncomeStyleboxAllocationRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -46,9 +45,8 @@ public class FixedIncomeStyleboxExposureCacheStorage
   public FixedIncomeStyleboxExposureCacheStorage(
       SecurityDataPort<FixedIncomeStyleboxExposure> securityDataPort,
       CacheEntityMapper<FixedIncomeStyleboxExposure, RFixedIncomeStyleboxExposure> mapper,
-      FixedIncomeStyleboxAllocationRepository fixedIncomeStyleboxAllocationRepository,
-      CacheStatisticService cacheStatisticService) {
-    super(securityDataPort, mapper, fixedIncomeStyleboxAllocationRepository, cacheStatisticService, FIXED_INCOME_STYLEBOX_ALLOCATION);
+      FixedIncomeStyleboxAllocationRepository fixedIncomeStyleboxAllocationRepository) {
+    super(securityDataPort, mapper, fixedIncomeStyleboxAllocationRepository, FIXED_INCOME_STYLEBOX_ALLOCATION);
   }
 
   @Override

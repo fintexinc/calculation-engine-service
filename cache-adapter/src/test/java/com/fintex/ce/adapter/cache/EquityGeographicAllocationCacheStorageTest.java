@@ -55,7 +55,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
 
       final List<Holding> holdings = List.of(new Holding());
       final List<FundSeriesHolding> filtered = List.of(new FundSeriesHolding().setFundServCode("TEST"));
@@ -86,7 +86,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
@@ -117,7 +117,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
@@ -148,7 +148,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
@@ -179,7 +179,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
@@ -209,7 +209,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
       when(geographicAllocationMappingService.mapToGeographicRegions(Mockito.anyMap(), Mockito.anyList(), Mockito.eq(
           WRN_RRC_EGE_001)))
           .thenReturn(Map.of());
@@ -240,7 +240,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
 
       final List<Holding> holdings = List.of(new Holding());
       final List<BenchmarkIndexHolding> filtered = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
@@ -268,7 +268,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
 
       final List<Holding> holdings = List.of(new Holding());
       final Map allocations = mock(Map.class);
@@ -313,7 +313,7 @@ class EquityGeographicAllocationCacheStorageTest {
       final BusinessCountryCacheStorage businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
 
       final EquityGeographicAllocationCacheStorage sut = mock(EquityGeographicAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService, businessCountryCacheStorage));
 
       final List<Holding> holdings = List.of(new Holding());
       final Map allocations = mock(Map.class);

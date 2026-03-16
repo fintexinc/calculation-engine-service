@@ -1,6 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://fintex.ce.qat.com:34532/ce
   redis:
     use-key-prefix: true
     key-prefix: pcs-qat

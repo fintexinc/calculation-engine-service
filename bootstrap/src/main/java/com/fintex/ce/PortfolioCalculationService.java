@@ -1,7 +1,6 @@
 package com.fintex.ce;
 
 import com.fintex.smclient.config.EnableSmClientLibrary;
-import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -11,7 +10,6 @@ import static com.fintex.ce.util.validation.startup.LogRequestCheckerForPortfoli
 
 @EnableScheduling
 @EnableSmClientLibrary
-@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class PortfolioCalculationService {
 

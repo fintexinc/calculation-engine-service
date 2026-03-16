@@ -22,7 +22,7 @@
         <module>api</module>
         <module>application</module>
         <module>cache-adapter</module>
-        <module>jdbc-adapter</module>
+
         <module>graphql-client-adapter</module>
         <module>web-client-adapter</module>
         <module>rest-adapter</module>
@@ -42,10 +42,11 @@
         <!-- External dependencies -->
         <spring-openapi.version>2.1.0</spring-openapi.version>
         <graphql-support.version>0.2.1</graphql-support.version>
-        <flyway-core.version>7.15.0</flyway-core.version>
-        <shedlock.version>5.10.2</shedlock.version>
+
+
         <poi-ooxml.version>5.4.1</poi-ooxml.version>
-        <postgresql.version>42.7.2</postgresql.version>
+
+
         <commons-io.version>2.16.0</commons-io.version>
         <commons-compress.version>1.26.0</commons-compress.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
@@ -118,11 +119,7 @@
                 <artifactId>cache-adapter</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.fintex</groupId>
-                <artifactId>jdbc-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.fintex</groupId>
                 <artifactId>graphql-client-adapter</artifactId>
@@ -162,31 +159,15 @@
                 <artifactId>support</artifactId>
                 <version>${graphql-support.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-core</artifactId>
-                <version>${flyway-core.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.javacrumbs.shedlock</groupId>
-                <artifactId>shedlock-spring</artifactId>
-                <version>${shedlock.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.javacrumbs.shedlock</groupId>
-                <artifactId>shedlock-provider-jdbc-template</artifactId>
-                <version>${shedlock.version}</version>
-            </dependency>
+
+
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi-ooxml.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${postgresql.version}</version>
-            </dependency>
+
+
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>

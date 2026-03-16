@@ -4,7 +4,6 @@ import com.fintex.ce.adapter.cache.FixedIncomeStyleboxExposureCacheStorage;
 import com.fintex.ce.adapter.cache.entity.RFixedIncomeStyleboxExposure;
 import com.fintex.ce.adapter.cache.repository.FixedIncomeStyleboxAllocationRepository;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.FixedIncomeStyleboxType;
@@ -57,12 +56,10 @@ class FixedIncomeStyleboxExposureCacheStorageTest {
       final CacheEntityMapper<FixedIncomeStyleboxExposure, RFixedIncomeStyleboxExposure> mapper = mock(
           CacheEntityMapper.class);
       final var fixedIncomeStyleboxAllocationRepository = mock(FixedIncomeStyleboxAllocationRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final FixedIncomeStyleboxExposureCacheStorage m = mock(FixedIncomeStyleboxExposureCacheStorage.class,
           withSettings()
-              .useConstructor(securityDataPort, mapper, fixedIncomeStyleboxAllocationRepository,
-                  cacheStatisticService));
+              .useConstructor(securityDataPort, mapper, fixedIncomeStyleboxAllocationRepository));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
 

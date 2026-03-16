@@ -47,19 +47,6 @@ param cpuCore string = '0.5'
 @description('Memory allocated to container')
 param memory string = '1Gi'
 
-@description('PostgreSQL server name')
-param postgresServerName string = 'sql-fndserv-dev-cc-01'
-
-@description('PostgreSQL database name')
-param postgresDatabaseName string = 'calculation-engine-service'
-
-@description('PostgreSQL username')
-param postgresUsername string = ''
-
-@description('PostgreSQL password')
-@secure()
-param postgresPassword string = ''
-
 @description('Redis server name')
 param redisServerName string = 'fndserv'
 
@@ -92,12 +79,6 @@ var secretsArray = concat(
     {
       name: 'container-registry-password'
       value: containerRegistryPassword
-    }
-  ]),
-  (empty(postgresPassword) ? [] : [
-    {
-      name: 'postgres-password'
-      value: postgresPassword
     }
   ]),
   (empty(redisPassword) ? [] : [
@@ -143,21 +124,6 @@ var baseEnvVars = [
   }
 ]
 
-var postgresEnvVars = empty(postgresServerName) ? [] : [
-  {
-    name: 'POSTGRES_USER'
-    value: postgresUsername
-  }
-  {
-    name: 'POSTGRES_PWD'
-    secretRef: 'postgres-password'
-  }
-  {
-    name: 'POSTGRES_URL'
-    value: 'jdbc:postgresql://${postgresServerName}.postgres.database.azure.com:5432/${postgresDatabaseName}?sslmode=require'
-  }
-]
-
 var redisEnvVars = empty(redisServerName) ? [] : [
   {
     name: 'REDIS_USERNAME'
@@ -188,7 +154,7 @@ var apiEnvVars = empty(fmpApiKey) ? [] : [
   }
 ]
 
-var allEnvVars = concat(baseEnvVars, postgresEnvVars, redisEnvVars, apiEnvVars)
+var allEnvVars = concat(baseEnvVars, redisEnvVars, apiEnvVars)
 
 // Container App
 resource containerApp 'Microsoft.App/containerApps@2025-02-02-preview' = {

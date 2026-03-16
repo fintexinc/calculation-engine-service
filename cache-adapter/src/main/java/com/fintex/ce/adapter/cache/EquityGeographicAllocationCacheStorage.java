@@ -19,7 +19,6 @@ import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.EquityCountryAllocationRepository;
 import com.fintex.ce.service.GeographicAllocationMappingService;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.util.CollectorUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -60,9 +59,8 @@ public class EquityGeographicAllocationCacheStorage
       CacheEntityMapper<EquityCountryAllocation, REquityCountryAllocation> mapper,
       EquityCountryAllocationRepository equityCountryAllocationRepository,
       GeographicAllocationMappingService geographicAllocationService,
-      CacheStatisticService cacheStatisticService,
       BusinessCountryCacheStorage businessCountryCacheStorage) {
-    super(securityDataPort, mapper, equityCountryAllocationRepository, cacheStatisticService, EQUITY_COUNTRY_ALLOCATIONS);
+    super(securityDataPort, mapper, equityCountryAllocationRepository, EQUITY_COUNTRY_ALLOCATIONS);
     this.geographicAllocationService = geographicAllocationService;
     this.businessCountryCacheStorage = businessCountryCacheStorage;
   }

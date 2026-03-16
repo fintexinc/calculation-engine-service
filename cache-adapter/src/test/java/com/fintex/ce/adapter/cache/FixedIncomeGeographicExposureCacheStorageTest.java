@@ -50,7 +50,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
@@ -80,7 +80,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       var fsh = new FundSeriesHolding().setFundServCode("TEST");
@@ -111,7 +111,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       var etf = new EtfHolding().setTicker("TEST").setExchangeCode("TST");
@@ -142,7 +142,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       final List<BenchmarkIndexHolding> filtered = List.of(new BenchmarkIndexHolding().setMrStarId("TEST"));
@@ -172,7 +172,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       final List<CanadaPooledFundHolding> filtered = List.of(new CanadaPooledFundHolding().setMorningstarId("TEST"));
@@ -202,7 +202,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       final List<CanadaHedgeFundHolding> filtered = List.of(new CanadaHedgeFundHolding().setMorningstarId("TEST"));
@@ -232,7 +232,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
       final List<UsMutualFundHolding> filtered = List.of(new UsMutualFundHolding().setTicker("TEST"));
@@ -262,7 +262,7 @@ class FixedIncomeGeographicExposureCacheStorageTest {
           GeographicAllocationMappingService.class);
 
       final FixedIncomeGeographicExposureCacheStorage sut = mock(FixedIncomeGeographicExposureCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, geographicAllocationMappingService));
+          withSettings().useConstructor(null, null, null, geographicAllocationMappingService));
 
       final var gicHolding = new GicHolding();
       gicHolding.setTerm(new BigDecimal(400));

@@ -4,7 +4,6 @@ import com.fintex.ce.adapter.cache.IncomeForecastCacheStorage;
 import com.fintex.ce.adapter.cache.entity.RIncomeForecast;
 import com.fintex.ce.adapter.cache.repository.IncomeForecastRepository;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.IncomeForecast;
@@ -57,10 +56,9 @@ class IncomeForecastCacheStorageTest {
       final var securityDataPort = mock(SecurityDataPort.class);
       final CacheEntityMapper<IncomeForecast, RIncomeForecast> mapper = mock(CacheEntityMapper.class);
       final var incomeForecastRepository = mock(IncomeForecastRepository.class);
-      final var cacheStatisticService = mock(CacheStatisticService.class);
 
       final IncomeForecastCacheStorage m = mock(IncomeForecastCacheStorage.class, withSettings()
-          .useConstructor(securityDataPort, mapper, incomeForecastRepository, cacheStatisticService));
+          .useConstructor(securityDataPort, mapper, incomeForecastRepository));
 
       final List<Holding> holdings = List.of(new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE));
 

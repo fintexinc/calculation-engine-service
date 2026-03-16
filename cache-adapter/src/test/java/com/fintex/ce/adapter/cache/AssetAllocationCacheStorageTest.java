@@ -333,7 +333,7 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          businessCountryCacheStorage, null));
+          businessCountryCacheStorage));
 
       final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
       final var holdings = List.of(holding);
@@ -356,7 +356,7 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          businessCountryCacheStorage, null));
+          businessCountryCacheStorage));
 
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -379,7 +379,7 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          businessCountryCacheStorage, null));
+          businessCountryCacheStorage));
 
       final var holding = new Holding().setType(HoldingType.CANADA_STOCKS).setValue(BigDecimal.ONE);
       final Map<Holding, Country> countries = Map.of(holding, CAN);
@@ -409,7 +409,7 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          businessCountryCacheStorage, null));
+          businessCountryCacheStorage));
 
       final var holding = new Holding().setType(HoldingType.US_STOCKS).setValue(BigDecimal.ONE);
       final Map<Holding, Country> countries = Map.of(holding, USA);
@@ -439,7 +439,7 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          businessCountryCacheStorage, null));
+          businessCountryCacheStorage));
 
       final var holding = new Holding().setType(HoldingType.CASH).setValue(BigDecimal.ONE);
       final Map<Holding, Country> countries = Map.of(holding, EMPTY);
@@ -469,7 +469,7 @@ class AssetAllocationCacheStorageTest {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
       final var sut = mock(AssetAllocationCacheStorage.class, withSettings().useConstructor(null, null, null,
-          businessCountryCacheStorage, null));
+          businessCountryCacheStorage));
 
       final var holding = new Holding().setType(HoldingType.BENCHMARK_INDEX).setValue(BigDecimal.ONE);
       final Map<Holding, Country> countries = Map.of(holding, Country.OTHER);

@@ -2,7 +2,6 @@ package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.CommonHoldingsCacheStorage;
 import com.fintex.ce.adapter.cache.repository.commonholdings.CommonHoldingsRepository;
-import com.fintex.ce.adapter.cache.statistic.CacheStatisticService;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.CommonHoldings;
@@ -58,10 +57,9 @@ class CommonHoldingsCacheStorageTest {
       var set = mock(Set.class);
       var securityDataPort = mock(SecurityDataPort.class);
       var holdingRepository = mock(CommonHoldingsRepository.class);
-      var cacheStatisticService = mock(CacheStatisticService.class);
 
       var cacheStorage = mock(CommonHoldingsCacheStorage.class, withSettings()
-          .useConstructor(set, securityDataPort, null, holdingRepository, cacheStatisticService));
+          .useConstructor(set, securityDataPort, null, holdingRepository));
 
       var holdings = List.of(new Holding());
       var warnings = List.of(new Warning("id", "msg", "code"));

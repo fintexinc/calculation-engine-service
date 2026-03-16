@@ -320,7 +320,7 @@ class EquityCountryAllocationCacheStorageTest {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
       final var sut = mock(EquityCountryAllocationCacheStorage.class,
-          withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
+          withSettings().useConstructor(null, null, null, null, businessCountryCacheStorage));
 
       final List<Holding> holdings = List.of(new Holding());
       final List<DataProvider> providers = mock(List.class);
@@ -362,7 +362,7 @@ class EquityCountryAllocationCacheStorageTest {
     final CountryAllocationMappingService c = mock(CountryAllocationMappingService.class);
 
     final EquityCountryAllocationCacheStorage m = mock(EquityCountryAllocationCacheStorage.class,
-        withSettings().useConstructor(null, null, null, c, null, null));
+        withSettings().useConstructor(null, null, null, c, null));
 
     final Holding h = new Holding();
     final EquityCountryAllocation v1 = mock(EquityCountryAllocation.class);
@@ -385,7 +385,7 @@ class EquityCountryAllocationCacheStorageTest {
     final CountryAllocationMappingService c = mock(CountryAllocationMappingService.class);
 
     final EquityCountryAllocationCacheStorage m = mock(EquityCountryAllocationCacheStorage.class,
-        withSettings().useConstructor(null, null, null, c, null, null));
+        withSettings().useConstructor(null, null, null, c, null));
 
     final Holding h = new Holding();
     final EquityCountryAllocation v1 = mock(EquityCountryAllocation.class);
@@ -410,7 +410,7 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, businessCountryCacheStorage));
 
       final List holdings = mock(List.class);
       final List dataProviders = mock(List.class);
@@ -432,7 +432,7 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, businessCountryCacheStorage));
 
       final Holding holding = new Holding();
       final Map<Holding, Country> countries = Map.of(holding, CAN);
@@ -460,7 +460,7 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, businessCountryCacheStorage));
 
       final Holding holding = new Holding();
       final Map<Holding, Country> countries = Map.of(holding, USA);
@@ -489,7 +489,7 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, businessCountryCacheStorage));
 
       final Holding holding = new Holding();
       final Map<Holding, Country> countries = Map.of(holding, EMPTY);
@@ -517,7 +517,7 @@ class EquityCountryAllocationCacheStorageTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var businessCountryCacheStorage = mock(BusinessCountryCacheStorage.class);
-      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, null, businessCountryCacheStorage));
+      final var sut = mock(EquityCountryAllocationCacheStorage.class, withSettings().useConstructor(null, null, null, null, businessCountryCacheStorage));
 
       final Holding holding = new Holding();
       final Map<Holding, Country> countries = Map.of(holding, Country.OTHER);
