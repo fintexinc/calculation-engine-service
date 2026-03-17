@@ -9,7 +9,7 @@ import com.fintex.ce.domain.model.holding.EtfHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.StockHolding;
-import com.fintex.smclient.dto.FxRatesDTO;
+import com.fintex.ce.domain.model.FxRates;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -46,11 +46,11 @@ class PortfolioUtilsTest {
 
   private void mapFxRatesBasedOnCurrencyTest(Currency from, Currency to, int actualReturn) {
     // SETUP
-    final FxRatesDTO fx = mock(FxRatesDTO.class);
+    final FxRates.FxRate fx = mock(FxRates.FxRate.class);
     when(fx.getUsdCad()).thenReturn(BigDecimal.valueOf(3));
     when(fx.getCadUsd()).thenReturn(BigDecimal.valueOf(2));
 
-    final Map<LocalDate, FxRatesDTO> fxRates = Map.of(LOCAL_DATE_NOW, fx);
+    final Map<LocalDate, FxRates.FxRate> fxRates = Map.of(LOCAL_DATE_NOW, fx);
 
     // ACT
     final Map<LocalDate, BigDecimal> actual = PortfolioUtils.fxRatesForHolding(fxRates, from, to);

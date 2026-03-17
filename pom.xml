@@ -23,7 +23,6 @@
         <module>application</module>
         <module>cache-adapter</module>
 
-        <module>graphql-client-adapter</module>
         <module>web-client-adapter</module>
         <module>rest-adapter</module>
         <module>bootstrap</module>
@@ -36,12 +35,10 @@
         <maven.compiler.target>17</maven.compiler.target>
 
         <!-- Internal dependencies -->
-        <smclient.version>1.0.0-SNAPSHOT</smclient.version>
         <sm-domain.version>2.0.0-SNAPSHOT</sm-domain.version>
 
         <!-- External dependencies -->
         <spring-openapi.version>2.1.0</spring-openapi.version>
-        <graphql-support.version>0.2.1</graphql-support.version>
 
 
         <poi-ooxml.version>5.4.1</poi-ooxml.version>
@@ -122,11 +119,6 @@
 
             <dependency>
                 <groupId>com.fintex</groupId>
-                <artifactId>graphql-client-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fintex</groupId>
                 <artifactId>web-client-adapter</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -141,23 +133,11 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Security Master Client -->
-            <dependency>
-                <groupId>com.fintex</groupId>
-                <artifactId>smclient</artifactId>
-                <version>${smclient.version}</version>
-            </dependency>
-
             <!-- External dependencies -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${spring-openapi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.shopify.graphql.support</groupId>
-                <artifactId>support</artifactId>
-                <version>${graphql-support.version}</version>
             </dependency>
 
 

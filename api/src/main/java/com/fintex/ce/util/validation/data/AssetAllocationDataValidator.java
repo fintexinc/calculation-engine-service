@@ -6,14 +6,11 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.AssetAllocation;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-@Component
 public class AssetAllocationDataValidator {
 
   public void validate(final AssetAllocationDataDTO assetAllocationDataDto, final List<Warning> warnings) {
@@ -36,7 +33,7 @@ public class AssetAllocationDataValidator {
   void validate(final Holding holding,
       final Map<String, BigDecimal> assetAllocations,
       final List<Warning> warnings) {
-    if (CollectionUtils.isEmpty(assetAllocations)) {
+    if (assetAllocations == null || assetAllocations.isEmpty()) {
       validateWhenAssetAllocationIsEmpty(holding, warnings);
       return;
     }

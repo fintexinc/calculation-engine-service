@@ -5,7 +5,7 @@ import com.fintex.ce.domain.enumeration.calculation.SalesCharge;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.result.SalesChargeResult;
-import com.fintex.smclient.graphql.SalesChargeType;
+import com.fintex.sm.model.domain.enumeration.SalesChargeType;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ import java.util.Set;
 
 import static com.fintex.ce.application.calculation.SalesChargeCalculation.DEFAULT_MAP;
 import static com.fintex.ce.application.calculation.SalesChargeCalculation.DEFAULT_SALES_CHARGE_DTO;
-import static com.fintex.smclient.graphql.SalesChargeType.*;
+import static com.fintex.sm.model.domain.enumeration.SalesChargeType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SalesChargeCalculationTest {

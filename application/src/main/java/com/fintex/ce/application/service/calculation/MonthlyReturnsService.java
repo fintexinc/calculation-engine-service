@@ -1,6 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.smclient.dto.FxRatesDTO;
+import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
 import com.fintex.ce.application.validation.BenchmarkCpsdDataValidation;
@@ -112,7 +112,7 @@ public class MonthlyReturnsService {
     return benchmarkMonthlyReturns;
   }
 
-  public Map<LocalDate, FxRatesDTO> getFxRates() {
+  public Map<LocalDate, FxRates.FxRate> getFxRates() {
     return fxRatesProvider.loadFxRates();
   }
 
