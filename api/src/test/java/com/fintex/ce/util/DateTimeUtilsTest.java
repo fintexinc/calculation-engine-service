@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.util.ReflectionUtils;
-
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -120,9 +118,9 @@ class DateTimeUtilsTest {
   @ParameterizedTest
   @MethodSource("dataForLimitStatDate")
   void testLimitStartDate(LocalDate startDate, LocalDate endDate, LocalDate expected) throws Exception {
-    Method limitStartDateMethod = ReflectionUtils.findMethod(DateTimeUtils.class, "limitStartDate", LocalDate.class,
+    Method limitStartDateMethod = DateTimeUtils.class.getDeclaredMethod("limitStartDate", LocalDate.class,
         LocalDate.class);
-    ReflectionUtils.makeAccessible(limitStartDateMethod);
+    limitStartDateMethod.setAccessible(true);
     LocalDate result = (LocalDate) limitStartDateMethod.invoke(null, startDate, endDate);
 
     assertEquals(expected, result);

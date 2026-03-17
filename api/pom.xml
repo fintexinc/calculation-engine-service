@@ -54,10 +54,10 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
-        <!-- Security Master Client -->
+        <!-- SLF4J API -->
         <dependency>
-            <groupId>com.fintex</groupId>
-            <artifactId>smclient</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <!-- Test dependencies -->

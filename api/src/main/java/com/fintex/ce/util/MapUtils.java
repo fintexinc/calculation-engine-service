@@ -1,7 +1,6 @@
 package com.fintex.ce.util;
 
 import com.fintex.ce.domain.model.CommonDates;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -59,7 +58,7 @@ public class MapUtils {
 
   public static <K, V> Map<K, V> copy(final Map<K, V> originalMap, final Supplier<Map<K, V>> mapCreator) {
     final Map<K, V> newMap = mapCreator.get();
-    if (!CollectionUtils.isEmpty(originalMap)) {
+    if (originalMap != null && !originalMap.isEmpty()) {
       newMap.putAll(originalMap);
     }
     return newMap;
@@ -68,7 +67,7 @@ public class MapUtils {
   public static <K, V> TreeMap<K, V> copyTreeMap(final Map<K, V> originalMap,
       final Supplier<TreeMap<K, V>> mapCreator) {
     final TreeMap<K, V> newMap = mapCreator.get();
-    if (!CollectionUtils.isEmpty(originalMap)) {
+    if (originalMap != null && !originalMap.isEmpty()) {
       newMap.putAll(originalMap);
     }
     return newMap;

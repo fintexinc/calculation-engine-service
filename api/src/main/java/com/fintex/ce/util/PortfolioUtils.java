@@ -1,12 +1,11 @@
 package com.fintex.ce.util;
 
-import com.fintex.smclient.dto.FxRatesDTO;
+import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.IncomeForecastDto;
 import com.fintex.ce.domain.model.holding.*;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,18 +28,18 @@ public class PortfolioUtils {
   }
 
   public static Map<Holding, Map<LocalDate, BigDecimal>> fxRatesForHoldings(
-      final Map<Holding, Currency> holdings, final Currency toCurrency, final Map<LocalDate, FxRatesDTO> fxRates) {
+      final Map<Holding, Currency> holdings, final Currency toCurrency, final Map<LocalDate, FxRates.FxRate> fxRates) {
     return holdings.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> fxRatesForHolding(fxRates, entry
         .getValue(), toCurrency)));
   }
 
-  public static Map<LocalDate, BigDecimal> fxRatesForHolding(final Map<LocalDate, FxRatesDTO> fxRates,
+  public static Map<LocalDate, BigDecimal> fxRatesForHolding(final Map<LocalDate, FxRates.FxRate> fxRates,
       final Currency from, final Currency to) {
     return fxRates.entrySet().stream().collect(CollectorUtils.toTreeMap(Map.Entry::getKey, mapFxRateBasedOnCurrency(
         from, to)));
   }
 
-  private static Function<Map.Entry<LocalDate, FxRatesDTO>, BigDecimal> mapFxRateBasedOnCurrency(final Currency from,
+  private static Function<Map.Entry<LocalDate, FxRates.FxRate>, BigDecimal> mapFxRateBasedOnCurrency(final Currency from,
       final Currency to) {
     return entry -> {
       if (Currency.USD.equals(from) && Currency.CAD.equals(to)) {
@@ -88,7 +87,7 @@ public class PortfolioUtils {
    */
   public static <T> boolean areAllValuesInMapEmpty(final Map<Holding, Map<T, BigDecimal>> map) {
     for (final Map.Entry<Holding, Map<T, BigDecimal>> entry : map.entrySet()) {
-      if (!CollectionUtils.isEmpty(entry.getValue())) {
+      if (entry.getValue() != null && !entry.getValue().isEmpty()) {
         return false;
       }
     }

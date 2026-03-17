@@ -35,10 +35,6 @@ management:
       exposure:
         include: env, health, configprops, caches, httptrace, loggers, metrics, mappings, threaddump
 
-security-master-graphql-transport:
-  headers:
-    Content-Type: application/x-www-form-urlencoded
-
 rest-template:
   rest-template-pool:
     size-per-route: 50
@@ -49,13 +45,12 @@ rest-template:
     connect-timeout: 90000 # time in millis
 
 security-master:
-  web-protocol: graphql  # "graphql" (default) or "rest"
+  web-protocol: rest # "graphql" or "rest"
   rest:
     base-url: ${SM_REST_BASE_URL:http://localhost:8080}
     timeout: 90000
 
 application:
-  graphql-enabled: true
   rest-template-enabled: true
 
 default:

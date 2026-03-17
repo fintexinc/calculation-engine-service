@@ -34,11 +34,6 @@
 
         <dependency>
             <groupId>com.fintex</groupId>
-            <artifactId>graphql-client-adapter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fintex</groupId>
             <artifactId>web-client-adapter</artifactId>
             <version>${project.version}</version>
         </dependency>

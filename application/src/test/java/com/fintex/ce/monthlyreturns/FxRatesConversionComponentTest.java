@@ -4,8 +4,7 @@ import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.EtfHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.exception.DataErrorException;
-import com.fintex.ce.monthlyreturns.FxRatesConversionComponent;
-import com.fintex.smclient.dto.FxRatesDTO;
+import com.fintex.ce.domain.model.FxRates;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -24,7 +23,7 @@ class FxRatesConversionComponentTest {
   @Test
   void convert_checkResultConvertUsdToCad() {
     // SETUP
-    Map<LocalDate, FxRatesDTO> fxRates = getFxRates();
+    Map<LocalDate, FxRates.FxRate> fxRates = getFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.CAD);
 
     final EtfHolding etfHolding = new EtfHolding();
@@ -48,7 +47,7 @@ class FxRatesConversionComponentTest {
   @Test
   void convert_checkResultConvertCadToUsd() {
     // SETUP
-    Map<LocalDate, FxRatesDTO> fxRates = getFxRates();
+    Map<LocalDate, FxRates.FxRate> fxRates = getFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.USD);
 
     final EtfHolding etfHolding = new EtfHolding();
@@ -72,7 +71,7 @@ class FxRatesConversionComponentTest {
   @Test
   void convert_fxRateIsNullThrowError() {
     // SETUP
-    Map<LocalDate, FxRatesDTO> fxRates = getNotCompleteFxRates();
+    Map<LocalDate, FxRates.FxRate> fxRates = getNotCompleteFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.USD);
 
     final EtfHolding etfHolding = new EtfHolding();
@@ -101,20 +100,20 @@ class FxRatesConversionComponentTest {
     return returns;
   }
 
-  private Map<LocalDate, FxRatesDTO> getFxRates() {
-    final Map<LocalDate, FxRatesDTO> fxRates = new HashMap<>();
-    fxRates.put(toLastDayOfMonth(LocalDate.now()), new FxRatesDTO(BigDecimal.valueOf(2), BigDecimal.valueOf(1)));
-    fxRates.put(toLastDayOfMonth(LocalDate.now().plusMonths(1)), new FxRatesDTO(BigDecimal.valueOf(4), BigDecimal
+  private Map<LocalDate, FxRates.FxRate> getFxRates() {
+    final Map<LocalDate, FxRates.FxRate> fxRates = new HashMap<>();
+    fxRates.put(toLastDayOfMonth(LocalDate.now()), new FxRates.FxRate(BigDecimal.valueOf(2), BigDecimal.valueOf(1)));
+    fxRates.put(toLastDayOfMonth(LocalDate.now().plusMonths(1)), new FxRates.FxRate(BigDecimal.valueOf(4), BigDecimal
         .valueOf(2)));
-    fxRates.put(toLastDayOfMonth(LocalDate.now().plusMonths(2)), new FxRatesDTO(BigDecimal.valueOf(16), BigDecimal
+    fxRates.put(toLastDayOfMonth(LocalDate.now().plusMonths(2)), new FxRates.FxRate(BigDecimal.valueOf(16), BigDecimal
         .valueOf(10)));
     return fxRates;
   }
 
-  private Map<LocalDate, FxRatesDTO> getNotCompleteFxRates() {
-    final Map<LocalDate, FxRatesDTO> fxRates = new HashMap<>();
-    fxRates.put(toLastDayOfMonth(LocalDate.now()), new FxRatesDTO(BigDecimal.valueOf(2), BigDecimal.valueOf(1)));
-    fxRates.put(toLastDayOfMonth(LocalDate.now().plusMonths(2)), new FxRatesDTO(BigDecimal.valueOf(16), BigDecimal
+  private Map<LocalDate, FxRates.FxRate> getNotCompleteFxRates() {
+    final Map<LocalDate, FxRates.FxRate> fxRates = new HashMap<>();
+    fxRates.put(toLastDayOfMonth(LocalDate.now()), new FxRates.FxRate(BigDecimal.valueOf(2), BigDecimal.valueOf(1)));
+    fxRates.put(toLastDayOfMonth(LocalDate.now().plusMonths(2)), new FxRates.FxRate(BigDecimal.valueOf(16), BigDecimal
         .valueOf(10)));
     return fxRates;
   }

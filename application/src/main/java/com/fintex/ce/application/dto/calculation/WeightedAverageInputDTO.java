@@ -4,7 +4,7 @@ import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.enumeration.Rebalanced;
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.smclient.dto.FxRatesDTO;
+import com.fintex.ce.domain.model.FxRates;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -27,7 +27,7 @@ public class WeightedAverageInputDTO {
 
   // already pre-formatted monthly returns
   private Map<Holding, Map<LocalDate, BigDecimal>> portfolioReturns;
-  private Map<LocalDate, FxRatesDTO> fxRates;
+  private Map<LocalDate, FxRates.FxRate> fxRates;
 
   private Currency currency;
 

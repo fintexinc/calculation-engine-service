@@ -1,6 +1,6 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.smclient.graphql.PaymentFrequencyType;
+import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
 import com.fintex.ce.constant.GeneralConstants;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.InterestFreq;

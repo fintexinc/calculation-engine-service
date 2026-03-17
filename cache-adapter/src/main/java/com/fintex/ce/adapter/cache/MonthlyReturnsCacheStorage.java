@@ -14,6 +14,7 @@ import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.adapter.cache.repository.monthlyreturns.MonthlyReturnsRepository;
 import com.fintex.ce.adapter.cache.core.CacheStorageAbstract;
+import com.fintex.ce.port.output.TBillsPort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -45,14 +46,14 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 public class MonthlyReturnsCacheStorage
     extends CacheStorageAbstract<MonthlyReturns, RMonthlyReturns, Map<Holding, MonthlyReturns>> {
 
-  private final TBillsCacheStorage tBillsCacheStorage;
+  private final TBillsPort tBillsCacheStorage;
   private final ReturnsGenerator monthlyReturnGenerator;
 
   public MonthlyReturnsCacheStorage(
       final SecurityDataPort<MonthlyReturns> securityDataPort,
       final CacheEntityMapper<MonthlyReturns, RMonthlyReturns> mapper,
       final MonthlyReturnsRepository monthlyReturnsRepository,
-      final TBillsCacheStorage tBillsCacheStorage,
+      final TBillsPort tBillsCacheStorage,
       final ReturnsGenerator monthlyReturnGenerator) {
     super(securityDataPort, mapper, monthlyReturnsRepository, MONTHLY_RETURNS);
     this.tBillsCacheStorage = tBillsCacheStorage;
@@ -114,7 +115,7 @@ public class MonthlyReturnsCacheStorage
     if (cashHolding.hasClientIntRate()) {
       return monthlyReturnGenerator.generateReturns(cashHolding);
     } else {
-      return tBillsCacheStorage.loadTBillsFor(of(checkCurrency(cashHolding.getCurrency(), currencyFromRequest)));
+      return new TreeMap<>(tBillsCacheStorage.loadTBillsFor(of(checkCurrency(cashHolding.getCurrency(), currencyFromRequest))));
     }
   }
 

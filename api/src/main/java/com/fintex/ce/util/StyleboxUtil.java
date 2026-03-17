@@ -1,7 +1,7 @@
 package com.fintex.ce.util;
 
-import com.fintex.smclient.graphql.StyleBoxValue;
-import com.fintex.smclient.graphql.StyleBoxes;
+import com.fintex.sm.model.domain.value.StyleBoxValue;
+import com.fintex.sm.model.domain.rating.StyleBoxes;
 import lombok.experimental.UtilityClass;
 
 import java.math.BigDecimal;

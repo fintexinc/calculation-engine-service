@@ -23,7 +23,7 @@ public class DownsideDeviationCalculationServiceImpl
 
   public DownsideDeviationCalculationServiceImpl(
       @Autowired final MonthlyReturnsService monthlyReturnsService,
-      @Autowired final TBillsPort tBillsProvider,
+      @Autowired  final TBillsPort tBillsProvider,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
     this.tBillsProvider = tBillsProvider;

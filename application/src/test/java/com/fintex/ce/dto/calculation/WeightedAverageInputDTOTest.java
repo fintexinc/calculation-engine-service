@@ -5,7 +5,7 @@ import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.enumeration.Rebalanced;
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.smclient.dto.FxRatesDTO;
+import com.fintex.ce.domain.model.FxRates;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -21,7 +21,7 @@ class WeightedAverageInputDtoTest {
   void makeCopy_checkResult() {
     // SETUP
     final var expected = new WeightedAverageInputDTO();
-    final var fxRates = Map.of(LocalDate.MIN, mock(FxRatesDTO.class));
+    final var fxRates = Map.of(LocalDate.MIN, mock(FxRates.FxRate.class));
     final var holdings = Map.of(mock(Holding.class), Currency.CAD);
     final var portfolioReturns = Map.of(mock(Holding.class),
         Map.of(LocalDate.MIN, mock(BigDecimal.class)));

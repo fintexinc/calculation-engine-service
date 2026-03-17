@@ -1,6 +1,6 @@
 package com.fintex.ce.monthlyreturns;
 
-import com.fintex.smclient.dto.FxRatesDTO;
+import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.domain.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.PortfolioUtils;
@@ -23,10 +23,10 @@ import static java.math.BigDecimal.ONE;
 @EqualsAndHashCode
 public class FxRatesConversionComponent {
 
-  private final Map<LocalDate, FxRatesDTO> fxRates;
+  private final Map<LocalDate, FxRates.FxRate> fxRates;
   private final Currency toCurrency;
 
-  public FxRatesConversionComponent(final Map<LocalDate, FxRatesDTO> fxRates,
+  public FxRatesConversionComponent(final Map<LocalDate, FxRates.FxRate> fxRates,
       final Currency toCurrency) {
     this.fxRates = makeCopy(fxRates);
     this.toCurrency = toCurrency;
@@ -68,10 +68,10 @@ public class FxRatesConversionComponent {
     return fxRateValue;
   }
 
-  private Map<LocalDate, FxRatesDTO> makeCopy(final Map<LocalDate, FxRatesDTO> fxRates) {
+  private Map<LocalDate, FxRates.FxRate> makeCopy(final Map<LocalDate, FxRates.FxRate> fxRates) {
     return fxRates.entrySet().stream().collect(
         Collectors.toMap(
             Map.Entry::getKey,
-            entry -> new FxRatesDTO(entry.getValue().getUsdCad(), entry.getValue().getCadUsd())));
+            entry -> new FxRates.FxRate(entry.getValue().getUsdCad(), entry.getValue().getCadUsd())));
   }
 }

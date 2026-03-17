@@ -9,7 +9,7 @@ import com.fintex.ce.domain.model.Income;
 import com.fintex.ce.domain.model.holding.FixedIncomeHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.smclient.graphql.PaymentFrequencyType;
+import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
 import com.fintex.ce.port.input.command.IncomeForecastCommand;
 import com.fintex.ce.port.input.result.IncomeForecastResult;
 import com.fintex.ce.util.DecimalUtils;

@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.adapter.cache.entity.core.RedisId;
-import com.fintex.ce.adapter.cache.repository.FxRatesRepository;
 import com.fintex.ce.adapter.cache.repository.core.CoreRedisCacheRepository;
 import com.fintex.ce.port.output.cache.CacheCleanupPort;
 import lombok.extern.log4j.Log4j2;
@@ -28,20 +27,17 @@ import java.util.stream.Collectors;
 public class CacheCleanupAdapter implements CacheCleanupPort {
 
   private final List<CoreRedisCacheRepository<?>> coreRedisCacheRepositories;
-  private final FxRatesRepository fxRatesRepository;
   private final CacheManager redis5DaysCacheManager;
   private final CacheManager caffeine1HourCacheManager;
   private final RedisConnectionFactory redisConnectionFactory;
   private final CacheKeyPrefix cacheKeyPrefix;
 
   public CacheCleanupAdapter(final List<CoreRedisCacheRepository<?>> coreRedisCacheRepositories,
-      final FxRatesRepository fxRatesRepository,
       @Qualifier("redis5DaysCacheManager") final CacheManager redis5DaysCacheManager,
       @Qualifier("caffeine1HourCacheManager") final CacheManager caffeine1HourCacheManager,
       final RedisConnectionFactory redisConnectionFactory,
       final CacheKeyPrefix cacheKeyPrefix) {
     this.coreRedisCacheRepositories = coreRedisCacheRepositories;
-    this.fxRatesRepository = fxRatesRepository;
     this.redis5DaysCacheManager = redis5DaysCacheManager;
     this.caffeine1HourCacheManager = caffeine1HourCacheManager;
     this.redisConnectionFactory = redisConnectionFactory;
@@ -50,8 +46,7 @@ public class CacheCleanupAdapter implements CacheCleanupPort {
 
   @Override
   public void removeFxRatesFromCache() {
-    fxRatesRepository.deleteAll();
-    log.info("Remove fx rates from redis cache");
+    log.info("Remove fx rates from redis cache (no-op: FxRatesRepository removed)");
   }
 
   @Override
