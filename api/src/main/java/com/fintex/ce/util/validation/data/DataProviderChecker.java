@@ -3,7 +3,6 @@ package com.fintex.ce.util.validation.data;
 import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
