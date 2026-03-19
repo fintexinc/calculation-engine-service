@@ -144,11 +144,11 @@ public class IncomeForecastCalculationServiceImpl
 
   private static IncomeForecastDto getIncomeForecastDto(final Holding holding) {
     final String holdingType = holding.getType().name();
-    final String holdingIdentifier = holding.getHoldingIdentifier().name();
+    final String securityIdentifierType = holding.getSecurityIdentifier().getIdType().name();
 
     final IncomeForecastDto incomeForecastDto = IncomeForecastDto.builder()
         .type(holdingType)
-        .holdingIdentifier(holdingIdentifier)
+        .holdingIdentifier(securityIdentifierType)
         .build();
 
     PortfolioUtils.setHoldingResponseDetails(holding, incomeForecastDto);

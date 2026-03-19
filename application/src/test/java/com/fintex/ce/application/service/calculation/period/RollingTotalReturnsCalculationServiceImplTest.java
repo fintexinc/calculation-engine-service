@@ -8,6 +8,7 @@ import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.port.input.command.RollingCalculationCommand;
+import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.ce.port.input.result.RollingTotalReturnsResult;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ComparisonUtils;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.enumeration.HoldingIdentifierType.FUNDSERV;
+import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.FUNDSERV;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.any;
@@ -42,7 +43,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var holding = new FundSeriesHolding();
     holding.setFundServCode("RBF605");
-    holding.setHoldingIdentifier(FUNDSERV);
+    holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
     holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
     holding.setValue(BigDecimal.valueOf(50000));
 
@@ -73,7 +74,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var holding = new FundSeriesHolding();
     holding.setFundServCode("RBF605");
-    holding.setHoldingIdentifier(FUNDSERV);
+    holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
     holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
     holding.setValue(BigDecimal.valueOf(50000));
 
@@ -102,7 +103,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var holding = new FundSeriesHolding();
     holding.setFundServCode("RBF605");
-    holding.setHoldingIdentifier(FUNDSERV);
+    holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
     holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
     holding.setValue(BigDecimal.valueOf(50000));
 
@@ -202,7 +203,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var holding = new FundSeriesHolding();
     holding.setFundServCode("RBF605");
-    holding.setHoldingIdentifier(FUNDSERV);
+    holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
     holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
     holding.setValue(BigDecimal.valueOf(50000));
     final var req = new RollingCalculationCommand();
@@ -229,7 +230,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var holding = new FundSeriesHolding();
     holding.setFundServCode("RBF605");
-    holding.setHoldingIdentifier(FUNDSERV);
+    holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
     holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
     holding.setValue(BigDecimal.valueOf(50000));
     final var req = new RollingCalculationCommand();

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @deprecated Use domain models with FinancialInstrumentType instead
+ * @deprecated Use domain models (AssetAllocationDto) with FinancialInstrumentType instead
  */
 @Deprecated
 @Data

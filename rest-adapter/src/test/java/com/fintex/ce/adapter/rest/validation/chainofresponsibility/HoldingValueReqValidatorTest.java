@@ -1,7 +1,8 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -24,7 +25,7 @@ class HoldingValueReqValidatorTest {
     when(f.getFundServCode()).thenReturn("F");
     when(f.getType()).thenReturn(HoldingType.CANADA_MUTUAL_FUNDS);
     when(f.getValue()).thenReturn(null);
-    when(f.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    when(f.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("F", FiIdentifierType.FUNDSERV));
 
     final List<Holding> holdings = List.of(f);
 
@@ -43,7 +44,7 @@ class HoldingValueReqValidatorTest {
     when(f.getFundServCode()).thenReturn("F");
     when(f.getType()).thenReturn(HoldingType.CANADA_MUTUAL_FUNDS);
     when(f.getValue()).thenReturn(BigDecimal.valueOf(-1));
-    when(f.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    when(f.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("F", FiIdentifierType.FUNDSERV));
 
     final List<Holding> holdings = List.of(f);
 
@@ -62,7 +63,7 @@ class HoldingValueReqValidatorTest {
     when(f.getFundServCode()).thenReturn("F");
     when(f.getType()).thenReturn(HoldingType.CANADA_MUTUAL_FUNDS);
     when(f.getValue()).thenReturn(BigDecimal.valueOf(0));
-    when(f.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    when(f.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("F", FiIdentifierType.FUNDSERV));
 
     final List<Holding> holdings = List.of(f);
 
@@ -78,7 +79,7 @@ class HoldingValueReqValidatorTest {
     when(f.getFundServCode()).thenReturn("F");
     when(f.getType()).thenReturn(HoldingType.CANADA_MUTUAL_FUNDS);
     when(f.getValue()).thenReturn(BigDecimal.valueOf(100));
-    when(f.getHoldingIdentifier()).thenReturn(HoldingIdentifierType.FUNDSERV);
+    when(f.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("F", FiIdentifierType.FUNDSERV));
 
     final List<Holding> holdings = List.of(f);
 

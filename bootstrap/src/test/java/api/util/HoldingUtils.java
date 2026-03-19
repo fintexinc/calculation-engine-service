@@ -34,11 +34,7 @@ public class HoldingUtils {
       HoldingDataDTO holdingDataDTO) {
     Holding holding = defineHolding(holdingName, holdingDataDTO);
 
-    if (holdingDataDTO.getHoldingIdentifier() == null) {
-      holding.setHoldingIdentifier(null);
-    } else {
-      holding.setHoldingIdentifier(holdingDataDTO.getHoldingIdentifier());
-    }
+    holding.setSecurityIdentifier(holdingDataDTO.getSecurityIdentifier());
 
     holding.setType(holdingDataDTO.getHoldingType());
     holding.setValue(holdingValue);
@@ -158,10 +154,10 @@ public class HoldingUtils {
     final PortfolioHoldingDTO dto = new PortfolioHoldingDTO();
 
     if (HoldingGroups.MUTUAL_FUND.contains(type)) {
-      dto.setFundHoldingIdentifier(holdingDataDTO.getHoldingIdentifier().name());
+      dto.setFundHoldingIdentifier(holdingDataDTO.getSecurityIdentifier().getIdType().name());
       return dto;
     } else if (HoldingGroups.ETFS.contains(type)) {
-      dto.setFundHoldingIdentifier(holdingDataDTO.getHoldingIdentifier().name());
+      dto.setFundHoldingIdentifier(holdingDataDTO.getSecurityIdentifier().getIdType().name());
       return dto;
     } else if (HoldingGroups.STOCKS.contains(type)) {
       dto.setExchangeId(holdingDataDTO.getExchangeCode());

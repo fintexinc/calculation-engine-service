@@ -5,24 +5,28 @@ import com.fintex.ce.domain.model.holding.EtfHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.StockHolding;
-
+import com.fintex.sm.model.domain.SecurityIdentifier;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.fintex.ce.domain.enumeration.HoldingIdentifierType.FUNDSERV;
-import static com.fintex.ce.domain.enumeration.HoldingIdentifierType.TICKER;
-import static com.fintex.ce.domain.enumeration.HoldingType.*;
+import static com.fintex.ce.domain.enumeration.HoldingType.CANADA_ETF;
+import static com.fintex.ce.domain.enumeration.HoldingType.CANADA_MUTUAL_FUNDS;
+import static com.fintex.ce.domain.enumeration.HoldingType.CANADA_STOCKS;
+import static com.fintex.ce.domain.enumeration.HoldingType.US_ETF;
+import static com.fintex.ce.domain.enumeration.HoldingType.US_STOCKS;
+import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.FUNDSERV;
+import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.TICKER;
 import static performance.testing.RandomUtil.getRandomInt;
 
 public class HoldingFactory {
 
-  private final static List<String> usEtfs;
-  private final static List<String> canadaEtfs;
-  private final static List<String> mutualFunds;
-  private final static List<String> benchmarksMorningStar;
-  private final static List<StockParseDTO> canadaStocks;
-  private final static List<StockParseDTO> usStocks;
+  private static final List<String> usEtfs;
+  private static final List<String> canadaEtfs;
+  private static final List<String> mutualFunds;
+  private static final List<String> benchmarksMorningStar;
+  private static final List<StockParseDTO> canadaStocks;
+  private static final List<StockParseDTO> usStocks;
 
   private final LinkedList<Integer> randomIndexesForUsEtfs = new LinkedList<>();
   private final LinkedList<Integer> randomIndexesForCanadaEtfs = new LinkedList<>();
@@ -81,20 +85,22 @@ public class HoldingFactory {
       final LinkedList<Integer> randomIndexes) {
     final int randomIndex = randomIndexes.pop();
     final var etfHolding = new EtfHolding();
-    etfHolding.setHoldingIdentifier(TICKER);
+    final String ticker = codes.get(randomIndex);
+    etfHolding.setSecurityIdentifier(new SecurityIdentifier(ticker, TICKER));
     etfHolding.setType(holdingType);
     etfHolding.setValue(BigDecimal.valueOf(randomIndex));
-    etfHolding.setTicker(codes.get(randomIndex));
+    etfHolding.setTicker(ticker);
     return etfHolding;
   }
 
   private Holding getMutualFund() {
     final int randomIndex = randomIndexesForMutualFunds.pop();
     final var mutualFund = new FundSeriesHolding();
-    mutualFund.setHoldingIdentifier(FUNDSERV);
+    final String fundServCode = mutualFunds.get(randomIndex);
+    mutualFund.setSecurityIdentifier(new SecurityIdentifier(fundServCode, FUNDSERV));
     mutualFund.setType(CANADA_MUTUAL_FUNDS);
     mutualFund.setValue(BigDecimal.valueOf(randomIndex));
-    mutualFund.setFundServCode(mutualFunds.get(randomIndex));
+    mutualFund.setFundServCode(fundServCode);
     return mutualFund;
   }
 
@@ -102,10 +108,11 @@ public class HoldingFactory {
       LinkedList<Integer> randomIndexes) {
     final int randomIndex = randomIndexes.pop();
     final var stockHolding = new StockHolding();
-    stockHolding.setHoldingIdentifier(TICKER);
+    final String ticker = codes.get(randomIndex).getTicker();
+    stockHolding.setSecurityIdentifier(new SecurityIdentifier(ticker, TICKER));
     stockHolding.setType(holdingType);
     stockHolding.setValue(BigDecimal.valueOf(randomIndex));
-    stockHolding.setTicker(codes.get(randomIndex).getTicker());
+    stockHolding.setTicker(ticker);
     stockHolding.setExchangeCode(codes.get(randomIndex).getExchangeId());
     return stockHolding;
   }
