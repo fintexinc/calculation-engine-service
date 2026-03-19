@@ -1,4 +1,4 @@
-package com.fintex.ce.domain.enumeration.calculation;
+package com.fintex.ce.domain.model.enumeration.calculation;
 
 import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import org.junit.jupiter.api.Test;

@@ -1,23 +1,25 @@
 package com.fintex.ce.application.service.calculation;
 
+import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapper.response.CreditQualityResponseMapper;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.CreditQuality;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
-import com.fintex.ce.domain.model.AssetAllocation;
-import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.service.calculation.CalculationService;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.math.BigDecimal;
-import java.util.*;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
@@ -36,12 +38,12 @@ import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
 public class CreditQualityServiceImpl implements CalculationService<CreditQualityResult, PortfolioHoldingsCommand> {
 
   private final SecurityDataFetcher<CreditQuality> creditQualitySecurityDataFetcher;
-  private final SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher;
+  private final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
   private final CreditQualityResponseMapper responseMapper;
 
   public CreditQualityServiceImpl(final SecurityDataFetcher<CreditQuality> creditQualitySecurityDataFetcher,
-      final SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher,
+      final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher,
       final AssetAllocationDataMapper assetAllocationDataMapper,
       final CreditQualityResponseMapper responseMapper) {
     this.creditQualitySecurityDataFetcher = creditQualitySecurityDataFetcher;
@@ -67,10 +69,10 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
 
   public Map<Holding, BigDecimal> getFixedIncomeCreditQuality(final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    final Map<Holding, AssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
+    final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR, EAGLE));
-    final var assetAllocations = assetAllocationDataMapper.mapFromRaw(rawData, reqDTO.getHoldings());
+    final var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
     return assetAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, this::getFixedIncomeValue));
   }
 

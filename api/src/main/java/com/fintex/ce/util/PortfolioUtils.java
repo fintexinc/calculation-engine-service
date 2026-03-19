@@ -1,12 +1,14 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.model.FxRates;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.dto.IncomeForecastDto;
-import com.fintex.ce.domain.model.holding.*;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
-
+import com.fintex.ce.domain.model.FxRates;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.holding.CashHolding;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.EquitySecurityIdentifier;
+import com.fintex.sm.model.domain.SecurityIdentifier;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -58,32 +60,23 @@ public class PortfolioUtils {
 
   public static void setHoldingResponseDetails(final Holding holding,
       final IncomeForecastDto incomeForecastDTO) {
-    if (FilterUtils.STOCK_PREDICATE.test(holding)) {
-      final StockHolding stockHolding = (StockHolding) holding;
-      incomeForecastDTO.setExchangeCode(stockHolding.getExchangeCode());
-      incomeForecastDTO.setTicker(stockHolding.getTicker());
+    SecurityIdentifier secId = holding.getSecurityIdentifier();
+    if (secId == null) {
+      return;
+    }
+
+    if (secId instanceof EquitySecurityIdentifier eqId) {
+      incomeForecastDTO.setTicker(secId.getId());
+      incomeForecastDTO.setExchangeCode(eqId.getExchangeId());
     } else if (FilterUtils.CANADA_MUTUAL_PREDICATE.test(holding)) {
-      final FundSeriesHolding fundSeriesHolding = (FundSeriesHolding) holding;
-      incomeForecastDTO.setFundServeCode(fundSeriesHolding.getFundServCode());
-    } else if (FilterUtils.US_MUTUAL_FUND_PREDICATE.test(holding)) {
-      final UsMutualFundHolding usMutualFundHolding = (UsMutualFundHolding) holding;
-      incomeForecastDTO.setTicker(usMutualFundHolding.getTicker());
-    } else if (FilterUtils.ETF_PREDICATE.test(holding)) {
-      final EtfHolding etfHolding = (EtfHolding) holding;
-      incomeForecastDTO.setTicker(etfHolding.getTicker());
-      incomeForecastDTO.setExchangeCode(etfHolding.getExchangeCode());
-    } else if (FilterUtils.FIXED_INCOME_PREDICATE.test(holding)) {
-      final FixedIncomeHolding fixedIncomeHolding = (FixedIncomeHolding) holding;
-      incomeForecastDTO.setIdentifier(fixedIncomeHolding.getIdentifier());
+      incomeForecastDTO.setFundServeCode(secId.getId());
+    } else {
+      incomeForecastDTO.setIdentifier(secId.getId());
     }
   }
 
   /**
-   * return true if no holdings in the portfolio contain any values
-   *
-   * @param map
-   * @param <T>
-   * @return
+   * return true if no holdings in the portfolio contain any value
    */
   public static <T> boolean areAllValuesInMapEmpty(final Map<Holding, Map<T, BigDecimal>> map) {
     for (final Map.Entry<Holding, Map<T, BigDecimal>> entry : map.entrySet()) {
@@ -101,43 +94,24 @@ public class PortfolioUtils {
    *          contains Map with values for each Holding type
    * @param <T>
    *          generic key
-   * @return
    */
   public static <T> boolean areAllValuesZerosInMap(final Map<Holding, Map<T, BigDecimal>> map) {
     return map.values().stream().flatMap(e -> e.values().stream()).allMatch(v -> v.compareTo(ZERO) == 0);
   }
 
   public static String createKey(final Holding holding) {
-    var result = "";
-    if (FilterUtils.CANADA_MUTUAL_PREDICATE.test(holding)) {
-      final FundSeriesHolding fundSeriesHolding = (FundSeriesHolding) holding;
-      result = fundSeriesHolding.getFundServCode();
-    } else if (FilterUtils.ETF_PREDICATE.test(holding)) {
-      final EtfHolding etfHolding = (EtfHolding) holding;
-      result = etfHolding.getTicker();
-    } else if (FilterUtils.STOCK_PREDICATE.test(holding)) {
-      final StockHolding stockHolding = (StockHolding) holding;
-      result = stockHolding.getTicker() + "_" + stockHolding.getExchangeCode();
-    } else if (FilterUtils.BENCHMARKS_PREDICATE.test(holding)) {
-      final BenchmarkIndexHolding benchmarkIndexHolding = (BenchmarkIndexHolding) holding;
-      result = benchmarkIndexHolding.getMrStarId();
-    } else if (FilterUtils.CASH_PREDICATE.test(holding)) {
-      final CashHolding cashHolding = (CashHolding) holding;
-      result = cashHolding.getCurrency().name();
-    } else if (FilterUtils.CANADA_POOLED_FUND_PREDICATE.test(holding)) {
-      final CanadaPooledFundHolding canadaPooledFundHolding = (CanadaPooledFundHolding) holding;
-      result = canadaPooledFundHolding.getMorningstarId();
-    } else if (FilterUtils.CANADA_HEDGE_FUND_PREDICATE.test(holding)) {
-      final CanadaHedgeFundHolding canadaHedgeFundHolding = (CanadaHedgeFundHolding) holding;
-      result = canadaHedgeFundHolding.getMorningstarId();
-    } else if (FilterUtils.US_MUTUAL_FUND_PREDICATE.test(holding)) {
-      final UsMutualFundHolding usMutualFundHolding = (UsMutualFundHolding) holding;
-      result = usMutualFundHolding.getTicker();
-    } else if (FilterUtils.SEPARATELY_MANAGED_ACCOUNT_PREDICATE.test(holding)) {
-      final SmaHolding smaHolding = (SmaHolding) holding;
-      result = smaHolding.getIdentifier();
+    String result;
+    SecurityIdentifier secId = holding.getSecurityIdentifier();
+
+    if (FilterUtils.CASH_PREDICATE.test(holding)) {
+      CashHolding cashHolding = (CashHolding) holding;
+      result = cashHolding.getCurrency() != null ? cashHolding.getCurrency().name() : "";
+    } else if (secId instanceof EquitySecurityIdentifier eqId) {
+      result = secId.getId() + "_" + eqId.getExchangeId();
+    } else {
+      result = secId != null ? secId.getId() : "";
     }
-    return holding.getType() + "_" + result;
+    return holding.getHoldingType() + "_" + result;
   }
 
 }

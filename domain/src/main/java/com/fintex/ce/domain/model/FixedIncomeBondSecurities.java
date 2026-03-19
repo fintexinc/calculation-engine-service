@@ -1,16 +1,15 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.core.ProviderAware;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +17,7 @@ import java.util.Map;
 @Accessors(chain = true)
 public class FixedIncomeBondSecurities implements ProviderAware {
 
-  private HoldingType holdingType;
+  private FinancialInstrumentType holdingType;
   private Map<String, BigDecimal> fixedIncomeBondSectors;
 
   // Common fields
@@ -27,7 +26,7 @@ public class FixedIncomeBondSecurities implements ProviderAware {
   private String providers;
   private List<ValidationError> errors = new ArrayList<>();
 
-  public FixedIncomeBondSecurities(HoldingType holdingType, Map<String, BigDecimal> fixedIncomeBondSectors) {
+  public FixedIncomeBondSecurities(FinancialInstrumentType holdingType, Map<String, BigDecimal> fixedIncomeBondSectors) {
     this.holdingType = holdingType;
     this.fixedIncomeBondSectors = fixedIncomeBondSectors;
   }

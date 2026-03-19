@@ -1,15 +1,14 @@
 package com.fintex.ce.application.mapper.response;
 
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
-import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.AssetAllocationResult;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -30,8 +29,8 @@ class AssetAllocationResponseMapperTest {
 
   @Test
   void shouldAggregateByRegionTypeAndIgnoreUnknownKeys_whenMappingFromDomain() {
-    AssetAllocation domain = new AssetAllocation();
-    domain.setAssetAllocation(Map.of(
+    HoldingAssetAllocation domain = new HoldingAssetAllocation();
+    domain.setAllocations(Map.of(
         "CANADIAN_EQUITIES", new BigDecimal("0.12345678901"),
         "US_EQUITIES", new BigDecimal("0.2"),
         "EUROPEAN_EQUITIES", new BigDecimal("0.3"),

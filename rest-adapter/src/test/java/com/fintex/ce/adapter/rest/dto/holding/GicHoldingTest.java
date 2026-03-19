@@ -1,14 +1,13 @@
 package com.fintex.ce.adapter.rest.dto.holding;
 
 import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.holding.GicHolding;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 import static com.fintex.ce.domain.model.enumeration.Currency.USD;
@@ -24,7 +23,7 @@ class GicHoldingTest {
   @Test
   void getCurrency_ifEmptyGetCAD() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
 
     // ACT
     final Currency actual = sut.getCurrency();
@@ -36,7 +35,7 @@ class GicHoldingTest {
   @Test
   void getCurrency_getEnteredCurrency() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
     sut.setCurrency(USD);
 
     // ACT
@@ -49,7 +48,7 @@ class GicHoldingTest {
   @Test
   void getInceptionDate_ifEmptyGetDefaultStartDate() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
 
     // ACT
     final LocalDate actual = sut.getInvestmentDate();
@@ -61,7 +60,7 @@ class GicHoldingTest {
   @Test
   void getCompoundingFrequency_ifEmptyGetAnnual() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
 
     // ACT
     final InterestFreq actual = sut.getInterestFreq();
@@ -73,7 +72,7 @@ class GicHoldingTest {
   @Test
   void getCompoundingFrequency_getEnteredFrequencyAnnual() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
     sut.setInterestFreq(InterestFreq.SEMI_ANNUAL);
 
     // ACT
@@ -86,7 +85,7 @@ class GicHoldingTest {
   @Test
   void getAssetAllocation_ifLessThanOneYearThanCash() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
     sut.setTerm(LESS_THAN_YEAR);
 
     // ACT
@@ -99,7 +98,7 @@ class GicHoldingTest {
   @Test
   void getAssetAllocation_ifMoreThanOneYearThanFixedIncome() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
     sut.setTerm(GREATER_THAN_YEAR);
 
     // ACT
@@ -112,7 +111,7 @@ class GicHoldingTest {
   @Test
   void isLessThanOneYear_lessThanOneYear() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
     sut.setTerm(LESS_THAN_YEAR);
 
     // ACT
@@ -125,7 +124,7 @@ class GicHoldingTest {
   @Test
   void isLessThanOneYear_OneYear() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
     sut.setTerm(GREATER_THAN_YEAR);
 
     // ACT
@@ -138,7 +137,7 @@ class GicHoldingTest {
   @Test
   void isLessThanOneYear_moreThanOneYear() {
     // SETUP
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
     sut.setTerm(GREATER_THAN_YEAR);
 
     // ACT

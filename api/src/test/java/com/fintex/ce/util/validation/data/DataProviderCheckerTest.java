@@ -1,13 +1,12 @@
 package com.fintex.ce.util.validation.data;
 
-import com.fintex.ce.domain.model.AssetAllocation;
-import com.fintex.ce.domain.dto.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
+import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.util.validation.DataProviderRequestHandlingValidator;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -53,13 +52,13 @@ class DataProviderCheckerTest {
   void clearAssetAllocation_checkResult() {
     // SETUP
     final var sut = new DataProviderChecker();
-    final AssetAllocation assetAllocation = mock(AssetAllocation.class);
+    final HoldingAssetAllocation assetAllocation = mock(HoldingAssetAllocation.class);
 
     // ACT
     sut.clearAssetAllocation().apply(assetAllocation, null);
 
     // VERIFY
-    verify(assetAllocation).setAssetAllocation(argThat(Map::isEmpty));
+    verify(assetAllocation).setAllocations(argThat(Map::isEmpty));
   }
 
 }

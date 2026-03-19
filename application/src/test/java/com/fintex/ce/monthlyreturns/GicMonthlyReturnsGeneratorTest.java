@@ -1,18 +1,17 @@
 package com.fintex.ce.monthlyreturns;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.MonthlyReturns;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.util.DateTimeUtils.rangeWithLastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +33,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(2));
     gicHolding.setInvestmentDate(LocalDate.of(2020, 5, 1));
 
@@ -52,7 +51,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(10));
 
     final HashMap<Holding, MonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_10_PERCENT_ANNUAL);
@@ -69,7 +68,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(5));
     gicHolding.setInterestFreq(InterestFreq.SEMI_ANNUAL);
     gicHolding.setInvestmentDate(LocalDate.of(2005, 2, 1));
@@ -88,7 +87,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(5));
     gicHolding.setInterestFreq(InterestFreq.QUARTERLY);
     gicHolding.setInvestmentDate(LocalDate.of(2018, 9, 28));
@@ -107,7 +106,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(5));
     gicHolding.setInterestFreq(InterestFreq.MONTHLY);
     gicHolding.setInvestmentDate(LocalDate.of(2000, 3, 15));
@@ -126,7 +125,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(5));
     gicHolding.setInterestFreq(InterestFreq.BI_MONTHLY);
     gicHolding.setInvestmentDate(LocalDate.of(2020, 1, 1));
@@ -145,7 +144,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(5));
     gicHolding.setInterestFreq(InterestFreq.WEEKLY);
     gicHolding.setInvestmentDate(LocalDate.of(2019, 7, 15));
@@ -164,7 +163,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(5));
     gicHolding.setInterestFreq(InterestFreq.BI_WEEKLY);
     gicHolding.setInvestmentDate(LocalDate.of(2020, 5, 31));
@@ -183,7 +182,7 @@ class GicMonthlyReturnsGeneratorTest {
     // SETUP
     final var sut = new MonthlyReturnsGenerator();
     final var gicHolding = new GicHolding();
-    gicHolding.setType(HoldingType.GIC);
+    gicHolding.setHoldingType(FinancialInstrumentType.GIC);
     gicHolding.setClientIntRate(BigDecimal.valueOf(5));
     gicHolding.setInterestFreq(InterestFreq.DAILY);
     gicHolding.setInvestmentDate(LocalDate.of(2019, 6, 12));
@@ -205,7 +204,7 @@ class GicMonthlyReturnsGeneratorTest {
         .forEach(localDate -> returns.put(localDate, gicReturnValue));
 
     final MonthlyReturns rMonthlyReturns = new MonthlyReturns();
-    rMonthlyReturns.setHoldingType(HoldingType.GIC);
+    rMonthlyReturns.setHoldingType(FinancialInstrumentType.GIC);
     rMonthlyReturns.setCurrency(gicHolding.getCurrency().name());
     rMonthlyReturns.setReturns(returns);
 

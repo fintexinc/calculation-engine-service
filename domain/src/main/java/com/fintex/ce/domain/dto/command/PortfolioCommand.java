@@ -1,7 +1,7 @@
 package com.fintex.ce.domain.dto.command;
 
 import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import lombok.Data;
@@ -20,7 +20,7 @@ public abstract class PortfolioCommand {
 
   public void setReqCurrencyToCashHolding() {
     final List<CashHolding> cashHoldings = holdings.stream()
-        .filter(h -> h.getType() == HoldingType.CASH)
+        .filter(h -> h.getHoldingType() == FinancialInstrumentType.CASH)
         .map(h -> (CashHolding) h)
         .collect(Collectors.toList());
     if (cashHoldings.size() == 1 && Objects.isNull(cashHoldings.get(0).getCurrency())) {

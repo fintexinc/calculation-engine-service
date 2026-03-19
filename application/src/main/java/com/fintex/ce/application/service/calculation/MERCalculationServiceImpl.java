@@ -6,11 +6,11 @@ import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.AverageMer;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AverageMerResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_MERMF_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_NERGER_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
@@ -42,7 +43,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
   }
 
   @Override
-  public Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
+  public Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
       final AverageMerCommand reqDTO) {
     Map<Holding, AverageMer> rawData = averageMerSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
@@ -50,25 +51,25 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
     return groupAndMap(rawData, reqDTO.getHoldings());
   }
 
-  private Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupAndMap(
+  private Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupAndMap(
       Map<Holding, AverageMer> rawData, List<? extends Holding> holdings) {
-    Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> result = new EnumMap<>(HoldingType.class);
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> result = new EnumMap<>(FinancialInstrumentType.class);
 
     for (var entry : rawData.entrySet()) {
       Holding holding = entry.getKey();
       AverageMer mer = entry.getValue();
       AverageManagementExpenseCalculationDTO dto = mapMerToDto(holding, mer);
-      result.computeIfAbsent(holding.getType(), k -> new HashMap<>()).put(holding, dto);
+      result.computeIfAbsent(holding.getHoldingType(), k -> new HashMap<>()).put(holding, dto);
     }
 
     for (Holding holding : holdings) {
       if (!rawData.containsKey(holding)) {
         AverageManagementExpenseCalculationDTO dto = new AverageManagementExpenseCalculationDTO()
             .setMarketValue(holding.getValue())
-            .setHoldingType(holding.getType())
+            .setHoldingType(holding.getHoldingType())
             .setInitialFee(BigDecimal.ZERO)
             .setModifiedFee(BigDecimal.ZERO);
-        result.computeIfAbsent(holding.getType(), k -> new HashMap<>()).put(holding, dto);
+        result.computeIfAbsent(holding.getHoldingType(), k -> new HashMap<>()).put(holding, dto);
       }
     }
 
@@ -78,9 +79,9 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
   private AverageManagementExpenseCalculationDTO mapMerToDto(Holding holding, AverageMer mer) {
     var dto = new AverageManagementExpenseCalculationDTO()
         .setMarketValue(holding.getValue())
-        .setHoldingType(holding.getType());
-    HoldingType type = holding.getType();
-    if (type == HoldingType.US_ETF || type == HoldingType.US_MUTUAL_FUNDS) {
+        .setHoldingType(holding.getHoldingType());
+    FinancialInstrumentType type = holding.getHoldingType();
+    if (type == FinancialInstrumentType.ETF_US || type == FinancialInstrumentType.MUTUAL_FUND_US) {
       dto.setNetExpenseRatio(mer.getNetExpenseRatio());
       dto.setGrossExpenseRatio(mer.getGrossExpenseRatio());
     } else {
@@ -92,16 +93,16 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   @Override
   public List<Warning> setInitialFeeAndModifiedFeeValues(
-      final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupOfMers) {
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupOfMers) {
     List<Warning> warnings = new ArrayList<>();
     var notification = new Notification();
     groupOfMers.forEach((holdingType, mer) -> {
-      if (HoldingType.CANADA_ETF.equals(holdingType) || HoldingType.CANADA_MUTUAL_FUNDS.equals(holdingType)
-          || HoldingType.SEGREGATED_FUND_CANADA.equals(holdingType)
-          || HoldingType.CANADA_HEDGE_FUNDS.equals(holdingType)) {
+      if (FinancialInstrumentType.ETF_CANADA.equals(holdingType) || FinancialInstrumentType.MUTUAL_FUND_CANADA.equals(holdingType)
+          || FinancialInstrumentType.SEGREGATED_FUND_CANADA.equals(holdingType)
+          || FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holdingType)) {
         mer.forEach((key, value) -> handleFeesForCanadaMutualHedgeFundsAndEtf(value, key, notification).ifPresent(
             warnings::addAll));
-      } else if (HoldingType.US_ETF.equals(holdingType) || HoldingType.US_MUTUAL_FUNDS.equals(holdingType)) {
+      } else if (FinancialInstrumentType.ETF_US.equals(holdingType) || FinancialInstrumentType.MUTUAL_FUND_US.equals(holdingType)) {
         mer.forEach((key, value) -> handleFeesForUsEtfAndMutualFund(value, key, notification).ifPresent(warnings::add));
       }
     });
@@ -116,7 +117,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
       Notification notification) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getManagementExpenseRatio()) &&
         Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
-      if (HoldingType.CANADA_HEDGE_FUNDS.equals(holding.getType())) {
+      if (FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holding.getHoldingType())) {
         setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
             .getManagementExpenseRatio());
         return Optional.of(List.of(WRN_MER_MER_001.warning(holding), WRN_MER_AMF_001.warning(holding)));
@@ -158,7 +159,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   @Override
   public AverageMerResult calculateAverageValue(final List<ParameterType> parameterTypes,
-      final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos) {
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos) {
     final var resDTO = new AverageMerResult();
     if (parameterTypes.contains(SCALED)) {
       final BigDecimal scaledAverageMer = getScaledAverageMer(averageMerCalculationDtos);

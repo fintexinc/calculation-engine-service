@@ -2,8 +2,8 @@ package com.fintex.ce.util.validation.data;
 
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.AssetAllocation;
-import com.fintex.ce.domain.dto.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
+import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import java.math.BigDecimal;
@@ -24,9 +24,9 @@ public class AssetAllocationDataValidator {
     validateNonStock(assetAllocationDataDto.getSeparatelyManagedAccountFdsResponse(), warnings);
   }
 
-  <H extends Holding> void validateNonStock(final Map<H, AssetAllocation> holdings,
+  <H extends Holding> void validateNonStock(final Map<H, HoldingAssetAllocation> holdings,
       final List<Warning> warnings) {
-    holdings.forEach((holding, assetAllocation) -> validate(holding, assetAllocation.getAssetAllocation(), warnings));
+    holdings.forEach((holding, assetAllocation) -> validate(holding, assetAllocation.getAllocations(), warnings));
   }
 
   void validate(final Holding holding,

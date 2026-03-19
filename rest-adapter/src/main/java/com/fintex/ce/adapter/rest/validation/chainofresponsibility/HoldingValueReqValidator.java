@@ -1,16 +1,10 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.model.holding.CanadaHedgeFundHolding;
-import com.fintex.ce.domain.model.holding.CanadaPooledFundHolding;
-import com.fintex.ce.domain.model.holding.EtfHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.StockHolding;
-import com.fintex.ce.domain.model.holding.UsMutualFundHolding;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
-import lombok.EqualsAndHashCode;
-
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.SecurityIdentifier;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -27,18 +21,9 @@ public class HoldingValueReqValidator extends ReqValidation {
   public void check() {
     for (Holding holding : holdings) {
       if (holding.getValue() == null) {
-        if (holding instanceof FundSeriesHolding h) {
-          throw ExceptionCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(h.getFundServCode());
-        } else if (holding instanceof EtfHolding h) {
-          throw ExceptionCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(h.getTicker());
-        } else if (holding instanceof StockHolding h) {
-          throw ExceptionCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(h.getTicker());
-        } else if (holding instanceof UsMutualFundHolding h) {
-          throw ExceptionCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(h.getTicker());
-        } else if (holding instanceof CanadaPooledFundHolding h) {
-          throw ExceptionCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(h.getMorningstarId());
-        } else if (holding instanceof CanadaHedgeFundHolding h) {
-          throw ExceptionCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(h.getMorningstarId());
+        SecurityIdentifier secId = holding.getSecurityIdentifier();
+        if (secId != null && secId.getId() != null) {
+          throw ExceptionCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(secId.getId());
         }
         throw ExceptionCode.ERR_ALL_GTZ_001.reqValidationError();
       } else if (holding.getValue().compareTo(ZERO) < ZERO.intValue()) {

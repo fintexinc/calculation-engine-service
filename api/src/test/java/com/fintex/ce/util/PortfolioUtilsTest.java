@@ -1,28 +1,32 @@
 package com.fintex.ce.util;
 
 import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.exception.SystemException;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.EtfHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.StockHolding;
 import com.fintex.ce.domain.model.FxRates;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.domain.model.holding.CashHolding;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.EquitySecurityIdentifier;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AAA;
 import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
-import static java.math.BigDecimal.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.TEN;
+import static java.math.BigDecimal.ZERO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +35,7 @@ class PortfolioUtilsTest {
   @Test
   void calculateInitialPortfolioWeight_test() {
     // SETUP
-    final Holding h1 = new Holding().setType(HoldingType.US_ETF).setValue(TEN);
+    final Holding h1 = new Holding().setHoldingType(FinancialInstrumentType.ETF_US).setValue(TEN);
     final Holding h2 = new Holding().setValue(TEN);
     final Set<Holding> holdings = Set.of(h1, h2);
 
@@ -108,7 +112,7 @@ class PortfolioUtilsTest {
   @Test
   void areAllValuesInMapEmpty_checkResultWhenNotAllValuesInMapAreEmpty() {
     // SETUP
-    final Map map = Map.of(new Holding(), Map.of(), new Holding(ONE, HoldingType.CANADA_MUTUAL_FUNDS), Map.of(AAA,
+    final Map map = Map.of(new Holding(), Map.of(), new Holding(ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA), Map.of(AAA,
         ONE));
     // ACT
     final boolean actual = PortfolioUtils.areAllValuesInMapEmpty(map);
@@ -143,7 +147,7 @@ class PortfolioUtilsTest {
   @Test
   void createKey_checkResultWhenHoldingTypeCash() {
     // ACT
-    final String actual = PortfolioUtils.createKey(new CashHolding().setCurrency(CAD).setType(HoldingType.CASH));
+    final String actual = PortfolioUtils.createKey(new CashHolding().setCurrency(CAD).setHoldingType(FinancialInstrumentType.CASH));
 
     // VERIFY
     assertEquals("CASH_CAD", actual);
@@ -153,59 +157,65 @@ class PortfolioUtilsTest {
   void createKey_checkResultWhenHoldingTypeUsEtf() {
     // SETUP
     // ACT
-    final String result = PortfolioUtils.createKey(new EtfHolding().setTicker("TICKER").setType(HoldingType.US_ETF));
+    final String result = PortfolioUtils.createKey(new Holding().setSecurityIdentifier(new SecurityIdentifier("TICKER", FiIdentifierType.TICKER)).setHoldingType(FinancialInstrumentType.ETF_US));
 
     // VERIFY
-    assertEquals(HoldingType.US_ETF.name() + "_" + "TICKER", result);
+    assertEquals(FinancialInstrumentType.ETF_US.name() + "_" + "TICKER", result);
   }
 
   @Test
   void createKey_checkResultWhenHoldingTypeCanadaEtf() {
     // SETUP
     // ACT
-    final String result = PortfolioUtils.createKey(new EtfHolding().setTicker("TICKER").setType(
-        HoldingType.CANADA_ETF));
+    final String result = PortfolioUtils.createKey(new Holding().setSecurityIdentifier(new SecurityIdentifier("TICKER", FiIdentifierType.TICKER)).setHoldingType(
+        FinancialInstrumentType.ETF_CANADA));
 
     // VERIFY
-    assertEquals(HoldingType.CANADA_ETF.name() + "_" + "TICKER", result);
+    assertEquals(FinancialInstrumentType.ETF_CANADA.name() + "_" + "TICKER", result);
   }
 
   @Test
   void createKey_checkResultWhenHoldingTypeUsStock() {
     // SETUP
+    final EquitySecurityIdentifier securityIdentifier = mock(EquitySecurityIdentifier.class);
+    when(securityIdentifier.getId()).thenReturn("TICKER");
+    when(securityIdentifier.getExchangeId()).thenReturn("EXCHANGE_CODE");
+
     // ACT
-    final String result = PortfolioUtils.createKey(new StockHolding()
-        .setExchangeCode("EXCHANGE_CODE")
-        .setTicker("TICKER")
-        .setType(HoldingType.US_STOCKS));
+    final String result = PortfolioUtils.createKey(new Holding()
+        .setSecurityIdentifier(securityIdentifier)
+        .setHoldingType(FinancialInstrumentType.STOCK_US));
 
     // VERIFY
-    assertEquals(HoldingType.US_STOCKS.name() + "_" + "TICKER" + "_" + "EXCHANGE_CODE", result);
+    assertEquals(FinancialInstrumentType.STOCK_US.name() + "_" + "TICKER" + "_" + "EXCHANGE_CODE", result);
   }
 
   @Test
   void createKey_checkResultWhenHoldingTypeCadStock() {
     // SETUP
+    final EquitySecurityIdentifier securityIdentifier = mock(EquitySecurityIdentifier.class);
+    when(securityIdentifier.getId()).thenReturn("TICKER");
+    when(securityIdentifier.getExchangeId()).thenReturn("EXCHANGE_CODE");
+
     // ACT
-    final String result = PortfolioUtils.createKey(new StockHolding()
-        .setExchangeCode("EXCHANGE_CODE")
-        .setTicker("TICKER")
-        .setType(HoldingType.CANADA_STOCKS));
+    final String result = PortfolioUtils.createKey(new Holding()
+        .setSecurityIdentifier(securityIdentifier)
+        .setHoldingType(FinancialInstrumentType.STOCK_CANADA));
 
     // VERIFY
-    assertEquals(HoldingType.CANADA_STOCKS.name() + "_" + "TICKER" + "_" + "EXCHANGE_CODE", result);
+    assertEquals(FinancialInstrumentType.STOCK_CANADA.name() + "_" + "TICKER" + "_" + "EXCHANGE_CODE", result);
   }
 
   @Test
   void createKey_checkResultWhenHoldingTypeMutualFund() {
     // SETUP
     // ACT
-    final String result = PortfolioUtils.createKey(new FundSeriesHolding()
-        .setFundServCode("FUND_SERVE_CODE")
-        .setType(HoldingType.CANADA_MUTUAL_FUNDS));
+    final String result = PortfolioUtils.createKey(new Holding()
+        .setSecurityIdentifier(new SecurityIdentifier("FUND_SERVE_CODE", FiIdentifierType.FUNDSERV))
+        .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA));
 
     // VERIFY
-    assertEquals(HoldingType.CANADA_MUTUAL_FUNDS.name() + "_" + "FUND_SERVE_CODE", result);
+    assertEquals(FinancialInstrumentType.MUTUAL_FUND_CANADA.name() + "_" + "FUND_SERVE_CODE", result);
   }
 
 }

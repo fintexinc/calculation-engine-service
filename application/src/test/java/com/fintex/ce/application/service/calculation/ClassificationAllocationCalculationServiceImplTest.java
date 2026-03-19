@@ -1,6 +1,7 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.ClassificationAllocation;
 import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ClassificationAllocationResult;
@@ -27,19 +28,23 @@ class ClassificationAllocationCalculationServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(ClassificationAllocationCalculationServiceImpl.class, withSettings()
-        .useConstructor( fetcher));
+        .useConstructor(fetcher));
 
     final var holding = mock(Holding.class);
-    final var exposures = Map.of(holding, Map.of(ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL,
-        BigDecimal.TEN));
+    final var classificationAllocation = new ClassificationAllocation()
+        .setSecurityClassificationValues(Map.of(
+            ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL.name(), BigDecimal.TEN));
+    final var rawData = Map.of(holding, classificationAllocation);
 
-    when(fetcher.fetch(any(), any())).thenReturn(exposures);
+    when(fetcher.fetch(any(), any())).thenReturn(rawData);
     doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
     final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
     // VERIFY
-    Assertions.assertEquals(exposures, actual);
+    Assertions.assertEquals(1, actual.size());
+    Assertions.assertTrue(actual.containsKey(holding));
+    Assertions.assertEquals(BigDecimal.TEN, actual.get(holding).get(ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL));
   }
 
   @Test

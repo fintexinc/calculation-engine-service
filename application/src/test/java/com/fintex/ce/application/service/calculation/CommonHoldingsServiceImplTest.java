@@ -4,13 +4,13 @@ import com.fintex.ce.domain.dto.CommonHoldingsDTO;
 import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.model.HoldingAggregator;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.StockHolding;
 import com.fintex.ce.domain.model.result.TopCommonHoldingsResult;
 import com.fintex.ce.domain.model.result.commonholdings.TopCommonHoldingData;
 import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.List;
@@ -825,7 +825,7 @@ class CommonHoldingsServiceImplTest {
         .useConstructor(fetcher, accumulateTypes));
 
     final var allocations = Map.of(mock(Holding.class), TEN);
-    final var parent = mock(StockHolding.class);
+    final var parent = mock(Holding.class);
     final var child = mock(CommonHoldingsDTO.class);
     final var firstLevelChildren = List.of(child);
     final var expected = new CommonHoldingsDTO("Apple Inc", null, TEN, null, null);
@@ -879,9 +879,10 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
-    final var parent = mock(StockHolding.class);
+    final var parent = mock(Holding.class);
     final var child = mock(CommonHoldingsDTO.class);
 
+    when(parent.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_CANADA);
     when(child.getCompanyName()).thenReturn("test");
     when(child.getType()).thenReturn("E");
 
@@ -901,9 +902,10 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
-    final var parent = mock(StockHolding.class);
+    final var parent = mock(Holding.class);
     final var child = mock(CommonHoldingsDTO.class);
 
+    when(parent.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_CANADA);
     when(child.getCompanyName()).thenReturn("test");
     when(child.getType()).thenReturn("FE");
 

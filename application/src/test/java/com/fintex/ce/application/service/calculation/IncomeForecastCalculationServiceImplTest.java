@@ -3,16 +3,15 @@ package com.fintex.ce.application.service.calculation;
 import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
 import com.fintex.ce.domain.model.Income;
 import com.fintex.ce.domain.model.IncomeForecast;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
-import com.fintex.ce.domain.model.holding.FixedIncomeHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
+import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.IncomeForecastResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +27,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -79,7 +79,7 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldPerformFundSeries_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
-    final FundSeriesHolding fundSeriesHolding = Mockito.mock(FundSeriesHolding.class);
+    final Holding fundSeriesHolding = Mockito.mock(Holding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final List<String> schedule = List.of("1-30", "3-15", "6-20", "10-12");
@@ -87,7 +87,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(fundSeriesHolding, incomeForecast));
-    Mockito.when(fundSeriesHolding.getType()).thenReturn(HoldingType.CANADA_MUTUAL_FUNDS);
+    Mockito.when(fundSeriesHolding.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     Mockito.when(fundSeriesHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(fundSeriesHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("FUNDSERV_CODE", FiIdentifierType.FUNDSERV));
@@ -100,7 +100,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), HoldingType.CANADA_MUTUAL_FUNDS.name());
+    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), FinancialInstrumentType.MUTUAL_FUND_CANADA.name());
     Assertions.assertEquals(result.getIncomeForecast().get(0).getHoldingIdentifier(), FiIdentifierType.FUNDSERV
         .name());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
@@ -127,7 +127,7 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldPerformFundSeries_whenVerify2() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
-    final FundSeriesHolding fundSeriesHolding = Mockito.mock(FundSeriesHolding.class);
+    final Holding fundSeriesHolding = Mockito.mock(Holding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final List<String> schedule = List.of("6-30", "12-30");
@@ -135,7 +135,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(fundSeriesHolding, incomeForecast));
-    Mockito.when(fundSeriesHolding.getType()).thenReturn(HoldingType.CANADA_MUTUAL_FUNDS);
+    Mockito.when(fundSeriesHolding.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     Mockito.when(fundSeriesHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(fundSeriesHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("FUNDSERV_CODE", FiIdentifierType.FUNDSERV));
@@ -148,7 +148,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(HoldingType.CANADA_MUTUAL_FUNDS.name(), result.getIncomeForecast().get(0).getType());
+    Assertions.assertEquals(FinancialInstrumentType.MUTUAL_FUND_CANADA.name(), result.getIncomeForecast().get(0).getType());
     Assertions.assertEquals(FiIdentifierType.FUNDSERV.name(), result.getIncomeForecast().get(0)
         .getHoldingIdentifier());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
@@ -173,20 +173,18 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldPerformFixedIncome_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
-    final FixedIncomeHolding fixedIncomeHolding = Mockito.mock(FixedIncomeHolding.class);
+    final Holding fixedIncomeHolding = Mockito.mock(Holding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final List<String> schedule = List.of("6-30", "12-30");
     final BigDecimal holdingValue = new BigDecimal(1000);
-    final String adpNumber = "ADP";
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(fixedIncomeHolding, incomeForecast));
-    Mockito.when(fixedIncomeHolding.getType()).thenReturn(HoldingType.FIXED_INCOME);
+    Mockito.when(fixedIncomeHolding.getHoldingType()).thenReturn(FinancialInstrumentType.FIXED_INCOME);
     Mockito.when(fixedIncomeHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(fixedIncomeHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("CUSIP_ID", FiIdentifierType.CUSIP));
-    Mockito.when(fixedIncomeHolding.getIdentifier()).thenReturn(adpNumber);
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
@@ -196,10 +194,9 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(HoldingType.FIXED_INCOME.name(), result.getIncomeForecast().get(0).getType());
+    Assertions.assertEquals(FinancialInstrumentType.FIXED_INCOME.name(), result.getIncomeForecast().get(0).getType());
     Assertions.assertEquals(FiIdentifierType.CUSIP.name(), result.getIncomeForecast().get(0)
         .getHoldingIdentifier());
-    Assertions.assertEquals(adpNumber, result.getIncomeForecast().get(0).getIdentifier());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
 
     Assertions.assertEquals(2, income.size());
@@ -223,14 +220,14 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldPerformFixedIncomeAtMaturity_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
-    final FixedIncomeHolding fixedIncomeHolding = Mockito.mock(FixedIncomeHolding.class);
+    final Holding fixedIncomeHolding = Mockito.mock(Holding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final BigDecimal holdingValue = new BigDecimal(1000);
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(fixedIncomeHolding, incomeForecast));
-    Mockito.when(fixedIncomeHolding.getType()).thenReturn(HoldingType.FIXED_INCOME);
+    Mockito.when(fixedIncomeHolding.getHoldingType()).thenReturn(FinancialInstrumentType.FIXED_INCOME);
     Mockito.when(fixedIncomeHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(fixedIncomeHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("CUSIP_ID", FiIdentifierType.CUSIP));
@@ -246,7 +243,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(HoldingType.FIXED_INCOME.name(), result.getIncomeForecast().get(0).getType());
+    Assertions.assertEquals(FinancialInstrumentType.FIXED_INCOME.name(), result.getIncomeForecast().get(0).getType());
     Assertions.assertEquals(FiIdentifierType.CUSIP.name(), result.getIncomeForecast().get(0)
         .getHoldingIdentifier());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
@@ -266,7 +263,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
-    Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
+    Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(currentDate);
@@ -280,7 +277,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), HoldingType.GIC.name());
+    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), FinancialInstrumentType.GIC.name());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
     Assertions.assertEquals(3, income.size());
     Assertions.assertEquals(format(currentDate.plusYears(1)), income.get(0).getDate());
@@ -306,7 +303,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
-    Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
+    Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(investmentDate);
@@ -320,7 +317,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), HoldingType.GIC.name());
+    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), FinancialInstrumentType.GIC.name());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
     Assertions.assertEquals(2, income.size());
     Assertions.assertEquals(format(investmentDate.plusMonths(6)), income.get(0).getDate());
@@ -340,7 +337,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
-    Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
+    Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(investmentDate);
     Mockito.when(gicHolding.getTerm()).thenReturn(new BigDecimal(5));
@@ -353,7 +350,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), HoldingType.GIC.name());
+    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), FinancialInstrumentType.GIC.name());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
     Assertions.assertEquals(4, income.size());
     Assertions.assertEquals(format(investmentDate.plusMonths(2)), income.get(0).getDate());
@@ -377,7 +374,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
-    Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
+    Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(investmentDate);
     Mockito.when(gicHolding.getTerm()).thenReturn(new BigDecimal(5));
@@ -390,7 +387,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(HoldingType.GIC.name(), result.getIncomeForecast().get(0).getType());
+    Assertions.assertEquals(FinancialInstrumentType.GIC.name(), result.getIncomeForecast().get(0).getType());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
     Assertions.assertEquals(4, income.size());
     Assertions.assertEquals(format(investmentDate.plusMonths(2)), income.get(0).getDate());
@@ -414,7 +411,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
-    Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
+    Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(investmentDate);
     Mockito.when(gicHolding.getTerm()).thenReturn(new BigDecimal(5));
@@ -427,7 +424,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), HoldingType.GIC.name());
+    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), FinancialInstrumentType.GIC.name());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
     Assertions.assertEquals(4, income.size());
     Assertions.assertEquals(format(investmentDate.plusMonths(2)), income.get(0).getDate());
@@ -451,7 +448,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
-    Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
+    Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(investmentDate);
     Mockito.when(gicHolding.getTerm()).thenReturn(new BigDecimal(5));
@@ -464,7 +461,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(HoldingType.GIC.name(), result.getIncomeForecast().get(0).getType());
+    Assertions.assertEquals(FinancialInstrumentType.GIC.name(), result.getIncomeForecast().get(0).getType());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
     Assertions.assertEquals(4, income.size());
     Assertions.assertEquals(format(investmentDate.plusMonths(2)), income.get(0).getDate());
@@ -488,7 +485,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
-    Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
+    Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(investmentDate);
     Mockito.when(gicHolding.getTerm()).thenReturn(new BigDecimal(4));
@@ -501,7 +498,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(HoldingType.GIC.name(), result.getIncomeForecast().get(0).getType());
+    Assertions.assertEquals(FinancialInstrumentType.GIC.name(), result.getIncomeForecast().get(0).getType());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
     Assertions.assertEquals(2, income.size());
     Assertions.assertEquals(format(investmentDate.plusMonths(2)), income.get(0).getDate());
@@ -521,7 +518,7 @@ class IncomeForecastCalculationServiceImplTest {
 
     Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
-    Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
+    Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(investmentDate);
     Mockito.when(gicHolding.getTerm()).thenReturn(new BigDecimal(7));
@@ -534,7 +531,7 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(HoldingType.GIC.name(), result.getIncomeForecast().get(0).getType());
+    Assertions.assertEquals(FinancialInstrumentType.GIC.name(), result.getIncomeForecast().get(0).getType());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
     Assertions.assertEquals(2, income.size());
     Assertions.assertEquals(format(investmentDate.plusMonths(3)), income.get(0).getDate());

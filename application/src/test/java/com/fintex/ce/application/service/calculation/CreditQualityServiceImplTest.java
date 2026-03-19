@@ -2,29 +2,27 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapper.response.CreditQualityResponseMapper;
-import com.fintex.ce.domain.model.AssetAllocation;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.model.calculation.CreditQualityRating.A;
@@ -235,7 +233,7 @@ class CreditQualityServiceImplTest {
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getDataProviders()).thenReturn(providers);
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
-    when(assetAllocationDataMapper.mapFromRaw(any(), any())).thenReturn(Map.of());
+    when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of());
 
     doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
     sut.getFixedIncomeCreditQuality(reqDTO, warnings);
@@ -262,7 +260,7 @@ class CreditQualityServiceImplTest {
 
       when(reqDTO.getDataProviders()).thenReturn(providers);
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
-      when(assetAllocationDataMapper.mapFromRaw(any(), any())).thenReturn(Map.of());
+      when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of());
       mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(providers, specifiedProviders)).thenReturn(
           providers);
 
@@ -289,7 +287,7 @@ class CreditQualityServiceImplTest {
         AssetAllocationRegion.FIXED_INCOME, HUNDRED);
 
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
-    when(assetAllocationDataMapper.mapFromRaw(any(), any())).thenReturn(Map.of(h, asset));
+    when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of(h, asset));
 
     final List<Warning> warnings = List.of(mock(Warning.class));
     final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
@@ -339,7 +337,7 @@ class CreditQualityServiceImplTest {
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
     final Holding h = mock(Holding.class);
-    final Holding h2 = new Holding().setType(HoldingType.CASH);
+    final Holding h2 = new Holding().setHoldingType(FinancialInstrumentType.CASH);
 
     final int creditQValue = 2;
     final int fixedIncomeValue = 3;

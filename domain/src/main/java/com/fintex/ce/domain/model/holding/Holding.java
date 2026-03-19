@@ -1,10 +1,7 @@
 package com.fintex.ce.domain.model.holding;
 
-import static com.fintex.ce.domain.constant.ErrorMessage.NOT_NULL_MSG;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
@@ -15,23 +12,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true, defaultImpl = Holding.class)
+import static com.fintex.ce.domain.constant.ErrorMessage.NOT_NULL_MSG;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "holdingType", visible = true, defaultImpl = Holding.class)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = FundSeriesHolding.class, name = "CANADA_MUTUAL_FUNDS"),
-    @JsonSubTypes.Type(value = FundSeriesHolding.class, name = "SEGREGATED_FUND_CANADA"),
-    @JsonSubTypes.Type(value = EtfHolding.class, name = "US_ETF"),
-    @JsonSubTypes.Type(value = EtfHolding.class, name = "CANADA_ETF"),
-    @JsonSubTypes.Type(value = StockHolding.class, name = "CANADA_STOCKS"),
-    @JsonSubTypes.Type(value = StockHolding.class, name = "US_STOCKS"),
     @JsonSubTypes.Type(value = CashHolding.class, name = "CASH"),
-    @JsonSubTypes.Type(value = BenchmarkIndexHolding.class, name = "BENCHMARK_INDEX"),
-    @JsonSubTypes.Type(value = GicHolding.class, name = "GIC"),
-    @JsonSubTypes.Type(value = CanadaPooledFundHolding.class, name = "CANADA_POOLED_FUNDS"),
-    @JsonSubTypes.Type(value = CanadaHedgeFundHolding.class, name = "CANADA_HEDGE_FUNDS"),
-    @JsonSubTypes.Type(value = UsMutualFundHolding.class, name = "US_MUTUAL_FUNDS"),
-    @JsonSubTypes.Type(value = FixedIncomeHolding.class, name = "FIXED_INCOME"),
-    @JsonSubTypes.Type(value = SmaHolding.class, name = "SEPARATELY_MANAGED_ACCOUNT"),
-    @JsonSubTypes.Type(value = PagHolding.class, name = "PAG_GUIDED_PORTFOLIO")
+    @JsonSubTypes.Type(value = GicHolding.class, name = "GIC")
 })
 @Data
 @EqualsAndHashCode
@@ -46,9 +32,6 @@ public class Holding {
   @NotNull(message = NOT_NULL_MSG)
   private FinancialInstrumentType holdingType;
 
-  @Deprecated(forRemoval = true)  // use holdingType
-  private HoldingType type;
-
   @NotNull(message = NOT_NULL_MSG)
   @Valid
   private SecurityIdentifier securityIdentifier;
@@ -56,9 +39,9 @@ public class Holding {
   public Holding() {
   }
 
-  public Holding(BigDecimal value, HoldingType type) {
+  public Holding(BigDecimal value, FinancialInstrumentType holdingType) {
     this.value = value;
-    this.type = type;
+    this.holdingType = holdingType;
   }
 
   /**
@@ -68,12 +51,12 @@ public class Holding {
    */
   public String generateUserIdentifier() {
     if (securityIdentifier == null) {
-      return type + DELIMITER + value;
+      return holdingType + DELIMITER + value;
     }
     if (securityIdentifier instanceof EquitySecurityIdentifier eq) {
-      return type + DELIMITER + securityIdentifier.getId() + DELIMITER + eq.getExchangeId();
+      return holdingType + DELIMITER + securityIdentifier.getId() + DELIMITER + eq.getExchangeId();
     }
-    return type + DELIMITER + securityIdentifier.getId();
+    return holdingType + DELIMITER + securityIdentifier.getId();
   }
 
 }

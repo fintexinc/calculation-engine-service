@@ -1,10 +1,9 @@
 package com.fintex.ce.adapter.rest.dto.request.core;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.CashHolding;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 import static com.fintex.ce.domain.model.enumeration.Currency.USD;
@@ -19,7 +18,7 @@ class PortfolioReqDTOTest {
     final PortfolioReqDTO sut = new PortfolioReqDTO();
     sut.setCurrency(USD);
     final CashHolding cashHolding = new CashHolding();
-    cashHolding.setType(HoldingType.CASH);
+    cashHolding.setHoldingType(FinancialInstrumentType.CASH);
     cashHolding.setCurrency(CAD);
     sut.setHoldings(List.of(cashHolding));
 
@@ -36,7 +35,7 @@ class PortfolioReqDTOTest {
     final PortfolioReqDTO sut = new PortfolioReqDTO();
     sut.setCurrency(CAD);
     final CashHolding cashHolding = new CashHolding();
-    cashHolding.setType(HoldingType.CASH);
+    cashHolding.setHoldingType(FinancialInstrumentType.CASH);
     sut.setHoldings(List.of(cashHolding));
 
     // ACT
@@ -52,7 +51,7 @@ class PortfolioReqDTOTest {
     final PortfolioReqDTO sut = new PortfolioReqDTO();
     sut.setCurrency(USD);
     final CashHolding cashHolding = new CashHolding();
-    cashHolding.setType(HoldingType.CASH);
+    cashHolding.setHoldingType(FinancialInstrumentType.CASH);
     sut.setHoldings(List.of(cashHolding));
 
     // ACT
@@ -68,9 +67,9 @@ class PortfolioReqDTOTest {
     final PortfolioReqDTO sut = new PortfolioReqDTO();
     sut.setCurrency(USD);
     final CashHolding cashHolding1 = new CashHolding();
-    cashHolding1.setType(HoldingType.CASH);
+    cashHolding1.setHoldingType(FinancialInstrumentType.CASH);
     final CashHolding cashHolding2 = new CashHolding();
-    cashHolding2.setType(HoldingType.CASH);
+    cashHolding2.setHoldingType(FinancialInstrumentType.CASH);
     sut.setHoldings(List.of(cashHolding1, cashHolding2));
 
     // ACT
@@ -87,9 +86,9 @@ class PortfolioReqDTOTest {
     final PortfolioReqDTO sut = new PortfolioReqDTO();
     sut.setCurrency(USD);
     final CashHolding cashHolding1 = new CashHolding().setCurrency(CAD);
-    cashHolding1.setType(HoldingType.CASH);
+    cashHolding1.setHoldingType(FinancialInstrumentType.CASH);
     final CashHolding cashHolding2 = new CashHolding().setCurrency(USD);
-    cashHolding2.setType(HoldingType.CASH);
+    cashHolding2.setHoldingType(FinancialInstrumentType.CASH);
     sut.setHoldings(List.of(cashHolding1, cashHolding2));
 
     // ACT

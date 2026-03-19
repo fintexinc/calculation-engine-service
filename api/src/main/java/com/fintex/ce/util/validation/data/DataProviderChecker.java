@@ -1,8 +1,8 @@
 package com.fintex.ce.util.validation.data;
 
 import com.fintex.ce.domain.model.enumeration.DataProvider;
-import com.fintex.ce.domain.model.AssetAllocation;
-import com.fintex.ce.domain.dto.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
+import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -28,9 +28,9 @@ public class DataProviderChecker {
         clearAssetAllocation());
   }
 
-  BiFunction<AssetAllocation, Object, AssetAllocation> clearAssetAllocation() {
+  BiFunction<HoldingAssetAllocation, Object, HoldingAssetAllocation> clearAssetAllocation() {
     return (t, e) -> {
-      t.setAssetAllocation(Map.of());
+      t.setAllocations(Map.of());
       return t;
     };
   }

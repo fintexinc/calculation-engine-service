@@ -38,3 +38,4 @@ allure-results/
 
 # Misc
 nul
+/.claude/settings.local.json

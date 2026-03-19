@@ -1,15 +1,17 @@
 package com.fintex.ce.domain.model.result.correlation;
 
 import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.ce.domain.model.holding.*;
+import com.fintex.ce.domain.model.holding.CashHolding;
+import com.fintex.ce.domain.model.holding.GicHolding;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor
@@ -17,16 +19,12 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 public class HoldingsKeyResult {
 
-  private HoldingType type;
+  private FinancialInstrumentType type;
   private SecurityIdentifier securityIdentifier;
-  private String fundServCode;
-  private String ticker;
-  private String exchangeCode;
   private String key;
   private BigDecimal allocation;
   private String name;
   private Currency currency;
-  private String morningstarId;
 
   public static HoldingsKeyResult buildHoldingsKeyResult(final Holding holding) {
     return buildFromHolding(holding, null);
@@ -34,32 +32,32 @@ public class HoldingsKeyResult {
 
   public static HoldingsKeyResult buildFromHolding(final Holding holding, final BigDecimal allocation) {
     HoldingsKeyResult result = new HoldingsKeyResult();
-    HoldingType holdingType = holding.getType();
-    result.setType(holdingType);
+    result.setType(holding.getHoldingType());
     result.setSecurityIdentifier(holding.getSecurityIdentifier());
-    if (holdingType == HoldingType.CANADA_MUTUAL_FUNDS || holdingType == HoldingType.SEGREGATED_FUND_CANADA) {
-      result.setFundServCode(((FundSeriesHolding) holding).getFundServCode());
-    } else if (holdingType == HoldingType.US_ETF || holdingType == HoldingType.CANADA_ETF) {
-      result.setTicker(((EtfHolding) holding).getTicker());
-      result.setExchangeCode(((EtfHolding) holding).getExchangeCode());
-    } else if (holdingType == HoldingType.US_STOCKS || holdingType == HoldingType.CANADA_STOCKS) {
-      result.setTicker(((StockHolding) holding).getTicker());
-      result.setExchangeCode(((StockHolding) holding).getExchangeCode());
-    } else if (holdingType == HoldingType.CASH) {
+
+    if (FinancialInstrumentType.CASH.equals(holding.getHoldingType())) {
       result.setCurrency(((CashHolding) holding).getCurrency());
-    } else if (holdingType == HoldingType.GIC) {
+    } else if (FinancialInstrumentType.GIC.equals(holding.getHoldingType())) {
       result.setName(((GicHolding) holding).getName());
-    } else if (holdingType == HoldingType.CANADA_POOLED_FUNDS) {
-      result.setMorningstarId(((CanadaPooledFundHolding) holding).getMorningstarId());
-    } else if (holdingType == HoldingType.CANADA_HEDGE_FUNDS) {
-      result.setMorningstarId(((CanadaHedgeFundHolding) holding).getMorningstarId());
-    } else if (holdingType == HoldingType.US_MUTUAL_FUNDS) {
-      result.setTicker(((UsMutualFundHolding) holding).getTicker());
-    } else if (holdingType == HoldingType.SEPARATELY_MANAGED_ACCOUNT) {
-      result.setTicker(((SmaHolding) holding).getIdentifier());
     }
-    result.setKey(holding.generateUserIdentifier());
+
+    result.setKey(createKey(holding));
     result.setAllocation(allocation);
     return result;
+  }
+
+  private static String createKey(final Holding holding) {
+    String result;
+    SecurityIdentifier secId = holding.getSecurityIdentifier();
+
+    if (FinancialInstrumentType.CASH.equals(holding.getHoldingType())) {
+      CashHolding cashHolding = (CashHolding) holding;
+      result = cashHolding.getCurrency() != null ? cashHolding.getCurrency().name() : "";
+    } else if (secId instanceof EquitySecurityIdentifier eqId) {
+      result = secId.getId() + "_" + eqId.getExchangeId();
+    } else {
+      result = secId != null ? secId.getId() : "";
+    }
+    return holding.getHoldingType() + "_" + result;
   }
 }

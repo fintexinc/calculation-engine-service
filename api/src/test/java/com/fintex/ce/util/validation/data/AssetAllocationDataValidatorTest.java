@@ -1,16 +1,15 @@
 package com.fintex.ce.util.validation.data;
 
-import com.fintex.ce.domain.model.AssetAllocation;
-import com.fintex.ce.domain.dto.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
+import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_AA_AA_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
@@ -62,16 +61,16 @@ class AssetAllocationDataValidatorTest {
     // SETUP
     final var sut = mock(AssetAllocationDataValidator.class);
 
-    final var rAssetAllocation1 = mock(AssetAllocation.class);
+    final var rAssetAllocation1 = mock(HoldingAssetAllocation.class);
     final var rAssetAllocation1Map = mock(Map.class);
-    when(rAssetAllocation1.getAssetAllocation()).thenReturn(rAssetAllocation1Map);
-    final var rAssetAllocation2 = mock(AssetAllocation.class);
+    when(rAssetAllocation1.getAllocations()).thenReturn(rAssetAllocation1Map);
+    final var rAssetAllocation2 = mock(HoldingAssetAllocation.class);
     final var rAssetAllocation2Map = mock(Map.class);
-    when(rAssetAllocation2.getAssetAllocation()).thenReturn(rAssetAllocation2Map);
+    when(rAssetAllocation2.getAllocations()).thenReturn(rAssetAllocation2Map);
     final var holding1 = mock(Holding.class);
     final var holding2 = mock(Holding.class);
 
-    final var holdings = new HashMap<Holding, AssetAllocation>();
+    final var holdings = new HashMap<Holding, HoldingAssetAllocation>();
     holdings.put(holding1, rAssetAllocation1);
     holdings.put(holding2, rAssetAllocation2);
 
@@ -82,7 +81,7 @@ class AssetAllocationDataValidatorTest {
     sut.validateNonStock(holdings, warnings);
 
     // VERIFY
-    holdings.forEach((holding, rAssetAllocation) -> verify(sut).validate(holding, rAssetAllocation.getAssetAllocation(),
+    holdings.forEach((holding, rAssetAllocation) -> verify(sut).validate(holding, rAssetAllocation.getAllocations(),
         warnings));
   }
 
