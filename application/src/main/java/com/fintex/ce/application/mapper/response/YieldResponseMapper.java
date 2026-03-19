@@ -1,18 +1,17 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.Yield;
+import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.YieldResult;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.mapper.ResponseMapper;
 import com.fintex.ce.util.DecimalUtils;
-import org.springframework.stereotype.Component;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 @Component
 public class YieldResponseMapper implements ResponseMapper<Yield, YieldResult> {
@@ -60,7 +59,7 @@ public class YieldResponseMapper implements ResponseMapper<Yield, YieldResult> {
   }
 
   private BigDecimal getDividendYield(Holding holding, Yield yield) {
-    if (Objects.nonNull(yield.getDividendYield()) && holding.getType().equals(HoldingType.GIC)) {
+    if (Objects.nonNull(yield.getDividendYield()) && FinancialInstrumentType.GIC.equals(holding.getHoldingType())) {
       return DecimalUtils.divide(yield.getDividendYield(), new BigDecimal(100));
     }
     return yield.getDividendYield();

@@ -7,7 +7,6 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.service.CountryAllocationMappingService;
@@ -15,6 +14,7 @@ import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
@@ -93,8 +94,8 @@ class AssetAllocationEMServiceImplTest {
 
     final Holding h = mock(Holding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
-    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding().setType(
-        HoldingType.CASH), cRegions);
+    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding().setHoldingType(
+        FinancialInstrumentType.CASH), cRegions);
 
     final Map<AssetAllocationRegion, BigDecimal> aRegions = Map.of(
         CANADIAN_EQUITIES, BigDecimal.valueOf(3),
@@ -116,8 +117,8 @@ class AssetAllocationEMServiceImplTest {
 
     final Holding h = mock(Holding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
-    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding().setType(
-        HoldingType.CASH), cRegions);
+    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding().setHoldingType(
+        FinancialInstrumentType.CASH), cRegions);
 
     final Map<AssetAllocationRegion, BigDecimal> aRegions = Map.of(
         CANADIAN_EQUITIES, BigDecimal.valueOf(3),
@@ -893,14 +894,14 @@ class AssetAllocationEMServiceImplTest {
       final var req = mock(PortfolioHoldingsCommand.class);
       final List<Warning> warnings = List.of();
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
-      when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(Map.of());
+      when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(Map.of());
 
       doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
       sut.fetchExposures(req, warnings);
 
       // VERIFY
-      verify(assetAllocationDataMapper).mapFromRawWithProvider(any(), any());
+      verify(assetAllocationDataMapper).toRegionExposuresWithProvider(any());
     }
   }
 
@@ -920,14 +921,14 @@ class AssetAllocationEMServiceImplTest {
       final var req = mock(PortfolioHoldingsCommand.class);
       final List<Warning> warnings = List.of();
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
-      when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(Map.of());
+      when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(Map.of());
 
       doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
       sut.fetchExposures(req, warnings);
 
       // VERIFY
-      verify(assetAllocationDataMapper).mapFromRawWithProvider(any(), any());
+      verify(assetAllocationDataMapper).toRegionExposuresWithProvider(any());
     }
   }
 
@@ -947,7 +948,7 @@ class AssetAllocationEMServiceImplTest {
     final var providers = List.of(DataProvider.EAGLE, DataProvider.MORNINGSTAR);
     when(req.getDataProviders()).thenReturn(providers);
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
-    when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(Map.of());
+    when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(Map.of());
 
     doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
@@ -1008,9 +1009,9 @@ class AssetAllocationEMServiceImplTest {
 
     when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
     when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
-    when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(assetAllocations);
+    when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(assetAllocations);
     when(sut.calculateAssetAllocationEMarketMap(any(), any(), any(), any())).thenReturn(exposures);
-    when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(mappedResult);
+    when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(mappedResult);
     doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
     sut.fetchExposures(portfolioHoldingsReqDTO, List.of());
@@ -1041,14 +1042,14 @@ class AssetAllocationEMServiceImplTest {
 
       when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
       when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
-      when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(assetAllocations);
+      when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(assetAllocations);
       when(sut.calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList())).thenReturn(exposures);
       doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
       sut.fetchExposures(portfolioHoldingsReqDTO, List.of());
 
       // VERIFY
-      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, DEFAULT_PROVIDERS), Mockito.times(3));
+      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, DEFAULT_PROVIDERS), Mockito.times(2));
     }
   }
 

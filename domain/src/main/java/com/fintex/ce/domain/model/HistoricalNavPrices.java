@@ -1,17 +1,16 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.core.ProviderAware;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +19,7 @@ import java.util.TreeMap;
 public class HistoricalNavPrices implements ReturnsData, ProviderAware {
 
   private String currency;
-  private HoldingType holdingType;
+  private FinancialInstrumentType holdingType;
   private TreeMap<LocalDate, BigDecimal> returns;
   private List<LocalDate> missedMonthData = new ArrayList<>();
   private List<LocalDate> missedDates = new ArrayList<>();

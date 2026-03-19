@@ -1,25 +1,25 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
-import com.fintex.ce.domain.model.holding.EtfHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.ce.util.ComparisonUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSector_whenPortfolioContainsOnlyAom() {
-    final EtfHolding aom = new EtfHolding(BigDecimal.valueOf(50), HoldingType.US_ETF, "", "AOM");
+    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US)
+        .setSecurityIdentifier(new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
 
     Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> exposures = new HashMap<>();
     final HashMap<FixedIncomeSectorType, BigDecimal> fixedIncomeSectorTypes = getFixedIncomeSectorTypeOfAOM();
@@ -75,8 +75,10 @@ class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSector_whenPortfolioContainsAomAndRbf605() {
-    final EtfHolding aom = new EtfHolding(BigDecimal.valueOf(50), HoldingType.US_ETF, "", "AOM");
-    final FundSeriesHolding rbf605 = new FundSeriesHolding(BigDecimal.valueOf(50), "RBF605");
+    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US)
+        .setSecurityIdentifier(new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
+    final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .setSecurityIdentifier(new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
 
     Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> exposures = new HashMap<>();
     exposures.put(rbf605, getFixedIncomeSectorTypeOfRBF605());
@@ -97,8 +99,10 @@ class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSectorFromAomOnly_whenRbf605FixedIncomePlusCashIsZero() {
-    final EtfHolding aom = new EtfHolding(BigDecimal.valueOf(50), HoldingType.US_ETF, "", "AOM");
-    final FundSeriesHolding rbf605 = new FundSeriesHolding(BigDecimal.valueOf(50), "RBF605");
+    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US)
+        .setSecurityIdentifier(new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
+    final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .setSecurityIdentifier(new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
 
     Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> exposures = new HashMap<>();
     exposures.put(rbf605, getFixedIncomeSectorTypeOfRBF605());

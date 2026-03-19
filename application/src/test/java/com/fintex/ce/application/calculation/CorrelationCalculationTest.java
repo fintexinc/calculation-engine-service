@@ -1,25 +1,24 @@
 package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.model.holding.EtfHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CorrelationResult;
 import com.fintex.ce.domain.model.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.domain.model.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.util.ComparisonUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
@@ -252,8 +251,8 @@ class CorrelationCalculationTest {
     final var sut = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, ONE);
-    final var usEtfHolding = new Holding().setType(HoldingType.US_ETF);
-    final var mutualFundsHolding = new Holding().setType(HoldingType.CANADA_MUTUAL_FUNDS);
+    final var usEtfHolding = new Holding().setHoldingType(FinancialInstrumentType.ETF_US);
+    final var mutualFundsHolding = new Holding().setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     final var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
     when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
@@ -269,8 +268,8 @@ class CorrelationCalculationTest {
     final var sut = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, ONE);
-    final var usEtfHolding = new Holding().setType(HoldingType.US_ETF);
-    final var mutualFundsHolding = new Holding().setType(HoldingType.CANADA_MUTUAL_FUNDS);
+    final var usEtfHolding = new Holding().setHoldingType(FinancialInstrumentType.ETF_US);
+    final var mutualFundsHolding = new Holding().setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     final var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
     when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
@@ -388,25 +387,30 @@ class CorrelationCalculationTest {
   @Test
   void shouldBuildCorrelationPeriodResult_whenMappingCorrelationValues() {
     final var sut = mock(CorrelationCalculation.class);
-    final var usEtfHolding = new EtfHolding().setTicker("TEST").setType(HoldingType.US_ETF);
-    final var mutualFundsHolding = new FundSeriesHolding().setFundServCode("TEST").setType(
-        HoldingType.CANADA_MUTUAL_FUNDS);
+    final var usEtfHolding = new Holding()
+        .setSecurityIdentifier(new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV))
+        .setHoldingType(FinancialInstrumentType.ETF_US);
+    final var mutualFundsHolding = new Holding()
+        .setSecurityIdentifier(new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV))
+        .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     final var map = Map.of(mutualFundsHolding, BigDecimalConstants.TWELVE);
 
     doCallRealMethod().when(sut).mapToCorrelationPeriodResult(any(), anyInt(), any());
     final CorrelationPeriodResult correlationPeriodDTO = sut.mapToCorrelationPeriodResult(usEtfHolding, TWELVE, map);
 
     assertEquals(String.valueOf(TWELVE), correlationPeriodDTO.getPeriod());
-    assertEquals("US_ETF_TEST", correlationPeriodDTO.getKey());
+    assertEquals("ETF_US_TEST", correlationPeriodDTO.getKey());
     assertEquals(1, correlationPeriodDTO.getCorrelations().size());
-    assertEquals("CANADA_MUTUAL_FUNDS_TEST", correlationPeriodDTO.getCorrelations().get(0).getCorrelationKey());
+    assertEquals("MUTUAL_FUND_CANADA_TEST", correlationPeriodDTO.getCorrelations().get(0).getCorrelationKey());
     assertEquals(BigDecimal.valueOf(TWELVE), correlationPeriodDTO.getCorrelations().get(0).getValue());
   }
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var calculationDTO = mock(CalculationDTO.class);
-    final var map = Map.of(new EtfHolding().setTicker("TEST").setType(HoldingType.US_ETF), mock(Map.class));
+    final var map = Map.of(new Holding()
+        .setSecurityIdentifier(new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV))
+        .setHoldingType(FinancialInstrumentType.ETF_US), mock(Map.class));
     final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), map);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));

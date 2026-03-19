@@ -1,12 +1,11 @@
 package com.fintex.ce.performance.beanshell;
 
+import java.util.Random;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -79,7 +78,7 @@ class BeanshellTest {
   JSONArray addMutualFund(JSONArray holdings, String holdingIdentifier,
       String fundServCode, int value) throws JSONException {
     JSONObject holding = new JSONObject();
-    holding.put("type", "CANADA_MUTUAL_FUNDS");
+    holding.put("type", "MUTUAL_FUND_CANADA");
     holding.put("holdingIdentifier", holdingIdentifier);
     holding.put("fundServCode", fundServCode);
     holding.put("value", value);

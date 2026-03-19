@@ -1,21 +1,22 @@
 package com.fintex.ce.adapter.rest.dto;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.EtfHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.StockHolding;
 import com.fintex.ce.adapter.rest.dto.response.correlation.HoldingsKeyDTO;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.holding.CashHolding;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.EquitySecurityIdentifier;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.util.PortfolioUtils.createKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class HoldingsKeyDTOTest {
 
@@ -25,44 +26,58 @@ class HoldingsKeyDTOTest {
     final String testTicker = "TEST_TICKER";
     final String testFundServCode = "TEST_FUND_SER_CODE";
     final String exchangeCode = "ExchangeCode";
-    final Holding usEtfHolding = new EtfHolding().setTicker(testTicker).setType(HoldingType.US_ETF);
-    final Holding mutualFundsHolding = new FundSeriesHolding().setFundServCode(testFundServCode).setType(
-        HoldingType.CANADA_MUTUAL_FUNDS);
-    final Holding cash = new CashHolding().setCurrency(Currency.CAD).setType(HoldingType.CASH);
-    final Holding canadaEtfHolding = new EtfHolding().setTicker(testTicker).setType(HoldingType.CANADA_ETF);
-    final Holding usStockHolding = new StockHolding().setExchangeCode(exchangeCode).setTicker(testTicker).setType(
-        HoldingType.US_STOCKS);
-    final Holding canadaStockHolding = new StockHolding().setExchangeCode(exchangeCode).setTicker(testTicker).setType(
-        HoldingType.CANADA_STOCKS);
+    final Holding usEtfHolding = new Holding().setSecurityIdentifier(new SecurityIdentifier(testTicker, FiIdentifierType.TICKER)).setHoldingType(FinancialInstrumentType.ETF_US);
+    final Holding mutualFundsHolding = new Holding().setSecurityIdentifier(new SecurityIdentifier(testFundServCode, FiIdentifierType.FUNDSERV)).setHoldingType(
+        FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    final Holding cash = new CashHolding().setCurrency(Currency.CAD).setHoldingType(FinancialInstrumentType.CASH);
+    final Holding canadaEtfHolding = new Holding().setSecurityIdentifier(new SecurityIdentifier(testTicker, FiIdentifierType.TICKER)).setHoldingType(FinancialInstrumentType.ETF_CANADA);
+
+    final EquitySecurityIdentifier usStockSecId = mock(EquitySecurityIdentifier.class);
+    when(usStockSecId.getId()).thenReturn(testTicker);
+    when(usStockSecId.getExchangeId()).thenReturn(exchangeCode);
+    final Holding usStockHolding = new Holding().setSecurityIdentifier(usStockSecId).setHoldingType(FinancialInstrumentType.STOCK_US);
+
+    final EquitySecurityIdentifier canadaStockSecId = mock(EquitySecurityIdentifier.class);
+    when(canadaStockSecId.getId()).thenReturn(testTicker);
+    when(canadaStockSecId.getExchangeId()).thenReturn(exchangeCode);
+    final Holding canadaStockHolding = new Holding().setSecurityIdentifier(canadaStockSecId).setHoldingType(FinancialInstrumentType.STOCK_CANADA);
+
     final List<Holding> holdings = List.of(usEtfHolding, mutualFundsHolding, cash, canadaEtfHolding, usStockHolding,
         canadaStockHolding);
 
     // ACT
-    final List<HoldingsKeyDTO> results = holdings.stream().map(HoldingsKeyDTO::buildHoldingsKeyDTO).collect(Collectors
-        .toList());
+    final List<HoldingsKeyDTO> results = holdings.stream().map(HoldingsKeyDTO::buildHoldingsKeyDTO).toList();
 
     // VERIFY
     assertEquals(6, results.size());
+
+    // US ETF - has SecurityIdentifier with ticker
     assertEquals(createKey(usEtfHolding), results.get(0).getKey());
-    assertEquals(testTicker, results.get(0).getTicker());
-    assertNull(results.get(0).getExchangeCode());
+    assertEquals(testTicker, results.get(0).getSecurityIdentifier().getId());
 
+    // Mutual Fund - has SecurityIdentifier with fundserv code
     assertEquals(createKey(mutualFundsHolding), results.get(1).getKey());
-    assertEquals(testFundServCode, results.get(1).getFundServCode());
+    assertEquals(testFundServCode, results.get(1).getSecurityIdentifier().getId());
 
+    // Cash - no SecurityIdentifier
     assertEquals(createKey(cash), results.get(2).getKey());
+    assertNull(results.get(2).getSecurityIdentifier());
 
+    // Canada ETF - has SecurityIdentifier with ticker
     assertEquals(createKey(canadaEtfHolding), results.get(3).getKey());
-    assertEquals(testTicker, results.get(3).getTicker());
-    assertNull(results.get(3).getExchangeCode());
+    assertEquals(testTicker, results.get(3).getSecurityIdentifier().getId());
 
+    // US Stock - has EquitySecurityIdentifier with ticker and exchangeCode
     assertEquals(createKey(usStockHolding), results.get(4).getKey());
-    assertEquals(testTicker, results.get(4).getTicker());
-    assertEquals(exchangeCode, results.get(4).getExchangeCode());
+    assertInstanceOf(EquitySecurityIdentifier.class, results.get(4).getSecurityIdentifier());
+    assertEquals(testTicker, results.get(4).getSecurityIdentifier().getId());
+    assertEquals(exchangeCode, ((EquitySecurityIdentifier) results.get(4).getSecurityIdentifier()).getExchangeId());
 
+    // Canada Stock - has EquitySecurityIdentifier with ticker and exchangeCode
     assertEquals(createKey(canadaStockHolding), results.get(5).getKey());
-    assertEquals(testTicker, results.get(5).getTicker());
-    assertEquals(exchangeCode, results.get(5).getExchangeCode());
+    assertInstanceOf(EquitySecurityIdentifier.class, results.get(5).getSecurityIdentifier());
+    assertEquals(testTicker, results.get(5).getSecurityIdentifier().getId());
+    assertEquals(exchangeCode, ((EquitySecurityIdentifier) results.get(5).getSecurityIdentifier()).getExchangeId());
   }
 
 }

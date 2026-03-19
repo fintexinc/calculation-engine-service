@@ -2,17 +2,17 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.exception.SystemException;
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
-import com.fintex.ce.domain.exception.SystemException;
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.result.AssetAllocationEMResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.service.CountryAllocationMappingService;
@@ -28,13 +28,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
-
-import static com.fintex.ce.domain.model.enumeration.DataProvider.BROADRIDGE;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.DEFAULT_PROVIDERS;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.ENVESTNET;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
@@ -46,6 +39,12 @@ import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.CountryRegionType.UNITED_STATES;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.BROADRIDGE;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.DEFAULT_PROVIDERS;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.ENVESTNET;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.util.CalculationUtils.sum;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
@@ -57,13 +56,13 @@ public class AssetAllocationEMServiceImpl
       BreakdownAbstractService<AssetAllocationEMResult, AssetAllocationRegionEmType> {
 
   private final SecurityDataFetcher<EquityCountryAllocation> countryAllocationSecurityDataFetcher;
-  private final SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher;
+  private final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
   private final CountryAllocationMappingService countryAllocationMappingService;
 
   public AssetAllocationEMServiceImpl(
           final SecurityDataFetcher<EquityCountryAllocation> countryAllocationSecurityDataFetcher,
-          final SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher,
+          final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher,
           final AssetAllocationDataMapper assetAllocationDataMapper, CountryAllocationMappingService countryAllocationMappingService) {
     super();
     this.countryAllocationSecurityDataFetcher = countryAllocationSecurityDataFetcher;
@@ -88,10 +87,10 @@ public class AssetAllocationEMServiceImpl
   public Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> fetchExposures(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    final Map<Holding, AssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
+    final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS));
-    final var assetAllocations = assetAllocationDataMapper.mapFromRawWithProvider(rawData, reqDTO.getHoldings());
+    final var assetAllocations = assetAllocationDataMapper.toRegionExposuresWithProvider(rawData);
 
     return calculateAssetAllocationEMarketMap(reqDTO.getHoldings(),
         assetAllocations,

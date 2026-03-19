@@ -1,18 +1,17 @@
 package api.model;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
-import lombok.Data;
-
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import lombok.Data;
 
 @Data
 public class HoldingDataDTO {
 
   private String holdingCode;
-  private HoldingType holdingType;
+  private FinancialInstrumentType holdingType;
   private String exchangeCode;
   private SecurityIdentifier securityIdentifier;
   private LocalDate gicInvestmentDate;
@@ -21,7 +20,7 @@ public class HoldingDataDTO {
   private BigDecimal gicTerm;
   private String gicName;
 
-  public HoldingDataDTO(String holdingCode, HoldingType holdingType, String exchangeCode) {
+  public HoldingDataDTO(String holdingCode, FinancialInstrumentType holdingType, String exchangeCode) {
     this.holdingCode = holdingCode;
     this.holdingType = holdingType;
     this.exchangeCode = exchangeCode;

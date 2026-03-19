@@ -6,11 +6,11 @@ import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.ManagementFee;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ManagementFeeResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MF_MF_001;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
@@ -45,7 +46,7 @@ public class ManagementFeeCalculationServiceImpl
   }
 
   @Override
-  public Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
+  public Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
       final AverageMerCommand reqDTO) {
     Map<Holding, ManagementFee> rawData = managementFeeSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
@@ -53,28 +54,28 @@ public class ManagementFeeCalculationServiceImpl
     return groupAndMap(rawData, reqDTO.getHoldings());
   }
 
-  private Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupAndMap(
+  private Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupAndMap(
       Map<Holding, ManagementFee> rawData, List<? extends Holding> holdings) {
-    Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> result = new EnumMap<>(HoldingType.class);
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> result = new EnumMap<>(FinancialInstrumentType.class);
 
     for (var entry : rawData.entrySet()) {
       Holding holding = entry.getKey();
       ManagementFee fee = entry.getValue();
       var dto = new AverageManagementExpenseCalculationDTO()
           .setMarketValue(holding.getValue())
-          .setHoldingType(holding.getType())
+          .setHoldingType(holding.getHoldingType())
           .setActualManagementFee(fee.getManagementFee());
-      result.computeIfAbsent(holding.getType(), k -> new HashMap<>()).put(holding, dto);
+      result.computeIfAbsent(holding.getHoldingType(), k -> new HashMap<>()).put(holding, dto);
     }
 
     for (Holding holding : holdings) {
       if (!rawData.containsKey(holding)) {
         var dto = new AverageManagementExpenseCalculationDTO()
             .setMarketValue(holding.getValue())
-            .setHoldingType(holding.getType())
+            .setHoldingType(holding.getHoldingType())
             .setInitialFee(BigDecimal.ZERO)
             .setModifiedFee(BigDecimal.ZERO);
-        result.computeIfAbsent(holding.getType(), k -> new HashMap<>()).put(holding, dto);
+        result.computeIfAbsent(holding.getHoldingType(), k -> new HashMap<>()).put(holding, dto);
       }
     }
 
@@ -83,7 +84,7 @@ public class ManagementFeeCalculationServiceImpl
 
   @Override
   public List<Warning> setInitialFeeAndModifiedFeeValues(
-      final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupOfMers) {
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupOfMers) {
     List<Warning> warnings = new ArrayList<>();
     var notification = new Notification();
     groupOfMers.forEach((holdingType, managementFee) -> {
@@ -110,7 +111,7 @@ public class ManagementFeeCalculationServiceImpl
 
   @Override
   public ManagementFeeResult calculateAverageValue(List<ParameterType> parameterTypes,
-      Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos) {
+      Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos) {
     final var resDTO = new ManagementFeeResult();
     if (parameterTypes.contains(SCALED)) {
       final BigDecimal scaledAverageMer = getScaledAverageMer(averageMerCalculationDtos);

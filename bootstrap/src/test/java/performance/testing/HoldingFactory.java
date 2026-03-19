@@ -1,18 +1,20 @@
 package performance.testing;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.ce.domain.model.holding.EtfHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.StockHolding;
+import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
 import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.FUNDSERV;
 import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.TICKER;
-import static com.fintex.ce.domain.model.enumeration.HoldingType.*;
+import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.ETF_CANADA;
+import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.ETF_US;
+import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.MUTUAL_FUND_CANADA;
+import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.STOCK_CANADA;
+import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.STOCK_US;
 import static performance.testing.RandomUtil.getRandomInt;
 
 public class HoldingFactory {
@@ -40,21 +42,15 @@ public class HoldingFactory {
     usStocks = ParserUtil.parseStocks("us_stock_ticker-exchange_id.txt");
   }
 
-  public Holding getHolding(final HoldingType holdingType) {
-    switch (holdingType) {
-      case US_ETF :
-        return getEtf(usEtfs, US_ETF, randomIndexesForUsEtfs);
-      case CANADA_ETF :
-        return getEtf(canadaEtfs, CANADA_ETF, randomIndexesForCanadaEtfs);
-      case CANADA_MUTUAL_FUNDS :
-        return getMutualFund();
-      case US_STOCKS :
-        return getStock(usStocks, US_STOCKS, randomIndexesForUsStocks);
-      case CANADA_STOCKS :
-        return getStock(canadaStocks, CANADA_STOCKS, randomIndexesForCanadaStocks);
-      default :
-        throw new IllegalArgumentException("Invalid holding type : " + holdingType);
-    }
+  public Holding getHolding(final FinancialInstrumentType holdingType) {
+    return switch (holdingType) {
+      case ETF_US -> getEtf(usEtfs, ETF_US, randomIndexesForUsEtfs);
+      case ETF_CANADA -> getEtf(canadaEtfs, ETF_CANADA, randomIndexesForCanadaEtfs);
+      case MUTUAL_FUND_CANADA -> getMutualFund();
+      case STOCK_US -> getStock(usStocks, STOCK_US, randomIndexesForUsStocks);
+      case STOCK_CANADA -> getStock(canadaStocks, STOCK_CANADA, randomIndexesForCanadaStocks);
+      default -> throw new IllegalArgumentException("Invalid holding type : " + holdingType);
+    };
   }
 
   public void generateRandomIndexNumbersForEachHoldingSet(final int numberOfHoldings) {
@@ -77,40 +73,40 @@ public class HoldingFactory {
     }
   }
 
-  private Holding getEtf(final List<String> codes, final HoldingType holdingType,
+  private Holding getEtf(final List<String> codes, final FinancialInstrumentType holdingType,
       final LinkedList<Integer> randomIndexes) {
     final int randomIndex = randomIndexes.pop();
-    final var etfHolding = new EtfHolding();
+    final var holding = new Holding();
     final String ticker = codes.get(randomIndex);
-    etfHolding.setSecurityIdentifier(new SecurityIdentifier(ticker, TICKER));
-    etfHolding.setType(holdingType);
-    etfHolding.setValue(BigDecimal.valueOf(randomIndex));
-    etfHolding.setTicker(ticker);
-    return etfHolding;
+    holding.setSecurityIdentifier(new SecurityIdentifier(ticker, TICKER));
+    holding.setHoldingType(holdingType);
+    holding.setValue(BigDecimal.valueOf(randomIndex));
+    return holding;
   }
 
   private Holding getMutualFund() {
     final int randomIndex = randomIndexesForMutualFunds.pop();
-    final var mutualFund = new FundSeriesHolding();
+    final var holding = new Holding();
     final String fundServCode = mutualFunds.get(randomIndex);
-    mutualFund.setSecurityIdentifier(new SecurityIdentifier(fundServCode, FUNDSERV));
-    mutualFund.setType(CANADA_MUTUAL_FUNDS);
-    mutualFund.setValue(BigDecimal.valueOf(randomIndex));
-    mutualFund.setFundServCode(fundServCode);
-    return mutualFund;
+    holding.setSecurityIdentifier(new SecurityIdentifier(fundServCode, FUNDSERV));
+    holding.setHoldingType(MUTUAL_FUND_CANADA);
+    holding.setValue(BigDecimal.valueOf(randomIndex));
+    return holding;
   }
 
-  private Holding getStock(final List<StockParseDTO> codes, final HoldingType holdingType,
+  private Holding getStock(final List<StockParseDTO> codes, final FinancialInstrumentType holdingType,
       LinkedList<Integer> randomIndexes) {
     final int randomIndex = randomIndexes.pop();
-    final var stockHolding = new StockHolding();
+    final var holding = new Holding();
     final String ticker = codes.get(randomIndex).getTicker();
-    stockHolding.setSecurityIdentifier(new SecurityIdentifier(ticker, TICKER));
-    stockHolding.setType(holdingType);
-    stockHolding.setValue(BigDecimal.valueOf(randomIndex));
-    stockHolding.setTicker(ticker);
-    stockHolding.setExchangeCode(codes.get(randomIndex).getExchangeId());
-    return stockHolding;
+    final EquitySecurityIdentifier secId = new EquitySecurityIdentifier();
+    secId.setId(ticker);
+    secId.setIdType(TICKER);
+    secId.setExchangeId(codes.get(randomIndex).getExchangeId());
+    holding.setSecurityIdentifier(secId);
+    holding.setHoldingType(holdingType);
+    holding.setValue(BigDecimal.valueOf(randomIndex));
+    return holding;
   }
 
   private int getRandomIndex(final List<?> codes) {

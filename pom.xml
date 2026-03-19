@@ -229,7 +229,6 @@
                     </dependencies>
                     <configuration>
                         <skipTests>false</skipTests>
-                        <testFailureIgnore>true</testFailureIgnore>
                         <forkCount>${forkCount}</forkCount>
                         <reuseForks>true</reuseForks>
                         <properties>

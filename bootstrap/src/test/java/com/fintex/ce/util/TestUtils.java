@@ -1,13 +1,12 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.core.PortfolioReqDTO;
-import org.mockito.Mockito;
-
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.util.ArrayList;
 import java.util.List;
+import org.mockito.Mockito;
 
 public class TestUtils {
   private TestUtils() {
@@ -34,7 +33,7 @@ public class TestUtils {
 
   public static Holding getCashHolding() {
     final Holding holding = Mockito.mock(Holding.class);
-    Mockito.when(holding.getType()).thenReturn(HoldingType.CASH);
+    Mockito.when(holding.getHoldingType()).thenReturn(FinancialInstrumentType.CASH);
     return holding;
   }
 

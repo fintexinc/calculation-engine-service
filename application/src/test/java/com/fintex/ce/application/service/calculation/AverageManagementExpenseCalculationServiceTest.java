@@ -1,17 +1,13 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
-import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
+import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AverageMerResult;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.FilterUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -22,6 +18,9 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
@@ -63,7 +62,7 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldGetScaledAverageMer_whenCallsGetAbsoluteAndForceReportFeeHoldingList() {
     // SETUP
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     doCallRealMethod().when(sut).getScaledAverageMer(anyMap());
 
@@ -75,15 +74,15 @@ class AverageManagementExpenseCalculationServiceTest {
   }
 
   @Test
-  void shouldGetScaledAverageMer_whenWhenParameterTypeAbsoluteCallsGetAverageMerByParameterTypeWithAllHoldingTypes() {
+  void shouldGetScaledAverageMer_whenWhenParameterTypeAbsoluteCallsGetAverageMerByParameterTypeWithAllFinancialInstrumentTypes() {
     // SETUP
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     final var sut = mock(AverageManagementExpenseCalculationService.class);
     final List<AverageManagementExpenseCalculationDTO> absoluteHoldings = Stream.of(holdings.get(
-        HoldingType.CANADA_MUTUAL_FUNDS), holdings.get(HoldingType.SEGREGATED_FUND_CANADA), holdings.get(
-            HoldingType.US_ETF),
-        holdings.get(HoldingType.CANADA_ETF), holdings.get(HoldingType.US_STOCKS), holdings.get(
-            HoldingType.CANADA_STOCKS), holdings.get(HoldingType.CASH))
+        FinancialInstrumentType.MUTUAL_FUND_CANADA), holdings.get(FinancialInstrumentType.SEGREGATED_FUND_CANADA), holdings.get(
+            FinancialInstrumentType.ETF_US),
+        holdings.get(FinancialInstrumentType.ETF_CANADA), holdings.get(FinancialInstrumentType.STOCK_US), holdings.get(
+            FinancialInstrumentType.STOCK_CANADA), holdings.get(FinancialInstrumentType.CASH))
         .filter(Objects::nonNull)
         .map(Map::values)
         .flatMap(Collection::stream)
@@ -101,11 +100,11 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldGetAbsoluteAndForceReportFeeHoldingList_whenIsPappedProperly() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     doCallRealMethod().when(sut).getAbsoluteAndForceReportFeeHoldingList(anyMap());
     final List<AverageManagementExpenseCalculationDTO> absoluteOrForceReportFeeHoldings = Stream.of(holdings.get(
-        HoldingType.CANADA_MUTUAL_FUNDS), holdings.get(HoldingType.SEGREGATED_FUND_CANADA), holdings.get(
-            HoldingType.US_ETF), holdings.get(HoldingType.CANADA_ETF))
+        FinancialInstrumentType.MUTUAL_FUND_CANADA), holdings.get(FinancialInstrumentType.SEGREGATED_FUND_CANADA), holdings.get(
+            FinancialInstrumentType.ETF_US), holdings.get(FinancialInstrumentType.ETF_CANADA))
         .filter(Objects::nonNull)
         .map(Map::values)
         .flatMap(Collection::stream)
@@ -180,7 +179,7 @@ class AverageManagementExpenseCalculationServiceTest {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
 
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     doCallRealMethod().when(sut).getScaledAverageMer(anyMap());
     doCallRealMethod().when(sut).getAbsoluteAndForceReportFeeHoldingList(anyMap());
 
@@ -189,8 +188,8 @@ class AverageManagementExpenseCalculationServiceTest {
 
     // VERIFY
     verify(sut).getAverageMerByParameterType(
-        Stream.of(holdings.get(HoldingType.CANADA_MUTUAL_FUNDS), holdings.get(HoldingType.SEGREGATED_FUND_CANADA),
-            holdings.get(HoldingType.US_ETF), holdings.get(HoldingType.CANADA_ETF))
+        Stream.of(holdings.get(FinancialInstrumentType.MUTUAL_FUND_CANADA), holdings.get(FinancialInstrumentType.SEGREGATED_FUND_CANADA),
+            holdings.get(FinancialInstrumentType.ETF_US), holdings.get(FinancialInstrumentType.ETF_CANADA))
             .map(Map::values).flatMap(Collection::stream)
             .collect(Collectors.toList()));
   }
@@ -200,7 +199,7 @@ class AverageManagementExpenseCalculationServiceTest {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
 
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     doCallRealMethod().when(sut).getForceReportFeeAverageMer(anyMap());
 
     // ACT
@@ -214,7 +213,7 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldGetForceReportFeeAverageMer_whenWhenParameterTypeForceReportFeeCallsGetAverageMerByParameterTypeWithCanadaMutualFundsUsEtfAndCanadaEtfHoldings() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     doCallRealMethod().when(sut).getForceReportFeeAverageMer(anyMap());
     doCallRealMethod().when(sut).getAbsoluteAndForceReportFeeHoldingList(anyMap());
 
@@ -222,8 +221,8 @@ class AverageManagementExpenseCalculationServiceTest {
     sut.getForceReportFeeAverageMer(holdings);
 
     // VERIFY
-    verify(sut).getAverageMerByParameterType(Stream.of(holdings.get(HoldingType.CANADA_MUTUAL_FUNDS), holdings.get(
-        HoldingType.SEGREGATED_FUND_CANADA), holdings.get(HoldingType.US_ETF), holdings.get(HoldingType.CANADA_ETF))
+    verify(sut).getAverageMerByParameterType(Stream.of(holdings.get(FinancialInstrumentType.MUTUAL_FUND_CANADA), holdings.get(
+        FinancialInstrumentType.SEGREGATED_FUND_CANADA), holdings.get(FinancialInstrumentType.ETF_US), holdings.get(FinancialInstrumentType.ETF_CANADA))
         .map(Map::values)
         .flatMap(Collection::stream)
         .collect(Collectors.toList()));
@@ -233,7 +232,7 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldGetForceReportFeeAverageMer_whenCallsIsMerPresentForAHolding4Times() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     doCallRealMethod().when(sut).getForceReportFeeAverageMer(anyMap());
 
     // ACT
@@ -247,9 +246,9 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldGetForceReportFeeAverageMer_whenReturnsNullWhenMerValueIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> holdings = getAverageMerCalculationDtoMap();
     final Function<AverageManagementExpenseCalculationDTO, BigDecimal> expenseRatioFunction = AverageManagementExpenseCalculationDTO::getManagementExpenseRatio;
-    when(sut.isMerPresentForHolding(holdings.get(HoldingType.CANADA_MUTUAL_FUNDS), expenseRatioFunction)).thenReturn(
+    when(sut.isMerPresentForHolding(holdings.get(FinancialInstrumentType.MUTUAL_FUND_CANADA), expenseRatioFunction)).thenReturn(
         true);
 
     doCallRealMethod().when(sut).getForceReportFeeAverageMer(anyMap());
@@ -456,8 +455,8 @@ class AverageManagementExpenseCalculationServiceTest {
       resDTO.getManagementExpenseRatio().put(FORCE_REPORT_FEE, ZERO);
       final var holding1 = new Holding();
       final var holding2 = new Holding();
-      holding1.setType(HoldingType.US_STOCKS);
-      holding2.setType(HoldingType.CASH);
+      holding1.setHoldingType(FinancialInstrumentType.STOCK_US);
+      holding2.setHoldingType(FinancialInstrumentType.CASH);
       final var holdings = List.of(holding1, holding2);
       final var expected = new HashMap<ParameterType, BigDecimal>();
       expected.put(ABSOLUTE, ONE);
@@ -478,7 +477,7 @@ class AverageManagementExpenseCalculationServiceTest {
     }
   }
 
-  private Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> getAverageMerCalculationDtoMap() {
+  private Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> getAverageMerCalculationDtoMap() {
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO1 = new AverageManagementExpenseCalculationDTO();
     averageManagementExpenseCalculationDTO1.setMarketValue(new BigDecimal("10"));
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO2 = new AverageManagementExpenseCalculationDTO();
@@ -494,13 +493,13 @@ class AverageManagementExpenseCalculationServiceTest {
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO7 = new AverageManagementExpenseCalculationDTO();
     averageManagementExpenseCalculationDTO7.setMarketValue(new BigDecimal("70"));
 
-    return Map.of(HoldingType.CANADA_MUTUAL_FUNDS, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO1),
-        HoldingType.US_ETF, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO2),
-        HoldingType.CANADA_ETF, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO3),
-        HoldingType.CANADA_STOCKS, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO4),
-        HoldingType.US_STOCKS, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO5),
-        HoldingType.CASH, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO6),
-        HoldingType.SEGREGATED_FUND_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO7));
+    return Map.of(FinancialInstrumentType.MUTUAL_FUND_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO1),
+        FinancialInstrumentType.ETF_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO2),
+        FinancialInstrumentType.ETF_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO3),
+        FinancialInstrumentType.STOCK_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO4),
+        FinancialInstrumentType.STOCK_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO5),
+        FinancialInstrumentType.CASH, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO6),
+        FinancialInstrumentType.SEGREGATED_FUND_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO7));
   }
 
 }

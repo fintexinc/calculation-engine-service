@@ -1,18 +1,17 @@
 package com.fintex.ce.domain.model.holding;
 
 import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 
@@ -27,8 +26,8 @@ public class GicHolding extends Holding implements MonthlyReturnGeneratableHoldi
   public GicHolding() {
   }
 
-  public GicHolding(final BigDecimal amount, final HoldingType type) {
-    super(amount, type);
+  public GicHolding(final BigDecimal amount, final FinancialInstrumentType holdingType) {
+    super(amount, holdingType);
   }
 
   private UUID uuid = UUID.randomUUID();
@@ -68,14 +67,11 @@ public class GicHolding extends Holding implements MonthlyReturnGeneratableHoldi
   }
 
   public boolean isLessThanOneYearOld() {
-    if (getTerm().intValue() < 365) {
-      return true;
-    }
-    return false;
+    return getTerm().intValue() < 365;
   }
 
   @Override
   public String generateUserIdentifier() {
-    return super.getType() + DELIMITER + getCurrency() + DELIMITER + super.getValue();
+    return getHoldingType() + Holding.DELIMITER + getCurrency() + Holding.DELIMITER + getValue();
   }
 }

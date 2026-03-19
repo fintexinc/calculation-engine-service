@@ -5,12 +5,12 @@ import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AverageMerResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_MER_001;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
@@ -163,7 +164,7 @@ class MERCalculationServiceImplTest {
     final var averageMERFetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
-    final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+    final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
     final var reqDTO = mock(AverageMerCommand.class);
     final var parameterTypes = List.of(SCALED, ABSOLUTE);
 
@@ -186,7 +187,7 @@ class MERCalculationServiceImplTest {
       final var averageMERFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
-      final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
@@ -210,7 +211,7 @@ class MERCalculationServiceImplTest {
       final var averageMERFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
-      final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var providers = mock(List.class);
 
@@ -240,7 +241,7 @@ class MERCalculationServiceImplTest {
 
     doCallRealMethod().when(merCalculationServiceMock).setInitialFeeAndModifiedFeeValues(anyMap());
     // ACT
-    merCalculationServiceMock.setInitialFeeAndModifiedFeeValues(Map.of(HoldingType.CANADA_ETF, Map.of(h, a)));
+    merCalculationServiceMock.setInitialFeeAndModifiedFeeValues(Map.of(FinancialInstrumentType.ETF_CANADA, Map.of(h, a)));
 
     // VERIFY
     verify(merCalculationServiceMock).handleFeesForCanadaMutualHedgeFundsAndEtf(a, h, notification);
@@ -257,7 +258,7 @@ class MERCalculationServiceImplTest {
 
     doCallRealMethod().when(merCalculationServiceMock).setInitialFeeAndModifiedFeeValues(anyMap());
     // ACT
-    merCalculationServiceMock.setInitialFeeAndModifiedFeeValues(Map.of(HoldingType.CANADA_MUTUAL_FUNDS, Map.of(h, a)));
+    merCalculationServiceMock.setInitialFeeAndModifiedFeeValues(Map.of(FinancialInstrumentType.MUTUAL_FUND_CANADA, Map.of(h, a)));
 
     // VERIFY
     verify(merCalculationServiceMock).handleFeesForCanadaMutualHedgeFundsAndEtf(a, h, notification);
@@ -274,7 +275,7 @@ class MERCalculationServiceImplTest {
 
     doCallRealMethod().when(merCalculationServiceMock).setInitialFeeAndModifiedFeeValues(anyMap());
     // ACT
-    merCalculationServiceMock.setInitialFeeAndModifiedFeeValues(Map.of(HoldingType.US_ETF, Map.of(h, aDto)));
+    merCalculationServiceMock.setInitialFeeAndModifiedFeeValues(Map.of(FinancialInstrumentType.ETF_US, Map.of(h, aDto)));
 
     // VERIFY
     verify(merCalculationServiceMock).handleFeesForUsEtfAndMutualFund(aDto, h, notification);
@@ -300,9 +301,9 @@ class MERCalculationServiceImplTest {
     doCallRealMethod().when(m).setInitialFeeAndModifiedFeeValues(anyMap());
     // ACT
     final List<Warning> actual = m.setInitialFeeAndModifiedFeeValues(Map.of(
-        HoldingType.US_ETF, Map.of(h1, aDto1),
-        HoldingType.CANADA_ETF, Map.of(h2, aDto2),
-        HoldingType.CANADA_STOCKS, Map.of(mock(Holding.class), mock(AverageManagementExpenseCalculationDTO.class))));
+        FinancialInstrumentType.ETF_US, Map.of(h1, aDto1),
+        FinancialInstrumentType.ETF_CANADA, Map.of(h2, aDto2),
+        FinancialInstrumentType.STOCK_CANADA, Map.of(mock(Holding.class), mock(AverageManagementExpenseCalculationDTO.class))));
 
     // VERIFY
     Assertions.assertNotNull(actual);
@@ -316,7 +317,7 @@ class MERCalculationServiceImplTest {
     final Notification notification = new Notification();
 
     final AverageManagementExpenseCalculationDTO etfHoldingDto = new AverageManagementExpenseCalculationDTO();
-    etfHoldingDto.setHoldingType(HoldingType.CANADA_ETF);
+    etfHoldingDto.setHoldingType(FinancialInstrumentType.ETF_CANADA);
 
     final BigDecimal mockManagementExpenseRatio = mock(BigDecimal.class);
     etfHoldingDto.setManagementExpenseRatio(mockManagementExpenseRatio);
@@ -457,7 +458,7 @@ class MERCalculationServiceImplTest {
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
     final AverageManagementExpenseCalculationDTO etfHoldingDto = new AverageManagementExpenseCalculationDTO();
-    etfHoldingDto.setHoldingType(HoldingType.CANADA_ETF);
+    etfHoldingDto.setHoldingType(FinancialInstrumentType.ETF_CANADA);
     final BigDecimal mockActualManagementFee = mock(BigDecimal.class);
     etfHoldingDto.setActualManagementFee(mockActualManagementFee);
 
@@ -651,7 +652,7 @@ class MERCalculationServiceImplTest {
     final Notification notification = new Notification();
 
     final var holding = new Holding();
-    holding.setType(HoldingType.CANADA_HEDGE_FUNDS);
+    holding.setHoldingType(FinancialInstrumentType.HEDGE_FUND_CANADA);
     final var input = mock(AverageManagementExpenseCalculationDTO.class);
     final Optional<List<Warning>> expected = Optional.of(List.of(WRN_MER_MER_001.warning(holding), WRN_MER_AMF_001
         .warning(holding)));

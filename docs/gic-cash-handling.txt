@@ -1,0 +1,57 @@
+GIC AND CASH HANDLING IN CALCULATION ENGINE
+============================================
+
+OVERVIEW
+--------
+GIC and Cash are self-contained holding types. Unlike stocks or funds,
+they do not require external data lookups - all information comes from
+the request itself.
+
+
+GIC REQUEST FIELDS
+------------------
+  value           - Investment amount (required)
+  clientIntRate   - Annual interest rate (required)
+  term            - Term in days (required)
+  currency        - Currency, defaults to CAD
+  investmentDate  - When GIC was purchased
+  interestFreq    - How often interest compounds (Annual, Monthly, etc.)
+
+
+CASH REQUEST FIELDS
+-------------------
+  value           - Cash amount (required)
+  currency        - Currency (required if multiple cash holdings)
+  clientIntRate   - Interest rate (optional, for interest-bearing accounts)
+  investmentDate  - When cash was acquired
+  interestFreq    - How often interest compounds
+
+
+INTEREST FREQUENCY OPTIONS
+--------------------------
+Annual, Semi-Annual, Quarterly, Bi-Monthly, Monthly, Bi-Weekly, Weekly, Daily
+
+
+PROCESSING FLOW
+---------------
+1. Request received with GIC/Cash holdings
+2. Validation checks:
+   - GIC must have interest rate and term
+   - Cash must have currency if there are multiple cash holdings
+3. No external data lookup needed (self-contained)
+4. Monthly returns calculated from interest rate and compounding frequency
+5. Results returned
+
+
+CALCULATIONS
+------------
+Monthly Returns:
+  - Generated from investment date to today
+  - Based on interest rate and compounding frequency
+
+Asset Allocation (GIC only):
+  - Short-term GIC (under 1 year): classified as Cash
+  - Long-term GIC (1 year or more): classified as Fixed Income
+
+Yield:
+  - Uses the provided interest rate directly

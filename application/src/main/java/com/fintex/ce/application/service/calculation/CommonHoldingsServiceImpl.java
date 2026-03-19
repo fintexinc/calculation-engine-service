@@ -1,22 +1,18 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.google.common.base.Strings;
 import com.fintex.ce.domain.dto.CommonHoldingsDTO;
+import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.model.CommonHoldings;
 import com.fintex.ce.domain.model.HoldingAggregator;
+import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.StockHolding;
-import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.model.result.TopCommonHoldingsResult;
 import com.fintex.ce.domain.model.result.commonholdings.TopCommonHoldingData;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.service.calculation.CalculationService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.google.common.base.Strings;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +24,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import static com.fintex.ce.util.CollectorUtils.toLinkedHashMap;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
@@ -329,7 +328,12 @@ public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHo
   }
 
   boolean isLeafStock(final Holding parent, final CommonHoldingsDTO child) {
-    return parent instanceof StockHolding && child.getCompanyName() != null && child.getType().equals("E");
+    return isStockHolding(parent) && child.getCompanyName() != null && child.getType().equals("E");
+  }
+
+  private boolean isStockHolding(final Holding holding) {
+    return FinancialInstrumentType.STOCK_CANADA.equals(holding.getHoldingType())
+        || FinancialInstrumentType.STOCK_US.equals(holding.getHoldingType());
   }
 
   /**

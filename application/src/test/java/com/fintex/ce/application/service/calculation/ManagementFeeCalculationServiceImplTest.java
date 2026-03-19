@@ -5,29 +5,31 @@ import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ManagementFeeResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MF_MF_001;
-import static com.fintex.ce.domain.model.enumeration.HoldingType.CANADA_ETF;
-import static com.fintex.ce.domain.model.enumeration.HoldingType.CANADA_MUTUAL_FUNDS;
-import static com.fintex.ce.domain.model.enumeration.HoldingType.US_ETF;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
+import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.ETF_CANADA;
+import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.ETF_US;
+import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.MUTUAL_FUND_CANADA;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -122,7 +124,7 @@ class ManagementFeeCalculationServiceImplTest {
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(managementFeeFetcher));
 
-      final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
@@ -148,7 +150,7 @@ class ManagementFeeCalculationServiceImplTest {
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(managementFeeFetcher));
 
-      final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
@@ -173,7 +175,7 @@ class ManagementFeeCalculationServiceImplTest {
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(managementFeeFetcher));
 
-      final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var providers = mock(List.class);
 
@@ -198,9 +200,9 @@ class ManagementFeeCalculationServiceImplTest {
     final var sut = mock(ManagementFeeCalculationServiceImpl.class);
 
     final var calculationDtoMap = getCalculationDtoMap();
-    calculationDtoMap.get(CANADA_MUTUAL_FUNDS).forEach((key, value) -> value.setActualManagementFee(TEN));
-    calculationDtoMap.get(US_ETF).forEach((key, value) -> value.setActualManagementFee(ONE));
-    calculationDtoMap.get(CANADA_ETF).forEach((key, value) -> value.setActualManagementFee(ZERO));
+    calculationDtoMap.get(MUTUAL_FUND_CANADA).forEach((key, value) -> value.setActualManagementFee(TEN));
+    calculationDtoMap.get(ETF_US).forEach((key, value) -> value.setActualManagementFee(ONE));
+    calculationDtoMap.get(ETF_CANADA).forEach((key, value) -> value.setActualManagementFee(ZERO));
 
     doCallRealMethod().when(sut).setFeeValues(any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
@@ -209,17 +211,19 @@ class ManagementFeeCalculationServiceImplTest {
     sut.setInitialFeeAndModifiedFeeValues(calculationDtoMap);
 
     // VERIFY
-    calculationDtoMap.get(CANADA_MUTUAL_FUNDS).forEach((key, value) -> {
+    // Only FUNDS (children of FUND type) have their fees validated and set
+    calculationDtoMap.get(MUTUAL_FUND_CANADA).forEach((key, value) -> {
       assertEquals(TEN, value.getInitialFee());
       assertEquals(TEN, value.getModifiedFee());
     });
-    calculationDtoMap.get(US_ETF).forEach((key, value) -> {
-      assertEquals(ONE, value.getInitialFee());
-      assertEquals(ONE, value.getModifiedFee());
+    // ETFs are not in FUNDS group, so their fees are not processed by setInitialFeeAndModifiedFeeValues
+    calculationDtoMap.get(ETF_US).forEach((key, value) -> {
+      assertNull(value.getInitialFee());
+      assertNull(value.getModifiedFee());
     });
-    calculationDtoMap.get(CANADA_ETF).forEach((key, value) -> {
-      assertEquals(ZERO, value.getInitialFee());
-      assertEquals(ZERO, value.getModifiedFee());
+    calculationDtoMap.get(ETF_CANADA).forEach((key, value) -> {
+      assertNull(value.getInitialFee());
+      assertNull(value.getModifiedFee());
     });
   }
 
@@ -280,7 +284,7 @@ class ManagementFeeCalculationServiceImplTest {
     verify(sut).getScaledAverageMer(averageMerCalculationDtoMap);
   }
 
-  private Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> getCalculationDtoMap() {
+  private Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> getCalculationDtoMap() {
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO1 = new AverageManagementExpenseCalculationDTO();
     averageManagementExpenseCalculationDTO1.setMarketValue(new BigDecimal("10"));
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO2 = new AverageManagementExpenseCalculationDTO();
@@ -294,12 +298,12 @@ class ManagementFeeCalculationServiceImplTest {
     final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO6 = new AverageManagementExpenseCalculationDTO();
     averageManagementExpenseCalculationDTO6.setMarketValue(new BigDecimal("60"));
 
-    return Map.of(CANADA_MUTUAL_FUNDS, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO1),
-        US_ETF, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO2),
-        CANADA_ETF, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO3),
-        HoldingType.CANADA_STOCKS, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO4),
-        HoldingType.US_STOCKS, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO5),
-        HoldingType.CASH, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO6));
+    return Map.of(MUTUAL_FUND_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO1),
+        ETF_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO2),
+        ETF_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO3),
+        FinancialInstrumentType.STOCK_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO4),
+        FinancialInstrumentType.STOCK_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO5),
+        FinancialInstrumentType.CASH, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO6));
   }
 
   @Test
@@ -310,8 +314,8 @@ class ManagementFeeCalculationServiceImplTest {
     var averageCalculationDto = new AverageManagementExpenseCalculationDTO().setActualManagementFee(null);
     var expected = ERR_MF_MF_001.error(holding);
 
-    Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
-    map.put(CANADA_MUTUAL_FUNDS, Map.of(holding, averageCalculationDto));
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+    map.put(MUTUAL_FUND_CANADA, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
@@ -331,8 +335,8 @@ class ManagementFeeCalculationServiceImplTest {
     var holding = new Holding();
     var averageCalculationDto = new AverageManagementExpenseCalculationDTO().setActualManagementFee(null);
 
-    Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
-    map.put(HoldingType.US_STOCKS, Map.of(holding, averageCalculationDto));
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+    map.put(FinancialInstrumentType.STOCK_US, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
@@ -351,8 +355,8 @@ class ManagementFeeCalculationServiceImplTest {
     var holding = new Holding();
     var averageCalculationDto = new AverageManagementExpenseCalculationDTO().setActualManagementFee(TEN);
 
-    Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
-    map.put(US_ETF, Map.of(holding, averageCalculationDto));
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+    map.put(ETF_US, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());

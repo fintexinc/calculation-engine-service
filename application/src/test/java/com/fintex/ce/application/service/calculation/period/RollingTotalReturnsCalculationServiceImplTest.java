@@ -2,25 +2,24 @@ package com.fintex.ce.application.service.calculation.period;
 
 import com.fintex.ce.application.calculation.RollingTotalReturnsCalculation;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.RollingTotalReturnsResult;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.ReturnFactorScale;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import com.fintex.sm.model.domain.SecurityIdentifier;
 import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.FUNDSERV;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -40,10 +39,9 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
-    final var holding = new FundSeriesHolding();
-    holding.setFundServCode("RBF605");
+    final var holding = new Holding();
     holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
-    holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
+    holding.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     holding.setValue(BigDecimal.valueOf(50000));
 
     final var req = new RollingCalculationCommand();
@@ -71,10 +69,9 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
-    final var holding = new FundSeriesHolding();
-    holding.setFundServCode("RBF605");
+    final var holding = new Holding();
     holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
-    holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
+    holding.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     holding.setValue(BigDecimal.valueOf(50000));
 
     final var req = new RollingCalculationCommand();
@@ -100,10 +97,9 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
-    final var holding = new FundSeriesHolding();
-    holding.setFundServCode("RBF605");
+    final var holding = new Holding();
     holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
-    holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
+    holding.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     holding.setValue(BigDecimal.valueOf(50000));
 
     final var req = new RollingCalculationCommand();
@@ -200,10 +196,9 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, null));
 
-    final var holding = new FundSeriesHolding();
-    holding.setFundServCode("RBF605");
+    final var holding = new Holding();
     holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
-    holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
+    holding.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     holding.setValue(BigDecimal.valueOf(50000));
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
@@ -227,10 +222,9 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, null));
 
-    final var holding = new FundSeriesHolding();
-    holding.setFundServCode("RBF605");
+    final var holding = new Holding();
     holding.setSecurityIdentifier(new SecurityIdentifier("RBF605", FUNDSERV));
-    holding.setType(HoldingType.CANADA_MUTUAL_FUNDS);
+    holding.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     holding.setValue(BigDecimal.valueOf(50000));
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));

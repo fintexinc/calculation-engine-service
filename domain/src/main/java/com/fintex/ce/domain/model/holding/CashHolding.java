@@ -1,16 +1,15 @@
 package com.fintex.ce.domain.model.holding;
 
 import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Objects;
 
 @Data
 @ToString(callSuper = true)
@@ -26,7 +25,6 @@ public class CashHolding extends Holding implements MonthlyReturnGeneratableHold
   private LocalDate investmentDate;
   private BigDecimal clientIntRate;
   private InterestFreq interestFreq;
-  private String identifier;
 
   public InterestFreq getInterestFreq() {
     if (Objects.isNull(interestFreq)) {
@@ -42,8 +40,8 @@ public class CashHolding extends Holding implements MonthlyReturnGeneratableHold
     return investmentDate;
   }
 
-  public CashHolding(final BigDecimal amount, final HoldingType type) {
-    super(amount, type);
+  public CashHolding(final BigDecimal amount, final FinancialInstrumentType holdingType) {
+    super(amount, holdingType);
   }
 
   public boolean hasClientIntRate() {

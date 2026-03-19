@@ -1,5 +1,19 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
+import com.fintex.ce.domain.exception.ReqValidationException;
+import com.fintex.ce.domain.model.holding.CashHolding;
+import com.fintex.ce.domain.model.holding.GicHolding;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.domain.model.enumeration.Currency.USD;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_DH_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MC_002;
@@ -9,25 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.ce.domain.model.enumeration.InterestFreq;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
-import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-
 class HoldingReqValidationTest {
 
   @Test
   void check_duplicatedGicHoldingIsAllowed() {
     // GIC holdings are excluded from duplicate check
-    final GicHolding gic = new GicHolding(BigDecimal.ONE, HoldingType.GIC);
+    final GicHolding gic = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
     gic.setInvestmentDate(LocalDate.now());
     gic.setClientIntRate(BigDecimal.valueOf(100));
     gic.setCurrency(USD);
@@ -41,9 +42,9 @@ class HoldingReqValidationTest {
 
   @Test
   void check_duplicateHoldingsThrowsException() {
-    final FundSeriesHolding f = new FundSeriesHolding();
-    f.setFundServCode("F");
-    f.setType(HoldingType.CANADA_MUTUAL_FUNDS);
+    final Holding f = new Holding();
+    f.setSecurityIdentifier(new SecurityIdentifier("F", FiIdentifierType.FUNDSERV));
+    f.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     f.setValue(BigDecimal.ONE);
 
     final List<Holding> holdings = List.of(f, f);
@@ -59,11 +60,11 @@ class HoldingReqValidationTest {
   @Test
   void check_multipleCashHoldingsWithoutCurrencyThrowsException() {
     final CashHolding cashWithoutCurrency = new CashHolding();
-    cashWithoutCurrency.setType(HoldingType.CASH);
+    cashWithoutCurrency.setHoldingType(FinancialInstrumentType.CASH);
     cashWithoutCurrency.setValue(BigDecimal.ONE);
 
     final CashHolding cashWithCurrency = new CashHolding();
-    cashWithCurrency.setType(HoldingType.CASH);
+    cashWithCurrency.setHoldingType(FinancialInstrumentType.CASH);
     cashWithCurrency.setValue(BigDecimal.ONE);
     cashWithCurrency.setCurrency(Currency.CAD);
 
@@ -80,7 +81,7 @@ class HoldingReqValidationTest {
   @Test
   void check_singleCashHoldingWithoutCurrencyIsAllowed() {
     final CashHolding cashWithoutCurrency = new CashHolding();
-    cashWithoutCurrency.setType(HoldingType.CASH);
+    cashWithoutCurrency.setHoldingType(FinancialInstrumentType.CASH);
     cashWithoutCurrency.setValue(BigDecimal.ONE);
 
     final List<Holding> holdings = List.of(cashWithoutCurrency);
@@ -93,7 +94,7 @@ class HoldingReqValidationTest {
   void check_gicWithValidInvestmentDatePasses() {
     final GicHolding gic = mock(GicHolding.class);
     when(gic.getInvestmentDate()).thenReturn(LocalDate.now());
-    when(gic.getType()).thenReturn(HoldingType.GIC);
+    when(gic.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
 
     final List<Holding> holdings = List.of(gic);
     final var sut = new HoldingReqValidation(holdings);
@@ -105,7 +106,7 @@ class HoldingReqValidationTest {
   void check_gicWithVeryOldInvestmentDateThrowsException() {
     final GicHolding gic = mock(GicHolding.class);
     when(gic.getInvestmentDate()).thenReturn(LocalDate.of(1523, 6, 1));
-    when(gic.getType()).thenReturn(HoldingType.GIC);
+    when(gic.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
 
     final List<Holding> holdings = List.of(gic);
     final var sut = new HoldingReqValidation(holdings);

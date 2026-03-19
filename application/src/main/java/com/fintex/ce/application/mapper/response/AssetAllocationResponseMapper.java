@@ -1,31 +1,30 @@
 package com.fintex.ce.application.mapper.response;
 
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
-import com.fintex.ce.domain.model.AssetAllocation;
+import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationResult;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.mapper.ResponseMapper;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 
 @Component
-public class AssetAllocationResponseMapper implements ResponseMapper<AssetAllocation, AssetAllocationResult> {
+public class AssetAllocationResponseMapper implements ResponseMapper<HoldingAssetAllocation, AssetAllocationResult> {
 
   @Override
-  public AssetAllocationResult toResponse(AssetAllocation domain) {
-    if (domain == null || domain.getAssetAllocation() == null) {
+  public AssetAllocationResult toResponse(HoldingAssetAllocation domain) {
+    if (domain == null || domain.getAllocations() == null) {
       return new AssetAllocationResult();
     }
     // Domain model uses String keys - convert to enum first
-    Map<AssetAllocationRegion, BigDecimal> enumMap = convertToEnumMap(domain.getAssetAllocation());
+    Map<AssetAllocationRegion, BigDecimal> enumMap = convertToEnumMap(domain.getAllocations());
     Map<AssetAllocationRegionType, BigDecimal> result = calculateAssetAllocationResponse(enumMap);
     AssetAllocationResult assetAllocationResult = new AssetAllocationResult();
     assetAllocationResult.setAssetAllocation(toUserScale(result));
@@ -50,9 +49,9 @@ public class AssetAllocationResponseMapper implements ResponseMapper<AssetAlloca
   }
 
   @Override
-  public AssetAllocationResult toResponse(Map<Holding, AssetAllocation> domainMap, List<Warning> warnings) {
+  public AssetAllocationResult toResponse(Map<Holding, HoldingAssetAllocation> domainMap, List<Warning> warnings) {
     // This method would need aggregation logic - delegate to service for now
-    throw new UnsupportedOperationException("Use service-level aggregation for AssetAllocation");
+    throw new UnsupportedOperationException("Use service-level aggregation for HoldingAssetAllocation");
   }
 
   /**

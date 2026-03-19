@@ -1,15 +1,15 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.ClassificationAllocation;
+import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.result.ClassificationAllocationResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -38,7 +38,7 @@ public class ClassificationAllocationCalculationServiceImpl
 
   static final Map<ClassificationAllocationType, BigDecimal> ALLOCATION_DEFAULT_MAP;
 
-  static final Map<HoldingType, ClassificationAllocationType> UNCLASSIFIED_MAP;
+  static final Map<FinancialInstrumentType, ClassificationAllocationType> UNCLASSIFIED_MAP;
 
   static {
     Stream.of(ClassificationAllocationType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
@@ -47,13 +47,13 @@ public class ClassificationAllocationCalculationServiceImpl
         Stream.of(ClassificationAllocationType.values()).collect(toMap(type -> type, type -> ZERO)));
 
     UNCLASSIFIED_MAP = Map.of(
-        HoldingType.CANADA_MUTUAL_FUNDS, ClassificationAllocationType.UNCLASSIFIED__CANADA,
-        HoldingType.CANADA_ETF, ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED,
-        HoldingType.US_ETF, ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED,
-        HoldingType.US_MUTUAL_FUNDS, ClassificationAllocationType.UNCLASSIFIED__US,
-        HoldingType.CANADA_STOCKS, ClassificationAllocationType.EQUITY__UNCLASSIFIED,
-        HoldingType.US_STOCKS, ClassificationAllocationType.EQUITY__UNCLASSIFIED,
-        HoldingType.FIXED_INCOME, ClassificationAllocationType.FIXED_INCOME__UNCLASSIFIED);
+        FinancialInstrumentType.MUTUAL_FUND_CANADA, ClassificationAllocationType.UNCLASSIFIED__CANADA,
+        FinancialInstrumentType.ETF_CANADA, ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED,
+        FinancialInstrumentType.ETF_US, ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED,
+        FinancialInstrumentType.MUTUAL_FUND_US, ClassificationAllocationType.UNCLASSIFIED__US,
+        FinancialInstrumentType.STOCK_CANADA, ClassificationAllocationType.EQUITY__UNCLASSIFIED,
+        FinancialInstrumentType.STOCK_US, ClassificationAllocationType.EQUITY__UNCLASSIFIED,
+        FinancialInstrumentType.FIXED_INCOME, ClassificationAllocationType.FIXED_INCOME__UNCLASSIFIED);
   }
 
   private final SecurityDataFetcher<ClassificationAllocation> classificationAllocationSecurityDataFetcher;
@@ -103,7 +103,7 @@ public class ClassificationAllocationCalculationServiceImpl
       Map<ClassificationAllocationType, BigDecimal> map = new EnumMap<>(ALLOCATION_DEFAULT_MAP);
 
       if (Objects.isNull(allocation) || CollectionUtils.isEmpty(allocation.getSecurityClassificationValues())) {
-        Optional.ofNullable(holding.getType())
+        Optional.ofNullable(holding.getHoldingType())
             .map(UNCLASSIFIED_MAP::get)
             .ifPresentOrElse(type -> map.put(type, BigDecimal.ONE),
                 () -> warnings.add(WRN_CA_CA_001.warning(holding)));

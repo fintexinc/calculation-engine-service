@@ -2,10 +2,9 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -95,17 +95,17 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final var fixedIncomeFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final FundSeriesHolding fundSeriesHolding = mock(FundSeriesHolding.class);
+      final Holding fundSeriesHolding = mock(Holding.class);
 
       final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
           .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
       final var exposures = mock(Map.class);
 
-      final AssetAllocation assetAllocation = mock(AssetAllocation.class);
+      final HoldingAssetAllocation assetAllocation = mock(HoldingAssetAllocation.class);
       Mockito.when(assetAllocationFetcher.fetch(any(), any()))
           .thenReturn(Map.of(fundSeriesHolding, assetAllocation));
-      Mockito.when(assetAllocationDataMapper.mapFromRaw(any(), any()))
+      Mockito.when(assetAllocationDataMapper.toRegionExposures(any()))
           .thenReturn(Map.of(
               fundSeriesHolding,
               Map.of(

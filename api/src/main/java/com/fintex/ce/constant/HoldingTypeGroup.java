@@ -1,18 +1,14 @@
 package com.fintex.ce.constant;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-
-import java.util.EnumSet;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 
+import static com.fintex.ce.util.FinancialInstrumentTypeUtils.getChildren;
+
+@UtilityClass
 public class HoldingTypeGroup {
 
-  public static final Set<HoldingType> FUNDS = EnumSet.of(HoldingType.CANADA_MUTUAL_FUNDS, HoldingType.US_ETF,
-      HoldingType.CANADA_ETF, HoldingType.SEGREGATED_FUND_CANADA, HoldingType.CANADA_HEDGE_FUNDS,
-      HoldingType.US_MUTUAL_FUNDS);
-  public static final Set<HoldingType> EQUITIES = EnumSet.of(HoldingType.CANADA_STOCKS, HoldingType.US_STOCKS);
-
-  private HoldingTypeGroup() {
-  }
+  public static final Set<FinancialInstrumentType> FUNDS = getChildren(FinancialInstrumentType.FUND);
 
 }

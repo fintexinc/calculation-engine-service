@@ -4,8 +4,8 @@ import com.fintex.ce.application.calculation.FixedIncomeBondSectorCalculation;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.core.Warning;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
 import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
@@ -45,12 +46,12 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   }
 
   private final SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSectorSecurityDataFetcher;
-  private final SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher;
+  private final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
 
   public FixedIncomeBondSectorCalculationServiceImpl(
       SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSectorSecurityDataFetcher,
-      SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher,
+      SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher,
       AssetAllocationDataMapper assetAllocationDataMapper) {
     super();
     this.fixedIncomeBondSectorSecurityDataFetcher = fixedIncomeBondSectorSecurityDataFetcher;
@@ -88,9 +89,9 @@ public class FixedIncomeBondSectorCalculationServiceImpl
 
   private Map<Holding, BigDecimal> getFixedIncomePlusCash(final List<Holding> holdings,
       final List<Warning> warnings) {
-    final Map<Holding, AssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
+    final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         holdings, List.of(MORNINGSTAR, EAGLE));
-    var assetAllocations = assetAllocationDataMapper.mapFromRaw(rawData, holdings);
+    var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
     return assetAllocations.entrySet()
         .stream()
         .collect(toMap(Map.Entry::getKey, this::getFixedIncomePlusCashValue));

@@ -1,25 +1,21 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
 import com.fintex.ce.constant.GeneralConstants;
-import com.fintex.ce.domain.model.enumeration.HoldingType;
-import com.fintex.ce.domain.model.enumeration.InterestFreq;
-import com.fintex.ce.domain.model.Income;
 import com.fintex.ce.domain.dto.IncomeForecastDto;
+import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
+import com.fintex.ce.domain.model.Income;
+import com.fintex.ce.domain.model.IncomeForecast;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
 import com.fintex.ce.domain.model.result.IncomeForecastResult;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.IncomeForecast;
 import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.service.calculation.CalculationService;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.MonthDay;
@@ -36,6 +32,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 public class IncomeForecastCalculationServiceImpl
@@ -85,7 +84,7 @@ public class IncomeForecastCalculationServiceImpl
   private IncomeForecastDto getIncomeForecastDto(final Integer terms,
       final Map.Entry<Holding, IncomeForecast> entry) {
     final Holding holding = entry.getKey();
-    return Objects.equals(holding.getType(), HoldingType.GIC)
+    return Objects.equals(holding.getHoldingType(), FinancialInstrumentType.GIC)
         ? getGicIncomeForecast(holding)
         : getIncomeForecast(terms, entry.getValue(), holding);
   }
@@ -134,7 +133,7 @@ public class IncomeForecastCalculationServiceImpl
 
   private boolean isFixedIncomeAtMaturityType(final IncomeForecast rIncomeForecast,
       final Holding holding) {
-    return Objects.equals(holding.getType(), HoldingType.FIXED_INCOME) &&
+    return Objects.equals(holding.getHoldingType(), FinancialInstrumentType.FIXED_INCOME) &&
         Objects.isNull(rIncomeForecast.getSchedule()) &&
         ObjectUtils.allNotNull(rIncomeForecast.getDividendYield(), rIncomeForecast.getPaymentFrequencyType(),
             rIncomeForecast.getMaturityDate(), rIncomeForecast.getIssueDate()) &&
@@ -142,7 +141,7 @@ public class IncomeForecastCalculationServiceImpl
   }
 
   private static IncomeForecastDto getIncomeForecastDto(final Holding holding) {
-    final String holdingType = holding.getType().name();
+    final String holdingType = holding.getHoldingType().name();
     final String securityIdentifierType = holding.getSecurityIdentifier().getIdType().name();
 
     final IncomeForecastDto incomeForecastDto = IncomeForecastDto.builder()
@@ -160,7 +159,7 @@ public class IncomeForecastCalculationServiceImpl
     final List<Income> incomeDtos = getGicIncomes(investmentDate, gicHolding);
 
     return IncomeForecastDto.builder()
-        .type(gicHolding.getType().toString())
+        .type(gicHolding.getHoldingType().toString())
         .holdingIdentifier(gicHolding.getName())
         .income(incomeDtos)
         .build();

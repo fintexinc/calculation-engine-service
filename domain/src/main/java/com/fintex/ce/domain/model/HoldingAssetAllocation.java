@@ -1,7 +1,7 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.core.ProviderAware;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,18 +11,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * @deprecated Use domain models (AssetAllocationDto) with FinancialInstrumentType instead
- */
-@Deprecated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class AssetAllocation implements ProviderAware {
+public class HoldingAssetAllocation implements ProviderAware {
 
-  private HoldingType holdingType;
-  private Map<String, BigDecimal> assetAllocation;
+  private FinancialInstrumentType holdingType;
+  private Map<String, BigDecimal> allocations;
 
   // Common fields
   private String holdingId;
@@ -30,9 +26,9 @@ public class AssetAllocation implements ProviderAware {
   private String providers;
   private List<ValidationError> errors = new ArrayList<>();
 
-  public AssetAllocation(HoldingType holdingType, Map<String, BigDecimal> assetAllocation) {
+  public HoldingAssetAllocation(FinancialInstrumentType holdingType, Map<String, BigDecimal> allocations) {
     this.holdingType = holdingType;
-    this.assetAllocation = assetAllocation;
+    this.allocations = allocations;
   }
 
   public boolean hasErrors() {

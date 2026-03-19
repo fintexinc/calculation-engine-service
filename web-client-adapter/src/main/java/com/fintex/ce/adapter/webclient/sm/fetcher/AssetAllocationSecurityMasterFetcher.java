@@ -4,8 +4,7 @@ import com.fintex.ce.adapter.webclient.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.mapper.AssetAllocationSecurityMasterMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.dto.AssetAllocationDto;
-import com.fintex.sm.model.domain.allocation.AssetAllocation;
+import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(name = "external-services.security-master.api-type", havingValue = "rest", matchIfMissing = true)
 public class AssetAllocationSecurityMasterFetcher
-    extends AbstractSecurityMasterFetcher<AssetAllocationDto, AssetAllocation> {
+    extends AbstractSecurityMasterFetcher<HoldingAssetAllocation, com.fintex.sm.model.domain.allocation.AssetAllocation> {
 
   private final String endpointPath;
   private final AssetAllocationSecurityMasterMapper mapper;
@@ -39,12 +38,12 @@ public class AssetAllocationSecurityMasterFetcher
   }
 
   @Override
-  protected ParameterizedTypeReference<List<SecurityAttributeResult<AssetAllocation>>> responseType() {
+  protected ParameterizedTypeReference<List<SecurityAttributeResult<com.fintex.sm.model.domain.allocation.AssetAllocation>>> responseType() {
     return new ParameterizedTypeReference<>() {};
   }
 
   @Override
-  protected SecurityMasterResponseMapper<AssetAllocationDto, AssetAllocation> responseMapper() {
+  protected SecurityMasterResponseMapper<HoldingAssetAllocation, com.fintex.sm.model.domain.allocation.AssetAllocation> responseMapper() {
     return mapper;
   }
 }

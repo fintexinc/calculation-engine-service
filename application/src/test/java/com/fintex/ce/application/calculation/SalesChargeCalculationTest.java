@@ -1,21 +1,27 @@
 package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.domain.model.calculation.SalesCharge;
-import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.SalesChargeResult;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.SalesChargeType;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.application.calculation.SalesChargeCalculation.DEFAULT_MAP;
 import static com.fintex.ce.application.calculation.SalesChargeCalculation.DEFAULT_SALES_CHARGE_DTO;
-import static com.fintex.sm.model.domain.enumeration.SalesChargeType.*;
+import static com.fintex.sm.model.domain.enumeration.SalesChargeType.DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT;
+import static com.fintex.sm.model.domain.enumeration.SalesChargeType.DEFERRED_SALES_CHARGE_ON_MARKET_VALUE;
+import static com.fintex.sm.model.domain.enumeration.SalesChargeType.FORMULA_ONE;
+import static com.fintex.sm.model.domain.enumeration.SalesChargeType.FRONT_END_CHARGE;
+import static com.fintex.sm.model.domain.enumeration.SalesChargeType.LOW_SALES_CHARGE;
+import static com.fintex.sm.model.domain.enumeration.SalesChargeType.VOLUME_SALES_CHARGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SalesChargeCalculationTest {
@@ -40,9 +46,9 @@ class SalesChargeCalculationTest {
   @Test
   void shouldCalculateWeightsPerType_whenEachTypeContainsOneHolding() {
     final Map<Holding, com.fintex.ce.domain.model.SalesCharge> dataFromFds = new HashMap<>();
-    final FundSeriesHolding holding1 = getFundSeriesHolding("RBF605", 10_000);
-    final FundSeriesHolding holding2 = getFundSeriesHolding("RBF606", 20_000);
-    final FundSeriesHolding holding3 = getFundSeriesHolding("RBF607", 70_000);
+    final Holding holding1 = createHolding("RBF605", 10_000);
+    final Holding holding2 = createHolding("RBF606", 20_000);
+    final Holding holding3 = createHolding("RBF607", 70_000);
     dataFromFds.put(holding1, new com.fintex.ce.domain.model.SalesCharge(DEFERRED_SALES_CHARGE_ON_MARKET_VALUE.name(),
         null, null, null, null));
     dataFromFds.put(holding2, new com.fintex.ce.domain.model.SalesCharge(FRONT_END_CHARGE.name(), null, null, null,
@@ -52,9 +58,9 @@ class SalesChargeCalculationTest {
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf605 = new SalesChargeResult.SalesChargeHoldingEntry("RBF605", scaled(0.10));
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("RBF606", scaled(0.20));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("RBF607", scaled(0.70));
+    final var rbf605 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF605", scaled(0.10));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.20));
+    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", scaled(0.70));
 
     final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.10), BigDecimal.valueOf(10_000), Set
         .of(rbf605));
@@ -72,19 +78,19 @@ class SalesChargeCalculationTest {
     assertEquals(expected, actual);
   }
 
-  private FundSeriesHolding getFundSeriesHolding(final String fundServCode, final int value) {
-    final FundSeriesHolding holding = new FundSeriesHolding();
-    holding.setFundServCode(fundServCode);
-    holding.setValue(BigDecimal.valueOf(value));
-    return holding;
+  private Holding createHolding(final String fundServCode, final int value) {
+    return new Holding()
+        .setSecurityIdentifier(new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV))
+        .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .setValue(BigDecimal.valueOf(value));
   }
 
   @Test
   void shouldCalculateWeights_whenTwoTypesContainOneHoldingEach() {
 
     final Map<Holding, com.fintex.ce.domain.model.SalesCharge> dataFromFds = new HashMap<>();
-    final FundSeriesHolding holding2 = getFundSeriesHolding("RBF606", 51_000);
-    final FundSeriesHolding holding3 = getFundSeriesHolding("RBF607", 49_000);
+    final Holding holding2 = createHolding("RBF606", 51_000);
+    final Holding holding3 = createHolding("RBF607", 49_000);
     dataFromFds.put(holding2, new com.fintex.ce.domain.model.SalesCharge(VOLUME_SALES_CHARGE.name(), null, null, null,
         null));
     dataFromFds.put(holding3, new com.fintex.ce.domain.model.SalesCharge(DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT.name(),
@@ -92,8 +98,8 @@ class SalesChargeCalculationTest {
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("RBF606", scaled(0.51));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("RBF607", scaled(0.49));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.51));
+    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", scaled(0.49));
 
     final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.51), BigDecimal.valueOf(51_000), Set
         .of(rbf606));
@@ -121,12 +127,12 @@ class SalesChargeCalculationTest {
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("RBF606", scaled(0.10));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("RBF607", scaled(0.15));
-    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("RBF608", scaled(0.17));
-    final var rbf609 = new SalesChargeResult.SalesChargeHoldingEntry("RBF609", scaled(0.13));
-    final var rbf610 = new SalesChargeResult.SalesChargeHoldingEntry("RBF610", scaled(0.25));
-    final var rbf611 = new SalesChargeResult.SalesChargeHoldingEntry("RBF611", scaled(0.20));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.10));
+    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", scaled(0.15));
+    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF608", scaled(0.17));
+    final var rbf609 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF609", scaled(0.13));
+    final var rbf610 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF610", scaled(0.25));
+    final var rbf611 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF611", scaled(0.20));
 
     final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.42), BigDecimal.valueOf(42_000), Set
         .of(rbf606, rbf607, rbf608));
@@ -166,9 +172,9 @@ class SalesChargeCalculationTest {
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("RBF606", BigDecimal.valueOf(0.3333333333));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("RBF607", BigDecimal.valueOf(0.3333333333));
-    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("RBF608", BigDecimal.valueOf(0.3333333333));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", BigDecimal.valueOf(0.3333333333));
+    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", BigDecimal.valueOf(0.3333333333));
+    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF608", BigDecimal.valueOf(0.3333333333));
 
     final var s1 = new SalesChargeResult.SalesChargeEntry(BigDecimal.valueOf(1), BigDecimal.valueOf(150_000), Set.of(
         rbf606, rbf607, rbf608));
@@ -188,7 +194,7 @@ class SalesChargeCalculationTest {
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 150_000, FRONT_END_CHARGE);
 
     final var sut = new SalesChargeCalculation(dataFromFds);
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("RBF606", BigDecimal.valueOf(1));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", BigDecimal.valueOf(1));
 
     final var s1 = new SalesChargeResult.SalesChargeEntry(BigDecimal.valueOf(1), BigDecimal.valueOf(150_000), Set.of(
         rbf606));
@@ -206,9 +212,10 @@ class SalesChargeCalculationTest {
       final String fundServCode,
       final int value,
       final SalesChargeType frontEndCharge) {
-    final FundSeriesHolding holding = new FundSeriesHolding();
-    holding.setFundServCode(fundServCode);
-    holding.setValue(BigDecimal.valueOf(value));
+    final Holding holding = new Holding()
+        .setSecurityIdentifier(new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV))
+        .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .setValue(BigDecimal.valueOf(value));
 
     dataFromFds.put(holding, new com.fintex.ce.domain.model.SalesCharge(frontEndCharge.name(), null, null, null, null));
   }
