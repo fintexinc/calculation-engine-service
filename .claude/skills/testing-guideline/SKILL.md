@@ -23,7 +23,7 @@ Follow these rules strictly.
 Is it pure domain/application logic without external dependencies?
   → UNIT TEST (mock collaborators, many assertions)
 
-Does it test a single adapter (DB, cache, HTTP client)?
+Does it test a single adapter (HTTP client)?
   → INTEGRATION TEST in that adapter module (@Tag("integration"))
 
 Does it test the full application through HTTP boundary?
@@ -38,7 +38,7 @@ Does it test the full application through HTTP boundary?
 
 ### WireMock for External Services (Integration Tests)
 
-When mocking external HTTP services (GraphQL, REST APIs):
+When mocking external HTTP services (REST APIs):
 
 1. **Build test data in Java** using DTOs with **real-world realistic values**
 2. **Serialize to JSON** using ObjectMapper (same config as production)
@@ -71,7 +71,7 @@ willReturn(okJson(json)));
 | Mocks allowed   | ✅ Yes      | ❌ No                  | ❌ No           |
 | @MockBean       | ❌ Never    | ❌ Never               | ❌ Never        |
 | WireMock        | ❌ No       | ✅ Yes (external HTTP) | ✅ Yes          |
-| TestContainers  | ❌ No       | ✅ Yes (DB, Redis)     | ✅ Yes          |
+| TestContainers  | ❌ No       | ❌ No                  | ❌ No           |
 | Many assertions | ✅ Required | Nice-to-have          | Nice-to-have   |
 | Tag             | None       | `@Tag("integration")` | `@Tag("e2e")`  |
 | Location        | Any module | Adapter module        | Bootstrap only |
@@ -131,7 +131,21 @@ Where it's possible you can combine hierarchical test classes with implementatio
 
 **Do NOT duplicate near-identical tests or tests with the same pattern (boilerplate).** it is a key rule.
 
-### 1.5 Libraries and style
+### 1.5 Use `@Accessors(chain = true)` for test data setup
+
+When building Result/Command objects in tests, use fluent setters via `@Accessors(chain = true)`. These classes already
+have this annotation — use the chaining style for cleaner test data construction.
+
+```java
+var result = new CalculationResult()
+    .setValue(BigDecimal.TEN)
+    .setCurrency("USD");
+```
+
+**Gotcha:** Lombok `@Accessors(chain = true)` on a parent class generates setters returning the parent type, which
+breaks fluent chains in subclasses. If you encounter this, apply `@Accessors(chain = true)` on each class individually.
+
+### 1.6 Libraries and style
 
 - JUnit 5 only.
 - Prefer AssertJ assertions (`assertThat(...)`) for readability.
@@ -155,26 +169,21 @@ Unit tests MUST NOT depend on:
 - database
 - filesystem
 
-### 2.2 Integration tests must be in the corresponding adapter modules (e.g. repository integration tests in jpa-adapter, cache tests in cache-adapter). Cross-module integration tests that require full Spring context live in the bootstrap module.
+### 2.2 Integration tests must be in the corresponding adapter modules (e.g. HTTP client tests in web-client-adapter). Cross-module integration tests that require full Spring context live in the bootstrap module.
 
 Integration tests should cover:
 
-- adapters wiring (persistence, messaging, HTTP clients)
+- adapters wiring (HTTP clients)
 - Spring configuration
-- repository implementations
-- database integrations
-- transactional boundaries
-
-If integration tests need external services e.g. database or SFTP, they must create test containers for them.
+- WireMock for external REST APIs
 
 ### 2.3 E2E tests: bootstrap module only (mandatory)
 
 E2E tests MUST live in the `bootstrap` module and cover:
 
-- application running with HTTP endpoints (or messaging entrypoints)
-- real database
-- real external dependency containers when applicable
-- test flows through the system boundary (API in → DB/out)
+- application running with HTTP endpoints
+- WireMock for external REST APIs (Security Master)
+- test flows through the system boundary (REST API in → response out)
 
 ---
 
@@ -194,7 +203,7 @@ E2E tests MUST live in the `bootstrap` module and cover:
 
 - Integration tests MUST NOT use mocks.
 - No `@MockBean`, no Mockito stubs, no fake adapters.
-- Use real beans + real persistence + real containers.
+- Use real beans + WireMock for external HTTP services.
 
 ### 3.3 E2E tests
 
@@ -235,7 +244,6 @@ Unit tests should typically have no tag (default).
 ### 5.2 Integration tests (Spring context)
 
 - Use `@SpringBootTest` (bootstrap module) when verifying real wiring.
-- Use `@Transactional` where appropriate for cleanup; otherwise ensure cleanup per test.
 
 ### 5.3 E2E tests (HTTP boundary)
 
@@ -271,8 +279,7 @@ Unit tests should assert:
 Integration tests should validate:
 
 - correct wiring of adapters
-- persistence correctness (schema + queries + mappings)
-- transactional behavior
+- HTTP client behavior with WireMock
 
 Assertions should focus on:
 
@@ -286,7 +293,6 @@ E2E tests should validate:
 - external API contract (status codes, payload shape)
 - the main user/system flows
 - basic resilience (idempotency where relevant)
-- real persistence effects
 
 Keep e2e suite smaller than integration suite; keep integration suite smaller than unit suite.
 
@@ -331,11 +337,11 @@ Keep e2e suite smaller than integration suite; keep integration suite smaller th
 ## 9) Execution notes
 
 - Unit tests must be fast and run on every local iteration.
-- Integration tests may be slower (containers). Still aim to keep them deterministic.
+- Integration tests may be slower (WireMock). Still aim to keep them deterministic.
 - E2E tests are the slowest; keep them focused on critical flows.
 
 Always run the appropriate subset locally before finishing a change:
 
 - unit tests for touched logic
-- integration tests for adapter/db changes
+- integration tests for adapter changes
 - e2e tests for boundary changes

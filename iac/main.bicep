@@ -119,7 +119,7 @@ var baseEnvVars = [
     value: '-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC'
   }
   {
-    name: 'SECURITY_MASTER_SERVICE_URL'
+    name: 'SM_REST_BASE_URL'
     value: securityMasterServiceUrl
   }
 ]

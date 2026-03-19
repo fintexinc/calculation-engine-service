@@ -99,7 +99,7 @@ public abstract class AbstractEndpoint<T> {
 
 ### External Service Calls (Security Master)
 
-This service fetches data from Security Master (SM) via REST/GraphQL. All external calls must:
+This service fetches data from Security Master (SM) via REST. All external calls must:
 
 1. **Never call SM in loops (N+1 problem)**
    ```java
@@ -119,6 +119,30 @@ This service fetches data from Security Master (SM) via REST/GraphQL. All extern
    ```
 
 3. **Configuration in application.yaml** - no hardcoded timeouts, URLs, or retry counts in code
+
+### Use `@Accessors(chain = true)` on Result/Command Classes
+
+All Result and Command DTOs must use `@Accessors(chain = true)` for fluent setters. This enables method chaining for
+cleaner object construction.
+
+```java
+// ✅ Good
+@Data
+@Accessors(chain = true)
+public class CalculationResult {
+    private BigDecimal value;
+    private String currency;
+}
+
+// Usage:
+new CalculationResult()
+    .setValue(BigDecimal.TEN)
+    .setCurrency("USD");
+```
+
+**Gotcha:** Lombok `@Accessors(chain = true)` on a parent class generates setters that return the parent type. This
+breaks fluent chains in subclasses. If you have a class hierarchy, apply `@Accessors(chain = true)` on each class
+individually.
 
 ### Extract Constants and Utilities
 
@@ -166,10 +190,7 @@ void shouldCalculateReturns_whenSecurityDataExists() { ... }
 void shouldThrowException_whenSecurityNotFound() { ... }
 
 @Test
-void shouldReturnCachedData_whenCacheHit() { ... }
-
-@Test
-void shouldFetchFromSM_whenCacheMiss() { ... }
+void shouldFetchFromSM_whenSecurityIdIsValid() { ... }
 ```
 
 ### Avoid Duplicate Tests
@@ -229,7 +250,7 @@ refs: CE-123
 ```
 
 ```
-fix(graphql-adapter): add circuit breaker to SM endpoint
+fix(web-client): add circuit breaker to SM endpoint
 
 Added Resilience4j annotations to prevent cascading failures
 when Security Master is unavailable.
@@ -370,15 +391,14 @@ mvn test
 
 ### Module Structure (Hexagonal Architecture)
 
-| Module                   | Purpose                                    |
-|--------------------------|--------------------------------------------|
-| `domain`                 | Business logic, calculations (no Spring)   |
-| `application`            | Use cases, orchestration (uses ports only) |
-| `api`                    | Port interfaces                            |
-| `rest-adapter`           | REST API endpoints                         |
-| `graphql-client-adapter` | Security Master GraphQL client             |
-| `cache-adapter`          | Redis caching                              |
-| `bootstrap`              | Application startup, wiring                |
+| Module               | Purpose                                                                       | Spring allowed? |
+|----------------------|-------------------------------------------------------------------------------|-----------------|
+| `domain`             | Pure domain models & calculations                                             | No              |
+| `api`                | Port interfaces (input/output) + shared DTOs                                  | No              |
+| `application`        | Use cases, orchestration (uses ports only)                                    | Minimal         |
+| `rest-adapter`       | Exposes REST API to consumers (driving adapter)                               | Yes             |
+| `web-client-adapter` | Retrieves data from Security Master via REST (partly implemented, many stubs) | Yes             |
+| `bootstrap`          | Spring Boot entry point, wiring, bean configs                                 | Yes             |
 
 **Architecture rules:**
 

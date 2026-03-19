@@ -10,8 +10,8 @@ description: >
 
 # Code Review Guidelines
 
-Calculation engine service: fetches data from Security Master (SM) via GraphQL, caches in Redis, performs financial
-calculations. **No database.**
+Calculation engine service: fetches data from Security Master (SM) via REST, performs financial
+calculations. **No database, no cache, no GraphQL.**
 
 ---
 
@@ -109,13 +109,6 @@ private static final String SM_URL = "http://sm-service/api";
 // GOOD - use @ConfigurationProperties or @Value
 ```
 
-### Cache Issues
-
-- Missing cache-aside pattern (not checking cache before SM call)
-- No TTL configured
-- Cache key collisions (non-unique keys)
-- No graceful degradation when Redis is down
-
 ### Missing Fallback
 
 External service calls without fallback method for when SM is unavailable.
@@ -148,20 +141,15 @@ External service calls without fallback method for when SM is unavailable.
 - [ ] Commands/DTOs are immutable
 - [ ] Proper validation before domain operations
 
-### GraphQL Client Adapter
+### Web Client Adapter
 
+- [ ] New fetchers extend `AbstractSecurityMasterFetcher` (not creating standalone implementations)
 - [ ] Resilience4j annotations present (CircuitBreaker, Retry, Bulkhead)
 - [ ] Fallback methods implemented
 - [ ] Errors translated to domain exceptions
-- [ ] No duplicate code across endpoint classes
+- [ ] No duplicate code across fetcher classes
 - [ ] Batch methods available (no N+1)
-
-### Cache Adapter
-
-- [ ] Cache-aside pattern used
-- [ ] TTL configured
-- [ ] Graceful degradation if Redis unavailable
-- [ ] Extends `MultipleCacheStorageAbstract`
+- [ ] Stubs removed when real fetcher is implemented
 
 ### REST Adapter
 
@@ -195,7 +183,7 @@ External service calls without fallback method for when SM is unavailable.
 ## Key Questions During Review
 
 1. **Can these classes be abstracted?** → Look for duplicate code across similar classes
-2. **Is there a hierarchy?** → Securities, endpoints, cache storages should have abstract parents
+2. **Is there a hierarchy?** → Securities, SM fetchers should have abstract parents
 3. **N+1 calls?** → Any SM fetch inside a loop?
 4. **Resilience?** → CircuitBreaker, Retry, Bulkhead on external calls?
 5. **Layer violations?** → Domain must be pure, adapters must not call each other
