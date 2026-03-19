@@ -1,10 +1,10 @@
 package com.fintex.ce.port.input.result.correlation;
 
 import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.*;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.sm.model.domain.SecurityIdentifier;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.Data;
@@ -21,7 +21,7 @@ import static com.fintex.ce.util.PortfolioUtils.createKey;
 public class HoldingsKeyResult {
 
   private HoldingType type;
-  private HoldingIdentifierType holdingIdentifier;
+  private SecurityIdentifier securityIdentifier;
   private String fundServCode;
   private String ticker;
   private String exchangeCode;
@@ -38,7 +38,7 @@ public class HoldingsKeyResult {
   public static HoldingsKeyResult buildFromHolding(final Holding holding, final BigDecimal allocation) {
     HoldingsKeyResult result = new HoldingsKeyResult();
     result.setType(holding.getType());
-    result.setHoldingIdentifier(holding.getHoldingIdentifier());
+    result.setSecurityIdentifier(holding.getSecurityIdentifier());
     if (FilterUtils.CANADA_MUTUAL_PREDICATE.test(holding)) {
       result.setFundServCode(((FundSeriesHolding) holding).getFundServCode());
     } else if (FilterUtils.ETF_PREDICATE.test(holding)) {

@@ -2,11 +2,11 @@ package com.fintex.ce.adapter.rest.dto.response.correlation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.*;
 import com.fintex.ce.adapter.rest.dto.response.commonholdings.ParentHoldingDTO;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.sm.model.domain.SecurityIdentifier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +26,7 @@ import static com.fintex.ce.util.PortfolioUtils.createKey;
 public class HoldingsKeyDTO {
 
   private HoldingType type;
-  private HoldingIdentifierType holdingIdentifier;
+  private SecurityIdentifier securityIdentifier;
   private String fundServCode;
   private String ticker;
   private String exchangeCode;
@@ -46,7 +46,7 @@ public class HoldingsKeyDTO {
 
   private static HoldingsKeyDTO buildDTO(final Holding holding, final HoldingsKeyDTO holdingsKeyDTO) {
     holdingsKeyDTO.setType(holding.getType());
-    holdingsKeyDTO.setHoldingIdentifier(holding.getHoldingIdentifier());
+    holdingsKeyDTO.setSecurityIdentifier(holding.getSecurityIdentifier());
     if (FilterUtils.CANADA_MUTUAL_PREDICATE.test(holding)) {
       final FundSeriesHolding fundSeriesHolding = (FundSeriesHolding) holding;
       holdingsKeyDTO.setFundServCode(fundSeriesHolding.getFundServCode());

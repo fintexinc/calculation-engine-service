@@ -1,6 +1,5 @@
 package performance.testing.payload.generator;
 
-import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -61,7 +60,6 @@ public abstract class PayloadGenerator<T> {
   private CashHolding getCashHolding() {
     final CashHolding cashHolding = new CashHolding();
     cashHolding.setType(CASH);
-    cashHolding.setHoldingIdentifier(HoldingIdentifierType.FUNDSERV);
     cashHolding.setValue(BigDecimal.valueOf(new Random().nextInt(100500)));
     return cashHolding;
   }

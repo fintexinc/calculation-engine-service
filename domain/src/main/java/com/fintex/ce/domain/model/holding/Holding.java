@@ -4,7 +4,6 @@ import static com.fintex.ce.domain.constant.ErrorMessage.NOT_NULL_MSG;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
@@ -49,9 +48,6 @@ public class Holding {
 
   @Deprecated(forRemoval = true)  // use holdingType
   private HoldingType type;
-
-  @Deprecated(forRemoval = true) // use securityIdentifier
-  private HoldingIdentifierType holdingIdentifier;
 
   @NotNull(message = NOT_NULL_MSG)
   @Valid

@@ -4,8 +4,9 @@ import api.config.constant.HoldingGroups;
 import api.excel.reader.HoldingReaderTab;
 import api.model.HoldingDataDTO;
 import api.model.HoldingsDataColumnType;
-import com.fintex.ce.domain.enumeration.HoldingIdentifierType;
 import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.google.common.base.Strings;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -32,22 +33,23 @@ public class HoldingsDataTab implements HoldingReaderTab<HoldingDataDTO> {
         break;
       }
 
+      final String trimmedHoldingCode = holdingCode.trim();
       final String holdingTypeStr = readAsString(row, convertColStringToIndex(indexMap.get(HOLDING_TYPE)));
       final HoldingType holdingType = HoldingType.valueOf(holdingTypeStr);
       final int exchangedId = convertColStringToIndex(indexMap.get(EXCHANGE_ID));
 
       final HoldingDataDTO dto = new HoldingDataDTO(
-          holdingCode.trim(),
+          trimmedHoldingCode,
           holdingType,
           readAsString(row, exchangedId));
 
       if (!HoldingGroups.CASH.contains(holdingType) && !HoldingGroups.GIC.contains(holdingType)) {
         final String identifier = readAsString(row, convertColStringToIndex(indexMap.get(HOLDING_IDENTIFIER)));
-        final HoldingIdentifierType holdingIdentifierType = HoldingIdentifierType.valueOf(identifier);
-        dto.setHoldingIdentifier(holdingIdentifierType);
+        final FiIdentifierType fiIdentifierType = FiIdentifierType.valueOf(identifier);
+        dto.setSecurityIdentifier(new SecurityIdentifier(trimmedHoldingCode, fiIdentifierType));
       }
 
-      map.put(holdingCode.trim(), dto);
+      map.put(trimmedHoldingCode, dto);
     }
     return map;
   }
