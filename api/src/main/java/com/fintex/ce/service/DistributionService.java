@@ -1,7 +1,7 @@
 package com.fintex.ce.service;
 
-import com.fintex.ce.port.input.command.DailyPerformanceCommand;
-import com.fintex.ce.port.input.result.DistributionResult;
+import com.fintex.ce.domain.dto.command.DailyPerformanceCommand;
+import com.fintex.ce.domain.model.result.DistributionResult;
 
 public interface DistributionService {
 

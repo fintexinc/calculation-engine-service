@@ -1,9 +1,9 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.CountryExposure;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.input.result.CountryExposureResult;
+import com.fintex.ce.domain.model.result.CountryExposureResult;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

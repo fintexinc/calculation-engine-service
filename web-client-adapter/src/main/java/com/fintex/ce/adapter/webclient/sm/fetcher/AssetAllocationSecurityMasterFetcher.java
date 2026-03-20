@@ -4,7 +4,7 @@ import com.fintex.ce.adapter.webclient.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.mapper.AssetAllocationSecurityMasterMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.port.output.sm.dto.AssetAllocationDto;
+import com.fintex.ce.domain.dto.AssetAllocationDto;
 import com.fintex.sm.model.domain.allocation.AssetAllocation;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;

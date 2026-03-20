@@ -1,6 +1,6 @@
 package com.fintex.ce.application.validation;
 
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 
 import java.time.LocalDate;

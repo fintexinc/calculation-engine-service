@@ -1,7 +1,7 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.domain.model.FxRates;
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
 import com.fintex.ce.application.validation.BenchmarkCpsdDataValidation;
 import com.fintex.ce.monthlyreturns.FxRatesConversionComponent;
@@ -11,12 +11,11 @@ import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.monthlyreturns.ReturnsCutComponent;
 import com.fintex.ce.monthlyreturns.WeightedAverageComponent;
-import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.model.MonthlyReturns;
-import com.fintex.ce.port.output.FxRatesPort;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.port.FxRatesFetcher;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.springframework.stereotype.Service;
 
@@ -29,14 +28,14 @@ import java.util.NavigableMap;
 @Service
 public class MonthlyReturnsService {
 
-  private final HoldingDataLoader<Map<Holding, MonthlyReturns>> monthlyReturnsCachePort;
-  private final FxRatesPort fxRatesProvider;
+  private final SecurityDataFetcher<MonthlyReturns> monthlyReturnsSecurityDataFetcher;
+  private final FxRatesFetcher fxRatesProvider;
   private final MonthlyReturnsGenerator monthlyReturnsGenerator;
 
-  public MonthlyReturnsService(HoldingDataLoader<Map<Holding, MonthlyReturns>> monthlyReturnsCachePort,
-      FxRatesPort fxRatesProvider,
+  public MonthlyReturnsService(SecurityDataFetcher<MonthlyReturns> monthlyReturnsSecurityDataFetcher,
+      FxRatesFetcher fxRatesProvider,
       MonthlyReturnsGenerator monthlyReturnsGenerator) {
-    this.monthlyReturnsCachePort = monthlyReturnsCachePort;
+    this.monthlyReturnsSecurityDataFetcher = monthlyReturnsSecurityDataFetcher;
     this.fxRatesProvider = fxRatesProvider;
     this.monthlyReturnsGenerator = monthlyReturnsGenerator;
   }
@@ -65,8 +64,7 @@ public class MonthlyReturnsService {
   }
 
   public Returns<MonthlyReturns> getMonthlyReturns(List<Holding> holdings, Currency currency) {
-    Map<Holding, MonthlyReturns> originalMonthlyReturns = monthlyReturnsCachePort.load(holdings, List.of(), List
-        .of(), new ParamHolderDTO(currency));
+    Map<Holding, MonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List.of());
     originalMonthlyReturns.putAll(monthlyReturnsGenerator.generateGicMonthlyReturns(holdings));
     return getMonthlyReturns(originalMonthlyReturns);
   }
@@ -77,8 +75,7 @@ public class MonthlyReturnsService {
 
   public Returns<MonthlyReturns> getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(List<Holding> holdings,
       Currency currency) {
-    Map<Holding, MonthlyReturns> originalMonthlyReturns = monthlyReturnsCachePort.load(holdings, List.of(), List
-        .of(), new ParamHolderDTO(currency));
+    Map<Holding, MonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List.of());
     return Returns.initOnlyWithReturnsDataValidation(originalMonthlyReturns);
   }
 
@@ -113,7 +110,7 @@ public class MonthlyReturnsService {
   }
 
   public Map<LocalDate, FxRates.FxRate> getFxRates() {
-    return fxRatesProvider.loadFxRates();
+    return fxRatesProvider.fetch();
   }
 
 }

@@ -1,23 +1,20 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.enumeration.calculation.FixedIncomeSectorType;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.AssetAllocation;
+import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.FixedIncomeSectorResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,28 +23,24 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+@SuppressWarnings("unchecked")
 class FixedIncomeBondSectorCalculationServiceImplTest {
 
   @Test
   void shouldCalculate_whenVerifyAreAllValuesZerosInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
-      final AssetAllocationCachePort assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
+      final var fixedIncomeFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final AssetAllocationDataValidator assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
 
       final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
-          .useConstructor(fixedIncomeBondSectorCacheStorage, assetAllocationCacheStorage,
-              assetAllocationDataMapper, assetAllocationDataValidator));
+          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
       final var exposures = mock(Map.class);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       sut.calculate(exposures, List.of(), List.of());
 
-      // VERIFY
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesZerosInMap(exposures));
     }
   }
@@ -55,15 +48,12 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
   @Test
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
-      final AssetAllocationCachePort assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
+      final var fixedIncomeFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final AssetAllocationDataValidator assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
 
       final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
-          .useConstructor(fixedIncomeBondSectorCacheStorage, assetAllocationCacheStorage,
-              assetAllocationDataMapper, assetAllocationDataValidator));
+          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
       final var exposures = mock(Map.class);
       final var expected = new FixedIncomeSectorResult();
@@ -73,60 +63,49 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       final var actual = sut.calculate(exposures, List.of(), List.of());
 
-      // VERIFY
       assertEquals(expected, actual);
     }
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenCheckResult() {
-    try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
-      final AssetAllocationCachePort assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final AssetAllocationDataValidator assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+  void shouldFetch_whenCheckResult() {
+    final var fixedIncomeFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
+    final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
 
-      final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
-          .useConstructor(fixedIncomeBondSectorCacheStorage, assetAllocationCacheStorage,
-              assetAllocationDataMapper, assetAllocationDataValidator));
+    final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
+        .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
-      final var holding = mock(Holding.class);
-      final var exposures = Map.of(holding, Map.of(FixedIncomeSectorType.CORPORATE_BONDS, TEN));
+    final var holding = mock(Holding.class);
+    final var rawData = new FixedIncomeBondSecurities();
+    rawData.setFixedIncomeBondSectors(Map.of("CORPORATE_BONDS", TEN));
 
-      when(fixedIncomeBondSectorCacheStorage.load(any(), any(), any(), any())).thenReturn(exposures);
-      doCallRealMethod().when(sut).fetchExposures(any(), any());
-      // ACT
-      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    when(fixedIncomeFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawData));
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), new java.util.ArrayList<>());
 
-      // VERIFY
-      assertEquals(exposures, actual);
-    }
+    assertEquals(1, actual.size());
   }
 
   @Test
   void shouldCalculate_whenVerifyResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var fixedIncomeBondSectorCacheStorage = mock(HoldingDataLoader.class);
-      final AssetAllocationCachePort assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
+      final var fixedIncomeFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final AssetAllocationDataValidator assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
       final FundSeriesHolding fundSeriesHolding = mock(FundSeriesHolding.class);
-      final AssetAllocationDataDTO assetAllocationDataDTO = mock(AssetAllocationDataDTO.class);
 
       final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
-          .useConstructor(fixedIncomeBondSectorCacheStorage, assetAllocationCacheStorage,
-              assetAllocationDataMapper, assetAllocationDataValidator));
+          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
       final var exposures = mock(Map.class);
 
-      Mockito.when(assetAllocationCacheStorage.load(any(), any(), any(), any()))
-          .thenReturn(assetAllocationDataDTO);
-      Mockito.when(assetAllocationDataMapper.mapForAA(assetAllocationDataDTO))
+      final AssetAllocation assetAllocation = mock(AssetAllocation.class);
+      Mockito.when(assetAllocationFetcher.fetch(any(), any()))
+          .thenReturn(Map.of(fundSeriesHolding, assetAllocation));
+      Mockito.when(assetAllocationDataMapper.mapFromRaw(any(), any()))
           .thenReturn(Map.of(
               fundSeriesHolding,
               Map.of(
@@ -134,10 +113,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
                   AssetAllocationRegion.CASH, BigDecimal.ONE)));
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       final FixedIncomeSectorResult result = sut.calculate(exposures, List.of(fundSeriesHolding), List.of());
 
-      // VERIFY
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesZerosInMap(exposures));
     }
   }

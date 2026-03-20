@@ -1,17 +1,17 @@
 package com.fintex.ce.adapter.rest.dto.holding;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.InterestFreq;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
-import static com.fintex.ce.domain.enumeration.Currency.USD;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
+import static com.fintex.ce.domain.model.enumeration.Currency.USD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

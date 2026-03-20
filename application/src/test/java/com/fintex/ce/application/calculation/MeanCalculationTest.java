@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.MeanCalculation;
-import com.fintex.ce.port.input.result.MeanResult;
+import com.fintex.ce.domain.model.result.MeanResult;
 import com.fintex.ce.util.CalculationUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

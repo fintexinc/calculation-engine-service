@@ -1,31 +1,34 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
-import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
-import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.model.calculation.GeographicRegionType;
+import com.fintex.ce.domain.model.EquityCountryAllocation;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.GeographicExposureResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.result.GeographicExposureResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.service.GeographicAllocationMappingService;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_EGE_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class EquityGeographicExposureCalculationServiceImpl
     extends
       BreakdownAbstractService<GeographicExposureResult, GeographicRegionType> {
 
-  private final HoldingDataLoader<Map<Holding, Map<GeographicRegionType, BigDecimal>>> geographicAllocationCacheStorage;
+  private final SecurityDataFetcher<EquityCountryAllocation> equityCountryAllocationSecurityDataFetcher;
+  private final GeographicAllocationMappingService geographicAllocationMappingService;
 
   static final Map<GeographicRegionType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
@@ -34,9 +37,11 @@ public class EquityGeographicExposureCalculationServiceImpl
   }
 
   public EquityGeographicExposureCalculationServiceImpl(
-      @Qualifier("equityGeographic") final HoldingDataLoader<Map<Holding, Map<GeographicRegionType, BigDecimal>>> geographicAllocationCacheStorage) {
+      final SecurityDataFetcher<EquityCountryAllocation> equityCountryAllocationSecurityDataFetcher,
+      final GeographicAllocationMappingService geographicAllocationMappingService) {
     super();
-    this.geographicAllocationCacheStorage = geographicAllocationCacheStorage;
+    this.equityCountryAllocationSecurityDataFetcher = equityCountryAllocationSecurityDataFetcher;
+    this.geographicAllocationMappingService = geographicAllocationMappingService;
   }
 
   @Override
@@ -62,7 +67,11 @@ public class EquityGeographicExposureCalculationServiceImpl
   public Map<Holding, Map<GeographicRegionType, BigDecimal>> fetchExposures(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    return geographicAllocationCacheStorage.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
+    Map<Holding, EquityCountryAllocation> rawData = equityCountryAllocationSecurityDataFetcher.fetch(
+        reqDTO.getHoldings(), List.of());
+    Map<Holding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
+    return geographicAllocationMappingService.mapToGeographicRegions(mappedHoldings, warnings, WRN_RRC_EGE_001);
   }
 
 }

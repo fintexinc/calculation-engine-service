@@ -1,6 +1,6 @@
 package performance.testing;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.EtfHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -10,13 +10,9 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.fintex.ce.domain.enumeration.HoldingType.CANADA_ETF;
-import static com.fintex.ce.domain.enumeration.HoldingType.CANADA_MUTUAL_FUNDS;
-import static com.fintex.ce.domain.enumeration.HoldingType.CANADA_STOCKS;
-import static com.fintex.ce.domain.enumeration.HoldingType.US_ETF;
-import static com.fintex.ce.domain.enumeration.HoldingType.US_STOCKS;
 import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.FUNDSERV;
 import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.TICKER;
+import static com.fintex.ce.domain.model.enumeration.HoldingType.*;
 import static performance.testing.RandomUtil.getRandomInt;
 
 public class HoldingFactory {

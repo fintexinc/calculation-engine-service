@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.core;
 
-import com.fintex.ce.port.input.result.core.TimeIntervalResult;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.result.PeriodResult;
+import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.util.DecimalUtils;
 import lombok.Getter;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.domain.enumeration.Period.*;
+import static com.fintex.ce.domain.model.enumeration.Period.*;
 import static com.fintex.ce.util.CalculationUtils.product;
 import static com.fintex.ce.util.CalculationUtils.sum;
 import static com.fintex.ce.util.CollectorUtils.toTreeMap;

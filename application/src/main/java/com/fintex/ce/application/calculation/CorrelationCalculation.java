@@ -1,12 +1,12 @@
 package com.fintex.ce.application.calculation;
 
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.result.CorrelationResult;
-import com.fintex.ce.port.input.result.correlation.CorrelationKeyValueResult;
-import com.fintex.ce.port.input.result.correlation.CorrelationPeriodResult;
-import com.fintex.ce.port.input.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.domain.model.result.CorrelationResult;
+import com.fintex.ce.domain.model.result.correlation.CorrelationKeyValueResult;
+import com.fintex.ce.domain.model.result.correlation.CorrelationPeriodResult;
+import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.util.CalculationUtils;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.tuple.Pair;

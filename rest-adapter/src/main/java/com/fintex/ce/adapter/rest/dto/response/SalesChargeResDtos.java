@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fintex.ce.domain.enumeration.calculation.SalesCharge;
+import com.fintex.ce.domain.model.calculation.SalesCharge;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;

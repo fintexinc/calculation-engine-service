@@ -1,14 +1,12 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.calculation.AnnualReturnCalculation;
-import com.fintex.ce.application.service.calculation.AnnualReturnServiceImpl;
-import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.ReturnCommand;
-import com.fintex.ce.port.input.result.AnnualReturnResult;
+import com.fintex.ce.domain.dto.command.ReturnCommand;
+import com.fintex.ce.domain.model.result.AnnualReturnResult;
 import com.fintex.ce.monthlyreturns.Returns;
 import org.junit.jupiter.api.Test;
 

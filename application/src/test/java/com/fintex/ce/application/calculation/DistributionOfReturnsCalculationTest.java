@@ -1,12 +1,10 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.DistributionOfReturnsCalculation;
-import com.fintex.ce.application.calculation.RollingTotalReturnsCalculation;
 import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.port.input.command.DistributionOfReturnsCommand;
-import com.fintex.ce.port.input.result.distributionofreturns.DistributionOfReturnsIntervalResult;
-import com.fintex.ce.port.input.result.DistributionOfReturnsResult;
-import com.fintex.ce.port.input.result.distributionofreturns.DistributionRangeResult;
+import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
+import com.fintex.ce.domain.model.result.distributionofreturns.DistributionOfReturnsIntervalResult;
+import com.fintex.ce.domain.model.result.DistributionOfReturnsResult;
+import com.fintex.ce.domain.model.result.distributionofreturns.DistributionRangeResult;
 import com.fintex.ce.util.DecimalUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

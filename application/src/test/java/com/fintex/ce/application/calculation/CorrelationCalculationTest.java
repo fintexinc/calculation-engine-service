@@ -1,15 +1,14 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.CorrelationCalculation;
 import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.EtfHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.result.CorrelationResult;
-import com.fintex.ce.port.input.result.correlation.CorrelationKeyValueResult;
-import com.fintex.ce.port.input.result.correlation.CorrelationPeriodResult;
+import com.fintex.ce.domain.model.result.CorrelationResult;
+import com.fintex.ce.domain.model.result.correlation.CorrelationKeyValueResult;
+import com.fintex.ce.domain.model.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.util.ComparisonUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;

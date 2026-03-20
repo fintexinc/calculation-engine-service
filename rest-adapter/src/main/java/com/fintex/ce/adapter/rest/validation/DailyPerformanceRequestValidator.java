@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.model.calculation.HoldingForDailyCalculationDTO;
+import com.fintex.ce.domain.dto.calculation.HoldingForDailyCalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.DailyPerformanceReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CipsdGreaterThanCpedReqValidation;

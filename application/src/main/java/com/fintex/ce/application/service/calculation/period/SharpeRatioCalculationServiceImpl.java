@@ -2,10 +2,10 @@ package com.fintex.ce.application.service.calculation.period;
 
 import com.fintex.ce.application.calculation.SharpeRatioCalculation;
 import com.fintex.ce.application.calculation.StandardDeviationCalculation;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.port.input.result.SharpeRatioResult;
-import com.fintex.ce.port.output.TBillsPort;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.result.SharpeRatioResult;
+import com.fintex.ce.port.TBillsFetcher;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -17,11 +17,11 @@ import java.util.Set;
 @Service
 public class SharpeRatioCalculationServiceImpl extends PeriodAbstractService<SharpeRatioResult, PeriodCommand> {
 
-  private final TBillsPort tBillsProvider;
+  private final TBillsFetcher tBillsProvider;
 
   public SharpeRatioCalculationServiceImpl(
       final MonthlyReturnsService monthlyReturnsService,
-      final TBillsPort tBillsProvider,
+      final TBillsFetcher tBillsProvider,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
     this.tBillsProvider = tBillsProvider;
@@ -29,7 +29,7 @@ public class SharpeRatioCalculationServiceImpl extends PeriodAbstractService<Sha
 
   public SharpeRatioCalculation defineCalculationMethod(final PeriodCommand reqDTO) {
     final CalculationDTO input = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_ONE);
-    final var tBills = tBillsProvider.loadTBillsFor(reqDTO.getCurrency());
+    final var tBills = tBillsProvider.fetch(reqDTO.getCurrency());
     final var standardDeviationCalculation = new StandardDeviationCalculation<SharpeRatioResult>(input, defaultPeriods);
     return new SharpeRatioCalculation(input, defaultPeriods, tBills, standardDeviationCalculation);
   }

@@ -2,26 +2,21 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapper.response.AssetAllocationResponseMapper;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionType;
+import com.fintex.ce.domain.dto.AssetAllocationDto;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.AssetAllocationResult;
-import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
-import com.fintex.ce.port.output.sm.SecurityDataPort;
-import com.fintex.ce.port.output.sm.dto.AssetAllocationDto;
+import com.fintex.ce.domain.model.result.AssetAllocationResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ComparisonUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
-import com.fintex.ce.util.validation.data.DataProviderChecker;
 import org.junit.jupiter.api.Test;
-
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -37,11 +32,11 @@ import static org.mockito.Mockito.withSettings;
 class AssetAllocationServiceImplTest {
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenCheckResult() {
+  void shouldFetch_whenCheckResult() {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
-    final var securityDataPort = mock(SecurityDataPort.class);
+    final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
@@ -62,11 +57,34 @@ class AssetAllocationServiceImplTest {
   }
 
   @Test
+  void fetchExposures_verifySecurityDataPortFetch() {
+    // SETUP
+    final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
+    final var responseMapper = mock(AssetAllocationResponseMapper.class);
+    final var securityDataPort = mock(SecurityDataFetcher.class);
+
+    final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
+        assetAllocationDataMapper, responseMapper, securityDataPort));
+
+    final var reqDTO = mock(PortfolioHoldingsCommand.class);
+    final var holdings = List.of(mock(Holding.class));
+    when(reqDTO.getHoldings()).thenReturn(holdings);
+
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
+
+    // ACT
+    sut.fetchExposures(reqDTO, List.of());
+
+    // VERIFY
+    verify(securityDataPort).fetch(any(), anyList());
+  }
+
+  @Test
   void fetchExposures_verifyMapFromAllocations() {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
-    final var securityDataPort = mock(SecurityDataPort.class);
+    final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
@@ -88,7 +106,7 @@ class AssetAllocationServiceImplTest {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
-    final var securityDataPort = mock(SecurityDataPort.class);
+    final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
@@ -110,7 +128,7 @@ class AssetAllocationServiceImplTest {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
-    final var securityDataPort = mock(SecurityDataPort.class);
+    final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
@@ -135,7 +153,7 @@ class AssetAllocationServiceImplTest {
     // SETUP
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
-    final var securityDataPort = mock(SecurityDataPort.class);
+    final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));

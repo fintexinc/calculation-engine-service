@@ -1,7 +1,7 @@
 package com.fintex.ce.monthlyreturns;
 
 import com.fintex.ce.domain.model.FxRates;
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.PortfolioUtils;
 import lombok.EqualsAndHashCode;
@@ -13,7 +13,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_MFR_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MFR_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;

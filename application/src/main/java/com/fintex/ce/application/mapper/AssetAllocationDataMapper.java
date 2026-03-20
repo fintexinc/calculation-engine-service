@@ -1,12 +1,12 @@
 package com.fintex.ce.application.mapper;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.dto.AssetAllocationDto;
+import com.fintex.ce.domain.dto.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.AssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.output.sm.dto.AssetAllocationDto;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -18,8 +18,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.UNCLASSIFIED;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.util.FilterUtils.CASH_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.filterHoldings;
@@ -45,6 +44,20 @@ public class AssetAllocationDataMapper {
   public Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> mapForAAEM(
       AssetAllocationDataDTO dto) {
     return map(dto);
+  }
+
+  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapFromRaw(
+      Map<Holding, AssetAllocation> rawData, List<? extends Holding> holdings) {
+    return removeLeftPairElement(mapFromRawWithProvider(rawData, holdings));
+  }
+
+  public Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> mapFromRawWithProvider(
+      Map<Holding, AssetAllocation> rawData, List<? extends Holding> holdings) {
+    Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> result = new HashMap<>();
+    result.putAll(mapForNoneStock(rawData));
+    result.putAll(mapForCash(filterHoldings(holdings, CASH_PREDICATE)));
+    result.putAll(mapForGic(filterHoldings(holdings, GIC_PREDICATE)));
+    return result;
   }
 
   private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> removeLeftPairElement(

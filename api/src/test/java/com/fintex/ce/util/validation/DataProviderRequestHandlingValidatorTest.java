@@ -1,6 +1,6 @@
 package com.fintex.ce.util.validation;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.core.ProviderAware;
 import org.junit.jupiter.api.Test;
 

@@ -17,7 +17,8 @@ import reactor.netty.http.client.HttpClient;
 public class SecurityMasterWebClientConfig {
 
   @Bean
-  public WebClient securityMasterRestWebClient(
+  public WebClient smWebClient(
+      WebClient.Builder webClientBuilder,
       @Value("${external-services.security-master.rest.base-url}") String baseUrl,
       @Value("${external-services.security-master.rest.timeout:90000}") int timeout) {
 
@@ -25,7 +26,7 @@ public class SecurityMasterWebClientConfig {
         .responseTimeout(Duration.ofMillis(timeout))
         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout);
 
-    return WebClient.builder()
+    return webClientBuilder
         .baseUrl(baseUrl)
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .clientConnector(new ReactorClientHttpConnector(httpClient))

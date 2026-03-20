@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.model.calculation.InflationDTO;
+import com.fintex.ce.domain.dto.calculation.InflationDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

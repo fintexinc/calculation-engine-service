@@ -1,11 +1,11 @@
 package api.util;
 
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 
 import java.util.List;
 import java.util.Objects;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.*;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.*;
 
 public class ExceptionCodeUtil {
 

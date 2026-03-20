@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_CPED_002;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_CPED_003;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_CPED_002;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_CPED_003;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;

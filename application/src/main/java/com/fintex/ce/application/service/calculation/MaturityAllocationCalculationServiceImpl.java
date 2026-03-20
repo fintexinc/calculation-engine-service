@@ -2,33 +2,41 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.response.MaturityAllocationResponseMapper;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
-import com.fintex.ce.domain.enumeration.calculation.MaturityAllocationType;
-import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.MaturityAllocation;
+import com.fintex.ce.domain.model.calculation.MaturityAllocationType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.MaturityAllocationResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.domain.model.result.MaturityAllocationResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import java.math.BigDecimal;
-import java.util.EnumMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MA_MA_001;
+import static java.math.BigDecimal.ZERO;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class MaturityAllocationCalculationServiceImpl
     extends
       BreakdownAbstractService<MaturityAllocationResult, MaturityAllocationType> {
 
-  private final HoldingDataLoader<Map<Holding, Map<MaturityAllocationType, BigDecimal>>> cacheStorage;
+  private final SecurityDataFetcher<MaturityAllocation> maturityAllocationSecurityDataFetcher;
   private final MaturityAllocationResponseMapper responseMapper;
-  public static final Map<MaturityAllocationType, BigDecimal> DEFAULT_MAP = new EnumMap<>(MaturityAllocationType.class);
 
-  public MaturityAllocationCalculationServiceImpl(      final HoldingDataLoader<Map<Holding, Map<MaturityAllocationType, BigDecimal>>> cacheStorage,
+  static final Map<MaturityAllocationType, BigDecimal> ALLOCATION_DEFAULT_MAP = Collections.unmodifiableMap(
+      Stream.of(MaturityAllocationType.values()).collect(toMap(type -> type, type -> ZERO)));
+
+  public MaturityAllocationCalculationServiceImpl(
+      final SecurityDataFetcher<MaturityAllocation> maturityAllocationSecurityDataFetcher,
       final MaturityAllocationResponseMapper responseMapper) {
     super();
-    this.cacheStorage = cacheStorage;
+    this.maturityAllocationSecurityDataFetcher = maturityAllocationSecurityDataFetcher;
     this.responseMapper = responseMapper;
   }
 
@@ -46,6 +54,15 @@ public class MaturityAllocationCalculationServiceImpl
   @Override
   public Map<Holding, Map<MaturityAllocationType, BigDecimal>> fetchExposures(PortfolioHoldingsCommand reqDTO,
       List<Warning> warnings) {
-    return cacheStorage.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
+    Map<Holding, MaturityAllocation> rawData = maturityAllocationSecurityDataFetcher.fetch(reqDTO.getHoldings(),
+        List.of());
+    return AllocationMappingUtils.mapToAllocations(rawData,
+        MaturityAllocation::getMaturityDurationValues,
+        MaturityAllocationType::of,
+        ALLOCATION_DEFAULT_MAP,
+        WRN_MA_MA_001,
+        "FDS Get Maturity Allocation",
+        warnings,
+        (map, entry) -> map.merge(entry.getKey().getDisplayType(), entry.getValue(), BigDecimal::add));
   }
 }

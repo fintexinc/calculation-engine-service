@@ -1,9 +1,8 @@
 package com.fintex.ce.application.service.calculation.period.core;
 
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.application.service.calculation.period.core.PeriodBenchmarkAbstractService;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.port.input.command.PeriodCommand;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.junit.jupiter.api.Test;

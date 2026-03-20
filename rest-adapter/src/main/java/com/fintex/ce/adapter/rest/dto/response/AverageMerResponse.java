@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.enumeration.ParameterType;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

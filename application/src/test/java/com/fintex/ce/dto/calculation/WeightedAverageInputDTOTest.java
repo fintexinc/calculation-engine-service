@@ -1,8 +1,8 @@
 package com.fintex.ce.dto.calculation;
 
 import com.fintex.ce.application.dto.calculation.WeightedAverageInputDTO;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.Rebalanced;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Rebalanced;
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.FxRates;

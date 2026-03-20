@@ -1,25 +1,19 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.model.EquitySector;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.result.EquitySectorResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.mapper.ResponseMapper;
-import org.springframework.stereotype.Component;
-
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.result.EquitySectorResult;
+import com.fintex.ce.mapper.ResponseMapper;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
+import org.springframework.stereotype.Component;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 
-/**
- * Response mapper for EquitySector domain model to EquitySectorResult. Handles conversion of equity sector allocation
- * calculations to response format.
- */
 @Component
 public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, EquitySectorResult> {
 
@@ -45,20 +39,9 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
 
   @Override
   public EquitySectorResult toResponse(Map<Holding, EquitySector> domainMap, List<Warning> warnings) {
-    // This method requires complex aggregation with holding weights
-    // Delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for EquitySector");
   }
 
-  /**
-   * Creates response from pre-calculated net products (after weighting and rescaling).
-   *
-   * @param netProducts
-   *          the calculated net product values per sector type
-   * @param warnings
-   *          list of warnings to include in response
-   * @return the response DTO with scaled values
-   */
   public EquitySectorResult fromNetProducts(Map<EquitySectorAllocationType, BigDecimal> netProducts,
       List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
@@ -73,13 +56,6 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
     return result;
   }
 
-  /**
-   * Creates empty/default response with warnings.
-   *
-   * @param warnings
-   *          list of warnings to include in response
-   * @return response with default (null) values for all sector types
-   */
   public EquitySectorResult toEmptyResponse(List<Warning> warnings) {
     EquitySectorResult result = new EquitySectorResult();
     result.setEquitySector(DEFAULT_MAP);

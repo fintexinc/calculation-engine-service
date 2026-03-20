@@ -27,13 +27,6 @@
         <!-- All adapter modules -->
         <dependency>
             <groupId>com.fintex</groupId>
-            <artifactId>cache-adapter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.fintex</groupId>
             <artifactId>web-client-adapter</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -60,6 +53,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Micrometer Tracing with Brave bridge -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
         </dependency>
 
 

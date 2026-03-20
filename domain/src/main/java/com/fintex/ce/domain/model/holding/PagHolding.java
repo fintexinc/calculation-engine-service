@@ -1,14 +1,12 @@
 package com.fintex.ce.domain.model.holding;
 
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import static com.fintex.ce.domain.model.holding.Holding.DELIMITER;
 
 @Data
 @Accessors(chain = true)

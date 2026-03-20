@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.ReturnReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpedLastDayOfMonthReqValidation;

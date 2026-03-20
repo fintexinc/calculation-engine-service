@@ -1,9 +1,9 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.enumeration.calculation.FixedIncomeStyleboxType;
+import com.fintex.ce.domain.model.calculation.FixedIncomeStyleboxType;
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.input.result.FixedIncomeStyleboxExposureResult;
+import com.fintex.ce.domain.model.result.FixedIncomeStyleboxExposureResult;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

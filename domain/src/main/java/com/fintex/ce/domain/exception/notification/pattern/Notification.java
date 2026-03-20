@@ -1,6 +1,6 @@
 package com.fintex.ce.domain.exception.notification.pattern;
 
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import lombok.Data;

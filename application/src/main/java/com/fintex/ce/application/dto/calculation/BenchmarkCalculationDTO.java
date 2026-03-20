@@ -1,6 +1,6 @@
 package com.fintex.ce.application.dto.calculation;
 
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

@@ -1,30 +1,32 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.TBillsPort;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.PeriodCommand;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.port.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
-import org.junit.jupiter.api.Test;
-
 import java.util.TreeMap;
-
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 class SharpeRatioCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsPort.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsCacheStorage, null));
+        .useConstructor(null, tBillsFetcher, null));
 
     final var weightedAverageInputDTO = mock(CalculationDTO.class);
     final PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(sut.buildCalculationDto(any(), any())).thenReturn(weightedAverageInputDTO);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
@@ -38,13 +40,13 @@ class SharpeRatioCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsPort.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsCacheStorage, null));
+        .useConstructor(null, tBillsFetcher, null));
 
     final var calculationDTO = mock(CalculationDTO.class);
     final PeriodCommand req = mock(PeriodCommand.class);
-    when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(sut.buildCalculationDto(any(), any())).thenReturn(calculationDTO);
 
@@ -53,7 +55,7 @@ class SharpeRatioCalculationServiceImplTest {
     sut.defineCalculationMethod(req);
 
     // VERIFY
-    verify(tBillsCacheStorage).loadTBillsFor(Currency.CAD);
+    verify(tBillsFetcher).fetch(Currency.CAD);
   }
 
 }

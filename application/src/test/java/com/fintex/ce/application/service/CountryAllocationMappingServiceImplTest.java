@@ -1,8 +1,7 @@
 package com.fintex.ce.application.service;
 
-import com.fintex.ce.application.service.CountryAllocationMappingServiceImpl;
-import com.fintex.ce.domain.enumeration.ExceptionCode;
-import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.model.CountryAllocation;
 import com.fintex.ce.domain.model.core.Warning;

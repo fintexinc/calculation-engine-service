@@ -1,6 +1,6 @@
 package com.fintex.ce.domain.model.holding;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import lombok.Data;

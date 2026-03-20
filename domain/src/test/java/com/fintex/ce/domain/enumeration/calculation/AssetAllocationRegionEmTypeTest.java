@@ -1,6 +1,7 @@
 package com.fintex.ce.domain.enumeration.calculation;
 
 import com.fintex.ce.domain.exception.SystemException;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

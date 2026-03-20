@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_TIP_008;
-import static com.fintex.ce.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_TIP_008;
+import static com.fintex.ce.domain.model.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

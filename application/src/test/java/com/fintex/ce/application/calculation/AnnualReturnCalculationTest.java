@@ -1,8 +1,7 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.AnnualReturnCalculation;
-import com.fintex.ce.port.input.result.AnnualReturnResult;
-import com.fintex.ce.port.input.result.core.KeyValueResult;
+import com.fintex.ce.domain.model.result.AnnualReturnResult;
+import com.fintex.ce.domain.model.result.core.KeyValueResult;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

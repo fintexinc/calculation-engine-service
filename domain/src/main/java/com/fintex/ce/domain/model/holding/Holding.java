@@ -4,7 +4,7 @@ import static com.fintex.ce.domain.constant.ErrorMessage.NOT_NULL_MSG;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;

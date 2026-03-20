@@ -4,11 +4,11 @@ import com.fintex.ce.application.calculation.RollingSharpeRatioCalculation;
 import com.fintex.ce.application.calculation.SharpeRatioCalculation;
 import com.fintex.ce.application.calculation.StandardDeviationCalculation;
 import com.fintex.ce.monthlyreturns.Returns;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.RollingCalculationCommand;
-import com.fintex.ce.port.input.result.RollingSharpeRatioResult;
-import com.fintex.ce.port.input.result.SharpeRatioResult;
-import com.fintex.ce.port.output.TBillsPort;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
+import com.fintex.ce.domain.model.result.RollingSharpeRatioResult;
+import com.fintex.ce.domain.model.result.SharpeRatioResult;
+import com.fintex.ce.port.TBillsFetcher;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodAbstractService;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -25,11 +25,11 @@ public class RollingSharpeRatioCalculationServiceImpl
     extends
       PeriodAbstractService<RollingSharpeRatioResult, RollingCalculationCommand> {
 
-  private final TBillsPort tBillsProvider;
+  private final TBillsFetcher tBillsProvider;
 
   public RollingSharpeRatioCalculationServiceImpl(
       final MonthlyReturnsService monthlyReturnsService,
-      final TBillsPort tBillsProvider,
+      final TBillsFetcher tBillsProvider,
       @Value("#{'${default.periods.rolling-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
     this.tBillsProvider = tBillsProvider;
@@ -44,7 +44,7 @@ public class RollingSharpeRatioCalculationServiceImpl
   @Override
   public RollingSharpeRatioCalculation defineCalculationMethod(final RollingCalculationCommand reqDTO) {
     final CalculationDTO input = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_ONE);
-    final var tBills = tBillsProvider.loadTBillsFor(reqDTO.getCurrency());
+    final var tBills = tBillsProvider.fetch(reqDTO.getCurrency());
 
     final var standardDeviationCalculation = new StandardDeviationCalculation<SharpeRatioResult>(input, defaultPeriods);
     final var sharpeRatioCalculation = new SharpeRatioCalculation(input, defaultPeriods, tBills,

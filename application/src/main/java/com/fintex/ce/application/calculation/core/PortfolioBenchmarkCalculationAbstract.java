@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.core;
 
 import com.fintex.ce.domain.constant.BigDecimalConstants;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.port.input.result.PeriodResult;
+import com.fintex.ce.domain.model.result.PeriodResult;
 import lombok.Getter;
 
 import java.math.BigDecimal;

@@ -1,27 +1,24 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.domain.model.CommonHoldingsDTO;
+import com.fintex.ce.domain.dto.CommonHoldingsDTO;
+import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.model.HoldingAggregator;
-import com.fintex.ce.domain.model.ParamHolderDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.StockHolding;
-import com.fintex.ce.port.input.command.TopCommonHoldingsCommand;
-import com.fintex.ce.port.input.result.TopCommonHoldingsResult;
-import com.fintex.ce.port.input.result.commonholdings.TopCommonHoldingData;
-import com.fintex.ce.port.input.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.domain.model.result.TopCommonHoldingsResult;
+import com.fintex.ce.domain.model.result.commonholdings.TopCommonHoldingData;
+import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.TEN;
@@ -29,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
@@ -46,10 +44,10 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenVerifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
@@ -70,10 +68,10 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenVerifyLoad() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
@@ -87,7 +85,7 @@ class CommonHoldingsServiceImplTest {
       sut.perform(reqDTO);
 
       // VERIFY
-      verify(cacheStorage).load(holdings, List.of(), List.of(), new ParamHolderDTO(allocations));
+      verify(fetcher).fetch(eq(holdings), any());
     }
   }
 
@@ -95,17 +93,17 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenVerifyGetNumOfFundsMin() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
       when(reqDTO.getHoldings()).thenReturn(holdings);
-      when(cacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(Map.of());
+      when(fetcher.fetch(any(), any())).thenReturn(Map.of());
 
       doCallRealMethod().when(sut).perform(any());
       // ACT
@@ -120,17 +118,17 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenVerifyverifyGetAccumulativeTypes() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
       when(reqDTO.getHoldings()).thenReturn(holdings);
-      when(cacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(Map.of());
+      when(fetcher.fetch(any(), any())).thenReturn(Map.of());
       when(sut.getNumOfFundsMin(any())).thenReturn(1);
 
       doCallRealMethod().when(sut).perform(any());
@@ -146,22 +144,24 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenVerifyCalculateCalculateTopCommonHoldings() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
-      final var holdingsFromCache = Map.of(mock(Holding.class), List.of(mock(CommonHoldingsDTO.class)));
+      final var rawCommonHoldings = new com.fintex.ce.domain.model.CommonHoldings();
+      rawCommonHoldings.setHoldings(List.of());
+      final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
       final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
       when(reqDTO.getHoldings()).thenReturn(holdings);
-      when(cacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(holdingsFromCache);
+      when(fetcher.fetch(any(), any())).thenReturn(holdingsFromSms);
       when(sut.getNumOfFundsMin(any())).thenReturn(1);
       when(sut.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
       when(sut.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
@@ -171,7 +171,7 @@ class CommonHoldingsServiceImplTest {
       sut.perform(reqDTO);
 
       // VERIFY
-      verify(sut).calculateTopCommonHoldings(holdingsFromCache, allocations, accumulativeTypes);
+      verify(sut).calculateTopCommonHoldings(anyMap(), eq(allocations), eq(accumulativeTypes));
     }
   }
 
@@ -179,22 +179,24 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenVerifyCalculateFilterTop10Common() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
-      final var holdingsFromCache = Map.of(mock(Holding.class), List.of(mock(CommonHoldingsDTO.class)));
+      final var rawCommonHoldings = new com.fintex.ce.domain.model.CommonHoldings();
+      rawCommonHoldings.setHoldings(List.of());
+      final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
       final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
       when(reqDTO.getHoldings()).thenReturn(holdings);
-      when(cacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(holdingsFromCache);
+      when(fetcher.fetch(any(), any())).thenReturn(holdingsFromSms);
       when(sut.getNumOfFundsMin(any())).thenReturn(1);
       when(sut.getTopCommonHoldingsNumber(any())).thenReturn(123);
       when(sut.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
@@ -213,15 +215,17 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenVerifytoFinalResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
-      final var holdingsFromCache = Map.of(mock(Holding.class), List.of(mock(CommonHoldingsDTO.class)));
+      final var rawCommonHoldings = new com.fintex.ce.domain.model.CommonHoldings();
+      rawCommonHoldings.setHoldings(List.of());
+      final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
       final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
@@ -229,7 +233,7 @@ class CommonHoldingsServiceImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
       when(reqDTO.getHoldings()).thenReturn(holdings);
-      when(cacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(holdingsFromCache);
+      when(fetcher.fetch(any(), any())).thenReturn(holdingsFromSms);
       when(sut.getNumOfFundsMin(any())).thenReturn(1);
       when(sut.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
       when(sut.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
@@ -248,15 +252,17 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenCheckResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
-      final var holdingsFromCache = Map.of(mock(Holding.class), List.of(mock(CommonHoldingsDTO.class)));
+      final var rawCommonHoldings = new com.fintex.ce.domain.model.CommonHoldings();
+      rawCommonHoldings.setHoldings(List.of());
+      final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
       final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
@@ -265,7 +271,7 @@ class CommonHoldingsServiceImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
       when(reqDTO.getHoldings()).thenReturn(holdings);
-      when(cacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(holdingsFromCache);
+      when(fetcher.fetch(any(), any())).thenReturn(holdingsFromSms);
       when(sut.getNumOfFundsMin(any())).thenReturn(1);
       when(sut.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
       when(sut.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
@@ -284,10 +290,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldToFinalResult_whenVerifyMapToFinalResult() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
     final var aggregator = mock(HoldingAggregator.class);
@@ -306,10 +312,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldToFinalResult_whenCheckResult() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
     final var sortedLeaves = Map.of(mock(HoldingAggregator.class), TEN);
@@ -328,10 +334,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldGetNumOfFundsMin_whenCheckResult() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var topCommonHoldingsReqDTO = mock(TopCommonHoldingsCommand.class);
     final var expected = 1;
@@ -349,10 +355,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldGetNumOfFundsMin_whenCheckResult2() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var topCommonHoldingsReqDTO = mock(TopCommonHoldingsCommand.class);
     final var expected = 7;
@@ -371,9 +377,9 @@ class CommonHoldingsServiceImplTest {
   void shouldGetAccumulativeTypes_whenCheckResult() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulativeTypes));
+        .useConstructor(fetcher, accumulativeTypes));
 
     final var topCommonHoldingsReqDTO = mock(TopCommonHoldingsCommand.class);
 
@@ -391,9 +397,9 @@ class CommonHoldingsServiceImplTest {
   void shouldGetAccumulativeTypes_whenCheckResult2() {
     // SETUP
     final var accumulativeTypes = Set.of();
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulativeTypes));
+        .useConstructor(fetcher, accumulativeTypes));
 
     final var topCommonHoldingsReqDTO = mock(TopCommonHoldingsCommand.class);
 
@@ -412,9 +418,9 @@ class CommonHoldingsServiceImplTest {
   void shouldSecondLevelLeaves_whenCheckResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulateTypes));
+        .useConstructor(fetcher, accumulateTypes));
 
     final var firstLvlChild = mock(CommonHoldingsDTO.class);
 
@@ -432,9 +438,9 @@ class CommonHoldingsServiceImplTest {
   void shouldSecondLevelLeaves_whenCheckResult2() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulateTypes));
+        .useConstructor(fetcher, accumulateTypes));
 
     final var firstLvlChild = mock(CommonHoldingsDTO.class);
     final var underlyingHolding = mock(CommonHoldingsDTO.class);
@@ -455,10 +461,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldFilterTop10Common_whenCheckResult() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var holdingAggregator = mock(HoldingAggregator.class);
     final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
@@ -478,10 +484,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldSetParentAndCalculateWeight_whenVerifyIsLeafStock() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var allocations = Map.of(new Holding(), TEN);
     final var parent = new Holding();
@@ -504,10 +510,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldSetParentAndCalculateWeight_whenCheckResult() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var allocations = Map.of(new Holding(), TEN);
     final var parent = new Holding();
@@ -532,10 +538,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldSetParentAndCalculateWeight_whenCheckResult2() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var parent = mock(Holding.class);
     final var allocations = Map.of(parent, TEN);
@@ -563,10 +569,10 @@ class CommonHoldingsServiceImplTest {
   void shouldCalculateWeightWithinSameLeaves_whenVerifyToUserScale() {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var holdingsDTO = mock(CommonHoldingsDTO.class);
       final var sameLeaves = List.of(holdingsDTO);
@@ -589,10 +595,10 @@ class CommonHoldingsServiceImplTest {
   @Test
   void shouldCalculateWeightWithinSameLeaves_whenCheckResult() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, defaultPeriods));
+        .useConstructor(fetcher, defaultPeriods));
 
     final var holdingsDTO = mock(CommonHoldingsDTO.class);
     final var sameLeaves = List.of(holdingsDTO);
@@ -615,10 +621,10 @@ class CommonHoldingsServiceImplTest {
   void shouldMapToFinalResult_whenVerifyBuildDTO() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var holdingAggregator = mock(HoldingAggregator.class);
       final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
@@ -646,10 +652,10 @@ class CommonHoldingsServiceImplTest {
   void shouldMapToFinalResult_whenVerifyCalculateWeightWithinSameLeaves() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var holdingAggregator = mock(HoldingAggregator.class);
       final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
@@ -676,10 +682,10 @@ class CommonHoldingsServiceImplTest {
   void shouldMapToFinalResult_whenCheckResult() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var holdingAggregator = new HoldingAggregator("Tesla", null, null);
       final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
@@ -709,10 +715,10 @@ class CommonHoldingsServiceImplTest {
   void shouldMapToFinalResult_whenCheckResult2() {
     try (var mockedHoldingsKeyResult = Mockito.mockStatic(HoldingsKeyResult.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var holdingAggregator = new HoldingAggregator("Tesla", null, null);
       final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
@@ -743,9 +749,9 @@ class CommonHoldingsServiceImplTest {
   void shouldCalculateTopCommonHoldings_whenVerifyFirstLevelLeaves() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulativeTypes));
+        .useConstructor(fetcher, accumulativeTypes));
 
     final var holding = mock(Holding.class);
     final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
@@ -764,9 +770,9 @@ class CommonHoldingsServiceImplTest {
   void shouldCalculateTopCommonHoldings_whenVerifySecondLevelLeaves() {
     // SETUP
     final var accumulativeTypes = Set.of("E");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulativeTypes));
+        .useConstructor(fetcher, accumulativeTypes));
 
     final var holding = mock(Holding.class);
     final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
@@ -787,10 +793,10 @@ class CommonHoldingsServiceImplTest {
   void shouldFirstLevelLeaves_whenVerifySetParentAndCalculateWeight() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulateTypes));
+        .useConstructor(fetcher, accumulateTypes));
 
     final var allocations = Map.of(mock(Holding.class), TEN);
     final var parent = mock(Holding.class);
@@ -814,9 +820,9 @@ class CommonHoldingsServiceImplTest {
   void shouldFirstLevelLeaves_whenCheckResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulateTypes));
+        .useConstructor(fetcher, accumulateTypes));
 
     final var allocations = Map.of(mock(Holding.class), TEN);
     final var parent = mock(StockHolding.class);
@@ -843,9 +849,9 @@ class CommonHoldingsServiceImplTest {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       // SETUP
       final var accumulateTypes = Set.of("FE");
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, accumulateTypes));
+          .useConstructor(fetcher, accumulateTypes));
 
       final var firstLvlParent = mock(CommonHoldingsDTO.class);
       final var child = mock(CommonHoldingsDTO.class);
@@ -869,9 +875,9 @@ class CommonHoldingsServiceImplTest {
   void shouldIsLeafStock_whenCheckResult() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulateTypes));
+        .useConstructor(fetcher, accumulateTypes));
 
     final var parent = mock(StockHolding.class);
     final var child = mock(CommonHoldingsDTO.class);
@@ -891,9 +897,9 @@ class CommonHoldingsServiceImplTest {
   void shouldIsLeafStock_whenCheckResult2() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulateTypes));
+        .useConstructor(fetcher, accumulateTypes));
 
     final var parent = mock(StockHolding.class);
     final var child = mock(CommonHoldingsDTO.class);
@@ -913,9 +919,9 @@ class CommonHoldingsServiceImplTest {
   void shouldGetTopCommonHoldingsNumber_whenReturnDefault10WhenGetNumOfTopCommonHoldingsIsNull() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulateTypes));
+        .useConstructor(fetcher, accumulateTypes));
 
     final TopCommonHoldingsCommand req = mock(TopCommonHoldingsCommand.class);
     doReturn(null).when(req).getNumOfTopCommonHoldings();
@@ -933,9 +939,9 @@ class CommonHoldingsServiceImplTest {
   void shouldGetTopCommonHoldingsNumber_whenReturnProvidedNumberIfNotNull() {
     // SETUP
     final var accumulateTypes = Set.of("FE");
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-        .useConstructor(cacheStorage, accumulateTypes));
+        .useConstructor(fetcher, accumulateTypes));
 
     final TopCommonHoldingsCommand req = mock(TopCommonHoldingsCommand.class);
     doReturn(11).when(req).getNumOfTopCommonHoldings();
@@ -953,17 +959,17 @@ class CommonHoldingsServiceImplTest {
   void shouldPerform_whenVerifyGetTopCommonHoldingsNumber() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
       final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
-          .useConstructor(cacheStorage, defaultPeriods));
+          .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
       when(reqDTO.getHoldings()).thenReturn(holdings);
-      when(cacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(Map.of());
+      when(fetcher.fetch(any(), any())).thenReturn(Map.of());
 
       doCallRealMethod().when(sut).perform(any());
       // ACT

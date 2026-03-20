@@ -1,12 +1,12 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.ValidationError;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.MultiplePortfoliosCommand;
-import com.fintex.ce.port.input.result.CommonPerformanceDatesResult;
+import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
+import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.model.MonthlyReturns;
 import org.junit.jupiter.api.Test;

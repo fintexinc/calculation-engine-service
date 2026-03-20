@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_TIP_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_TIP_001;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PeriodLessThan12ReqValidationTest {

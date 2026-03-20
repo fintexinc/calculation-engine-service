@@ -1,10 +1,11 @@
 package com.fintex.ce.application.mapper;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
+import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.AssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.dto.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.holding.BenchmarkIndexHolding;
 import com.fintex.ce.domain.model.holding.CanadaHedgeFundHolding;
 import com.fintex.ce.domain.model.holding.CanadaPooledFundHolding;

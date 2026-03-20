@@ -2,14 +2,12 @@ package com.fintex.ce.application.service.calculation.period;
 
 import com.fintex.ce.application.calculation.RollingTotalReturnsCalculation;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.application.service.calculation.period.RollingTotalReturnsCalculationServiceImpl;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
-import com.fintex.ce.port.input.command.RollingCalculationCommand;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.ce.port.input.result.RollingTotalReturnsResult;
+import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
+import com.fintex.ce.domain.model.result.RollingTotalReturnsResult;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -22,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.fintex.sm.model.domain.SecurityIdentifier;
 import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.FUNDSERV;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;

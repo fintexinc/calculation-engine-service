@@ -1,8 +1,9 @@
 package com.fintex.ce.domain.enumeration.calculation;
 
+import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.NOT_RATED;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.NOT_RATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

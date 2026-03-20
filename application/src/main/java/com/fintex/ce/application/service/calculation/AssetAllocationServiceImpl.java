@@ -3,15 +3,15 @@ package com.fintex.ce.application.service.calculation;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapper.response.AssetAllocationResponseMapper;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionType;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.AssetAllocationResult;
-import com.fintex.ce.port.output.sm.SecurityDataPort;
-import com.fintex.ce.port.output.sm.dto.AssetAllocationDto;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.result.AssetAllocationResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.domain.dto.AssetAllocationDto;
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static com.fintex.ce.domain.enumeration.DataProvider.DEFAULT_PROVIDERS;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.DEFAULT_PROVIDERS;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service
@@ -28,7 +28,7 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
 
   private final AssetAllocationDataMapper assetAllocationDataMapper;
   private final AssetAllocationResponseMapper responseMapper;
-  private final SecurityDataPort<AssetAllocationDto> securityDataPort;
+  private final SecurityDataFetcher<AssetAllocationDto> securityDataPort;
 
   @Override
   public AssetAllocationResult calculate(Map<Holding, Map<AssetAllocationRegion, BigDecimal>> exposures,

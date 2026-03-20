@@ -1,8 +1,8 @@
 package com.fintex.ce.domain.model.holding;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.InterestFreq;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

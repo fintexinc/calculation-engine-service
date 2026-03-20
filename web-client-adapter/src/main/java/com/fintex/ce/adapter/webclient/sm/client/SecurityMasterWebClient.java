@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.client;
 
 import com.fintex.ce.adapter.webclient.sm.exception.SecurityMasterWebClientException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,13 +18,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "external-services.security-master.api-type", havingValue = "rest", matchIfMissing = true)
+@RequiredArgsConstructor
 public class SecurityMasterWebClient {
 
-  private final WebClient webClient;
-
-  public SecurityMasterWebClient(WebClient securityMasterRestWebClient) {
-    this.webClient = securityMasterRestWebClient;
-  }
+  private final WebClient smWebClient;
 
   /**
    * Performs a POST request and returns the response body.
@@ -37,7 +35,7 @@ public class SecurityMasterWebClient {
    */
   public <T, R> R post(String path, T request, ParameterizedTypeReference<R> responseType) {
     log.debug("POST request to: {}", path);
-    R result = webClient.post()
+    R result = smWebClient.post()
         .uri(path)
         .bodyValue(request)
         .retrieve()
@@ -58,7 +56,7 @@ public class SecurityMasterWebClient {
    */
   public <R> R get(String path, Class<R> responseType) {
     log.debug("GET request to: {}", path);
-    R result = webClient.get()
+    R result = smWebClient.get()
         .uri(path)
         .retrieve()
         .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
@@ -78,7 +76,7 @@ public class SecurityMasterWebClient {
    */
   public <R> R get(String path, ParameterizedTypeReference<R> responseType) {
     log.debug("GET request to: {}", path);
-    R result = webClient.get()
+    R result = smWebClient.get()
         .uri(path)
         .retrieve()
         .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))

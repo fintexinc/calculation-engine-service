@@ -1,6 +1,6 @@
 package com.fintex.ce.monthlyreturns;
 
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.EtfHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.exception.DataErrorException;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_MFR_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MFR_001;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

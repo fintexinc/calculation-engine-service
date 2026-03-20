@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_TIP_002;
-import static com.fintex.ce.domain.enumeration.Period.YEAR_TO_DATE;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_TIP_002;
+import static com.fintex.ce.domain.model.enumeration.Period.YEAR_TO_DATE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PeriodContainYearToDateReqValidationTest {

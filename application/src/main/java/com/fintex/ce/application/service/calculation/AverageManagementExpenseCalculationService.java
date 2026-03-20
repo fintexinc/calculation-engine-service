@@ -1,13 +1,12 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.input.command.AverageMerCommand;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.ParameterType;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.input.result.WarningResult;
-
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.result.WarningResult;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -16,9 +15,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
-import static com.fintex.ce.domain.enumeration.ParameterType.*;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
 import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
@@ -33,7 +33,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
   protected AverageManagementExpenseCalculationService() {
   }
 
-  protected abstract Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> loadDataFromCacheStorage(
+  protected abstract Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
       final AverageMerCommand command);
 
   protected abstract List<Warning> setInitialFeeAndModifiedFeeValues(
@@ -46,7 +46,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
       final AverageMerCommand command);
 
   public R perform(final AverageMerCommand command) {
-    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDTOs = loadDataFromCacheStorage(
+    final Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDTOs = fetchData(
         command);
 
     final List<Warning> warnings = setInitialFeeAndModifiedFeeValues(averageMerCalculationDTOs);

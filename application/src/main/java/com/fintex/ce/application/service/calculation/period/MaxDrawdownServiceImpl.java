@@ -2,9 +2,9 @@ package com.fintex.ce.application.service.calculation.period;
 
 import com.fintex.ce.application.calculation.Growth10KCalculation;
 import com.fintex.ce.application.calculation.MaxDrawdownCalculation;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.port.input.result.MaxDrawdownResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.result.MaxDrawdownResult;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.application.service.calculation.period.core.PeriodAbstractService;
 import com.fintex.ce.util.DecimalUtils;

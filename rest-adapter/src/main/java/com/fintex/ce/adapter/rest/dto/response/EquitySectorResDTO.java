@@ -1,16 +1,15 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 
 @Data
 @ToString(callSuper = true)

@@ -4,11 +4,10 @@ import api.config.constant.HoldingGroups;
 import api.exception.TestException;
 import api.model.CashHoldingDTO;
 import api.model.HoldingDataDTO;
-import api.testcases.v1x5.dto.request.PortfolioHoldingDTO;
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.dto.IncomeForecastDto;
 import com.fintex.ce.domain.model.IncomeForecast;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.model.IncomeForecastDto;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.CanadaHedgeFundHolding;
 import com.fintex.ce.domain.model.holding.CanadaPooledFundHolding;
 import com.fintex.ce.domain.model.holding.EtfHolding;
@@ -18,11 +17,9 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.StockHolding;
 import com.fintex.ce.domain.model.holding.UsMutualFundHolding;
 import com.fintex.ce.util.FilterUtils;
-
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Objects;
-
 import static com.fintex.ce.domain.model.holding.GicHolding.DEFAULT_START_DATE;
 
 public class HoldingUtils {
@@ -135,39 +132,6 @@ public class HoldingUtils {
       default :
         return null;
     }
-  }
-
-  public static PortfolioHoldingDTO createAppSpecificHoldingV1x5(final String holdingName,
-      final BigDecimal holdingValue, HoldingDataDTO holdingDataDTO) {
-    final PortfolioHoldingDTO holding = defineHoldingV1x5(holdingName, holdingDataDTO);
-
-    holding.setHoldingType(holdingDataDTO.getHoldingType().name());
-    holding.setValue(holdingValue);
-    holding.setHoldingCode(holdingName);
-
-    return holding;
-  }
-
-  // TODO: 6/17/2020 verify STOCKS
-  private static PortfolioHoldingDTO defineHoldingV1x5(final String holdingName, final HoldingDataDTO holdingDataDTO) {
-    final HoldingType type = holdingDataDTO.getHoldingType();
-    final PortfolioHoldingDTO dto = new PortfolioHoldingDTO();
-
-    if (HoldingGroups.MUTUAL_FUND.contains(type)) {
-      dto.setFundHoldingIdentifier(holdingDataDTO.getSecurityIdentifier().getIdType().name());
-      return dto;
-    } else if (HoldingGroups.ETFS.contains(type)) {
-      dto.setFundHoldingIdentifier(holdingDataDTO.getSecurityIdentifier().getIdType().name());
-      return dto;
-    } else if (HoldingGroups.STOCKS.contains(type)) {
-      dto.setExchangeId(holdingDataDTO.getExchangeCode());
-      dto.setEquitySearchIdentifierType("SYMBOL");
-      return dto;
-    } else if (HoldingGroups.CASH.contains(type)) {
-      dto.setPerformanceCurrencyEnum("NOT_SPECIFIED");
-      return dto;
-    }
-    throw new TestException("There is no such holding type as: " + type);
   }
 
 }

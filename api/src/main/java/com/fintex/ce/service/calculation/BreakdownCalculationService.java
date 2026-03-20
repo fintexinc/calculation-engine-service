@@ -1,7 +1,7 @@
 package com.fintex.ce.service.calculation;
 
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.WarningResult;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.result.WarningResult;
 
 /**
  * Port interface for breakdown calculation services. Implementations handle calculations like asset allocation, equity
@@ -14,13 +14,6 @@ import com.fintex.ce.port.input.result.WarningResult;
  */
 public interface BreakdownCalculationService<E extends WarningResult, T> {
 
-  /**
-   * Performs the breakdown calculation.
-   *
-   * @param command
-   *          the command containing portfolio holdings
-   * @return the calculation result with breakdown by type
-   */
   E perform(PortfolioHoldingsCommand command);
 
 }

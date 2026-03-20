@@ -1,6 +1,6 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.core.ProviderAware;
 import lombok.AllArgsConstructor;
 import lombok.Data;

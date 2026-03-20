@@ -2,15 +2,15 @@ package com.fintex.ce.application.service.calculation.period.core;
 
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.monthlyreturns.Returns;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.port.input.result.PeriodResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.domain.model.MonthlyReturns;
 import com.fintex.ce.service.calculation.PeriodCalculationService;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.ce.domain.enumeration.ExceptionCode;
-import com.fintex.ce.domain.enumeration.Period;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.Period;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 

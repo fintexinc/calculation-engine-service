@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.TopCommonHoldingsReqDTO;
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import lombok.EqualsAndHashCode;
 import org.springframework.util.CollectionUtils;
 

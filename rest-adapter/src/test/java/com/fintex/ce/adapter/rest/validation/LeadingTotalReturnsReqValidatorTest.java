@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 

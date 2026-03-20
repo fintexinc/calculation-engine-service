@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.output.sm.dto.AssetAllocationDto;
+import com.fintex.ce.domain.dto.AssetAllocationDto;
 import com.fintex.sm.model.domain.allocation.AssetAllocation;
 import com.fintex.sm.model.domain.value.NameValue;
 import java.math.BigDecimal;

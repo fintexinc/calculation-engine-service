@@ -1,9 +1,9 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.enumeration.calculation.FixedIncomeCreditQuality;
+import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
 import com.fintex.ce.domain.model.CreditQuality;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.input.result.CreditQualityResult;
+import com.fintex.ce.domain.model.result.CreditQualityResult;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -21,8 +21,6 @@
         <module>domain</module>
         <module>api</module>
         <module>application</module>
-        <module>cache-adapter</module>
-
         <module>web-client-adapter</module>
         <module>rest-adapter</module>
         <module>bootstrap</module>
@@ -30,9 +28,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
 
         <!-- Internal dependencies -->
         <sm-domain.version>2.0.0-SNAPSHOT</sm-domain.version>
@@ -52,7 +50,7 @@
         <rhino.version>1.8.0</rhino.version>
 
         <!-- Test dependencies -->
-        <mockito.version>5.11.0</mockito.version>
+        <mockito.version>5.18.0</mockito.version>
         <allure-junit5.version>2.7.0</allure-junit5.version>
         <testng.version>7.8.0</testng.version>
         <swagger-request-validator.version>2.44.8</swagger-request-validator.version>
@@ -111,12 +109,6 @@
                 <artifactId>application</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.fintex</groupId>
-                <artifactId>cache-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.fintex</groupId>
                 <artifactId>web-client-adapter</artifactId>

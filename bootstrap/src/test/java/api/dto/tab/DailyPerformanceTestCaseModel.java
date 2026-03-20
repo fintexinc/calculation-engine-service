@@ -1,6 +1,6 @@
 package api.dto.tab;
 
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import lombok.AllArgsConstructor;
 import lombok.Data;

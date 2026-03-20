@@ -2,16 +2,15 @@ package com.fintex.ce.monthlyreturns;
 
 import com.fintex.ce.application.validation.CpedDataValidation;
 import com.fintex.ce.application.validation.CpsdDataValidation;
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.HistoricalNavPrices;
 import com.fintex.ce.domain.model.MonthlyReturns;
 import com.fintex.ce.domain.model.ValidationError;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.DailyPerformanceCommand;
+import com.fintex.ce.domain.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
-import com.fintex.ce.monthlyreturns.Returns;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

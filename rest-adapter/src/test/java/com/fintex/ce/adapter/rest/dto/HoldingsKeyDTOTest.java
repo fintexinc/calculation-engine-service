@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.dto;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.EtfHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;

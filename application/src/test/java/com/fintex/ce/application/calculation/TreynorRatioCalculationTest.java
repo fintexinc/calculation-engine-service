@@ -1,10 +1,8 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.BetaCalculation;
-import com.fintex.ce.application.calculation.TreynorRatioCalculation;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.result.TreynorRatioResult;
-import com.fintex.ce.port.input.result.core.TimeIntervalResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.result.TreynorRatioResult;
+import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 

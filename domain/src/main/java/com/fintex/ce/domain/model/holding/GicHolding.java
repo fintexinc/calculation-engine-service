@@ -1,9 +1,9 @@
 package com.fintex.ce.domain.model.holding;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.InterestFreq;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -14,8 +14,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
-import static com.fintex.ce.domain.model.holding.Holding.DELIMITER;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 
 @Data
 @ToString(callSuper = true)

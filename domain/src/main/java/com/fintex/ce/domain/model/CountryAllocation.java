@@ -1,6 +1,6 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

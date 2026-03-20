@@ -1,13 +1,14 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
-import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
-import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.EquityMarketCapitalization;
+import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.EquityMarketCapResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.domain.model.result.EquityMarketCapResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -15,22 +16,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
-
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.GIANT;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.LARGE;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.MEDIUM;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.MICRO;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.SMALL;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.GIANT;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.LARGE;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.MEDIUM;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.MICRO;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.SMALL;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_EMC_EMC_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ZERO;
 
-/**
- * Equity Market Capitalization Service
- */
 @Service
 public class EquityMarketCapCalculationServiceImpl
     extends
@@ -40,6 +38,8 @@ public class EquityMarketCapCalculationServiceImpl
 
   static final Map<EquityMarketCapType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
+  static final Map<EquityMarketCapType, BigDecimal> ALLOCATION_DEFAULT_MAP;
+
   static {
     GROUPS = Collections.unmodifiableMap(
         Map.of(
@@ -47,21 +47,28 @@ public class EquityMarketCapCalculationServiceImpl
             MEDIUM, Set.of(MEDIUM),
             SMALL, Set.of(SMALL, MICRO)));
     GROUPS.keySet().forEach(f -> DEFAULT_MAP.put(f, null));
+
+    ALLOCATION_DEFAULT_MAP = Collections.unmodifiableMap(
+        Stream.of(EquityMarketCapType.values()).collect(toMap(type -> type, type -> ZERO)));
   }
 
-  private final HoldingDataLoader<Map<Holding, Map<EquityMarketCapType, BigDecimal>>> marketCapCacheStorage;
+  private final SecurityDataFetcher<EquityMarketCapitalization> equityMarketCapSecurityDataFetcher;
 
-  @Autowired
-  public EquityMarketCapCalculationServiceImpl(final HoldingDataLoader<Map<Holding, Map<EquityMarketCapType, BigDecimal>>> marketCapCacheStorage) {
+  public EquityMarketCapCalculationServiceImpl(
+      final SecurityDataFetcher<EquityMarketCapitalization> equityMarketCapSecurityDataFetcher) {
     super();
-    this.marketCapCacheStorage = marketCapCacheStorage;
+    this.equityMarketCapSecurityDataFetcher = equityMarketCapSecurityDataFetcher;
   }
 
   @Override
   public Map<Holding, Map<EquityMarketCapType, BigDecimal>> fetchExposures(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    return marketCapCacheStorage.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
+    Map<Holding, EquityMarketCapitalization> rawData = equityMarketCapSecurityDataFetcher.fetch(reqDTO.getHoldings(),
+        List.of());
+    return AllocationMappingUtils.mapToAllocations(rawData,
+        EquityMarketCapitalization::getRatings, EquityMarketCapType::of,
+        ALLOCATION_DEFAULT_MAP, WRN_EMC_EMC_001, "FDS Equity Market Capitalization", warnings);
   }
 
   @Override

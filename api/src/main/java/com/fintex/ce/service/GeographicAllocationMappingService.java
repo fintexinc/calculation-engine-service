@@ -1,7 +1,7 @@
 package com.fintex.ce.service;
 
-import com.fintex.ce.domain.enumeration.ExceptionCode;
-import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 

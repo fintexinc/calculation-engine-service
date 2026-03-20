@@ -1,16 +1,17 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.CountryExposure;
+import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.GeographicExposureResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.domain.model.result.GeographicExposureResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.service.GeographicAllocationMappingService;
 import com.fintex.ce.util.PortfolioUtils;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,18 +26,16 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   @Test
   void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var storage = mock(HoldingDataLoader.class);
+      final var storage = mock(SecurityDataFetcher.class);
+      final var geographicAllocationMappingService = mock(GeographicAllocationMappingService.class);
       final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
-          withSettings().useConstructor(storage));
+          withSettings().useConstructor(storage, geographicAllocationMappingService));
 
       final var exposures = mock(Map.class);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       sut.calculate(exposures, List.of(), List.of());
 
-      // VERIFY
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(exposures));
     }
   }
@@ -44,10 +43,10 @@ class FixedIncomeGeographicExposureCalculationImplTest {
   @Test
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var storage = mock(HoldingDataLoader.class);
+      final var storage = mock(SecurityDataFetcher.class);
+      final var geographicAllocationMappingService = mock(GeographicAllocationMappingService.class);
       final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
-          withSettings().useConstructor(storage));
+          withSettings().useConstructor(storage, geographicAllocationMappingService));
 
       final var exposures = mock(Map.class);
       final var expected = new GeographicExposureResult();
@@ -57,42 +56,41 @@ class FixedIncomeGeographicExposureCalculationImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(true);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       final var actual = sut.calculate(exposures, List.of(), List.of());
 
-      // VERIFY
       assertEquals(expected, actual);
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Test
-  void shouldGetLoadFromCacheStorage_whenCheckResult() {
-    try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var storage = mock(HoldingDataLoader.class);
-      final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
-          withSettings().useConstructor(storage));
+  void shouldFetch_whenCheckResult() {
+    final var storage = mock(SecurityDataFetcher.class);
+    final var geographicAllocationMappingService = mock(GeographicAllocationMappingService.class);
+    final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
+        withSettings().useConstructor(storage, geographicAllocationMappingService));
 
-      final var holding = mock(Holding.class);
-      final var exposures = Map.of(holding, Map.of(GeographicRegionType.CANADA, TEN));
+    final var holding = mock(Holding.class);
+    final var countryExposure = new CountryExposure();
+    countryExposure.setAllocations(Map.of("CA", TEN));
+    final var rawData = Map.of(holding, countryExposure);
+    final var mappedResult = Map.of(holding, Map.of(GeographicRegionType.CANADA, TEN));
 
-      when(storage.load(any(), any(), any(), any())).thenReturn(exposures);
-      doCallRealMethod().when(sut).fetchExposures(any(), any());
-      // ACT
-      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    when(storage.fetch(any(), any())).thenReturn(rawData);
+    when(geographicAllocationMappingService.mapToGeographicRegions(any(), any(), any())).thenReturn(mappedResult);
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
-      // VERIFY
-      assertEquals(exposures, actual);
-    }
+    assertEquals(mappedResult, actual);
   }
 
   @Test
   void shouldCalculate_whenVerifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var storage = mock(HoldingDataLoader.class);
+      final var storage = mock(SecurityDataFetcher.class);
+      final var geographicAllocationMappingService = mock(GeographicAllocationMappingService.class);
       final var sut = mock(FixedIncomeGeographicExposureCalculationImpl.class,
-          withSettings().useConstructor(storage));
+          withSettings().useConstructor(storage, geographicAllocationMappingService));
 
       final var holding = mock(Holding.class);
       final var holdings = List.of(holding);
@@ -100,10 +98,8 @@ class FixedIncomeGeographicExposureCalculationImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       sut.calculate(exposures, holdings, List.of());
 
-      // VERIFY
       verify(sut).calculateNetProducts(exposures, holdings, GeographicRegionType.values());
     }
   }

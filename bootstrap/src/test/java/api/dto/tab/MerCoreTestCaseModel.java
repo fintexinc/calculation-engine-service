@@ -1,6 +1,6 @@
 package api.dto.tab;
 
-import com.fintex.ce.domain.enumeration.ParameterType;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

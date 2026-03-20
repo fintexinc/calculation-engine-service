@@ -1,18 +1,17 @@
 package com.fintex.ce.application.service.calculation.period;
 
 import com.fintex.ce.application.calculation.MeanCalculation;
-import com.fintex.ce.application.service.calculation.period.MeanCalculationServiceImpl;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.PeriodCommand;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_TIP_001;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_TIP_002;
-import static com.fintex.ce.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_TIP_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_TIP_002;
+import static com.fintex.ce.domain.model.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
 import static com.fintex.ce.util.DecimalUtils.OUTPUT_SCALE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

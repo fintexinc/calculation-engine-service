@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.dto.request;
 
-import com.fintex.ce.domain.enumeration.ParameterType;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.core.DataProviderReqDTO;
 import lombok.Data;

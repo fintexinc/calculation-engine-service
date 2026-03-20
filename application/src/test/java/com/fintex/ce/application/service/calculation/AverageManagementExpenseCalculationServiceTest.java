@@ -1,13 +1,11 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.application.service.calculation.AverageManagementExpenseCalculationService;
-import com.fintex.ce.application.service.calculation.MERCalculationServiceImpl;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.ParameterType;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
+import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.AverageMerCommand;
-import com.fintex.ce.port.input.result.AverageMerResult;
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
+import com.fintex.ce.domain.model.result.AverageMerResult;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.FilterUtils;
 import org.junit.jupiter.api.Assertions;
@@ -25,9 +23,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.domain.enumeration.ParameterType.ABSOLUTE;
-import static com.fintex.ce.domain.enumeration.ParameterType.FORCE_REPORT_FEE;
-import static com.fintex.ce.domain.enumeration.ParameterType.SCALED;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;

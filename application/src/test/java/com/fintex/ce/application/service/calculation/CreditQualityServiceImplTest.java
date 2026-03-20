@@ -1,24 +1,22 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
-import com.fintex.ce.port.output.HoldingDataLoader;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapper.response.CreditQualityResponseMapper;
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.enumeration.calculation.CreditQualityRating;
-import com.fintex.ce.domain.enumeration.calculation.FixedIncomeCreditQuality;
-import com.fintex.ce.domain.model.ParamHolderDTO;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.model.AssetAllocation;
+import com.fintex.ce.domain.model.CreditQuality;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.calculation.CreditQualityRating;
+import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.CreditQualityResult;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.result.CreditQualityResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -29,15 +27,15 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.A;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.AA;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.AAA;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.B;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.BB;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.BBB;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.BELOW_B;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.NOT_RATED;
-import static com.fintex.ce.domain.enumeration.calculation.FixedIncomeCreditQuality.HIGH_YIELD;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.A;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AA;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AAA;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.B;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BB;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BBB;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BELOW_B;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.NOT_RATED;
+import static com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality.HIGH_YIELD;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
@@ -53,98 +51,81 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+@SuppressWarnings("unchecked")
 class CreditQualityServiceImplTest {
 
   @Test
   void shouldPerform_whenVerifyLoad() {
-    // SETUP
-    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-        creditQualityCacheStorage, assetAllocationCacheStorage,
-        assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+        creditQualityFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, responseMapper));
 
     final Holding h = mock(Holding.class);
     final List<Holding> holdings = List.of(h);
     final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
 
-    when(creditQualityCacheStorage.load(any(), any(), any(), any())).thenReturn(Map.of());
+    when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(reqDTO.getHoldings()).thenReturn(holdings);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     sut.perform(reqDTO);
 
-    // VERIFY
-    verify(creditQualityCacheStorage).load(eq(holdings), any(), anyList(), eq(new ParamHolderDTO()));
+    verify(creditQualityFetcher).fetch(eq(holdings), any());
   }
 
   @Test
   void shouldPerform_whenVerifyAreAllValuesInMapEmpty() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+      final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
 
       final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-          creditQualityCacheStorage, assetAllocationCacheStorage,
-          assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+          creditQualityFetcher, assetAllocationFetcher,
+          assetAllocationDataMapper, responseMapper));
 
       final Holding h = mock(Holding.class);
-      final Map mockMap = Map.of();
-      when(creditQualityCacheStorage.load(any(), any(), any(), any())).thenReturn(mockMap);
+      when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
 
       final List<Holding> holdings = List.of(h);
-
       final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
-
       when(reqDTO.getHoldings()).thenReturn(holdings);
 
       doCallRealMethod().when(sut).perform(any());
-      // ACT
       sut.perform(reqDTO);
 
-      // VERIFY
-      mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(mockMap));
+      mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(any()));
     }
   }
 
   @Test
   void shouldPerform_whenVerifyGetFixedIncomeCreditQuality() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+      final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
 
       final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-          creditQualityCacheStorage, assetAllocationCacheStorage,
-          assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+          creditQualityFetcher, assetAllocationFetcher,
+          assetAllocationDataMapper, responseMapper));
 
       final Holding h = mock(Holding.class);
-
-      when(creditQualityCacheStorage.load(any(), any(), any(), any())).thenReturn(Map.of());
+      when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
 
       final List<Holding> holdings = List.of(h);
-
       final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
-
       when(reqDTO.getHoldings()).thenReturn(holdings);
 
       doCallRealMethod().when(sut).perform(any());
-      // ACT
       sut.perform(reqDTO);
 
-      // VERIFY
       verify(sut).getFixedIncomeCreditQuality(eq(reqDTO), anyList());
     }
   }
@@ -152,83 +133,75 @@ class CreditQualityServiceImplTest {
   @Test
   void shouldPerform_whenVerifyCalculate() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+      final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
 
       final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-          creditQualityCacheStorage, assetAllocationCacheStorage,
-          assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+          creditQualityFetcher, assetAllocationFetcher,
+          assetAllocationDataMapper, responseMapper));
 
       final Holding h = mock(Holding.class);
       final List<Holding> holdings = List.of(h);
 
-      final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality = Map.of(h, Map.of());
-      when(creditQualityCacheStorage.load(any(), any(), any(), any())).thenReturn(creditQuality);
+      final CreditQuality rawCq = new CreditQuality();
+      rawCq.setRatings(Map.of());
+      when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(h, rawCq));
 
       final Map<Holding, BigDecimal> fixed = Map.of(h, TEN);
       when(sut.getFixedIncomeCreditQuality(any(), anyList())).thenReturn(fixed);
 
       final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
-
       when(reqDTO.getHoldings()).thenReturn(holdings);
 
       doCallRealMethod().when(sut).perform(any());
-      // ACT
       sut.perform(reqDTO);
 
-      // VERIFY
-      verify(sut).calculate(holdings, creditQuality, fixed);
+      verify(sut).calculate(eq(holdings), any(), eq(fixed));
     }
   }
 
   @Test
   void shouldPerform_whenVerifyResponseMapperFromCalculatedValues() {
-    // SETUP
-    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-        creditQualityCacheStorage, assetAllocationCacheStorage,
-        assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+        creditQualityFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, responseMapper));
 
     final var holding = mock(Holding.class);
-    final var creditQuality = Map.of(holding, Map.of(CreditQualityRating.AAA, ONE));
-    when(creditQualityCacheStorage.load(any(), any(), any(), any())).thenReturn(creditQuality);
+    final CreditQuality rawCq = new CreditQuality();
+    rawCq.setRatings(Map.of("AAA", ONE));
+    when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
 
     final Map<FixedIncomeCreditQuality, BigDecimal> map = Map.of(HIGH_YIELD, ONE);
     when(sut.calculate(any(), any(), any())).thenReturn(map);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     sut.perform(mock(PortfolioHoldingsCommand.class));
 
-    // VERIFY
     verify(responseMapper).fromCalculatedValues(eq(map), anyList());
   }
 
   @Test
   void shouldPerform_whenCheckResult() {
-    // SETUP
-    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-        creditQualityCacheStorage, assetAllocationCacheStorage,
-        assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+        creditQualityFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, responseMapper));
 
     final var holding = mock(Holding.class);
-    final var creditQuality = Map.of(holding, Map.of(CreditQualityRating.AAA, ONE));
-    when(creditQualityCacheStorage.load(any(), any(), anyList(), any())).thenReturn(creditQuality);
+    final CreditQuality rawCq = new CreditQuality();
+    rawCq.setRatings(Map.of("AAA", ONE));
+    when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
 
     final Map<FixedIncomeCreditQuality, BigDecimal> map = Map.of(HIGH_YIELD, ONE);
     final CreditQualityResult expected = new CreditQualityResult();
@@ -237,28 +210,23 @@ class CreditQualityServiceImplTest {
     when(responseMapper.fromCalculatedValues(any(), anyList())).thenReturn(expected);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     final CreditQualityResult actual = sut.perform(mock(PortfolioHoldingsCommand.class));
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldGetFixedIncomeCreditQuality_whenVerifyLoad() {
-    // SETUP
-    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-        creditQualityCacheStorage, assetAllocationCacheStorage,
-        assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+        creditQualityFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, responseMapper));
 
     final Holding h = mock(Holding.class);
-
     final List<Warning> warnings = List.of(mock(Warning.class));
     final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
     final List<Holding> holdings = List.of(h);
@@ -266,28 +234,26 @@ class CreditQualityServiceImplTest {
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getDataProviders()).thenReturn(providers);
+    when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
+    when(assetAllocationDataMapper.mapFromRaw(any(), any())).thenReturn(Map.of());
 
     doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-    // ACT
     sut.getFixedIncomeCreditQuality(reqDTO, warnings);
 
-    // VERIFY
-    verify(assetAllocationCacheStorage).load(holdings, providers, warnings, new ParamHolderDTO());
+    verify(assetAllocationFetcher).fetch(eq(holdings), any());
   }
 
   @Test
   void shouldGetFixedIncomeCreditQuality_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-      // SETUP
-      final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+      final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
 
       final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-          creditQualityCacheStorage, assetAllocationCacheStorage,
-          assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+          creditQualityFetcher, assetAllocationFetcher,
+          assetAllocationDataMapper, responseMapper));
 
       final var warnings = List.of(mock(Warning.class));
       final var reqDTO = mock(PortfolioHoldingsCommand.class);
@@ -295,91 +261,35 @@ class CreditQualityServiceImplTest {
       final DataProvider[] specifiedProviders = {DataProvider.MORNINGSTAR, DataProvider.EAGLE};
 
       when(reqDTO.getDataProviders()).thenReturn(providers);
+      when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
+      when(assetAllocationDataMapper.mapFromRaw(any(), any())).thenReturn(Map.of());
       mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(providers, specifiedProviders)).thenReturn(
           providers);
 
       doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-      // ACT
       sut.getFixedIncomeCreditQuality(reqDTO, warnings);
 
-      // VERIFY
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, specifiedProviders));
     }
   }
 
   @Test
-  void shouldGetFixedIncomeCreditQuality_whenVerifyValidate() {
-    // SETUP
-    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+  void shouldGetFixedIncomeCreditQuality_checkResult() {
+    final var creditQualityFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-        creditQualityCacheStorage, assetAllocationCacheStorage,
-        assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
-
-    final var req = mock(PortfolioHoldingsCommand.class);
-    final List<Warning> warnings = List.of();
-    final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
-    when(assetAllocationCacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(assetAllocationDataDto);
-
-    doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), any());
-    // ACT
-    sut.getFixedIncomeCreditQuality(req, warnings);
-
-    // VERIFY
-    verify(assetAllocationDataValidator).validate(assetAllocationDataDto, warnings);
-  }
-
-  @Test
-  void shouldGetFixedIncomeCreditQuality_whenVerifyMapForAA() {
-    // SETUP
-    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
-    final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var responseMapper = mock(CreditQualityResponseMapper.class);
-
-    final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-        creditQualityCacheStorage, assetAllocationCacheStorage,
-        assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
-
-    final var req = mock(PortfolioHoldingsCommand.class);
-    final List<Warning> warnings = List.of();
-    final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
-    when(assetAllocationCacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(assetAllocationDataDto);
-
-    doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), any());
-    // ACT
-    sut.getFixedIncomeCreditQuality(req, warnings);
-
-    // VERIFY
-    verify(assetAllocationDataMapper).mapForAA(assetAllocationDataDto);
-  }
-
-  @Test
-  void shouldGetFixedIncomeCreditQuality_whenCheckResult() {
-    // SETUP
-    final var creditQualityCacheStorage = mock(HoldingDataLoader.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
-    final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var responseMapper = mock(CreditQualityResponseMapper.class);
-
-    final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
-        creditQualityCacheStorage, assetAllocationCacheStorage,
-        assetAllocationDataValidator, assetAllocationDataMapper, responseMapper));
+        creditQualityFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, responseMapper));
 
     final Holding h = mock(Holding.class);
     final Map<AssetAllocationRegion, BigDecimal> asset = Map.of(AssetAllocationRegion.ASIA_PACIFIC_EQUITIES, TEN,
         AssetAllocationRegion.FIXED_INCOME, HUNDRED);
 
-    final var assetAllocationDataDTO = mock(AssetAllocationDataDTO.class);
-    when(assetAllocationCacheStorage.load(any(), any(), anyList(), any())).thenReturn(assetAllocationDataDTO);
-    final var expected = Map.of(h, asset);
-    when(assetAllocationDataMapper.mapForAA(assetAllocationDataDTO)).thenReturn(expected);
+    when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
+    when(assetAllocationDataMapper.mapFromRaw(any(), any())).thenReturn(Map.of(h, asset));
 
     final List<Warning> warnings = List.of(mock(Warning.class));
     final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
@@ -390,10 +300,8 @@ class CreditQualityServiceImplTest {
 
     doCallRealMethod().when(sut).getFixedIncomeValue(any());
     doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-    // ACT
     final Map<Holding, BigDecimal> actual = sut.getFixedIncomeCreditQuality(reqDTO, warnings);
 
-    // VERIFY
     assertEquals(Map.of(h, HUNDRED), actual);
   }
 
@@ -407,28 +315,22 @@ class CreditQualityServiceImplTest {
         AssetAllocationRegion.FIXED_INCOME, HUNDRED);
 
     doCallRealMethod().when(c).getFixedIncomeValue(any());
-    // ACT
     final Map<Holding, BigDecimal> actual = Map.of(h, asset).entrySet().stream().collect(toMap(Map.Entry::getKey,
         c::getFixedIncomeValue));
 
-    // VERIFY
     assertEquals(Map.of(h, HUNDRED), actual);
   }
 
   @Test
   void shouldGetFixedIncomeValue_whenCheckResult2() {
-    // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
     final Holding h = mock(Holding.class);
     final Map<AssetAllocationRegion, BigDecimal> asset = Map.of(AssetAllocationRegion.ASIA_PACIFIC_EQUITIES, TEN);
 
     doCallRealMethod().when(c).getFixedIncomeValue(any());
-    // ACT
     Map.Entry<Holding, Map<AssetAllocationRegion, BigDecimal>> entry = Map.of(h, asset).entrySet().iterator().next();
     assertThrows(NoSuchElementException.class, () -> c.getFixedIncomeValue(entry));
-
-    // VERIFY
   }
 
   @Test
@@ -449,17 +351,14 @@ class CreditQualityServiceImplTest {
     final Map<Holding, BigDecimal> weights = Map.of(h, BigDecimal.valueOf(weightValue), h2, BigDecimal.ONE);
 
     doCallRealMethod().when(c).calculateSumProductRating(any(), any(), any(), any());
-    // ACT
     final BigDecimal actual = c.calculateSumProductRating(creditQuality, fixedIncomeCreditQuality, weights, AAA);
 
-    // VERIFY
     assertEquals(0, actual.compareTo(BigDecimal.valueOf(creditQValue * fixedIncomeValue * weightValue)));
   }
 
   @Test
   void shouldCalculateCreditQualityRatings_whenVerifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
       final List<Holding> holdings = List.of(mock(Holding.class));
@@ -467,10 +366,8 @@ class CreditQualityServiceImplTest {
       when(sut.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
       doCallRealMethod().when(sut).calculateCreditQualityRatings(any(), any(), any());
-      // ACT
       sut.calculateCreditQualityRatings(holdings, Map.of(), Map.of());
 
-      // VERIFY
       mockedPortfolioUtils.verify(() -> PortfolioUtils.calculateInitialPortfolioWeight(holdings));
     }
   }
@@ -478,7 +375,6 @@ class CreditQualityServiceImplTest {
   @Test
   void shouldCalculateCreditQualityRatings_whenVerifyCalculateSumProductRating() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
       final Holding h = mock(Holding.class);
@@ -493,11 +389,9 @@ class CreditQualityServiceImplTest {
       when(sut.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
       doCallRealMethod().when(sut).calculateCreditQualityRatings(any(), any(), any());
-      // ACT
       final Map<CreditQualityRating, BigDecimal> actual = sut.calculateCreditQualityRatings(holdings, creditQ,
           fixedCreditQ);
 
-      // VERIFY
       for (CreditQualityRating rating : CreditQualityRating.values()) {
         verify(sut).calculateSumProductRating(creditQ, fixedCreditQ, weights, rating);
       }
@@ -521,10 +415,8 @@ class CreditQualityServiceImplTest {
         NOT_RATED, BigDecimal.valueOf(80));
 
     doCallRealMethod().when(c).toFixedIncomeCreditQuality(any());
-    // ACT
     final Map<FixedIncomeCreditQuality, BigDecimal> actual = c.toFixedIncomeCreditQuality(ratings);
 
-    // VERIFY
     Map<FixedIncomeCreditQuality, BigDecimal> expected = Map.of(
         FixedIncomeCreditQuality.AAA, BigDecimal.valueOf(100),
         FixedIncomeCreditQuality.AA, BigDecimal.valueOf(2),
@@ -550,17 +442,14 @@ class CreditQualityServiceImplTest {
     final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
     doCallRealMethod().when(c).calculate(any(), any(), any());
-    // ACT
     final Map<FixedIncomeCreditQuality, BigDecimal> actual = c.calculate(holdings, creditQ, fixedCreditQ);
 
-    // VERIFY
     verify(c).calculateCreditQualityRatings(holdings, creditQ, fixedCreditQ);
   }
 
   @Test
   void shouldCalculate_whenVerifyReScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
-      // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
       final Holding h = mock(Holding.class);
@@ -574,10 +463,8 @@ class CreditQualityServiceImplTest {
       final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);
 
-      // VERIFY
       mockedCalculationUtils.verify(() -> CalculationUtils.reScaleAbs(rescaled));
     }
   }
@@ -585,7 +472,6 @@ class CreditQualityServiceImplTest {
   @Test
   void shouldCalculate_whenVerifyToFixedIncomeCreditQuality() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
-      // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
       final Holding h = mock(Holding.class);
@@ -599,10 +485,8 @@ class CreditQualityServiceImplTest {
       final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);
 
-      // VERIFY
       verify(sut).toFixedIncomeCreditQuality(rescaled);
     }
   }
@@ -610,7 +494,6 @@ class CreditQualityServiceImplTest {
   @Test
   void shouldCalculate_whenCheckResult() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
-      // SETUP
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
       final Holding h = mock(Holding.class);
@@ -627,10 +510,8 @@ class CreditQualityServiceImplTest {
       final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);
 
-      // VERIFY
       assertSame(expected, actual);
     }
   }

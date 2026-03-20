@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_BWP_BWPTIP_001;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_BWP_BWPTIP_002;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_BWP_BWPTIP_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_BWP_BWPTIP_002;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

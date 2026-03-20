@@ -1,11 +1,11 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.Yield;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.result.YieldResult;
+import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.mapper.ResponseMapper;
+import com.fintex.ce.mapper.ResponseMapper;
 import com.fintex.ce.util.DecimalUtils;
 import org.springframework.stereotype.Component;
 

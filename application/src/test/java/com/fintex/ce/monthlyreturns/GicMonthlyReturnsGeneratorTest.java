@@ -1,11 +1,10 @@
 package com.fintex.ce.monthlyreturns;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.InterestFreq;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.MonthlyReturns;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.monthlyreturns.MonthlyReturnsGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

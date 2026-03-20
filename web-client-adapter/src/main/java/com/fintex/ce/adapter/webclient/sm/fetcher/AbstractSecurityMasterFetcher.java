@@ -6,9 +6,9 @@ import com.fintex.ce.adapter.webclient.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.mapper.HoldingTypeMapper;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.output.sm.SecurityDataPort;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.groupingBy;
  * @param <SmsResponse> SMS API response type that will be mapped to domain model
  */
 @Slf4j
-public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> implements SecurityDataPort<DomainModel> {
+public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> implements SecurityDataFetcher<DomainModel> {
 
     private static final String KEY_SEPARATOR = ":";
 

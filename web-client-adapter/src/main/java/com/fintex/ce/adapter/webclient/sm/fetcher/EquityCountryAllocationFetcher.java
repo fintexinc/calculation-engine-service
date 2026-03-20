@@ -12,10 +12,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
-/**
- * Fetcher for Equity Country Allocation data from Security Master API.
- * Activated when external-services.security-master.api-type=rest (default).
- */
 @Component
 @ConditionalOnProperty(name = "external-services.security-master.api-type", havingValue = "rest", matchIfMissing = true)
 public class EquityCountryAllocationFetcher

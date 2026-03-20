@@ -3,11 +3,10 @@ package com.fintex.ce.application.service.calculation.period;
 import com.fintex.ce.application.calculation.RollingStandardDeviationCalculation;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.application.service.calculation.period.RollingStandardDeviationCalculationServiceImpl;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.RollingCalculationCommand;
+import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.monthlyreturns.Returns;
 import org.junit.jupiter.api.Test;
 

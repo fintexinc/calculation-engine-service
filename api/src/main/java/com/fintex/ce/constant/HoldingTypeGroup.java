@@ -1,6 +1,6 @@
 package com.fintex.ce.constant;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 
 import java.util.EnumSet;
 import java.util.Set;

@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.enumeration.calculation.FixedIncomeCreditQuality;
+import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import lombok.Data;

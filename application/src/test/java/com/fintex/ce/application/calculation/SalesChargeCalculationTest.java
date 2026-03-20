@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.domain.enumeration.calculation.SalesCharge;
+import com.fintex.ce.domain.model.calculation.SalesCharge;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.result.SalesChargeResult;
+import com.fintex.ce.domain.model.result.SalesChargeResult;
 import com.fintex.sm.model.domain.enumeration.SalesChargeType;
 import org.junit.jupiter.api.Test;
 
