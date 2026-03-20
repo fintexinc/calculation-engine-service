@@ -1,6 +1,6 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.result.EquitySectorResult;
@@ -37,10 +37,8 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
       defaultResult.setWarnings(List.of());
       return defaultResult;
     }
-    // Domain model uses String keys - convert to enum
-    Map<EquitySectorAllocationType, BigDecimal> enumMap = convertToEnumMap(domain.getAllocations());
     EquitySectorResult result = new EquitySectorResult();
-    result.setEquitySector(toUserScale(enumMap));
+    result.setEquitySector(toUserScale(domain.getAllocations()));
     result.setWarnings(List.of());
     return result;
   }
@@ -89,19 +87,4 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
     return result;
   }
 
-  /**
-   * Converts String-keyed map from domain model to enum-keyed map.
-   */
-  private Map<EquitySectorAllocationType, BigDecimal> convertToEnumMap(Map<String, BigDecimal> stringMap) {
-    Map<EquitySectorAllocationType, BigDecimal> result = new HashMap<>();
-    for (Map.Entry<String, BigDecimal> entry : stringMap.entrySet()) {
-      try {
-        EquitySectorAllocationType type = EquitySectorAllocationType.valueOf(entry.getKey());
-        result.put(type, entry.getValue());
-      } catch (IllegalArgumentException ignored) {
-        // Skip unknown type keys
-      }
-    }
-    return result;
-  }
 }

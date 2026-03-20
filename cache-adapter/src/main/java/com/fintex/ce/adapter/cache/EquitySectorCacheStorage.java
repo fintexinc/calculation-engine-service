@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.cache;
 
 import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.EquitySectorStock;
 import com.fintex.ce.domain.model.ParamHolderDTO;
@@ -104,13 +104,25 @@ public class EquitySectorCacheStorage
             WRN_ES_SN_001.name()));
         return;
       }
-      final EquitySectorAllocationType type = EquitySectorAllocationType.of(equitySectorStock.getSectorName());
+      final EquitySectorAllocationType type = resolveSectorType(equitySectorStock.getSectorName());
       if (type == null) {
         throw WRN_UNKNOWN_001.error(stockHolding, equitySectorStock.getSectorName(), "FDS Get Sector Name");
       }
       map.put(stockHolding, overrideDefaultValues(DEFAULT_MAP, Map.of(type, ONE)));
     });
     return map;
+  }
+
+  private static EquitySectorAllocationType resolveSectorType(String sectorName) {
+    try {
+      return EquitySectorAllocationType.valueOf(sectorName);
+    } catch (IllegalArgumentException e) {
+      try {
+        return EquitySectorAllocationType.fromValue(sectorName);
+      } catch (IllegalArgumentException e2) {
+        return null;
+      }
+    }
   }
 
   private Map<StockHolding, EquitySectorStock> loadStockSectors(final List<StockHolding> holdings) {
@@ -140,14 +152,7 @@ public class EquitySectorCacheStorage
       warnings.add(WRN_ES_ESA_001.warning(entry.getKey()));
       return map;
     }
-    entry.getValue().getAllocations().forEach((typeStr, value) -> {
-      final EquitySectorAllocationType type = EquitySectorAllocationType.of(typeStr);
-      if (type == null) {
-        warnings.add(WRN_UNKNOWN_001.warning(entry.getKey(), typeStr, "FDS Get Equity Sector Allocations"));
-      } else {
-        map.put(type, value);
-      }
-    });
+    map.putAll(entry.getValue().getAllocations());
     return map;
   }
 

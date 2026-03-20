@@ -1,5 +1,6 @@
 package com.fintex.ce.domain.model;
 
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.model.core.ProviderAware;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,7 @@ import java.util.Map;
 @Accessors(chain = true)
 public class EquitySector implements ProviderAware {
 
-  private Map<String, BigDecimal> allocations;
+  private Map<EquitySectorAllocationType, BigDecimal> allocations;
 
   // Common fields
   private String holdingId;
@@ -25,7 +26,7 @@ public class EquitySector implements ProviderAware {
   private String providers;
   private List<ValidationError> errors = new ArrayList<>();
 
-  public EquitySector(Map<String, BigDecimal> allocations) {
+  public EquitySector(Map<EquitySectorAllocationType, BigDecimal> allocations) {
     this.allocations = allocations;
   }
 

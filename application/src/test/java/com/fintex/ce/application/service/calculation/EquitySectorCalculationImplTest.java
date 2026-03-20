@@ -1,12 +1,14 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.response.EquitySectorResponseMapper;
-import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.EquitySectorResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.util.PortfolioUtils;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -23,26 +25,31 @@ import static org.mockito.Mockito.withSettings;
 
 class EquitySectorCalculationImplTest {
 
+  @SuppressWarnings("unchecked")
+  private final SecurityDataPort<EquitySector> securityDataPort = mock(SecurityDataPort.class);
+  private final EquitySectorResponseMapper responseMapper = mock(EquitySectorResponseMapper.class);
+
   @Test
   void shouldGetLoadFromCacheStorage_whenCheckResult() {
-    try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
-      final var responseMapper = mock(EquitySectorResponseMapper.class);
-      final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
-          .useConstructor(cacheStorage, responseMapper));
+    // SETUP
+    final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
+        .useConstructor(securityDataPort, responseMapper));
 
-      final var holding = mock(Holding.class);
-      final var exposures = Map.of(holding, Map.of(EquitySectorAllocationType.CONSUMER_DEFENSIVE, TEN));
+    final var holding = mock(Holding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of());
 
-      when(cacheStorage.load(any(), any(), any(), any())).thenReturn(exposures);
-      doCallRealMethod().when(sut).fetchExposures(any(), any());
-      // ACT
-      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    final var equitySector = new EquitySector(Map.of(EquitySectorAllocationType.TECHNOLOGY, TEN));
+    when(securityDataPort.fetch(any(), any())).thenReturn(Map.of(holding, equitySector));
 
-      // VERIFY
-      Assertions.assertEquals(exposures, actual);
-    }
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    // ACT
+    final var actual = sut.fetchExposures(command, List.of());
+
+    // VERIFY
+    Assertions.assertTrue(actual.containsKey(holding));
+    Assertions.assertEquals(TEN, actual.get(holding).get(EquitySectorAllocationType.TECHNOLOGY));
   }
 
   @Test
@@ -50,10 +57,8 @@ class EquitySectorCalculationImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
 
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
-      final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
-          .useConstructor(cacheStorage, responseMapper));
+          .useConstructor(securityDataPort, responseMapper));
 
       final var holding = mock(Holding.class);
       final var holdings = List.of(holding);
@@ -73,14 +78,13 @@ class EquitySectorCalculationImplTest {
   void shouldCalculate_whenVerifyResponseMapperFromNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
-      final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
-          .useConstructor(cacheStorage, responseMapper));
+          .useConstructor(securityDataPort, responseMapper));
 
       final var holding = mock(Holding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(EquitySectorAllocationType.CONSUMER_DEFENSIVE, TEN));
+      @SuppressWarnings("unchecked")
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
@@ -99,11 +103,10 @@ class EquitySectorCalculationImplTest {
   void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
-      final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
-          .useConstructor(cacheStorage, responseMapper));
+          .useConstructor(securityDataPort, responseMapper));
 
+      @SuppressWarnings("unchecked")
       final var exposures = mock(Map.class);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
@@ -119,11 +122,10 @@ class EquitySectorCalculationImplTest {
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
-      final var responseMapper = mock(EquitySectorResponseMapper.class);
       final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
-          .useConstructor(cacheStorage, responseMapper));
+          .useConstructor(securityDataPort, responseMapper));
 
+      @SuppressWarnings("unchecked")
       final var exposures = mock(Map.class);
       final var expected = new EquitySectorResult();
       expected.setEquitySector(Map.of());
