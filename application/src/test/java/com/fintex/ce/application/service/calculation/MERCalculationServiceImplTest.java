@@ -1,35 +1,46 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
-import com.fintex.ce.domain.model.ParamHolderDTO;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.AverageMerCommand;
-import com.fintex.ce.port.input.result.AverageMerResult;
+import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.result.AverageMerResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.FilterUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.fintex.ce.domain.enumeration.ExceptionCode.WRN_MER_AMF_001;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.WRN_MER_MER_001;
-import static com.fintex.ce.domain.enumeration.ParameterType.ABSOLUTE;
-import static com.fintex.ce.domain.enumeration.ParameterType.FORCE_REPORT_FEE;
-import static com.fintex.ce.domain.enumeration.ParameterType.SCALED;
-import static java.math.BigDecimal.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_MER_001;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.TEN;
+import static java.math.BigDecimal.ZERO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 @SuppressWarnings("unchecked")
 class MERCalculationServiceImplTest {
@@ -37,8 +48,8 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldPerform_whenCheckResult() {
     // SETUP
-    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
+    final var averageMERFetcher = mock(SecurityDataFetcher.class);
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
     final var resDto = mock(AverageMerResult.class);
 
@@ -55,32 +66,33 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldPerform_whenVerifyLoad() {
     // SETUP
-    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
+    final var averageMERFetcher = mock(SecurityDataFetcher.class);
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
     final var reqDTO = mock(AverageMerCommand.class);
-    final var holdings = mock(List.class);
+    final List<Holding> holdings = List.of();
     final var resDto = mock(AverageMerResult.class);
     final var providers = List.of(DataProvider.MORNINGSTAR);
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getDataProviders()).thenReturn(providers);
     when(sut.calculateAverageValue(any(), any())).thenReturn(resDto);
+    when(averageMERFetcher.fetch(any(), any())).thenReturn(Map.of());
 
     doCallRealMethod().when(sut).perform(any());
-    doCallRealMethod().when(sut).loadDataFromCacheStorage(any());
+    doCallRealMethod().when(sut).fetchData(any());
     // ACT
     sut.perform(reqDTO);
 
     // VERIFY
-    verify(averageMERCacheStorage).load(holdings, providers, List.of(), new ParamHolderDTO());
+    verify(averageMERFetcher).fetch(holdings, providers);
   }
 
   @Test
   void shouldPerform_whenVerifyResDTOSetWarnings() {
     // SETUP
-    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
+    final var averageMERFetcher = mock(SecurityDataFetcher.class);
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
     final var reqDTO = mock(AverageMerCommand.class);
     final var resDTO = mock(AverageMerResult.class);
@@ -101,31 +113,31 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldPerform_whenVerifySetInitialFeeAndModifiedFeeValues() {
     // SETUP
-    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
+    final var averageMERFetcher = mock(SecurityDataFetcher.class);
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
     final var reqDTO = mock(AverageMerCommand.class);
     final var resDTO = mock(AverageMerResult.class);
-    final var averageMerCalculationDtos = mock(Map.class);
 
-    when(averageMERCacheStorage.load(any(), any(), any(), any())).thenReturn(averageMerCalculationDtos);
+    when(reqDTO.getHoldings()).thenReturn(List.of());
+    when(averageMERFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(sut.calculateAverageValue(any(), any())).thenReturn(resDTO);
 
     doCallRealMethod().when(sut).perform(any());
-    doCallRealMethod().when(sut).loadDataFromCacheStorage(any());
+    doCallRealMethod().when(sut).fetchData(any());
     // ACT
     sut.perform(reqDTO);
 
     // VERIFY
-    verify(sut).setInitialFeeAndModifiedFeeValues(averageMerCalculationDtos);
+    verify(sut).setInitialFeeAndModifiedFeeValues(any());
 
   }
 
   @Test
   void shouldPerform_whenVerifyGetResultAndSetNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds() {
     // SETUP
-    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
+    final var averageMERFetcher = mock(SecurityDataFetcher.class);
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
     final var resDto = mock(AverageMerResult.class);
     final var reqDTO = mock(AverageMerCommand.class);
@@ -148,14 +160,14 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldPerform_whenVerifyCalculateAverageMER() {
     // SETUP
-    final var averageMERCacheStorage = mock(HoldingDataLoader.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
+    final var averageMERFetcher = mock(SecurityDataFetcher.class);
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
     final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
     final var reqDTO = mock(AverageMerCommand.class);
     final var parameterTypes = List.of(SCALED, ABSOLUTE);
 
-    when(sut.loadDataFromCacheStorage(any())).thenReturn(map);
+    when(sut.fetchData(any())).thenReturn(map);
     when(reqDTO.getParameterTypes()).thenReturn(parameterTypes);
     when(sut.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
 
@@ -171,15 +183,15 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var averageMERCacheStorage = mock(HoldingDataLoader.class);
-      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
+      final var averageMERFetcher = mock(SecurityDataFetcher.class);
+      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
       final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
       when(reqDTO.getParameterTypes()).thenReturn(parameterTypes);
-      when(averageMERCacheStorage.load(any(), anyList(), anyList(), any())).thenReturn(map);
+      when(averageMERFetcher.fetch(any(), any())).thenReturn(map);
       when(sut.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
 
       doCallRealMethod().when(sut).perform(any());
@@ -195,19 +207,20 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyGetSpecifiedIfEmptyDEFAULTDATAPROVIDERS() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var averageMERCacheStorage = mock(HoldingDataLoader.class);
-      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERCacheStorage));
+      final var averageMERFetcher = mock(SecurityDataFetcher.class);
+      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(averageMERFetcher));
 
       final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var providers = mock(List.class);
 
       when(reqDTO.getDataProviders()).thenReturn(providers);
-      when(averageMERCacheStorage.load(any(), anyList(), anyList(), any())).thenReturn(map);
+      when(reqDTO.getHoldings()).thenReturn(List.of());
+      when(averageMERFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(sut.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
 
       doCallRealMethod().when(sut).perform(any());
-      doCallRealMethod().when(sut).loadDataFromCacheStorage(any());
+      doCallRealMethod().when(sut).fetchData(any());
       // ACT
       sut.perform(reqDTO);
 

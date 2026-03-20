@@ -1,8 +1,7 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.BestWorstPeriodCalculation;
-import com.fintex.ce.port.input.result.BestWorstPeriodsResult;
-import com.fintex.ce.port.input.result.bestworstperiods.PeriodValueResult;
+import com.fintex.ce.domain.model.result.BestWorstPeriodsResult;
+import com.fintex.ce.domain.model.result.bestworstperiods.PeriodValueResult;
 import com.fintex.ce.util.DecimalUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

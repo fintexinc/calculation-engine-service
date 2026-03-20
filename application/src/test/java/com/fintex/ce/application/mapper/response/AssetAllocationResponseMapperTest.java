@@ -1,10 +1,10 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionType;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.input.result.AssetAllocationResult;
+import com.fintex.ce.domain.model.result.AssetAllocationResult;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

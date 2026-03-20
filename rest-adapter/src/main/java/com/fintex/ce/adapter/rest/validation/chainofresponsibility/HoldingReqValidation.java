@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;

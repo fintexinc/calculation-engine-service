@@ -1,9 +1,9 @@
 package com.fintex.ce.application.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fintex.ce.domain.enumeration.ExceptionCode;
-import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
-import com.fintex.ce.domain.model.GeographicAllocationDTO;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.calculation.GeographicRegionType;
+import com.fintex.ce.domain.dto.GeographicAllocationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.exception.SystemException;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.WRN_UNKNOWN_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 
 @Service

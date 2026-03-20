@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import lombok.EqualsAndHashCode;
 
 import static java.util.Objects.isNull;

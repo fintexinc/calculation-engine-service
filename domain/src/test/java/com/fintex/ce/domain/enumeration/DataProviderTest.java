@@ -1,5 +1,6 @@
 package com.fintex.ce.domain.enumeration;
 
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

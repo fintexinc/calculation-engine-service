@@ -47,16 +47,6 @@ param cpuCore string = '0.5'
 @description('Memory allocated to container')
 param memory string = '1Gi'
 
-@description('Redis server name')
-param redisServerName string = 'fndserv'
-
-@description('Redis username')
-param redisUsername string = 'default'
-
-@description('Redis password')
-@secure()
-param redisPassword string = ''
-
 @description('Security Master Service')
 param securityMasterServiceUrl string = 'https://security-master-service.ashybay-bfa8feae.canadacentral.azurecontainerapps.io'
 
@@ -79,12 +69,6 @@ var secretsArray = concat(
     {
       name: 'container-registry-password'
       value: containerRegistryPassword
-    }
-  ]),
-  (empty(redisPassword) ? [] : [
-    {
-      name: 'redis-password'
-      value: redisPassword
     }
   ]),
   (empty(fmpApiKey) ? [] : [
@@ -124,29 +108,6 @@ var baseEnvVars = [
   }
 ]
 
-var redisEnvVars = empty(redisServerName) ? [] : [
-  {
-    name: 'REDIS_USERNAME'
-    value: redisUsername
-  }
-  {
-    name: 'REDIS_PASSWORD'
-    secretRef: 'redis-password'
-  }
-  {
-    name: 'REDIS_HOST'
-    value: '${redisServerName}.redis.cache.windows.net'
-  }
-  {
-    name: 'REDIS_PORT'
-    value: '6380'
-  }
-  {
-    name: 'SPRING_DATA_REDIS_SSL_ENABLED'
-    value: 'true'
-  }
-]
-
 var apiEnvVars = empty(fmpApiKey) ? [] : [
   {
     name: 'FMP_API_KEY'
@@ -154,7 +115,7 @@ var apiEnvVars = empty(fmpApiKey) ? [] : [
   }
 ]
 
-var allEnvVars = concat(baseEnvVars, redisEnvVars, apiEnvVars)
+var allEnvVars = concat(baseEnvVars, apiEnvVars)
 
 // Container App
 resource containerApp 'Microsoft.App/containerApps@2025-02-02-preview' = {

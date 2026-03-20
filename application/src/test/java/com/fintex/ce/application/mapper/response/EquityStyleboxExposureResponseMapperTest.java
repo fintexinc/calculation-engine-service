@@ -1,9 +1,9 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.enumeration.calculation.EquityStyleboxType;
+import com.fintex.ce.domain.model.calculation.EquityStyleboxType;
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.input.result.EquityStyleboxExposureResult;
+import com.fintex.ce.domain.model.result.EquityStyleboxExposureResult;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

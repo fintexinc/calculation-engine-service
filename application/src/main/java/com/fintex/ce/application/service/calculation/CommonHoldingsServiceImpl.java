@@ -1,17 +1,17 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.google.common.base.Strings;
-import com.fintex.ce.domain.model.CommonHoldingsDTO;
-import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.dto.CommonHoldingsDTO;
+import com.fintex.ce.domain.model.CommonHoldings;
 import com.fintex.ce.domain.model.HoldingAggregator;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.StockHolding;
-import com.fintex.ce.port.input.command.TopCommonHoldingsCommand;
-import com.fintex.ce.port.input.result.TopCommonHoldingsResult;
-import com.fintex.ce.port.input.result.commonholdings.TopCommonHoldingData;
+import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
+import com.fintex.ce.domain.model.result.TopCommonHoldingsResult;
+import com.fintex.ce.domain.model.result.commonholdings.TopCommonHoldingData;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.input.result.correlation.HoldingsKeyResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.service.calculation.CalculationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,7 @@ import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 @Service
@@ -42,11 +43,11 @@ public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHo
   private static final int DEFAULT_NUMBER_OF_FUNDS_MIN = 1;
   private static final int DEFAULT_NUMBER_OF_TOP_COMMON_HOLDINGS = 10;
   final Set<String> defaultAccumulateTypes;
-  private final HoldingDataLoader<Map<Holding, List<CommonHoldingsDTO>>> commonHoldingsCachePort;
+  private final SecurityDataFetcher<CommonHoldings> commonHoldingsSecurityDataFetcher;
 
-  public CommonHoldingsServiceImpl(final HoldingDataLoader<Map<Holding, List<CommonHoldingsDTO>>> commonHoldingsCachePort,
+  public CommonHoldingsServiceImpl(final SecurityDataFetcher<CommonHoldings> commonHoldingsSecurityDataFetcher,
       @Value("#{'${default.top-common-holdings.accumulate-types}'.split(',')}") final Set<String> defaultAccumulateTypes) {
-    this.commonHoldingsCachePort = commonHoldingsCachePort;
+    this.commonHoldingsSecurityDataFetcher = commonHoldingsSecurityDataFetcher;
     this.defaultAccumulateTypes = defaultAccumulateTypes;
   }
 
@@ -56,8 +57,9 @@ public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHo
     final List<Warning> warnings = new ArrayList<>();
     final Map<Holding, BigDecimal> allocations = calculateInitialPortfolioWeight(reqDTO.getHoldings());
 
-    final Map<Holding, List<CommonHoldingsDTO>> holdings = commonHoldingsCachePort.load(reqDTO.getHoldings(), List
-        .of(), warnings, new ParamHolderDTO(allocations));
+    final Map<Holding, CommonHoldings> rawHoldings = commonHoldingsSecurityDataFetcher.fetch(
+        reqDTO.getHoldings(), List.of());
+    final Map<Holding, List<CommonHoldingsDTO>> holdings = mapToCommonHoldingsDTOs(rawHoldings);
 
     final int numberOfMin = getNumOfFundsMin(reqDTO);
     final int numberOfTopCommonHoldings = getTopCommonHoldingsNumber(reqDTO);
@@ -348,6 +350,31 @@ public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHo
     return child
         .setHolding(firstLvlParent.getHolding())
         .setWeight(toUserScale(childWeight));
+  }
+
+  private Map<Holding, List<CommonHoldingsDTO>> mapToCommonHoldingsDTOs(
+      final Map<Holding, CommonHoldings> rawData) {
+    return rawData.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, e -> mapHoldingsToDTO(e.getValue().getHoldings())));
+  }
+
+  private List<CommonHoldingsDTO> mapHoldingsToDTO(final List<CommonHoldings.CommonHolding> holdings) {
+    if (holdings == null) {
+      return List.of();
+    }
+    return holdings.stream()
+        .map(h -> {
+          var dto = new CommonHoldingsDTO();
+          dto.setUuid(h.getUuid());
+          dto.setName(h.getName());
+          dto.setType(h.getType());
+          dto.setValue(h.getValue());
+          dto.setTicker(h.getTicker());
+          dto.setExchangeCode(h.getExchangeCode());
+          dto.setUnderlyingHoldings(mapHoldingsToDTO(h.getUnderlyingHoldings()));
+          return dto;
+        })
+        .toList();
   }
 
 }

@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.EquitySector;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
@@ -14,9 +14,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
-/**
- * Maps Security Master EquitySectorAllocation response to CE EquitySector domain model.
- */
 @Component
 public class EquitySectorAllocationMapper
     implements SecurityMasterResponseMapper<EquitySector, EquitySectorAllocation> {
@@ -29,7 +26,7 @@ public class EquitySectorAllocationMapper
         .stream()
         .filter(entry -> entry.getType() != null && entry.getValue() != null)
         .collect(Collectors.toMap(
-            entry -> entry.getType(),
+            EquitySectorAllocationTypeNameValue::getType,
             EquitySectorAllocationTypeNameValue::getValue,
             (existing, replacement) -> existing,
             () -> new EnumMap<>(EquitySectorAllocationType.class)));

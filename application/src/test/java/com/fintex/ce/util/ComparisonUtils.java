@@ -1,6 +1,5 @@
 package com.fintex.ce.util;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 
 import java.math.BigDecimal;
@@ -9,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j
 public class ComparisonUtils {
   private static final double DIFF_8x = 0.000_000_01;
 
@@ -29,7 +27,6 @@ public class ComparisonUtils {
       Assertions.assertTrue(expected.containsKey(actualKey),
           String.format("Key '%s' should not be present in the actual response", actualKey));
       final V expectedValue = expected.get(actualKey);
-      log.info("key: {}, expectedValue: {}, actualValue: {}", actualKey, expectedValue, actualValue);
       if (expectedValue instanceof BigDecimal && actualValue instanceof BigDecimal) {
         compareWithin8xRange((BigDecimal) expectedValue, (BigDecimal) actualValue, String.format(
             "Values are different: expected value is %s, but actual is %s", expectedValue, actualValue));

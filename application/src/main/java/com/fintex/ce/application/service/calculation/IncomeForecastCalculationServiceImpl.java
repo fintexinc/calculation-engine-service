@@ -2,18 +2,17 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
 import com.fintex.ce.constant.GeneralConstants;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.InterestFreq;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.Income;
-import com.fintex.ce.domain.model.IncomeForecastDto;
-import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.dto.IncomeForecastDto;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.IncomeForecastCommand;
-import com.fintex.ce.port.input.result.IncomeForecastResult;
+import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
+import com.fintex.ce.domain.model.result.IncomeForecastResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.IncomeForecast;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.service.calculation.CalculationService;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
@@ -50,17 +49,17 @@ public class IncomeForecastCalculationServiceImpl
   private static final Set<InterestFreq> MONTHLY_FREQUENCY = Set.of(InterestFreq.DAILY, InterestFreq.WEEKLY,
       InterestFreq.BI_WEEKLY);
 
-  private final HoldingDataLoader<Map<Holding, IncomeForecast>> incomeForecastCachePort;
+  private final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher;
 
-  public IncomeForecastCalculationServiceImpl(final HoldingDataLoader<Map<Holding, IncomeForecast>> incomeForecastCachePort) {
-    this.incomeForecastCachePort = incomeForecastCachePort;
+  public IncomeForecastCalculationServiceImpl(final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher) {
+    this.incomeForecastSecurityDataFetcher = incomeForecastSecurityDataFetcher;
   }
 
   @Override
   public IncomeForecastResult perform(final IncomeForecastCommand reqDTO) {
     final ArrayList<Warning> warnings = new ArrayList<>();
-    final Map<Holding, IncomeForecast> incomeForecastDto = incomeForecastCachePort.load(
-        reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
+    final Map<Holding, IncomeForecast> incomeForecastDto = incomeForecastSecurityDataFetcher.fetch(
+        reqDTO.getHoldings(), List.of());
 
     final Integer period = Optional.ofNullable(reqDTO.getTimeIntervalPeriods()).orElse(TWELVE_MONTH);
     final IncomeForecastResult incomeForecastResDto = calculate(incomeForecastDto, period);

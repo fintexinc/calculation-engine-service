@@ -1,31 +1,29 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.ParameterType;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
-import com.fintex.ce.domain.model.ParamHolderDTO;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.AverageMerCommand;
-import com.fintex.ce.port.input.result.ManagementFeeResult;
-import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.port.output.HoldingDataLoader;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
+import com.fintex.ce.domain.model.ManagementFee;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.result.ManagementFeeResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
+import org.springframework.stereotype.Service;
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_MF_MF_001;
-import static com.fintex.ce.domain.enumeration.ParameterType.ABSOLUTE;
-import static com.fintex.ce.domain.enumeration.ParameterType.SCALED;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MF_MF_001;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service
@@ -33,11 +31,11 @@ public class ManagementFeeCalculationServiceImpl
     extends
       AverageManagementExpenseCalculationService<ManagementFeeResult> {
 
-  private final HoldingDataLoader<Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>>> managementFeeCachePort;
+  private final SecurityDataFetcher<ManagementFee> managementFeeSecurityDataFetcher;
 
-  public ManagementFeeCalculationServiceImpl(@Qualifier("managementFee") final HoldingDataLoader<Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>>> managementFeeCachePort) {
+  public ManagementFeeCalculationServiceImpl(final SecurityDataFetcher<ManagementFee> managementFeeSecurityDataFetcher) {
     super();
-    this.managementFeeCachePort = managementFeeCachePort;
+    this.managementFeeSecurityDataFetcher = managementFeeSecurityDataFetcher;
   }
 
   @Override
@@ -47,11 +45,40 @@ public class ManagementFeeCalculationServiceImpl
   }
 
   @Override
-  public Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> loadDataFromCacheStorage(
+  public Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
       final AverageMerCommand reqDTO) {
-    return managementFeeCachePort.load(reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS), List.of(),
-        new ParamHolderDTO());
+    Map<Holding, ManagementFee> rawData = managementFeeSecurityDataFetcher.fetch(
+        reqDTO.getHoldings(),
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS));
+    return groupAndMap(rawData, reqDTO.getHoldings());
+  }
+
+  private Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupAndMap(
+      Map<Holding, ManagementFee> rawData, List<? extends Holding> holdings) {
+    Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> result = new EnumMap<>(HoldingType.class);
+
+    for (var entry : rawData.entrySet()) {
+      Holding holding = entry.getKey();
+      ManagementFee fee = entry.getValue();
+      var dto = new AverageManagementExpenseCalculationDTO()
+          .setMarketValue(holding.getValue())
+          .setHoldingType(holding.getType())
+          .setActualManagementFee(fee.getManagementFee());
+      result.computeIfAbsent(holding.getType(), k -> new HashMap<>()).put(holding, dto);
+    }
+
+    for (Holding holding : holdings) {
+      if (!rawData.containsKey(holding)) {
+        var dto = new AverageManagementExpenseCalculationDTO()
+            .setMarketValue(holding.getValue())
+            .setHoldingType(holding.getType())
+            .setInitialFee(BigDecimal.ZERO)
+            .setModifiedFee(BigDecimal.ZERO);
+        result.computeIfAbsent(holding.getType(), k -> new HashMap<>()).put(holding, dto);
+      }
+    }
+
+    return result;
   }
 
   @Override
@@ -74,7 +101,7 @@ public class ManagementFeeCalculationServiceImpl
       Holding holding,
       Notification notification) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
-      notification.addError(ERR_MF_MF_001.error(holding, HttpStatus.BAD_REQUEST));
+      notification.addError(ERR_MF_MF_001.error(holding, org.springframework.http.HttpStatus.BAD_REQUEST));
     }
     setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
         .getActualManagementFee());

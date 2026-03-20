@@ -1,9 +1,8 @@
 package com.fintex.ce.application.calculation.core;
 
-import com.fintex.ce.application.calculation.core.RollingAbstractCalculation;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.result.core.RollingIntervalResult;
-import com.fintex.ce.port.input.result.core.IntervalResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.result.core.RollingIntervalResult;
+import com.fintex.ce.domain.model.result.core.IntervalResult;
 import com.fintex.ce.util.ComparisonUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;

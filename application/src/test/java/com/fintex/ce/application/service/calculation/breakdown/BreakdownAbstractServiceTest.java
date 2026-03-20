@@ -1,8 +1,8 @@
 package com.fintex.ce.application.service.calculation.breakdown;
 
-import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.PortfolioUtils;
@@ -12,7 +12,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import static java.math.BigDecimal.TEN;
 import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
@@ -132,7 +131,7 @@ class BreakdownAbstractServiceTest {
   }
 
   @Test
-  void shouldPerform_whenVerifyGetLoadFromCacheStorage() {
+  void shouldPerform_whenVerifyFetch() {
     // SETUP
     final var sut = mock(BreakdownAbstractService.class, withSettings().useConstructor());
 

@@ -1,11 +1,10 @@
 package com.fintex.ce.application.service.calculation.period;
 
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.application.service.calculation.period.DistributionOfReturnsServiceImpl;
 import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.DistributionOfReturnsCommand;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.junit.jupiter.api.Test;

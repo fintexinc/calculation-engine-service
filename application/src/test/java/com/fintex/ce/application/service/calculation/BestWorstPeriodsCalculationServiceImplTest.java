@@ -1,13 +1,11 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.calculation.BestWorstPeriodCalculation;
-import com.fintex.ce.application.service.calculation.BestWorstPeriodsCalculationServiceImpl;
-import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.BestWorstPeriodsCommand;
-import com.fintex.ce.port.input.result.BestWorstPeriodsResult;
+import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
+import com.fintex.ce.domain.model.result.BestWorstPeriodsResult;
 import com.fintex.ce.monthlyreturns.Returns;
 import org.junit.jupiter.api.Test;
 

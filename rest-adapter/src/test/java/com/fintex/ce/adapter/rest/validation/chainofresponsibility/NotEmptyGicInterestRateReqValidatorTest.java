@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_GIC_MC_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_GIC_MC_001;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NotEmptyGicInterestRateReqValidatorTest {

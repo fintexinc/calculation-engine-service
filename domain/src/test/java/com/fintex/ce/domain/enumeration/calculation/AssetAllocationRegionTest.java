@@ -1,9 +1,10 @@
 package com.fintex.ce.domain.enumeration.calculation;
 
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.INTERNATIONAL_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.INTERNATIONAL_EQUITIES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

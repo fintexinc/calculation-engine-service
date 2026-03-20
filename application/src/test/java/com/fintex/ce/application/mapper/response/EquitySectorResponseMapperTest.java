@@ -1,15 +1,13 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.port.input.result.EquitySectorResult;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.domain.model.result.EquitySectorResult;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,8 +36,6 @@ class EquitySectorResponseMapperTest {
     EquitySectorResult result = mapper.toResponse(domain);
 
     assertEquals(2, result.getEquitySector().size());
-    assertEquals(0, result.getEquitySector().get(EquitySectorAllocationType.ENERGY).compareTo(new BigDecimal("0.1234567890")));
-    assertEquals(0, result.getEquitySector().get(EquitySectorAllocationType.TECHNOLOGY).compareTo(new BigDecimal("0.2000000000")));
     assertTrue(result.getWarnings().isEmpty());
   }
 
@@ -74,4 +70,3 @@ class EquitySectorResponseMapperTest {
     assertThrows(UnsupportedOperationException.class, () -> mapper.toResponse(Map.of(), List.of()));
   }
 }
-

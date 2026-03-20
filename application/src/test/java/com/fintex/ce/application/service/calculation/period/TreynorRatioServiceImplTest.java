@@ -1,19 +1,17 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.port.input.command.PeriodCommand;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.port.TBillsFetcher;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeMap;
-
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -32,9 +30,9 @@ class TreynorRatioServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsPort.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, tBillsCacheStorage, Set.of()));
+        .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
     final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
@@ -44,7 +42,7 @@ class TreynorRatioServiceImplTest {
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
-    when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(weightedAverageReturns);
+    when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
     // ACT
@@ -58,9 +56,9 @@ class TreynorRatioServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsPort.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, tBillsCacheStorage, Set.of()));
+        .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
     final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
@@ -70,14 +68,14 @@ class TreynorRatioServiceImplTest {
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
-    when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(weightedAverageReturns);
+    when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
     // ACT
     sut.defineCalculationMethod(req);
 
     // VERIFY
-    verify(tBillsCacheStorage).loadTBillsFor(CAD);
+    verify(tBillsFetcher).fetch(CAD);
   }
 
   @Test
@@ -85,16 +83,16 @@ class TreynorRatioServiceImplTest {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
       final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-      final var tBillsCacheStorage = mock(TBillsPort.class);
+      final var tBillsFetcher = mock(TBillsFetcher.class);
       final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
-          .useConstructor(monthlyReturnsService, tBillsCacheStorage, Set.of()));
+          .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
       final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
       final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>();
       final var req = mock(PeriodCommand.class);
 
       when(req.getCurrency()).thenReturn(CAD);
-      when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(treeMap);
+      when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
       when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
       when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);

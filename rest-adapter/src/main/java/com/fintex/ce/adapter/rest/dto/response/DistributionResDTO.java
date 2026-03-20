@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.enumeration.DailyResultType;
+import com.fintex.ce.domain.model.enumeration.DailyResultType;
 import com.fintex.ce.domain.model.calculation.DistributionData;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import lombok.AllArgsConstructor;

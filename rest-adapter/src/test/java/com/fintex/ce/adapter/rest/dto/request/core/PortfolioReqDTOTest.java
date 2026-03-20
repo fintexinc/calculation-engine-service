@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.rest.dto.request.core;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
-import static com.fintex.ce.domain.enumeration.Currency.USD;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
+import static com.fintex.ce.domain.model.enumeration.Currency.USD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

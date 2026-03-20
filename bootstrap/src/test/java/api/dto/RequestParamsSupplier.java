@@ -1,7 +1,7 @@
 package api.dto;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import lombok.Data;
 
 import java.util.List;

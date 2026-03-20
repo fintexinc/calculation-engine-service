@@ -1,7 +1,7 @@
 package com.fintex.ce.service.calculation;
 
-import com.fintex.ce.port.input.command.MultiplePortfoliosCommand;
-import com.fintex.ce.port.input.result.CommonPerformanceDatesResult;
+import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
+import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
 
 public interface CommonPerformanceDateService {
 

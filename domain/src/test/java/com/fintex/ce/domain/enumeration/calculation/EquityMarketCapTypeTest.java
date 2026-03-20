@@ -1,8 +1,9 @@
 package com.fintex.ce.domain.enumeration.calculation;
 
+import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.SMALL;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.SMALL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_TIP_006;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_TIP_006;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.CountryAllocation;
 import com.fintex.sm.model.domain.value.CountryValue;

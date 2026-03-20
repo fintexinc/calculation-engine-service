@@ -1,38 +1,43 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.ParameterType;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
-import com.fintex.ce.domain.model.ParamHolderDTO;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.AverageMerCommand;
-import com.fintex.ce.port.input.result.ManagementFeeResult;
+import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.result.ManagementFeeResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_MF_MF_001;
-import static com.fintex.ce.domain.enumeration.HoldingType.CANADA_ETF;
-import static com.fintex.ce.domain.enumeration.HoldingType.CANADA_MUTUAL_FUNDS;
-import static com.fintex.ce.domain.enumeration.HoldingType.US_ETF;
-import static com.fintex.ce.domain.enumeration.ParameterType.ABSOLUTE;
-import static com.fintex.ce.domain.enumeration.ParameterType.SCALED;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MF_MF_001;
+import static com.fintex.ce.domain.model.enumeration.HoldingType.CANADA_ETF;
+import static com.fintex.ce.domain.model.enumeration.HoldingType.CANADA_MUTUAL_FUNDS;
+import static com.fintex.ce.domain.model.enumeration.HoldingType.US_ETF;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 @SuppressWarnings("unchecked")
 class ManagementFeeCalculationServiceImplTest {
@@ -40,9 +45,9 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void shouldPerform_whenCheckResult() {
     // SETUP
-    final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
+    final var managementFeeFetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-        .useConstructor(managementFeeCacheStorage));
+        .useConstructor(managementFeeFetcher));
 
     final var resDto = mock(ManagementFeeResult.class);
 
@@ -60,35 +65,36 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifyLoad() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
+      final var managementFeeFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-          .useConstructor(managementFeeCacheStorage));
+          .useConstructor(managementFeeFetcher));
 
       final var reqDTO = mock(AverageMerCommand.class);
-      final var holdings = mock(List.class);
+      final List<Holding> holdings = List.of();
       final var resDto = mock(ManagementFeeResult.class);
       final var defaultProviders = mock(List.class);
 
       mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(anyList(), any(DataProvider[].class))).thenReturn(defaultProviders);
       when(reqDTO.getHoldings()).thenReturn(holdings);
       when(sut.calculateAverageValue(any(), any())).thenReturn(resDto);
+      when(managementFeeFetcher.fetch(any(), any())).thenReturn(Map.of());
 
       doCallRealMethod().when(sut).perform(any());
-      doCallRealMethod().when(sut).loadDataFromCacheStorage(any());
+      doCallRealMethod().when(sut).fetchData(any());
       // ACT
       sut.perform(reqDTO);
 
       // VERIFY
-      verify(managementFeeCacheStorage).load(holdings, defaultProviders, List.of(), new ParamHolderDTO());
+      verify(managementFeeFetcher).fetch(holdings, defaultProviders);
     }
   }
 
   @Test
   void shouldPerform_whenVerifySetNullForScaledIfHoldingContainsNoFunds() {
     // SETUP
-    final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
+    final var managementFeeFetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-        .useConstructor(managementFeeCacheStorage));
+        .useConstructor(managementFeeFetcher));
 
     final var resDto = mock(ManagementFeeResult.class);
     final var reqDTO = mock(AverageMerCommand.class);
@@ -112,15 +118,15 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifyCalculateAverageValue() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
+      final var managementFeeFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-          .useConstructor(managementFeeCacheStorage));
+          .useConstructor(managementFeeFetcher));
 
       final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
-      when(managementFeeCacheStorage.load(any(), anyList(), anyList(), any())).thenReturn(map);
+      when(managementFeeFetcher.fetch(any(), any())).thenReturn(map);
       mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(anyList(), any(ParameterType[].class))).thenReturn(parameterTypes);
       when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
@@ -138,16 +144,16 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
+      final var managementFeeFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-          .useConstructor(managementFeeCacheStorage));
+          .useConstructor(managementFeeFetcher));
 
       final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
       when(reqDTO.getParameterTypes()).thenReturn(parameterTypes);
-      when(managementFeeCacheStorage.load(any(), anyList(), anyList(), any())).thenReturn(map);
+      when(managementFeeFetcher.fetch(any(), any())).thenReturn(map);
       when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
       doCallRealMethod().when(sut).perform(any());
@@ -163,20 +169,21 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifyGetSpecifiedIfEmptyDEFAULTDATAPROVIDERS() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeCacheStorage = mock(HoldingDataLoader.class);
+      final var managementFeeFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-          .useConstructor(managementFeeCacheStorage));
+          .useConstructor(managementFeeFetcher));
 
       final HashMap<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var providers = mock(List.class);
 
       when(reqDTO.getDataProviders()).thenReturn(providers);
-      when(managementFeeCacheStorage.load(any(), anyList(), anyList(), any())).thenReturn(map);
+      when(reqDTO.getHoldings()).thenReturn(List.of());
+      when(managementFeeFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
       doCallRealMethod().when(sut).perform(any());
-      doCallRealMethod().when(sut).loadDataFromCacheStorage(any());
+      doCallRealMethod().when(sut).fetchData(any());
       // ACT
       sut.perform(reqDTO);
 

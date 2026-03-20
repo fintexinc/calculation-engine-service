@@ -1,8 +1,7 @@
 package com.fintex.ce.application.service;
 
-import com.fintex.ce.application.service.GeographicAllocationMappingServiceImpl;
-import com.fintex.ce.domain.enumeration.ExceptionCode;
-import com.fintex.ce.domain.enumeration.calculation.GeographicRegionType;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import org.junit.jupiter.api.BeforeEach;

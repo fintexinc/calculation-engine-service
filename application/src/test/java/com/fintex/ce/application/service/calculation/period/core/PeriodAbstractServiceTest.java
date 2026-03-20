@@ -2,11 +2,10 @@ package com.fintex.ce.application.service.calculation.period.core;
 
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.application.service.calculation.period.core.PeriodAbstractService;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.port.input.result.PeriodResult;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.util.ReturnFactorScale;
 import org.junit.jupiter.api.Assertions;

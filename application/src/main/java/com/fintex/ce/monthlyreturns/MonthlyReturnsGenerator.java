@@ -1,11 +1,11 @@
 package com.fintex.ce.monthlyreturns;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.MonthlyReturns;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.MonthlyReturnGeneratableHolding;
-import com.fintex.ce.port.output.ReturnsGenerator;
+import com.fintex.ce.service.ReturnsGenerator;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

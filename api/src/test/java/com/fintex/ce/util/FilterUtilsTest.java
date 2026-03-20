@@ -1,7 +1,7 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.Holding;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

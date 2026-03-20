@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.webclient.mapper;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.util.EnumMap;
 import java.util.Map;

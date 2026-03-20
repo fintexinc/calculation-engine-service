@@ -1,34 +1,29 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.FxRatesPort;
-import com.fintex.ce.port.output.HoldingDataLoader;
-
-import java.util.HashMap;
-
 import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
 import com.fintex.ce.application.validation.BenchmarkCpsdDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.monthlyreturns.FxRatesConversionComponent;
 import com.fintex.ce.monthlyreturns.MonthlyReturnsGenerator;
 import com.fintex.ce.monthlyreturns.Returns;
 import com.fintex.ce.monthlyreturns.ReturnsCutComponent;
 import com.fintex.ce.monthlyreturns.WeightedAverageComponent;
+import com.fintex.ce.port.FxRatesFetcher;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -143,34 +138,34 @@ class MonthlyReturnsServiceTest {
   void shouldGetMonthlyReturns_whenVerifyLoad() {
     // SETUP
     try (MockedConstruction<Returns> mocked = Mockito.mockConstruction(Returns.class)) {
-      final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
+      final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
       final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
       final var sut = mock(MonthlyReturnsService.class, withSettings()
-          .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesPort.class), gicMonthlyReturnsGenerator));
+          .useConstructor(monthlyReturnsFetcher, mock(FxRatesFetcher.class), gicMonthlyReturnsGenerator));
 
       final var holdings = mock(List.class);
 
-      when(monthlyReturnsCacheStorage.load(any(), any(), any(), any())).thenReturn(new HashMap<>());
+      when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
       doCallRealMethod().when(sut).getMonthlyReturns(anyList(), any());
 
       // ACT
       sut.getMonthlyReturns(holdings, CAD);
 
       // VERIFY
-      verify(monthlyReturnsCacheStorage).load(holdings, List.of(), List.of(), new ParamHolderDTO(CAD));
+      verify(monthlyReturnsFetcher).fetch(holdings, List.of());
     }
   }
 
   @Test
   void shouldGetMonthlyReturns_whenCheckResult() {
     // SETUP
-    final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
+    final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesPort.class), gicMonthlyReturnsGenerator));
+        .useConstructor(monthlyReturnsFetcher, mock(FxRatesFetcher.class), gicMonthlyReturnsGenerator));
 
     final var originalMonthlyReturns = mock(Map.class);
-    when(monthlyReturnsCacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(originalMonthlyReturns);
+    when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(originalMonthlyReturns);
     final Returns expected = mock(Returns.class);
     when(sut.getMonthlyReturns(originalMonthlyReturns)).thenReturn(expected);
 
@@ -186,13 +181,13 @@ class MonthlyReturnsServiceTest {
   @Test
   void shouldGetMonthlyReturns_whenVerifyGicWasGenerated() {
     // SETUP
-    final var monthlyReturnsCacheStorage = mock(HoldingDataLoader.class);
+    final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(monthlyReturnsCacheStorage, mock(FxRatesPort.class), gicMonthlyReturnsGenerator));
+        .useConstructor(monthlyReturnsFetcher, mock(FxRatesFetcher.class), gicMonthlyReturnsGenerator));
 
     final var originalMonthlyReturns = mock(Map.class);
-    when(monthlyReturnsCacheStorage.load(anyList(), anyList(), anyList(), any())).thenReturn(originalMonthlyReturns);
+    when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(originalMonthlyReturns);
     final Map gicOriginalMonthlyReturns = mock(Map.class);
     when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(gicOriginalMonthlyReturns);
 
@@ -340,13 +335,13 @@ class MonthlyReturnsServiceTest {
   @Test
   void shouldGetFxRates_whenCheckResult() {
     // SETUP
-    final var fxRatesCacheStorage = mock(FxRatesPort.class);
+    final var fxRatesFetcher = mock(FxRatesFetcher.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(mock(HoldingDataLoader.class), fxRatesCacheStorage, gicMonthlyReturnsGenerator));
+        .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, gicMonthlyReturnsGenerator));
 
     final var fxRates = mock(Map.class);
-    when(fxRatesCacheStorage.loadFxRates()).thenReturn(fxRates);
+    when(fxRatesFetcher.fetch()).thenReturn(fxRates);
     doCallRealMethod().when(sut).getFxRates();
 
     // ACT

@@ -1,18 +1,16 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.port.input.command.PeriodCommand;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.port.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.TreeMap;
-
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -28,15 +26,15 @@ class BetaCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsPort.class);
-    final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsCacheStorage, null));
+    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher, null));
 
     final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
@@ -52,16 +50,16 @@ class BetaCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     // SETUP
-    final var tBillsCacheStorage = mock(TBillsPort.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(BetaCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsCacheStorage, null));
+        .useConstructor(null, tBillsFetcher, null));
 
     final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
@@ -71,15 +69,15 @@ class BetaCalculationServiceImplTest {
     sut.defineCalculationMethod(req);
 
     // VERIFY
-    verify(tBillsCacheStorage).loadTBillsFor(Currency.CAD);
+    verify(tBillsFetcher).fetch(Currency.CAD);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       // SETUP
-      final var tBillsCacheStorage = mock(TBillsPort.class);
-      final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsCacheStorage,
+      final var tBillsFetcher = mock(TBillsFetcher.class);
+      final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
           null));
 
       final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
@@ -87,7 +85,7 @@ class BetaCalculationServiceImplTest {
       final var req = mock(PeriodCommand.class);
 
       when(req.getCurrency()).thenReturn(Currency.CAD);
-      when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(treeMap);
+      when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
       when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
       when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);

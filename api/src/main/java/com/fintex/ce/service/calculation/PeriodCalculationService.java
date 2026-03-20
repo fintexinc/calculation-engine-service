@@ -1,7 +1,7 @@
 package com.fintex.ce.service.calculation;
 
-import com.fintex.ce.port.input.command.PeriodCommand;
-import com.fintex.ce.port.input.result.PeriodResult;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.result.PeriodResult;
 
 /**
  * Port interface for period-based calculation services. Implementations handle calculations like trailing returns,
@@ -12,15 +12,6 @@ import com.fintex.ce.port.input.result.PeriodResult;
  * @param <R>
  *          The command type extending PeriodCommand
  */
-public interface PeriodCalculationService<E extends PeriodResult, R extends PeriodCommand> {
-
-  /**
-   * Performs the period-based calculation.
-   *
-   * @param command
-   *          the command containing holdings, periods, and other parameters
-   * @return the calculation result
-   */
-  E perform(R command);
+public interface PeriodCalculationService<E extends PeriodResult, R extends PeriodCommand> extends CalculationService<E, R> {
 
 }

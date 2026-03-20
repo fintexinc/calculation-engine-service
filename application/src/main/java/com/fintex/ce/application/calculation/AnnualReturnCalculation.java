@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.port.input.result.AnnualReturnResult;
-import com.fintex.ce.port.input.result.core.KeyValueResult;
+import com.fintex.ce.domain.model.result.AnnualReturnResult;
+import com.fintex.ce.domain.model.result.core.KeyValueResult;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.util.DecimalUtils;
 import lombok.extern.log4j.Log4j2;

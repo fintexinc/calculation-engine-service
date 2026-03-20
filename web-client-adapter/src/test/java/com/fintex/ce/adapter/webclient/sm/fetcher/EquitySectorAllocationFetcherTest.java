@@ -2,9 +2,9 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.adapter.webclient.sm.mapper.EquitySectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.sm.model.domain.value.EquitySectorAllocationTypeNameValue;
 import java.math.BigDecimal;
 import java.util.List;

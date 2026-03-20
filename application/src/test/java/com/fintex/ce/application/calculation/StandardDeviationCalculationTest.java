@@ -1,9 +1,8 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.StandardDeviationCalculation;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.result.StandardDeviationResult;
-import com.fintex.ce.port.input.result.core.TimeIntervalResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.result.StandardDeviationResult;
+import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import com.fintex.ce.util.CalculationUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;

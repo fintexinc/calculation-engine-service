@@ -1,16 +1,15 @@
 package com.fintex.ce.application.service.calculation.breakdown;
 
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.WarningResult;
+import com.fintex.ce.domain.model.result.WarningResult;
 import com.fintex.ce.service.calculation.BreakdownCalculationService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import static com.fintex.ce.util.CalculationUtils.sumProduct;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
@@ -33,7 +32,7 @@ public abstract class BreakdownAbstractService<E extends WarningResult, T>
       final List<Warning> warnings);
 
   /**
-   * Fetches exposure data for holdings. Implementation decides the data source (REST API, cache, etc.).
+   * Fetches exposure data for holdings. Implementation decides the data source (REST API, etc.).
    */
   public abstract Map<Holding, Map<T, BigDecimal>> fetchExposures(PortfolioHoldingsCommand command,
       List<Warning> warnings);

@@ -1,9 +1,10 @@
 package com.fintex.ce.domain.enumeration;
 
 import com.fintex.ce.domain.exception.SystemException;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

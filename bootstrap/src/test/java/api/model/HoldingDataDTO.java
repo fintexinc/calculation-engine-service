@@ -1,8 +1,8 @@
 package api.model;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.InterestFreq;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import lombok.Data;
 
 import java.math.BigDecimal;

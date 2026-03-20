@@ -1,11 +1,8 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.InformationRatioCalculation;
-import com.fintex.ce.application.calculation.TrackingErrorCalculation;
-import com.fintex.ce.application.calculation.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.port.input.result.InformationRatioResult;
-import com.fintex.ce.port.input.result.core.TimeIntervalResult;
+import com.fintex.ce.domain.model.result.InformationRatioResult;
+import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 

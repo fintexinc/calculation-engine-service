@@ -1,10 +1,10 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.domain.enumeration.calculation.ClassificationAllocationType;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.ClassificationAllocationResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.domain.model.result.ClassificationAllocationResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import java.math.BigDecimal;
@@ -13,7 +13,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -24,17 +23,17 @@ import static org.mockito.Mockito.withSettings;
 class ClassificationAllocationCalculationServiceImplTest {
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenCheckResult() {
+  void shouldFetch_whenCheckResult() {
     // SETUP
-    final var cacheStorage = mock(HoldingDataLoader.class);
+    final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(ClassificationAllocationCalculationServiceImpl.class, withSettings()
-        .useConstructor( cacheStorage));
+        .useConstructor( fetcher));
 
     final var holding = mock(Holding.class);
     final var exposures = Map.of(holding, Map.of(ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL,
         BigDecimal.TEN));
 
-    when(cacheStorage.load(any(), any(), any(), any())).thenReturn(exposures);
+    when(fetcher.fetch(any(), any())).thenReturn(exposures);
     doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
     final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
@@ -104,9 +103,9 @@ class ClassificationAllocationCalculationServiceImplTest {
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var cacheStorage = mock(HoldingDataLoader.class);
+      final var fetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ClassificationAllocationCalculationServiceImpl.class, withSettings()
-          .useConstructor( cacheStorage));
+          .useConstructor( fetcher));
 
       final var exposures = mock(Map.class);
       final var expected = new ClassificationAllocationResult();

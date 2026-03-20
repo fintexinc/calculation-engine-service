@@ -34,6 +34,12 @@
 
 
 
+        <!-- Micrometer Tracing API -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing</artifactId>
+        </dependency>
+
         <!-- AspectJ for AOP -->
         <dependency>
             <groupId>org.aspectj</groupId>

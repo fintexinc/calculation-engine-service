@@ -1,6 +1,6 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.Holding;
 import java.util.List;
 import java.util.function.Predicate;

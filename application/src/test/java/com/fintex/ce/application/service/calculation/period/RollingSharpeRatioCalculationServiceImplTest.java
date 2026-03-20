@@ -1,20 +1,18 @@
 package com.fintex.ce.application.service.calculation.period;
 
-import com.fintex.ce.port.output.TBillsPort;
 import com.fintex.ce.application.calculation.RollingSharpeRatioCalculation;
 import com.fintex.ce.application.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.application.service.calculation.MonthlyReturnsService;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.RollingCalculationCommand;
 import com.fintex.ce.monthlyreturns.Returns;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.port.TBillsFetcher;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-
+import org.junit.jupiter.api.Test;
 import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_ONE;
 import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
 import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
@@ -33,10 +31,10 @@ class RollingSharpeRatioCalculationServiceImplTest {
   void shouldPerform_whenVerifyDefineCalculationMethod() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsPort.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, tBillsCacheStorage, defaultPeriods));
+        .useConstructor(monthlyReturnsService, tBillsFetcher, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
     final var holdings = List.of(mock(Holding.class));
@@ -58,10 +56,10 @@ class RollingSharpeRatioCalculationServiceImplTest {
   void shouldPerform_whenVerifyCalculate() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsPort.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, tBillsCacheStorage, defaultPeriods));
+        .useConstructor(monthlyReturnsService, tBillsFetcher, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
     final var holdings = List.of(mock(Holding.class));
@@ -84,17 +82,17 @@ class RollingSharpeRatioCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsCacheStorage = mock(TBillsPort.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, tBillsCacheStorage, defaultPeriods));
+        .useConstructor(monthlyReturnsService, tBillsFetcher, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
     final var input = mock(BenchmarkCalculationDTO.class);
 
     when(sut.buildCalculationDto(any(), any())).thenReturn(input);
     when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsCacheStorage.loadTBillsFor(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     // ACT
@@ -109,7 +107,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, mock(TBillsPort.class), Set.of()));
+        .useConstructor(monthlyReturnsService, mock(TBillsFetcher.class), Set.of()));
 
     final TreeMap portfolioBaseTotalReturn = mock(TreeMap.class);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
@@ -130,7 +128,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, mock(TBillsPort.class), Set.of()));
+        .useConstructor(monthlyReturnsService, mock(TBillsFetcher.class), Set.of()));
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
 
@@ -152,7 +150,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, mock(TBillsPort.class), Set.of()));
+        .useConstructor(monthlyReturnsService, mock(TBillsFetcher.class), Set.of()));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
     final var holdings = mock(List.class);

@@ -1,8 +1,8 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.EtfHolding;
@@ -18,8 +18,8 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
-import static com.fintex.ce.domain.enumeration.calculation.CreditQualityRating.AAA;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
+import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AAA;
 import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
 import static java.math.BigDecimal.*;
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,8 +1,8 @@
 package com.fintex.ce.util;
 
 import com.fintex.ce.domain.model.FxRates;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.model.IncomeForecastDto;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.dto.IncomeForecastDto;
 import com.fintex.ce.domain.model.holding.*;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;

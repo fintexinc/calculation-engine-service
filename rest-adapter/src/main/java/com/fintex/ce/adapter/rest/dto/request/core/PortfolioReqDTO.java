@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.dto.request.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.FilterUtils;

@@ -2,7 +2,7 @@ package performance.testing.payload.generator;
 
 import com.fintex.ce.adapter.rest.dto.request.ReturnReqDTO;
 
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
 
 public class ReturnReqDTOPayloadGenerator extends PayloadGenerator<ReturnReqDTO> {
 

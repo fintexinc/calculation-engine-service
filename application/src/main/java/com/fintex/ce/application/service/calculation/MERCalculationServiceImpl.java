@@ -1,46 +1,93 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.ParameterType;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculationDTO;
-import com.fintex.ce.domain.model.ParamHolderDTO;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.AverageMerCommand;
-import com.fintex.ce.port.input.result.AverageMerResult;
-import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.port.output.HoldingDataLoader;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
+import com.fintex.ce.domain.model.AverageMer;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.result.AverageMerResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import static com.fintex.ce.domain.enumeration.ExceptionCode.*;
-import static com.fintex.ce.domain.enumeration.ParameterType.*;
+import org.springframework.stereotype.Service;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_MERMF_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_NERGER_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_GER_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_MER_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_NER_001;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service
 public class MERCalculationServiceImpl extends AverageManagementExpenseCalculationService<AverageMerResult> {
 
-  private final HoldingDataLoader<Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>>> averageMERCachePort;
+  private final SecurityDataFetcher<AverageMer> averageMerSecurityDataFetcher;
 
-  public MERCalculationServiceImpl(@Qualifier("averageMer") final HoldingDataLoader<Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>>> averageMERCachePort) {
+  public MERCalculationServiceImpl(final SecurityDataFetcher<AverageMer> averageMerSecurityDataFetcher) {
     super();
-    this.averageMERCachePort = averageMERCachePort;
+    this.averageMerSecurityDataFetcher = averageMerSecurityDataFetcher;
   }
 
   @Override
-  public Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> loadDataFromCacheStorage(
+  public Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
       final AverageMerCommand reqDTO) {
-    return averageMERCachePort.load(reqDTO.getHoldings(), getSpecifiedIfEmpty(reqDTO.getDataProviders(),
-        DataProvider.DEFAULT_PROVIDERS),
-        List.of(), new ParamHolderDTO());
+    Map<Holding, AverageMer> rawData = averageMerSecurityDataFetcher.fetch(
+        reqDTO.getHoldings(),
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS));
+    return groupAndMap(rawData, reqDTO.getHoldings());
+  }
+
+  private Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupAndMap(
+      Map<Holding, AverageMer> rawData, List<? extends Holding> holdings) {
+    Map<HoldingType, Map<Holding, AverageManagementExpenseCalculationDTO>> result = new EnumMap<>(HoldingType.class);
+
+    for (var entry : rawData.entrySet()) {
+      Holding holding = entry.getKey();
+      AverageMer mer = entry.getValue();
+      AverageManagementExpenseCalculationDTO dto = mapMerToDto(holding, mer);
+      result.computeIfAbsent(holding.getType(), k -> new HashMap<>()).put(holding, dto);
+    }
+
+    for (Holding holding : holdings) {
+      if (!rawData.containsKey(holding)) {
+        AverageManagementExpenseCalculationDTO dto = new AverageManagementExpenseCalculationDTO()
+            .setMarketValue(holding.getValue())
+            .setHoldingType(holding.getType())
+            .setInitialFee(BigDecimal.ZERO)
+            .setModifiedFee(BigDecimal.ZERO);
+        result.computeIfAbsent(holding.getType(), k -> new HashMap<>()).put(holding, dto);
+      }
+    }
+
+    return result;
+  }
+
+  private AverageManagementExpenseCalculationDTO mapMerToDto(Holding holding, AverageMer mer) {
+    var dto = new AverageManagementExpenseCalculationDTO()
+        .setMarketValue(holding.getValue())
+        .setHoldingType(holding.getType());
+    HoldingType type = holding.getType();
+    if (type == HoldingType.US_ETF || type == HoldingType.US_MUTUAL_FUNDS) {
+      dto.setNetExpenseRatio(mer.getNetExpenseRatio());
+      dto.setGrossExpenseRatio(mer.getGrossExpenseRatio());
+    } else {
+      dto.setManagementExpenseRatio(mer.getMer());
+      dto.setActualManagementFee(mer.getActualManagementFee());
+    }
+    return dto;
   }
 
   @Override

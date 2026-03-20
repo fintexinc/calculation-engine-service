@@ -1,11 +1,9 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.SharpeRatioCalculation;
-import com.fintex.ce.application.calculation.StandardDeviationCalculation;
 import com.fintex.ce.application.calculation.core.PeriodCalculationAbstract;
 import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.port.input.result.SharpeRatioResult;
-import com.fintex.ce.port.input.result.core.TimeIntervalResult;
+import com.fintex.ce.domain.model.result.SharpeRatioResult;
+import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

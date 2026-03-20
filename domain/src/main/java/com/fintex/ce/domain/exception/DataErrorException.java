@@ -1,6 +1,6 @@
 package com.fintex.ce.domain.exception;
 
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import lombok.Getter;
 
 @Getter

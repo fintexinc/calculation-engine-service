@@ -7,7 +7,7 @@ import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.StockHolding;
 import com.fintex.ce.domain.model.holding.UsMutualFundHolding;
-import com.fintex.ce.domain.enumeration.ExceptionCode;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;

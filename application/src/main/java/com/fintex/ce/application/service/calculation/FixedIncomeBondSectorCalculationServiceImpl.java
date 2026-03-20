@@ -3,31 +3,31 @@ package com.fintex.ce.application.service.calculation;
 import com.fintex.ce.application.calculation.FixedIncomeBondSectorCalculation;
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.enumeration.calculation.FixedIncomeSectorType;
-import com.fintex.ce.domain.model.ParamHolderDTO;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.AssetAllocation;
+import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.FixedIncomeSectorResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
+import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import static com.fintex.ce.domain.enumeration.DataProvider.EAGLE;
-import static com.fintex.ce.domain.enumeration.DataProvider.MORNINGSTAR;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.CASH;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.FIXED_INCOME;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_BS_BS_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
+import static java.math.BigDecimal.ZERO;
 
 @Service
 public class FixedIncomeBondSectorCalculationServiceImpl
@@ -36,31 +36,36 @@ public class FixedIncomeBondSectorCalculationServiceImpl
 
   public static final Map<FixedIncomeSectorType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
+  static final Map<FixedIncomeSectorType, BigDecimal> ALLOCATION_DEFAULT_MAP;
+
   static {
     Stream.of(FixedIncomeSectorType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
+    ALLOCATION_DEFAULT_MAP = Collections.unmodifiableMap(
+        Stream.of(FixedIncomeSectorType.values()).collect(java.util.stream.Collectors.toMap(type -> type, type -> ZERO)));
   }
 
-  private final HoldingDataLoader<Map<Holding, Map<FixedIncomeSectorType, BigDecimal>>> fixedIncomeBondSectorCachePort;
-  private final AssetAllocationCachePort assetAllocationCachePort;
+  private final SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSectorSecurityDataFetcher;
+  private final SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
-  private final AssetAllocationDataValidator assetAllocationDataValidator;
 
-  @Autowired
   public FixedIncomeBondSectorCalculationServiceImpl(
-      HoldingDataLoader<Map<Holding, Map<FixedIncomeSectorType, BigDecimal>>> fixedIncomeBondSectorCachePort,      AssetAllocationCachePort assetAllocationCachePort,
-      AssetAllocationDataMapper assetAllocationDataMapper,
-      AssetAllocationDataValidator assetAllocationDataValidator) {
+      SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSectorSecurityDataFetcher,
+      SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher,
+      AssetAllocationDataMapper assetAllocationDataMapper) {
     super();
-    this.fixedIncomeBondSectorCachePort = fixedIncomeBondSectorCachePort;
-    this.assetAllocationCachePort = assetAllocationCachePort;
+    this.fixedIncomeBondSectorSecurityDataFetcher = fixedIncomeBondSectorSecurityDataFetcher;
+    this.assetAllocationSecurityDataFetcher = assetAllocationSecurityDataFetcher;
     this.assetAllocationDataMapper = assetAllocationDataMapper;
-    this.assetAllocationDataValidator = assetAllocationDataValidator;
   }
 
   @Override
   public Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> fetchExposures(PortfolioHoldingsCommand reqDTO,
       List<Warning> warnings) {
-    return fixedIncomeBondSectorCachePort.load(reqDTO.getHoldings(), List.of(), warnings, new ParamHolderDTO());
+    Map<Holding, FixedIncomeBondSecurities> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
+        reqDTO.getHoldings(), List.of());
+    return AllocationMappingUtils.mapToAllocations(rawData,
+        FixedIncomeBondSecurities::getFixedIncomeBondSectors, FixedIncomeSectorType::of,
+        ALLOCATION_DEFAULT_MAP, WRN_BS_BS_001, "FDS Fixed Income Sector Allocation", warnings);
   }
 
   @Override
@@ -83,10 +88,9 @@ public class FixedIncomeBondSectorCalculationServiceImpl
 
   private Map<Holding, BigDecimal> getFixedIncomePlusCash(final List<Holding> holdings,
       final List<Warning> warnings) {
-    final AssetAllocationDataDTO assetAllocationDataDto = assetAllocationCachePort.load(
-        holdings, List.of(MORNINGSTAR, EAGLE), warnings, new ParamHolderDTO());
-    assetAllocationDataValidator.validate(assetAllocationDataDto, warnings);
-    var assetAllocations = assetAllocationDataMapper.mapForAA(assetAllocationDataDto);
+    final Map<Holding, AssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
+        holdings, List.of(MORNINGSTAR, EAGLE));
+    var assetAllocations = assetAllocationDataMapper.mapFromRaw(rawData, holdings);
     return assetAllocations.entrySet()
         .stream()
         .collect(toMap(Map.Entry::getKey, this::getFixedIncomePlusCashValue));

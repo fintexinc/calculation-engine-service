@@ -1,12 +1,9 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.MarRatioCalculation;
-import com.fintex.ce.application.calculation.MaxDrawdownCalculation;
-import com.fintex.ce.application.calculation.TrailingTotalReturnsCalculation;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.result.MARRatioResult;
-import com.fintex.ce.port.input.result.core.MaxDrawdownEntry;
-import com.fintex.ce.port.input.result.core.TimeIntervalResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.result.MARRatioResult;
+import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.domain.model.result.core.MaxDrawdownEntry;
 import com.fintex.ce.util.DecimalUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;

@@ -1,6 +1,6 @@
 package performance.testing.payload.generator;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.PeriodsReqDTO;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-import static com.fintex.ce.domain.enumeration.HoldingType.*;
+import static com.fintex.ce.domain.model.enumeration.HoldingType.*;
 import static performance.testing.RandomUtil.getCurrency;
 import static performance.testing.RandomUtil.getRandomInt;
 

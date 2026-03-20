@@ -1,12 +1,12 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
+import com.fintex.ce.domain.model.calculation.CountryRegionType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.EquityCountryExposureResult;
-import com.fintex.ce.port.output.sm.SecurityDataPort;
+import com.fintex.ce.domain.model.result.EquityCountryExposureResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.service.CountryAllocationMappingService;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
@@ -16,12 +16,10 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -31,14 +29,12 @@ import static org.mockito.Mockito.withSettings;
 
 class EquityCountryExposureCalculationServiceImplTest {
 
-  @SuppressWarnings("unchecked")
-  private final SecurityDataPort<EquityCountryAllocation> securityDataPort = mock(SecurityDataPort.class);
-  private final CountryAllocationMappingService countryAllocationMappingService = mock(CountryAllocationMappingService.class);
-
   @Test
   void shouldPerform_whenVerifyValidateHoldings() {
+    final var fetcher = mock(SecurityDataFetcher.class);
+    final var mappingService = mock(CountryAllocationMappingService.class);
     final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
-        withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
+        withSettings().useConstructor(fetcher, mappingService));
 
     final PortfolioHoldingsCommand req = mock(PortfolioHoldingsCommand.class);
     final List<Holding> holdings = List.of(mock(Holding.class));
@@ -91,8 +87,10 @@ class EquityCountryExposureCalculationServiceImplTest {
   @Test
   void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
+      final var fetcher = mock(SecurityDataFetcher.class);
+      final var mappingService = mock(CountryAllocationMappingService.class);
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
-          withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
+          withSettings().useConstructor(fetcher, mappingService));
 
       final var exposures = mock(Map.class);
 
@@ -106,8 +104,10 @@ class EquityCountryExposureCalculationServiceImplTest {
   @Test
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
+      final var fetcher = mock(SecurityDataFetcher.class);
+      final var mappingService = mock(CountryAllocationMappingService.class);
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
-          withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
+          withSettings().useConstructor(fetcher, mappingService));
 
       final var exposures = mock(Map.class);
       final var expected = new EquityCountryExposureResult();
@@ -124,27 +124,25 @@ class EquityCountryExposureCalculationServiceImplTest {
   }
 
   @Test
-  void shouldFetchExposures_whenCheckResult() {
-    final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
-        withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
+  void shouldFetch_whenCheckResult() {
+    try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
+      final var fetcher = mock(SecurityDataFetcher.class);
+      final var mappingService = mock(CountryAllocationMappingService.class);
+      final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
+          withSettings().useConstructor(fetcher, mappingService));
 
-    final var holding = mock(Holding.class);
-    final var command = mock(PortfolioHoldingsCommand.class);
-    when(command.getHoldings()).thenReturn(List.of(holding));
-    when(command.getDataProviders()).thenReturn(List.of());
+      final var holding = mock(Holding.class);
+      final var rawAllocation = new EquityCountryAllocation();
+      rawAllocation.setAllocations(Map.of("CAN", TEN));
+      when(fetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawAllocation));
+      final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
+      when(mappingService.mapToCountryRegions(any(), any(), any())).thenReturn(exposures);
+      doCallRealMethod().when(sut).fetchExposures(any(), any());
+      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
 
-    final var allocation = new EquityCountryAllocation()
-        .setAllocations(Map.of("CAN", BigDecimal.valueOf(0.65)));
-    when(securityDataPort.fetch(any(), any())).thenReturn(Map.of(holding, allocation));
-
-    final var expected = Map.of(holding, Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(0.65)));
-    when(countryAllocationMappingService.mapToCountryRegions(any(), anyList(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
-    final var actual = sut.fetchExposures(command, List.of());
-
-    assertEquals(expected, actual);
-    assertTrue(actual.containsKey(holding));
+      assertEquals(exposures, actual);
+      assertTrue(actual.containsKey(holding));
+    }
   }
 
   @Test

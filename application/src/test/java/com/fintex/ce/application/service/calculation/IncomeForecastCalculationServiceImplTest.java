@@ -1,27 +1,19 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.port.output.HoldingDataLoader;
-import com.fintex.ce.domain.model.IncomeForecast;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.ce.domain.enumeration.InterestFreq;
+import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
 import com.fintex.ce.domain.model.Income;
+import com.fintex.ce.domain.model.IncomeForecast;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.holding.FixedIncomeHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
-import com.fintex.ce.port.input.command.IncomeForecastCommand;
-import com.fintex.ce.port.input.result.IncomeForecastResult;
+import com.fintex.ce.domain.model.result.IncomeForecastResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +21,13 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,7 +37,7 @@ import static org.mockito.Mockito.when;
 class IncomeForecastCalculationServiceImplTest {
 
   @Mock
-  private HoldingDataLoader incomeForecastCacheStorage;
+  private SecurityDataFetcher incomeForecastFetcher;
 
   @InjectMocks
   private IncomeForecastCalculationServiceImpl sut;
@@ -52,7 +50,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldTestPerform_whenConditionIsMet() {
     IncomeForecastCommand reqDTO = new IncomeForecastCommand(); // Initialize with some mock data if needed
-    when(incomeForecastCacheStorage.load(any(), any(), any(), any())).thenReturn(new HashMap<>());
+    when(incomeForecastFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
     IncomeForecastResult response = sut.perform(reqDTO);
     assertNotNull(response);
   }
@@ -87,7 +85,7 @@ class IncomeForecastCalculationServiceImplTest {
     final List<String> schedule = List.of("1-30", "3-15", "6-20", "10-12");
     final BigDecimal holdingValue = new BigDecimal(1000);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(fundSeriesHolding, incomeForecast));
     Mockito.when(fundSeriesHolding.getType()).thenReturn(HoldingType.CANADA_MUTUAL_FUNDS);
     Mockito.when(fundSeriesHolding.getValue()).thenReturn(holdingValue);
@@ -135,7 +133,7 @@ class IncomeForecastCalculationServiceImplTest {
     final List<String> schedule = List.of("6-30", "12-30");
     final BigDecimal holdingValue = new BigDecimal(1000);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(fundSeriesHolding, incomeForecast));
     Mockito.when(fundSeriesHolding.getType()).thenReturn(HoldingType.CANADA_MUTUAL_FUNDS);
     Mockito.when(fundSeriesHolding.getValue()).thenReturn(holdingValue);
@@ -182,7 +180,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final String adpNumber = "ADP";
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(fixedIncomeHolding, incomeForecast));
     Mockito.when(fixedIncomeHolding.getType()).thenReturn(HoldingType.FIXED_INCOME);
     Mockito.when(fixedIncomeHolding.getValue()).thenReturn(holdingValue);
@@ -230,7 +228,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final BigDecimal holdingValue = new BigDecimal(1000);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(fixedIncomeHolding, incomeForecast));
     Mockito.when(fixedIncomeHolding.getType()).thenReturn(HoldingType.FIXED_INCOME);
     Mockito.when(fixedIncomeHolding.getValue()).thenReturn(holdingValue);
@@ -266,7 +264,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final LocalDate currentDate = LocalDate.now();
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
@@ -306,7 +304,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final LocalDate investmentDate = LocalDate.now().minusMonths(1);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
@@ -340,7 +338,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final LocalDate investmentDate = LocalDate.now().minusMonths(2);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
@@ -377,7 +375,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final LocalDate investmentDate = LocalDate.now().minusMonths(2);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
@@ -414,7 +412,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final LocalDate investmentDate = LocalDate.now().minusMonths(2);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
@@ -451,7 +449,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final LocalDate investmentDate = LocalDate.now().minusMonths(2);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
@@ -488,7 +486,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final LocalDate investmentDate = LocalDate.now().minusMonths(2);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
@@ -521,7 +519,7 @@ class IncomeForecastCalculationServiceImplTest {
     final BigDecimal holdingValue = new BigDecimal(1000);
     final LocalDate investmentDate = LocalDate.now().minusMonths(2);
 
-    Mockito.when(incomeForecastCacheStorage.load(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(incomeForecastFetcher.fetch(Mockito.any(), Mockito.any()))
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getType()).thenReturn(HoldingType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);

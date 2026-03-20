@@ -1,11 +1,10 @@
 package com.fintex.ce.application.service.calculation;
 
-import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
-import com.fintex.ce.domain.model.ParamHolderDTO;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.EquityMarketCapResult;
-import com.fintex.ce.port.output.HoldingDataLoader;
+import com.fintex.ce.domain.model.result.EquityMarketCapResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ComparisonUtils;
 import com.fintex.ce.util.DecimalUtils;
@@ -19,14 +18,13 @@ import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import static com.fintex.ce.application.service.calculation.EquityMarketCapCalculationServiceImpl.DEFAULT_MAP;
 import static com.fintex.ce.application.service.calculation.EquityMarketCapCalculationServiceImpl.GROUPS;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.GIANT;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.LARGE;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.MEDIUM;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.MICRO;
-import static com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType.SMALL;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.GIANT;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.LARGE;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.MEDIUM;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.MICRO;
+import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.SMALL;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
@@ -74,9 +72,9 @@ class EquityMarketCapCalculationServiceImplTest {
   @Test
   void shouldPerform_whenVerifyLoad() {
     // SETUP
-    final var marketCapCacheStorage = mock(HoldingDataLoader.class);
+    final var marketCapFetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
-        .useConstructor(marketCapCacheStorage));
+        .useConstructor(marketCapFetcher));
 
     final var holdings = List.of(mock(Holding.class));
     final var req = mock(PortfolioHoldingsCommand.class);
@@ -88,16 +86,16 @@ class EquityMarketCapCalculationServiceImplTest {
     sut.fetchExposures(req, List.of());
 
     // VERIFY
-    verify(marketCapCacheStorage).load(req.getHoldings(), List.of(), List.of(), new ParamHolderDTO());
+    verify(marketCapFetcher).fetch(any(), any());
   }
 
   @Test
   void shouldPerform_whenVerifyAreAllValuesZerosInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var marketCapCacheStorage = mock(HoldingDataLoader.class);
+      final var marketCapFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
-          .useConstructor(marketCapCacheStorage));
+          .useConstructor(marketCapFetcher));
 
       final var exposures = mock(Map.class);
 
@@ -114,9 +112,9 @@ class EquityMarketCapCalculationServiceImplTest {
   void shouldPerform_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var marketCapCacheStorage = mock(HoldingDataLoader.class);
+      final var marketCapFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
-          .useConstructor(marketCapCacheStorage));
+          .useConstructor(marketCapFetcher));
 
       final var exposures = mock(Map.class);
       final var expected = new EquityMarketCapResult();

@@ -1,11 +1,11 @@
 package performance.testing;
 
-import com.fintex.ce.domain.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.Currency;
 
 import java.util.Random;
 
-import static com.fintex.ce.domain.enumeration.Currency.CAD;
-import static com.fintex.ce.domain.enumeration.Currency.USD;
+import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
+import static com.fintex.ce.domain.model.enumeration.Currency.USD;
 
 public class RandomUtil {
 

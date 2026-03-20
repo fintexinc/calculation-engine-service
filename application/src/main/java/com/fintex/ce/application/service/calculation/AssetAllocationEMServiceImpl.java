@@ -2,21 +2,21 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
 import com.fintex.ce.application.service.calculation.breakdown.BreakdownAbstractService;
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionEmType;
-import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.domain.model.EquityCountryAllocation;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
+import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.domain.model.AssetAllocation;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.input.result.AssetAllocationEMResult;
-import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
-import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.result.AssetAllocationEMResult;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.service.CountryAllocationMappingService;
 import com.fintex.ce.util.DecimalUtils;
-import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
-import com.fintex.ce.util.validation.data.DataProviderChecker;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -28,22 +28,24 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
-import static com.fintex.ce.domain.enumeration.DataProvider.BROADRIDGE;
-import static com.fintex.ce.domain.enumeration.DataProvider.DEFAULT_PROVIDERS;
-import static com.fintex.ce.domain.enumeration.DataProvider.EAGLE;
-import static com.fintex.ce.domain.enumeration.DataProvider.ENVESTNET;
-import static com.fintex.ce.domain.enumeration.DataProvider.MORNINGSTAR;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.CASH;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.EM_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.EUROPEAN_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.FIXED_INCOME;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.INTERNATIONAL_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.OTHER;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.UNCLASSIFIED;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.US_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.CountryRegionType.UNITED_STATES;
+
+import static com.fintex.ce.domain.model.enumeration.DataProvider.BROADRIDGE;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.DEFAULT_PROVIDERS;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.ENVESTNET;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.EM_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.EUROPEAN_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.INTERNATIONAL_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.CountryRegionType.UNITED_STATES;
 import static com.fintex.ce.util.CalculationUtils.sum;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
@@ -54,23 +56,20 @@ public class AssetAllocationEMServiceImpl
     extends
       BreakdownAbstractService<AssetAllocationEMResult, AssetAllocationRegionEmType> {
 
-  private final EquityCountryAllocationCachePort countryAllocationCachePort;
-  private final AssetAllocationCachePort assetAllocationCachePort;
-  private final AssetAllocationDataValidator assetAllocationDataValidator;
+  private final SecurityDataFetcher<EquityCountryAllocation> countryAllocationSecurityDataFetcher;
+  private final SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
-  private final DataProviderChecker dataProviderChecker;
+  private final CountryAllocationMappingService countryAllocationMappingService;
 
-  public AssetAllocationEMServiceImpl(final EquityCountryAllocationCachePort countryAllocationCachePort,
-      final AssetAllocationCachePort assetAllocationCachePort,
-      final AssetAllocationDataValidator assetAllocationDataValidator,
-      final AssetAllocationDataMapper assetAllocationDataMapper,
-      final DataProviderChecker dataProviderChecker) {
+  public AssetAllocationEMServiceImpl(
+          final SecurityDataFetcher<EquityCountryAllocation> countryAllocationSecurityDataFetcher,
+          final SecurityDataFetcher<AssetAllocation> assetAllocationSecurityDataFetcher,
+          final AssetAllocationDataMapper assetAllocationDataMapper, CountryAllocationMappingService countryAllocationMappingService) {
     super();
-    this.countryAllocationCachePort = countryAllocationCachePort;
-    this.assetAllocationCachePort = assetAllocationCachePort;
-    this.assetAllocationDataValidator = assetAllocationDataValidator;
+    this.countryAllocationSecurityDataFetcher = countryAllocationSecurityDataFetcher;
+    this.assetAllocationSecurityDataFetcher = assetAllocationSecurityDataFetcher;
     this.assetAllocationDataMapper = assetAllocationDataMapper;
-    this.dataProviderChecker = dataProviderChecker;
+    this.countryAllocationMappingService = countryAllocationMappingService;
   }
 
   @Override
@@ -89,14 +88,10 @@ public class AssetAllocationEMServiceImpl
   public Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> fetchExposures(
       final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    final var assetAllocationDataDto = assetAllocationCachePort.loadWithDataProvidersCheck(
+    final Map<Holding, AssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS),
-        warnings);
-    dataProviderChecker.check(getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS),
-        assetAllocationDataDto);
-    assetAllocationDataValidator.validate(assetAllocationDataDto, warnings);
-    final var assetAllocations = assetAllocationDataMapper.mapForAAEM(assetAllocationDataDto);
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS));
+    final var assetAllocations = assetAllocationDataMapper.mapFromRawWithProvider(rawData, reqDTO.getHoldings());
 
     return calculateAssetAllocationEMarketMap(reqDTO.getHoldings(),
         assetAllocations,
@@ -114,8 +109,12 @@ public class AssetAllocationEMServiceImpl
       final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> assetAllocations,
       final List<DataProvider> providers,
       final List<Warning> warnings) {
-    final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = countryAllocationCachePort
-        .loadWithDataProvidersCheck(holdings, providers, warnings);
+    Map<Holding, EquityCountryAllocation> rawCountryAllocations = countryAllocationSecurityDataFetcher.fetch(
+        holdings, providers);
+    Map<Holding, Map<String, BigDecimal>> holdingAllocations = rawCountryAllocations.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
+    final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = countryAllocationMappingService
+        .mapToCountryRegions(holdingAllocations, warnings, WRN_RRC_ECE_001);
     final Map<Holding, BigDecimal> equityDifference = calculateEquityDifference(
         holdings, countryAllocationsMap, retrieveAssetAllocations(assetAllocations));
     return holdings.stream().collect(
@@ -165,11 +164,9 @@ public class AssetAllocationEMServiceImpl
           CountryRegionType.EMERGING_MARKET)).orElse(ZERO);
       return selectEmergingValueForDataProvider(assetPair.getKey(), eSupplier, mSupplier, holding);
     } else if (AssetAllocationRegionEmType.UNCLASSIFIED.equals(type)) {
-      // OTHER
       final Supplier<BigDecimal> supplier = () -> assetPair.getValue().get(UNCLASSIFIED);
       return selectEmergingValueForDataProvider(assetPair.getKey(), supplier, supplier, holding);
     } else {
-      // OTHER
       final Supplier<BigDecimal> supplier = () -> assetPair.getValue().get(OTHER);
       return selectEmergingValueForDataProvider(assetPair.getKey(), supplier, supplier, holding);
     }
@@ -180,19 +177,6 @@ public class AssetAllocationEMServiceImpl
     return () -> Optional.ofNullable(countryAllocations).map(p -> (p.get(type))).orElse(ZERO);
   }
 
-  /**
-   * Calculates emerging market for international-equity
-   *
-   * @param holding
-   *          holding
-   * @param assetPair
-   *          asset allocations pair
-   * @param countryAllocations
-   *          country allocations
-   * @param equityDifference
-   *          equity differences
-   * @return emerging market for international-equity
-   */
   public BigDecimal emForInternationalEquity(final Holding holding,
       final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> assetPair,
       final Map<CountryRegionType, BigDecimal> countryAllocations,
@@ -211,19 +195,6 @@ public class AssetAllocationEMServiceImpl
     return selectEmergingValueForDataProvider(assetPair.getKey(), eSupplier, mSupplier, holding);
   }
 
-  /**
-   * Calculates value by one of the entered suppliers (eagle, morningstar)
-   *
-   * @param dataProvider
-   *          data provider
-   * @param eagleSupplier
-   *          eagle supplier
-   * @param mrStarSupplier
-   *          mrStar supplier
-   * @param holding
-   *          holding
-   * @return value calculated by one of the suppliers
-   */
   public BigDecimal selectEmergingValueForDataProvider(final DataProvider dataProvider,
       final Supplier<BigDecimal> eagleSupplier,
       final Supplier<BigDecimal> mrStarSupplier,
@@ -240,17 +211,6 @@ public class AssetAllocationEMServiceImpl
     throw new SystemException(message, ErrorCode.INTERNAL_SERVER_ERROR);
   }
 
-  /**
-   * Calculates equity difference for each holding
-   *
-   * @param holdings
-   *          holdings
-   * @param countryAllocations
-   *          country allocations
-   * @param assetAllocations
-   *          asset allocations
-   * @return map of holdings and their equity difference
-   */
   public Map<Holding, BigDecimal> calculateEquityDifference(final List<Holding> holdings,
       final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations,
       final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations) {
@@ -260,19 +220,6 @@ public class AssetAllocationEMServiceImpl
         equities, h)));
   }
 
-  /**
-   * Calculates equity difference
-   *
-   * @param countryAllocations
-   *          country allocations
-   * @param assetAllocations
-   *          asset allocations
-   * @param equities
-   *          set of equities to perform sum for
-   * @param holding
-   *          holding
-   * @return equity difference
-   */
   public BigDecimal calculateEquityDiff(final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations,
       final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
       final Set<AssetAllocationRegion> equities,

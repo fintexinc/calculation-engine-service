@@ -2,9 +2,9 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.calculation.BestWorstPeriodCalculation;
 import com.fintex.ce.monthlyreturns.Returns;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.command.BestWorstPeriodsCommand;
-import com.fintex.ce.port.input.result.BestWorstPeriodsResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
+import com.fintex.ce.domain.model.result.BestWorstPeriodsResult;
 import com.fintex.ce.service.calculation.CalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

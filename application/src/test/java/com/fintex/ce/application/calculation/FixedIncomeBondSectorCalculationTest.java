@@ -1,12 +1,11 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.FixedIncomeBondSectorCalculation;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.calculation.FixedIncomeSectorType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.holding.EtfHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.result.FixedIncomeSectorResult;
+import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.ce.util.ComparisonUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

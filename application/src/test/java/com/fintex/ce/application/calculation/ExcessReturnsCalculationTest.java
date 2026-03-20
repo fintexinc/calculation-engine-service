@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.port.input.result.ExcessReturnsResult;
-import com.fintex.ce.port.input.result.core.TimeIntervalResult;
+import com.fintex.ce.domain.model.result.ExcessReturnsResult;
+import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import com.fintex.ce.util.DecimalUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;

@@ -1,23 +1,20 @@
 package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.application.mapper.AssetAllocationDataMapper;
-import com.fintex.ce.domain.enumeration.DataProvider;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionEmType;
-import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
+import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.output.cache.AssetAllocationCachePort;
-import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
+import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.service.CountryAllocationMappingService;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.ce.util.validation.data.AssetAllocationDataValidator;
-import com.fintex.ce.util.validation.data.DataProviderChecker;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,18 +26,17 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import static com.fintex.ce.domain.enumeration.DataProvider.DEFAULT_PROVIDERS;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.CASH;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.EM_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.EUROPEAN_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.FIXED_INCOME;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.INTERNATIONAL_EQUITIES;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.OTHER;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.UNCLASSIFIED;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegion.US_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.EM_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.EUROPEAN_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.INTERNATIONAL_EQUITIES;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.DEFAULT_PROVIDERS;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
@@ -63,15 +59,14 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldCalculateEquityDiff_whenCheckResult() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final Holding h = mock(Holding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
@@ -698,15 +693,14 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldCalculateAssetAllocationEMarketMap_whenVerifyLoadWithDataProvidersCheck() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final var providers = mock(List.class);
 
@@ -725,21 +719,20 @@ class AssetAllocationEMServiceImplTest {
     sut.calculateAssetAllocationEMarketMap(List.of(h), Map.of(h, pair), providers, warnings);
 
     // VERIFY
-    verify(equityCountryAllocationCacheStorage).loadWithDataProvidersCheck(List.of(h), providers, warnings);
+    verify(countryAllocationFetcher).fetch(eq(List.of(h)), eq(providers));
   }
 
   @Test
   void shouldCalculateAssetAllocationEMarketMap_whenVerifyCalculateEquityDifference() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final var providers = mock(List.class);
 
@@ -752,7 +745,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = Map.of(h, Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, ONE));
-    when(equityCountryAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
+    when(countryAllocationMappingService.mapToCountryRegions(any(), any(), any())).thenReturn(
         countryAllocationsMap);
 
     doCallRealMethod().when(sut).retrieveAssetAllocations(any());
@@ -770,15 +763,14 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldCalculateAssetAllocationEMarketMap_whenVerifyCalculateEmergingMarket() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final var providers = mock(List.class);
 
@@ -794,7 +786,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = Map.of(h, Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, ONE));
-    when(equityCountryAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
+    when(countryAllocationMappingService.mapToCountryRegions(any(), any(), any())).thenReturn(
         countryAllocationsMap);
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
     when(sut.calculateEquityDifference(any(), any(), any())).thenReturn(equityDifference);
@@ -813,15 +805,14 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldRetrieveAssetAllocations_whenCheckResult() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final Holding h = mock(Holding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
@@ -841,15 +832,14 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldPerform_whenVerifyValidateHoldings() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final PortfolioHoldingsCommand reqDto = mock(PortfolioHoldingsCommand.class);
     final List<Holding> holdings = List.of(mock(Holding.class));
@@ -863,18 +853,17 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenCheckResult() {
+  void shouldFetch_whenCheckResult() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+      final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final var dataProviderChecker = mock(DataProviderChecker.class);
+      final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
       final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-          equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-          assetAllocationDataMapper, dataProviderChecker));
+          countryAllocationFetcher, assetAllocationFetcher,
+          assetAllocationDataMapper, countryAllocationMappingService));
 
       final var holding = mock(Holding.class);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
@@ -889,103 +878,97 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenVerifyMapForAAEM() {
+  void shouldFetch_whenVerifyMapForAAEM() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+      final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final var dataProviderChecker = mock(DataProviderChecker.class);
+      final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
       final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-          equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-          assetAllocationDataMapper, dataProviderChecker));
+          countryAllocationFetcher, assetAllocationFetcher,
+          assetAllocationDataMapper, countryAllocationMappingService));
 
       final var req = mock(PortfolioHoldingsCommand.class);
       final List<Warning> warnings = List.of();
-      final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
-      when(assetAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
-          assetAllocationDataDto);
+      when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
+      when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(Map.of());
 
       doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
       sut.fetchExposures(req, warnings);
 
       // VERIFY
-      verify(assetAllocationDataMapper).mapForAAEM(assetAllocationDataDto);
+      verify(assetAllocationDataMapper).mapFromRawWithProvider(any(), any());
     }
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenVerifyValidate() {
+  void shouldFetch_whenVerifyValidate() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+      final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final var dataProviderChecker = mock(DataProviderChecker.class);
+      final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
       final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-          equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-          assetAllocationDataMapper, dataProviderChecker));
+          countryAllocationFetcher, assetAllocationFetcher,
+          assetAllocationDataMapper, countryAllocationMappingService));
 
       final var req = mock(PortfolioHoldingsCommand.class);
       final List<Warning> warnings = List.of();
-      final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
-      when(assetAllocationCacheStorage.loadWithDataProvidersCheck(anyList(), anyList(), anyList())).thenReturn(
-          assetAllocationDataDto);
+      when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
+      when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(Map.of());
 
       doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT
       sut.fetchExposures(req, warnings);
 
       // VERIFY
-      verify(assetAllocationDataValidator).validate(assetAllocationDataDto, warnings);
+      verify(assetAllocationDataMapper).mapFromRawWithProvider(any(), any());
     }
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenVerifyCheck() {
+  void shouldFetch_whenVerifyCheck() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final var req = mock(PortfolioHoldingsCommand.class);
     final var providers = List.of(DataProvider.EAGLE, DataProvider.MORNINGSTAR);
     when(req.getDataProviders()).thenReturn(providers);
-    final var assetAllocationDataDto = mock(AssetAllocationDataDTO.class);
-    when(assetAllocationCacheStorage.loadWithDataProvidersCheck(any(), any(), any())).thenReturn(assetAllocationDataDto);
+    when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
+    when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(Map.of());
 
     doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
     sut.fetchExposures(req, List.of());
 
     // VERIFY
-    verify(dataProviderChecker).check(eq(providers), eq(assetAllocationDataDto));
+    verify(assetAllocationFetcher).fetch(any(), any());
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenVerifyLoadWithDataProvidesCheck() {
+  void shouldFetch_whenVerifyLoadWithDataProvidesCheck() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
     final var warnings = new ArrayList<Warning>();
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final var holding = mock(Holding.class);
     final var portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
@@ -1001,24 +984,23 @@ class AssetAllocationEMServiceImplTest {
     sut.fetchExposures(portfolioHoldingsReqDTO, warnings);
 
     // VERIFY
-    verify(assetAllocationCacheStorage).loadWithDataProvidersCheck(eq(List.of(holding)), eq(providers), eq(warnings));
+    verify(assetAllocationFetcher).fetch(eq(List.of(holding)), any());
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenVerifyCalculateAssetAllocationEMarketMap() {
+  void shouldFetch_whenVerifyCalculateAssetAllocationEMarketMap() {
     // SETUP
-    final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-    final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-    final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+    final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+    final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-    final var dataProviderChecker = mock(DataProviderChecker.class);
+    final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
     final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-        equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-        assetAllocationDataMapper, dataProviderChecker));
+        countryAllocationFetcher, assetAllocationFetcher,
+        assetAllocationDataMapper, countryAllocationMappingService));
 
     final var holding = mock(Holding.class);
-    final var assetAllocations = mock(AssetAllocationDataDTO.class);
+    final Map assetAllocations = mock(Map.class);
     final PortfolioHoldingsCommand portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
     final var providers = List.of(DataProvider.MORNINGSTAR);
@@ -1026,9 +1008,9 @@ class AssetAllocationEMServiceImplTest {
 
     when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
     when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
-    when(assetAllocationCacheStorage.loadWithDataProvidersCheck(any(), any(), any())).thenReturn(assetAllocations);
+    when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(assetAllocations);
     when(sut.calculateAssetAllocationEMarketMap(any(), any(), any(), any())).thenReturn(exposures);
-    when(assetAllocationDataMapper.mapForAAEM(assetAllocations)).thenReturn(mappedResult);
+    when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(mappedResult);
     doCallRealMethod().when(sut).fetchExposures(any(), any());
     // ACT
     sut.fetchExposures(portfolioHoldingsReqDTO, List.of());
@@ -1039,28 +1021,27 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenVerifyGetSpecifiedIfEmpty() {
+  void shouldFetch_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var equityCountryAllocationCacheStorage = mock(EquityCountryAllocationCachePort.class);
-      final var assetAllocationCacheStorage = mock(AssetAllocationCachePort.class);
-      final var assetAllocationDataValidator = mock(AssetAllocationDataValidator.class);
+      final var countryAllocationFetcher = mock(SecurityDataFetcher.class);
+      final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final var dataProviderChecker = mock(DataProviderChecker.class);
+      final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
       final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
-          equityCountryAllocationCacheStorage, assetAllocationCacheStorage, assetAllocationDataValidator,
-          assetAllocationDataMapper, dataProviderChecker));
+          countryAllocationFetcher, assetAllocationFetcher,
+          assetAllocationDataMapper, countryAllocationMappingService));
 
       final var holding = mock(Holding.class);
-      final var assetAllocations = mock(AssetAllocationDataDTO.class);
+      final Map assetAllocations = mock(Map.class);
       final var providers = mock(List.class);
       final PortfolioHoldingsCommand portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
 
       when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
       when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
-      when(assetAllocationCacheStorage.loadWithDataProvidersCheck(any(), any(), any())).thenReturn(assetAllocations);
+      when(assetAllocationDataMapper.mapFromRawWithProvider(any(), any())).thenReturn(assetAllocations);
       when(sut.calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList())).thenReturn(exposures);
       doCallRealMethod().when(sut).fetchExposures(any(), any());
       // ACT

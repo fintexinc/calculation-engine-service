@@ -1,11 +1,9 @@
 package com.fintex.ce.application.calculation;
 
-import com.fintex.ce.application.calculation.RollingTotalReturnsCalculation;
-import com.fintex.ce.application.calculation.TrailingTotalReturnsCalculation;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.result.core.RollingIntervalResult;
-import com.fintex.ce.port.input.result.RollingTotalReturnsResult;
-import com.fintex.ce.port.input.result.core.IntervalResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.result.core.RollingIntervalResult;
+import com.fintex.ce.domain.model.result.RollingTotalReturnsResult;
+import com.fintex.ce.domain.model.result.core.IntervalResult;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;

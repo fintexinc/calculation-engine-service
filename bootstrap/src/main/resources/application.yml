@@ -8,12 +8,6 @@ spring:
       client:
         composite-indicator:
           enabled: false
-  lettuce:
-    pool:
-      max-idle: 10
-      max-wait: 5000
-      min-idle: 3
-      max-active: 15
 
 external-services:
   security-master:
@@ -43,12 +37,6 @@ rest-template:
     connection-request-timeout: 90000 # time in millis, 1 * 60 * 1000
     connect-timeout: 90000 # time in millis
 
-security-master:
-  web-protocol: rest # "graphql" or "rest"
-  rest:
-    base-url: ${SM_REST_BASE_URL:http://localhost:8080}
-    timeout: 90000
-
 application:
   rest-template-enabled: true
 
@@ -64,14 +52,24 @@ default:
     accumulate-types: "E,ER,B,BC,BD,BT"
     recursion-types: "FO,FE,FS,EX"
 
-redis:
-  host: ${REDIS_HOST:localhost}
-  port: ${REDIS_PORT:6379}
-  timeout: 300000
-  password: ${REDIS_PASSWORD}
-  username: ${REDIS_USERNAME}
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: b3
+  observations:
+    http:
+      server:
+        requests:
+          name: http.server.requests
+      client:
+        requests:
+          name: http.client.requests
 
 logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
     root: INFO
 

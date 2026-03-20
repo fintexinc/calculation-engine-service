@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response.correlation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.ce.domain.model.holding.*;
 import com.fintex.ce.adapter.rest.dto.response.commonholdings.ParentHoldingDTO;
 import com.fintex.ce.util.FilterUtils;

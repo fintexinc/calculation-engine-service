@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.ce.domain.exception.ReqValidationException;
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_ALL_GTZ_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_ALL_GTZ_001;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.core;
 
-import com.fintex.ce.port.input.result.core.IntervalResult;
-import com.fintex.ce.port.input.result.core.RollingIntervalResult;
-import com.fintex.ce.domain.model.calculation.CalculationDTO;
-import com.fintex.ce.port.input.result.PeriodResult;
+import com.fintex.ce.domain.model.result.core.IntervalResult;
+import com.fintex.ce.domain.model.result.core.RollingIntervalResult;
+import com.fintex.ce.domain.dto.calculation.CalculationDTO;
+import com.fintex.ce.domain.model.result.PeriodResult;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;

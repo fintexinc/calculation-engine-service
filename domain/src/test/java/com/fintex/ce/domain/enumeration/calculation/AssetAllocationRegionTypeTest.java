@@ -1,11 +1,12 @@
 package com.fintex.ce.domain.enumeration.calculation;
 
 import com.fintex.ce.domain.exception.SystemException;
+import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionType.CASH;
-import static com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionType.US_EQUITY;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegionType.CASH;
+import static com.fintex.ce.domain.model.calculation.AssetAllocationRegionType.US_EQUITY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AssetAllocationRegionTypeTest {

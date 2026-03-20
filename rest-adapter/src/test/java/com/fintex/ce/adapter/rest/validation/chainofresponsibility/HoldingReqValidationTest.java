@@ -1,17 +1,17 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import static com.fintex.ce.domain.enumeration.Currency.USD;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_DH_001;
-import static com.fintex.ce.domain.enumeration.ExceptionCode.ERR_RRC_MC_002;
+import static com.fintex.ce.domain.model.enumeration.Currency.USD;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_DH_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MC_002;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fintex.ce.domain.enumeration.Currency;
-import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.InterestFreq;
+import com.fintex.ce.domain.model.enumeration.Currency;
+import com.fintex.ce.domain.model.enumeration.HoldingType;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.FundSeriesHolding;
