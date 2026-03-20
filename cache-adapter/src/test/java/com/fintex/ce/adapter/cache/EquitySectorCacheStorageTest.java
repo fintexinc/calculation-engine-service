@@ -8,7 +8,7 @@ import com.fintex.ce.adapter.cache.repository.equitysector.EquitySectorStockRepo
 import com.fintex.ce.port.output.sm.SecurityDataPort;
 import com.fintex.ce.port.mapper.CacheEntityMapper;
 import com.fintex.ce.domain.enumeration.HoldingType;
-import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.EquitySectorStock;
@@ -417,7 +417,7 @@ class EquitySectorCacheStorageTest {
     final EquitySector sector = mock(EquitySector.class);
     when(entry.getValue()).thenReturn(sector);
 
-    when(sector.getAllocations()).thenReturn(Map.of("TEST", BigDecimal.ONE));
+    when(sector.getAllocations()).thenReturn(Map.of(EquitySectorAllocationType.BASIC_MATERIALS, BigDecimal.ONE));
 
     doCallRealMethod().when(m).equitySectorAllocationMapper(any(), any());
     // ACT
@@ -425,9 +425,10 @@ class EquitySectorCacheStorageTest {
     final Map actual = m.equitySectorAllocationMapper(entry, warnings);
 
     // VERIFY
-    assertEquals(DEFAULT_MAP, actual);
-    assertEquals(1, warnings.size());
-    assertTrue(warnings.get(0).getMessage().contains("TEST"));
+    final HashMap<EquitySectorAllocationType, BigDecimal> expected = new HashMap<>(DEFAULT_MAP);
+    expected.put(EquitySectorAllocationType.BASIC_MATERIALS, BigDecimal.ONE);
+    assertEquals(expected, actual);
+    assertEquals(0, warnings.size());
   }
 
   @Test
@@ -443,7 +444,7 @@ class EquitySectorCacheStorageTest {
     final EquitySector sector = mock(EquitySector.class);
     when(entry.getValue()).thenReturn(sector);
 
-    when(sector.getAllocations()).thenReturn(Map.of(EquitySectorAllocationType.BASIC_MATERIALS.name(), BigDecimal.ONE));
+    when(sector.getAllocations()).thenReturn(Map.of(EquitySectorAllocationType.TECHNOLOGY, BigDecimal.TEN));
 
     doCallRealMethod().when(m).equitySectorAllocationMapper(any(), any());
     // ACT
@@ -452,7 +453,7 @@ class EquitySectorCacheStorageTest {
 
     // VERIFY
     final HashMap<EquitySectorAllocationType, BigDecimal> expected = new HashMap<>(DEFAULT_MAP);
-    expected.put(EquitySectorAllocationType.BASIC_MATERIALS, BigDecimal.ONE);
+    expected.put(EquitySectorAllocationType.TECHNOLOGY, BigDecimal.TEN);
 
     assertEquals(expected, actual);
     assertEquals(0, warnings.size());

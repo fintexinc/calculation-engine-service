@@ -1,6 +1,6 @@
 package com.fintex.ce.application.mapper.response;
 
-import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.port.input.result.EquitySectorResult;
@@ -28,12 +28,11 @@ class EquitySectorResponseMapperTest {
   }
 
   @Test
-  void shouldMapKnownKeysAndIgnoreUnknownKeys_whenMappingFromDomain() {
+  void shouldMapAndScaleAllocations_whenMappingFromDomain() {
     EquitySector domain = new EquitySector();
     domain.setAllocations(Map.of(
-        "ENERGY", new BigDecimal("0.12345678901"),
-        "TECHNOLOGY", new BigDecimal("0.2"),
-        "UNKNOWN_KEY", new BigDecimal("0.9")
+        EquitySectorAllocationType.ENERGY, new BigDecimal("0.12345678901"),
+        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2")
     ));
 
     EquitySectorResult result = mapper.toResponse(domain);

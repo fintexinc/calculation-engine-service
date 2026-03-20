@@ -70,7 +70,7 @@ import com.fintex.ce.domain.enumeration.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.enumeration.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
 import com.fintex.ce.domain.enumeration.calculation.EquityMarketCapType;
-import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.domain.enumeration.calculation.EquityStyleboxType;
 import com.fintex.ce.domain.enumeration.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.enumeration.calculation.FixedIncomeStyleboxType;

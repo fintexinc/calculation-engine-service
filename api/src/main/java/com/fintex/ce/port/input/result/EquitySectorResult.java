@@ -1,6 +1,6 @@
 package com.fintex.ce.port.input.result;
 
-import com.fintex.ce.domain.enumeration.calculation.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.ce.port.input.result.WarningResult;
 import lombok.Data;
 import lombok.experimental.Accessors;
