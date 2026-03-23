@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Component
+@Component("cacheEquityCountryAllocationMapper")
 public class EquityCountryAllocationMapper
     implements
       CacheEntityMapper<EquityCountryAllocation, REquityCountryAllocation> {
