@@ -2,10 +2,12 @@ package com.fintex.ce.application.service.calculation;
 
 import com.fintex.ce.domain.enumeration.HoldingType;
 import com.fintex.ce.domain.enumeration.calculation.CountryRegionType;
+import com.fintex.ce.domain.model.EquityCountryAllocation;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.input.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.input.result.EquityCountryExposureResult;
-import com.fintex.ce.port.output.cache.EquityCountryAllocationCachePort;
+import com.fintex.ce.port.output.sm.SecurityDataPort;
+import com.fintex.ce.service.CountryAllocationMappingService;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
@@ -17,7 +19,9 @@ import org.mockito.Mockito;
 
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -27,27 +31,25 @@ import static org.mockito.Mockito.withSettings;
 
 class EquityCountryExposureCalculationServiceImplTest {
 
+  @SuppressWarnings("unchecked")
+  private final SecurityDataPort<EquityCountryAllocation> securityDataPort = mock(SecurityDataPort.class);
+  private final CountryAllocationMappingService countryAllocationMappingService = mock(CountryAllocationMappingService.class);
+
   @Test
   void shouldPerform_whenVerifyValidateHoldings() {
-    // SETUP
-    final var storage = mock(EquityCountryAllocationCachePort.class);
     final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
-        withSettings().useConstructor(storage));
+        withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
 
     final PortfolioHoldingsCommand req = mock(PortfolioHoldingsCommand.class);
     final List<Holding> holdings = List.of(mock(Holding.class));
     when(req.getHoldings()).thenReturn(holdings);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     sut.perform(req);
-
-    // VERIFY
   }
 
   @Test
   void shouldCalculateNetProduct_whenCheckResult() {
-    // SETUP
     final EquityCountryExposureCalculationServiceImpl e = mock(EquityCountryExposureCalculationServiceImpl.class);
 
     final CountryRegionType canada = CountryRegionType.CANADA;
@@ -60,17 +62,14 @@ class EquityCountryExposureCalculationServiceImplTest {
         h2, Map.of(canada, BigDecimal.valueOf(5)));
 
     doCallRealMethod().when(e).calculateNetProduct(any(), any(), any());
-    // ACT
     final BigDecimal actual = e.calculateNetProduct(canada, exposures, Map.of(h1, BigDecimal.valueOf(3), h2, BigDecimal
         .valueOf(4)));
 
-    // VERIFY
     assertEquals(0, BigDecimal.valueOf(26).compareTo(actual));
   }
 
   @Test
   void shouldCalculateNetProduct_whenCheckResult2() {
-    // SETUP
     final EquityCountryExposureCalculationServiceImpl e = mock(EquityCountryExposureCalculationServiceImpl.class);
 
     final CountryRegionType type = CountryRegionType.EMERGING_MARKET;
@@ -83,29 +82,23 @@ class EquityCountryExposureCalculationServiceImplTest {
         h2, Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(5)));
 
     doCallRealMethod().when(e).calculateNetProduct(any(), any(), any());
-    // ACT
     final BigDecimal actual = e.calculateNetProduct(type, exposures, Map.of(h1, BigDecimal.valueOf(3), h2, BigDecimal
         .valueOf(4)));
 
-    // VERIFY
     assertEquals(0, BigDecimal.valueOf(6).compareTo(actual));
   }
 
   @Test
   void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var storage = mock(EquityCountryAllocationCachePort.class);
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
-          withSettings().useConstructor(storage));
+          withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
 
       final var exposures = mock(Map.class);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       sut.calculate(exposures, List.of(), List.of());
 
-      // VERIFY
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(exposures));
     }
   }
@@ -113,10 +106,8 @@ class EquityCountryExposureCalculationServiceImplTest {
   @Test
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var storage = mock(EquityCountryAllocationCachePort.class);
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
-          withSettings().useConstructor(storage));
+          withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
 
       final var exposures = mock(Map.class);
       final var expected = new EquityCountryExposureResult();
@@ -126,38 +117,39 @@ class EquityCountryExposureCalculationServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(true);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       final var actual = sut.calculate(exposures, List.of(), List.of());
 
-      // VERIFY
       assertEquals(expected, actual);
     }
   }
 
   @Test
-  void shouldGetLoadFromCacheStorage_whenCheckResult() {
-    try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
-      final var storage = mock(EquityCountryAllocationCachePort.class);
-      final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
-          withSettings().useConstructor(storage));
+  void shouldFetchExposures_whenCheckResult() {
+    final var sut = mock(EquityCountryExposureCalculationServiceImpl.class,
+        withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
 
-      final var holding = mock(Holding.class);
-      final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
-      when(storage.load(any(), any(), any(), any())).thenReturn(exposures);
-      doCallRealMethod().when(sut).fetchExposures(any(), any());
-      // ACT
-      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    final var holding = mock(Holding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of());
 
-      // VERIFY
-      assertEquals(exposures, actual);
-    }
+    final var allocation = new EquityCountryAllocation()
+        .setAllocations(Map.of("CAN", BigDecimal.valueOf(0.65)));
+    when(securityDataPort.fetch(any(), any())).thenReturn(Map.of(holding, allocation));
+
+    final var expected = Map.of(holding, Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(0.65)));
+    when(countryAllocationMappingService.mapToCountryRegions(any(), anyList(), any())).thenReturn(expected);
+
+    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    final var actual = sut.fetchExposures(command, List.of());
+
+    assertEquals(expected, actual);
+    assertTrue(actual.containsKey(holding));
   }
 
   @Test
   void shouldCalculate_whenVerifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class);
 
       final var holding = mock(Holding.class);
@@ -166,10 +158,8 @@ class EquityCountryExposureCalculationServiceImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       sut.calculate(exposures, holdings, List.of());
 
-      // VERIFY
       verify(sut).calculateNetProducts(exposures, holdings, CountryRegionType.values());
     }
   }
@@ -178,7 +168,6 @@ class EquityCountryExposureCalculationServiceImplTest {
   void shouldCalculate_whenVerifyReScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class);
 
       final var holding = mock(Holding.class);
@@ -190,10 +179,8 @@ class EquityCountryExposureCalculationServiceImplTest {
       when(sut.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       sut.calculate(exposures, holdings, List.of());
 
-      // VERIFY
       mockedCalculationUtils.verify(() -> CalculationUtils.reScaleAbs(netProducts));
     }
   }
@@ -203,7 +190,6 @@ class EquityCountryExposureCalculationServiceImplTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      // SETUP
       final var sut = mock(EquityCountryExposureCalculationServiceImpl.class);
 
       final var holding = mock(Holding.class);
@@ -217,10 +203,8 @@ class EquityCountryExposureCalculationServiceImplTest {
       when(sut.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
-      // ACT
       sut.calculate(exposures, holdings, List.of());
 
-      // VERIFY
       mockedDecimalUtils.verify(() -> DecimalUtils.toUserScale(netProducts));
     }
   }
