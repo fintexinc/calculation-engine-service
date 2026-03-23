@@ -252,6 +252,10 @@
                                 <value>${project.basedir}/allure-results</value>
                             </property>
                             <property>
+                                <name>org.aspectj.dump.directory</name>
+                                <value>${project.build.directory}/ajcore</value>
+                            </property>
+                            <property>
                                 <name>junit.jupiter.extensions.autodetection.enabled</name>
                                 <value>true</value>
                             </property>
