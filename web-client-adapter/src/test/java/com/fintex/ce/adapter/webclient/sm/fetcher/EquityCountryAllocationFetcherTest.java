@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.adapter.webclient.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
+import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquityCountryAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
@@ -9,7 +9,6 @@ import com.fintex.sm.model.domain.allocation.CountryAllocation;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 

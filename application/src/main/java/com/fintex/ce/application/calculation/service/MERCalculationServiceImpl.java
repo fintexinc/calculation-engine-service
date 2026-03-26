@@ -1,0 +1,184 @@
+package com.fintex.ce.application.calculation.service;
+
+import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
+import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.domain.model.AverageMer;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.ce.domain.model.enumeration.ParameterType;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.model.result.AverageMerResult;
+import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import org.springframework.stereotype.Service;
+
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_MERMF_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_NERGER_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_GER_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_MER_001;
+import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_NER_001;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
+import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
+import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
+
+@Service
+public class MERCalculationServiceImpl extends AverageManagementExpenseCalculationService<AverageMerResult> {
+
+  private final SecurityDataFetcher<AverageMer> averageMerSecurityDataFetcher;
+
+  public MERCalculationServiceImpl(final SecurityDataFetcher<AverageMer> averageMerSecurityDataFetcher) {
+    super();
+    this.averageMerSecurityDataFetcher = averageMerSecurityDataFetcher;
+  }
+
+  @Override
+  public Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
+      final AverageMerCommand reqDTO) {
+    Map<Holding, AverageMer> rawData = averageMerSecurityDataFetcher.fetch(
+        reqDTO.getHoldings(),
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS));
+    return groupAndMap(rawData, reqDTO.getHoldings());
+  }
+
+  private Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupAndMap(
+      Map<Holding, AverageMer> rawData, List<? extends Holding> holdings) {
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> result = new EnumMap<>(FinancialInstrumentType.class);
+
+    for (var entry : rawData.entrySet()) {
+      Holding holding = entry.getKey();
+      AverageMer mer = entry.getValue();
+      AverageManagementExpenseCalculationDTO dto = mapMerToDto(holding, mer);
+      result.computeIfAbsent(holding.getHoldingType(), k -> new HashMap<>()).put(holding, dto);
+    }
+
+    for (Holding holding : holdings) {
+      if (!rawData.containsKey(holding)) {
+        AverageManagementExpenseCalculationDTO dto = new AverageManagementExpenseCalculationDTO()
+            .setMarketValue(holding.getValue())
+            .setHoldingType(holding.getHoldingType())
+            .setInitialFee(BigDecimal.ZERO)
+            .setModifiedFee(BigDecimal.ZERO);
+        result.computeIfAbsent(holding.getHoldingType(), k -> new HashMap<>()).put(holding, dto);
+      }
+    }
+
+    return result;
+  }
+
+  private AverageManagementExpenseCalculationDTO mapMerToDto(Holding holding, AverageMer mer) {
+    var dto = new AverageManagementExpenseCalculationDTO()
+        .setMarketValue(holding.getValue())
+        .setHoldingType(holding.getHoldingType());
+    FinancialInstrumentType type = holding.getHoldingType();
+    if (type == FinancialInstrumentType.ETF_US || type == FinancialInstrumentType.MUTUAL_FUND_US) {
+      dto.setNetExpenseRatio(mer.getNetExpenseRatio());
+      dto.setGrossExpenseRatio(mer.getGrossExpenseRatio());
+    } else {
+      dto.setManagementExpenseRatio(mer.getMer());
+      dto.setActualManagementFee(mer.getActualManagementFee());
+    }
+    return dto;
+  }
+
+  @Override
+  public List<Warning> setInitialFeeAndModifiedFeeValues(
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupOfMers) {
+    List<Warning> warnings = new ArrayList<>();
+    var notification = new Notification();
+    groupOfMers.forEach((holdingType, mer) -> {
+      if (FinancialInstrumentType.ETF_CANADA.equals(holdingType) || FinancialInstrumentType.MUTUAL_FUND_CANADA.equals(holdingType)
+          || FinancialInstrumentType.SEGREGATED_FUND_CANADA.equals(holdingType)
+          || FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holdingType)) {
+        mer.forEach((key, value) -> handleFeesForCanadaMutualHedgeFundsAndEtf(value, key, notification).ifPresent(
+            warnings::addAll));
+      } else if (FinancialInstrumentType.ETF_US.equals(holdingType) || FinancialInstrumentType.MUTUAL_FUND_US.equals(holdingType)) {
+        mer.forEach((key, value) -> handleFeesForUsEtfAndMutualFund(value, key, notification).ifPresent(warnings::add));
+      }
+    });
+
+    notification.ifAnyErrorThrowException();
+    return warnings;
+  }
+
+  public Optional<List<Warning>> handleFeesForCanadaMutualHedgeFundsAndEtf(
+      AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO,
+      Holding holding,
+      Notification notification) {
+    if (Objects.isNull(averageManagementExpenseCalculationDTO.getManagementExpenseRatio()) &&
+        Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
+      if (FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holding.getHoldingType())) {
+        setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+            .getManagementExpenseRatio());
+        return Optional.of(List.of(WRN_MER_MER_001.warning(holding), WRN_MER_AMF_001.warning(holding)));
+      } else {
+        notification.addError(ERR_MER_MERMF_001.error(holding));
+      }
+    } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getManagementExpenseRatio())) {
+      setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+          .getActualManagementFee());
+      return Optional.of(List.of(WRN_MER_MER_001.warning(holding)));
+    } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
+      setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+          .getManagementExpenseRatio());
+      return Optional.of(List.of(WRN_MER_AMF_001.warning(holding)));
+    }
+    setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+        .getManagementExpenseRatio());
+    return Optional.empty();
+  }
+
+  public Optional<Warning> handleFeesForUsEtfAndMutualFund(
+      AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO,
+      Holding holding,
+      Notification notification) {
+    if (Objects.isNull(averageManagementExpenseCalculationDTO.getNetExpenseRatio()) &&
+        Objects.isNull(averageManagementExpenseCalculationDTO.getGrossExpenseRatio())) {
+      notification.addError(ERR_MER_NERGER_001.error(holding));
+    } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getNetExpenseRatio())) {
+      setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+          .getGrossExpenseRatio());
+      return Optional.of(WRN_MER_NER_001.warning(holding));
+    } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getGrossExpenseRatio())) {
+      setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO.getNetExpenseRatio());
+      return Optional.of(WRN_MER_GER_001.warning(holding));
+    }
+    setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO.getNetExpenseRatio());
+    return Optional.empty();
+  }
+
+  @Override
+  public AverageMerResult calculateAverageValue(final List<ParameterType> parameterTypes,
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos) {
+    final var resDTO = new AverageMerResult();
+    if (parameterTypes.contains(SCALED)) {
+      final BigDecimal scaledAverageMer = getScaledAverageMer(averageMerCalculationDtos);
+      resDTO.getManagementExpenseRatio().put(SCALED, scaledAverageMer);
+    }
+    if (parameterTypes.contains(ABSOLUTE)) {
+      final BigDecimal absoluteAverageMer = getAbsoluteAverageMer(averageMerCalculationDtos);
+      resDTO.getManagementExpenseRatio().put(ABSOLUTE, absoluteAverageMer);
+    }
+    if (parameterTypes.contains(FORCE_REPORT_FEE)) {
+      final BigDecimal forceReportFeeAverageMer = getForceReportFeeAverageMer(averageMerCalculationDtos);
+      resDTO.getManagementExpenseRatio().put(FORCE_REPORT_FEE, forceReportFeeAverageMer);
+    }
+    return resDTO;
+  }
+
+  @Override
+  public void setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(final AverageMerResult response,
+      final AverageMerCommand reqDTO) {
+    setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(response.getManagementExpenseRatio(), reqDTO);
+  }
+}
