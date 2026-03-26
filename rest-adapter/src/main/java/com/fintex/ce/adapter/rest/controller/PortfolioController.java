@@ -65,11 +65,15 @@ import com.fintex.ce.adapter.rest.dto.response.distributionofreturns.Distributio
 import com.fintex.ce.adapter.rest.mapper.RestCommandMapper;
 import com.fintex.ce.adapter.rest.service.RestExceptionHandlingServiceImpl;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
-import com.fintex.ce.application.service.calculation.AverageManagementExpenseCalculationService;
+import com.fintex.ce.application.calculation.service.AverageManagementExpenseCalculationService;
+import com.fintex.ce.calculation.BreakdownCalculationService;
+import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.PeriodCalculationService;
 import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
 import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
+import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.dto.command.ReturnCommand;
@@ -94,6 +98,7 @@ import com.fintex.ce.domain.model.result.AverageMerResult;
 import com.fintex.ce.domain.model.result.BestWorstPeriodsResult;
 import com.fintex.ce.domain.model.result.BetaResult;
 import com.fintex.ce.domain.model.result.ClassificationAllocationResult;
+import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
 import com.fintex.ce.domain.model.result.CorrelationResult;
 import com.fintex.ce.domain.model.result.CountryExposureResult;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
@@ -132,10 +137,6 @@ import com.fintex.ce.domain.model.result.TrailingTotalReturnsResult;
 import com.fintex.ce.domain.model.result.TreynorRatioResult;
 import com.fintex.ce.domain.model.result.UpsideCaptureResult;
 import com.fintex.ce.domain.model.result.YieldResult;
-import com.fintex.ce.service.calculation.BreakdownCalculationService;
-import com.fintex.ce.service.calculation.CalculationService;
-import com.fintex.ce.service.calculation.CommonPerformanceDateService;
-import com.fintex.ce.service.calculation.PeriodCalculationService;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -169,7 +170,7 @@ public class PortfolioController {
   private final PeriodCalculationService<CorrelationResult, PeriodCommand> correlationService;
   private final AverageManagementExpenseCalculationService<AverageMerResult> merCalculationService;
   private final AverageManagementExpenseCalculationService<ManagementFeeResult> managementFeeCalculationService;
-  private final CommonPerformanceDateService commonPerformanceDateService;
+  private final CalculationService<CommonPerformanceDatesResult, MultiplePortfoliosCommand> commonPerformanceDateService;
   private final CalculationService<AnnualReturnResult<Integer>, ReturnCommand> annualReturnService;
   private final CalculationService<CreditQualityResult, PortfolioHoldingsCommand> creditQualityService;
   private final BreakdownCalculationService<EquitySectorResult, EquitySectorAllocationType> equitySectorCalculation;
@@ -217,7 +218,7 @@ public class PortfolioController {
       PeriodCalculationService<RSquaredResult, PeriodCommand> rSquaredCalculationService,
       AverageManagementExpenseCalculationService<AverageMerResult> merCalculationService,
       AverageManagementExpenseCalculationService<ManagementFeeResult> managementFeeCalculationService,
-      CommonPerformanceDateService commonPerformanceDateService,
+      CalculationService<CommonPerformanceDatesResult, MultiplePortfoliosCommand> commonPerformanceDateService,
       BreakdownCalculationService<EquityCountryExposureResult, CountryRegionType> equityCountryExposureCalculationService,
       @Qualifier("equityGeographicExposureCalculationServiceImpl") BreakdownCalculationService<GeographicExposureResult, GeographicRegionType> equityGeographicExposureCalculationService,
       CalculationService<CreditQualityResult, PortfolioHoldingsCommand> creditQualityService,
@@ -346,7 +347,7 @@ public class PortfolioController {
       HttpServletRequest request) {
     validation.validateCommonDatesRequest(reqDTO);
     return restExceptionHandler.handleWithResultMapping(
-        () -> commonPerformanceDateService.commonPerformanceDate(commandMapper.toMultiplePortfoliosCommand(reqDTO)),
+        () -> commonPerformanceDateService.perform(commandMapper.toMultiplePortfoliosCommand(reqDTO)),
         CommonPerformanceDatesResDTO::new, request);
   }
 

@@ -265,6 +265,8 @@ throw new CalculationException(String.format(
 - **Extract repeated code into utility methods** - same 3+ lines twice → create util
 - **BigDecimal:** use `BigDecimal.valueOf()` for numeric literals, never `new BigDecimal(double)` (avoids floating-point representation issues). `new BigDecimal(String)` is fine.
 - **Collections:** always use Stream API with `Collectors` to build/transform collections — never use for-loops or `forEach` with manual `add()`/`put()` into a new collection
+- Don't use `final` for variables and parameters without a need. Only for class fields or explicit constants.
+- Prefer using @RequiredArgsConstructor with final fields for bean dependencies over @AllArgsConstructor.
 
 ```java
 // BAD: for-loop with manual add

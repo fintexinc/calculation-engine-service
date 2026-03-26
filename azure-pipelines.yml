@@ -204,7 +204,6 @@ stages:
                         --parameters containerRegistryServer="$(containerRegistry)" \
                         --parameters containerRegistryUsername="$ACR_USERNAME" \
                         --parameters containerRegistryPassword="$ACR_PASSWORD" \
-                        --parameters redisPassword="$(redis-password)" \
                         --verbose
                       
                       echo "✅ Infrastructure deployment completed successfully!"

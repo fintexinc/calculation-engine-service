@@ -1,14 +1,14 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.adapter.webclient.dto.IdsAndDataProvidersRequest;
-import com.fintex.ce.adapter.webclient.dto.IdsAndDataProvidersRequest.TypedIdentifiers;
-import com.fintex.ce.adapter.webclient.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.mapper.HoldingTypeMapper;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
+import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest;
+import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest.TypedIdentifiers;
+import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.sm.SecurityDataFetcher;
+import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.CollectionUtils;
-
 import static java.util.stream.Collectors.groupingBy;
 
 /**
