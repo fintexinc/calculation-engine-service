@@ -25,7 +25,6 @@ import java.util.Map;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_CQ_CQ_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CalculationUtils.sumProduct;
 import static com.fintex.ce.util.CollectorUtils.toMap;
@@ -57,7 +56,7 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     final ArrayList<Warning> warnings = new ArrayList<>();
     final Map<Holding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality = mapToRatings(rawCreditQuality, warnings);
+    final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality = extractRatings(rawCreditQuality, warnings);
     if (areAllValuesInMapEmpty(creditQuality)) {
       return responseMapper.toEmptyResponse(warnings);
     }
@@ -121,34 +120,27 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
       final CreditQualityRating rating) {
     final Map<Holding, BigDecimal> collectedRating = creditQuality.entrySet().stream()
         .filter(e -> e.getValue().containsKey(rating))
+        .filter(e -> fixedIncomeCreditQuality.containsKey(e.getKey()))
+        .filter(e -> weights.containsKey(e.getKey()))
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().get(rating)));
     return sumProduct(collectedRating, fixedIncomeCreditQuality, weights);
   }
 
-  private Map<Holding, Map<CreditQualityRating, BigDecimal>> mapToRatings(
+  private Map<Holding, Map<CreditQualityRating, BigDecimal>> extractRatings(
       final Map<Holding, CreditQuality> rawData,
       final List<Warning> warnings) {
     return rawData.entrySet().stream()
-        .collect(toMap(Map.Entry::getKey, e -> mapRatings(e.getKey(), e.getValue(), warnings)));
+        .collect(toMap(Map.Entry::getKey, e -> extractRatings(e.getKey(), e.getValue(), warnings)));
   }
 
-  private Map<CreditQualityRating, BigDecimal> mapRatings(final Holding holding,
+  private Map<CreditQualityRating, BigDecimal> extractRatings(final Holding holding,
       final CreditQuality creditQuality,
       final List<Warning> warnings) {
     if (CollectionUtils.isEmpty(creditQuality.getRatings())) {
       warnings.add(WRN_CQ_CQ_001.warning(holding));
       return Map.of();
     }
-    final Map<CreditQualityRating, BigDecimal> map = new EnumMap<>(CreditQualityRating.class);
-    creditQuality.getRatings().forEach((ratingStr, value) -> {
-      final CreditQualityRating rating = CreditQualityRating.fromValue(ratingStr);
-      if (rating == null) {
-        warnings.add(WRN_UNKNOWN_001.warning(holding, ratingStr, "Credit Quality"));
-      } else {
-        map.put(rating, value);
-      }
-    });
-    return map;
+    return creditQuality.getRatings();
   }
 
 }
