@@ -174,7 +174,7 @@ class CreditQualityServiceImplTest {
 
     final var holding = mock(Holding.class);
     final CreditQuality rawCq = new CreditQuality();
-    rawCq.setRatings(Map.of("AAA", ONE));
+    rawCq.setRatings(Map.of(AAA, ONE));
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
 
     final Map<FixedIncomeCreditQuality, BigDecimal> map = Map.of(HIGH_YIELD, ONE);
@@ -199,7 +199,7 @@ class CreditQualityServiceImplTest {
 
     final var holding = mock(Holding.class);
     final CreditQuality rawCq = new CreditQuality();
-    rawCq.setRatings(Map.of("AAA", ONE));
+    rawCq.setRatings(Map.of(AAA, ONE));
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
 
     final Map<FixedIncomeCreditQuality, BigDecimal> map = Map.of(HIGH_YIELD, ONE);

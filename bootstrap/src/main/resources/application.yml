@@ -25,8 +25,8 @@ external-services:
           equity-market-cap: /api/v1/wealth/securities/allocations/equity-market-cap
           country: /api/v1/wealth/securities/allocations/country
           equity-country: /api/v1/wealth/securities/allocations/equity-country
-          credit-quality: /api/v1/wealth/securities/allocations/credit-quality
           maturities: /api/v1/wealth/securities/allocations/maturities
+          credit-quality: /api/v1/wealth/securities/allocations/credit-quality
         income: /api/v1/wealth/securities/income
         fees: /api/v1/wealth/securities/fees
         sales-charge: /api/v1/wealth/securities/sales-charge
