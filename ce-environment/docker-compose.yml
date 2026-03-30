@@ -1,0 +1,9 @@
+services:
+  security-master:
+    image: security-master:2.0.0-SNAPSHOT
+    container_name: security-master
+    ports:
+      - "8090:8080"
+    env_file:
+      - .env
+

@@ -58,7 +58,7 @@ param fmpApiKey string = ''
 param msReferenceTablesSuffix string = 'X'
 
 @description('Spring Profile')
-param springProfile string = 'dev'
+param springProfile string = ''
 
 @description('Tags to apply to resources')
 param tags object = {}
@@ -89,11 +89,14 @@ var registriesArray = empty(containerRegistryServer) ? [] : [
 ]
 
 // Build environment variables array conditionally
-var baseEnvVars = [
+var profileEnvVars = empty(springProfile) ? [] : [
   {
     name: 'SPRING_PROFILES_ACTIVE'
     value: springProfile
   }
+]
+
+var baseEnvVars = [
   {
     name: 'MS_REFERENCE_TABLES_SUFFIX'
     value: msReferenceTablesSuffix
@@ -115,7 +118,7 @@ var apiEnvVars = empty(fmpApiKey) ? [] : [
   }
 ]
 
-var allEnvVars = concat(baseEnvVars, apiEnvVars)
+var allEnvVars = concat(profileEnvVars, baseEnvVars, apiEnvVars)
 
 // Container App
 resource containerApp 'Microsoft.App/containerApps@2025-02-02-preview' = {

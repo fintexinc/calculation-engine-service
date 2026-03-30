@@ -72,6 +72,7 @@ logging:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
     root: INFO
+    com.fintex.ce: DEBUG
 
 performance-monitor-duration:
   info-threshold: 59000 #59 seconds
