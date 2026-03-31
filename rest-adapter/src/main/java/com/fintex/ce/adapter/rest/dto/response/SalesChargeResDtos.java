@@ -1,30 +1,30 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fintex.ce.domain.model.calculation.SalesCharge;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-
+import com.fintex.ce.domain.model.calculation.SalesChargeCategory;
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@Accessors(chain = true)
 public class SalesChargeResDtos extends ErrorDTO {
 
-  private Map<SalesCharge, SalesChargeResDto> salesCharges = new EnumMap<>(SalesCharge.class);
+  private Map<SalesChargeCategory, SalesChargeResDto> salesCharges = new EnumMap<>(SalesChargeCategory.class);
 
-  @Data
+  @Getter
+  @Setter
   @AllArgsConstructor
   @NoArgsConstructor
   public static class SalesChargeResDto {
@@ -53,7 +53,8 @@ public class SalesChargeResDtos extends ErrorDTO {
     }
   }
 
-  @Data
+  @Getter
+  @Setter
   @AllArgsConstructor
   @NoArgsConstructor
   public static class SalesChargeHoldingResDto {
@@ -71,8 +72,8 @@ public class SalesChargeResDtos extends ErrorDTO {
       if (fundServCode != null ? !fundServCode.equals(that.fundServCode) : that.fundServCode != null)
         return false;
       return mutualFundAllocation != null
-          ? (mutualFundAllocation.compareTo(that.mutualFundAllocation) == 0)
-          : that.mutualFundAllocation == null;
+              ? (mutualFundAllocation.compareTo(that.mutualFundAllocation) == 0)
+              : that.mutualFundAllocation == null;
     }
 
     @Override

@@ -141,7 +141,7 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     }
     final Map<CreditQualityRating, BigDecimal> map = new EnumMap<>(CreditQualityRating.class);
     creditQuality.getRatings().forEach((ratingStr, value) -> {
-      final CreditQualityRating rating = CreditQualityRating.of(ratingStr);
+      final CreditQualityRating rating = CreditQualityRating.fromValue(ratingStr);
       if (rating == null) {
         warnings.add(WRN_UNKNOWN_001.warning(holding, ratingStr, "Credit Quality"));
       } else {

@@ -27,6 +27,9 @@ external-services:
           equity-country: /api/v1/wealth/securities/allocations/equity-country
           credit-quality: /api/v1/wealth/securities/allocations/credit-quality
           maturities: /api/v1/wealth/securities/allocations/maturities
+        income: /api/v1/wealth/securities/income
+        fees: /api/v1/wealth/securities/fees
+        sales-charge: /api/v1/wealth/securities/sales-charge
 
 rest-template:
   rest-template-pool:

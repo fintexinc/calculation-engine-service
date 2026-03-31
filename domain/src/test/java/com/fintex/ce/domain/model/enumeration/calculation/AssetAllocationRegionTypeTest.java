@@ -16,7 +16,7 @@ class AssetAllocationRegionTypeTest {
     final AssetAllocationRegionType expected = AssetAllocationRegionType.FIXED_INCOME;
 
     // ACT
-    final AssetAllocationRegionType actual = AssetAllocationRegionType.of(expected.name());
+    final AssetAllocationRegionType actual = AssetAllocationRegionType.fromValue(expected.name());
 
     // VERIFY
     assertEquals(expected, actual);
@@ -28,7 +28,7 @@ class AssetAllocationRegionTypeTest {
     final String region = CASH.getRegion();
 
     // ACT
-    final AssetAllocationRegionType actual = AssetAllocationRegionType.of(region);
+    final AssetAllocationRegionType actual = AssetAllocationRegionType.fromValue(region);
 
     // VERIFY
     assertEquals(CASH, actual);
@@ -41,7 +41,7 @@ class AssetAllocationRegionTypeTest {
 
     // VERIFY
     Assertions.assertThrows(SystemException.class, () -> {
-      AssetAllocationRegionType.of(region);
+      AssetAllocationRegionType.fromValue(region);
     });
   }
 
@@ -51,7 +51,7 @@ class AssetAllocationRegionTypeTest {
     final String region = "Us eQuItY";
 
     // ACT
-    final AssetAllocationRegionType actual = AssetAllocationRegionType.of(region);
+    final AssetAllocationRegionType actual = AssetAllocationRegionType.fromValue(region);
 
     // VERIFY
     assertEquals(US_EQUITY, actual);

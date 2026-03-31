@@ -20,7 +20,7 @@ public enum FixedIncomeStyleboxType {
     this.name = name;
   }
 
-  public static FixedIncomeStyleboxType of(final String typeStr) {
+  public static FixedIncomeStyleboxType fromValue(final String typeStr) {
     for (FixedIncomeStyleboxType value : values()) {
       if (value.name().equalsIgnoreCase(typeStr)) {
         return value;

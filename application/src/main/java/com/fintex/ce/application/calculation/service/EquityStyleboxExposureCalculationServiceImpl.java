@@ -61,7 +61,7 @@ public class EquityStyleboxExposureCalculationServiceImpl
     Map<Holding, EquityStyleboxExposure> rawData = equityStyleboxSecurityDataFetcher.fetch(reqDTO.getHoldings(),
         List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
-        EquityStyleboxExposure::getBoxValues, EquityStyleboxType::of,
+        EquityStyleboxExposure::getBoxValues, EquityStyleboxType::fromValue,
         DEFAULT_MAP, WRN_ES_ESE_001, "FDS Get Equity Stylebox Exposure", warnings);
   }
 }

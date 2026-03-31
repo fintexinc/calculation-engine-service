@@ -18,7 +18,7 @@ public enum Currency {
     return MAP.get(name);
   }
 
-  public static Currency of(final String name) {
+  public static Currency fromValue(final String name) {
     for (Currency value : values()) {
       if (value.name().equalsIgnoreCase(name)) {
         return value;

@@ -16,7 +16,7 @@ class CountryRegionTypeTest {
     final CountryRegionType expected = CANADA;
 
     // ACT
-    final CountryRegionType actual = CountryRegionType.of(expected.name());
+    final CountryRegionType actual = CountryRegionType.fromValue(expected.name());
 
     // VERIFY
     assertEquals(expected, actual);
@@ -28,7 +28,7 @@ class CountryRegionTypeTest {
     final String region = CANADA.getRegion();
 
     // ACT
-    final CountryRegionType actual = CountryRegionType.of(region);
+    final CountryRegionType actual = CountryRegionType.fromValue(region);
 
     // VERIFY
     assertEquals(CANADA, actual);
@@ -41,7 +41,7 @@ class CountryRegionTypeTest {
 
     // VERIFY
     Assertions.assertThrows(SystemException.class, () -> {
-      CountryRegionType.of(region);
+      CountryRegionType.fromValue(region);
     });
   }
 
@@ -51,7 +51,7 @@ class CountryRegionTypeTest {
     final String region = "IntErnAtiOnaL-DevEloPeD";
 
     // ACT
-    final CountryRegionType actual = CountryRegionType.of(region);
+    final CountryRegionType actual = CountryRegionType.fromValue(region);
 
     // VERIFY
     assertEquals(INTERNATIONAL_DEVELOPED, actual);

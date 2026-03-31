@@ -18,7 +18,7 @@ public enum AssetAllocationRegionType {
     this.region = region;
   }
 
-  public static AssetAllocationRegionType of(final String region) {
+  public static AssetAllocationRegionType fromValue(final String region) {
     for (AssetAllocationRegionType value : values()) {
       if (value.name().equalsIgnoreCase(region) || value.region.equalsIgnoreCase(region)) {
         return value;

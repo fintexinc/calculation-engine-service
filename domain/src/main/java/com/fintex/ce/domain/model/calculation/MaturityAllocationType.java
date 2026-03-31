@@ -52,14 +52,14 @@ public enum MaturityAllocationType {
     this.displayType = Optional.ofNullable(displayType);
   }
 
-  public static MaturityAllocationType of(final String typeStr) {
+  public static MaturityAllocationType fromValue(final String typeStr) {
     return Arrays.stream(values())
         .filter(value -> value.name().equalsIgnoreCase(typeStr))
         .findFirst()
         .orElse(null);
   }
 
-  public static MaturityAllocationType of(final int years, final int days) {
+  public static MaturityAllocationType fromValue(final int years, final int days) {
     return Arrays.stream(values())
         .filter(type -> years <= type.getMaxYears())
         .filter(type -> years > 0 || days <= type.getMaxDays())

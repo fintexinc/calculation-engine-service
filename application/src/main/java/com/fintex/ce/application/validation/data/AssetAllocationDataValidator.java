@@ -39,7 +39,7 @@ public class AssetAllocationDataValidator {
       return;
     }
     assetAllocations.keySet().forEach(region -> {
-      final var assetAllocationRegion = AssetAllocationRegion.of(region);
+      final var assetAllocationRegion = AssetAllocationRegion.fromValue(region);
       if (assetAllocationRegion == null || assetAllocationRegion.getName() == null) {
         warnings.add(ExceptionCode.WRN_UNKNOWN_001.warning(holding, region, "Asset Allocation"));
       }

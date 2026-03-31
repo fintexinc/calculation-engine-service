@@ -15,7 +15,7 @@ class AssetAllocationRegionTest {
     final AssetAllocationRegion expected = AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 
     // ACT
-    final AssetAllocationRegion actual = AssetAllocationRegion.of(expected.getName());
+    final AssetAllocationRegion actual = AssetAllocationRegion.fromValue(expected.getName());
 
     // VERIFY
     assertEquals(expected, actual);
@@ -27,7 +27,7 @@ class AssetAllocationRegionTest {
     final String region = INTERNATIONAL_EQUITIES.getName();
 
     // ACT
-    final AssetAllocationRegion actual = AssetAllocationRegion.of(region);
+    final AssetAllocationRegion actual = AssetAllocationRegion.fromValue(region);
 
     // VERIFY
     assertEquals(INTERNATIONAL_EQUITIES, actual);
@@ -39,7 +39,7 @@ class AssetAllocationRegionTest {
     final String region = "OtherrR";
 
     // ACT
-    final AssetAllocationRegion actual = AssetAllocationRegion.of(region);
+    final AssetAllocationRegion actual = AssetAllocationRegion.fromValue(region);
 
     // VERIFY
     assertNull(actual);
@@ -51,7 +51,7 @@ class AssetAllocationRegionTest {
     final String region = "CaNadIaN EqUitIeS";
 
     // ACT
-    final AssetAllocationRegion actual = AssetAllocationRegion.of(region);
+    final AssetAllocationRegion actual = AssetAllocationRegion.fromValue(region);
 
     // VERIFY
     assertEquals(CANADIAN_EQUITIES, actual);

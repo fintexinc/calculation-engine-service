@@ -9,7 +9,7 @@ public enum FixedIncomeSectorType {
   ST_INVESTMENTS,
   ASSET_BACKED_SECURITIES;
 
-  public static FixedIncomeSectorType of(final String typeStr) {
+  public static FixedIncomeSectorType fromValue(final String typeStr) {
     for (FixedIncomeSectorType value : values()) {
       if (value.name().equalsIgnoreCase(typeStr)) {
         return value;

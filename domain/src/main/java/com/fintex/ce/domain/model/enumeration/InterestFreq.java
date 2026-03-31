@@ -25,7 +25,7 @@ public enum InterestFreq {
     this.monthsInPeriod = monthsInPeriod;
   }
 
-  public static InterestFreq of(final BigDecimal frequency) {
+  public static InterestFreq fromValue(final BigDecimal frequency) {
     for (InterestFreq value : values()) {
       if (value.getFrequency().compareTo(frequency) == 0) {
         return value;

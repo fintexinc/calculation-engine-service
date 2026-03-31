@@ -14,7 +14,7 @@ class EquityMarketCapTypeTest {
     final EquityMarketCapType expected = EquityMarketCapType.GIANT;
 
     // ACT
-    final EquityMarketCapType actual = EquityMarketCapType.of(expected.name());
+    final EquityMarketCapType actual = EquityMarketCapType.fromValue(expected.name());
 
     // VERIFY
     assertEquals(expected, actual);
@@ -26,7 +26,7 @@ class EquityMarketCapTypeTest {
     final String type = SMALL.name();
 
     // ACT
-    final EquityMarketCapType actual = EquityMarketCapType.of(type);
+    final EquityMarketCapType actual = EquityMarketCapType.fromValue(type);
 
     // VERIFY
     assertEquals(SMALL, actual);
@@ -38,7 +38,7 @@ class EquityMarketCapTypeTest {
     final String region = "Mediumq";
 
     // ACT
-    final EquityMarketCapType actual = EquityMarketCapType.of(region);
+    final EquityMarketCapType actual = EquityMarketCapType.fromValue(region);
 
     // VERIFY
     assertNull(actual);
@@ -50,7 +50,7 @@ class EquityMarketCapTypeTest {
     final String region = "SmaLL";
 
     // ACT
-    final EquityMarketCapType actual = EquityMarketCapType.of(region);
+    final EquityMarketCapType actual = EquityMarketCapType.fromValue(region);
 
     // VERIFY
     assertEquals(SMALL, actual);

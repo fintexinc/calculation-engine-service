@@ -16,7 +16,7 @@ public enum EquityMarketCapType {
     this.names = names;
   }
 
-  public static EquityMarketCapType of(final String typeStr) {
+  public static EquityMarketCapType fromValue(final String typeStr) {
     for (EquityMarketCapType value : values()) {
       if (value.getNames().contains(typeStr.toUpperCase())) {
         return value;

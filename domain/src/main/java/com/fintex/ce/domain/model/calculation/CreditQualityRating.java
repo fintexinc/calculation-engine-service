@@ -20,7 +20,7 @@ public enum CreditQualityRating {
     this.rating = rating;
   }
 
-  public static CreditQualityRating of(final String value) {
+  public static CreditQualityRating fromValue(final String value) {
     for (CreditQualityRating qualityRating : values()) {
       if (qualityRating.name().equalsIgnoreCase(value) || qualityRating.rating.equalsIgnoreCase(value)) {
         return qualityRating;

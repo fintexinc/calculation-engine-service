@@ -60,7 +60,7 @@ public enum ClassificationAllocationType {
     this.name = name;
   }
 
-  public static ClassificationAllocationType of(final String typeStr) {
+  public static ClassificationAllocationType fromValue(final String typeStr) {
     for (ClassificationAllocationType value : values()) {
       if (value.name().equalsIgnoreCase(typeStr)) {
         return value;

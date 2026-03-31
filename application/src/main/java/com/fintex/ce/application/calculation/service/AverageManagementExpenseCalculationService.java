@@ -1,19 +1,23 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
+import com.fintex.ce.domain.model.FeeData;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.WarningResult;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
+import java.util.AbstractMap;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
@@ -34,20 +38,56 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
   protected AverageManagementExpenseCalculationService() {
   }
 
-  protected abstract Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> fetchData(
+  /**
+   * Maps FeeData to AverageManagementExpenseCalculation. Subclasses implement this to define which fee fields to
+   * extract.
+   */
+  protected abstract AverageManagementExpenseCalculation mapFeeDataToDto(Holding holding, FeeData fees);
+
+  protected abstract Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> fetchData(
       final AverageMerCommand command);
 
+  /**
+   * Groups raw fee data by holding type and maps to calculation DTOs. Holdings without fee data get a default DTO with
+   * zero fees.
+   */
+  protected Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> groupAndMap(
+      Map<Holding, FeeData> rawData, List<? extends Holding> holdings) {
+
+    final Stream<Map.Entry<Holding, AverageManagementExpenseCalculation>> fetched = rawData.entrySet().stream()
+        .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), mapFeeDataToDto(e.getKey(), e.getValue())));
+
+    final Stream<Map.Entry<Holding, AverageManagementExpenseCalculation>> defaults = holdings.stream()
+        .filter(holding -> !rawData.containsKey(holding))
+        .map(holding -> new AbstractMap.SimpleEntry<>(holding, createDefaultDto(holding)));
+
+    return Stream.concat(fetched, defaults)
+        .collect(Collectors.groupingBy(
+            e -> e.getKey().getHoldingType(),
+            () -> new EnumMap<>(FinancialInstrumentType.class),
+            Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+  }
+
+  private AverageManagementExpenseCalculation createDefaultDto(Holding holding) {
+    return AverageManagementExpenseCalculation.builder()
+        .marketValue(holding.getValue())
+        .holdingType(holding.getHoldingType())
+        .initialFee(BigDecimal.ZERO)
+        .modifiedFee(BigDecimal.ZERO)
+        .build();
+  }
+
   protected abstract List<Warning> setInitialFeeAndModifiedFeeValues(
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> groupOfMers);
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> groupOfMers);
 
   protected abstract R calculateAverageValue(final List<ParameterType> parameterTypes,
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos);
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDtos);
 
   protected abstract void setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(final R response,
       final AverageMerCommand command);
 
   public R perform(final AverageMerCommand command) {
-    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDTOs = fetchData(
+    final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDTOs = fetchData(
         command);
 
     final List<Warning> warnings = setInitialFeeAndModifiedFeeValues(averageMerCalculationDTOs);
@@ -82,22 +122,22 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
     }
   }
 
-  public void setFeeValues(final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO,
+  public void setFeeValues(final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
       final BigDecimal managementExpenseRatio) {
     averageManagementExpenseCalculationDTO.setInitialFee(managementExpenseRatio);
     averageManagementExpenseCalculationDTO.setModifiedFee(managementExpenseRatio);
   }
 
   public BigDecimal getScaledAverageMer(
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos) {
-    final List<AverageManagementExpenseCalculationDTO> scaledAverageManagementExpenseCalculationDTOList = getAbsoluteAndForceReportFeeHoldingList(
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
+    final List<AverageManagementExpenseCalculation> scaledAverageManagementExpenseCalculationList = getAbsoluteAndForceReportFeeHoldingList(
         averageMerCalculationDtos);
-    return getAverageMerByParameterType(scaledAverageManagementExpenseCalculationDTOList);
+    return getAverageMerByParameterType(scaledAverageManagementExpenseCalculationList);
   }
 
   public BigDecimal getAbsoluteAverageMer(
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos) {
-    final List<AverageManagementExpenseCalculationDTO> scaledAverageManagementExpenseCalculationDTOList = Stream.of(
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
+    final List<AverageManagementExpenseCalculation> scaledAverageManagementExpenseCalculationList = Stream.of(
         averageMerCalculationDtos.get(FinancialInstrumentType.MUTUAL_FUND_CANADA),
         averageMerCalculationDtos.get(FinancialInstrumentType.SEGREGATED_FUND_CANADA),
         averageMerCalculationDtos.get(FinancialInstrumentType.ETF_US),
@@ -113,11 +153,11 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
         .map(Map::values)
         .flatMap(Collection::stream)
         .toList();
-    return getAverageMerByParameterType(scaledAverageManagementExpenseCalculationDTOList);
+    return getAverageMerByParameterType(scaledAverageManagementExpenseCalculationList);
   }
 
-  public List<AverageManagementExpenseCalculationDTO> getAbsoluteAndForceReportFeeHoldingList(
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> resultMap) {
+  public List<AverageManagementExpenseCalculation> getAbsoluteAndForceReportFeeHoldingList(
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> resultMap) {
     return Stream.of(
         resultMap.get(FinancialInstrumentType.MUTUAL_FUND_CANADA),
         resultMap.get(FinancialInstrumentType.SEGREGATED_FUND_CANADA),
@@ -132,7 +172,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
   }
 
   public BigDecimal getAverageMerByParameterType(
-      final List<AverageManagementExpenseCalculationDTO> merCalculationDTOList) {
+      final List<AverageManagementExpenseCalculation> merCalculationDTOList) {
     final BigDecimal amountOfMarketValues = getAmountOfMarketValues(merCalculationDTOList);
     final BigDecimal[] averageManagementExpenseRatio = {BigDecimal.ZERO};
     merCalculationDTOList.forEach(merCalculationDTO -> {
@@ -145,13 +185,13 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
   }
 
   public BigDecimal getAmountOfMarketValues(
-      final List<AverageManagementExpenseCalculationDTO> averageManagementExpenseCalculationDTOList) {
+      final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDTOList) {
     return averageManagementExpenseCalculationDTOList.stream().map(
-        AverageManagementExpenseCalculationDTO::getMarketValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+        AverageManagementExpenseCalculation::getMarketValue).reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
   public void calculateMarketValueQualified(
-      final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO) {
+      final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getModifiedFee())) {
       averageManagementExpenseCalculationDTO.setMarketValueQualified(ZERO);
     } else {
@@ -161,7 +201,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
   }
 
   public void calculatePercentageQualified(
-      final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO,
+      final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
       final BigDecimal amountOfMarketValues) {
     if (Objects.nonNull(averageManagementExpenseCalculationDTO.getMarketValueQualified())
         && !averageManagementExpenseCalculationDTO.getMarketValueQualified().equals(BigDecimal.ZERO)) {
@@ -171,7 +211,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
   }
 
   public BigDecimal calculateAverageManagementExpenseRatio(final BigDecimal currentAverageManagementExpenseRatio,
-      final AverageManagementExpenseCalculationDTO merCalculationDTO) {
+      final AverageManagementExpenseCalculation merCalculationDTO) {
     if (Objects.nonNull(merCalculationDTO.getModifiedFee()) && Objects.nonNull(merCalculationDTO
         .getPercentageQualified())) {
       return currentAverageManagementExpenseRatio.add(merCalculationDTO.getModifiedFee().multiply(merCalculationDTO
@@ -181,28 +221,28 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
   }
 
   public BigDecimal getForceReportFeeAverageMer(
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> averageMerCalculationDtos) {
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
     if (isMerPresentForHolding(averageMerCalculationDtos.get(FinancialInstrumentType.MUTUAL_FUND_CANADA),
-        AverageManagementExpenseCalculationDTO::getManagementExpenseRatio) ||
+        AverageManagementExpenseCalculation::getManagementExpenseRatio) ||
         isMerPresentForHolding(averageMerCalculationDtos.get(FinancialInstrumentType.SEGREGATED_FUND_CANADA),
-            AverageManagementExpenseCalculationDTO::getManagementExpenseRatio) ||
+            AverageManagementExpenseCalculation::getManagementExpenseRatio) ||
         isMerPresentForHolding(averageMerCalculationDtos.get(FinancialInstrumentType.ETF_CANADA),
-            AverageManagementExpenseCalculationDTO::getManagementExpenseRatio) ||
+            AverageManagementExpenseCalculation::getManagementExpenseRatio) ||
         isMerPresentForHolding(averageMerCalculationDtos.get(FinancialInstrumentType.ETF_US),
-            AverageManagementExpenseCalculationDTO::getNetExpenseRatio) ||
+            AverageManagementExpenseCalculation::getNetExpenseRatio) ||
         isMerPresentForHolding(averageMerCalculationDtos.get(FinancialInstrumentType.HEDGE_FUND_CANADA),
-            AverageManagementExpenseCalculationDTO::getManagementExpenseRatio) ||
+            AverageManagementExpenseCalculation::getManagementExpenseRatio) ||
         isMerPresentForHolding(averageMerCalculationDtos.get(FinancialInstrumentType.MUTUAL_FUND_US),
-            AverageManagementExpenseCalculationDTO::getNetExpenseRatio)) {
+            AverageManagementExpenseCalculation::getNetExpenseRatio)) {
       return null;
     }
-    final List<AverageManagementExpenseCalculationDTO> scaledAverageManagementExpenseCalculationDTOList = getAbsoluteAndForceReportFeeHoldingList(
+    final List<AverageManagementExpenseCalculation> scaledAverageManagementExpenseCalculationList = getAbsoluteAndForceReportFeeHoldingList(
         averageMerCalculationDtos);
-    return getAverageMerByParameterType(scaledAverageManagementExpenseCalculationDTOList);
+    return getAverageMerByParameterType(scaledAverageManagementExpenseCalculationList);
   }
 
-  public boolean isMerPresentForHolding(final Map<Holding, AverageManagementExpenseCalculationDTO> merList,
-      final Function<AverageManagementExpenseCalculationDTO, BigDecimal> function) {
+  public boolean isMerPresentForHolding(final Map<Holding, AverageManagementExpenseCalculation> merList,
+      final Function<AverageManagementExpenseCalculation, BigDecimal> function) {
     return Optional.ofNullable(merList).orElse(Map.of()).values().stream().anyMatch(r -> Objects.isNull(function.apply(
         r)));
   }
