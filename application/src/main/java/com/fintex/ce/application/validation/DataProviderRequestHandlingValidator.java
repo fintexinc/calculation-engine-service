@@ -26,7 +26,7 @@ public class DataProviderRequestHandlingValidator {
       final BiFunction<T, U, T> actionFunction) {
     responseFromFds.forEach(value -> {
       final String providerStr = getterForProvider.apply(value);
-      final DataProvider dataProvider = StringUtils.isEmpty(providerStr) ? null : DataProvider.of(providerStr);
+      final DataProvider dataProvider = StringUtils.isEmpty(providerStr) ? null : DataProvider.fromValue(providerStr);
       if (Objects.isNull(dataProvider) || !providers.contains(dataProvider)) {
         actionFunction.apply(value, null);
       }

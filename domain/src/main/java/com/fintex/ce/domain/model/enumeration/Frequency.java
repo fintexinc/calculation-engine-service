@@ -14,7 +14,7 @@ public enum Frequency {
     this.frequency = frequency;
   }
 
-  public static Frequency of(int frequency) {
+  public static Frequency fromValue(int frequency) {
     for (Frequency value : values()) {
       if (value.getFrequency() == frequency) {
         return value;

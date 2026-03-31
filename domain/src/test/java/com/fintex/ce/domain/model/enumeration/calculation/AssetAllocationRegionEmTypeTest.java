@@ -12,7 +12,7 @@ class AssetAllocationRegionEmTypeTest {
   void of_verify() {
 
     // ACT
-    AssetAllocationRegionEmType actual = AssetAllocationRegionEmType.of(AssetAllocationRegionEmType.CANADIAN_EQUITY
+    AssetAllocationRegionEmType actual = AssetAllocationRegionEmType.fromValue(AssetAllocationRegionEmType.CANADIAN_EQUITY
         .name());
 
     // VERIFY
@@ -23,7 +23,7 @@ class AssetAllocationRegionEmTypeTest {
   void of_verify2() {
 
     // ACT
-    AssetAllocationRegionEmType actual = AssetAllocationRegionEmType.of(AssetAllocationRegionEmType.CANADIAN_EQUITY
+    AssetAllocationRegionEmType actual = AssetAllocationRegionEmType.fromValue(AssetAllocationRegionEmType.CANADIAN_EQUITY
         .getRegion());
 
     // VERIFY
@@ -35,7 +35,7 @@ class AssetAllocationRegionEmTypeTest {
 
     // ACT
     String region = AssetAllocationRegionEmType.CANADIAN_EQUITY.getRegion() + 1;
-    assertThrows(SystemException.class, () -> AssetAllocationRegionEmType.of(region));
+    assertThrows(SystemException.class, () -> AssetAllocationRegionEmType.fromValue(region));
   }
 
 }

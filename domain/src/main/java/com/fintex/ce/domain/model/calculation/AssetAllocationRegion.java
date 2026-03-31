@@ -24,7 +24,7 @@ public enum AssetAllocationRegion {
     this.assetAllocationRegionType = assetAllocationRegionType;
   }
 
-  public static AssetAllocationRegion of(final String regionName) {
+  public static AssetAllocationRegion fromValue(final String regionName) {
     for (AssetAllocationRegion value : values()) {
       if (value.getName().equalsIgnoreCase(regionName)) {
         return value;

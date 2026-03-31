@@ -58,7 +58,7 @@ public class MaturityAllocationCalculationServiceImpl
         List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
         MaturityAllocation::getMaturityDurationValues,
-        MaturityAllocationType::of,
+        MaturityAllocationType::fromValue,
         ALLOCATION_DEFAULT_MAP,
         WRN_MA_MA_001,
         "FDS Get Maturity Allocation",

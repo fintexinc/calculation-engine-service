@@ -67,7 +67,7 @@ public class EquityMarketCapCalculationServiceImpl
     Map<Holding, EquityMarketCapitalization> rawData = equityMarketCapSecurityDataFetcher.fetch(reqDTO.getHoldings(),
         List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
-        EquityMarketCapitalization::getRatings, EquityMarketCapType::of,
+        EquityMarketCapitalization::getRatings, EquityMarketCapType::fromValue,
         ALLOCATION_DEFAULT_MAP, WRN_EMC_EMC_001, "FDS Equity Market Capitalization", warnings);
   }
 

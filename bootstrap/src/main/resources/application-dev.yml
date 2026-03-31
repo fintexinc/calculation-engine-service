@@ -1,3 +1,13 @@
 server:
   port: 8181
 
+external-services:
+  security-master:
+    rest:
+      log-body: true
+      log-requests: true
+
+logging:
+  level:
+    reactor.netty.http.client.HttpClient: DEBUG
+

@@ -159,8 +159,8 @@ public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> im
             SecurityAttributeResult<SmsResponse> response,
             Map<String, List<Holding>> identifierToHoldings) {
 
-        String key = buildKey(response.getIdentifier());
-        List<Holding> holdings = identifierToHoldings.get(key);
+        String responseKey = buildKey(response.getIdentifier());
+        List<Holding> holdings = identifierToHoldings.get(responseKey);
 
         if (CollectionUtils.isEmpty(holdings)) {
             log.warn("No matching holdings for identifier: {}", response.getIdentifier());

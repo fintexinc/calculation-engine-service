@@ -14,7 +14,7 @@ public enum DataProvider {
   BROADRIDGE,
   PAG;
 
-  public static DataProvider of(final String provider) {
+  public static DataProvider fromValue(final String provider) {
     if (provider == null) {
       return null;
     }

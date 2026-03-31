@@ -65,7 +65,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
     Map<Holding, FixedIncomeBondSecurities> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
-        FixedIncomeBondSecurities::getFixedIncomeBondSectors, FixedIncomeSectorType::of,
+        FixedIncomeBondSecurities::getFixedIncomeBondSectors, FixedIncomeSectorType::fromValue,
         ALLOCATION_DEFAULT_MAP, WRN_BS_BS_001, "FDS Fixed Income Sector Allocation", warnings);
   }
 

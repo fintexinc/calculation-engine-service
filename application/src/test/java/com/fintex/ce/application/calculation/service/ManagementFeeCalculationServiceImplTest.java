@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.AverageManagementExpenseCalculationDTO;
+import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
@@ -48,9 +48,9 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void shouldPerform_whenCheckResult() {
     // SETUP
-    final var managementFeeFetcher = mock(SecurityDataFetcher.class);
+    final var feesFetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-        .useConstructor(managementFeeFetcher));
+            .useConstructor(feesFetcher));
 
     final var resDto = mock(ManagementFeeResult.class);
 
@@ -68,19 +68,20 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifyLoad() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeFetcher = mock(SecurityDataFetcher.class);
+      final var feesFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-          .useConstructor(managementFeeFetcher));
+              .useConstructor(feesFetcher));
 
       final var reqDTO = mock(AverageMerCommand.class);
       final List<Holding> holdings = List.of();
       final var resDto = mock(ManagementFeeResult.class);
       final var defaultProviders = mock(List.class);
 
-      mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(anyList(), any(DataProvider[].class))).thenReturn(defaultProviders);
+      mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(anyList(), any(DataProvider[].class)))
+              .thenReturn(defaultProviders);
       when(reqDTO.getHoldings()).thenReturn(holdings);
       when(sut.calculateAverageValue(any(), any())).thenReturn(resDto);
-      when(managementFeeFetcher.fetch(any(), any())).thenReturn(Map.of());
+      when(feesFetcher.fetch(any(), any())).thenReturn(Map.of());
 
       doCallRealMethod().when(sut).perform(any());
       doCallRealMethod().when(sut).fetchData(any());
@@ -88,16 +89,16 @@ class ManagementFeeCalculationServiceImplTest {
       sut.perform(reqDTO);
 
       // VERIFY
-      verify(managementFeeFetcher).fetch(holdings, defaultProviders);
+      verify(feesFetcher).fetch(holdings, defaultProviders);
     }
   }
 
   @Test
   void shouldPerform_whenVerifySetNullForScaledIfHoldingContainsNoFunds() {
     // SETUP
-    final var managementFeeFetcher = mock(SecurityDataFetcher.class);
+    final var feesFetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-        .useConstructor(managementFeeFetcher));
+            .useConstructor(feesFetcher));
 
     final var resDto = mock(ManagementFeeResult.class);
     final var reqDTO = mock(AverageMerCommand.class);
@@ -108,7 +109,7 @@ class ManagementFeeCalculationServiceImplTest {
 
     doCallRealMethod().when(sut).perform(any());
     doCallRealMethod().when(sut).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(
-        (ManagementFeeResult) any(), (AverageMerCommand) any());
+            (ManagementFeeResult) any(), (AverageMerCommand) any());
     // ACT
     sut.perform(reqDTO);
 
@@ -121,16 +122,17 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifyCalculateAverageValue() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeFetcher = mock(SecurityDataFetcher.class);
+      final var feesFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-          .useConstructor(managementFeeFetcher));
+              .useConstructor(feesFetcher));
 
-      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
-      when(managementFeeFetcher.fetch(any(), any())).thenReturn(map);
-      mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(anyList(), any(ParameterType[].class))).thenReturn(parameterTypes);
+      when(feesFetcher.fetch(any(), any())).thenReturn(map);
+      mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(anyList(), any(ParameterType[].class)))
+              .thenReturn(parameterTypes);
       when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
       doCallRealMethod().when(sut).perform(any());
@@ -147,16 +149,16 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifyGetSpecifiedIfEmpty() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeFetcher = mock(SecurityDataFetcher.class);
+      final var feesFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-          .useConstructor(managementFeeFetcher));
+              .useConstructor(feesFetcher));
 
-      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
       when(reqDTO.getParameterTypes()).thenReturn(parameterTypes);
-      when(managementFeeFetcher.fetch(any(), any())).thenReturn(map);
+      when(feesFetcher.fetch(any(), any())).thenReturn(map);
       when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
       doCallRealMethod().when(sut).perform(any());
@@ -172,17 +174,17 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifyGetSpecifiedIfEmptyDEFAULTDATAPROVIDERS() {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
-      final var managementFeeFetcher = mock(SecurityDataFetcher.class);
+      final var feesFetcher = mock(SecurityDataFetcher.class);
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
-          .useConstructor(managementFeeFetcher));
+              .useConstructor(feesFetcher));
 
-      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var providers = mock(List.class);
 
       when(reqDTO.getDataProviders()).thenReturn(providers);
       when(reqDTO.getHoldings()).thenReturn(List.of());
-      when(managementFeeFetcher.fetch(any(), any())).thenReturn(Map.of());
+      when(feesFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
       doCallRealMethod().when(sut).perform(any());
@@ -285,26 +287,26 @@ class ManagementFeeCalculationServiceImplTest {
     verify(sut).getScaledAverageMer(averageMerCalculationDtoMap);
   }
 
-  private Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> getCalculationDtoMap() {
-    final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO1 = new AverageManagementExpenseCalculationDTO();
+  private Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> getCalculationDtoMap() {
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO1 = new AverageManagementExpenseCalculation();
     averageManagementExpenseCalculationDTO1.setMarketValue(new BigDecimal("10"));
-    final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO2 = new AverageManagementExpenseCalculationDTO();
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO2 = new AverageManagementExpenseCalculation();
     averageManagementExpenseCalculationDTO2.setMarketValue(new BigDecimal("20"));
-    final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO3 = new AverageManagementExpenseCalculationDTO();
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO3 = new AverageManagementExpenseCalculation();
     averageManagementExpenseCalculationDTO3.setMarketValue(new BigDecimal("30"));
-    final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO4 = new AverageManagementExpenseCalculationDTO();
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO4 = new AverageManagementExpenseCalculation();
     averageManagementExpenseCalculationDTO4.setMarketValue(new BigDecimal("40"));
-    final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO5 = new AverageManagementExpenseCalculationDTO();
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO5 = new AverageManagementExpenseCalculation();
     averageManagementExpenseCalculationDTO5.setMarketValue(new BigDecimal("50"));
-    final AverageManagementExpenseCalculationDTO averageManagementExpenseCalculationDTO6 = new AverageManagementExpenseCalculationDTO();
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO6 = new AverageManagementExpenseCalculation();
     averageManagementExpenseCalculationDTO6.setMarketValue(new BigDecimal("60"));
 
     return Map.of(MUTUAL_FUND_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO1),
-        ETF_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO2),
-        ETF_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO3),
-        FinancialInstrumentType.STOCK_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO4),
-        FinancialInstrumentType.STOCK_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO5),
-        FinancialInstrumentType.CASH, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO6));
+            ETF_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO2),
+            ETF_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO3),
+            FinancialInstrumentType.STOCK_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO4),
+            FinancialInstrumentType.STOCK_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO5),
+            FinancialInstrumentType.CASH, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO6));
   }
 
   @Test
@@ -312,17 +314,18 @@ class ManagementFeeCalculationServiceImplTest {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var holding = new Holding();
-    var averageCalculationDto = new AverageManagementExpenseCalculationDTO().setActualManagementFee(null);
+    var averageCalculationDto = new AverageManagementExpenseCalculation();
+    averageCalculationDto.setActualManagementFee(null);
     var expected = ERR_MF_MF_001.error(holding);
 
-    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(MUTUAL_FUND_CANADA, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
     // ACT
     var actualException = assertThrows(FdsDataValidationException.class, () -> sut.setInitialFeeAndModifiedFeeValues(
-        map));
+            map));
 
     // VERIFY
     assertTrue(actualException.getExceptionList().stream().anyMatch(e -> e.getCode().equals(expected.getCode())));
@@ -334,9 +337,10 @@ class ManagementFeeCalculationServiceImplTest {
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var notification = new Notification();
     var holding = new Holding();
-    var averageCalculationDto = new AverageManagementExpenseCalculationDTO().setActualManagementFee(null);
+    var averageCalculationDto = new AverageManagementExpenseCalculation();
+    averageCalculationDto.setActualManagementFee(null);
 
-    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(FinancialInstrumentType.STOCK_US, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
@@ -354,9 +358,10 @@ class ManagementFeeCalculationServiceImplTest {
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var notification = new Notification();
     var holding = new Holding();
-    var averageCalculationDto = new AverageManagementExpenseCalculationDTO().setActualManagementFee(TEN);
+    var averageCalculationDto = new AverageManagementExpenseCalculation();
+    averageCalculationDto.setActualManagementFee(TEN);
 
-    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculationDTO>> map = new HashMap<>();
+    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(ETF_US, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());

@@ -112,7 +112,7 @@ public class ClassificationAllocationCalculationServiceImpl
 
       allocation.getSecurityClassificationValues()
           .forEach((typeStr, value) -> {
-            ClassificationAllocationType type = ClassificationAllocationType.of(typeStr);
+            ClassificationAllocationType type = ClassificationAllocationType.fromValue(typeStr);
             Optional.ofNullable(type)
                 .ifPresentOrElse(
                     classificationAllocationType -> map.put(classificationAllocationType, value),

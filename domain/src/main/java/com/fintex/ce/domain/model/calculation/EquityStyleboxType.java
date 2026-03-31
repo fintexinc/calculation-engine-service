@@ -17,7 +17,7 @@ public enum EquityStyleboxType {
     this.name = name;
   }
 
-  public static EquityStyleboxType of(final String typeStr) {
+  public static EquityStyleboxType fromValue(final String typeStr) {
     for (EquityStyleboxType value : values()) {
       if (value.name().equalsIgnoreCase(typeStr)) {
         return value;

@@ -14,7 +14,7 @@ class CurrencyTest {
     final var currency = CAD;
 
     // ACT
-    final Currency actual = Currency.of(currency.name());
+    final Currency actual = Currency.fromValue(currency.name());
 
     // VERIFY
     assertEquals(CAD.name(), actual.name());
@@ -25,7 +25,7 @@ class CurrencyTest {
     // SETUP
 
     // ACT
-    final SystemException actual = assertThrows(SystemException.class, () -> Currency.of("Zl"));
+    final SystemException actual = assertThrows(SystemException.class, () -> Currency.fromValue("Zl"));
     // VERIFY
     assertEquals("Could not find such Currency Zl", actual.getMessage());
   }

@@ -14,7 +14,7 @@ class CreditQualityRatingTest {
     final CreditQualityRating rating = NOT_RATED;
 
     // ACT
-    final CreditQualityRating actual = CreditQualityRating.of(rating.name());
+    final CreditQualityRating actual = CreditQualityRating.fromValue(rating.name());
 
     // VERIFY
     assertEquals(rating, actual);
@@ -26,7 +26,7 @@ class CreditQualityRatingTest {
     final String rating = NOT_RATED.getRating();
 
     // ACT
-    final CreditQualityRating actual = CreditQualityRating.of(rating);
+    final CreditQualityRating actual = CreditQualityRating.fromValue(rating);
 
     // VERIFY
     assertEquals(NOT_RATED, actual);
@@ -38,7 +38,7 @@ class CreditQualityRatingTest {
     final String rating = "NotRated1";
 
     // ACT
-    final CreditQualityRating actual = CreditQualityRating.of(rating);
+    final CreditQualityRating actual = CreditQualityRating.fromValue(rating);
 
     // VERIFY
     assertNull(actual);

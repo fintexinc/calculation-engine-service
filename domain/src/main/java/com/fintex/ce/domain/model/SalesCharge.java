@@ -1,13 +1,13 @@
 package com.fintex.ce.domain.model;
 
 import com.fintex.ce.domain.model.core.ProviderAware;
+import com.fintex.sm.model.domain.enumeration.SalesChargeType;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,7 +15,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class SalesCharge implements ProviderAware {
 
-  private String value;
+  private SalesChargeType type;
 
   // Common fields
   private String holdingId;

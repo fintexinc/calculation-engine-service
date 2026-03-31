@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.calculation.SalesCharge;
+import com.fintex.ce.domain.model.SalesCharge;
+import com.fintex.ce.domain.model.calculation.SalesChargeCategory;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.SalesChargeResult;
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ZERO;
@@ -19,21 +21,19 @@ import static java.util.stream.Collectors.toSet;
 
 public class SalesChargeCalculation {
 
-  private final Map<Holding, com.fintex.ce.domain.model.SalesCharge> salesCharges;
-  private final BigDecimal sumOfAllMarketValues;
+  private final Map<Holding, SalesCharge> salesCharges;
 
   public static final SalesChargeResult.SalesChargeEntry DEFAULT_SALES_CHARGE_DTO = new SalesChargeResult.SalesChargeEntry(
-      ZERO, ZERO, Set.of());
-  public static final Map<SalesCharge, SalesChargeResult.SalesChargeEntry> DEFAULT_MAP = new EnumMap<>(
-      SalesCharge.class);
+          ZERO, ZERO, Set.of());
+  protected static final Map<SalesChargeCategory, SalesChargeResult.SalesChargeEntry> DEFAULT_MAP = new EnumMap<>(
+          SalesChargeCategory.class);
 
   static {
-    Stream.of(SalesCharge.values()).forEach(type -> DEFAULT_MAP.put(type, DEFAULT_SALES_CHARGE_DTO));
+    Stream.of(SalesChargeCategory.values()).forEach(type -> DEFAULT_MAP.put(type, DEFAULT_SALES_CHARGE_DTO));
   }
 
-  public SalesChargeCalculation(final Map<Holding, com.fintex.ce.domain.model.SalesCharge> salesCharges) {
+  public SalesChargeCalculation(final Map<Holding, SalesCharge> salesCharges) {
     this.salesCharges = salesCharges;
-    this.sumOfAllMarketValues = getSumOfMarketValues(salesCharges.keySet());
   }
 
   public SalesChargeResult calculate() {
@@ -51,14 +51,21 @@ public class SalesChargeCalculation {
    * @return sales charges with allocation, value and holdings with respective allocations
    */
   private SalesChargeResult calculateSalesCharge() {
-    final Map<SalesCharge, SalesChargeResult.SalesChargeEntry> result = new EnumMap<>(DEFAULT_MAP);
+    final Map<SalesChargeCategory, SalesChargeResult.SalesChargeEntry> result = new EnumMap<>(DEFAULT_MAP);
 
-    final Map<SalesCharge, Set<Holding>> groupedHoldingsBySalesCharge = groupBySalesChargeTypes(salesCharges);
+    final Map<SalesChargeCategory, Set<Holding>> groupedHoldingsBySalesCharge = groupBySalesChargeCategories(
+            salesCharges);
+
+    final BigDecimal categorizedMarketValues = groupedHoldingsBySalesCharge.values().stream()
+            .flatMap(Set::stream)
+            .map(Holding::getValue)
+            .reduce(ZERO, BigDecimal::add);
+
     groupedHoldingsBySalesCharge.forEach((salesCharge, holdingSet) -> {
-      final BigDecimal allocation = calculateAllocation(holdingSet);
+      final BigDecimal allocation = calculateAllocation(holdingSet, categorizedMarketValues);
       final BigDecimal value = getSumOfMarketValues(holdingSet);
       final Set<SalesChargeResult.SalesChargeHoldingEntry> salesChargeHoldingResDtos = getSalesChargeHoldingResDtos(
-          holdingSet);
+              holdingSet, categorizedMarketValues);
 
       result.put(salesCharge, new SalesChargeResult.SalesChargeEntry(allocation, value, salesChargeHoldingResDtos));
     });
@@ -66,32 +73,35 @@ public class SalesChargeCalculation {
     return new SalesChargeResult().setSalesCharges(result);
   }
 
-  private BigDecimal calculateAllocation(final Set<Holding> holdingSet) {
-    return toUserScale(divide(getSumOfMarketValues(holdingSet), sumOfAllMarketValues));
+  private BigDecimal calculateAllocation(final Set<Holding> holdingSet, final BigDecimal totalMarketValues) {
+    return toUserScale(divide(getSumOfMarketValues(holdingSet), totalMarketValues));
   }
 
-  private Set<SalesChargeResult.SalesChargeHoldingEntry> getSalesChargeHoldingResDtos(final Set<Holding> holdingSet) {
+  private Set<SalesChargeResult.SalesChargeHoldingEntry> getSalesChargeHoldingResDtos(final Set<Holding> holdingSet,
+          final BigDecimal totalMarketValues) {
     return holdingSet.stream()
-        .map(holding -> new SalesChargeResult.SalesChargeHoldingEntry(holding.generateUserIdentifier(),
-            getMutualFundAllocation(holding)))
-        .collect(Collectors.toSet());
+            .map(holding -> new SalesChargeResult.SalesChargeHoldingEntry(holding.generateUserIdentifier(),
+                    getMutualFundAllocation(holding, totalMarketValues)))
+            .collect(Collectors.toSet());
   }
 
-  private BigDecimal getMutualFundAllocation(final Holding holding) {
-    return toUserScale(divide(holding.getValue(), sumOfAllMarketValues));
+  private BigDecimal getMutualFundAllocation(final Holding holding, final BigDecimal totalMarketValues) {
+    return toUserScale(divide(holding.getValue(), totalMarketValues));
   }
 
   /**
    * groups holdings by sales charge types.
    *
-   * @param salesCharges
-   *          map of holdings as key and sales charge type as value.
+   * @param salesCharges map of holdings as key and sales charge type as value.
    * @return grouped holdings.
    */
-  private Map<SalesCharge, Set<Holding>> groupBySalesChargeTypes(
-      final Map<Holding, com.fintex.ce.domain.model.SalesCharge> salesCharges) {
-    return salesCharges.entrySet().stream().collect(groupingBy(e -> SalesCharge.of(e.getValue().getValue()),
-        mapping(Map.Entry::getKey, toSet())));
+  private Map<SalesChargeCategory, Set<Holding>> groupBySalesChargeCategories(
+          final Map<Holding, SalesCharge> salesCharges) {
+    return salesCharges.entrySet().stream()
+            .filter(e -> e.getValue().getType() != null)
+            .filter(e -> SalesChargeCategory.fromValue(e.getValue().getType()) != null)
+            .collect(groupingBy(e -> SalesChargeCategory.fromValue(e.getValue().getType()),
+                    mapping(Map.Entry::getKey, toSet())));
   }
 
   /**

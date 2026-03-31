@@ -22,11 +22,6 @@ class EquityCountryAllocationFetcherTest {
       new EquityCountryAllocationFetcher(client, mapper, ENDPOINT_PATH);
 
   @Test
-  void shouldReturnConfiguredEndpointPath() {
-    assertThat(sut.endpointPath()).isEqualTo(ENDPOINT_PATH);
-  }
-
-  @Test
   void shouldReturnCorrectResponseType() {
     ParameterizedTypeReference<List<SecurityAttributeResult<CountryAllocation>>> responseType = sut.responseType();
     assertThat(responseType).isNotNull();

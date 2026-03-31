@@ -34,7 +34,7 @@ public class EquityCountryAllocationMapper
     Optional.ofNullable(smsResponse)
         .map(CountryAllocation::getDataProvider)
         .ifPresent(dp -> {
-          DataProvider provider = DataProvider.of(dp.name());
+          DataProvider provider = DataProvider.fromValue(dp.name());
           result.setProvider(provider != null ? provider.name() : dp.name());
         });
 

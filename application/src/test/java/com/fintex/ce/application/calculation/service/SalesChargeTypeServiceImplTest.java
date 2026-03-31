@@ -6,6 +6,7 @@ import com.fintex.ce.domain.model.result.SalesChargeResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-class SalesChargeServiceImplTest {
+class SalesChargeTypeServiceImplTest {
 
   @Test
   void shouldPerform_whenVerifyLoad() {

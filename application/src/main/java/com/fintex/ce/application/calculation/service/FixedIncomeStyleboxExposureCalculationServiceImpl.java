@@ -61,7 +61,7 @@ public class FixedIncomeStyleboxExposureCalculationServiceImpl
     Map<Holding, FixedIncomeStyleboxExposure> rawData = fixedIncomeStyleboxSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
-        FixedIncomeStyleboxExposure::getBoxValues, FixedIncomeStyleboxType::of,
+        FixedIncomeStyleboxExposure::getBoxValues, FixedIncomeStyleboxType::fromValue,
         DEFAULT_MAP, WRN_FIS_FISE_001, "FDS Get Fixed Income Stylebox Exposure", warnings);
   }
 }

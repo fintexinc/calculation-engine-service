@@ -10,13 +10,13 @@ public enum GeographicRegionType {
   EUROPE("Europe"),
   ASIA("Asia");
 
-  private String region;
+  private final String region;
 
   GeographicRegionType(String region) {
     this.region = region;
   }
 
-  public static GeographicRegionType of(final String region) {
+  public static GeographicRegionType fromValue(final String region) {
     for (GeographicRegionType value : values()) {
       if (value.name().equalsIgnoreCase(region) || value.region.equalsIgnoreCase(region)) {
         return value;

@@ -22,7 +22,7 @@ public enum AssetAllocationRegionEmType {
     this.region = region;
   }
 
-  public static AssetAllocationRegionEmType of(final String region) {
+  public static AssetAllocationRegionEmType fromValue(final String region) {
     for (AssetAllocationRegionEmType value : values()) {
       if (value.name().equalsIgnoreCase(region) || value.region.equalsIgnoreCase(region)) {
         return value;

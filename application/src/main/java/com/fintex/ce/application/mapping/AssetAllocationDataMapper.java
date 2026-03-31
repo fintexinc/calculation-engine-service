@@ -101,7 +101,7 @@ public class AssetAllocationDataMapper {
     return holdings.entrySet().stream().collect(
         toMap(
             Map.Entry::getKey,
-            e -> mapToRegions(Pair.of(DataProvider.of(e.getValue().getProvider()), e.getValue()
+            e -> mapToRegions(Pair.of(DataProvider.fromValue(e.getValue().getProvider()), e.getValue()
                 .getAllocations()))));
   }
 
@@ -114,7 +114,7 @@ public class AssetAllocationDataMapper {
     }
     final Map<AssetAllocationRegion, BigDecimal> result = new EnumMap<>(AssetAllocationRegion.class);
     pair.getValue().forEach((region, value) -> {
-      final var assetAllocationRegion = AssetAllocationRegion.of(region);
+      final var assetAllocationRegion = AssetAllocationRegion.fromValue(region);
       if (assetAllocationRegion != null && assetAllocationRegion.getName() != null) {
         result.put(assetAllocationRegion, value);
       }
@@ -147,7 +147,7 @@ public class AssetAllocationDataMapper {
     }
     final Map<AssetAllocationRegion, BigDecimal> result = new EnumMap<>(AssetAllocationRegion.class);
     allocation.getAllocations().forEach((region, value) -> {
-      final var assetAllocationRegion = AssetAllocationRegion.of(region);
+      final var assetAllocationRegion = AssetAllocationRegion.fromValue(region);
       if (assetAllocationRegion != null && assetAllocationRegion.getName() != null) {
         result.put(assetAllocationRegion, value);
       }
@@ -170,7 +170,7 @@ public class AssetAllocationDataMapper {
         .collect(toMap(
             Map.Entry::getKey,
             e -> Pair.of(
-                DataProvider.of(e.getValue().getProvider()),
+                DataProvider.fromValue(e.getValue().getProvider()),
                 mapAllocationToRegions(e.getValue()))));
   }
 }

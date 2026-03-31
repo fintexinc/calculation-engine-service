@@ -18,7 +18,7 @@ public enum CountryRegionType {
     this.region = region;
   }
 
-  public static CountryRegionType of(final String region) {
+  public static CountryRegionType fromValue(final String region) {
     for (CountryRegionType value : values()) {
       if (value.name().equalsIgnoreCase(region) || value.region.equalsIgnoreCase(region)) {
         return value;
