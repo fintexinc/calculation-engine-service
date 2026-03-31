@@ -1,6 +1,6 @@
-# Contributing to Fintex Calculation Engine Service
+# Contributing to Fintex Portfolio Calculation Engine
 
-Thank you for contributing to the Fintex Calculation Engine Service! This document provides guidelines and best
+Thank you for contributing to the Fintex Portfolio Calculation Engine! This document provides guidelines and best
 practices for contributing to this project.
 
 ## Table of Contents

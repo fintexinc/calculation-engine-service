@@ -7,7 +7,7 @@
     <groupId>com.fintex</groupId>
     <artifactId>ce</artifactId>
     <version>1.0.0</version>
-    <name>Calculation Engine Service</name>
+    <name>Portfolio Calculation Engine</name>
     <packaging>pom</packaging>
 
     <parent>

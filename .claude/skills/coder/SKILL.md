@@ -10,7 +10,7 @@ description: >
 
 # Coding Guidelines
 
-Calculation engine service: fetches data from Security Master (SM) via REST, performs
+Portfolio calculation engine: fetches data from Security Master (SM) via REST, performs
 financial calculations. **No database, no cache, no GraphQL.**
 
 ---
@@ -260,13 +260,15 @@ throw new CalculationException(String.format(
 
 - Max 5-7 dependencies per class (split if more)
 - Max 3 nesting levels (use early returns)
-- Use enums instead of strings/booleans for types
+- Use enums instead of strings/booleans for types.
+- Always name enum factory methods `fromValue(value)` (e.g., `SecurityType.fromValue(String value)`).
 - **Extract strings into constants or enums** - no magic strings
 - **Extract repeated code into utility methods** - same 3+ lines twice → create util
 - **BigDecimal:** use `BigDecimal.valueOf()` for numeric literals, never `new BigDecimal(double)` (avoids floating-point representation issues). `new BigDecimal(String)` is fine.
 - **Collections:** always use Stream API with `Collectors` to build/transform collections — never use for-loops or `forEach` with manual `add()`/`put()` into a new collection
 - Don't use `final` for variables and parameters without a need. Only for class fields or explicit constants.
 - Prefer using @RequiredArgsConstructor with final fields for bean dependencies over @AllArgsConstructor.
+- **Never use fully qualified class names in code** (e.g., `java.util.Collectors`, `java.util.List`). Always use imports. If two classes share the same simple name, import one and use the fully qualified name only for the other — but first consider renaming one of the conflicting classes/interfaces/enums to avoid the conflict entirely.
 
 ```java
 // BAD: for-loop with manual add

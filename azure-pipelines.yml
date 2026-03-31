@@ -1,4 +1,4 @@
-# Azure DevOps Pipeline for Calculation Engine Service
+# Azure DevOps Pipeline for Portfolio Calculation Engine
 # Builds, containerizes, and deploys to Azure Container Apps
 
 trigger:
@@ -21,7 +21,7 @@ variables:
     value: 'crfintexfndservdevcc01'
 
   - name: imageRepository
-    value: 'calculation-engine-service'
+    value: 'portfolio-calculation-engine'
 
   - name: tag
     value: '$(Build.BuildId)'
@@ -41,7 +41,7 @@ variables:
     value: 'cae-fintex-fndserv-dev-cc-01'
 
   - name: containerAppName
-    value: 'calculation-engine-service'
+    value: 'portfolio-calculation-engine'
 
   # Build Configuration
   - name: mavenPomFile
@@ -131,7 +131,7 @@ stages:
               options: >
                 -Djib.from.image=mcr.microsoft.com/openjdk/jdk:21-azurelinux
                 -Djib.from.auth.username=anonymous
-                -Djib.to.image=crfintexfndservdevcc01.azurecr.io/calculation-engine-service:$(tag)
+                -Djib.to.image=crfintexfndservdevcc01.azurecr.io/portfolio-calculation-engine:$(tag)
 
           - task: AzureCLI@2
             displayName: Push Docker Image
@@ -283,7 +283,7 @@ stages:
                       set -e
                       
                       echo "================================================"
-                      echo "Calculation Engine Service Deployment Summary"
+                      echo "Portfolio Calculation Engine Deployment Summary"
                       echo "================================================"
                       echo "Build ID: $(Build.BuildId)"
                       echo "Branch: $(Build.SourceBranchName)"

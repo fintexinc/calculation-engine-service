@@ -1,4 +1,4 @@
-# Calculation Engine Service
+# Portfolio Calculation Engine
 
 ## Project Overview
 

@@ -10,7 +10,7 @@ description: >
 
 # Code Review Guidelines
 
-Calculation engine service: fetches data from Security Master (SM) via REST, performs financial
+Portfolio calculation engine: fetches data from Security Master (SM) via REST, performs financial
 calculations. **No database, no cache, no GraphQL.**
 
 ---
