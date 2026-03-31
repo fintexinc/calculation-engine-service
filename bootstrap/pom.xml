@@ -198,14 +198,27 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>${jib-maven-plugin.version}</version>
                 <configuration>
-                    <extraDirectories>
-                        <paths>
-                            <path>
-                                <from>src/main/resources</from>
-                                <into>/app/resources</into>
-                            </path>
-                        </paths>
-                    </extraDirectories>
+                    <from>
+                        <image>eclipse-temurin:21-jre-alpine@sha256:6ad8ed080d9be96b61438ec3ce99388e294af216ed57356000c06070e85c5d5d</image>
+                    </from>
+                    <to>
+                        <image>portfolio-calculation-engine:${project.version}</image>
+                    </to>
+                    <container>
+                        <user>1000:1000</user>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        <ports>
+                            <port>8080</port>
+                        </ports>
+                        <jvmFlags>
+                            <jvmFlag>-XX:MaxRAMPercentage=75</jvmFlag>
+                            <jvmFlag>-XX:InitialRAMPercentage=40</jvmFlag>
+                        </jvmFlags>
+                        <labels>
+                            <org.opencontainers.image.source>https://dev.azure.com/fintexincorporated/portfolio-calculation-engine</org.opencontainers.image.source>
+                            <org.opencontainers.image.title>portfolio-calculation-engine</org.opencontainers.image.title>
+                        </labels>
+                    </container>
                 </configuration>
             </plugin>
         </plugins>

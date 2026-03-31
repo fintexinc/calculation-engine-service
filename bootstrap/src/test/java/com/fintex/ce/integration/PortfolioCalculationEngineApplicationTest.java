@@ -1,6 +1,6 @@
 package com.fintex.ce.integration;
 
-import com.fintex.ce.PortfolioCalculationService;
+import com.fintex.ce.PortfolioCalculationEngineApplication;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("integration")
 @ActiveProfiles("test")
 @SpringBootTest(
-    classes = PortfolioCalculationService.class,
+    classes = PortfolioCalculationEngineApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
-class PortfolioCalculationServiceIntegrationTest {
+class PortfolioCalculationEngineApplicationTest {
 
   @Autowired
   private ApplicationContext applicationContext;

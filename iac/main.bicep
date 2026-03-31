@@ -1,9 +1,9 @@
-// Main Bicep template for Calculation Engine Service
+// Main Bicep template for Portfolio Calculation Engine
 // Azure Container App deployment
 
 // Parameters
 @description('Container App name')
-param containerAppName string = 'calculation-engine-service'
+param containerAppName string = 'portfolio-calculation-engine'
 
 @description('The Azure region for the deployment')
 param location string = 'Canada Central'
@@ -15,7 +15,7 @@ param managedEnvironmentId string
 param containerImage string = 'mcr.microsoft.com/k8se/quickstart:latest'
 
 @description('Container name')
-param containerName string = 'calculation-engine-service-container'
+param containerName string = 'portfolio-calculation-engine-container'
 
 @description('Container registry server')
 param containerRegistryServer string = 'crfintexfndservdevcc01.azurecr.io'
@@ -53,9 +53,6 @@ param securityMasterServiceUrl string = 'https://security-master-service.ashybay
 @description('FMP API Key')
 @secure()
 param fmpApiKey string = ''
-
-@description('MS Reference Tables Suffix')
-param msReferenceTablesSuffix string = 'X'
 
 @description('Spring Profile')
 param springProfile string = ''
@@ -97,10 +94,6 @@ var profileEnvVars = empty(springProfile) ? [] : [
 ]
 
 var baseEnvVars = [
-  {
-    name: 'MS_REFERENCE_TABLES_SUFFIX'
-    value: msReferenceTablesSuffix
-  }
   {
     name: 'JAVA_OPTS'
     value: '-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC'

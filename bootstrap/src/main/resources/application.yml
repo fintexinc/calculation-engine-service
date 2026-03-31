@@ -79,5 +79,11 @@ logging:
     root: INFO
     com.fintex.ce: DEBUG
 
+springdoc:
+  swagger-ui:
+    path: /api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui
+  api-docs:
+    path: /api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/api-docs
+
 performance-monitor-duration:
   info-threshold: 59000 #59 seconds
