@@ -6,17 +6,18 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.calculation.PeriodCalculationService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.MonthlyReturns;
+import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.enumeration.Period;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.util.ReturnFactorScale;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @param <E>
@@ -43,7 +44,7 @@ public abstract class PeriodAbstractService<E extends PeriodResult, R extends Pe
   }
 
   public CalculationDTO buildCalculationDto(final R command, final ReturnFactorScale returnFactorScale) {
-    final Returns<MonthlyReturns> monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(
+    final Returns<HoldingMonthlyReturns> monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(
         command.getHoldings(), command.getCurrency(), returnFactorScale);
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService

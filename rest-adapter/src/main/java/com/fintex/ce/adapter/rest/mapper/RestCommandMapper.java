@@ -20,16 +20,19 @@ import com.fintex.ce.domain.dto.command.CorrelationCommand;
 import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
 import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
+import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
+import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand.Portfolio;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.dto.command.ReturnCommand;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.dto.command.RollingCorrelationCommand;
 import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.dto.command.YieldCommand;
-import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 @Component
 public class RestCommandMapper {
@@ -65,8 +68,13 @@ public class RestCommandMapper {
     }
 
     public MultiplePortfoliosCommand toMultiplePortfoliosCommand(MultiplePortfoliosReqDTO dto) {
-        MultiplePortfoliosCommand cmd = new MultiplePortfoliosCommand();
-        BeanUtils.copyProperties(dto, cmd);
+        MultiplePortfoliosCommand cmd = new MultiplePortfoliosCommand()
+            .setBenchmarkHoldings(dto.getBenchmarkHoldings());
+        if (dto.getPortfolios() != null) {
+            cmd.setPortfolios(dto.getPortfolios().stream()
+                .map(p -> new Portfolio(p.getHoldings()))
+                .collect(Collectors.toSet()));
+        }
         return cmd;
     }
 

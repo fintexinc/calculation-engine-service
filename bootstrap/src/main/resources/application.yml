@@ -30,6 +30,8 @@ external-services:
         income: /api/v1/wealth/securities/income
         fees: /api/v1/wealth/securities/fees
         sales-charge: /api/v1/wealth/securities/sales-charge
+        returns:
+          monthly: /api/v1/wealth/securities/returns/monthly
 
 rest-template:
   rest-template-pool:

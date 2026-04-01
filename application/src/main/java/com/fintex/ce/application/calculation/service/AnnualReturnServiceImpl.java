@@ -5,13 +5,15 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.ReturnCommand;
-import com.fintex.ce.domain.model.MonthlyReturns;
+import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.result.AnnualReturnResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
 
 @Service
@@ -35,7 +37,7 @@ public class AnnualReturnServiceImpl implements CalculationService<AnnualReturnR
   }
 
   public CalculationDTO buildWeightedAverageInputDto(final ReturnCommand reqDTO) {
-    final Returns<MonthlyReturns> monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO
+    final Returns<HoldingMonthlyReturns> monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO
         .getHoldings(), reqDTO.getCurrency(), SCALE_OF_TWO);
 
     final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsService
