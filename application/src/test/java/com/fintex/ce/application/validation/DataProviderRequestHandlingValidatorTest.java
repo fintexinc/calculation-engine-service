@@ -2,9 +2,11 @@ package com.fintex.ce.application.validation;
 
 import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
+import org.junit.jupiter.api.Test;
+
 import java.util.List;
 import java.util.function.BiFunction;
-import org.junit.jupiter.api.Test;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -50,7 +52,7 @@ class DataProviderRequestHandlingValidatorTest {
     // ACT
     DataProviderRequestHandlingValidator.dataProviderCheckValidation(
         List.of(),
-        List.of(buildProviderAware("EAGLE")),
+        List.of(buildProviderAware("MORNINGSTAR")),
         function);
 
     // VERIFY
@@ -65,7 +67,7 @@ class DataProviderRequestHandlingValidatorTest {
     // ACT
     DataProviderRequestHandlingValidator.dataProviderCheckValidation(
         List.of(DataProvider.values()),
-        List.of(buildProviderAware("EAGLE")),
+        List.of(buildProviderAware("MORNINGSTAR")),
         function);
 
     // VERIFY

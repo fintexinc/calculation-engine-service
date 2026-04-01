@@ -3,10 +3,11 @@ package com.fintex.ce.util;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.math.BigDecimal;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -304,7 +305,7 @@ class FilterUtilsTest {
   @Test
   void getSpecifiedIfEmpty_checkResultWhenDataProvidersIsNotEmpty() {
     // SETUP
-    final var dataProviders = List.of(DataProvider.EAGLE, DataProvider.MORNINGSTAR);
+    final var dataProviders = List.of(DataProvider.MORNINGSTAR);
 
     // ACT
     final var actual = FilterUtils.getSpecifiedIfEmpty(dataProviders);

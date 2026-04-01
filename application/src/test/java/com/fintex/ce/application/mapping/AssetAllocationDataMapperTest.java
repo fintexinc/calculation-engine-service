@@ -9,14 +9,15 @@ import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.fintex.ce.application.util.TestConstants.GREATER_THAN_YEAR;
 import static com.fintex.ce.application.util.TestConstants.LESS_THAN_YEAR;
@@ -146,7 +147,7 @@ class AssetAllocationDataMapperTest {
 
   private HashMap<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> getExpected(
       final Holding... holdings) {
-    return getExpectedWithSpecifiedDataProvider(DataProvider.EAGLE, holdings);
+    return getExpectedWithSpecifiedDataProvider(DataProvider.MORNINGSTAR, holdings);
   }
 
   private HashMap<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> getExpectedWithSpecifiedDataProvider(
@@ -176,7 +177,7 @@ class AssetAllocationDataMapperTest {
     final var rAssetAllocation = new HoldingAssetAllocation();
     rAssetAllocation.setHoldingType(FinancialInstrumentType.ETF_US);
     rAssetAllocation.setAllocations(assetAllocations);
-    rAssetAllocation.setProvider(DataProvider.EAGLE.name());
+    rAssetAllocation.setProvider(DataProvider.MORNINGSTAR.name());
 
     result.put(holding, rAssetAllocation);
     return result;

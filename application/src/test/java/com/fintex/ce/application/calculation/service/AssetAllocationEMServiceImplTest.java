@@ -15,17 +15,17 @@ import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
@@ -37,20 +37,17 @@ import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.INTER
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.DEFAULT_PROVIDERS;
+import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -141,118 +138,20 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void shouldSelectEmergingValueForDataProvider_whenCheckResult() {
-    // SETUP
-    final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
-
-    final Supplier<BigDecimal> supplierE = mock(Supplier.class);
-    when(supplierE.get()).thenReturn(ONE);
-    final Supplier<BigDecimal> supplierM = mock(Supplier.class);
-    when(supplierM.get()).thenReturn(TEN);
-
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
-    // ACT
-    final BigDecimal actual = a.selectEmergingValueForDataProvider(DataProvider.EAGLE, supplierE, supplierM, mock(
-        Holding.class));
-
-    // VERIFY
-    assertEquals(actual, supplierE.get());
-    verify(supplierM, times(0)).get();
-  }
-
-  @Test
-  void shouldSelectEmergingValueForDataProvider_whenCheckResult2() {
-    // SETUP
-    final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
-
-    final Supplier<BigDecimal> supplierE = mock(Supplier.class);
-    when(supplierE.get()).thenReturn(ONE);
-    final Supplier<BigDecimal> supplierM = mock(Supplier.class);
-    when(supplierM.get()).thenReturn(TEN);
-
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
-    // ACT
-    final BigDecimal actual = a.selectEmergingValueForDataProvider(DataProvider.MORNINGSTAR, supplierE, supplierM, mock(
-        Holding.class));
-
-    // VERIFY
-    assertEquals(actual, supplierM.get());
-    verify(supplierE, times(0)).get();
-  }
-
-  @Test
-  void shouldSelectEmergingValueForDataProvider_whenCheckResult3() {
-    // SETUP
-    final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
-
-    final Supplier<BigDecimal> supplierE = mock(Supplier.class);
-    when(supplierE.get()).thenReturn(ONE);
-    final Supplier<BigDecimal> supplierM = mock(Supplier.class);
-    when(supplierM.get()).thenReturn(TEN);
-
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
-    // ACT
-    a.selectEmergingValueForDataProvider(DataProvider.EAGLE, supplierE, supplierM, mock(Holding.class));
-
-    // VERIFY
-    verify(supplierE, times(1)).get();
-  }
-
-  @Test
-  void shouldEmForInternationalEquity_whenVerifySelectEmergingValueForDataProviderEagle() {
-    // SETUP
-    final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
-
-    // if eagle
-    final Holding h = mock(Holding.class);
-    final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
-        EUROPEAN_EQUITIES, ONE,
-        ASIA_PACIFIC_EQUITIES, TEN);
-
-    // if mrstar
-    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
-        BigDecimal.valueOf(40));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
-
-    doCallRealMethod().when(a).emForInternationalEquity(any(), any(), any(), any());
-    // ACT
-    a.emForInternationalEquity(h, Pair.of(DataProvider.EAGLE, assetAllocations), countryAllocations, equityDifference);
-
-    // VERIFY
-    verify(a)
-        .selectEmergingValueForDataProvider(
-            eq(DataProvider.EAGLE),
-            argThat(arg -> arg.get().compareTo(BigDecimal.valueOf(1 + 10)) == 0),
-            argThat(arg -> arg.get().compareTo(BigDecimal.valueOf(40 + 5)) == 0),
-            eq(h));
-  }
-
-  @Test
   void shouldEmForInternationalEquity_whenCheckResult() {
     // SETUP
-    final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
+    final AssetAllocationEMServiceImpl a = new AssetAllocationEMServiceImpl(null, null, null, null);
 
-    // if eagle
     final Holding h = mock(Holding.class);
-    final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
-        EUROPEAN_EQUITIES, ONE,
-        ASIA_PACIFIC_EQUITIES, TEN);
-
-    // if mrstar
-    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
-        BigDecimal.valueOf(40));
+    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
+        CountryRegionType.INTERNATIONAL_DEVELOPED, BigDecimal.valueOf(40));
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
-    final BigDecimal expected = mock(BigDecimal.class);
-    when(a.selectEmergingValueForDataProvider(any(), any(), any(), any())).thenReturn(expected);
-
-    doCallRealMethod().when(a).emForInternationalEquity(any(), any(), any(), any());
     // ACT
-    final BigDecimal actual = a.emForInternationalEquity(h, Pair.of(DataProvider.EAGLE, assetAllocations),
-        countryAllocations, equityDifference);
+    final BigDecimal actual = a.emForInternationalEquity(h, countryAllocations, equityDifference);
 
     // VERIFY
-    assertSame(expected, actual);
+    assertEquals(BigDecimal.valueOf(45), actual);
   }
 
   @Test
@@ -275,7 +174,7 @@ class AssetAllocationEMServiceImplTest {
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final BigDecimal actual = a.getEmergingMarketValue(
-        h, Pair.of(DataProvider.EAGLE, assetAllocations), countryAllocations, equityDifference,
+        h, Pair.of(DataProvider.MORNINGSTAR, assetAllocations), countryAllocations, equityDifference,
         AssetAllocationRegionEmType.CASH);
 
     // VERIFY
@@ -302,7 +201,7 @@ class AssetAllocationEMServiceImplTest {
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final BigDecimal actual = a.getEmergingMarketValue(
-        h, Pair.of(DataProvider.EAGLE, assetAllocations), countryAllocations, equityDifference,
+        h, Pair.of(DataProvider.MORNINGSTAR, assetAllocations), countryAllocations, equityDifference,
         AssetAllocationRegionEmType.FIXED_INCOME);
 
     // VERIFY
@@ -314,23 +213,20 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    // if eagle
     final Holding h = mock(Holding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
-        CANADIAN_EQUITIES, expected,
+        CANADIAN_EQUITIES, BigDecimal.valueOf(99),
         ASIA_PACIFIC_EQUITIES, TEN);
 
-    // if mrstar
-    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
-        BigDecimal.valueOf(40));
+    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
+        CountryRegionType.CANADA, expected);
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final BigDecimal actual = a.getEmergingMarketValue(
-        h, Pair.of(DataProvider.EAGLE, assetAllocations), countryAllocations, equityDifference,
+        h, Pair.of(DataProvider.MORNINGSTAR, assetAllocations), countryAllocations, equityDifference,
         AssetAllocationRegionEmType.CANADIAN_EQUITY);
 
     // VERIFY
@@ -342,23 +238,20 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    // if eagle
     final Holding h = mock(Holding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
-        US_EQUITIES, expected,
+        US_EQUITIES, BigDecimal.valueOf(99),
         ASIA_PACIFIC_EQUITIES, TEN);
 
-    // if mrstar
-    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
-        BigDecimal.valueOf(40));
+    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
+        CountryRegionType.UNITED_STATES, expected);
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final BigDecimal actual = a.getEmergingMarketValue(
-        h, Pair.of(DataProvider.EAGLE, assetAllocations), countryAllocations, equityDifference,
+        h, Pair.of(DataProvider.MORNINGSTAR, assetAllocations), countryAllocations, equityDifference,
         AssetAllocationRegionEmType.US_EQUITY);
 
     // VERIFY
@@ -382,16 +275,15 @@ class AssetAllocationEMServiceImplTest {
         BigDecimal.valueOf(40));
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
-    final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.EAGLE,
+    final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.MORNINGSTAR,
         assetAllocations);
     final BigDecimal actual = a.getEmergingMarketValue(
         h, pair, countryAllocations, equityDifference, AssetAllocationRegionEmType.INTERNATIONAL_EQUITY);
 
     // VERIFY
-    verify(a).emForInternationalEquity(h, pair, countryAllocations, equityDifference);
+    verify(a).emForInternationalEquity(h, countryAllocations, equityDifference);
   }
 
   @Test
@@ -409,7 +301,6 @@ class AssetAllocationEMServiceImplTest {
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
     final var pair = Pair.of(DataProvider.MORNINGSTAR, assetAllocations);
 
-    doCallRealMethod().when(sut).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final BigDecimal actual = sut.getEmergingMarketValue(
@@ -420,27 +311,25 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void shouldGetEmergingMarketValue_whenVerifyCANADAEQUITYFromAssetAllocation() {
+  void shouldGetEmergingMarketValue_whenReturnZeroForCANADIANEQUITY_whenNoCanadaInCountryAllocations() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
 
     final Holding h = mock(Holding.class);
-    final BigDecimal expected = BigDecimal.valueOf(6);
-    final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, expected,
+    final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, BigDecimal.valueOf(6),
         US_EQUITIES, TEN);
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
         BigDecimal.valueOf(40));
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
-    final var pair = Pair.of(DataProvider.EAGLE, assetAllocations);
+    final var pair = Pair.of(DataProvider.MORNINGSTAR, assetAllocations);
 
-    doCallRealMethod().when(sut).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final BigDecimal actual = sut.getEmergingMarketValue(
         h, pair, countryAllocations, equityDifference, AssetAllocationRegionEmType.CANADIAN_EQUITY);
 
     // VERIFY
-    assertEquals(expected, actual);
+    assertEquals(ZERO, actual);
   }
 
   @Test
@@ -458,7 +347,6 @@ class AssetAllocationEMServiceImplTest {
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
     final var pair = Pair.of(DataProvider.MORNINGSTAR, assetAllocations);
 
-    doCallRealMethod().when(sut).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final BigDecimal actual = sut.getEmergingMarketValue(
@@ -469,27 +357,25 @@ class AssetAllocationEMServiceImplTest {
   }
 
   @Test
-  void shouldGetEmergingMarketValue_whenVerifyUSEQUITYFromAssetAllocation() {
+  void shouldGetEmergingMarketValue_whenReturnZeroForUSEQUITY_whenNoUnitedStatesInCountryAllocations() {
     // SETUP
     final var sut = mock(AssetAllocationEMServiceImpl.class);
 
     final Holding h = mock(Holding.class);
-    final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, TEN,
-        US_EQUITIES, expected);
+        US_EQUITIES, BigDecimal.valueOf(6));
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
         BigDecimal.valueOf(40));
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
-    final var pair = Pair.of(DataProvider.EAGLE, assetAllocations);
+    final var pair = Pair.of(DataProvider.MORNINGSTAR, assetAllocations);
 
-    doCallRealMethod().when(sut).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final BigDecimal actual = sut.getEmergingMarketValue(
         h, pair, countryAllocations, equityDifference, AssetAllocationRegionEmType.US_EQUITY);
 
     // VERIFY
-    assertEquals(expected, actual);
+    assertEquals(ZERO, actual);
   }
 
   @Test
@@ -497,22 +383,19 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    // if eagle
     final Holding h = mock(Holding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
-        EM_EQUITIES, expected,
+        EM_EQUITIES, BigDecimal.valueOf(99),
         ASIA_PACIFIC_EQUITIES, TEN);
 
-    // if mrstar
-    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
-        BigDecimal.valueOf(40));
+    final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
+        CountryRegionType.EMERGING_MARKET, expected);
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
-    final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.EAGLE,
+    final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.MORNINGSTAR,
         assetAllocations);
     final BigDecimal actual = a.getEmergingMarketValue(
         h, pair, countryAllocations, equityDifference, AssetAllocationRegionEmType.EMERGING_MARKET_EQUITY);
@@ -537,7 +420,6 @@ class AssetAllocationEMServiceImplTest {
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.EMERGING_MARKET, expected);
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.MORNINGSTAR,
@@ -566,7 +448,6 @@ class AssetAllocationEMServiceImplTest {
         .valueOf(3));
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
-    doCallRealMethod().when(a).selectEmergingValueForDataProvider(any(), any(), any(), any());
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
     final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.MORNINGSTAR,
@@ -581,22 +462,17 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldGetEmergingMarketValue_whenVerifyUNCLASSIFIED() {
     // SETUP
-    final var sut = mock(AssetAllocationEMServiceImpl.class);
-    final var unclassifiedRegion = AssetAllocationRegionEmType.UNCLASSIFIED;
-    final var bigDecimal = new BigDecimal("1.1");
-    final var map = Map.of(UNCLASSIFIED, bigDecimal);
-    final var dataProvider = DataProvider.MORNINGSTAR;
-    final var holding = mock(Holding.class);
-    final var pair = new ImmutablePair<>(dataProvider, map);
-
-    doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
+    final var a = new AssetAllocationEMServiceImpl(null, null, null, null);
+    final var expected = new BigDecimal("1.1");
+    final var map = Map.<AssetAllocationRegion, BigDecimal>of(UNCLASSIFIED, expected);
+    final var pair = new ImmutablePair<>(DataProvider.MORNINGSTAR, map);
 
     // ACT
-    sut.getEmergingMarketValue(holding, pair, null, null, unclassifiedRegion);
+    final BigDecimal actual = a.getEmergingMarketValue(mock(Holding.class), pair, null, null,
+        AssetAllocationRegionEmType.UNCLASSIFIED);
 
     // VERIFY
-    verify(sut).selectEmergingValueForDataProvider(eq(dataProvider), argThat(arg -> arg.get().equals(bigDecimal)),
-        argThat(arg -> arg.get().equals(bigDecimal)), eq(holding));
+    assertEquals(expected, actual);
   }
 
   @Test
@@ -945,7 +821,7 @@ class AssetAllocationEMServiceImplTest {
         assetAllocationDataMapper, countryAllocationMappingService));
 
     final var req = mock(PortfolioHoldingsCommand.class);
-    final var providers = List.of(DataProvider.EAGLE, DataProvider.MORNINGSTAR);
+    final var providers = List.of(DataProvider.MORNINGSTAR, DataProvider.MORNINGSTAR);
     when(req.getDataProviders()).thenReturn(providers);
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(Map.of());
@@ -1049,7 +925,7 @@ class AssetAllocationEMServiceImplTest {
       sut.fetchExposures(portfolioHoldingsReqDTO, List.of());
 
       // VERIFY
-      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, DEFAULT_PROVIDERS), Mockito.times(2));
+      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, MORNINGSTAR), Mockito.times(2));
     }
   }
 

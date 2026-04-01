@@ -13,15 +13,16 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
 import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_CQ_CQ_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
@@ -70,7 +71,7 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
       final List<Warning> warnings) {
     final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR, EAGLE));
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR));
     final var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
     return assetAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, this::getFixedIncomeValue));
   }
