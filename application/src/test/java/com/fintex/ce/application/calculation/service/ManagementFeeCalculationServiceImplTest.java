@@ -11,12 +11,13 @@ import com.fintex.ce.domain.model.result.ManagementFeeResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MF_MF_001;
@@ -190,7 +191,7 @@ class ManagementFeeCalculationServiceImplTest {
       sut.perform(reqDTO);
 
       // VERIFY
-      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, DataProvider.DEFAULT_PROVIDERS));
+      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, DataProvider.MORNINGSTAR));
     }
   }
 

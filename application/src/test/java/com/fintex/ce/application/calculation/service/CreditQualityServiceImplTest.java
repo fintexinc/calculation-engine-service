@@ -16,14 +16,14 @@ import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.model.calculation.CreditQualityRating.A;
@@ -257,7 +257,7 @@ class CreditQualityServiceImplTest {
       final var warnings = List.of(mock(Warning.class));
       final var reqDTO = mock(PortfolioHoldingsCommand.class);
       final var providers = List.of(DataProvider.MORNINGSTAR);
-      final DataProvider[] specifiedProviders = {DataProvider.MORNINGSTAR, DataProvider.EAGLE};
+      final DataProvider[] specifiedProviders = {DataProvider.MORNINGSTAR};
 
       when(reqDTO.getDataProviders()).thenReturn(providers);
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());

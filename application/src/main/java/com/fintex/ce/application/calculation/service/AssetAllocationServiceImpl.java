@@ -12,13 +12,15 @@ import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.DEFAULT_PROVIDERS;
+
+import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service
@@ -42,7 +44,7 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
   public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> fetchExposures(
       PortfolioHoldingsCommand reqDTO,
       List<Warning> warnings) {
-    List<DataProvider> providers = getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS);
+    List<DataProvider> providers = getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR);
     Map<Holding, HoldingAssetAllocation> allocations = securityDataPort.fetch(reqDTO.getHoldings(), providers);
     return assetAllocationDataMapper.toRegionExposures(allocations);
   }

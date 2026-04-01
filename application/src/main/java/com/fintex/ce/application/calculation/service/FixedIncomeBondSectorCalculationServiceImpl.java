@@ -14,17 +14,17 @@ import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.PortfolioUtils;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
 import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_BS_BS_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
@@ -90,7 +90,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   private Map<Holding, BigDecimal> getFixedIncomePlusCash(final List<Holding> holdings,
       final List<Warning> warnings) {
     final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
-        holdings, List.of(MORNINGSTAR, EAGLE));
+        holdings, List.of(MORNINGSTAR));
     var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
     return assetAllocations.entrySet()
         .stream()

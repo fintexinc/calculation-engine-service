@@ -3,8 +3,6 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.exception.SystemException;
-import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
@@ -17,16 +15,17 @@ import com.fintex.ce.domain.model.result.AssetAllocationEMResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
@@ -38,10 +37,6 @@ import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.CountryRegionType.UNITED_STATES;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.BROADRIDGE;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.DEFAULT_PROVIDERS;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.EAGLE;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.ENVESTNET;
 import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.util.CalculationUtils.sum;
@@ -88,12 +83,12 @@ public class AssetAllocationEMServiceImpl
       final List<Warning> warnings) {
     final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS));
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR));
     final var assetAllocations = assetAllocationDataMapper.toRegionExposuresWithProvider(rawData);
 
     return calculateAssetAllocationEMarketMap(reqDTO.getHoldings(),
         assetAllocations,
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DEFAULT_PROVIDERS),
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR),
         warnings);
   }
 
@@ -147,66 +142,33 @@ public class AssetAllocationEMServiceImpl
     } else if (AssetAllocationRegionEmType.FIXED_INCOME.equals(type)) {
       return assetPair.getValue().get(FIXED_INCOME);
     } else if (AssetAllocationRegionEmType.CANADIAN_EQUITY.equals(type)) {
-      final Supplier<BigDecimal> eSupplier = () -> assetPair.getValue().get(CANADIAN_EQUITIES);
-      final Supplier<BigDecimal> mSupplier = getValueFromMap(countryAllocations, CountryRegionType.CANADA);
-      return selectEmergingValueForDataProvider(assetPair.getKey(), eSupplier, mSupplier, holding);
+      return Objects.requireNonNull(getCountryValue(countryAllocations, CountryRegionType.CANADA));
     } else if (AssetAllocationRegionEmType.US_EQUITY.equals(type)) {
-      final Supplier<BigDecimal> eSupplier = () -> assetPair.getValue().get(US_EQUITIES);
-      final Supplier<BigDecimal> mSupplier = getValueFromMap(countryAllocations, UNITED_STATES);
-      return selectEmergingValueForDataProvider(assetPair.getKey(), eSupplier, mSupplier, holding);
+      return Objects.requireNonNull(getCountryValue(countryAllocations, UNITED_STATES));
     } else if (AssetAllocationRegionEmType.INTERNATIONAL_EQUITY.equals(type)) {
-      return emForInternationalEquity(holding, assetPair, countryAllocations, equityDifference);
+      return emForInternationalEquity(holding, countryAllocations, equityDifference);
     } else if (AssetAllocationRegionEmType.EMERGING_MARKET_EQUITY.equals(type)) {
-      final Supplier<BigDecimal> eSupplier = () -> assetPair.getValue().get(EM_EQUITIES);
-      final Supplier<BigDecimal> mSupplier = () -> Optional.ofNullable(countryAllocations).map(p -> p.get(
-          CountryRegionType.EMERGING_MARKET)).orElse(ZERO);
-      return selectEmergingValueForDataProvider(assetPair.getKey(), eSupplier, mSupplier, holding);
+      return Objects.requireNonNull(Optional.ofNullable(countryAllocations)
+          .map(p -> p.get(CountryRegionType.EMERGING_MARKET)).orElse(ZERO));
     } else if (AssetAllocationRegionEmType.UNCLASSIFIED.equals(type)) {
-      final Supplier<BigDecimal> supplier = () -> assetPair.getValue().get(UNCLASSIFIED);
-      return selectEmergingValueForDataProvider(assetPair.getKey(), supplier, supplier, holding);
+      return Objects.requireNonNull(assetPair.getValue().get(UNCLASSIFIED));
     } else {
-      final Supplier<BigDecimal> supplier = () -> assetPair.getValue().get(OTHER);
-      return selectEmergingValueForDataProvider(assetPair.getKey(), supplier, supplier, holding);
+      return Objects.requireNonNull(assetPair.getValue().get(OTHER));
     }
   }
 
-  private Supplier<BigDecimal> getValueFromMap(final Map<CountryRegionType, BigDecimal> countryAllocations,
+  private BigDecimal getCountryValue(final Map<CountryRegionType, BigDecimal> countryAllocations,
       final CountryRegionType type) {
-    return () -> Optional.ofNullable(countryAllocations).map(p -> (p.get(type))).orElse(ZERO);
+    return Optional.ofNullable(countryAllocations).map(p -> p.get(type)).orElse(ZERO);
   }
 
   public BigDecimal emForInternationalEquity(final Holding holding,
-      final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> assetPair,
       final Map<CountryRegionType, BigDecimal> countryAllocations,
       final Map<Holding, BigDecimal> equityDifference) {
-    final Supplier<BigDecimal> eSupplier = () -> {
-      final BigDecimal euroValue = assetPair.getValue().get(EUROPEAN_EQUITIES);
-      final BigDecimal asiaValue = assetPair.getValue().get(ASIA_PACIFIC_EQUITIES);
-      return euroValue.add(asiaValue);
-    };
-    final Supplier<BigDecimal> mSupplier = () -> {
-      final BigDecimal equityDiff = equityDifference.get(holding);
-      final BigDecimal internationalValue = Optional.ofNullable(countryAllocations)
-          .map(p -> p.get(CountryRegionType.INTERNATIONAL_DEVELOPED)).orElse(ZERO);
-      return internationalValue.add(equityDiff);
-    };
-    return selectEmergingValueForDataProvider(assetPair.getKey(), eSupplier, mSupplier, holding);
-  }
-
-  public BigDecimal selectEmergingValueForDataProvider(final DataProvider dataProvider,
-      final Supplier<BigDecimal> eagleSupplier,
-      final Supplier<BigDecimal> mrStarSupplier,
-      final Holding holding) {
-    if (EAGLE.equals(dataProvider)) {
-      return Objects.requireNonNull(eagleSupplier.get());
-    } else
-      if (MORNINGSTAR.equals(dataProvider) || BROADRIDGE.equals(dataProvider)
-          || ENVESTNET.equals(dataProvider) || dataProvider == null) {
-            return Objects.requireNonNull(mrStarSupplier.get());
-          }
-    final String message = String.format("Could not recognise data provider for holding: %s", holding
-        .generateUserIdentifier());
-    throw new SystemException(message, ErrorCode.INTERNAL_SERVER_ERROR);
+    final BigDecimal equityDiff = equityDifference.get(holding);
+    final BigDecimal internationalValue = Optional.ofNullable(countryAllocations)
+        .map(p -> p.get(CountryRegionType.INTERNATIONAL_DEVELOPED)).orElse(ZERO);
+    return internationalValue.add(equityDiff);
   }
 
   public Map<Holding, BigDecimal> calculateEquityDifference(final List<Holding> holdings,

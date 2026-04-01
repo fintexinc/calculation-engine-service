@@ -11,6 +11,8 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ManagementFeeResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -19,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MF_MF_001;
@@ -50,7 +51,7 @@ public class ManagementFeeCalculationServiceImpl
       final AverageMerCommand reqDTO) {
     Map<Holding, ManagementFee> rawData = managementFeeSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS));
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.MORNINGSTAR));
     return groupAndMap(rawData, reqDTO.getHoldings());
   }
 
