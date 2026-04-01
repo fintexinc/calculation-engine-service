@@ -24,7 +24,7 @@ import static com.fintex.ce.util.CollectorUtils.toMap;
 public class CountryAllocationMappingServiceImpl implements CountryAllocationMappingService {
   private static final String COUNTRY_ALLOCATION_MAPPING_PATH = "/jsons/country-allocation-mapping.json";
 
-  // pre-loaded country allocations mapping: country id - rest fields
+  // pre-loaded country allocations mapping: country id or country name - rest fields
   public Map<String, CountryAllocation> countryAllocationMap;
 
   public CountryAllocationMappingServiceImpl() {
@@ -95,7 +95,14 @@ public class CountryAllocationMappingServiceImpl implements CountryAllocationMap
     }
     final List<CountryAllocation> list = JacksonUtil.deserialize(in, new TypeReference<>() {
     });
-    return list.stream().filter(e -> e.getRegion() != null).collect(toMap(CountryAllocation::getCountryId, e -> e));
+    Map<String, CountryAllocation> map = new HashMap<>();
+    list.stream().filter(e -> e.getRegion() != null).forEach(e -> {
+      map.put(e.getCountryId(), e);
+      if (e.getCountryName() != null) {
+        map.put(e.getCountryName(), e);
+      }
+    });
+    return map;
   }
 
   public InputStream getCountryAllocationInputStream() {
