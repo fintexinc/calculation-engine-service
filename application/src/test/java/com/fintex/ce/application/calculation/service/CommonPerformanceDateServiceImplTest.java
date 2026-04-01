@@ -4,15 +4,17 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.model.CommonDates;
-import com.fintex.ce.domain.model.MonthlyReturns;
+import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.ValidationError;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -38,7 +40,7 @@ class CommonPerformanceDateServiceImplTest {
     doCallRealMethod().when(sut).getPortfolioMonthlyReturns(anyList());
     doCallRealMethod().when(sut).commonPerformanceDateFor(any());
 
-    final Returns<MonthlyReturns> monthlyReturns = sut.getPortfolioMonthlyReturns(holdings);
+    final Returns<HoldingMonthlyReturns> monthlyReturns = sut.getPortfolioMonthlyReturns(holdings);
 
     // ACT
     final CommonDates actual = sut.commonPerformanceDateFor(monthlyReturns);
@@ -120,7 +122,7 @@ class CommonPerformanceDateServiceImplTest {
     final DataErrorException error = new DataErrorException("message", "id", ExceptionCode.ERR_RRC_MR_002);
     final ValidationError resError = new ValidationError("id", ExceptionCode.ERR_RRC_MR_002.toString(), "message");
     final List<DataErrorException> errors = List.of(error);
-    final Returns<MonthlyReturns> returns = mock(Returns.class);
+    final Returns<HoldingMonthlyReturns> returns = mock(Returns.class);
 
     doReturn(portfolios).when(request).getPortfolios();
     doReturn(mock(CommonDates.class)).when(sut).commonPerformanceDateFor(any());
@@ -142,7 +144,7 @@ class CommonPerformanceDateServiceImplTest {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CommonPerformanceDateServiceImpl.class,
         withSettings().useConstructor(monthlyReturnsService));
-    final var returns = new Returns<MonthlyReturns>();
+    final var returns = new Returns<HoldingMonthlyReturns>();
     doCallRealMethod().when(sut).commonPerformanceDateFor(any());
 
     // ACT

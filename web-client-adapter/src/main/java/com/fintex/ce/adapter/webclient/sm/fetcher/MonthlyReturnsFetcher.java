@@ -1,23 +1,51 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.domain.model.MonthlyReturns;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
+import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
+import com.fintex.ce.adapter.webclient.sm.mapper.MonthlyReturnsMapper;
+import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
+import com.fintex.ce.domain.model.HoldingMonthlyReturns;
+import com.fintex.sm.model.domain.performance.MonthlyReturns;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
- * Stub implementation for MonthlyReturns SecurityDataFetcher.
- * TODO: Replace with actual REST implementation.
+ * Fetcher for Monthly Returns data from Security Master REST API.
+ * Activated when external-services.security-master.api-type=rest (default).
  */
 @Component
-public class MonthlyReturnsFetcher implements SecurityDataFetcher<MonthlyReturns> {
+@ConditionalOnProperty(name = "external-services.security-master.api-type", havingValue = "rest", matchIfMissing = true)
+public class MonthlyReturnsFetcher
+    extends AbstractSecurityMasterFetcher<HoldingMonthlyReturns, MonthlyReturns> {
+
+  private final String endpointPath;
+  private final MonthlyReturnsMapper mapper;
+
+  public MonthlyReturnsFetcher(
+      SecurityMasterWebClient client,
+      MonthlyReturnsMapper mapper,
+      @Value("${external-services.security-master.rest.endpoints.returns.monthly}") String endpointPath) {
+    super(client);
+    this.mapper = mapper;
+    this.endpointPath = endpointPath;
+  }
 
   @Override
-  public Map<Holding, MonthlyReturns> fetch(List<? extends Holding> holdings, List<DataProvider> providers) {
-    return new HashMap<>();
+  protected String endpointPath() {
+    return endpointPath;
+  }
+
+  @Override
+  protected ParameterizedTypeReference<List<SecurityAttributeResult<MonthlyReturns>>> responseType() {
+    return new ParameterizedTypeReference<>() {};
+  }
+
+  @Override
+  protected SecurityMasterResponseMapper<HoldingMonthlyReturns, MonthlyReturns> responseMapper() {
+    return mapper;
   }
 }

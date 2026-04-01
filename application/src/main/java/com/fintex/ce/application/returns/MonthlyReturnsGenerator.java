@@ -1,18 +1,20 @@
 package com.fintex.ce.application.returns;
 
-import com.fintex.ce.domain.model.MonthlyReturns;
+import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.MonthlyReturnGeneratableHolding;
 import com.fintex.ce.returns.ReturnsGenerator;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.springframework.stereotype.Component;
+
 import static com.fintex.ce.util.DateTimeUtils.rangeWithLastDayOfMonth;
 import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.DecimalUtils.pow;
@@ -23,8 +25,8 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 public class MonthlyReturnsGenerator implements ReturnsGenerator {
 
   @Override
-  public Map<Holding, MonthlyReturns> generateGicMonthlyReturns(List<Holding> holdings) {
-    Map<Holding, MonthlyReturns> result = new HashMap<>();
+  public Map<Holding, HoldingMonthlyReturns> generateGicMonthlyReturns(List<Holding> holdings) {
+    Map<Holding, HoldingMonthlyReturns> result = new HashMap<>();
     List<Holding> filteredHoldings = filterHoldings(holdings, GIC_PREDICATE);
     for (Holding h : filteredHoldings) {
       result.put(h, generatedMonthlyReturns((MonthlyReturnGeneratableHolding) h));
@@ -32,7 +34,7 @@ public class MonthlyReturnsGenerator implements ReturnsGenerator {
     return result;
   }
 
-  private MonthlyReturns generatedMonthlyReturns(MonthlyReturnGeneratableHolding holding) {
+  private HoldingMonthlyReturns generatedMonthlyReturns(MonthlyReturnGeneratableHolding holding) {
     TreeMap<LocalDate, BigDecimal> returns = generateReturns(holding);
     return createMonthlyReturns(returns, holding.getCurrency());
   }
@@ -62,8 +64,8 @@ public class MonthlyReturnsGenerator implements ReturnsGenerator {
     return gicHolding.getInterestFreq().getFrequency();
   }
 
-  private MonthlyReturns createMonthlyReturns(TreeMap<LocalDate, BigDecimal> returns, Currency currency) {
-    MonthlyReturns monthlyReturns = new MonthlyReturns();
+  private HoldingMonthlyReturns createMonthlyReturns(TreeMap<LocalDate, BigDecimal> returns, Currency currency) {
+    HoldingMonthlyReturns monthlyReturns = new HoldingMonthlyReturns();
     monthlyReturns.setReturns(returns);
     monthlyReturns.setCurrency(currency.name());
     monthlyReturns.setHoldingType(FinancialInstrumentType.GIC);
