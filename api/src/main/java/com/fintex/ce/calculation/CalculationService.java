@@ -1,6 +1,7 @@
 package com.fintex.ce.calculation;
 
 import com.fintex.ce.domain.dto.command.CalculationCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.ErrorResult;
 
 /**
@@ -13,13 +14,8 @@ import com.fintex.ce.domain.model.result.ErrorResult;
  */
 public interface CalculationService<E extends ErrorResult, R extends CalculationCommand> {
 
-  /**
-   * Performs the calculation.
-   *
-   * @param command
-   *          the command containing input parameters
-   * @return the calculation result
-   */
   E perform(R command);
+
+  CalculationMetric getMetric();
 
 }

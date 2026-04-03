@@ -1,13 +1,11 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.adapter.rest.dto.request.TopCommonHoldingsReqDTO;
+import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.exception.ReqValidationException;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.domain.model.holding.Holding;
 import java.util.List;
 import java.util.Set;
-
+import org.junit.jupiter.api.Test;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_TCH_AHT_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_TCH_NFM_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_TCH_NFM_002;
@@ -20,7 +18,7 @@ class TopCommonHoldingsReqValidationTest {
   @Test
   void check_numOfFundsMinLessThanOne() {
     // SETUP
-    final TopCommonHoldingsReqDTO reqDTO = new TopCommonHoldingsReqDTO();
+    final TopCommonHoldingsCommand reqDTO = new TopCommonHoldingsCommand();
     reqDTO.setNumOfFundsMin(0);
 
     final var sut = new TopCommonHoldingsReqValidation(reqDTO);
@@ -37,7 +35,7 @@ class TopCommonHoldingsReqValidationTest {
   @Test
   void check_numOfFundsMinGreaterThanHoldingSize() {
     // SETUP
-    final TopCommonHoldingsReqDTO reqDTO = new TopCommonHoldingsReqDTO();
+    final TopCommonHoldingsCommand reqDTO = new TopCommonHoldingsCommand();
     reqDTO.setNumOfFundsMin(3);
     reqDTO.setHoldings(List.of(mock(Holding.class), mock(Holding.class)));
 
@@ -55,7 +53,7 @@ class TopCommonHoldingsReqValidationTest {
   @Test
   void check_sizeOfAccumulateHoldingTypesGreaterThan12() {
     // SETUP
-    final TopCommonHoldingsReqDTO reqDTO = new TopCommonHoldingsReqDTO();
+    final TopCommonHoldingsCommand reqDTO = new TopCommonHoldingsCommand();
     reqDTO.setAccumulateHoldingTypes(Set.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"));
     reqDTO.setHoldings(List.of(mock(Holding.class), mock(Holding.class)));
 

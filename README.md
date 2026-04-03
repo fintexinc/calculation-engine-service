@@ -16,60 +16,25 @@ Built with Java 21, Spring Boot 3.4.6, Hexagonal Architecture.
 
 ### Exposed API
 
-All calculation endpoints are POST requests under `/portfolio`:
+Single unified endpoint for all 48 calculation metrics:
 
-| Endpoint | Description |
-|----------|-------------|
-| `/portfolio/trailing-total-return/calculation` | Trailing total returns |
-| `/portfolio/leading-total-return/calculation` | Leading total returns |
-| `/portfolio/rolling-total-returns/calculation` | Rolling total returns |
-| `/portfolio/annual-return/calculation` | Annual returns |
-| `/portfolio/growth-of-10k/calculation` | Growth of $10K |
-| `/portfolio/best-worst-periods/calculation` | Best/worst performance periods |
-| `/portfolio/distribution-of-monthly-return/calculation` | Monthly return distribution |
-| `/portfolio/standard-deviation/calculation` | Standard deviation |
-| `/portfolio/rolling-standard-deviation/calculation` | Rolling standard deviation |
-| `/portfolio/downside-deviation/calculation` | Downside deviation |
-| `/portfolio/max-drawdown/calculation` | Maximum drawdown |
-| `/portfolio/mean/calculation` | Mean return |
-| `/portfolio/sharpe-ratio/calculation` | Sharpe ratio |
-| `/portfolio/rolling-sharpe-ratio/calculation` | Rolling Sharpe ratio |
-| `/portfolio/sortino-ratio/calculation` | Sortino ratio |
-| `/portfolio/treynor-ratio/calculation` | Treynor ratio |
-| `/portfolio/information-ratio/calculation` | Information ratio |
-| `/portfolio/mar-ratio/calculation` | MAR ratio |
-| `/portfolio/alpha/calculation` | Alpha |
-| `/portfolio/beta/calculation` | Beta |
-| `/portfolio/rsquared/calculation` | R-squared |
-| `/portfolio/correlation/calculation` | Correlation |
-| `/portfolio/rolling-correlation/calculation` | Rolling correlation |
-| `/portfolio/tracking-error/calculation` | Tracking error |
-| `/portfolio/excess-returns/calculation` | Excess returns |
-| `/portfolio/upside-capture/calculation` | Upside capture ratio |
-| `/portfolio/downside-capture/calculation` | Downside capture ratio |
-| `/portfolio/asset-allocations/calculation` | Asset allocation |
-| `/portfolio/asset-allocations-em/calculation` | Asset allocation (EM) |
-| `/portfolio/equity-sector/calculation` | Equity sector breakdown |
-| `/portfolio/equity-country-exposure/calculation` | Equity country exposure |
-| `/portfolio/equity-geographic-exposure/calculation` | Equity geographic exposure |
-| `/portfolio/equity-stylebox-exposure/calculation` | Equity stylebox exposure |
-| `/portfolio/equity-market-capitalization/calculation` | Equity market cap |
-| `/portfolio/fixed-income-bond-sector/calculation` | Fixed income bond sector |
-| `/portfolio/fixed-income-country-exposure/calculation` | Fixed income country exposure |
-| `/portfolio/fixed-income-geographic-exposure/calculation` | Fixed income geographic exposure |
-| `/portfolio/fixed-income-stylebox-exposure/calculation` | Fixed income stylebox exposure |
-| `/portfolio/fixed-income-credit-quality/calculation` | Fixed income credit quality |
-| `/portfolio/maturity-allocation/calculation` | Maturity allocation |
-| `/portfolio/classification-allocation/calculation` | Classification allocation |
-| `/portfolio/country-exposure/calculation` | Country exposure |
-| `/portfolio/mer/calculation` | Average MER |
-| `/portfolio/management-fee/calculation` | Management fee |
-| `/portfolio/sales-charge/calculation` | Sales charges |
-| `/portfolio/top-common-holdings/calculation` | Top common holdings |
-| `/portfolio/income-forecast/calculation` | Income forecast |
-| `/portfolio/yield/calculation` | Yield |
-| `/portfolio/common-performance-dates/calculation` | Common performance dates |
+```
+POST /api/v1/portfolio/calculations/{metric-name}
+```
 
+The `{metric-name}` path parameter selects the calculation. The request body schema depends on the metric type. See Swagger UI for full details and all available metric values.
+
+You can read the description for all metrics, requests and responses on Swagger UI:
+
+| Resource | Local URL                                                                                 |
+|----------|-------------------------------------------------------------------------------------------|
+| Swagger UI | `http://localhost:8181/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui/index.html` |
+| OpenAPI YAML | `http://localhost:8181/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/api-docs.yaml`         |
+
+| Resource | Remote URL                                                                                |
+|----------|-------------------------------------------------------------------------------------------|
+| Swagger UI | `https://calculation-engine-service.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui/index.html` |
+| OpenAPI YAML | `https://calculation-engine-service.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/api-docs.yaml`         |
 
 ### Dependencies
 
@@ -153,6 +118,8 @@ Runner configuration properties:
 | `sms.runner.enabled` | `true` | Enable/disable the automatic runner |
 | `sms.runner.path` | `../security-master-service-v2` | Path to Security Master project |
 | `sms.runner.env-file` | `environment-v2/.env` | Env file relative to Security Master project root |
+
+**IMPORTANT**: `environment-ce/.env` overrides `environment-v2/.env` properties.
 
 To disable the runner (e.g., when running Security Master via Docker instead):
 

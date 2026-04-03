@@ -1,7 +1,8 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
+import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
+import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.model.FeeData;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
@@ -19,7 +20,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
@@ -33,7 +33,8 @@ import static java.math.BigDecimal.ZERO;
  * @param <R>
  *          result type. Return type of 'perform' method.
  */
-public abstract class AverageManagementExpenseCalculationService<R extends WarningResult> {
+public abstract class AverageManagementExpenseCalculationService<R extends WarningResult>
+    implements CalculationService<R, AverageMerCommand> {
 
   protected AverageManagementExpenseCalculationService() {
   }
@@ -86,6 +87,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends Warni
   protected abstract void setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(final R response,
       final AverageMerCommand command);
 
+  @Override
   public R perform(final AverageMerCommand command) {
     final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDTOs = fetchData(
         command);

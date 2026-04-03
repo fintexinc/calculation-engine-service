@@ -6,6 +6,7 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.UpsideCaptureResult;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,11 @@ public class UpsideCaptureCalculationServiceImpl
       final MonthlyReturnsService monthlyReturnsService,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.UPSIDE_CAPTURE;
   }
 
   @Override

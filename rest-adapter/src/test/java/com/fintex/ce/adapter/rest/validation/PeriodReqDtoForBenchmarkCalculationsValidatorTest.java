@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.BenchmarksCouldNotBeEmptyReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CipsdGreaterThanCpedReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CipsdLastDayOfMonthReqValidation;
@@ -14,10 +13,9 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodContain
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodLessThan12ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.domain.model.holding.Holding;
 import java.util.List;
-
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -28,7 +26,7 @@ class PeriodReqDtoForBenchmarkCalculationsValidatorTest {
     // SETUP
     final var sut = new PeriodReqDtoForBenchmarkCalculationsValidator(new PeriodsReqDtoValidator());
 
-    final var reqDTO = TrailingTotalReturnsReqValidatorTest.getPeriodsReqDTO();
+    final var reqDTO = TrailingTotalReturnsReqValidatorTest.getPeriodCommand();
     reqDTO.setBenchmarkHoldings(List.of(mock(Holding.class)));
 
     final ReqValidation expected = ReqValidation.create()

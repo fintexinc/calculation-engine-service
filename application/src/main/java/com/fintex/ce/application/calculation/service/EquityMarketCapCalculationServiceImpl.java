@@ -3,6 +3,8 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.HoldingEquityMarketCap;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityMarketCapResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -61,6 +63,11 @@ public class EquityMarketCapCalculationServiceImpl
       final SecurityDataFetcher<HoldingEquityMarketCap> equityMarketCapSecurityDataFetcher) {
     super();
     this.equityMarketCapSecurityDataFetcher = equityMarketCapSecurityDataFetcher;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.EQUITY_MARKET_CAPITALIZATION;
   }
 
   @Override

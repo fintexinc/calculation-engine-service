@@ -4,6 +4,8 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.mapping.response.EquitySectorResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.EquitySector;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquitySectorResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -44,6 +46,11 @@ public class EquitySectorCalculationImpl
     super();
     this.equitySectorSecurityDataFetcher = equitySectorSecurityDataFetcher;
     this.responseMapper = responseMapper;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.EQUITY_SECTOR;
   }
 
   @Override

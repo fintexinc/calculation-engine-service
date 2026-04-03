@@ -5,6 +5,7 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.MeanResult;
 import com.fintex.ce.util.ReturnFactorScale;
 import java.util.Set;
@@ -19,6 +20,11 @@ public class MeanCalculationServiceImpl extends PeriodAbstractService<MeanResult
       final MonthlyReturnsService monthlyReturnsService,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.MEAN;
   }
 
   public MeanCalculation defineCalculationMethod(final PeriodCommand reqDTO) {

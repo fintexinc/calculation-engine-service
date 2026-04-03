@@ -151,7 +151,7 @@ External service calls without fallback method for when SM is unavailable.
 - [ ] Batch methods available (no N+1)
 - [ ] Stubs removed when real fetcher is implemented
 
-### REST Adapter
+### REST API Adapter
 
 - [ ] Request validation present
 - [ ] No business logic

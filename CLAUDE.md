@@ -16,7 +16,7 @@ mvn test -pl application -Dtest=SharpeRatioCalculationServiceImplTest  # Run sin
 mvn compile -pl <module> -am              # Compile single module with dependencies
 mvn spotless:apply                         # Format code
 mvn spotless:check                         # Check formatting
-mvn spring-boot:run -D"spring-boot.run.profiles"=localdev  # Run locally
+mvn spring-boot:run -D"spring-boot.run.profiles"=dev  # Run locally
 mvn jib:build                              # Build Docker image
 ```
 

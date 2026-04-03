@@ -8,6 +8,7 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.RollingCorrelationResult;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -28,6 +29,11 @@ public class RollingCorrelationCalculationServiceImpl
       MonthlyReturnsService monthlyReturnsService,
       @Value("#{'${default.periods.rolling-calculations}'.split(',')}") Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.ROLLING_CORRELATION;
   }
 
   @Override

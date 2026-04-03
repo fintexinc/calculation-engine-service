@@ -5,6 +5,7 @@ import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.command.YieldCommand;
 import com.fintex.ce.domain.model.Yield;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -23,6 +24,11 @@ public class YieldCalculationServiceImpl implements CalculationService<YieldResu
       final YieldResponseMapper responseMapper) {
     this.yieldSecurityDataFetcher = yieldSecurityDataFetcher;
     this.responseMapper = responseMapper;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.YIELD;
   }
 
   @Override

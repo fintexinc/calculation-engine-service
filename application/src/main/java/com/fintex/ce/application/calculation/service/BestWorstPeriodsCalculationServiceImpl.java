@@ -5,6 +5,7 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.BestWorstPeriodsResult;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,6 +30,11 @@ public class BestWorstPeriodsCalculationServiceImpl
   @Autowired
   public BestWorstPeriodsCalculationServiceImpl(final MonthlyReturnsService monthlyReturnsService) {
     this.monthlyReturnsService = monthlyReturnsService;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.BEST_WORST_PERIODS;
   }
 
   @Override

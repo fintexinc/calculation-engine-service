@@ -9,14 +9,13 @@ import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.ReturnCommand;
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.Growth10KResult;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
 
 @Service
@@ -27,6 +26,11 @@ public class GrowthOf10KCalculationServiceImpl implements CalculationService<Gro
   @Autowired
   public GrowthOf10KCalculationServiceImpl(final MonthlyReturnsService monthlyReturnsService) {
     this.monthlyReturnsService = monthlyReturnsService;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.GROWTH_OF_10K;
   }
 
   @Override

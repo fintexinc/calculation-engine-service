@@ -5,29 +5,29 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Profile("dev")
 @Component
+@ConfigurationProperties(prefix = "sms.runner")
+@Setter
 public class SecurityMasterServiceRunner implements SmartLifecycle {
 
   private static final Logger log = LoggerFactory.getLogger(SecurityMasterServiceRunner.class);
 
-  @Value("${sms.runner.path:../security-master-service-v2}")
-  private String smsPath;
-
-  @Value("${sms.runner.env-file:environment-v2/.env}")
-  private String envFile;
-
-  @Value("${sms.runner.enabled:true}")
-  private boolean enabled;
+  private String path = "../security-master-service-v2";
+  private String envFile = "environment-v2/.env";
+  private String overrideEnvFile = "ce-environment/.env";
+  private boolean enabled = true;
 
   private Process process;
   private boolean running;
@@ -39,7 +39,7 @@ public class SecurityMasterServiceRunner implements SmartLifecycle {
       return;
     }
 
-    File smsDir = new File(smsPath).getAbsoluteFile();
+    File smsDir = new File(path).getAbsoluteFile();
     if (!new File(smsDir, "pom.xml").exists()) {
       log.warn("security-master-service-v2 not found at {}, skipping", smsDir);
       return;
@@ -47,6 +47,13 @@ public class SecurityMasterServiceRunner implements SmartLifecycle {
 
     try {
       Map<String, String> envVars = loadEnvFile(smsDir.toPath().resolve(envFile));
+
+      Path overridePath = new File(".").getAbsoluteFile().toPath().resolve(overrideEnvFile);
+      if (Files.exists(overridePath)) {
+        Map<String, String> overrides = loadEnvFile(overridePath);
+        envVars.putAll(overrides);
+        log.info("Applied {} env overrides from {}", overrides.size(), overridePath);
+      }
 
       boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("win");
       String[] command = isWindows
@@ -92,7 +99,9 @@ public class SecurityMasterServiceRunner implements SmartLifecycle {
           .filter(line -> !line.isEmpty() && !line.startsWith("#") && line.contains("="))
           .collect(Collectors.toMap(
               line -> line.substring(0, line.indexOf('=')),
-              line -> line.substring(line.indexOf('=') + 1)));
+              line -> line.substring(line.indexOf('=') + 1),
+              (existing, replacement) -> replacement,
+              HashMap::new));
     }
   }
 }

@@ -6,6 +6,7 @@ import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractS
 import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.LeadingTotalReturnsResult;
 import com.fintex.ce.util.ReturnFactorScale;
 import java.math.BigDecimal;
@@ -25,6 +26,11 @@ public class LeadingTotalReturnsCalculationServiceImpl
       @Autowired final MonthlyReturnsService monthlyReturnsService,
       @Value("#{'${default.periods.leading-total-returns}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.LEADING_TOTAL_RETURNS;
   }
 
   @Override

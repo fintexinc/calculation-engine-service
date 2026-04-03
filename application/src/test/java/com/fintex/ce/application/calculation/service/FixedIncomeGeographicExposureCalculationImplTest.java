@@ -4,7 +4,7 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.CountryExposure;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.GeographicExposureResult;
+import com.fintex.ce.domain.model.result.FixedIncomeGeographicExposureResult;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
@@ -52,7 +52,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
           withSettings().useConstructor(storage, geographicAllocationMappingService));
 
       final var exposures = mock(Map.class);
-      final var expected = new GeographicExposureResult();
+      final var expected = new FixedIncomeGeographicExposureResult();
       expected.setEquityGeographicExposure(FixedIncomeGeographicExposureCalculationImpl.DEFAULT_MAP);
       expected.setWarnings(List.of());
 

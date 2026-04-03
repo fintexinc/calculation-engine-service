@@ -7,15 +7,15 @@ import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.ValidationError;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-
-import java.util.List;
-import java.util.Set;
 
 @Service
 public class CommonPerformanceDateServiceImpl implements CalculationService<CommonPerformanceDatesResult, MultiplePortfoliosCommand> {
@@ -24,6 +24,11 @@ public class CommonPerformanceDateServiceImpl implements CalculationService<Comm
 
   public CommonPerformanceDateServiceImpl(MonthlyReturnsService monthlyReturnsService) {
     this.monthlyReturnsService = monthlyReturnsService;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.COMMON_PERFORMANCE_DATES;
   }
 
   @Override

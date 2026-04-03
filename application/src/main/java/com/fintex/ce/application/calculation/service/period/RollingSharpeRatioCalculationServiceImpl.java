@@ -8,6 +8,7 @@ import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractS
 import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.RollingSharpeRatioResult;
 import com.fintex.ce.domain.model.result.SharpeRatioResult;
 import com.fintex.ce.port.webclient.TBillsFetcher;
@@ -32,6 +33,11 @@ public class RollingSharpeRatioCalculationServiceImpl
       @Value("#{'${default.periods.rolling-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
     this.tBillsProvider = tBillsProvider;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.ROLLING_SHARPE_RATIO;
   }
 
   @Override

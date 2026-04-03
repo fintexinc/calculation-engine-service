@@ -39,7 +39,8 @@
         <sm-domain.version>2.0.0-SNAPSHOT</sm-domain.version>
 
         <!-- External dependencies -->
-        <spring-openapi.version>2.1.0</spring-openapi.version>
+        <spring-openapi.version>2.8.6</spring-openapi.version>
+        <swagger-annotations.version>2.2.29</swagger-annotations.version>
 
 
         <poi-ooxml.version>5.4.1</poi-ooxml.version>
@@ -129,6 +130,11 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${spring-openapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-annotations.version}</version>
             </dependency>
 
 

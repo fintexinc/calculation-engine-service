@@ -5,8 +5,9 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.CountryExposure;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.GeographicExposureResult;
+import com.fintex.ce.domain.model.result.FixedIncomeGeographicExposureResult;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
@@ -28,7 +29,7 @@ import static java.util.stream.Collectors.toMap;
 @Service
 public class FixedIncomeGeographicExposureCalculationImpl
     extends
-      BreakdownAbstractService<GeographicExposureResult, GeographicRegionType> {
+      BreakdownAbstractService<FixedIncomeGeographicExposureResult, GeographicRegionType> {
 
   private final SecurityDataFetcher<CountryExposure> fiCountryExposureSecurityDataFetcher;
   private final GeographicAllocationMappingService geographicAllocationMappingService;
@@ -48,12 +49,17 @@ public class FixedIncomeGeographicExposureCalculationImpl
   }
 
   @Override
-  public GeographicExposureResult calculate(ExposureDataHolder<GeographicRegionType> exposureData,
+  public CalculationMetric getMetric() {
+    return CalculationMetric.FIXED_INCOME_GEOGRAPHIC_EXPOSURE;
+  }
+
+  @Override
+  public FixedIncomeGeographicExposureResult calculate(ExposureDataHolder<GeographicRegionType> exposureData,
       List<Holding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (areAllValuesInMapEmpty(exposures)) {
-      GeographicExposureResult defaultResult = new GeographicExposureResult();
+      FixedIncomeGeographicExposureResult defaultResult = new FixedIncomeGeographicExposureResult();
       defaultResult.setEquityGeographicExposure(DEFAULT_MAP);
       defaultResult.setWarnings(warnings);
       return defaultResult;
@@ -61,7 +67,7 @@ public class FixedIncomeGeographicExposureCalculationImpl
     Map<GeographicRegionType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings, GeographicRegionType
         .values());
     Map<GeographicRegionType, BigDecimal> rescaledValues = toUserScale(reScaleAbs(netProducts));
-    GeographicExposureResult geoResult = new GeographicExposureResult();
+    FixedIncomeGeographicExposureResult geoResult = new FixedIncomeGeographicExposureResult();
     geoResult.setEquityGeographicExposure(rescaledValues);
     geoResult.setWarnings(warnings);
     return geoResult;

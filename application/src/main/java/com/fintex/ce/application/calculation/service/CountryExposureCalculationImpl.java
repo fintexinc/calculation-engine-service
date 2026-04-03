@@ -6,6 +6,7 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.CountryExposure;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CountryExposureResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
@@ -40,6 +41,11 @@ public class CountryExposureCalculationImpl extends BreakdownAbstractService<Cou
     this.countryExposureSecurityDataFetcher = countryExposureSecurityDataFetcher;
     this.responseMapper = responseMapper;
     this.countryAllocationMappingService = countryAllocationMappingService;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.FIXED_INCOME_COUNTRY_EXPOSURE;
   }
 
   @Override

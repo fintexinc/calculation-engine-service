@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.rest.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
 import com.fintex.ce.domain.model.calculation.SalesChargeCategory;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.Map;
@@ -19,8 +20,10 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@Schema(description = "Response for sales-charge metric. Contains sales charge breakdown by category.")
 public class SalesChargeResDtos extends ErrorDTO {
 
+  @Schema(description = "Sales charge breakdown by category")
   private Map<SalesChargeCategory, SalesChargeResDto> salesCharges = new EnumMap<>(SalesChargeCategory.class);
 
   @Getter

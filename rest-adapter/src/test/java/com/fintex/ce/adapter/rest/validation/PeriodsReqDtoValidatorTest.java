@@ -13,7 +13,6 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodLessTha
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PeriodsReqDtoValidatorTest {
@@ -23,7 +22,7 @@ class PeriodsReqDtoValidatorTest {
     // SETUP
     final var sut = new PeriodsReqDtoValidator();
 
-    final var reqDTO = TrailingTotalReturnsReqValidatorTest.getPeriodsReqDTO();
+    final var reqDTO = TrailingTotalReturnsReqValidatorTest.getPeriodCommand();
 
     final ReqValidation expected = ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))

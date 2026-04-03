@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.adapter.rest.dto.request.LeadingTotalReturnPeriodsReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingValueReqValidator;
@@ -14,13 +13,12 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotCon
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotContainingSincePerformanceStartDateReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotContainingYearToDateReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
 import com.fintex.ce.domain.model.holding.Holding;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-
+import org.junit.jupiter.api.Test;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -31,7 +29,7 @@ class LeadingTotalReturnsReqValidatorTest {
   void build_checkResult() {
     final var sut = new LeadingTotalReturnsReqValidator();
 
-    final var reqDTO = getPeriodsReqDTO();
+    final var reqDTO = getLeadingTotalReturnCommand();
 
     final ReqValidation expected = ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))
@@ -51,8 +49,8 @@ class LeadingTotalReturnsReqValidatorTest {
     assertEquals(expected, actual);
   }
 
-  static LeadingTotalReturnPeriodsReqDTO getPeriodsReqDTO() {
-    final var reqDTO = new LeadingTotalReturnPeriodsReqDTO();
+  static LeadingTotalReturnCommand getLeadingTotalReturnCommand() {
+    final var reqDTO = new LeadingTotalReturnCommand();
     reqDTO.setCurrency(CAD);
     reqDTO.setPeriods(Set.of("1", "2", "3"));
     reqDTO.setCustomIntervalPsd(LocalDate.of(2019, 5, 31));

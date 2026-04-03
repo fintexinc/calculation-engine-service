@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.adapter.rest.dto.request.RollingCalculationReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpedLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdGreaterThanCpedReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdLastDayOfMonthReqValidation;
@@ -16,13 +15,14 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotCon
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriodsLessThan12ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriodsReqValidation;
+import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RollingCalculationReqDtoValidator extends AbstractRequestValidator<RollingCalculationReqDTO> {
+public class RollingCalculationReqDtoValidator extends AbstractRequestValidator<RollingCalculationCommand> {
 
   @Override
-  public ReqValidation build(final RollingCalculationReqDTO reqDTO) {
+  public ReqValidation build(final RollingCalculationCommand reqDTO) {
     return ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))
         .linkWith(new NotEmptyCurrencyReqValidator(reqDTO.getCurrency()))

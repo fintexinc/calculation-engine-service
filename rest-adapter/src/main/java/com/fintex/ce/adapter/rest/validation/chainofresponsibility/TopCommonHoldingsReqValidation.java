@@ -1,25 +1,23 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
+import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.adapter.rest.dto.request.TopCommonHoldingsReqDTO;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
-import lombok.EqualsAndHashCode;
-import org.springframework.util.CollectionUtils;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
+import lombok.EqualsAndHashCode;
+import org.springframework.util.CollectionUtils;
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.filterHoldings;
 
 @EqualsAndHashCode(callSuper = true)
 public class TopCommonHoldingsReqValidation extends ReqValidation {
 
-  private final TopCommonHoldingsReqDTO reqDTO;
+  private final TopCommonHoldingsCommand reqDTO;
 
-  public TopCommonHoldingsReqValidation(final TopCommonHoldingsReqDTO reqDTO) {
+  public TopCommonHoldingsReqValidation(final TopCommonHoldingsCommand reqDTO) {
     this.reqDTO = reqDTO;
   }
 

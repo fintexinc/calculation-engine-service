@@ -6,6 +6,7 @@ import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.model.CommonHoldings;
 import com.fintex.ce.domain.model.HoldingAggregator;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.TopCommonHoldingsResult;
 import com.fintex.ce.domain.model.result.commonholdings.TopCommonHoldingData;
@@ -47,6 +48,11 @@ public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHo
       @Value("#{'${default.top-common-holdings.accumulate-types}'.split(',')}") final Set<String> defaultAccumulateTypes) {
     this.commonHoldingsSecurityDataFetcher = commonHoldingsSecurityDataFetcher;
     this.defaultAccumulateTypes = defaultAccumulateTypes;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.TOP_COMMON_HOLDINGS;
   }
 
   @Override

@@ -38,8 +38,7 @@ public class RestExceptionHandlingServiceImpl implements RestExceptionHandlingSe
     }
   }
 
-  public <R, D extends ErrorDTO> D handleWithResultMapping(Supplier<R> resultSupplier, Supplier<D> dtoFactory,
-      HttpServletRequest request) {
+  public <R, D extends ErrorDTO> D handleWithResultMapping(Supplier<R> resultSupplier, Supplier<D> dtoFactory) {
     try {
       R result = resultSupplier.get();
       D dto = dtoFactory.get();
