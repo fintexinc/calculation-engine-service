@@ -9,14 +9,13 @@ import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
+import org.springframework.stereotype.Service;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
 import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
@@ -59,6 +58,11 @@ public class FixedIncomeBondSectorCalculationServiceImpl
     this.fixedIncomeBondSectorSecurityDataFetcher = fixedIncomeBondSectorSecurityDataFetcher;
     this.assetAllocationSecurityDataFetcher = assetAllocationSecurityDataFetcher;
     this.assetAllocationDataMapper = assetAllocationDataMapper;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.FIXED_INCOME_BOND_SECTOR;
   }
 
   @Override

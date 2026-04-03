@@ -14,8 +14,7 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodReqVali
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotContainingYearToDateReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import org.junit.jupiter.api.Test;
-
-import static com.fintex.ce.adapter.rest.validation.TrailingTotalReturnsReqValidatorTest.getPeriodsReqDTO;
+import static com.fintex.ce.adapter.rest.validation.TrailingTotalReturnsReqValidatorTest.getPeriodCommand;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MarRatioReqValidatorTest {
@@ -25,7 +24,7 @@ class MarRatioReqValidatorTest {
     // SETUP
     final var sut = new MarRatioReqValidator();
 
-    final var reqDTO = getPeriodsReqDTO();
+    final var reqDTO = getPeriodCommand();
 
     final ReqValidation expected = ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))

@@ -1,12 +1,17 @@
 package com.fintex.ce.domain.dto.command;
 
 import com.fintex.ce.domain.model.enumeration.DataProvider;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Accessors(chain = true)
-public class DataProviderCommand implements CalculationCommand {
+@Schema(description = "Base command with data provider selection")
+public class DataProviderCommand extends CalculationCommand {
+  @Schema(description = "Data providers to use for fetching security data", example = "[\"MORNINGSTAR\"]")
   private List<DataProvider> dataProviders;
 }

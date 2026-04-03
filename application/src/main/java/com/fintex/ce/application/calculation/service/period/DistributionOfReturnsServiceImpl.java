@@ -8,6 +8,7 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.DistributionOfReturnsResult;
 import com.fintex.ce.util.ReturnFactorScale;
 import java.math.BigDecimal;
@@ -25,6 +26,11 @@ public class DistributionOfReturnsServiceImpl
 
   public DistributionOfReturnsServiceImpl(final MonthlyReturnsService monthlyReturnsService) {
     this.monthlyReturnsService = monthlyReturnsService;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS;
   }
 
   @Override

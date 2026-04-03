@@ -1,5 +1,7 @@
 package com.fintex.ce.adapter.rest.aop;
 
+import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -9,12 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
-
-import jakarta.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
-
-import static com.google.common.net.HttpHeaders.HOST;
-import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
 
 @Aspect
 @Component
@@ -33,18 +29,24 @@ public class LogRequestAspect {
   public Object logRequest(final ProceedingJoinPoint joinPoint) throws Throwable {
     var start = System.currentTimeMillis();
     var req = getRequestArgumentByType(joinPoint.getArgs(), HttpServletRequest.class);
+    if (req == null) {
+      req = ((org.springframework.web.context.request.ServletRequestAttributes)
+          org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()).getRequest();
+    }
 
+    var request = req;
     try {
       return joinPoint.proceed();
     } finally {
       var finish = System.currentTimeMillis();
       var executionTime = finish - start;
+      // TODO rework logging at TMI-350
       if (executionTime < infoThreshold) {
-        log.info("request url: {}, headers: [{}], payload: {}, execution time: {}ms", req.getRequestURI(), getHeaders(
-            req), getPayload(req), executionTime);
+        log.info("request url: {}, payload: {}, execution time: {}ms", request.getRequestURI(),
+            getPayload(request), executionTime);
       } else {
-        log.warn("request url: {}, headers: [{}], payload: {}, execution time: {}ms", req.getRequestURI(), getHeaders(
-            req), getPayload(req), executionTime);
+        log.warn("request url: {}, payload: {}, execution time: {}ms", request.getRequestURI(),
+            getPayload(request), executionTime);
       }
     }
   }
@@ -57,16 +59,6 @@ public class LogRequestAspect {
     final ContentCachingRequestWrapper cachingRequestWrapper = new ContentCachingRequestWrapper(request);
     cachingRequestWrapper.getParameterMap();
     return getPayload(cachingRequestWrapper);
-  }
-
-  private String getHeaders(final HttpServletRequest request) {
-    final String xForwardedFor = request.getHeader(X_FORWARDED_FOR);
-    final String host = request.getHeader(HOST);
-
-    return new StringBuilder()
-        .append(X_FORWARDED_FOR).append(" = ").append(xForwardedFor)
-        .append(", ")
-        .append(HOST).append(" = ").append(host).toString();
   }
 
   protected <T> T getRequestArgumentByType(final Object[] args, final Class<T> clazz) {

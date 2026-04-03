@@ -1,16 +1,16 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.adapter.rest.dto.request.AverageMerRequestDTO;
-import com.fintex.ce.adapter.rest.dto.request.BestWorstPeriodsReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.DistributionOfReturnsReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.IncomeForecastReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.LeadingTotalReturnPeriodsReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.MultiplePortfoliosReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.PeriodsReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.PortfolioHoldingsReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.ReturnReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.RollingCalculationReqDTO;
-import com.fintex.ce.adapter.rest.dto.request.TopCommonHoldingsReqDTO;
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
+import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
+import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
+import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
+import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
+import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.dto.command.ReturnCommand;
+import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
+import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -38,79 +38,79 @@ public class RequestValidationFacade {
   private final DistributionOfReturnsReqValidator distributionOfReturnsValidator;
   private final IncomeForecastReqValidation incomeForecastValidator;
 
-  public void validatePeriodsRequest(PeriodsReqDTO dto) {
+  public void validatePeriodsRequest(PeriodCommand dto) {
     periodsReqDtoValidator.validate(dto);
   }
 
-  public void validateBenchmarkPeriodsRequest(PeriodsReqDTO dto) {
+  public void validateBenchmarkPeriodsRequest(PeriodCommand dto) {
     benchmarkPeriodsValidator.validate(dto);
   }
 
-  public void validateTrailingTotalReturn(PeriodsReqDTO dto) {
+  public void validateTrailingTotalReturn(PeriodCommand dto) {
     trailingTotalReturnsValidator.validate(dto);
   }
 
-  public void validateMaxDrawdown(PeriodsReqDTO dto) {
+  public void validateMaxDrawdown(PeriodCommand dto) {
     maxDrawdownValidator.validate(dto);
   }
 
-  public void validateMarRatio(PeriodsReqDTO dto) {
+  public void validateMarRatio(PeriodCommand dto) {
     marRatioValidator.validate(dto);
   }
 
-  public void validateCorrelation(PeriodsReqDTO dto) {
+  public void validateCorrelation(PeriodCommand dto) {
     correlationValidator.validate(dto);
   }
 
-  public void validateRollingTotalReturns(RollingCalculationReqDTO dto) {
+  public void validateRollingTotalReturns(RollingCalculationCommand dto) {
     rollingTotalReturnsValidator.validate(dto);
   }
 
-  public void validateRollingCalculation(RollingCalculationReqDTO dto) {
+  public void validateRollingCalculation(RollingCalculationCommand dto) {
     rollingCalculationValidator.validate(dto);
   }
 
-  public void validateRollingCorrelation(RollingCalculationReqDTO dto) {
+  public void validateRollingCorrelation(RollingCalculationCommand dto) {
     rollingCorrelationValidator.validate(dto);
   }
 
-  public void validateLeadingTotalReturn(LeadingTotalReturnPeriodsReqDTO dto) {
+  public void validateLeadingTotalReturn(LeadingTotalReturnCommand dto) {
     leadingTotalReturnsValidator.validate(dto);
   }
 
-  public void validatePortfolioHoldingsRequest(PortfolioHoldingsReqDTO dto) {
+  public void validatePortfolioHoldingsRequest(PortfolioHoldingsCommand dto) {
     portfolioHoldingsValidator.validate(dto);
   }
 
-  public void validateReturnRequest(ReturnReqDTO dto) {
+  public void validateReturnRequest(ReturnCommand dto) {
     returnValidator.validate(dto);
   }
 
-  public void validateAverageMerRequest(AverageMerRequestDTO dto) {
+  public void validateAverageMerRequest(AverageMerCommand dto) {
     averageMerValidator.validate(dto);
   }
 
-  public void validateCommonDatesRequest(MultiplePortfoliosReqDTO dto) {
+  public void validateCommonDatesRequest(MultiplePortfoliosCommand dto) {
     commonDatesValidator.validate(dto.getBenchmarkHoldings(), dto.getPortfolios());
   }
 
-  public void validateBestWorstPeriods(BestWorstPeriodsReqDTO dto) {
+  public void validateBestWorstPeriods(BestWorstPeriodsCommand dto) {
     bestWorstPeriodsValidator.validate(dto);
   }
 
-  public void validateTopCommonHoldings(TopCommonHoldingsReqDTO dto) {
+  public void validateTopCommonHoldings(TopCommonHoldingsCommand dto) {
     topCommonHoldingsValidator.validate(dto);
   }
 
-  public void validateClassificationAllocation(PortfolioHoldingsReqDTO dto) {
+  public void validateClassificationAllocation(PortfolioHoldingsCommand dto) {
     classificationAllocationValidator.validate(dto);
   }
 
-  public void validateDistributionOfReturns(DistributionOfReturnsReqDTO dto) {
+  public void validateDistributionOfReturns(DistributionOfReturnsCommand dto) {
     distributionOfReturnsValidator.validate(dto);
   }
 
-  public void validateIncomeForecast(IncomeForecastReqDTO dto) {
+  public void validateIncomeForecast(IncomeForecastCommand dto) {
     incomeForecastValidator.validate(dto);
   }
 }

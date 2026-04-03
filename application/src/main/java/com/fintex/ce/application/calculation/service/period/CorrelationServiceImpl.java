@@ -7,6 +7,7 @@ import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractS
 import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CorrelationResult;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -24,6 +25,11 @@ public class CorrelationServiceImpl extends PeriodAbstractService<CorrelationRes
   public CorrelationServiceImpl(
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods,      final MonthlyReturnsService monthlyReturnsService) {
     super(monthlyReturnsService, defaultPeriods);
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.CORRELATION;
   }
 
   @Override

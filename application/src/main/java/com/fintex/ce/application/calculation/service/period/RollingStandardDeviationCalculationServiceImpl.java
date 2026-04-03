@@ -7,6 +7,7 @@ import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractS
 import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.RollingStandardDeviationResult;
 import com.fintex.ce.util.ReturnFactorScale;
 import java.math.BigDecimal;
@@ -26,6 +27,11 @@ public class RollingStandardDeviationCalculationServiceImpl
       final MonthlyReturnsService monthlyReturnsService,
       @Value("#{'${default.periods.rolling-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.ROLLING_STANDARD_DEVIATION;
   }
 
   @Override

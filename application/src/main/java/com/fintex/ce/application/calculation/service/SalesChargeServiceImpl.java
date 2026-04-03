@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.metric.SalesChargeCalculation;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.SalesCharge;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.SalesChargeResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -17,6 +18,11 @@ public class SalesChargeServiceImpl implements CalculationService<SalesChargeRes
 
   public SalesChargeServiceImpl(SecurityDataFetcher<SalesCharge> salesChargeSecurityDataFetcher) {
     this.salesChargeSecurityDataFetcher = salesChargeSecurityDataFetcher;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.SALES_CHARGE;
   }
 
   @Override

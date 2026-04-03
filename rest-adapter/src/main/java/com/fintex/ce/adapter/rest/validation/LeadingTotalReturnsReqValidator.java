@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.adapter.rest.dto.request.LeadingTotalReturnPeriodsReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingValueReqValidator;
@@ -14,13 +13,14 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotCon
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotContainingSincePerformanceStartDateReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotContainingYearToDateReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LeadingTotalReturnsReqValidator extends AbstractRequestValidator<LeadingTotalReturnPeriodsReqDTO> {
+public class LeadingTotalReturnsReqValidator extends AbstractRequestValidator<LeadingTotalReturnCommand> {
 
   @Override
-  public ReqValidation build(final LeadingTotalReturnPeriodsReqDTO reqDTO) {
+  public ReqValidation build(final LeadingTotalReturnCommand reqDTO) {
     return ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))
         .linkWith(new NotEmptyCurrencyReqValidator(reqDTO.getCurrency()))

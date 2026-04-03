@@ -4,6 +4,8 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.mapping.response.EquityStyleboxExposureResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityStyleboxExposureResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -45,6 +47,11 @@ public class EquityStyleboxExposureCalculationServiceImpl
     super();
     this.equityStyleboxSecurityDataFetcher = equityStyleboxSecurityDataFetcher;
     this.responseMapper = responseMapper;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.EQUITY_STYLEBOX_EXPOSURE;
   }
 
   @Override

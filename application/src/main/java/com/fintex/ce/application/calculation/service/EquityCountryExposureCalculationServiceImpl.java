@@ -5,6 +5,7 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityCountryExposureResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
@@ -45,6 +46,11 @@ public class EquityCountryExposureCalculationServiceImpl
     super();
     this.equityCountryAllocationSecurityDataFetcher = equityCountryAllocationSecurityDataFetcher;
     this.countryAllocationMappingService = countryAllocationMappingService;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.EQUITY_COUNTRY_EXPOSURE;
   }
 
   @Override

@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.adapter.rest.dto.request.DistributionOfReturnsReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CipsdGreaterThanCpedReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CipsdLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpedLastDayOfMonthReqValidation;
@@ -15,13 +14,14 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotEmptyCurre
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DistributionOfReturnsReqValidator extends AbstractRequestValidator<DistributionOfReturnsReqDTO> {
+public class DistributionOfReturnsReqValidator extends AbstractRequestValidator<DistributionOfReturnsCommand> {
 
   @Override
-  public ReqValidation build(final DistributionOfReturnsReqDTO reqDTO) {
+  public ReqValidation build(final DistributionOfReturnsCommand reqDTO) {
     return ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))
         .linkWith(new NotEmptyCurrencyReqValidator(reqDTO.getCurrency()))

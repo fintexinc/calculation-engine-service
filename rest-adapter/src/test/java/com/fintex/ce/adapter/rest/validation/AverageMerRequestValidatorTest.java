@@ -1,16 +1,14 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.adapter.rest.dto.request.AverageMerRequestDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingValueReqValidator;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingsCouldNotBeEmptyReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.domain.dto.command.AverageMerCommand;
+import com.fintex.ce.domain.model.holding.Holding;
 import java.util.List;
-
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -21,7 +19,7 @@ class AverageMerRequestValidatorTest {
     // SETUP
     final var sut = new AverageMerRequestValidator();
 
-    final AverageMerRequestDTO reqDTO = new AverageMerRequestDTO();
+    final AverageMerCommand reqDTO = new AverageMerCommand();
     reqDTO.setHoldings(List.of(mock(Holding.class)));
 
     final ReqValidation expected = ReqValidation.create()

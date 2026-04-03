@@ -7,6 +7,7 @@ import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
 import com.fintex.ce.domain.model.Income;
 import com.fintex.ce.domain.model.IncomeForecast;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -52,6 +53,11 @@ public class IncomeForecastCalculationServiceImpl
 
   public IncomeForecastCalculationServiceImpl(final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher) {
     this.incomeForecastSecurityDataFetcher = incomeForecastSecurityDataFetcher;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.INCOME_FORECAST;
   }
 
   @Override

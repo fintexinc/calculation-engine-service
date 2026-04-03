@@ -1,7 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.adapter.rest.dto.request.PortfolioHoldingsReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingValueReqValidator;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingsCouldNotBeEmptyReqValidation;
@@ -9,10 +7,10 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotEmptyGicTe
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullCashCurrencyValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.model.holding.CashHolding;
 import java.util.List;
-
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ClassificationAllocationReqValidatorTest {
@@ -22,7 +20,7 @@ class ClassificationAllocationReqValidatorTest {
     // SETUP
     final var sut = new ClassificationAllocationReqValidator();
 
-    final PortfolioHoldingsReqDTO reqDTO = new PortfolioHoldingsReqDTO();
+    final PortfolioHoldingsCommand reqDTO = new PortfolioHoldingsCommand();
     reqDTO.setHoldings(List.of(new CashHolding()));
 
     final ReqValidation expected = ReqValidation.create()

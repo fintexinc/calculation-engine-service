@@ -12,7 +12,7 @@
     </parent>
 
     <artifactId>rest-adapter</artifactId>
-    <name>Calculation Engine - REST Adapter</name>
+    <name>Calculation Engine - REST API Adapter</name>
     <description>Exposes REST API TO external consumers (Primary/Driving Adapter)</description>
     <packaging>jar</packaging>
 

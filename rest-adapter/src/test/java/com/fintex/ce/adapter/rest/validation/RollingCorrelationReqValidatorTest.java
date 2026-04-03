@@ -15,8 +15,7 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotCon
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriodsReqValidation;
 import org.junit.jupiter.api.Test;
-
-import static com.fintex.ce.adapter.rest.validation.RollingCalculationReqDtoValidatorTest.getRollingCalculationReqDTO;
+import static com.fintex.ce.adapter.rest.validation.RollingCalculationReqDtoValidatorTest.getRollingCalculationCommand;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RollingCorrelationReqValidatorTest {
@@ -26,7 +25,7 @@ class RollingCorrelationReqValidatorTest {
     // SETUP
     final var sut = new RollingCorrelationReqValidator();
 
-    final var reqDTO = getRollingCalculationReqDTO();
+    final var reqDTO = getRollingCalculationCommand();
 
     final ReqValidation expected = ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))

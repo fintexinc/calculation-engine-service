@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.adapter.rest.dto.request.PeriodsReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CipsdGreaterThanCpedReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CipsdLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpedLastDayOfMonthReqValidation;
@@ -12,9 +11,9 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodContain
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodLessThan12ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
 import org.junit.jupiter.api.Test;
-
-import static com.fintex.ce.adapter.rest.validation.TrailingTotalReturnsReqValidatorTest.getPeriodsReqDTO;
+import static com.fintex.ce.adapter.rest.validation.TrailingTotalReturnsReqValidatorTest.getPeriodCommand;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CorrelationReqValidatorTest {
@@ -24,7 +23,7 @@ class CorrelationReqValidatorTest {
     // SETUP
     final var sut = new CorrelationReqValidator();
 
-    final PeriodsReqDTO reqDTO = getPeriodsReqDTO();
+    final PeriodCommand reqDTO = getPeriodCommand();
 
     final ReqValidation expected = ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))

@@ -5,6 +5,7 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.TrailingTotalReturnsResult;
 import com.fintex.ce.util.ReturnFactorScale;
 import java.util.Set;
@@ -20,6 +21,11 @@ public class TrailingTotalReturnsCalculationServiceImpl
       final MonthlyReturnsService monthlyReturnsService,
       @Value("#{'${default.periods.trailing-total-returns}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.TRAILING_TOTAL_RETURNS;
   }
 
   public TrailingTotalReturnsCalculation defineCalculationMethod(final PeriodCommand reqDTO) {

@@ -9,6 +9,7 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationEMResult;
@@ -16,9 +17,6 @@ import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.ExposureDataHolder;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +25,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Service;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
@@ -65,6 +64,11 @@ public class AssetAllocationEMServiceImpl
     this.assetAllocationSecurityDataFetcher = assetAllocationSecurityDataFetcher;
     this.assetAllocationDataMapper = assetAllocationDataMapper;
     this.countryAllocationMappingService = countryAllocationMappingService;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.ASSET_ALLOCATIONS_EM;
   }
 
   @Override

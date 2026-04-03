@@ -6,6 +6,7 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.RSquaredResult;
 import com.fintex.ce.port.webclient.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -29,6 +30,11 @@ public class RSquaredCalculationServiceImpl extends PeriodBenchmarkAbstractServi
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
     this.tBillsProvider = tBillsProvider;
+  }
+
+  @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.R_SQUARED;
   }
 
   @Override

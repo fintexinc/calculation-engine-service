@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.adapter.rest.dto.request.BestWorstPeriodsReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.BestWorstPeriodReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpedLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdGreaterThanCpedReqValidation;
@@ -11,14 +10,13 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingsCould
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotEmptyCurrencyReqValidator;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import org.junit.jupiter.api.Test;
-
+import com.fintex.ce.domain.model.holding.Holding;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -28,7 +26,7 @@ class BestWorstPeriodsReqValidatorTest {
   void build_checkResult() {
     final var sut = new BestWorstPeriodsReqValidator();
 
-    final BestWorstPeriodsReqDTO reqDTO = getBestWorstPeriodsReqDTO();
+    final BestWorstPeriodsCommand reqDTO = getBestWorstPeriodsCommand();
 
     final ReqValidation expected = ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))
@@ -47,8 +45,8 @@ class BestWorstPeriodsReqValidatorTest {
     assertEquals(expected, actual);
   }
 
-  BestWorstPeriodsReqDTO getBestWorstPeriodsReqDTO() {
-    final BestWorstPeriodsReqDTO reqDTO = new BestWorstPeriodsReqDTO();
+  BestWorstPeriodsCommand getBestWorstPeriodsCommand() {
+    final BestWorstPeriodsCommand reqDTO = new BestWorstPeriodsCommand();
     reqDTO.setCurrency(CurrencyType.CAD);
     reqDTO.setCustomPerformanceStartDate(LocalDate.of(2000, 5, 31));
     reqDTO.setCustomPerformanceEndDate(LocalDate.of(2020, 4, 30));

@@ -1,18 +1,17 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.model.FeeData;
 import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AverageMerResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +21,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
-
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_MERMF_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_NERGER_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
@@ -45,11 +43,16 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
   }
 
   @Override
+  public CalculationMetric getMetric() {
+    return CalculationMetric.MER;
+  }
+
+  @Override
   public Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> fetchData(
-          final AverageMerCommand reqDTO) {
+      final AverageMerCommand reqDTO) {
     Map<Holding, FeeData> rawData = feesSecurityDataFetcher.fetch(
-            reqDTO.getHoldings(),
-            getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS));
+        reqDTO.getHoldings(),
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS));
     return groupAndMap(rawData, reqDTO.getHoldings());
   }
 

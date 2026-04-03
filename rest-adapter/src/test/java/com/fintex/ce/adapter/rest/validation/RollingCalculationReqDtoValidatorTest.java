@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.adapter.rest.dto.request.RollingCalculationReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpedLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdGreaterThanCpedReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdLastDayOfMonthReqValidation;
@@ -16,13 +15,12 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotCon
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriodsLessThan12ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriodsReqValidation;
+import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.model.holding.Holding;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-
+import org.junit.jupiter.api.Test;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -33,7 +31,7 @@ class RollingCalculationReqDtoValidatorTest {
   void build_checkResult() {
     final var sut = new RollingCalculationReqDtoValidator();
 
-    final RollingCalculationReqDTO reqDTO = getRollingCalculationReqDTO();
+    final RollingCalculationCommand reqDTO = getRollingCalculationCommand();
 
     final ReqValidation expected = ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))
@@ -57,8 +55,8 @@ class RollingCalculationReqDtoValidatorTest {
     assertEquals(expected, actual);
   }
 
-  static RollingCalculationReqDTO getRollingCalculationReqDTO() {
-    final var reqDTO = new RollingCalculationReqDTO();
+  static RollingCalculationCommand getRollingCalculationCommand() {
+    final var reqDTO = new RollingCalculationCommand();
     reqDTO.setCurrency(CAD);
     reqDTO.setCustomPsd(LocalDate.now());
     reqDTO.setCustomPed(LocalDate.now().plusMonths(1));
