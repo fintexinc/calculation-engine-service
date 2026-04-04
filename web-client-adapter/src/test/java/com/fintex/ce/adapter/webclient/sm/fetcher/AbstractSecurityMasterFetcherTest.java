@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   @Mock
-  protected SecurityMasterWebClient client;
+  protected SecurityMasterWebClient securityMasterWebClient;
 
   protected abstract AbstractSecurityMasterFetcher<D, R> fetcher();
 
@@ -59,7 +59,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     identifier.setId("XIU.TO");
     identifier.setIdType(FiIdentifierType.TICKER);
 
-    when(client.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
+    when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(List.of(new SecurityAttributeResult<>(identifier, smsResponse)));
     when(mapper().map(smsResponse, holding)).thenReturn(expected);
 
@@ -69,7 +69,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     assertThat(result).hasSize(1);
     assertThat(result).containsKey(holding);
     assertThat(result.get(holding)).isEqualTo(expected);
-    verify(client).post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class));
+    verify(securityMasterWebClient).post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class));
     verify(mapper()).map(smsResponse, holding);
   }
 
@@ -79,7 +79,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
         Collections.emptyList(), List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).isEmpty();
-    verifyNoInteractions(client);
+    verifyNoInteractions(securityMasterWebClient);
   }
 
   @Test
@@ -88,14 +88,14 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
         null, List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).isEmpty();
-    verifyNoInteractions(client);
+    verifyNoInteractions(securityMasterWebClient);
   }
 
   @Test
   void shouldReturnEmptyMap_whenSmReturnsNull() {
     Holding holding = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
 
-    when(client.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
+    when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(null);
 
     Map<Holding, D> result = fetcher().fetch(
@@ -108,7 +108,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
   void shouldReturnEmptyMap_whenSmReturnsEmptyList() {
     Holding holding = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
 
-    when(client.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
+    when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(Collections.emptyList());
 
     Map<Holding, D> result = fetcher().fetch(
@@ -129,7 +129,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     identifier.setId("XIU.TO");
     identifier.setIdType(FiIdentifierType.TICKER);
 
-    when(client.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
+    when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(List.of(new SecurityAttributeResult<>(identifier, smsResponse)));
     when(mapper().map(smsResponse, validHolding)).thenReturn(expected);
 
@@ -158,7 +158,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     id2.setId("VFV.TO");
     id2.setIdType(FiIdentifierType.TICKER);
 
-    when(client.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
+    when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(List.of(
             new SecurityAttributeResult<>(id1, smsResponse1),
             new SecurityAttributeResult<>(id2, smsResponse2)));

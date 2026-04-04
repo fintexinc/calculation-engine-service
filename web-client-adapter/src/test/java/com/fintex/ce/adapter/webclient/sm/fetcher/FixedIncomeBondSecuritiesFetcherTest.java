@@ -35,7 +35,7 @@ class FixedIncomeBondSecuritiesFetcherTest
 
   @BeforeEach
   void setUp() {
-    fetcher = new AbstractSecurityMasterFetcher<>(client, ENDPOINT_PATH, mapper,
+    fetcher = new AbstractSecurityMasterFetcher<>(securityMasterWebClient, ENDPOINT_PATH, mapper,
         new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeSectorAllocation>>>() {}) {};
   }
 
