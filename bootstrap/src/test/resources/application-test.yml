@@ -13,3 +13,9 @@ manual:
 
   versions:
     enable-ce-1.0: true
+
+# When SM_REST_BASE_URL is unset; SM fetcher ITs override via @DynamicPropertySource (MockWebServer).
+external-services:
+  security-master:
+    rest:
+      base-url: http://127.0.0.1:1

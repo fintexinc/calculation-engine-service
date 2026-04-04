@@ -1,0 +1,26 @@
+# SM REST slice ITs: paths align with bootstrap application.yml (required for @Value on fetcher beans).
+# base-url is overridden by @DynamicPropertySource (MockWebServer); placeholder for local/CI without SM_REST_BASE_URL.
+external-services:
+  security-master:
+    api-type: rest
+    rest:
+      base-url: http://127.0.0.1:1
+      timeout: 60000
+      endpoints:
+        allocations:
+          asset: /api/v1/wealth/securities/allocations/asset
+          equity-sector: /api/v1/wealth/securities/allocations/equity-sector
+          fixed-income-sector: /api/v1/wealth/securities/allocations/fixed-income-sector
+          equity-stylebox: /api/v1/wealth/securities/allocations/equity-stylebox
+          fixed-income-stylebox: /api/v1/wealth/securities/allocations/fixed-income-stylebox
+          equity-market-cap: /api/v1/wealth/securities/allocations/equity-market-cap
+          country: /api/v1/wealth/securities/allocations/country
+          equity-country: /api/v1/wealth/securities/allocations/equity-country
+          maturities: /api/v1/wealth/securities/allocations/maturities
+          credit-quality: /api/v1/wealth/securities/allocations/credit-quality
+          classification: /api/v1/wealth/securities/allocations/classification
+        income: /api/v1/wealth/securities/income
+        fees: /api/v1/wealth/securities/fees
+        sales-charge: /api/v1/wealth/securities/sales-charge
+        returns:
+          monthly: /api/v1/wealth/securities/returns/monthly
