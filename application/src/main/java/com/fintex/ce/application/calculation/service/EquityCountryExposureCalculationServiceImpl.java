@@ -9,12 +9,16 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityCountryExposureResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
@@ -44,9 +48,10 @@ public class EquityCountryExposureCalculationServiceImpl
   }
 
   @Override
-  public EquityCountryExposureResult calculate(final Map<Holding, Map<CountryRegionType, BigDecimal>> exposures,
-      final List<Holding> holdings,
-      final List<Warning> warnings) {
+  public EquityCountryExposureResult calculate(ExposureDataHolder<CountryRegionType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     if (areAllValuesInMapEmpty(exposures)) {
       EquityCountryExposureResult defaultResult = new EquityCountryExposureResult();
       defaultResult.setEquityCountryExposure(DEFAULT_MAP);
@@ -63,13 +68,15 @@ public class EquityCountryExposureCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<CountryRegionType, BigDecimal>> fetchExposures(final PortfolioHoldingsCommand reqDTO,
-      final List<Warning> warnings) {
+  public ExposureDataHolder<CountryRegionType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
+    List<Warning> warnings = new ArrayList<>();
     Map<Holding, EquityCountryAllocation> rawData = equityCountryAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     Map<Holding, Map<String, BigDecimal>> holdingAllocations = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
-    return countryAllocationMappingService.mapToCountryRegions(holdingAllocations, warnings, WRN_RRC_ECE_001);
+    Map<Holding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService
+        .mapToCountryRegions(holdingAllocations, warnings, WRN_RRC_ECE_001);
+    return new ExposureDataHolder<>(allocations, warnings);
   }
 
 }

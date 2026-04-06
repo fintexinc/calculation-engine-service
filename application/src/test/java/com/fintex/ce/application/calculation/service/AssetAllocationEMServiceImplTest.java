@@ -12,6 +12,7 @@ import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
@@ -62,7 +63,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -75,9 +76,9 @@ class AssetAllocationEMServiceImplTest {
         CASH, BigDecimal.valueOf(3));
     final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations = Map.of(h, aRegions);
 
-    doCallRealMethod().when(sut).calculateEquityDiff(any(), any(), any(), any());
+    doCallRealMethod().when(service).calculateEquityDiff(any(), any(), any(), any());
     // ACT
-    final BigDecimal actual = sut.calculateEquityDiff(countryAllocations, assetAllocations, Set.of(CANADIAN_EQUITIES),
+    final BigDecimal actual = service.calculateEquityDiff(countryAllocations, assetAllocations, Set.of(CANADIAN_EQUITIES),
         h);
 
     // VERIFY
@@ -289,7 +290,7 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldGetEmergingMarketValue_whenVerifyCANADAEQUITYFromCountryAllocations() {
     // SETUP
-    final var sut = mock(AssetAllocationEMServiceImpl.class);
+    final var service = mock(AssetAllocationEMServiceImpl.class);
 
     final Holding h = mock(Holding.class);
     final BigDecimal expected = TEN;
@@ -301,9 +302,9 @@ class AssetAllocationEMServiceImplTest {
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
     final var pair = Pair.of(DataProvider.MORNINGSTAR, assetAllocations);
 
-    doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
+    doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
-    final BigDecimal actual = sut.getEmergingMarketValue(
+    final BigDecimal actual = service.getEmergingMarketValue(
         h, pair, countryAllocations, equityDifference, AssetAllocationRegionEmType.CANADIAN_EQUITY);
 
     // VERIFY
@@ -313,7 +314,7 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldGetEmergingMarketValue_whenReturnZeroForCANADIANEQUITY_whenNoCanadaInCountryAllocations() {
     // SETUP
-    final var sut = mock(AssetAllocationEMServiceImpl.class);
+    final var service = mock(AssetAllocationEMServiceImpl.class);
 
     final Holding h = mock(Holding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, BigDecimal.valueOf(6),
@@ -323,9 +324,9 @@ class AssetAllocationEMServiceImplTest {
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
     final var pair = Pair.of(DataProvider.MORNINGSTAR, assetAllocations);
 
-    doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
+    doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
-    final BigDecimal actual = sut.getEmergingMarketValue(
+    final BigDecimal actual = service.getEmergingMarketValue(
         h, pair, countryAllocations, equityDifference, AssetAllocationRegionEmType.CANADIAN_EQUITY);
 
     // VERIFY
@@ -335,7 +336,7 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldGetEmergingMarketValue_whenVerifyUSEQUITYFromCountryAllocations() {
     // SETUP
-    final var sut = mock(AssetAllocationEMServiceImpl.class);
+    final var service = mock(AssetAllocationEMServiceImpl.class);
 
     final Holding h = mock(Holding.class);
     final BigDecimal expected = TEN;
@@ -347,9 +348,9 @@ class AssetAllocationEMServiceImplTest {
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
     final var pair = Pair.of(DataProvider.MORNINGSTAR, assetAllocations);
 
-    doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
+    doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
-    final BigDecimal actual = sut.getEmergingMarketValue(
+    final BigDecimal actual = service.getEmergingMarketValue(
         h, pair, countryAllocations, equityDifference, AssetAllocationRegionEmType.US_EQUITY);
 
     // VERIFY
@@ -359,7 +360,7 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldGetEmergingMarketValue_whenReturnZeroForUSEQUITY_whenNoUnitedStatesInCountryAllocations() {
     // SETUP
-    final var sut = mock(AssetAllocationEMServiceImpl.class);
+    final var service = mock(AssetAllocationEMServiceImpl.class);
 
     final Holding h = mock(Holding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, TEN,
@@ -369,9 +370,9 @@ class AssetAllocationEMServiceImplTest {
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
     final var pair = Pair.of(DataProvider.MORNINGSTAR, assetAllocations);
 
-    doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
+    doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
-    final BigDecimal actual = sut.getEmergingMarketValue(
+    final BigDecimal actual = service.getEmergingMarketValue(
         h, pair, countryAllocations, equityDifference, AssetAllocationRegionEmType.US_EQUITY);
 
     // VERIFY
@@ -478,15 +479,15 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldGetEmergingMarketValue_whenCheckResult() {
     // SETUP
-    final var sut = mock(AssetAllocationEMServiceImpl.class);
+    final var service = mock(AssetAllocationEMServiceImpl.class);
     final var map = new HashMap<>();
     final var pair = mock(Pair.class);
 
     when(pair.getValue()).thenReturn(map);
-    doCallRealMethod().when(sut).getEmergingMarketValue(any(), any(), any(), any(), any());
+    doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
 
     // ACT
-    final BigDecimal actual = sut.getEmergingMarketValue(null, pair, null, null, null);
+    final BigDecimal actual = service.getEmergingMarketValue(null, pair, null, null, null);
 
     // VERIFY
     assertEquals(ZERO, actual);
@@ -575,7 +576,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -586,14 +587,14 @@ class AssetAllocationEMServiceImplTest {
         OTHER, BigDecimal.valueOf(6),
         ASIA_PACIFIC_EQUITIES, TEN);
 
-    when(sut.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
+    when(service.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
 
-    doCallRealMethod().when(sut).calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList());
+    doCallRealMethod().when(service).calculateAssetAllocationEMarketMap(any(), any(), anyList());
     // ACT
     final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.MORNINGSTAR,
         assetAllocations);
     final List<Warning> warnings = List.of(mock(Warning.class));
-    sut.calculateAssetAllocationEMarketMap(List.of(h), Map.of(h, pair), providers, warnings);
+    service.calculateAssetAllocationEMarketMap(List.of(h), Map.of(h, pair), providers);
 
     // VERIFY
     verify(countryAllocationFetcher).fetch(eq(List.of(h)), eq(providers));
@@ -607,7 +608,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -618,23 +619,23 @@ class AssetAllocationEMServiceImplTest {
         OTHER, BigDecimal.valueOf(6),
         ASIA_PACIFIC_EQUITIES, TEN);
 
-    when(sut.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
+    when(service.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
 
     final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = Map.of(h, Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, ONE));
     when(countryAllocationMappingService.mapToCountryRegions(any(), any(), any())).thenReturn(
         countryAllocationsMap);
 
-    doCallRealMethod().when(sut).retrieveAssetAllocations(any());
-    doCallRealMethod().when(sut).calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList());
+    doCallRealMethod().when(service).retrieveAssetAllocations(any());
+    doCallRealMethod().when(service).calculateAssetAllocationEMarketMap(any(), any(), anyList());
     // ACT
     final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.MORNINGSTAR,
         assetAllocations);
     final List<Warning> warnings = List.of(mock(Warning.class));
-    sut.calculateAssetAllocationEMarketMap(List.of(h), Map.of(h, pair), providers, warnings);
+    service.calculateAssetAllocationEMarketMap(List.of(h), Map.of(h, pair), providers);
 
     // VERIFY
-    verify(sut).calculateEquityDifference(List.of(h), countryAllocationsMap, Map.of(h, assetAllocations));
+    verify(service).calculateEquityDifference(List.of(h), countryAllocationsMap, Map.of(h, assetAllocations));
   }
 
   @Test
@@ -645,7 +646,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -659,24 +660,24 @@ class AssetAllocationEMServiceImplTest {
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.EMERGING_MARKET, BigDecimal
         .valueOf(3));
 
-    when(sut.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
+    when(service.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
 
     final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = Map.of(h, Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, ONE));
     when(countryAllocationMappingService.mapToCountryRegions(any(), any(), any())).thenReturn(
         countryAllocationsMap);
     final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
-    when(sut.calculateEquityDifference(any(), any(), any())).thenReturn(equityDifference);
+    when(service.calculateEquityDifference(any(), any(), any())).thenReturn(equityDifference);
 
-    doCallRealMethod().when(sut).calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList());
+    doCallRealMethod().when(service).calculateAssetAllocationEMarketMap(any(), any(), anyList());
     // ACT
     final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.MORNINGSTAR,
         assetAllocations);
     final List<Warning> warnings = List.of(mock(Warning.class));
-    sut.calculateAssetAllocationEMarketMap(List.of(h), Map.of(h, pair), providers, warnings);
+    service.calculateAssetAllocationEMarketMap(List.of(h), Map.of(h, pair), providers);
 
     // VERIFY
-    verify(sut).calculateEmergingMarket(Map.of(h, pair), countryAllocationsMap, equityDifference, h);
+    verify(service).calculateEmergingMarket(Map.of(h, pair), countryAllocationsMap, equityDifference, h);
   }
 
   @Test
@@ -687,7 +688,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -696,11 +697,11 @@ class AssetAllocationEMServiceImplTest {
         OTHER, BigDecimal.valueOf(6),
         ASIA_PACIFIC_EQUITIES, TEN);
 
-    doCallRealMethod().when(sut).retrieveAssetAllocations(any());
+    doCallRealMethod().when(service).retrieveAssetAllocations(any());
     // ACT
     final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> pair = Pair.of(DataProvider.MORNINGSTAR,
         assetAllocations);
-    final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> actual = sut.retrieveAssetAllocations(Map.of(h, pair));
+    final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> actual = service.retrieveAssetAllocations(Map.of(h, pair));
 
     // VERIFY
     assertEquals(Map.of(h, assetAllocations), actual);
@@ -714,17 +715,18 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
     final PortfolioHoldingsCommand reqDto = mock(PortfolioHoldingsCommand.class);
     final List<Holding> holdings = List.of(mock(Holding.class));
     when(reqDto.getHoldings()).thenReturn(holdings);
+    when(service.fetchExposures(any())).thenReturn(new ExposureDataHolder<>(Map.of(), List.of()));
 
-    doCallRealMethod().when(sut).perform(any());
+    doCallRealMethod().when(service).perform(any());
     // ACT
-    sut.perform(reqDto);
+    service.perform(reqDto);
 
     // VERIFY
   }
@@ -738,16 +740,17 @@ class AssetAllocationEMServiceImplTest {
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-      final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+      final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
           countryAllocationFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, countryAllocationMappingService));
 
       final var holding = mock(Holding.class);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
-      when(sut.calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList())).thenReturn(exposures);
-      doCallRealMethod().when(sut).fetchExposures(any(), any());
+      when(service.calculateAssetAllocationEMarketMap(any(), any(), anyList())).thenReturn(new ExposureDataHolder<>(exposures, List.of()));
+      doCallRealMethod().when(service).fetchExposures(any());
       // ACT
-      final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+      final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var actual = result.allocations();
 
       // VERIFY
       assertEquals(exposures, actual);
@@ -763,7 +766,7 @@ class AssetAllocationEMServiceImplTest {
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-      final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+      final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
           countryAllocationFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -772,9 +775,9 @@ class AssetAllocationEMServiceImplTest {
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(Map.of());
 
-      doCallRealMethod().when(sut).fetchExposures(any(), any());
+      doCallRealMethod().when(service).fetchExposures(any());
       // ACT
-      sut.fetchExposures(req, warnings);
+      service.fetchExposures(req);
 
       // VERIFY
       verify(assetAllocationDataMapper).toRegionExposuresWithProvider(any());
@@ -790,7 +793,7 @@ class AssetAllocationEMServiceImplTest {
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-      final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+      final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
           countryAllocationFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -799,9 +802,9 @@ class AssetAllocationEMServiceImplTest {
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(Map.of());
 
-      doCallRealMethod().when(sut).fetchExposures(any(), any());
+      doCallRealMethod().when(service).fetchExposures(any());
       // ACT
-      sut.fetchExposures(req, warnings);
+      service.fetchExposures(req);
 
       // VERIFY
       verify(assetAllocationDataMapper).toRegionExposuresWithProvider(any());
@@ -816,7 +819,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -826,9 +829,9 @@ class AssetAllocationEMServiceImplTest {
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(Map.of());
 
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    doCallRealMethod().when(service).fetchExposures(any());
     // ACT
-    sut.fetchExposures(req, List.of());
+    service.fetchExposures(req);
 
     // VERIFY
     verify(assetAllocationFetcher).fetch(any(), any());
@@ -843,7 +846,7 @@ class AssetAllocationEMServiceImplTest {
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
     final var warnings = new ArrayList<Warning>();
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -854,11 +857,11 @@ class AssetAllocationEMServiceImplTest {
 
     when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
     when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
-    when(sut.calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList())).thenReturn(exposures);
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    when(service.calculateAssetAllocationEMarketMap(any(), any(), anyList())).thenReturn(new ExposureDataHolder<>(exposures, List.of()));
+    doCallRealMethod().when(service).fetchExposures(any());
 
     // ACT
-    sut.fetchExposures(portfolioHoldingsReqDTO, warnings);
+    service.fetchExposures(portfolioHoldingsReqDTO);
 
     // VERIFY
     verify(assetAllocationFetcher).fetch(eq(List.of(holding)), any());
@@ -872,7 +875,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-    final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -886,15 +889,14 @@ class AssetAllocationEMServiceImplTest {
     when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
     when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
     when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(assetAllocations);
-    when(sut.calculateAssetAllocationEMarketMap(any(), any(), any(), any())).thenReturn(exposures);
+    when(service.calculateAssetAllocationEMarketMap(any(), any(), anyList())).thenReturn(new ExposureDataHolder<>(exposures, List.of()));
     when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(mappedResult);
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    doCallRealMethod().when(service).fetchExposures(any());
     // ACT
-    sut.fetchExposures(portfolioHoldingsReqDTO, List.of());
+    service.fetchExposures(portfolioHoldingsReqDTO);
 
     // VERIFY
-    verify(sut).calculateAssetAllocationEMarketMap(eq(List.of(holding)), eq(mappedResult), eq(providers), eq(List
-        .of()));
+    verify(service).calculateAssetAllocationEMarketMap(eq(List.of(holding)), eq(mappedResult), eq(providers));
   }
 
   @Test
@@ -906,7 +908,7 @@ class AssetAllocationEMServiceImplTest {
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
 
-      final var sut = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
+      final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
           countryAllocationFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, countryAllocationMappingService));
 
@@ -919,10 +921,10 @@ class AssetAllocationEMServiceImplTest {
       when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
       when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
       when(assetAllocationDataMapper.toRegionExposuresWithProvider(any())).thenReturn(assetAllocations);
-      when(sut.calculateAssetAllocationEMarketMap(any(), any(), anyList(), anyList())).thenReturn(exposures);
-      doCallRealMethod().when(sut).fetchExposures(any(), any());
+      when(service.calculateAssetAllocationEMarketMap(any(), any(), anyList())).thenReturn(new ExposureDataHolder<>(exposures, List.of()));
+      doCallRealMethod().when(service).fetchExposures(any());
       // ACT
-      sut.fetchExposures(portfolioHoldingsReqDTO, List.of());
+      service.fetchExposures(portfolioHoldingsReqDTO);
 
       // VERIFY
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, MORNINGSTAR), Mockito.times(2));
@@ -932,18 +934,18 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldCalculate_whenVerifyCalculateNetProducts() {
     // SETUP
-    final var sut = mock(AssetAllocationEMServiceImpl.class);
+    final var service = mock(AssetAllocationEMServiceImpl.class);
 
     final var holding = mock(Holding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
-    doCallRealMethod().when(sut).calculate(any(), any(), any());
+    doCallRealMethod().when(service).calculate(any(), any());
 
     // ACT
-    sut.calculate(exposures, holdings, List.of());
+    service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
     // VERIFY
-    verify(sut).calculateNetProducts(exposures, holdings, AssetAllocationRegionEmType.values());
+    verify(service).calculateNetProducts(exposures, holdings, AssetAllocationRegionEmType.values());
   }
 
   @Test
@@ -952,18 +954,18 @@ class AssetAllocationEMServiceImplTest {
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class);
         var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       // SETUP
-      final var sut = mock(AssetAllocationEMServiceImpl.class);
+      final var service = mock(AssetAllocationEMServiceImpl.class);
 
       final var holding = mock(Holding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.FIXED_INCOME, TEN));
       final var netProducts = mock(Map.class);
 
-      when(sut.calculateNetProducts(exposures, holdings, AssetAllocationRegionEmType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, AssetAllocationRegionEmType.values())).thenReturn(netProducts);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
+      doCallRealMethod().when(service).calculate(any(), any());
       // ACT
-      sut.calculate(exposures, holdings, List.of());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       // VERIFY
       mockedDecimalUtils.verify(() -> DecimalUtils.toUserScale(netProducts));

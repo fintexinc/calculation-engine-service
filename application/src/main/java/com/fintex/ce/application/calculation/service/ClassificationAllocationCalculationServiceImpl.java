@@ -8,9 +8,14 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ClassificationAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -19,8 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_CA_CA_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
 import static com.fintex.ce.util.CalculationUtils.reScale;
@@ -65,9 +69,10 @@ public class ClassificationAllocationCalculationServiceImpl
 
   @Override
   public ClassificationAllocationResult calculate(
-      final Map<Holding, Map<ClassificationAllocationType, BigDecimal>> exposures,
-      final List<Holding> holdings,
-      final List<Warning> warnings) {
+      ExposureDataHolder<ClassificationAllocationType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
 
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
       ClassificationAllocationResult defaultResult = new ClassificationAllocationResult();
@@ -86,12 +91,12 @@ public class ClassificationAllocationCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<ClassificationAllocationType, BigDecimal>> fetchExposures(
-      final PortfolioHoldingsCommand reqDTO,
-      final List<Warning> warnings) {
+  public ExposureDataHolder<ClassificationAllocationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
     Map<Holding, ClassificationAllocation> rawData = classificationAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    return mapToAllocations(rawData, warnings);
+    List<Warning> warnings = new ArrayList<>();
+    Map<Holding, Map<ClassificationAllocationType, BigDecimal>> allocations = mapToAllocations(rawData, warnings);
+    return new ExposureDataHolder<>(allocations, warnings);
   }
 
   private Map<Holding, Map<ClassificationAllocationType, BigDecimal>> mapToAllocations(

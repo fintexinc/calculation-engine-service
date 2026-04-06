@@ -5,18 +5,21 @@ import com.fintex.ce.application.mapping.response.FixedIncomeStyleboxExposureRes
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
 import com.fintex.ce.domain.model.calculation.FixedIncomeStyleboxType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_FIS_FISE_001;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
@@ -45,8 +48,10 @@ public class FixedIncomeStyleboxExposureCalculationServiceImpl
   }
 
   @Override
-  public FixedIncomeStyleboxExposureResult calculate(Map<Holding, Map<FixedIncomeStyleboxType, BigDecimal>> exposures,
-      List<Holding> holdings, List<Warning> warnings) {
+  public FixedIncomeStyleboxExposureResult calculate(ExposureDataHolder<FixedIncomeStyleboxType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
       return responseMapper.toEmptyResponse(warnings);
     }
@@ -56,12 +61,11 @@ public class FixedIncomeStyleboxExposureCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<FixedIncomeStyleboxType, BigDecimal>> fetchExposures(PortfolioHoldingsCommand reqDTO,
-      List<Warning> warnings) {
+  public ExposureDataHolder<FixedIncomeStyleboxType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     Map<Holding, FixedIncomeStyleboxExposure> rawData = fixedIncomeStyleboxSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
         FixedIncomeStyleboxExposure::getBoxValues, FixedIncomeStyleboxType::fromValue,
-        DEFAULT_MAP, WRN_FIS_FISE_001, "FDS Get Fixed Income Stylebox Exposure", warnings);
+        DEFAULT_MAP, WRN_FIS_FISE_001, "FDS Get Fixed Income Stylebox Exposure");
   }
 }

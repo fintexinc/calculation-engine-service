@@ -5,18 +5,21 @@ import com.fintex.ce.application.mapping.response.MaturityAllocationResponseMapp
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.MaturityAllocation;
 import com.fintex.ce.domain.model.calculation.MaturityAllocationType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.MaturityAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MA_MA_001;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
@@ -41,8 +44,10 @@ public class MaturityAllocationCalculationServiceImpl
   }
 
   @Override
-  public MaturityAllocationResult calculate(Map<Holding, Map<MaturityAllocationType, BigDecimal>> exposures,
-      List<Holding> holdings, List<Warning> warnings) {
+  public MaturityAllocationResult calculate(ExposureDataHolder<MaturityAllocationType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
       return responseMapper.toEmptyResponse(warnings);
     }
@@ -52,8 +57,7 @@ public class MaturityAllocationCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<MaturityAllocationType, BigDecimal>> fetchExposures(PortfolioHoldingsCommand reqDTO,
-      List<Warning> warnings) {
+  public ExposureDataHolder<MaturityAllocationType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     Map<Holding, MaturityAllocation> rawData = maturityAllocationSecurityDataFetcher.fetch(reqDTO.getHoldings(),
         List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
@@ -62,7 +66,6 @@ public class MaturityAllocationCalculationServiceImpl
         ALLOCATION_DEFAULT_MAP,
         WRN_MA_MA_001,
         "FDS Get Maturity Allocation",
-        warnings,
         (map, entry) -> map.merge(entry.getKey().getDisplayType(), entry.getValue(), BigDecimal::add));
   }
 }

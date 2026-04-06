@@ -8,16 +8,19 @@ import com.fintex.ce.domain.model.result.EquityMarketCapResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import static com.fintex.ce.application.calculation.service.EquityMarketCapCalculationServiceImpl.DEFAULT_MAP;
 import static com.fintex.ce.application.calculation.service.EquityMarketCapCalculationServiceImpl.GROUPS;
 import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.GIANT;
@@ -73,7 +76,7 @@ class EquityMarketCapCalculationServiceImplTest {
   void shouldPerform_whenVerifyLoad() {
     // SETUP
     final var marketCapFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
+    final var service = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
         .useConstructor(marketCapFetcher));
 
     final var holdings = List.of(mock(Holding.class));
@@ -81,9 +84,9 @@ class EquityMarketCapCalculationServiceImplTest {
 
     when(req.getHoldings()).thenReturn(holdings);
 
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    doCallRealMethod().when(service).fetchExposures(any());
     // ACT
-    sut.fetchExposures(req, List.of());
+    service.fetchExposures(req);
 
     // VERIFY
     verify(marketCapFetcher).fetch(any(), any());
@@ -94,14 +97,14 @@ class EquityMarketCapCalculationServiceImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var marketCapFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
+      final var service = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
           .useConstructor(marketCapFetcher));
 
       final var exposures = mock(Map.class);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
+      doCallRealMethod().when(service).calculate(any(), any());
       // ACT
-      sut.calculate(exposures, List.of(), List.of());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
       // VERIFY
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesZerosInMap(exposures));
@@ -113,7 +116,7 @@ class EquityMarketCapCalculationServiceImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
       final var marketCapFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
+      final var service = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
           .useConstructor(marketCapFetcher));
 
       final var exposures = mock(Map.class);
@@ -123,9 +126,9 @@ class EquityMarketCapCalculationServiceImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(true);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
+      doCallRealMethod().when(service).calculate(any(), any());
       // ACT
-      final var actual = sut.calculate(exposures, List.of(), List.of());
+      final var actual = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
       // VERIFY
       Assertions.assertEquals(expected, actual);
@@ -137,19 +140,19 @@ class EquityMarketCapCalculationServiceImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
 
       // SETUP
-      final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+      final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
       final var holding = mock(Holding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(EquityMarketCapType.SMALL, TEN));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(false);
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
+      doCallRealMethod().when(service).calculate(any(), any());
       // ACT
-      sut.calculate(exposures, holdings, List.of());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       // VERIFY
-      verify(sut).calculateNetProducts(exposures, holdings, EquityMarketCapType.values());
+      verify(service).calculateNetProducts(exposures, holdings, EquityMarketCapType.values());
     }
   }
 
@@ -158,7 +161,7 @@ class EquityMarketCapCalculationServiceImplTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+      final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
       final var holding = mock(Holding.class);
       final var holdings = List.of(holding);
@@ -166,11 +169,11 @@ class EquityMarketCapCalculationServiceImplTest {
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(false);
-      when(sut.calculateNetProducts(exposures, holdings, EquityMarketCapType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, EquityMarketCapType.values())).thenReturn(netProducts);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
+      doCallRealMethod().when(service).calculate(any(), any());
       // ACT
-      sut.calculate(exposures, holdings, List.of());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       // VERIFY
       mockedCalculationUtils.verify(() -> CalculationUtils.reScaleAbs(netProducts));
@@ -182,7 +185,7 @@ class EquityMarketCapCalculationServiceImplTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+      final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
       final var holdings = mock(List.class);
       final var exposures = mock(Map.class);
@@ -191,14 +194,14 @@ class EquityMarketCapCalculationServiceImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(false);
       mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(netProducts)).thenReturn(reScaled);
-      when(sut.calculateNetProducts(exposures, holdings, EquityMarketCapType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, EquityMarketCapType.values())).thenReturn(netProducts);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
+      doCallRealMethod().when(service).calculate(any(), any());
       // ACT
-      sut.calculate(exposures, holdings, List.of());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       // VERIFY
-      verify(sut).groupedResults(reScaled);
+      verify(service).groupedResults(reScaled);
     }
   }
 
@@ -207,18 +210,18 @@ class EquityMarketCapCalculationServiceImplTest {
     try (var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class);
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+      final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
       final var holdings = mock(List.class);
       final var exposures = mock(Map.class);
       final var groupedResults = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(false);
-      when(sut.groupedResults(any())).thenReturn(groupedResults);
+      when(service.groupedResults(any())).thenReturn(groupedResults);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
+      doCallRealMethod().when(service).calculate(any(), any());
       // ACT
-      sut.calculate(exposures, holdings, List.of());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       // VERIFY
       mockedDecimalUtils.verify(() -> DecimalUtils.toUserScale(groupedResults));
@@ -231,7 +234,7 @@ class EquityMarketCapCalculationServiceImplTest {
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
 
-      final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+      final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
       final var holdings = mock(List.class);
       final var exposures = mock(Map.class);
@@ -240,11 +243,11 @@ class EquityMarketCapCalculationServiceImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(false);
       mockedDecimalUtils.when(() -> DecimalUtils.toUserScale(groupedResults)).thenReturn(expected);
-      when(sut.groupedResults(any())).thenReturn(groupedResults);
+      when(service.groupedResults(any())).thenReturn(groupedResults);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
+      doCallRealMethod().when(service).calculate(any(), any());
       // ACT
-      final var actual = sut.calculate(exposures, holdings, List.of());
+      final var actual = service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       // VERIFY
       Assertions.assertNotNull(actual);
@@ -255,35 +258,35 @@ class EquityMarketCapCalculationServiceImplTest {
   @Test
   void shouldGroupedResults_whenVerifyCalculateSumWithingTheSameGroupForEachOfGROUPS() {
     // SETUP
-    final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+    final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
     final var netProducts = mock(Map.class);
 
-    when(sut.calculateSumWithinTheSameGroup(any(), any())).thenReturn(TEN);
+    when(service.calculateSumWithinTheSameGroup(any(), any())).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).groupedResults(any());
+    doCallRealMethod().when(service).groupedResults(any());
     // ACT
-    sut.groupedResults(netProducts);
+    service.groupedResults(netProducts);
 
     // VERIFY
     for (var entry : GROUPS.entrySet()) {
-      verify(sut).calculateSumWithinTheSameGroup(netProducts, entry);
+      verify(service).calculateSumWithinTheSameGroup(netProducts, entry);
     }
   }
 
   @Test
   void shouldGroupedResults_whenCheckResult() {
     // SETUP
-    final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+    final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
     final var netProducts = Map.of(EquityMarketCapType.SMALL, TEN);
     final var expectedResult = GROUPS.keySet().stream().collect(toMap(e -> e, e -> TEN));
 
-    when(sut.calculateSumWithinTheSameGroup(any(), any())).thenReturn(TEN);
+    when(service.calculateSumWithinTheSameGroup(any(), any())).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).groupedResults(any());
+    doCallRealMethod().when(service).groupedResults(any());
     // ACT
-    final var actualResult = sut.groupedResults(netProducts);
+    final var actualResult = service.groupedResults(netProducts);
 
     // VERIFY
     Assertions.assertNotNull(actualResult);
@@ -293,7 +296,7 @@ class EquityMarketCapCalculationServiceImplTest {
   @Test
   void shouldCalculateSumWithinTheSameGroup_whenCheckResult1() {
     // SETUP
-    final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+    final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
     final var netProducts = Map.of(
         EquityMarketCapType.MICRO, BigDecimal.valueOf(5),
@@ -301,9 +304,9 @@ class EquityMarketCapCalculationServiceImplTest {
     final var expected = Map.of(EquityMarketCapType.SMALL, BigDecimal.valueOf(11));
     final var entry = new AbstractMap.SimpleEntry<>(SMALL, Set.of(SMALL, MICRO));
 
-    doCallRealMethod().when(sut).calculateSumWithinTheSameGroup(any(), any());
+    doCallRealMethod().when(service).calculateSumWithinTheSameGroup(any(), any());
     // ACT
-    final var actual = sut.calculateSumWithinTheSameGroup(netProducts, entry);
+    final var actual = service.calculateSumWithinTheSameGroup(netProducts, entry);
 
     // VERIFY
     assertEquals(expected.get(SMALL), actual);
@@ -312,15 +315,15 @@ class EquityMarketCapCalculationServiceImplTest {
   @Test
   void shouldCalculateSumWithinTheSameGroup_whenCheckResult2() {
     // SETUP
-    final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+    final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
     final var netProducts = Map.of(EquityMarketCapType.MEDIUM, ZERO);
     final var expected = Map.of(EquityMarketCapType.MEDIUM, ZERO);
     final var entry = new AbstractMap.SimpleEntry<>(MEDIUM, Set.of(MEDIUM));
 
-    doCallRealMethod().when(sut).calculateSumWithinTheSameGroup(any(), any());
+    doCallRealMethod().when(service).calculateSumWithinTheSameGroup(any(), any());
     // ACT
-    final var actual = sut.calculateSumWithinTheSameGroup(netProducts, entry);
+    final var actual = service.calculateSumWithinTheSameGroup(netProducts, entry);
 
     // VERIFY
     assertEquals(expected.get(MEDIUM), actual);
@@ -329,7 +332,7 @@ class EquityMarketCapCalculationServiceImplTest {
   @Test
   void shouldCalculateSumWithinTheSameGroup_whenCheckResult3() {
     // SETUP
-    final var sut = mock(EquityMarketCapCalculationServiceImpl.class);
+    final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
     final var netProducts = Map.of(
         EquityMarketCapType.LARGE, BigDecimal.valueOf(7),
@@ -337,9 +340,9 @@ class EquityMarketCapCalculationServiceImplTest {
     final var expected = Map.of(EquityMarketCapType.LARGE, BigDecimal.valueOf(15));
     final var entry = new AbstractMap.SimpleEntry<>(LARGE, Set.of(LARGE, GIANT));
 
-    doCallRealMethod().when(sut).calculateSumWithinTheSameGroup(any(), any());
+    doCallRealMethod().when(service).calculateSumWithinTheSameGroup(any(), any());
     // ACT
-    final var actual = sut.calculateSumWithinTheSameGroup(netProducts, entry);
+    final var actual = service.calculateSumWithinTheSameGroup(netProducts, entry);
 
     // VERIFY
     assertEquals(expected.get(LARGE), actual);

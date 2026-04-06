@@ -2,14 +2,15 @@ package com.fintex.ce.application.calculation.service.breakdown;
 
 import com.fintex.ce.calculation.BreakdownCalculationService;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.WarningResult;
+import com.fintex.ce.util.ExposureDataHolder;
+
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import static com.fintex.ce.util.CalculationUtils.sumProduct;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
@@ -27,21 +28,18 @@ public abstract class BreakdownAbstractService<E extends WarningResult, T>
   protected BreakdownAbstractService() {
   }
 
-  public abstract E calculate(final Map<Holding, Map<T, BigDecimal>> exposures,
-      final List<Holding> holdings,
-      final List<Warning> warnings);
+  public abstract E calculate(ExposureDataHolder<T> exposureData, List<Holding> holdings);
 
   /**
-   * Fetches exposure data for holdings. Implementation decides the data source (REST API, etc.).
+   * Fetches exposure data for holdings. Returns an immutable result containing both
+   * the mapped allocations and any warnings produced during fetching and mapping.
    */
-  public abstract Map<Holding, Map<T, BigDecimal>> fetchExposures(PortfolioHoldingsCommand command,
-      List<Warning> warnings);
+  public abstract ExposureDataHolder<T> fetchExposures(PortfolioHoldingsCommand command);
 
   @Override
   public E perform(PortfolioHoldingsCommand command) {
-    List<Warning> warnings = new ArrayList<>();
-    Map<Holding, Map<T, BigDecimal>> exposures = fetchExposures(command, warnings);
-    return calculate(exposures, command.getHoldings(), warnings);
+    ExposureDataHolder<T> exposureData = fetchExposures(command);
+    return calculate(exposureData, command.getHoldings());
   }
 
   /**

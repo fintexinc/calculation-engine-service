@@ -7,15 +7,16 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -32,21 +33,20 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
   private final SecurityDataFetcher<HoldingAssetAllocation> securityDataPort;
 
   @Override
-  public AssetAllocationResult calculate(Map<Holding, Map<AssetAllocationRegion, BigDecimal>> exposures,
-      List<Holding> holdings,
-      List<Warning> warnings) {
+  public AssetAllocationResult calculate(ExposureDataHolder<AssetAllocationRegion> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     final Map<AssetAllocationRegion, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
         AssetAllocationRegion.values());
     return responseMapper.fromNetProducts(netProducts, warnings);
   }
 
   @Override
-  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> fetchExposures(
-      PortfolioHoldingsCommand reqDTO,
-      List<Warning> warnings) {
+  public ExposureDataHolder<AssetAllocationRegion> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     List<DataProvider> providers = getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR);
     Map<Holding, HoldingAssetAllocation> allocations = securityDataPort.fetch(reqDTO.getHoldings(), providers);
-    return assetAllocationDataMapper.toRegionExposures(allocations);
+    return new ExposureDataHolder<>(assetAllocationDataMapper.toRegionExposures(allocations), List.of());
   }
 
   public Map<AssetAllocationRegionType, BigDecimal> calculateAssetAllocationResponse(

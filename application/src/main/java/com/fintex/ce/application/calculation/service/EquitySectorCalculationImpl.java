@@ -4,20 +4,23 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.mapping.response.EquitySectorResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.EquitySector;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquitySectorResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 
@@ -44,9 +47,10 @@ public class EquitySectorCalculationImpl
   }
 
   @Override
-  public EquitySectorResult calculate(final Map<Holding, Map<EquitySectorAllocationType, BigDecimal>> sectors,
-      final List<Holding> holdings,
-      final List<Warning> warnings) {
+  public EquitySectorResult calculate(ExposureDataHolder<EquitySectorAllocationType> exposureData,
+      List<Holding> holdings) {
+    var sectors = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(sectors)) {
       return responseMapper.toEmptyResponse(warnings);
     }
@@ -56,11 +60,9 @@ public class EquitySectorCalculationImpl
   }
 
   @Override
-  public Map<Holding, Map<EquitySectorAllocationType, BigDecimal>> fetchExposures(
-      final PortfolioHoldingsCommand reqDTO,
-      final List<Warning> warnings) {
+  public ExposureDataHolder<EquitySectorAllocationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
     Map<Holding, EquitySector> rawData = equitySectorSecurityDataFetcher.fetch(reqDTO.getHoldings(), List.of());
-    return toSectorExposures(rawData);
+    return new ExposureDataHolder<>(toSectorExposures(rawData), List.of());
   }
 
   private Map<Holding, Map<EquitySectorAllocationType, BigDecimal>> toSectorExposures(

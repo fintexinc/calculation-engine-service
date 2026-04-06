@@ -15,10 +15,12 @@ import com.fintex.ce.domain.model.result.AssetAllocationEMResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
+import com.fintex.ce.util.ExposureDataHolder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,9 +68,10 @@ public class AssetAllocationEMServiceImpl
   }
 
   @Override
-  public AssetAllocationEMResult calculate(final Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> exposures,
-      final List<Holding> holdings,
-      final List<Warning> warnings) {
+  public AssetAllocationEMResult calculate(ExposureDataHolder<AssetAllocationRegionEmType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     final Map<AssetAllocationRegionEmType, BigDecimal> result = calculateNetProducts(exposures, holdings,
         AssetAllocationRegionEmType.values());
     AssetAllocationEMResult emResult = new AssetAllocationEMResult();
@@ -78,18 +81,16 @@ public class AssetAllocationEMServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> fetchExposures(
-      final PortfolioHoldingsCommand reqDTO,
-      final List<Warning> warnings) {
+  public ExposureDataHolder<AssetAllocationRegionEmType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
     final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR));
     final var assetAllocations = assetAllocationDataMapper.toRegionExposuresWithProvider(rawData);
 
-    return calculateAssetAllocationEMarketMap(reqDTO.getHoldings(),
+    return calculateAssetAllocationEMarketMap(
+        reqDTO.getHoldings(),
         assetAllocations,
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR),
-        warnings);
+        getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR));
   }
 
   public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> retrieveAssetAllocations(
@@ -97,11 +98,11 @@ public class AssetAllocationEMServiceImpl
     return assetAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
   }
 
-  public Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> calculateAssetAllocationEMarketMap(
+  public ExposureDataHolder<AssetAllocationRegionEmType> calculateAssetAllocationEMarketMap(
       final List<Holding> holdings,
       final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> assetAllocations,
-      final List<DataProvider> providers,
-      final List<Warning> warnings) {
+      final List<DataProvider> providers) {
+    List<Warning> warnings = new ArrayList<>();
     Map<Holding, EquityCountryAllocation> rawCountryAllocations = countryAllocationSecurityDataFetcher.fetch(
         holdings, providers);
     Map<Holding, Map<String, BigDecimal>> holdingAllocations = rawCountryAllocations.entrySet().stream()
@@ -110,10 +111,11 @@ public class AssetAllocationEMServiceImpl
         .mapToCountryRegions(holdingAllocations, warnings, WRN_RRC_ECE_001);
     final Map<Holding, BigDecimal> equityDifference = calculateEquityDifference(
         holdings, countryAllocationsMap, retrieveAssetAllocations(assetAllocations));
-    return holdings.stream().collect(
+    Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> allocations = holdings.stream().collect(
         toMap(
             h -> h,
             h -> calculateEmergingMarket(assetAllocations, countryAllocationsMap, equityDifference, h)));
+    return new ExposureDataHolder<>(allocations, warnings);
   }
 
   public Map<AssetAllocationRegionEmType, BigDecimal> calculateEmergingMarket(

@@ -13,10 +13,12 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -60,19 +62,19 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> fetchExposures(PortfolioHoldingsCommand reqDTO,
-      List<Warning> warnings) {
+  public ExposureDataHolder<FixedIncomeSectorType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     Map<Holding, FixedIncomeBondSecurities> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
         FixedIncomeBondSecurities::getFixedIncomeBondSectors, FixedIncomeSectorType::fromValue,
-        ALLOCATION_DEFAULT_MAP, WRN_BS_BS_001, "FDS Fixed Income Sector Allocation", warnings);
+        ALLOCATION_DEFAULT_MAP, WRN_BS_BS_001, "FDS Fixed Income Sector Allocation");
   }
 
   @Override
-  public FixedIncomeSectorResult calculate(Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> exposures,
-      List<Holding> holdings,
-      List<Warning> warnings) {
+  public FixedIncomeSectorResult calculate(ExposureDataHolder<FixedIncomeSectorType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
       FixedIncomeSectorResult defaultResult = new FixedIncomeSectorResult();
       defaultResult.setFixedIncomeSector(DEFAULT_MAP);

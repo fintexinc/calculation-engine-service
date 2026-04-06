@@ -1,11 +1,11 @@
 package com.fintex.ce.domain.model.result;
 
-import com.fintex.ce.domain.model.calculation.EquityStyleboxType;
+import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -17,5 +17,5 @@ import java.util.Map;
 @Accessors(chain = true)
 public class EquityStyleboxExposureResult extends WarningResult {
 
-  private Map<EquityStyleboxType, BigDecimal> equityStyleboxExposure;
+  private Map<StyleBoxType, BigDecimal> equityStyleboxExposure;
 }

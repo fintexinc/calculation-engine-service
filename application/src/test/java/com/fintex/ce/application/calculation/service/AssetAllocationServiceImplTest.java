@@ -11,12 +11,14 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
 
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +41,7 @@ class AssetAllocationServiceImplTest {
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
-    final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
 
     final var holding = mock(Holding.class);
@@ -48,10 +50,11 @@ class AssetAllocationServiceImplTest {
 
     when(securityDataPort.fetch(anyList(), anyList())).thenReturn(allocations);
     when(assetAllocationDataMapper.toRegionExposures(allocations)).thenReturn(expected);
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    doCallRealMethod().when(service).fetchExposures(any());
 
     // ACT
-    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var actual = result.allocations();
 
     // VERIFY
     assertEquals(expected, actual);
@@ -64,16 +67,16 @@ class AssetAllocationServiceImplTest {
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
-    final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
 
     final var allocations = Map.of(mock(Holding.class), mock(HoldingAssetAllocation.class));
     when(securityDataPort.fetch(anyList(), anyList())).thenReturn(allocations);
 
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
+    doCallRealMethod().when(service).fetchExposures(any());
 
     // ACT
-    sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    service.fetchExposures(mock(PortfolioHoldingsCommand.class));
 
     // VERIFY
     verify(assetAllocationDataMapper).toRegionExposures(allocations);
@@ -86,19 +89,19 @@ class AssetAllocationServiceImplTest {
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
-    final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
 
     final var holding = mock(Holding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegion.OTHER, TEN));
-    doCallRealMethod().when(sut).calculate(any(), any(), any());
+    doCallRealMethod().when(service).calculate(any(), any());
 
     // ACT
-    sut.calculate(exposures, holdings, List.of());
+    service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
     // VERIFY
-    verify(sut).calculateNetProducts(exposures, holdings, AssetAllocationRegion.values());
+    verify(service).calculateNetProducts(exposures, holdings, AssetAllocationRegion.values());
   }
 
   @Test
@@ -108,7 +111,7 @@ class AssetAllocationServiceImplTest {
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
-    final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
 
     final var holding = mock(Holding.class);
@@ -116,11 +119,11 @@ class AssetAllocationServiceImplTest {
     final Map netProducts = mock(Map.class);
     final List<Warning> warnings = List.of();
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegion.OTHER, TEN));
-    when(sut.calculateNetProducts(any(), any(), any())).thenReturn(netProducts);
-    doCallRealMethod().when(sut).calculate(any(), any(), any());
+    when(service.calculateNetProducts(any(), any(), any())).thenReturn(netProducts);
+    doCallRealMethod().when(service).calculate(any(), any());
 
     // ACT
-    sut.calculate(exposures, holdings, warnings);
+    service.calculate(new ExposureDataHolder<>(exposures, warnings), holdings);
 
     // VERIFY
     verify(responseMapper).fromNetProducts(any(), any());
@@ -133,7 +136,7 @@ class AssetAllocationServiceImplTest {
     final var responseMapper = mock(AssetAllocationResponseMapper.class);
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
-    final var sut = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort));
 
     final var holding = mock(Holding.class);
@@ -143,13 +146,13 @@ class AssetAllocationServiceImplTest {
     final var expected = mock(AssetAllocationResult.class);
     final List<Warning> warnings = List.of();
 
-    when(sut.calculateNetProducts(exposures, holdings, AssetAllocationRegion.values())).thenReturn(netProducts);
+    when(service.calculateNetProducts(exposures, holdings, AssetAllocationRegion.values())).thenReturn(netProducts);
     when(responseMapper.fromNetProducts(any(), any())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).calculate(any(), any(), any());
+    doCallRealMethod().when(service).calculate(any(), any());
 
     // ACT
-    final var actual = sut.calculate(exposures, holdings, warnings);
+    final var actual = service.calculate(new ExposureDataHolder<>(exposures, warnings), holdings);
 
     // VERIFY
     assertEquals(expected, actual);

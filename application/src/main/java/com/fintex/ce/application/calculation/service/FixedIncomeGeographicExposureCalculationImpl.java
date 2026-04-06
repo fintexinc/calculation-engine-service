@@ -9,12 +9,16 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.GeographicExposureResult;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_FICQ_BCE_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
@@ -44,9 +48,10 @@ public class FixedIncomeGeographicExposureCalculationImpl
   }
 
   @Override
-  public GeographicExposureResult calculate(Map<Holding, Map<GeographicRegionType, BigDecimal>> exposures,
-      List<Holding> holdings,
-      List<Warning> warnings) {
+  public GeographicExposureResult calculate(ExposureDataHolder<GeographicRegionType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     if (areAllValuesInMapEmpty(exposures)) {
       GeographicExposureResult defaultResult = new GeographicExposureResult();
       defaultResult.setEquityGeographicExposure(DEFAULT_MAP);
@@ -63,12 +68,14 @@ public class FixedIncomeGeographicExposureCalculationImpl
   }
 
   @Override
-  public Map<Holding, Map<GeographicRegionType, BigDecimal>> fetchExposures(PortfolioHoldingsCommand reqDTO,
-      List<Warning> warnings) {
+  public ExposureDataHolder<GeographicRegionType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
+    List<Warning> warnings = new ArrayList<>();
     Map<Holding, CountryExposure> rawData = fiCountryExposureSecurityDataFetcher.fetch(reqDTO.getHoldings(), List.of());
     Map<Holding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
-    return geographicAllocationMappingService.mapToGeographicRegions(mappedHoldings, warnings, WRN_FICQ_BCE_001);
+    Map<Holding, Map<GeographicRegionType, BigDecimal>> allocations = geographicAllocationMappingService
+        .mapToGeographicRegions(mappedHoldings, warnings, WRN_FICQ_BCE_001);
+    return new ExposureDataHolder<>(allocations, warnings);
   }
 
 }
