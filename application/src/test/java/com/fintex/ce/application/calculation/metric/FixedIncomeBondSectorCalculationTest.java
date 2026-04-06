@@ -19,8 +19,8 @@ class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSector_whenPortfolioContainsOnlyAom() {
-    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US)
-        .setSecurityIdentifier(new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
+    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
+        new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
 
     Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
     final HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSectorTypes = getFixedIncomeSecuritiesAllocationTypeOfAOM();
@@ -78,10 +78,10 @@ class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSector_whenPortfolioContainsAomAndRbf605() {
-    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US)
-        .setSecurityIdentifier(new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
-    final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA)
-        .setSecurityIdentifier(new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
+    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
+        new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
+    final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
 
     Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
     exposures.put(rbf605, getFixedIncomeSecuritiesAllocationTypeOfRBF605());
@@ -102,10 +102,10 @@ class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSectorFromAomOnly_whenRbf605FixedIncomePlusCashIsZero() {
-    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US)
-        .setSecurityIdentifier(new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
-    final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA)
-        .setSecurityIdentifier(new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
+    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
+        new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
+    final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
 
     Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
     exposures.put(rbf605, getFixedIncomeSecuritiesAllocationTypeOfRBF605());

@@ -664,8 +664,7 @@ class MERCalculationServiceImplTest {
     final var sut = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
 
-    final var holding = new Holding();
-    holding.setHoldingType(FinancialInstrumentType.HEDGE_FUND_CANADA);
+    final var holding = new Holding(null, FinancialInstrumentType.HEDGE_FUND_CANADA, null);
     final var input = mock(AverageManagementExpenseCalculation.class);
     final Optional<List<Warning>> expected = Optional.of(List.of(WRN_MER_MER_001.warning(holding), WRN_MER_AMF_001
             .warning(holding)));

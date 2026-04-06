@@ -159,8 +159,6 @@ class CreditQualityMapperTest {
   }
 
   private Holding createHolding(String securityId) {
-    return new Holding()
-        .setHoldingType(FinancialInstrumentType.ETF_CANADA)
-        .setSecurityIdentifier(new SecurityIdentifier(securityId, null));
+    return new Holding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
   }
 }

@@ -6,18 +6,17 @@ import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AAA;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
@@ -35,8 +34,8 @@ class PortfolioUtilsTest {
 
   @Test
   void calculateInitialPortfolioWeight_test() {
-    final Holding h1 = new Holding().setHoldingType(FinancialInstrumentType.ETF_US).setValue(TEN);
-    final Holding h2 = new Holding().setValue(TEN);
+    final Holding h1 = new Holding(TEN, FinancialInstrumentType.ETF_US, null);
+    final Holding h2 = new Holding(TEN, null, null);
     final Set<Holding> holdings = Set.of(h1, h2);
 
     final Map<Holding, BigDecimal> actual = PortfolioUtils.calculateInitialPortfolioWeight(holdings);
@@ -90,7 +89,7 @@ class PortfolioUtilsTest {
 
   @Test
   void areAllValuesInMapEmpty_checkResultWhenAllValuesInMapAreEmpty() {
-    final Map map = Map.of(new Holding(), Map.of());
+    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> map = Map.of(new Holding(null, null, null), Map.of());
     final boolean actual = PortfolioUtils.areAllValuesInMapEmpty(map);
 
     assertTrue(actual);
@@ -98,7 +97,7 @@ class PortfolioUtilsTest {
 
   @Test
   void areAllValuesInMapEmpty_checkResultWhenNotAllValuesInMapAreEmpty() {
-    final Map map = Map.of(new Holding(), Map.of(), new Holding(ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA), Map.of(AAA,
+    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> map = Map.of(new Holding(null, null, null), Map.of(), new Holding(ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA, null), Map.of(AAA,
         ONE));
     final boolean actual = PortfolioUtils.areAllValuesInMapEmpty(map);
 
@@ -108,7 +107,7 @@ class PortfolioUtilsTest {
   @Test
   void areAllValuesZerosInMap_checkResultWhenAllValuesInMapAreZeros() {
     // SETUP
-    final Map map = Map.of(new Holding(), Map.of(EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO));
+    final Map<Holding, Map<EquityMarketCapitalizationType, BigDecimal>> map = Map.of(new Holding(null, null, null), Map.of(EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO));
     // ACT
     final boolean actual = PortfolioUtils.areAllValuesZerosInMap(map);
 
@@ -118,7 +117,7 @@ class PortfolioUtilsTest {
   @Test
   void areAllValuesZerosInMap_checkResultWhenNotAllValuesInMapAreZeros() {
     // SETUP
-    final Map map = Map.of(new Holding(), Map.of(EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO,
+    final Map<Holding, Map<EquityMarketCapitalizationType, BigDecimal>> map = Map.of(new Holding(null, null, null), Map.of(EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO,
         EquityMarketCapitalizationType.LARGE, ONE));
     // ACT
     final boolean actual = PortfolioUtils.areAllValuesZerosInMap(map);
@@ -128,22 +127,21 @@ class PortfolioUtilsTest {
 
   @Test
   void createKey_checkResultWhenHoldingTypeCash() {
-    final String actual = PortfolioUtils.createKey(new CashHolding().setCurrency(CAD).setHoldingType(FinancialInstrumentType.CASH));
+    final String actual = PortfolioUtils.createKey(CashHolding.builder().currency(CAD).holdingType(FinancialInstrumentType.CASH).build());
 
     assertEquals("CASH_CAD", actual);
   }
 
   @Test
   void createKey_checkResultWhenHoldingTypeUsEtf() {
-    final String result = PortfolioUtils.createKey(new Holding().setSecurityIdentifier(new SecurityIdentifier("TICKER", FiIdentifierType.TICKER)).setHoldingType(FinancialInstrumentType.ETF_US));
+    final String result = PortfolioUtils.createKey(new Holding(null, FinancialInstrumentType.ETF_US, new SecurityIdentifier("TICKER", FiIdentifierType.TICKER)));
 
     assertEquals(FinancialInstrumentType.ETF_US.name() + "_" + "TICKER", result);
   }
 
   @Test
   void createKey_checkResultWhenHoldingTypeCanadaEtf() {
-    final String result = PortfolioUtils.createKey(new Holding().setSecurityIdentifier(new SecurityIdentifier("TICKER", FiIdentifierType.TICKER)).setHoldingType(
-        FinancialInstrumentType.ETF_CANADA));
+    final String result = PortfolioUtils.createKey(new Holding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("TICKER", FiIdentifierType.TICKER)));
 
     assertEquals(FinancialInstrumentType.ETF_CANADA.name() + "_" + "TICKER", result);
   }
@@ -154,9 +152,7 @@ class PortfolioUtilsTest {
     when(securityIdentifier.getId()).thenReturn("TICKER");
     when(securityIdentifier.getExchangeId()).thenReturn("EXCHANGE_CODE");
 
-    final String result = PortfolioUtils.createKey(new Holding()
-        .setSecurityIdentifier(securityIdentifier)
-        .setHoldingType(FinancialInstrumentType.STOCK_US));
+    final String result = PortfolioUtils.createKey(new Holding(null, FinancialInstrumentType.STOCK_US, securityIdentifier));
 
     assertEquals(FinancialInstrumentType.STOCK_US.name() + "_" + "TICKER" + "_" + "EXCHANGE_CODE", result);
   }
@@ -167,18 +163,14 @@ class PortfolioUtilsTest {
     when(securityIdentifier.getId()).thenReturn("TICKER");
     when(securityIdentifier.getExchangeId()).thenReturn("EXCHANGE_CODE");
 
-    final String result = PortfolioUtils.createKey(new Holding()
-        .setSecurityIdentifier(securityIdentifier)
-        .setHoldingType(FinancialInstrumentType.STOCK_CANADA));
+    final String result = PortfolioUtils.createKey(new Holding(null, FinancialInstrumentType.STOCK_CANADA, securityIdentifier));
 
     assertEquals(FinancialInstrumentType.STOCK_CANADA.name() + "_" + "TICKER" + "_" + "EXCHANGE_CODE", result);
   }
 
   @Test
   void createKey_checkResultWhenHoldingTypeMutualFund() {
-    final String result = PortfolioUtils.createKey(new Holding()
-        .setSecurityIdentifier(new SecurityIdentifier("FUND_SERVE_CODE", FiIdentifierType.FUNDSERV))
-        .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA));
+    final String result = PortfolioUtils.createKey(new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, new SecurityIdentifier("FUND_SERVE_CODE", FiIdentifierType.FUNDSERV)));
 
     assertEquals(FinancialInstrumentType.MUTUAL_FUND_CANADA.name() + "_" + "FUND_SERVE_CODE", result);
   }

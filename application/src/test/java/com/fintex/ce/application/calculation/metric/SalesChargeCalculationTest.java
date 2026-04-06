@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-
 import static com.fintex.ce.application.calculation.metric.SalesChargeCalculation.DEFAULT_MAP;
 import static com.fintex.ce.application.calculation.metric.SalesChargeCalculation.DEFAULT_SALES_CHARGE_DTO;
 import static com.fintex.sm.model.domain.enumeration.SalesChargeType.DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT;
@@ -62,16 +61,13 @@ class SalesChargeTypeCalculationTest {
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf605 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF605", scaled(0.10));
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.20));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", scaled(0.70));
+    final var rbf605 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF605",scaled(0.10));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606",scaled(0.20));
+    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607",scaled(0.70));
 
-    final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.10), BigDecimal.valueOf(10_000), Set
-            .of(rbf605));
-    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.20), BigDecimal.valueOf(20_000), Set
-            .of(rbf606));
-    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.70), BigDecimal.valueOf(70_000), Set
-            .of(rbf607));
+    final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.10),BigDecimal.valueOf(10_000),Set.of(rbf605));
+    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.20),BigDecimal.valueOf(20_000),Set.of(rbf606));
+    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.70),BigDecimal.valueOf(70_000),Set.of(rbf607));
     final var expected = new SalesChargeResult().setSalesCharges(Map.of(
             SalesChargeCategory.DEFERRED_SALES_CHARGE, s1,
             SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s2,
@@ -83,10 +79,8 @@ class SalesChargeTypeCalculationTest {
   }
 
   private Holding createHolding(final String fundServCode, final int value) {
-    return new Holding()
-            .setSecurityIdentifier(new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV))
-            .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
-            .setValue(BigDecimal.valueOf(value));
+    return new Holding(BigDecimal.valueOf(value), FinancialInstrumentType.MUTUAL_FUND_CANADA,
+            new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV));
   }
 
   @Test
@@ -102,13 +96,11 @@ class SalesChargeTypeCalculationTest {
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.51));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", scaled(0.49));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606",scaled(0.51));
+    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607",scaled(0.49));
 
-    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.51), BigDecimal.valueOf(51_000), Set
-            .of(rbf606));
-    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.49), BigDecimal.valueOf(49_000), Set
-            .of(rbf607));
+    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.51),BigDecimal.valueOf(51_000),Set.of(rbf606));
+    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.49),BigDecimal.valueOf(49_000),Set.of(rbf607));
     final var expected = new SalesChargeResult().setSalesCharges(Map.of(
             SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
             SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s2,
@@ -131,19 +123,16 @@ class SalesChargeTypeCalculationTest {
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.10));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", scaled(0.15));
-    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF608", scaled(0.17));
-    final var rbf609 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF609", scaled(0.13));
-    final var rbf610 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF610", scaled(0.25));
-    final var rbf611 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF611", scaled(0.20));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606",scaled(0.10));
+    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607",scaled(0.15));
+    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF608",scaled(0.17));
+    final var rbf609 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF609",scaled(0.13));
+    final var rbf610 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF610",scaled(0.25));
+    final var rbf611 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF611",scaled(0.20));
 
-    final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.42), BigDecimal.valueOf(42_000), Set
-            .of(rbf606, rbf607, rbf608));
-    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.13), BigDecimal.valueOf(13_000), Set
-            .of(rbf609));
-    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.45), BigDecimal.valueOf(45_000), Set
-            .of(rbf610, rbf611));
+    final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.42),BigDecimal.valueOf(42_000),Set.of(rbf606, rbf607, rbf608));
+    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.13),BigDecimal.valueOf(13_000),Set.of(rbf609));
+    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.45),BigDecimal.valueOf(45_000),Set.of(rbf610, rbf611));
     final var expected = new SalesChargeResult().setSalesCharges(Map.of(
             SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
             SalesChargeCategory.LOW_LOAD_SALES_CHARGE, s2,
@@ -176,15 +165,12 @@ class SalesChargeTypeCalculationTest {
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606",
-            BigDecimal.valueOf(0.3333333333));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607",
-            BigDecimal.valueOf(0.3333333333));
-    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF608",
-            BigDecimal.valueOf(0.3333333333));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606",BigDecimal.valueOf(0.3333333333));
+    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607",BigDecimal.valueOf(0.3333333333));
+    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF608",BigDecimal.valueOf(0.3333333333));
 
-    final var s1 = new SalesChargeResult.SalesChargeEntry(BigDecimal.valueOf(1), BigDecimal.valueOf(150_000), Set.of(
-            rbf606, rbf607, rbf608));
+    final var s1 = new SalesChargeResult.SalesChargeEntry(BigDecimal.valueOf(1), BigDecimal.valueOf(150_000),
+            Set.of(rbf606, rbf607, rbf608));
     final var expected = new SalesChargeResult().setSalesCharges(Map.of(
             SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
             SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
@@ -201,11 +187,10 @@ class SalesChargeTypeCalculationTest {
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 150_000, FRONT_END_CHARGE);
 
     final var sut = new SalesChargeCalculation(dataFromFds);
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606",
-            BigDecimal.valueOf(1));
+    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", BigDecimal.valueOf(1));
 
-    final var s1 = new SalesChargeResult.SalesChargeEntry(BigDecimal.valueOf(1), BigDecimal.valueOf(150_000), Set.of(
-            rbf606));
+    final var s1 = new SalesChargeResult.SalesChargeEntry(BigDecimal.valueOf(1), BigDecimal.valueOf(150_000),
+            Set.of(rbf606));
     final var expected = new SalesChargeResult().setSalesCharges(Map.of(
             SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
             SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
@@ -220,10 +205,8 @@ class SalesChargeTypeCalculationTest {
           final String fundServCode,
           final int value,
           final SalesChargeType frontEndCharge) {
-    final Holding holding = new Holding()
-            .setSecurityIdentifier(new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV))
-            .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
-            .setValue(BigDecimal.valueOf(value));
+    final Holding holding = new Holding(BigDecimal.valueOf(value), FinancialInstrumentType.MUTUAL_FUND_CANADA,
+            new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV));
 
     dataFromFds.put(holding, new SalesCharge(frontEndCharge, null, null, null, null));
   }

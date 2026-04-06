@@ -92,8 +92,8 @@ class AssetAllocationEMServiceImplTest {
 
     final Holding h = mock(Holding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
-    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding().setHoldingType(
-        FinancialInstrumentType.CASH), cRegions);
+    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding(null,
+        FinancialInstrumentType.CASH, null), cRegions);
 
     final Map<AssetAllocationRegion, BigDecimal> aRegions = Map.of(
         CANADIAN_EQUITIES, BigDecimal.valueOf(3),
@@ -115,8 +115,8 @@ class AssetAllocationEMServiceImplTest {
 
     final Holding h = mock(Holding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
-    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding().setHoldingType(
-        FinancialInstrumentType.CASH), cRegions);
+    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding(null,
+        FinancialInstrumentType.CASH, null), cRegions);
 
     final Map<AssetAllocationRegion, BigDecimal> aRegions = Map.of(
         CANADIAN_EQUITIES, BigDecimal.valueOf(3),

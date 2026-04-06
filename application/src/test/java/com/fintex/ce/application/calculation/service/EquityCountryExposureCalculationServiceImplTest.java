@@ -12,13 +12,11 @@ import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,8 +55,8 @@ class EquityCountryExposureCalculationServiceImplTest {
 
     final CountryRegionType canada = CountryRegionType.CANADA;
 
-    final Holding h1 = new Holding().setValue(BigDecimal.ONE).setHoldingType(FinancialInstrumentType.CASH);
-    final Holding h2 = new Holding().setValue(BigDecimal.TEN).setHoldingType(FinancialInstrumentType.ETF_US);
+    final Holding h1 = new Holding(BigDecimal.ONE, FinancialInstrumentType.CASH, null);
+    final Holding h2 = new Holding(BigDecimal.TEN, FinancialInstrumentType.ETF_US, null);
 
     final Map<Holding, Map<CountryRegionType, BigDecimal>> exposures = Map.of(
         h1, Map.of(canada, BigDecimal.valueOf(2), CountryRegionType.EMERGING_MARKET, BigDecimal.valueOf(21)),
@@ -77,8 +75,8 @@ class EquityCountryExposureCalculationServiceImplTest {
 
     final CountryRegionType type = CountryRegionType.EMERGING_MARKET;
 
-    final Holding h1 = new Holding().setValue(BigDecimal.ONE).setHoldingType(FinancialInstrumentType.ETF_US);
-    final Holding h2 = new Holding().setValue(BigDecimal.TEN).setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    final Holding h1 = new Holding(BigDecimal.ONE, FinancialInstrumentType.ETF_US, null);
+    final Holding h2 = new Holding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
 
     final Map<Holding, Map<CountryRegionType, BigDecimal>> exposures = Map.of(
         h1, Map.of(type, BigDecimal.valueOf(2), CountryRegionType.CANADA, BigDecimal.valueOf(21)),

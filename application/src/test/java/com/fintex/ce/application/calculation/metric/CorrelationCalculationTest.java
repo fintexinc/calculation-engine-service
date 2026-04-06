@@ -19,8 +19,6 @@ import java.util.TreeMap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
@@ -252,8 +250,8 @@ class CorrelationCalculationTest {
     final var sut = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, ONE);
-    final var usEtfHolding = new Holding().setHoldingType(FinancialInstrumentType.ETF_US);
-    final var mutualFundsHolding = new Holding().setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    final var usEtfHolding = new Holding(null, FinancialInstrumentType.ETF_US, null);
+    final var mutualFundsHolding = new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
     final var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
     when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
@@ -269,8 +267,8 @@ class CorrelationCalculationTest {
     final var sut = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, ONE);
-    final var usEtfHolding = new Holding().setHoldingType(FinancialInstrumentType.ETF_US);
-    final var mutualFundsHolding = new Holding().setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    final var usEtfHolding = new Holding(null, FinancialInstrumentType.ETF_US, null);
+    final var mutualFundsHolding = new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
     final var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
     when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
@@ -388,12 +386,10 @@ class CorrelationCalculationTest {
   @Test
   void shouldBuildCorrelationPeriodResult_whenMappingCorrelationValues() {
     final var sut = mock(CorrelationCalculation.class);
-    final var usEtfHolding = new Holding()
-        .setSecurityIdentifier(new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV))
-        .setHoldingType(FinancialInstrumentType.ETF_US);
-    final var mutualFundsHolding = new Holding()
-        .setSecurityIdentifier(new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV))
-        .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    final var usEtfHolding = new Holding(null, FinancialInstrumentType.ETF_US,
+        new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV));
+    final var mutualFundsHolding = new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV));
     final var map = Map.of(mutualFundsHolding, BigDecimalConstants.TWELVE);
 
     doCallRealMethod().when(sut).mapToCorrelationPeriodResult(any(), anyInt(), any());
@@ -409,9 +405,8 @@ class CorrelationCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var calculationDTO = mock(CalculationDTO.class);
-    final var map = Map.of(new Holding()
-        .setSecurityIdentifier(new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV))
-        .setHoldingType(FinancialInstrumentType.ETF_US), mock(Map.class));
+    final var map = Map.of(new Holding(null, FinancialInstrumentType.ETF_US,
+        new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV)), mock(Map.class));
     final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), map);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));

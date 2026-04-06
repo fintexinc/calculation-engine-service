@@ -8,7 +8,6 @@ import com.fintex.sm.model.domain.datapoint.SalesChargeData;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.SalesChargeType;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -70,8 +69,9 @@ class SalesChargeTypeMapperTest {
   private Holding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding()
-            .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
-            .setSecurityIdentifier(identifier);
+    return Holding.builder()
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .securityIdentifier(identifier)
+        .build();
   }
 }

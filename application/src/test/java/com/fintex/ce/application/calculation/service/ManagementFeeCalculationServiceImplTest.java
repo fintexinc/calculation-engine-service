@@ -313,7 +313,7 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldSetInitialFeeAndModifiedFeeValues_whenExpectExceptionWhenHoldingIsFundAndManagementFeeIsEmpty() {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
-    var holding = new Holding();
+    var holding = new Holding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(null);
     var expected = ERR_MF_MF_001.error(holding);
@@ -336,7 +336,7 @@ class ManagementFeeCalculationServiceImplTest {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var notification = new Notification();
-    var holding = new Holding();
+    var holding = new Holding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(null);
 
@@ -357,7 +357,7 @@ class ManagementFeeCalculationServiceImplTest {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var notification = new Notification();
-    var holding = new Holding();
+    var holding = new Holding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(TEN);
 

@@ -9,8 +9,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -39,9 +37,9 @@ class YieldResponseMapperTest {
 
   @Test
   void shouldCalculateWeightedAverageYield_whenMappingPortfolioDomainMap() {
-    Holding stock = new Holding(new BigDecimal("2"), FinancialInstrumentType.STOCK_US);
-    Holding gic = new Holding(new BigDecimal("3"), FinancialInstrumentType.GIC);
-    Holding skipped = new Holding(new BigDecimal("5"), FinancialInstrumentType.STOCK_CANADA);
+    Holding stock = new Holding(new BigDecimal("2"), FinancialInstrumentType.STOCK_US, null);
+    Holding gic = new Holding(new BigDecimal("3"), FinancialInstrumentType.GIC, null);
+    Holding skipped = new Holding(new BigDecimal("5"), FinancialInstrumentType.STOCK_CANADA, null);
 
     Map<Holding, Yield> domainMap = Map.of(
         stock, new Yield().setDividendYield(new BigDecimal("0.1")),
@@ -59,7 +57,7 @@ class YieldResponseMapperTest {
 
   @Test
   void shouldReturnZeroYield_whenNoValidEntriesProvided() {
-    Holding invalid = new Holding(null, FinancialInstrumentType.STOCK_US);
+    Holding invalid = new Holding(null, FinancialInstrumentType.STOCK_US, null);
     Map<Holding, Yield> domainMap = Map.of(invalid, new Yield().setDividendYield(new BigDecimal("0.1")));
 
     YieldResult result = mapper.toResponse(domainMap, List.of());

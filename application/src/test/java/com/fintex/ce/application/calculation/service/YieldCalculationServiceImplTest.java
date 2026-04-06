@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
@@ -41,15 +40,15 @@ class YieldCalculationServiceImplTest {
     Map<Holding, Yield> mockData = new HashMap<>();
     Yield yield1 = new Yield();
     yield1.setDividendYield(new BigDecimal("0.05"));
-    mockData.put(new Holding().setValue(new BigDecimal("100")).setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA), yield1);
+    mockData.put(new Holding(new BigDecimal("100"), FinancialInstrumentType.MUTUAL_FUND_CANADA, null), yield1);
 
     Yield yield2 = new Yield();
     yield2.setDividendYield(new BigDecimal("0.10"));
-    mockData.put(new Holding().setValue(new BigDecimal("200")).setHoldingType(FinancialInstrumentType.HEDGE_FUND_CANADA), yield2);
+    mockData.put(new Holding(new BigDecimal("200"), FinancialInstrumentType.HEDGE_FUND_CANADA, null), yield2);
 
     Yield yield3 = new Yield();
     yield3.setDividendYield(new BigDecimal("0.06"));
-    mockData.put(new Holding().setValue(new BigDecimal("150")).setHoldingType(FinancialInstrumentType.GIC), yield3);
+    mockData.put(new Holding(new BigDecimal("150"), FinancialInstrumentType.GIC, null), yield3);
     return mockData;
   }
 

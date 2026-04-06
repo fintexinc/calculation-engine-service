@@ -9,7 +9,6 @@ import com.fintex.sm.model.domain.datapoint.Income;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class YieldMapperTest {
@@ -71,8 +70,6 @@ class YieldMapperTest {
   private Holding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding()
-            .setHoldingType(FinancialInstrumentType.ETF_CANADA)
-            .setSecurityIdentifier(identifier);
+    return new Holding(null, FinancialInstrumentType.ETF_CANADA, identifier);
   }
 }

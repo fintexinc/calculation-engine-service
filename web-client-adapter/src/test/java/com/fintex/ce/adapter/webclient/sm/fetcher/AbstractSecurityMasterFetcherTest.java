@@ -173,8 +173,6 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     var identifier = new SecurityIdentifier();
     identifier.setId(id);
     identifier.setIdType(idType);
-    return new Holding()
-        .setHoldingType(holdingType)
-        .setSecurityIdentifier(identifier);
+    return new Holding(null, holdingType, identifier);
   }
 }

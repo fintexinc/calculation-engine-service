@@ -8,15 +8,13 @@ import com.fintex.sm.model.domain.datapoint.EquityMarketCapitalization;
 import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.value.EquityMarketCapitalizationTypeValue;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EquityMarketCapitalizationMapperTest {
@@ -112,8 +110,6 @@ class EquityMarketCapitalizationMapperTest {
   }
 
   private Holding createHolding(String securityId) {
-    return new Holding()
-        .setHoldingType(FinancialInstrumentType.ETF_CANADA)
-        .setSecurityIdentifier(new SecurityIdentifier(securityId, null));
+    return new Holding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
   }
 }

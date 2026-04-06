@@ -14,7 +14,7 @@ Built with Java 21, Spring Boot 3.4.6, Hexagonal Architecture.
 - **Fees & Holdings** — MER, management fees, sales charges, top common holdings
 - **Forecasts** — income forecast, yield, distribution of monthly returns, best/worst periods
 
-### Exposed API
+### Exposed REST API
 
 Single unified endpoint for all 48 calculation metrics:
 
@@ -33,8 +33,8 @@ You can read the description for all metrics, requests and responses on Swagger 
 
 | Resource | Remote URL                                                                                |
 |----------|-------------------------------------------------------------------------------------------|
-| Swagger UI | `https://calculation-engine-service.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui/index.html` |
-| OpenAPI YAML | `https://calculation-engine-service.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/api-docs.yaml`         |
+| Swagger UI | `https://portfolio-calculation-engine.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui/index.html` |
+| OpenAPI YAML | `https://portfolio-calculation-engine.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/api-docs.yaml`         |
 
 ### Dependencies
 
@@ -44,7 +44,7 @@ You can read the description for all metrics, requests and responses on Swagger 
 
 ### Module Structure
 
-Hexagonal Architecture is used on this project.
+Hexagonal Architecture is used in this project.
 
 | Module | Purpose |
 |--------|---------|

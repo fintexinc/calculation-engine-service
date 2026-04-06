@@ -14,7 +14,8 @@ public class CorrelationCommand extends PeriodCommand {
 
   @Override
   public PortfolioCommand setHoldings(final List<Holding> holdings) {
-    holdings.forEach(holding -> holding.setValue(BigDecimal.ONE));
-    return super.setHoldings(holdings);
+    return super.setHoldings(holdings.stream()
+        .map(holding -> (Holding) holding.toBuilder().value(BigDecimal.ONE).build())
+        .toList());
   }
 }

@@ -9,12 +9,10 @@ import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
+import org.junit.jupiter.api.Test;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_DH_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MC_002;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.USD;
@@ -28,12 +26,14 @@ class HoldingReqValidationTest {
 
   @Test
   void check_duplicatedGicHoldingIsAllowed() {
-    // GIC holdings are excluded from duplicate check
-    final GicHolding gic = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
-    gic.setInvestmentDate(LocalDate.now());
-    gic.setClientIntRate(BigDecimal.valueOf(100));
-    gic.setCurrency(USD);
-    gic.setInterestFreq(InterestFreq.MONTHLY);
+    final GicHolding gic = GicHolding.builder()
+        .value(BigDecimal.ONE)
+        .holdingType(FinancialInstrumentType.GIC)
+        .investmentDate(LocalDate.now())
+        .clientIntRate(BigDecimal.valueOf(100))
+        .currency(USD)
+        .interestFreq(InterestFreq.MONTHLY)
+        .build();
 
     final List<Holding> holdings = List.of(gic, gic, gic, gic);
     final var sut = new HoldingReqValidation(holdings);
@@ -43,10 +43,8 @@ class HoldingReqValidationTest {
 
   @Test
   void check_duplicateHoldingsThrowsException() {
-    final Holding f = new Holding();
-    f.setSecurityIdentifier(new SecurityIdentifier("F", FiIdentifierType.FUNDSERV));
-    f.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
-    f.setValue(BigDecimal.ONE);
+    final Holding f = new Holding(BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("F", FiIdentifierType.FUNDSERV));
 
     final List<Holding> holdings = List.of(f, f);
     final var sut = new HoldingReqValidation(holdings);
@@ -60,14 +58,16 @@ class HoldingReqValidationTest {
 
   @Test
   void check_multipleCashHoldingsWithoutCurrencyThrowsException() {
-    final CashHolding cashWithoutCurrency = new CashHolding();
-    cashWithoutCurrency.setHoldingType(FinancialInstrumentType.CASH);
-    cashWithoutCurrency.setValue(BigDecimal.ONE);
+    final CashHolding cashWithoutCurrency = CashHolding.builder()
+        .holdingType(FinancialInstrumentType.CASH)
+        .value(BigDecimal.ONE)
+        .build();
 
-    final CashHolding cashWithCurrency = new CashHolding();
-    cashWithCurrency.setHoldingType(FinancialInstrumentType.CASH);
-    cashWithCurrency.setValue(BigDecimal.ONE);
-    cashWithCurrency.setCurrency(CurrencyType.CAD);
+    final CashHolding cashWithCurrency = CashHolding.builder()
+        .holdingType(FinancialInstrumentType.CASH)
+        .value(BigDecimal.ONE)
+        .currency(CurrencyType.CAD)
+        .build();
 
     final List<Holding> holdings = List.of(cashWithoutCurrency, cashWithCurrency);
     final var sut = new HoldingReqValidation(holdings);
@@ -81,9 +81,10 @@ class HoldingReqValidationTest {
 
   @Test
   void check_singleCashHoldingWithoutCurrencyIsAllowed() {
-    final CashHolding cashWithoutCurrency = new CashHolding();
-    cashWithoutCurrency.setHoldingType(FinancialInstrumentType.CASH);
-    cashWithoutCurrency.setValue(BigDecimal.ONE);
+    final CashHolding cashWithoutCurrency = CashHolding.builder()
+        .holdingType(FinancialInstrumentType.CASH)
+        .value(BigDecimal.ONE)
+        .build();
 
     final List<Holding> holdings = List.of(cashWithoutCurrency);
     final var sut = new HoldingReqValidation(holdings);

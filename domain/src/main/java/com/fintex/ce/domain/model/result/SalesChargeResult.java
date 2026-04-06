@@ -6,13 +6,14 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalEquals;
+import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalHashCode;
 
 @Getter
 @Setter
@@ -24,21 +25,7 @@ public class SalesChargeResult extends ErrorResult {
 
   private Map<SalesChargeCategory, SalesChargeEntry> salesCharges = new EnumMap<>(SalesChargeCategory.class);
 
-  private static boolean bigDecimalEquals(final BigDecimal a, final BigDecimal b) {
-    if (a == null) return b == null;
-    if (b == null) return false;
-    return a.compareTo(b) == 0;
-  }
-
-  @Getter
-  @Setter
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class SalesChargeEntry {
-
-    private BigDecimal allocation;
-    private BigDecimal value;
-    private Set<SalesChargeHoldingEntry> holdings;
+  public record SalesChargeEntry(BigDecimal allocation, BigDecimal value, Set<SalesChargeHoldingEntry> holdings) {
 
     @Override
     public boolean equals(final Object o) {
@@ -54,21 +41,14 @@ public class SalesChargeResult extends ErrorResult {
 
     @Override
     public int hashCode() {
-      int result = allocation != null ? allocation.stripTrailingZeros().hashCode() : 0;
-      result = 31 * result + (value != null ? value.stripTrailingZeros().hashCode() : 0);
+      int result = bigDecimalHashCode(allocation);
+      result = 31 * result + bigDecimalHashCode(value);
       result = 31 * result + (holdings != null ? holdings.hashCode() : 0);
       return result;
     }
   }
 
-  @Getter
-  @Setter
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class SalesChargeHoldingEntry {
-
-    private String fundServCode;
-    private BigDecimal mutualFundAllocation;
+  public record SalesChargeHoldingEntry(String fundServCode, BigDecimal mutualFundAllocation) {
 
     @Override
     public boolean equals(final Object o) {
@@ -84,7 +64,7 @@ public class SalesChargeResult extends ErrorResult {
     @Override
     public int hashCode() {
       int result = fundServCode != null ? fundServCode.hashCode() : 0;
-      result = 31 * result + (mutualFundAllocation != null ? mutualFundAllocation.stripTrailingZeros().hashCode() : 0);
+      result = 31 * result + bigDecimalHashCode(mutualFundAllocation);
       return result;
     }
   }

@@ -1,5 +1,7 @@
 package com.fintex.ce.domain.model.holding;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
@@ -8,47 +10,45 @@ import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
-
+import java.util.Objects;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import static com.fintex.ce.domain.constant.ErrorMessage.NOT_NULL_MSG;
+import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalEquals;
+import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalHashCode;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "holdingType", visible = true, defaultImpl = Holding.class)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CashHolding.class, name = "CASH"),
     @JsonSubTypes.Type(value = GicHolding.class, name = "GIC")
 })
-@Data
-@EqualsAndHashCode
-@Accessors(chain = true)
+@Getter
+@ToString
+@SuperBuilder(toBuilder = true)
 public class Holding {
 
   public static final String DELIMITER = "-";
 
-  @EqualsAndHashCode.Exclude
-  private BigDecimal value;
+  private final BigDecimal value;
 
   @NotNull(message = NOT_NULL_MSG)
-  private FinancialInstrumentType holdingType;
+  private final FinancialInstrumentType holdingType;
 
   @NotNull(message = NOT_NULL_MSG)
   @Valid
-  private SecurityIdentifier securityIdentifier;
+  private final SecurityIdentifier securityIdentifier;
 
-  public Holding() {
-  }
-
-  public Holding(BigDecimal value, FinancialInstrumentType holdingType) {
+  @JsonCreator
+  public Holding(
+      @JsonProperty("value") BigDecimal value,
+      @JsonProperty("holdingType") FinancialInstrumentType holdingType,
+      @JsonProperty("securityIdentifier") SecurityIdentifier securityIdentifier) {
     this.value = value;
     this.holdingType = holdingType;
+    this.securityIdentifier = securityIdentifier;
   }
 
-  /**
-   * Unique id for the end user
-   *
-   * @return id of the entity
-   */
   public String generateUserIdentifier() {
     if (securityIdentifier == null) {
       return holdingType + DELIMITER + value;
@@ -57,6 +57,24 @@ public class Holding {
       return holdingType + DELIMITER + securityIdentifier.getId() + DELIMITER + eq.getExchangeId();
     }
     return holdingType + DELIMITER + securityIdentifier.getId();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Holding holding = (Holding) o;
+    return bigDecimalEquals(value, holding.value)
+        && Objects.equals(holdingType, holding.holdingType)
+        && Objects.equals(securityIdentifier, holding.securityIdentifier);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = Objects.hashCode(holdingType);
+    result = 31 * result + Objects.hashCode(securityIdentifier);
+    result = 31 * result + bigDecimalHashCode(value);
+    return result;
   }
 
 }
