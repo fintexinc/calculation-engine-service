@@ -8,11 +8,14 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CountryExposureResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.List;
+import java.util.Map;
+
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,13 +33,13 @@ class CountryExposureCalculationImplTest {
       final var storage = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
-      final var sut = mock(CountryExposureCalculationImpl.class,
+      final var service = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
       final var exposures = mock(Map.class);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, List.of(), List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(exposures));
     }
@@ -48,7 +51,7 @@ class CountryExposureCalculationImplTest {
       final var storage = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
-      final var sut = mock(CountryExposureCalculationImpl.class,
+      final var service = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
       final var exposures = mock(Map.class);
@@ -59,8 +62,8 @@ class CountryExposureCalculationImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(true);
       when(responseMapper.toEmptyResponse(any())).thenReturn(expected);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      final var actual = sut.calculate(exposures, List.of(), List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      final var actual = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
       assertEquals(expected, actual);
     }
@@ -72,7 +75,7 @@ class CountryExposureCalculationImplTest {
       final var storage = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(CountryExposureResponseMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
-    final var sut = mock(CountryExposureCalculationImpl.class,
+    final var service = mock(CountryExposureCalculationImpl.class,
         withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
     final var holding = mock(Holding.class);
@@ -83,8 +86,9 @@ class CountryExposureCalculationImplTest {
 
     when(storage.fetch(any(), any())).thenReturn(rawData);
     when(countryAllocationMappingService.mapToCountryRegions(any(), any(), any())).thenReturn(mappedResult);
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
-    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    doCallRealMethod().when(service).fetchExposures(any());
+    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var actual = result.allocations();
 
     assertEquals(mappedResult, actual);
   }
@@ -95,7 +99,7 @@ class CountryExposureCalculationImplTest {
       final var storage = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
-      final var sut = mock(CountryExposureCalculationImpl.class,
+      final var service = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
       final var holding = mock(Holding.class);
@@ -103,10 +107,10 @@ class CountryExposureCalculationImplTest {
       final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(false);
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, holdings, List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
-      verify(sut).calculateNetProducts(exposures, holdings, CountryRegionType.values());
+      verify(service).calculateNetProducts(exposures, holdings, CountryRegionType.values());
     }
   }
 
@@ -116,7 +120,7 @@ class CountryExposureCalculationImplTest {
       final var storage = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
-      final var sut = mock(CountryExposureCalculationImpl.class,
+      final var service = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
       final var holding = mock(Holding.class);
@@ -125,10 +129,10 @@ class CountryExposureCalculationImplTest {
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(false);
-      when(sut.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, holdings, List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       verify(responseMapper).fromNetProducts(any(), any());
     }
@@ -140,7 +144,7 @@ class CountryExposureCalculationImplTest {
       final var storage = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(CountryExposureResponseMapper.class);
       final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
-      final var sut = mock(CountryExposureCalculationImpl.class,
+      final var service = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
       final var holding = mock(Holding.class);
@@ -149,10 +153,10 @@ class CountryExposureCalculationImplTest {
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(false);
-      when(sut.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, holdings, List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       verify(responseMapper).fromNetProducts(any(), any());
     }

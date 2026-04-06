@@ -10,11 +10,15 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CountryExposureResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_FICQ_BCE_001;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
 import static java.util.stream.Collectors.toMap;
@@ -39,9 +43,10 @@ public class CountryExposureCalculationImpl extends BreakdownAbstractService<Cou
   }
 
   @Override
-  public CountryExposureResult calculate(Map<Holding, Map<CountryRegionType, BigDecimal>> exposures,
-      List<Holding> holdings,
-      List<Warning> warnings) {
+  public CountryExposureResult calculate(ExposureDataHolder<CountryRegionType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     if (areAllValuesInMapEmpty(exposures)) {
       return responseMapper.toEmptyResponse(warnings);
     }
@@ -51,11 +56,13 @@ public class CountryExposureCalculationImpl extends BreakdownAbstractService<Cou
   }
 
   @Override
-  public Map<Holding, Map<CountryRegionType, BigDecimal>> fetchExposures(PortfolioHoldingsCommand reqDTO,
-      List<Warning> warnings) {
+  public ExposureDataHolder<CountryRegionType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
+    List<Warning> warnings = new ArrayList<>();
     Map<Holding, CountryExposure> rawData = countryExposureSecurityDataFetcher.fetch(reqDTO.getHoldings(), List.of());
     Map<Holding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
-    return countryAllocationMappingService.mapToCountryRegions(mappedHoldings, warnings, WRN_FICQ_BCE_001);
+    Map<Holding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService
+        .mapToCountryRegions(mappedHoldings, warnings, WRN_FICQ_BCE_001);
+    return new ExposureDataHolder<>(allocations, warnings);
   }
 }

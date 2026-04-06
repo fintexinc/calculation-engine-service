@@ -8,12 +8,15 @@ import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.List;
+import java.util.Map;
+
 import static java.math.BigDecimal.TEN;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -29,7 +32,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
   void shouldFetch_whenCheckResult() {
     final var fetcher = mock(SecurityDataFetcher.class);
     final var geographicAllocationMappingService = mock(GeographicAllocationMappingService.class);
-    final var sut = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
+    final var service = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, geographicAllocationMappingService));
 
     final var holding = mock(Holding.class);
@@ -40,8 +43,9 @@ class EquityGeographicExposureCalculationServiceImplTest {
 
     when(fetcher.fetch(any(), any())).thenReturn(rawData);
     when(geographicAllocationMappingService.mapToGeographicRegions(any(), any(), any())).thenReturn(mappedResult);
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
-    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    doCallRealMethod().when(service).fetchExposures(any());
+    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var actual = result.allocations();
 
     Assertions.assertEquals(mappedResult, actual);
   }
@@ -51,7 +55,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var fetcher = mock(SecurityDataFetcher.class);
       final var geographicAllocationMappingService = mock(GeographicAllocationMappingService.class);
-      final var sut = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
+      final var service = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(fetcher, geographicAllocationMappingService));
 
       final var holding = mock(Holding.class);
@@ -59,10 +63,10 @@ class EquityGeographicExposureCalculationServiceImplTest {
       final var exposures = Map.of(holding, Map.of(GeographicRegionType.CANADA, TEN));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, holdings, List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
-      verify(sut).calculateNetProducts(exposures, holdings, GeographicRegionType.values());
+      verify(service).calculateNetProducts(exposures, holdings, GeographicRegionType.values());
     }
   }
 
@@ -72,7 +76,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var fetcher = mock(SecurityDataFetcher.class);
       final var geographicAllocationMappingService = mock(GeographicAllocationMappingService.class);
-      final var sut = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
+      final var service = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(fetcher, geographicAllocationMappingService));
 
       final var holding = mock(Holding.class);
@@ -81,10 +85,10 @@ class EquityGeographicExposureCalculationServiceImplTest {
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
-      when(sut.calculateNetProducts(exposures, holdings, GeographicRegionType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, GeographicRegionType.values())).thenReturn(netProducts);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, holdings, List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       mockedCalculationUtils.verify(() -> CalculationUtils.reScaleAbs(netProducts));
     }
@@ -97,7 +101,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
         var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class)) {
       final var fetcher = mock(SecurityDataFetcher.class);
       final var geographicAllocationMappingService = mock(GeographicAllocationMappingService.class);
-      final var sut = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
+      final var service = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(fetcher, geographicAllocationMappingService));
 
       final var holding = mock(Holding.class);
@@ -108,10 +112,10 @@ class EquityGeographicExposureCalculationServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
       mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(any())).thenReturn(netProducts);
 
-      when(sut.calculateNetProducts(exposures, holdings, GeographicRegionType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, GeographicRegionType.values())).thenReturn(netProducts);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, holdings, List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       mockedDecimalUtils.verify(() -> DecimalUtils.toUserScale(netProducts));
     }

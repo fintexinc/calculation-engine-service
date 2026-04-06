@@ -1,17 +1,19 @@
 package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
-import com.fintex.ce.domain.model.calculation.EquityStyleboxType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityStyleboxExposureResult;
 import com.fintex.ce.mapping.ResponseMapper;
+import com.fintex.sm.model.domain.enumeration.StyleBoxType;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Component;
+
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 
 /**
@@ -23,10 +25,10 @@ public class EquityStyleboxExposureResponseMapper
     implements
       ResponseMapper<EquityStyleboxExposure, EquityStyleboxExposureResult> {
 
-  static final Map<EquityStyleboxType, BigDecimal> DEFAULT_MAP = new HashMap<>();
+  static final Map<StyleBoxType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
   static {
-    Stream.of(EquityStyleboxType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
+    Stream.of(StyleBoxType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
   }
 
   @Override
@@ -37,10 +39,8 @@ public class EquityStyleboxExposureResponseMapper
       defaultResult.setWarnings(List.of());
       return defaultResult;
     }
-    // Domain model uses String keys - convert to enum
-    Map<EquityStyleboxType, BigDecimal> enumMap = convertToEnumMap(domain.getBoxValues());
     EquityStyleboxExposureResult result = new EquityStyleboxExposureResult();
-    result.setEquityStyleboxExposure(toUserScale(enumMap));
+    result.setEquityStyleboxExposure(toUserScale(domain.getBoxValues()));
     result.setWarnings(List.of());
     return result;
   }
@@ -62,7 +62,7 @@ public class EquityStyleboxExposureResponseMapper
    *          list of warnings to include in response
    * @return the response DTO with scaled values
    */
-  public EquityStyleboxExposureResult fromNetProducts(Map<EquityStyleboxType, BigDecimal> netProducts,
+  public EquityStyleboxExposureResult fromNetProducts(Map<StyleBoxType, BigDecimal> netProducts,
       List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
       EquityStyleboxExposureResult defaultResult = new EquityStyleboxExposureResult();
@@ -90,19 +90,4 @@ public class EquityStyleboxExposureResponseMapper
     return result;
   }
 
-  /**
-   * Converts String-keyed map from domain model to enum-keyed map.
-   */
-  private Map<EquityStyleboxType, BigDecimal> convertToEnumMap(Map<String, BigDecimal> stringMap) {
-    Map<EquityStyleboxType, BigDecimal> result = new HashMap<>();
-    for (Map.Entry<String, BigDecimal> entry : stringMap.entrySet()) {
-      try {
-        EquityStyleboxType type = EquityStyleboxType.valueOf(entry.getKey());
-        result.put(type, entry.getValue());
-      } catch (IllegalArgumentException ignored) {
-        // Skip unknown type keys
-      }
-    }
-    return result;
-  }
 }

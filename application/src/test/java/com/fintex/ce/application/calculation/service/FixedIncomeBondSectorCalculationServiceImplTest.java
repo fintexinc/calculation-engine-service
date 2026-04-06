@@ -8,12 +8,14 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,13 +35,13 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
 
-      final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
+      final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
           .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
       final var exposures = mock(Map.class);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, List.of(), List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesZerosInMap(exposures));
     }
@@ -52,7 +54,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
 
-      final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
+      final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
           .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
       final var exposures = mock(Map.class);
@@ -62,8 +64,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      final var actual = sut.calculate(exposures, List.of(), List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      final var actual = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
       assertEquals(expected, actual);
     }
@@ -75,7 +77,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
     final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
 
-    final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
+    final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
         .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
     final var holding = mock(Holding.class);
@@ -83,8 +85,9 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
     rawData.setFixedIncomeBondSectors(Map.of("CORPORATE_BONDS", TEN));
 
     when(fixedIncomeFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawData));
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
-    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), new java.util.ArrayList<>());
+    doCallRealMethod().when(service).fetchExposures(any());
+    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var actual = result.allocations();
 
     assertEquals(1, actual.size());
   }
@@ -97,7 +100,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final Holding fundSeriesHolding = mock(Holding.class);
 
-      final var sut = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
+      final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
           .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper));
 
       final var exposures = mock(Map.class);
@@ -112,8 +115,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
                   AssetAllocationRegion.FIXED_INCOME, BigDecimal.ONE,
                   AssetAllocationRegion.CASH, BigDecimal.ONE)));
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      final FixedIncomeSectorResult result = sut.calculate(exposures, List.of(fundSeriesHolding), List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      final FixedIncomeSectorResult result = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of(fundSeriesHolding));
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesZerosInMap(exposures));
     }

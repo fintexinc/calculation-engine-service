@@ -4,20 +4,23 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.EquityMarketCapitalization;
 import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityMarketCapResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.GIANT;
 import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.LARGE;
 import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.MEDIUM;
@@ -61,20 +64,19 @@ public class EquityMarketCapCalculationServiceImpl
   }
 
   @Override
-  public Map<Holding, Map<EquityMarketCapType, BigDecimal>> fetchExposures(
-      final PortfolioHoldingsCommand reqDTO,
-      final List<Warning> warnings) {
+  public ExposureDataHolder<EquityMarketCapType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
     Map<Holding, EquityMarketCapitalization> rawData = equityMarketCapSecurityDataFetcher.fetch(reqDTO.getHoldings(),
         List.of());
     return AllocationMappingUtils.mapToAllocations(rawData,
         EquityMarketCapitalization::getRatings, EquityMarketCapType::fromValue,
-        ALLOCATION_DEFAULT_MAP, WRN_EMC_EMC_001, "FDS Equity Market Capitalization", warnings);
+        ALLOCATION_DEFAULT_MAP, WRN_EMC_EMC_001, "FDS Equity Market Capitalization");
   }
 
   @Override
-  public EquityMarketCapResult calculate(final Map<Holding, Map<EquityMarketCapType, BigDecimal>> exposures,
-      final List<Holding> holdings,
-      final List<Warning> warnings) {
+  public EquityMarketCapResult calculate(ExposureDataHolder<EquityMarketCapType> exposureData,
+      List<Holding> holdings) {
+    var exposures = exposureData.allocations();
+    var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
       EquityMarketCapResult defaultResult = new EquityMarketCapResult();
       defaultResult.setEquityMarketCapitalization(DEFAULT_MAP);

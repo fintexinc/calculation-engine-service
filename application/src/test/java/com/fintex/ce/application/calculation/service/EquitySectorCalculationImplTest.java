@@ -6,13 +6,16 @@ import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquitySectorResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.List;
+import java.util.Map;
+
 import static java.math.BigDecimal.TEN;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -28,15 +31,16 @@ class EquitySectorCalculationImplTest {
   void shouldFetch_whenCheckResult() {
     final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(EquitySectorResponseMapper.class);
-    final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
+    final var service = mock(EquitySectorCalculationImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
     final var holding = mock(Holding.class);
     final var equitySector = new EquitySector(Map.of(EquitySectorAllocationType.TECHNOLOGY, TEN));
     when(fetcher.fetch(any(), any())).thenReturn(Map.of(holding, equitySector));
 
-    doCallRealMethod().when(sut).fetchExposures(any(), any());
-    final var actual = sut.fetchExposures(mock(PortfolioHoldingsCommand.class), List.of());
+    doCallRealMethod().when(service).fetchExposures(any());
+    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var actual = result.allocations();
 
     Assertions.assertTrue(actual.containsKey(holding));
     Assertions.assertEquals(TEN, actual.get(holding).get(EquitySectorAllocationType.TECHNOLOGY));
@@ -47,7 +51,7 @@ class EquitySectorCalculationImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var fetcher = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
-      final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
+      final var service = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(fetcher, responseMapper));
 
       final var holding = mock(Holding.class);
@@ -55,10 +59,10 @@ class EquitySectorCalculationImplTest {
       final var exposures = Map.of(holding, Map.of(EquitySectorAllocationType.CONSUMER_DEFENSIVE, TEN));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, holdings, List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
-      verify(sut).calculateNetProducts(exposures, holdings, EquitySectorAllocationType.values());
+      verify(service).calculateNetProducts(exposures, holdings, EquitySectorAllocationType.values());
     }
   }
 
@@ -67,7 +71,7 @@ class EquitySectorCalculationImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var fetcher = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
-      final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
+      final var service = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(fetcher, responseMapper));
 
       final var holding = mock(Holding.class);
@@ -77,10 +81,10 @@ class EquitySectorCalculationImplTest {
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
-      when(sut.calculateNetProducts(exposures, holdings, EquitySectorAllocationType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, EquitySectorAllocationType.values())).thenReturn(netProducts);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, holdings, List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
       verify(responseMapper).fromNetProducts(any(), any());
     }
@@ -91,14 +95,14 @@ class EquitySectorCalculationImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var fetcher = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
-      final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
+      final var service = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(fetcher, responseMapper));
 
       @SuppressWarnings("unchecked")
       final var exposures = mock(Map.class);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      sut.calculate(exposures, List.of(), List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesZerosInMap(exposures));
     }
@@ -109,7 +113,7 @@ class EquitySectorCalculationImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var fetcher = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(EquitySectorResponseMapper.class);
-      final var sut = mock(EquitySectorCalculationImpl.class, withSettings()
+      final var service = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(fetcher, responseMapper));
 
       @SuppressWarnings("unchecked")
@@ -121,8 +125,8 @@ class EquitySectorCalculationImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
       when(responseMapper.toEmptyResponse(any())).thenReturn(expected);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      final var actual = sut.calculate(exposures, List.of(), List.of());
+      doCallRealMethod().when(service).calculate(any(), any());
+      final var actual = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
       Assertions.assertEquals(expected, actual);
       verify(responseMapper).toEmptyResponse(any());

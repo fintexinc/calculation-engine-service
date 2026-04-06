@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.model.calculation.EquityStyleboxType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,9 +20,9 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class EquityStyleboxExposureResDto extends WarningDTO {
 
-  private Map<EquityStyleboxType, BigDecimal> equityStyleboxExposure;
+  private Map<StyleBoxType, BigDecimal> equityStyleboxExposure;
 
-  public EquityStyleboxExposureResDto(Map<EquityStyleboxType, BigDecimal> equityStyleboxExposure,
+  public EquityStyleboxExposureResDto(Map<StyleBoxType, BigDecimal> equityStyleboxExposure,
       List<Warning> warnings) {
     super(warnings);
     this.equityStyleboxExposure = equityStyleboxExposure;
