@@ -489,8 +489,8 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
-    final var allocations = Map.of(new Holding(), TEN);
-    final var parent = new Holding();
+    final var allocations = Map.of(new Holding(null, null, null), TEN);
+    final var parent = new Holding(null, null, null);
     final var child = mock(CommonHoldingsDTO.class);
     final var expected = new CommonHoldingsDTO();
     expected.setWeight(TEN);
@@ -515,8 +515,8 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
-    final var allocations = Map.of(new Holding(), TEN);
-    final var parent = new Holding();
+    final var allocations = Map.of(new Holding(null, null, null), TEN);
+    final var parent = new Holding(null, null, null);
     final var child = mock(CommonHoldingsDTO.class);
     final var expected = new CommonHoldingsDTO();
     expected.setWeight(BigDecimal.valueOf(100));

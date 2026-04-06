@@ -338,7 +338,7 @@ class CreditQualityServiceImplTest {
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
     final Holding h = mock(Holding.class);
-    final Holding h2 = new Holding().setHoldingType(FinancialInstrumentType.CASH);
+    final Holding h2 = new Holding(null, FinancialInstrumentType.CASH, null);
 
     final int creditQValue = 2;
     final int fixedIncomeValue = 3;

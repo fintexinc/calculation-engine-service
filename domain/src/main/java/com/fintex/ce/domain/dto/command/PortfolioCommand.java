@@ -32,7 +32,11 @@ public abstract class PortfolioCommand extends CalculationCommand {
         .map(h -> (CashHolding) h)
         .collect(Collectors.toList());
     if (cashHoldings.size() == 1 && Objects.isNull(cashHoldings.get(0).getCurrency())) {
-      cashHoldings.get(0).setCurrency(currency);
+      CashHolding original = cashHoldings.get(0);
+      CashHolding updated = original.toBuilder().currency(currency).build();
+      holdings = holdings.stream()
+          .map(h -> h == original ? updated : h)
+          .toList();
     }
   }
 }

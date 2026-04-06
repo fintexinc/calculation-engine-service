@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
+import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.allocation.CountryAllocation;
@@ -10,7 +10,6 @@ import com.fintex.sm.model.domain.value.CountryValue;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EquityCountryAllocationMapperTest {
@@ -74,8 +73,6 @@ class EquityCountryAllocationMapperTest {
   private Holding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding()
-        .setHoldingType(FinancialInstrumentType.ETF_CANADA)
-        .setSecurityIdentifier(identifier);
+    return new Holding(null, FinancialInstrumentType.ETF_CANADA, identifier);
   }
 }

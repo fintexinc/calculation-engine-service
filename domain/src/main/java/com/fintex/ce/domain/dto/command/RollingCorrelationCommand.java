@@ -14,13 +14,15 @@ public class RollingCorrelationCommand extends RollingCalculationCommand {
 
   @Override
   public PortfolioCommand setHoldings(List<Holding> holdings) {
-    holdings.forEach(holding -> holding.setValue(BigDecimal.ONE));
-    return super.setHoldings(holdings);
+    return super.setHoldings(holdings.stream()
+        .map(holding -> (Holding) holding.toBuilder().value(BigDecimal.ONE).build())
+        .toList());
   }
 
   @Override
   public PortfolioCommand setBenchmarkHoldings(List<Holding> benchmarkHoldings) {
-    benchmarkHoldings.forEach(holding -> holding.setValue(BigDecimal.ONE));
-    return super.setBenchmarkHoldings(benchmarkHoldings);
+    return super.setBenchmarkHoldings(benchmarkHoldings.stream()
+        .map(holding -> (Holding) holding.toBuilder().value(BigDecimal.ONE).build())
+        .toList());
   }
 }

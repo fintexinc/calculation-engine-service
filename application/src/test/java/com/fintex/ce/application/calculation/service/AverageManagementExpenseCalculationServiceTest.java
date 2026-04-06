@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
+import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AverageMerResult;
@@ -21,8 +21,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
@@ -454,10 +452,8 @@ class AverageManagementExpenseCalculationServiceTest {
       resDTO.getManagementExpenseRatio().put(ABSOLUTE, ONE);
       resDTO.getManagementExpenseRatio().put(SCALED, TEN);
       resDTO.getManagementExpenseRatio().put(FORCE_REPORT_FEE, ZERO);
-      final var holding1 = new Holding();
-      final var holding2 = new Holding();
-      holding1.setHoldingType(FinancialInstrumentType.STOCK_US);
-      holding2.setHoldingType(FinancialInstrumentType.CASH);
+      final var holding1 = new Holding(null, FinancialInstrumentType.STOCK_US, null);
+      final var holding2 = new Holding(null, FinancialInstrumentType.CASH, null);
       final var holdings = List.of(holding1, holding2);
       final var expected = new HashMap<ParameterType, BigDecimal>();
       expected.put(ABSOLUTE, ONE);

@@ -8,11 +8,9 @@ import com.fintex.sm.model.domain.datapoint.Maturities;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.TimeDuration;
 import com.fintex.sm.model.domain.value.MaturityDurationValue;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.List;
-
+import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MaturityAllocationMapperTest {
@@ -117,8 +115,6 @@ class MaturityAllocationMapperTest {
   }
 
   private Holding createHolding(String securityId) {
-    return new Holding()
-        .setHoldingType(FinancialInstrumentType.ETF_CANADA)
-        .setSecurityIdentifier(new SecurityIdentifier(securityId, null));
+    return new Holding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
   }
 }

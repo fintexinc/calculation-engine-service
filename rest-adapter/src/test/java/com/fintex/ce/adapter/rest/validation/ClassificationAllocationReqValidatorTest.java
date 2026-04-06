@@ -21,7 +21,7 @@ class ClassificationAllocationReqValidatorTest {
     final var sut = new ClassificationAllocationReqValidator();
 
     final PortfolioHoldingsCommand reqDTO = new PortfolioHoldingsCommand();
-    reqDTO.setHoldings(List.of(new CashHolding()));
+    reqDTO.setHoldings(List.of(CashHolding.builder().build()));
 
     final ReqValidation expected = ReqValidation.create()
         .linkWith(new NotNullReqValidation(reqDTO))

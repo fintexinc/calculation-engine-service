@@ -9,15 +9,13 @@ import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.value.FixedIncomeSectorAllocationTypeNameValue;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FixedIncomeSectorAllocationMapperTest {
@@ -137,8 +135,6 @@ class FixedIncomeSectorAllocationMapperTest {
   private Holding createHolding(String securityId, FinancialInstrumentType holdingType) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding()
-        .setHoldingType(holdingType)
-        .setSecurityIdentifier(identifier);
+    return new Holding(null, holdingType, identifier);
   }
 }

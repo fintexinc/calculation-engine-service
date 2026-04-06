@@ -9,16 +9,14 @@ import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import static com.fintex.ce.application.util.TestConstants.GREATER_THAN_YEAR;
 import static com.fintex.ce.application.util.TestConstants.LESS_THAN_YEAR;
 import static com.fintex.ce.util.MapUtils.overrideDefaultValues;
@@ -44,10 +42,10 @@ class AssetAllocationDataMapperTest {
     final Holding benchmarkIndexHolding = mock(Holding.class);
     final Holding fixedIncomeHolding = mock(Holding.class);
     final Holding smaHolding = mock(Holding.class);
-    final CashHolding cashHolding = new CashHolding(BigDecimal.valueOf(100_000_000), FinancialInstrumentType.CASH);
+    final CashHolding cashHolding = CashHolding.builder().value(BigDecimal.valueOf(100_000_000)).holdingType(FinancialInstrumentType.CASH).build();
     final Holding stocksHoldings = mock(Holding.class);
-    final GicHolding gicHolding = new GicHolding(BigDecimal.valueOf(1), FinancialInstrumentType.GIC);
-    gicHolding.setTerm(LESS_THAN_YEAR);
+    final GicHolding gicHolding = GicHolding.builder().value(BigDecimal.valueOf(1)).holdingType(FinancialInstrumentType.GIC)
+        .term(LESS_THAN_YEAR).build();
     final Map<Holding, HoldingAssetAllocation> etfCanadaAssetAllocation = new HashMap<>();
     final var rAssetAllocationForEtfCanada = new HoldingAssetAllocation().setHoldingType(FinancialInstrumentType.ETF_CANADA)
         .setAllocations(EMPTY_SORTED_MAP);
@@ -100,10 +98,10 @@ class AssetAllocationDataMapperTest {
     final Holding etfCanada = mock(Holding.class);
     final Holding fundSeriesHolding = mock(Holding.class);
     final Holding benchmarkIndexHolding = mock(Holding.class);
-    final CashHolding cashHolding = new CashHolding(BigDecimal.valueOf(100_000_000), FinancialInstrumentType.CASH);
+    final CashHolding cashHolding = CashHolding.builder().value(BigDecimal.valueOf(100_000_000)).holdingType(FinancialInstrumentType.CASH).build();
     final Holding stocksHoldings = mock(Holding.class);
-    final GicHolding gicHolding = new GicHolding(BigDecimal.valueOf(1), FinancialInstrumentType.GIC);
-    gicHolding.setTerm(GREATER_THAN_YEAR);
+    final GicHolding gicHolding = GicHolding.builder().value(BigDecimal.valueOf(1)).holdingType(FinancialInstrumentType.GIC)
+        .term(GREATER_THAN_YEAR).build();
     final Map<Holding, HoldingAssetAllocation> etfCanadaAssetAllocation = new HashMap<>();
     final var rAssetAllocationForEtfCanada = new HoldingAssetAllocation().setHoldingType(FinancialInstrumentType.ETF_CANADA)
         .setAllocations(EMPTY_SORTED_MAP);

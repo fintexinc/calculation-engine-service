@@ -3,10 +3,8 @@ package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
+import org.junit.jupiter.api.Test;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MC_002;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +14,7 @@ class NotNullCashCurrencyValidationTest {
 
   @Test
   void check_ERR_RRC_MC_002ThrownWhenInterestRateIsNull() {
-    final var sut = new NotNullCashCurrencyValidation(List.of(new CashHolding()));
+    final var sut = new NotNullCashCurrencyValidation(List.of(CashHolding.builder().build()));
 
     final ReqValidationException expected = ERR_RRC_MC_002.reqValidationError();
 
@@ -27,8 +25,9 @@ class NotNullCashCurrencyValidationTest {
 
   @Test
   void checkValidCashHolding() {
-    final CashHolding cashHolding = new CashHolding();
-    cashHolding.setCurrency(CurrencyType.USD);
+    final CashHolding cashHolding = CashHolding.builder()
+        .currency(CurrencyType.USD)
+        .build();
 
     final var sut = new NotNullCashCurrencyValidation(List.of());
 
@@ -37,8 +36,8 @@ class NotNullCashCurrencyValidationTest {
 
   @Test
   void check_exceptionNotThrownBecausePortfolioContainsSeveralCashHoldings() {
-    final CashHolding cashHolding1 = new CashHolding();
-    final CashHolding cashHolding2 = new CashHolding();
+    final CashHolding cashHolding1 = CashHolding.builder().build();
+    final CashHolding cashHolding2 = CashHolding.builder().build();
 
     final var sut = new NotNullCashCurrencyValidation(List.of(cashHolding1, cashHolding2));
 

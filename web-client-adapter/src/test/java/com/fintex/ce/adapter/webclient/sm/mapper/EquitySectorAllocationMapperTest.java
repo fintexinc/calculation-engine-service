@@ -131,8 +131,6 @@ class EquitySectorAllocationMapperTest {
   private Holding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding()
-        .setHoldingType(FinancialInstrumentType.ETF_CANADA)
-        .setSecurityIdentifier(identifier);
+    return new Holding(null, FinancialInstrumentType.ETF_CANADA, identifier);
   }
 }

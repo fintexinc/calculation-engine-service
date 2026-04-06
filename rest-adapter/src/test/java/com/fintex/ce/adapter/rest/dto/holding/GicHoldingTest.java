@@ -5,11 +5,9 @@ import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+import org.junit.jupiter.api.Test;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.USD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +21,7 @@ class GicHoldingTest {
 
   @Test
   void getCurrency_ifEmptyGetCAD() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
+    final GicHolding sut = GicHolding.builder().value(BigDecimal.ONE).holdingType(FinancialInstrumentType.GIC).build();
 
     final CurrencyType actual = sut.getCurrency();
 
@@ -32,8 +30,11 @@ class GicHoldingTest {
 
   @Test
   void getCurrency_getEnteredCurrency() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
-    sut.setCurrency(USD);
+    final GicHolding sut = GicHolding.builder()
+        .value(BigDecimal.ONE)
+        .holdingType(FinancialInstrumentType.GIC)
+        .currency(USD)
+        .build();
 
     final CurrencyType actual = sut.getCurrency();
 
@@ -42,7 +43,7 @@ class GicHoldingTest {
 
   @Test
   void getInceptionDate_ifEmptyGetDefaultStartDate() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
+    final GicHolding sut = GicHolding.builder().value(BigDecimal.ONE).holdingType(FinancialInstrumentType.GIC).build();
 
     final LocalDate actual = sut.getInvestmentDate();
 
@@ -51,7 +52,7 @@ class GicHoldingTest {
 
   @Test
   void getCompoundingFrequency_ifEmptyGetAnnual() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
+    final GicHolding sut = GicHolding.builder().value(BigDecimal.ONE).holdingType(FinancialInstrumentType.GIC).build();
 
     final InterestFreq actual = sut.getInterestFreq();
 
@@ -60,8 +61,11 @@ class GicHoldingTest {
 
   @Test
   void getCompoundingFrequency_getEnteredFrequencyAnnual() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
-    sut.setInterestFreq(InterestFreq.SEMI_ANNUAL);
+    final GicHolding sut = GicHolding.builder()
+        .value(BigDecimal.ONE)
+        .holdingType(FinancialInstrumentType.GIC)
+        .interestFreq(InterestFreq.SEMI_ANNUAL)
+        .build();
 
     final InterestFreq actual = sut.getInterestFreq();
 
@@ -70,8 +74,11 @@ class GicHoldingTest {
 
   @Test
   void getAssetAllocation_ifLessThanOneYearThanCash() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
-    sut.setTerm(LESS_THAN_YEAR);
+    final GicHolding sut = GicHolding.builder()
+        .value(BigDecimal.ONE)
+        .holdingType(FinancialInstrumentType.GIC)
+        .term(LESS_THAN_YEAR)
+        .build();
 
     final AssetAllocationRegion actual = sut.getAssetAllocation();
 
@@ -80,8 +87,11 @@ class GicHoldingTest {
 
   @Test
   void getAssetAllocation_ifMoreThanOneYearThanFixedIncome() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
-    sut.setTerm(GREATER_THAN_YEAR);
+    final GicHolding sut = GicHolding.builder()
+        .value(BigDecimal.ONE)
+        .holdingType(FinancialInstrumentType.GIC)
+        .term(GREATER_THAN_YEAR)
+        .build();
 
     final AssetAllocationRegion actual = sut.getAssetAllocation();
 
@@ -90,8 +100,11 @@ class GicHoldingTest {
 
   @Test
   void isLessThanOneYear_lessThanOneYear() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
-    sut.setTerm(LESS_THAN_YEAR);
+    final GicHolding sut = GicHolding.builder()
+        .value(BigDecimal.ONE)
+        .holdingType(FinancialInstrumentType.GIC)
+        .term(LESS_THAN_YEAR)
+        .build();
 
     final boolean result = sut.isLessThanOneYearOld();
 
@@ -100,8 +113,11 @@ class GicHoldingTest {
 
   @Test
   void isLessThanOneYear_OneYear() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
-    sut.setTerm(GREATER_THAN_YEAR);
+    final GicHolding sut = GicHolding.builder()
+        .value(BigDecimal.ONE)
+        .holdingType(FinancialInstrumentType.GIC)
+        .term(GREATER_THAN_YEAR)
+        .build();
 
     final boolean result = sut.isLessThanOneYearOld();
 
@@ -110,8 +126,11 @@ class GicHoldingTest {
 
   @Test
   void isLessThanOneYear_moreThanOneYear() {
-    final GicHolding sut = new GicHolding(BigDecimal.ONE, FinancialInstrumentType.GIC);
-    sut.setTerm(GREATER_THAN_YEAR);
+    final GicHolding sut = GicHolding.builder()
+        .value(BigDecimal.ONE)
+        .holdingType(FinancialInstrumentType.GIC)
+        .term(GREATER_THAN_YEAR)
+        .build();
 
     final boolean result = sut.isLessThanOneYearOld();
 
@@ -120,8 +139,9 @@ class GicHoldingTest {
 
   @Test
   void getInterestRate_checkResult() {
-    final GicHolding sut = new GicHolding();
-    sut.setClientIntRate(BigDecimal.valueOf(1));
+    final GicHolding sut = GicHolding.builder()
+        .clientIntRate(BigDecimal.valueOf(1))
+        .build();
 
     final var result = sut.getClientIntRate();
 

@@ -10,7 +10,6 @@ import com.fintex.sm.model.domain.datapoint.ManagementFeeDatapoint;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FeesMapperTest {
@@ -105,8 +104,6 @@ class FeesMapperTest {
   private Holding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding()
-            .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
-            .setSecurityIdentifier(identifier);
+    return new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, identifier);
   }
 }

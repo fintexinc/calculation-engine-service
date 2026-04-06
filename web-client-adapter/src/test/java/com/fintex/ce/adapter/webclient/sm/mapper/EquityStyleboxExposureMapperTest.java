@@ -8,15 +8,13 @@ import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import com.fintex.sm.model.domain.rating.StyleBoxes;
 import com.fintex.sm.model.domain.value.StyleBoxValue;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EquityStyleboxExposureMapperTest {
@@ -119,8 +117,6 @@ class EquityStyleboxExposureMapperTest {
   private Holding createHolding(String securityId, FinancialInstrumentType holdingType) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding()
-        .setHoldingType(holdingType)
-        .setSecurityIdentifier(identifier);
+    return new Holding(null, holdingType, identifier);
   }
 }

@@ -6,14 +6,12 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-
+import org.junit.jupiter.api.Test;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MFR_001;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,8 +24,7 @@ class FxRatesConversionComponentTest {
     Map<LocalDate, FxRates.FxRate> fxRates = getFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, CurrencyType.CAD);
 
-    final Holding etfHolding = new Holding();
-    etfHolding.setSecurityIdentifier(new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
+    final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
 
     final BigDecimal expectedFirst = BigDecimal.valueOf(102);
     final BigDecimal expectedSecond = BigDecimal.valueOf(308);
@@ -47,8 +44,7 @@ class FxRatesConversionComponentTest {
     Map<LocalDate, FxRates.FxRate> fxRates = getFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, CurrencyType.USD);
 
-    final Holding etfHolding = new Holding();
-    etfHolding.setSecurityIdentifier(new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
+    final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
 
     final BigDecimal expectedFirst = BigDecimal.valueOf(102);
     final BigDecimal expectedSecond = BigDecimal.valueOf(410);
@@ -68,8 +64,7 @@ class FxRatesConversionComponentTest {
     Map<LocalDate, FxRates.FxRate> fxRates = getNotCompleteFxRates();
     final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, CurrencyType.USD);
 
-    final Holding etfHolding = new Holding();
-    etfHolding.setSecurityIdentifier(new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
+    final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
 
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     final Map<Holding, CurrencyType> holdingCurrencies = Map.of(etfHolding, CurrencyType.CAD);
