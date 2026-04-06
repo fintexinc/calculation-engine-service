@@ -7,7 +7,7 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
+import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_BS_BS_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static java.math.BigDecimal.ZERO;
@@ -34,16 +34,16 @@ import static java.math.BigDecimal.ZERO;
 @Service
 public class FixedIncomeBondSectorCalculationServiceImpl
     extends
-      BreakdownAbstractService<FixedIncomeSectorResult, FixedIncomeSectorType> {
+      BreakdownAbstractService<FixedIncomeSectorResult, FixedIncomeSecuritiesAllocationType> {
 
-  public static final Map<FixedIncomeSectorType, BigDecimal> DEFAULT_MAP = new HashMap<>();
+  public static final Map<FixedIncomeSecuritiesAllocationType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
-  static final Map<FixedIncomeSectorType, BigDecimal> ALLOCATION_DEFAULT_MAP;
+  static final Map<FixedIncomeSecuritiesAllocationType, BigDecimal> ALLOCATION_DEFAULT_MAP;
 
   static {
-    Stream.of(FixedIncomeSectorType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
+    Stream.of(FixedIncomeSecuritiesAllocationType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
     ALLOCATION_DEFAULT_MAP = Collections.unmodifiableMap(
-        Stream.of(FixedIncomeSectorType.values()).collect(java.util.stream.Collectors.toMap(type -> type, type -> ZERO)));
+        Stream.of(FixedIncomeSecuritiesAllocationType.values()).collect(java.util.stream.Collectors.toMap(type -> type, type -> ZERO)));
   }
 
   private final SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSectorSecurityDataFetcher;
@@ -66,7 +66,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   }
 
   @Override
-  public ExposureDataHolder<FixedIncomeSectorType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
+  public ExposureDataHolder<FixedIncomeSecuritiesAllocationType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     Map<Holding, FixedIncomeBondSecurities> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
@@ -75,7 +75,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   }
 
   @Override
-  public FixedIncomeSectorResult calculate(ExposureDataHolder<FixedIncomeSectorType> exposureData,
+  public FixedIncomeSectorResult calculate(ExposureDataHolder<FixedIncomeSecuritiesAllocationType> exposureData,
       List<Holding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());

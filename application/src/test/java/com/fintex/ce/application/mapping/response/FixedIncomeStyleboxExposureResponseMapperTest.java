@@ -1,15 +1,13 @@
 package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.FixedIncomeStyleboxExposureResult;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,7 +27,7 @@ class FixedIncomeStyleboxExposureResponseMapperTest {
   }
 
   @Test
-  void shouldMapKnownKeysAndIgnoreUnknownKeys_whenMappingFromDomain() {
+  void shouldMapEnumKeys_whenMappingFromDomain() {
     FixedIncomeStyleboxExposure domain = new FixedIncomeStyleboxExposure();
     domain.setBoxValues(Map.of(
         FixedIncomeStyleBoxType.HIGH_LIMITED, new BigDecimal("0.12345678901"),
@@ -75,4 +73,3 @@ class FixedIncomeStyleboxExposureResponseMapperTest {
     assertThrows(UnsupportedOperationException.class, () -> mapper.toResponse(Map.of(), List.of()));
   }
 }
-

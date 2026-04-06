@@ -10,7 +10,7 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationEMResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
@@ -38,7 +38,7 @@ import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.CountryRegionType.UNITED_STATES;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
+import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.util.CalculationUtils.sum;
 import static com.fintex.ce.util.CollectorUtils.toMap;

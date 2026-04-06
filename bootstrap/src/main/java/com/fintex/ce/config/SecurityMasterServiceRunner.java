@@ -45,8 +45,14 @@ public class SecurityMasterServiceRunner implements SmartLifecycle {
       return;
     }
 
+    Path envPath = smsDir.toPath().resolve(envFile);
+    if (!Files.exists(envPath)) {
+      log.warn("Environment file not found at {}, skipping SMS runner", envPath);
+      return;
+    }
+
     try {
-      Map<String, String> envVars = loadEnvFile(smsDir.toPath().resolve(envFile));
+      Map<String, String> envVars = loadEnvFile(envPath);
 
       Path overridePath = new File(".").getAbsoluteFile().toPath().resolve(overrideEnvFile);
       if (Files.exists(overridePath)) {

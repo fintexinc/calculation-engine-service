@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.domain.model.CommonHoldings;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import java.util.HashMap;

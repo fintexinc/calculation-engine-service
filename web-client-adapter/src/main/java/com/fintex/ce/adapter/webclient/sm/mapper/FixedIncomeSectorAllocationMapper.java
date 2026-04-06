@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
@@ -17,27 +17,27 @@ import java.util.stream.Collectors;
 
 /**
  * Maps SM FixedIncomeSectorAllocation (Morningstar SuperSector) to CE FixedIncomeBondSecurities.
- * SM sector types are translated to CE FixedIncomeSectorType-compatible string keys.
+ * SM sector types are translated to CE FixedIncomeSecuritiesAllocationType-compatible string keys.
  */
 @Component
 public class FixedIncomeSectorAllocationMapper
     implements SecurityMasterResponseMapper<FixedIncomeBondSecurities, FixedIncomeSectorAllocation> {
 
-  private static final Map<FixedIncomeSectorAllocationType, FixedIncomeSectorType> SECTOR_TYPE_MAPPING;
+  private static final Map<FixedIncomeSectorAllocationType, FixedIncomeSecuritiesAllocationType> SECTOR_TYPE_MAPPING;
 
   static {
     SECTOR_TYPE_MAPPING = new EnumMap<>(FixedIncomeSectorAllocationType.class);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.GOVERNMENT, FixedIncomeSectorType.GOVERNMENT_BONDS);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.CORPORATE, FixedIncomeSectorType.CORPORATE_BONDS);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.CASH, FixedIncomeSectorType.ST_INVESTMENTS);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.SECURITIZED, FixedIncomeSectorType.MORTGAGE_BACKED_SECURITIES);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.MUNICIPAL, FixedIncomeSectorType.OTHER_BONDS);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.DERIVATIVE, FixedIncomeSectorType.ASSET_BACKED_SECURITIES);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.GOVERNMENT, FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.CORPORATE, FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.CASH, FixedIncomeSecuritiesAllocationType.ST_INVESTMENTS);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.SECURITIZED, FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.MUNICIPAL, FixedIncomeSecuritiesAllocationType.OTHER_BONDS);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.DERIVATIVE, FixedIncomeSecuritiesAllocationType.ASSET_BACKED_SECURITIES);
   }
 
   @Override
   public FixedIncomeBondSecurities map(FixedIncomeSectorAllocation smsResponse, Holding holding) {
-    Map<FixedIncomeSectorType, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
+    Map<FixedIncomeSecuritiesAllocationType, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
         .map(FixedIncomeSectorAllocation::getAllocation)
         .orElse(List.of())
         .stream()

@@ -1,9 +1,9 @@
 package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
+import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.EquityStyleboxExposureResult;
-import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -1,7 +1,7 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.core.ProviderAware;
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
 public class CreditQuality implements ProviderAware {
 
   private FinancialInstrumentType holdingType;
-  private Map<CreditQualityRating, BigDecimal> ratings;
+  private Map<CreditQualityRatingType, BigDecimal> ratings;
 
   // Common fields
   private String holdingId;
@@ -27,7 +27,7 @@ public class CreditQuality implements ProviderAware {
   private String providers;
   private List<ValidationError> errors = new ArrayList<>();
 
-  public CreditQuality(FinancialInstrumentType holdingType, Map<CreditQualityRating, BigDecimal> ratings) {
+  public CreditQuality(FinancialInstrumentType holdingType, Map<CreditQualityRatingType, BigDecimal> ratings) {
     this.holdingType = holdingType;
     this.ratings = ratings;
   }

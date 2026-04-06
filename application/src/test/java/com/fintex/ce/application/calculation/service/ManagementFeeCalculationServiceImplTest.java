@@ -4,7 +4,7 @@ import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ManagementFeeResult;

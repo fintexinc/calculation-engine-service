@@ -56,6 +56,7 @@ class EquityMarketCapCalculationServiceImplTest {
 
   @Test
   void shouldStaticFieldsInitialization_whenVerifyDEFAULTMAP() {
+    // SETUP
     final Map<EquityMarketCapitalizationType, BigDecimal> defaultMapExpected = new HashMap<>();
     defaultMapExpected.put(LARGE, null);
     defaultMapExpected.put(MEDIUM, null);
@@ -134,6 +135,7 @@ class EquityMarketCapCalculationServiceImplTest {
       doCallRealMethod().when(service).calculate(any(), any());
       service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
+      // VERIFY
       verify(service).calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values());
     }
   }

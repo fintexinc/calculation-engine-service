@@ -38,6 +38,7 @@ class BreakdownAbstractServiceTest {
       final var exposures = mock(Map.class);
 
       doCallRealMethod().when(service).calculateNetProducts(any(), any(), any());
+      // ACT
       service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values());
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.calculateInitialPortfolioWeight(holdings));
@@ -56,8 +57,10 @@ class BreakdownAbstractServiceTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(weights);
 
       doCallRealMethod().when(service).calculateNetProducts(any(), any(), any());
+      // ACT
       service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values());
 
+      // VERIFY
       for (EquityMarketCapitalizationType type : EquityMarketCapitalizationType.values()) {
         verify(service).calculateNetProduct(type, exposures, weights);
       }
@@ -75,6 +78,7 @@ class BreakdownAbstractServiceTest {
     when(service.calculateNetProduct(any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(service).calculateNetProducts(any(), any(), any());
+    // ACT
     final var actual = service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values());
 
     Assertions.assertNotNull(actual);
@@ -94,6 +98,7 @@ class BreakdownAbstractServiceTest {
       final var typeExposures = Map.of(holding, TEN);
 
       doCallRealMethod().when(service).calculateNetProduct(any(), any(), any());
+      // ACT
       service.calculateNetProduct(EquityMarketCapitalizationType.SMALL, exposures, weights);
 
       mockedCalculationUtils.verify(() -> CalculationUtils.sumProduct(typeExposures, weights));
@@ -112,6 +117,7 @@ class BreakdownAbstractServiceTest {
       mockedCalculationUtils.when(() -> CalculationUtils.sumProduct(any(), any())).thenReturn(expectedResult);
 
       doCallRealMethod().when(service).calculateNetProduct(any(), any(), any());
+      // ACT
       final var actual = service.calculateNetProduct(EquityMarketCapitalizationType.MEDIUM, exposures, weights);
 
       assertSame(expectedResult, actual);

@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AAA;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AAA;
 import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static java.math.BigDecimal.ONE;
@@ -107,7 +107,9 @@ class PortfolioUtilsTest {
 
   @Test
   void areAllValuesZerosInMap_checkResultWhenAllValuesInMapAreZeros() {
+    // SETUP
     final Map map = Map.of(new Holding(), Map.of(EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO));
+    // ACT
     final boolean actual = PortfolioUtils.areAllValuesZerosInMap(map);
 
     assertTrue(actual);
@@ -115,8 +117,10 @@ class PortfolioUtilsTest {
 
   @Test
   void areAllValuesZerosInMap_checkResultWhenNotAllValuesInMapAreZeros() {
+    // SETUP
     final Map map = Map.of(new Holding(), Map.of(EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO,
         EquityMarketCapitalizationType.LARGE, ONE));
+    // ACT
     final boolean actual = PortfolioUtils.areAllValuesZerosInMap(map);
 
     assertFalse(actual);

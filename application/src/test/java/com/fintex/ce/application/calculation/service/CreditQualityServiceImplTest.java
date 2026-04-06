@@ -5,16 +5,16 @@ import com.fintex.ce.application.mapping.response.CreditQualityResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.CreditQuality;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,16 +26,16 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.A;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AA;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AAA;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.B;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BB;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BBB;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BELOW_B;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.NOT_RATED;
 import static com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality.HIGH_YIELD;
 import static com.fintex.ce.util.CollectorUtils.toMap;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.A;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AA;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AAA;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.B;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BB;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BBB;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BELOW_B;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.NOT_RATED;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -344,7 +344,7 @@ class CreditQualityServiceImplTest {
     final int fixedIncomeValue = 3;
     final int weightValue = 10;
 
-    final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality = Map.of(h, Map.of(AAA, BigDecimal.valueOf(
+    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = Map.of(h, Map.of(AAA, BigDecimal.valueOf(
         creditQValue)));
     final Map<Holding, BigDecimal> fixedIncomeCreditQuality = Map.of(h, BigDecimal.valueOf(fixedIncomeValue));
     final Map<Holding, BigDecimal> weights = Map.of(h, BigDecimal.valueOf(weightValue), h2, BigDecimal.ONE);
@@ -356,7 +356,7 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void shouldCalculateCreditQualityRatings_whenVerifyCalculateInitialPortfolioWeight() {
+  void shouldCalculateCreditQualityRatingTypes_whenVerifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
@@ -364,15 +364,15 @@ class CreditQualityServiceImplTest {
 
       when(sut.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
-      doCallRealMethod().when(sut).calculateCreditQualityRatings(any(), any(), any());
-      sut.calculateCreditQualityRatings(holdings, Map.of(), Map.of());
+      doCallRealMethod().when(sut).calculateCreditQualityRatingTypes(any(), any(), any());
+      sut.calculateCreditQualityRatingTypes(holdings, Map.of(), Map.of());
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.calculateInitialPortfolioWeight(holdings));
     }
   }
 
   @Test
-  void shouldCalculateCreditQualityRatings_whenVerifyCalculateSumProductRating() {
+  void shouldCalculateCreditQualityRatingTypes_whenVerifyCalculateSumProductRating() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
@@ -382,19 +382,19 @@ class CreditQualityServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(weights);
 
       final List<Holding> holdings = List.of(h);
-      final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQ = Map.of(h, Map.of());
+      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
       final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       when(sut.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
-      doCallRealMethod().when(sut).calculateCreditQualityRatings(any(), any(), any());
-      final Map<CreditQualityRating, BigDecimal> actual = sut.calculateCreditQualityRatings(holdings, creditQ,
+      doCallRealMethod().when(sut).calculateCreditQualityRatingTypes(any(), any(), any());
+      final Map<CreditQualityRatingType, BigDecimal> actual = sut.calculateCreditQualityRatingTypes(holdings, creditQ,
           fixedCreditQ);
 
-      for (CreditQualityRating rating : CreditQualityRating.values()) {
+      for (CreditQualityRatingType rating : CreditQualityRatingType.values()) {
         verify(sut).calculateSumProductRating(creditQ, fixedCreditQ, weights, rating);
       }
-      assertEquals(CreditQualityRating.values().length, actual.size());
+      assertEquals(CreditQualityRatingType.values().length, actual.size());
     }
   }
 
@@ -403,7 +403,7 @@ class CreditQualityServiceImplTest {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
-    final Map<CreditQualityRating, BigDecimal> ratings = Map.of(
+    final Map<CreditQualityRatingType, BigDecimal> ratings = Map.of(
         AAA, BigDecimal.valueOf(100),
         AA, BigDecimal.valueOf(2),
         A, BigDecimal.valueOf(3),
@@ -431,19 +431,19 @@ class CreditQualityServiceImplTest {
   }
 
   @Test
-  void shouldCalculate_whenVerifyCalculateCreditQualityRatings() {
+  void shouldCalculate_whenVerifyCalculateCreditQualityRatingTypes() {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
     final Holding h = mock(Holding.class);
     final List<Holding> holdings = List.of(h);
-    final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQ = Map.of(h, Map.of());
+    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
     final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
     doCallRealMethod().when(c).calculate(any(), any(), any());
     final Map<FixedIncomeCreditQuality, BigDecimal> actual = c.calculate(holdings, creditQ, fixedCreditQ);
 
-    verify(c).calculateCreditQualityRatings(holdings, creditQ, fixedCreditQ);
+    verify(c).calculateCreditQualityRatingTypes(holdings, creditQ, fixedCreditQ);
   }
 
   @Test
@@ -453,12 +453,12 @@ class CreditQualityServiceImplTest {
 
       final Holding h = mock(Holding.class);
 
-      Map<CreditQualityRating, BigDecimal> rescaled = Map.of(AAA, TEN);
+      Map<CreditQualityRatingType, BigDecimal> rescaled = Map.of(AAA, TEN);
 
-      when(sut.calculateCreditQualityRatings(any(), any(), any())).thenReturn(rescaled);
+      when(sut.calculateCreditQualityRatingTypes(any(), any(), any())).thenReturn(rescaled);
 
       final List<Holding> holdings = List.of(h);
-      final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQ = Map.of(h, Map.of());
+      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
       final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
@@ -475,12 +475,12 @@ class CreditQualityServiceImplTest {
 
       final Holding h = mock(Holding.class);
 
-      Map<CreditQualityRating, BigDecimal> rescaled = Map.of(AAA, TEN);
+      Map<CreditQualityRatingType, BigDecimal> rescaled = Map.of(AAA, TEN);
 
       mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(any())).thenReturn(rescaled);
 
       final List<Holding> holdings = List.of(h);
-      final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQ = Map.of(h, Map.of());
+      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
       final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
@@ -497,7 +497,7 @@ class CreditQualityServiceImplTest {
 
       final Holding h = mock(Holding.class);
 
-      Map<CreditQualityRating, BigDecimal> rescaled = Map.of(AAA, TEN);
+      Map<CreditQualityRatingType, BigDecimal> rescaled = Map.of(AAA, TEN);
 
       mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(any())).thenReturn(rescaled);
 
@@ -505,7 +505,7 @@ class CreditQualityServiceImplTest {
       when(sut.toFixedIncomeCreditQuality(rescaled)).thenReturn(expected);
 
       final List<Holding> holdings = List.of(h);
-      final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQ = Map.of(h, Map.of());
+      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
       final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());

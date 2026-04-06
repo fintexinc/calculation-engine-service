@@ -1,6 +1,6 @@
 package com.fintex.ce.domain.model.result;
 
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.EqualsAndHashCode;
@@ -17,5 +17,5 @@ import java.util.Map;
 @Accessors(chain = true)
 public class FixedIncomeSectorResult extends WarningResult {
 
-  private Map<FixedIncomeSectorType, BigDecimal> fixedIncomeSector;
+  private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSector;
 }

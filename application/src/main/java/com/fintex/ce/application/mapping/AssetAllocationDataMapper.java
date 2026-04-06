@@ -3,7 +3,7 @@ package com.fintex.ce.application.mapping;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import java.math.BigDecimal;
@@ -101,7 +101,7 @@ public class AssetAllocationDataMapper {
     return holdings.entrySet().stream().collect(
         toMap(
             Map.Entry::getKey,
-            e -> mapToRegions(Pair.of(DataProvider.fromValue(e.getValue().getProvider()), e.getValue()
+            e -> mapToRegions(Pair.of(safeValueOf(e.getValue().getProvider()), e.getValue()
                 .getAllocations()))));
   }
 
@@ -170,7 +170,19 @@ public class AssetAllocationDataMapper {
         .collect(toMap(
             Map.Entry::getKey,
             e -> Pair.of(
-                DataProvider.fromValue(e.getValue().getProvider()),
+                safeValueOf(e.getValue().getProvider()),
                 mapAllocationToRegions(e.getValue()))));
+  }
+
+  // todo remove when all dataProvider fields are migrated from String -> enum
+  private static DataProvider safeValueOf(String provider) {
+    if (provider == null) {
+      return null;
+    }
+    try {
+      return DataProvider.valueOf(provider.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
   }
 }

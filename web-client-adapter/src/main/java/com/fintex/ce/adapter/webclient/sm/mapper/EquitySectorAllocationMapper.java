@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.domain.model.EquitySector;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
@@ -37,10 +36,7 @@ public class EquitySectorAllocationMapper
 
     Optional.ofNullable(smsResponse)
         .map(EquitySectorAllocation::getDataProvider)
-        .ifPresent(dp -> {
-          DataProvider provider = DataProvider.fromValue(dp.name());
-          result.setProvider(provider != null ? provider.name() : dp.name());
-        });
+        .ifPresent(dp -> result.setProvider(dp.name()));
 
     return result;
   }

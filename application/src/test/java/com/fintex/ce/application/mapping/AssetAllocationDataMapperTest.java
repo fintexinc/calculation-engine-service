@@ -4,7 +4,7 @@ import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;

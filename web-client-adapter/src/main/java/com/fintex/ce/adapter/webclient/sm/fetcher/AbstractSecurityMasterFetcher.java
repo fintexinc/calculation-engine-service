@@ -6,7 +6,7 @@ import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest;
 import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest.TypedIdentifiers;
 import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.SecurityIdentifier;

@@ -7,13 +7,13 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.CreditQuality;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -22,7 +22,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
+import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_CQ_CQ_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CalculationUtils.sumProduct;
@@ -60,7 +60,7 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     final ArrayList<Warning> warnings = new ArrayList<>();
     final Map<Holding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality = extractRatings(rawCreditQuality, warnings);
+    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(rawCreditQuality, warnings);
     if (areAllValuesInMapEmpty(creditQuality)) {
       return responseMapper.toEmptyResponse(warnings);
     }
@@ -86,16 +86,16 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
   }
 
   public Map<FixedIncomeCreditQuality, BigDecimal> calculate(final List<Holding> holdings,
-      final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality,
+      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
       final Map<Holding, BigDecimal> fixedIncomeCreditQuality) {
-    final Map<CreditQualityRating, BigDecimal> ratings = calculateCreditQualityRatings(holdings, creditQuality,
+    final Map<CreditQualityRatingType, BigDecimal> ratings = calculateCreditQualityRatingTypes(holdings, creditQuality,
         fixedIncomeCreditQuality);
-    final Map<CreditQualityRating, BigDecimal> reScaled = reScaleAbs(ratings);
+    final Map<CreditQualityRatingType, BigDecimal> reScaled = reScaleAbs(ratings);
     return toFixedIncomeCreditQuality(reScaled);
   }
 
   public Map<FixedIncomeCreditQuality, BigDecimal> toFixedIncomeCreditQuality(
-      final Map<CreditQualityRating, BigDecimal> reScaled) {
+      final Map<CreditQualityRatingType, BigDecimal> reScaled) {
     final Map<FixedIncomeCreditQuality, BigDecimal> map = new EnumMap<>(FixedIncomeCreditQuality.class);
     for (FixedIncomeCreditQuality type : FixedIncomeCreditQuality.values()) {
       final BigDecimal sum = reScaled.entrySet().stream()
@@ -106,22 +106,22 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     return map;
   }
 
-  public Map<CreditQualityRating, BigDecimal> calculateCreditQualityRatings(final List<Holding> holdings,
-      final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality,
+  public Map<CreditQualityRatingType, BigDecimal> calculateCreditQualityRatingTypes(final List<Holding> holdings,
+      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
       final Map<Holding, BigDecimal> fixedIncomeCreditQuality) {
     final Map<Holding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
-    final Map<CreditQualityRating, BigDecimal> ratingMap = new EnumMap<>(CreditQualityRating.class);
-    for (CreditQualityRating rating : CreditQualityRating.values()) {
+    final Map<CreditQualityRatingType, BigDecimal> ratingMap = new EnumMap<>(CreditQualityRatingType.class);
+    for (CreditQualityRatingType rating : CreditQualityRatingType.values()) {
       final BigDecimal sumProduct = calculateSumProductRating(creditQuality, fixedIncomeCreditQuality, weights, rating);
       ratingMap.put(rating, divide(sumProduct, HUNDRED));
     }
     return ratingMap;
   }
 
-  public BigDecimal calculateSumProductRating(final Map<Holding, Map<CreditQualityRating, BigDecimal>> creditQuality,
+  public BigDecimal calculateSumProductRating(final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
       final Map<Holding, BigDecimal> fixedIncomeCreditQuality,
       final Map<Holding, BigDecimal> weights,
-      final CreditQualityRating rating) {
+      final CreditQualityRatingType rating) {
     final Map<Holding, BigDecimal> collectedRating = creditQuality.entrySet().stream()
         .filter(e -> e.getValue().containsKey(rating))
         .filter(e -> fixedIncomeCreditQuality.containsKey(e.getKey()))
@@ -130,14 +130,14 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     return sumProduct(collectedRating, fixedIncomeCreditQuality, weights);
   }
 
-  private Map<Holding, Map<CreditQualityRating, BigDecimal>> extractRatings(
+  private Map<Holding, Map<CreditQualityRatingType, BigDecimal>> extractRatings(
       final Map<Holding, CreditQuality> rawData,
       final List<Warning> warnings) {
     return rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> extractRatings(e.getKey(), e.getValue(), warnings)));
   }
 
-  private Map<CreditQualityRating, BigDecimal> extractRatings(final Holding holding,
+  private Map<CreditQualityRatingType, BigDecimal> extractRatings(final Holding holding,
       final CreditQuality creditQuality,
       final List<Warning> warnings) {
     if (CollectionUtils.isEmpty(creditQuality.getRatings())) {

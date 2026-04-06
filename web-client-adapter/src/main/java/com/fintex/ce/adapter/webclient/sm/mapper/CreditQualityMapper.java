@@ -1,14 +1,16 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.rating.CreditQualityRatings;
-import com.fintex.sm.model.domain.value.CreditQualityRatingTypeValue;
 import java.math.BigDecimal;
+import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -17,19 +19,27 @@ import org.springframework.stereotype.Component;
 public class CreditQualityMapper
     implements SecurityMasterResponseMapper<CreditQuality, CreditQualityRatings> {
 
+  private static final Map<String, CreditQualityRatingType> RATING_TYPE_LOOKUP = Arrays
+      .stream(CreditQualityRatingType.values())
+      .collect(Collectors.toMap(e -> e.name().toUpperCase(), e -> e));
+
   @Override
   public CreditQuality map(CreditQualityRatings smsResponse, Holding holding) {
-    Map<CreditQualityRating, BigDecimal> ratings = Optional.ofNullable(smsResponse)
+    Map<CreditQualityRatingType, BigDecimal> ratings = Optional.ofNullable(smsResponse)
         .map(CreditQualityRatings::getRatings)
         .orElse(List.of())
         .stream()
         .filter(entry -> entry.getRating() != null && entry.getValue() != null)
-        .filter(entry -> CreditQualityRating.fromValue(entry.getRating()) != null)
+        .map(entry -> {
+          CreditQualityRatingType type = RATING_TYPE_LOOKUP.get(entry.getRating().toUpperCase());
+          return type != null ? new AbstractMap.SimpleEntry<>(type, entry.getValue()) : null;
+        })
+        .filter(Objects::nonNull)
         .collect(Collectors.toMap(
-            entry -> CreditQualityRating.fromValue(entry.getRating()),
-            CreditQualityRatingTypeValue::getValue,
+            Map.Entry::getKey,
+            Map.Entry::getValue,
             (existing, replacement) -> existing,
-            () -> new EnumMap<>(CreditQualityRating.class)));
+            () -> new EnumMap<>(CreditQualityRatingType.class)));
 
     CreditQuality result = new CreditQuality()
         .setRatings(ratings)

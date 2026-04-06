@@ -1,29 +1,30 @@
 package com.fintex.ce.domain.model.calculation;
 
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import java.util.Set;
 
 public enum FixedIncomeCreditQuality {
   // credit ratings
-  AAA(Set.of(CreditQualityRating.AAA)),
-  AA(Set.of(CreditQualityRating.AA)),
-  A(Set.of(CreditQualityRating.A)),
-  BBB(Set.of(CreditQualityRating.BBB)),
-  BB(Set.of(CreditQualityRating.BB)),
-  B(Set.of(CreditQualityRating.B)),
-  BELOW_B(Set.of(CreditQualityRating.BELOW_B)),
+  AAA(Set.of(CreditQualityRatingType.AAA)),
+  AA(Set.of(CreditQualityRatingType.AA)),
+  A(Set.of(CreditQualityRatingType.A)),
+  BBB(Set.of(CreditQualityRatingType.BBB)),
+  BB(Set.of(CreditQualityRatingType.BB)),
+  B(Set.of(CreditQualityRatingType.B)),
+  BELOW_B(Set.of(CreditQualityRatingType.BELOW_B)),
 
-  INVESTMENT_GRADE(Set.of(CreditQualityRating.AAA, CreditQualityRating.AA, CreditQualityRating.A,
-      CreditQualityRating.BBB)),
-  HIGH_YIELD(Set.of(CreditQualityRating.BB, CreditQualityRating.B, CreditQualityRating.BELOW_B)),
-  NOT_RATED(Set.of(CreditQualityRating.NOT_RATED));
+  INVESTMENT_GRADE(Set.of(CreditQualityRatingType.AAA, CreditQualityRatingType.AA, CreditQualityRatingType.A,
+      CreditQualityRatingType.BBB)),
+  HIGH_YIELD(Set.of(CreditQualityRatingType.BB, CreditQualityRatingType.B, CreditQualityRatingType.BELOW_B)),
+  NOT_RATED(Set.of(CreditQualityRatingType.NOT_RATED));
 
-  private Set<CreditQualityRating> ratings;
+  private Set<CreditQualityRatingType> ratings;
 
-  FixedIncomeCreditQuality(final Set<CreditQualityRating> ratings) {
+  FixedIncomeCreditQuality(final Set<CreditQualityRatingType> ratings) {
     this.ratings = ratings;
   }
 
-  public boolean contains(final CreditQualityRating rating) {
+  public boolean contains(final CreditQualityRatingType rating) {
     return this.ratings.contains(rating);
   }
 }

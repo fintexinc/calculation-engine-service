@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.dto;
 
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import java.util.List;
 import lombok.AllArgsConstructor;

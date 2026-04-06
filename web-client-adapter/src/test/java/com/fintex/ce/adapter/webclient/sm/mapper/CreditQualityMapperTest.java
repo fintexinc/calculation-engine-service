@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.rating.CreditQualityRatings;
 import com.fintex.sm.model.domain.value.CreditQualityRatingTypeValue;
@@ -16,14 +16,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.A;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AA;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.AAA;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.B;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BB;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BBB;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.BELOW_B;
-import static com.fintex.ce.domain.model.calculation.CreditQualityRating.NOT_RATED;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.A;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AA;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AAA;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.B;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BB;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BBB;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BELOW_B;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.NOT_RATED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CreditQualityMapperTest {
@@ -89,7 +89,7 @@ class CreditQualityMapperTest {
   void shouldFilterOutEntriesWithNullRatingOrValue() {
     var validRating = createRating(AAA, "15.5");
     var nullRating = new CreditQualityRatingTypeValue(null, BigDecimal.valueOf(5.0), List.of());
-    var nullValue = new CreditQualityRatingTypeValue(BB.getRating(), null, List.of());
+    var nullValue = new CreditQualityRatingTypeValue(BB.name(), null, List.of());
 
     var smsResponse = new CreditQualityRatings();
     smsResponse.setRatings(List.of(validRating, nullRating, nullValue));
@@ -153,8 +153,8 @@ class CreditQualityMapperTest {
     assertThat(result.getRatings().get(NOT_RATED)).isEqualByComparingTo("5.0");
   }
 
-  private CreditQualityRatingTypeValue createRating(CreditQualityRating rating, String value) {
-    return new CreditQualityRatingTypeValue(rating.getRating(), new BigDecimal(value), List.of());
+  private CreditQualityRatingTypeValue createRating(CreditQualityRatingType rating, String value) {
+    return new CreditQualityRatingTypeValue(rating.name(), new BigDecimal(value), List.of());
   }
 
   private Holding createHolding(String securityId) {
