@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.LeadingTotalReturnPeriodsReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingReqValidation;
@@ -15,13 +14,14 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotCon
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotContainingSincePerformanceStartDateReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotContainingYearToDateReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+import com.fintex.ce.domain.model.holding.Holding;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
+import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -29,7 +29,6 @@ class LeadingTotalReturnsReqValidatorTest {
 
   @Test
   void build_checkResult() {
-    // SETUP
     final var sut = new LeadingTotalReturnsReqValidator();
 
     final var reqDTO = getPeriodsReqDTO();
@@ -47,10 +46,8 @@ class LeadingTotalReturnsReqValidatorTest {
         .linkWith(new HoldingsCouldNotBeEmptyReqValidation(reqDTO.getHoldings()))
         .linkWith(new HoldingReqValidation(reqDTO.getHoldings()))
         .linkWith(new HoldingValueReqValidator(reqDTO.getHoldings()));
-    // ACT
     final ReqValidation actual = sut.build(reqDTO);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 

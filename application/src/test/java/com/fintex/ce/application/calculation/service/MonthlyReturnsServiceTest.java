@@ -9,10 +9,14 @@ import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
 import com.fintex.ce.application.validation.BenchmarkCpsdDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.port.webclient.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -20,11 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
+
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
+import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,7 +46,6 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetWeightedAverageWithCpsdAndCpedValidation_whenVerifyGetWeightedAverage() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
     final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
@@ -60,13 +61,11 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any());
 
-    // ACT
     sut.getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, LOCAL_DATE_NOW, LOCAL_DATE_NOW.plusMonths(3));
   }
 
   @Test
   void shouldGetWeightedAverageWithCpsdAndCpedValidation_whenCheckResult() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
     final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
@@ -81,17 +80,14 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any());
 
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns,
         LOCAL_DATE_NOW, LOCAL_DATE_NOW.plusMonths(3));
 
-    // VERIFY
     assertSame(portfolioBaseTotalReturns, actual);
   }
 
   @Test
   void shouldGetWeightedAverageWithCpedValidation_whenVerifyGetWeightedAverage() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
     final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
@@ -106,13 +102,11 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getWeightedAverageWithCpedValidation(any(), any());
 
-    // ACT
     sut.getWeightedAverageWithCpedValidation(monthlyReturns, LOCAL_DATE_NOW);
   }
 
   @Test
   void shouldGetWeightedAverageWithCpedValidation_whenCheckResult() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
     final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
@@ -126,17 +120,14 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getWeightedAverageWithCpedValidation(any(), any());
 
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.getWeightedAverageWithCpedValidation(monthlyReturns,
         LOCAL_DATE_NOW);
 
-    // VERIFY
     assertSame(portfolioBaseTotalReturns, actual);
   }
 
   @Test
   void shouldGetMonthlyReturns_whenVerifyLoad() {
-    // SETUP
     try (MockedConstruction<Returns> mocked = Mockito.mockConstruction(Returns.class)) {
       final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
       final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
@@ -148,17 +139,14 @@ class MonthlyReturnsServiceTest {
       when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
       doCallRealMethod().when(sut).getMonthlyReturns(anyList(), any());
 
-      // ACT
       sut.getMonthlyReturns(holdings, CAD);
 
-      // VERIFY
       verify(monthlyReturnsFetcher).fetch(holdings, List.of());
     }
   }
 
   @Test
   void shouldGetMonthlyReturns_whenCheckResult() {
-    // SETUP
     final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
@@ -171,16 +159,13 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getMonthlyReturns(anyList(), any());
 
-    // ACT
-    final var actual = sut.getMonthlyReturns(mock(List.class), Currency.CAD);
+    final var actual = sut.getMonthlyReturns(mock(List.class), CurrencyType.CAD);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldGetMonthlyReturns_whenVerifyGicWasGenerated() {
-    // SETUP
     final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
@@ -193,16 +178,13 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getMonthlyReturns(anyList(), any());
 
-    // ACT
-    sut.getMonthlyReturns(mock(List.class), Currency.CAD);
+    sut.getMonthlyReturns(mock(List.class), CurrencyType.CAD);
 
-    // VERIFY
     verify(originalMonthlyReturns).putAll(gicOriginalMonthlyReturns);
   }
 
   @Test
   void shouldGetPortfolioMonthlyReturns_whenVerifyGetMonthlyReturns() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
     final var holdings = mock(List.class);
@@ -211,16 +193,13 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getPortfolioMonthlyReturns(anyList(), any(), any());
 
-    // ACT
     sut.getPortfolioMonthlyReturns(holdings, CAD, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
     verify(sut).getMonthlyReturns(holdings, CAD);
   }
 
   @Test
   void shouldGetPortfolioMonthlyReturns_whenVerifyInit() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
     final var monthlyReturns = mock(Returns.class, RETURNS_SELF);
@@ -231,10 +210,8 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getPortfolioMonthlyReturns(anyList(), any(), any());
 
-    // ACT
     sut.getPortfolioMonthlyReturns(mock(List.class), CAD, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
     final var inOrder = inOrder(monthlyReturns);
 
     then(monthlyReturns).should(inOrder).setFxRatesConversionComponent(eq(new FxRatesConversionComponent(fxRates,
@@ -250,7 +227,6 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetPortfolioMonthlyReturns_whenCheckResult() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
     final var holdings = mock(List.class);
@@ -259,16 +235,13 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getPortfolioMonthlyReturns(anyList(), any(), any());
 
-    // ACT
     final var actual = sut.getPortfolioMonthlyReturns(holdings, CAD, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
     assertSame(monthlyReturns, actual);
   }
 
   @Test
   void shouldGetBenchmarkMonthlyReturns_whenVerifyGetMonthlyReturns() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
     final var holdings = mock(List.class);
@@ -277,16 +250,13 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getBenchmarkMonthlyReturns(anyList(), any(), any());
 
-    // ACT
     sut.getBenchmarkMonthlyReturns(holdings, CAD, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
     verify(sut).getMonthlyReturns(holdings, CAD);
   }
 
   @Test
   void shouldGetBenchmarkMonthlyReturns_whenVerifyInit() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
     final var monthlyReturns = mock(Returns.class, RETURNS_SELF);
@@ -297,10 +267,8 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getBenchmarkMonthlyReturns(anyList(), any(), any());
 
-    // ACT
     sut.getBenchmarkMonthlyReturns(mock(List.class), CAD, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
     final var inOrder = inOrder(monthlyReturns);
 
     then(monthlyReturns).should(inOrder).setFxRatesConversionComponent(eq(new FxRatesConversionComponent(fxRates,
@@ -316,7 +284,6 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetBenchmarkMonthlyReturns_whenCheckResult() {
-    // SETUP
     final var sut = mock(MonthlyReturnsService.class);
 
     final var holdings = mock(List.class);
@@ -325,16 +292,13 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(sut).getBenchmarkMonthlyReturns(anyList(), any(), any());
 
-    // ACT
     final var actual = sut.getBenchmarkMonthlyReturns(holdings, CAD, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
     assertSame(benchmarkMonthlyReturns, actual);
   }
 
   @Test
   void shouldGetFxRates_whenCheckResult() {
-    // SETUP
     final var fxRatesFetcher = mock(FxRatesFetcher.class);
     final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
     final var sut = mock(MonthlyReturnsService.class, withSettings()
@@ -344,11 +308,9 @@ class MonthlyReturnsServiceTest {
     when(fxRatesFetcher.fetch()).thenReturn(fxRates);
     doCallRealMethod().when(sut).getFxRates();
 
-    // ACT
 
     final var actual = sut.getFxRates();
 
-    // VERIFY
     assertSame(fxRates, actual);
   }
 

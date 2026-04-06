@@ -4,11 +4,12 @@ import com.fintex.ce.domain.dto.IncomeForecastDto;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.FxRates;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -30,26 +31,26 @@ public class PortfolioUtils {
   }
 
   public static Map<Holding, Map<LocalDate, BigDecimal>> fxRatesForHoldings(
-      final Map<Holding, Currency> holdings, final Currency toCurrency, final Map<LocalDate, FxRates.FxRate> fxRates) {
+      final Map<Holding, CurrencyType> holdings, final CurrencyType toCurrency, final Map<LocalDate, FxRates.FxRate> fxRates) {
     return holdings.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> fxRatesForHolding(fxRates, entry
         .getValue(), toCurrency)));
   }
 
   public static Map<LocalDate, BigDecimal> fxRatesForHolding(final Map<LocalDate, FxRates.FxRate> fxRates,
-      final Currency from, final Currency to) {
+      final CurrencyType from, final CurrencyType to) {
     return fxRates.entrySet().stream().collect(CollectorUtils.toTreeMap(Map.Entry::getKey, mapFxRateBasedOnCurrency(
         from, to)));
   }
 
-  private static Function<Map.Entry<LocalDate, FxRates.FxRate>, BigDecimal> mapFxRateBasedOnCurrency(final Currency from,
-      final Currency to) {
+  private static Function<Map.Entry<LocalDate, FxRates.FxRate>, BigDecimal> mapFxRateBasedOnCurrency(final CurrencyType from,
+      final CurrencyType to) {
     return entry -> {
-      if (Currency.USD.equals(from) && Currency.CAD.equals(to)) {
+      if (CurrencyType.USD.equals(from) && CurrencyType.CAD.equals(to)) {
         return entry.getValue().getUsdCad();
-      } else if (Currency.CAD.equals(from) && Currency.USD.equals(to)) {
+      } else if (CurrencyType.CAD.equals(from) && CurrencyType.USD.equals(to)) {
         return entry.getValue().getCadUsd();
       } else
-        if (Currency.CAD.equals(from) && Currency.CAD.equals(to) || Currency.USD.equals(from) && Currency.USD.equals(
+        if (CurrencyType.CAD.equals(from) && CurrencyType.CAD.equals(to) || CurrencyType.USD.equals(from) && CurrencyType.USD.equals(
             to)) {
               return ONE;
             }

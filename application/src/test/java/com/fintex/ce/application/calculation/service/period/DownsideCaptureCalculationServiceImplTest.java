@@ -2,13 +2,15 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.util.ReturnFactorScale;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -20,7 +22,6 @@ class DownsideCaptureCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
-    // SETUP
     final var sut = mock(DownsideCaptureCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of()));
 
@@ -29,15 +30,13 @@ class DownsideCaptureCalculationServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
-    when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
-    // ACT
     sut.defineCalculationMethod(req);
 
-    // VERIFY
     verify(sut).buildCalculationDto(req, ReturnFactorScale.AS_IS);
   }
 }

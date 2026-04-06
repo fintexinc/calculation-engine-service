@@ -1,14 +1,15 @@
 package com.fintex.ce.domain.dto.calculation;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Map;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Map;
 
 @Data
 @ToString(callSuper = true)
@@ -17,6 +18,6 @@ import lombok.experimental.Accessors;
 public class BenchmarkWeightedAverageDTO extends WeightedAverageInputDTO {
 
   private Map<Holding, Map<LocalDate, BigDecimal>> benchmarkMonthlyReturns;
-  private Map<Holding, Currency> benchmarks;
+  private Map<Holding, CurrencyType> benchmarks;
 
 }

@@ -2,17 +2,17 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.model.FxRates;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
-
 
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MFR_001;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
@@ -23,9 +23,8 @@ class FxRatesConversionComponentTest {
 
   @Test
   void shouldConvert_whenCheckResultConvertUsdToCad() {
-    // SETUP
     Map<LocalDate, FxRates.FxRate> fxRates = getFxRates();
-    final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.CAD);
+    final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, CurrencyType.CAD);
 
     final Holding etfHolding = new Holding();
     etfHolding.setSecurityIdentifier(new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
@@ -33,12 +32,10 @@ class FxRatesConversionComponentTest {
     final BigDecimal expectedFirst = BigDecimal.valueOf(102);
     final BigDecimal expectedSecond = BigDecimal.valueOf(308);
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.USD);
+    final Map<Holding, CurrencyType> holdingCurrencies = Map.of(etfHolding, CurrencyType.USD);
 
-    // ACT
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> actual = sut.convert(returns, holdingCurrencies);
 
-    // VERIFY
     final BigDecimal actualFirst = actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(1)));
     final BigDecimal actualSecond = actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(2)));
     assertEquals(0, expectedFirst.compareTo(actualFirst));
@@ -47,9 +44,8 @@ class FxRatesConversionComponentTest {
 
   @Test
   void shouldConvert_whenCheckResultConvertCadToUsd() {
-    // SETUP
     Map<LocalDate, FxRates.FxRate> fxRates = getFxRates();
-    final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.USD);
+    final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, CurrencyType.USD);
 
     final Holding etfHolding = new Holding();
     etfHolding.setSecurityIdentifier(new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
@@ -57,12 +53,10 @@ class FxRatesConversionComponentTest {
     final BigDecimal expectedFirst = BigDecimal.valueOf(102);
     final BigDecimal expectedSecond = BigDecimal.valueOf(410);
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
+    final Map<Holding, CurrencyType> holdingCurrencies = Map.of(etfHolding, CurrencyType.CAD);
 
-    // ACT
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> actual = sut.convert(returns, holdingCurrencies);
 
-    // VERIFY
     final BigDecimal actualFirst = actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(1)));
     final BigDecimal actualSecond = actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(2)));
     assertEquals(0, expectedFirst.compareTo(actualFirst));
@@ -71,24 +65,21 @@ class FxRatesConversionComponentTest {
 
   @Test
   void shouldConvert_whenFxRateIsNullThrowError() {
-    // SETUP
     Map<LocalDate, FxRates.FxRate> fxRates = getNotCompleteFxRates();
-    final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, Currency.USD);
+    final FxRatesConversionComponent sut = new FxRatesConversionComponent(fxRates, CurrencyType.USD);
 
     final Holding etfHolding = new Holding();
     etfHolding.setSecurityIdentifier(new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
 
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
+    final Map<Holding, CurrencyType> holdingCurrencies = Map.of(etfHolding, CurrencyType.CAD);
 
     final LocalDate date = toLastDayOfMonth(LocalDate.now().plusMonths(1));
     final DataErrorException expected = ERR_RRC_MFR_001.error(date);
 
-    // ACT
     final DataErrorException actual = assertThrows(DataErrorException.class, () -> sut.convert(returns,
         holdingCurrencies));
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 

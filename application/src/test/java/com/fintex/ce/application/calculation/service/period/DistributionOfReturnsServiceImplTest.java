@@ -5,14 +5,16 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.constant.BigDecimalConstants;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.util.ReturnFactorScale;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -25,7 +27,6 @@ class DistributionOfReturnsServiceImplTest {
 
   @Test
   void shouldBuildCalculationDto_whenVerifyGetPortfolioTotalReturns() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
@@ -33,20 +34,17 @@ class DistributionOfReturnsServiceImplTest {
 
     final var reqDTO = mock(DistributionOfReturnsCommand.class);
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
+    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    // ACT
     sut.buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(reqDTO.getHoldings(), Currency.CAD,
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(reqDTO.getHoldings(), CurrencyType.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
   }
 
   @Test
   void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
@@ -55,7 +53,7 @@ class DistributionOfReturnsServiceImplTest {
 
     final var reqDTO = mock(DistributionOfReturnsCommand.class);
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
+    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
     when(reqDTO.getCustomPsd()).thenReturn(LocalDate.now());
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
 
@@ -63,17 +61,14 @@ class DistributionOfReturnsServiceImplTest {
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    // ACT
     sut.buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(),
         reqDTO.getCustomPed());
   }
 
   @Test
   void shouldBuildCalculationDto_whenCheckResult() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
@@ -83,7 +78,7 @@ class DistributionOfReturnsServiceImplTest {
 
     final var reqDTO = mock(DistributionOfReturnsCommand.class);
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
+    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
     when(reqDTO.getCustomPsd()).thenReturn(LocalDate.now());
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(2));
@@ -98,10 +93,8 @@ class DistributionOfReturnsServiceImplTest {
     expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    // ACT
     final CalculationDTO actual = sut.buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 

@@ -2,14 +2,14 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.EquityMarketCapitalization;
-import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
+import com.fintex.ce.domain.model.HoldingEquityMarketCap;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityMarketCapResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,27 +21,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.GIANT;
-import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.LARGE;
-import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.MEDIUM;
-import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.MICRO;
-import static com.fintex.ce.domain.model.calculation.EquityMarketCapType.SMALL;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_EMC_EMC_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
+import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.GIANT;
+import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.LARGE;
+import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.MEDIUM;
+import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.MICRO;
+import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.SMALL;
 import static java.math.BigDecimal.ZERO;
 
 @Service
 public class EquityMarketCapCalculationServiceImpl
     extends
-      BreakdownAbstractService<EquityMarketCapResult, EquityMarketCapType> {
+      BreakdownAbstractService<EquityMarketCapResult, EquityMarketCapitalizationType> {
 
-  static final Map<EquityMarketCapType, Set<EquityMarketCapType>> GROUPS;
+  static final Map<EquityMarketCapitalizationType, Set<EquityMarketCapitalizationType>> GROUPS;
 
-  static final Map<EquityMarketCapType, BigDecimal> DEFAULT_MAP = new HashMap<>();
+  static final Map<EquityMarketCapitalizationType, BigDecimal> DEFAULT_MAP = new HashMap<>();
 
-  static final Map<EquityMarketCapType, BigDecimal> ALLOCATION_DEFAULT_MAP;
+  static final Map<EquityMarketCapitalizationType, BigDecimal> ALLOCATION_DEFAULT_MAP;
 
   static {
     GROUPS = Collections.unmodifiableMap(
@@ -52,28 +52,28 @@ public class EquityMarketCapCalculationServiceImpl
     GROUPS.keySet().forEach(f -> DEFAULT_MAP.put(f, null));
 
     ALLOCATION_DEFAULT_MAP = Collections.unmodifiableMap(
-        Stream.of(EquityMarketCapType.values()).collect(toMap(type -> type, type -> ZERO)));
+        Stream.of(EquityMarketCapitalizationType.values()).collect(toMap(type -> type, type -> ZERO)));
   }
 
-  private final SecurityDataFetcher<EquityMarketCapitalization> equityMarketCapSecurityDataFetcher;
+  private final SecurityDataFetcher<HoldingEquityMarketCap> equityMarketCapSecurityDataFetcher;
 
   public EquityMarketCapCalculationServiceImpl(
-      final SecurityDataFetcher<EquityMarketCapitalization> equityMarketCapSecurityDataFetcher) {
+      final SecurityDataFetcher<HoldingEquityMarketCap> equityMarketCapSecurityDataFetcher) {
     super();
     this.equityMarketCapSecurityDataFetcher = equityMarketCapSecurityDataFetcher;
   }
 
   @Override
-  public ExposureDataHolder<EquityMarketCapType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
-    Map<Holding, EquityMarketCapitalization> rawData = equityMarketCapSecurityDataFetcher.fetch(reqDTO.getHoldings(),
+  public ExposureDataHolder<EquityMarketCapitalizationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
+    Map<Holding, HoldingEquityMarketCap> rawData = equityMarketCapSecurityDataFetcher.fetch(reqDTO.getHoldings(),
         List.of());
-    return AllocationMappingUtils.mapToAllocations(rawData,
-        EquityMarketCapitalization::getRatings, EquityMarketCapType::fromValue,
-        ALLOCATION_DEFAULT_MAP, WRN_EMC_EMC_001, "FDS Equity Market Capitalization");
+    return AllocationMappingUtils.mapTypedAllocations(rawData,
+        HoldingEquityMarketCap::getRatings,
+        ALLOCATION_DEFAULT_MAP, WRN_EMC_EMC_001);
   }
 
   @Override
-  public EquityMarketCapResult calculate(ExposureDataHolder<EquityMarketCapType> exposureData,
+  public EquityMarketCapResult calculate(ExposureDataHolder<EquityMarketCapitalizationType> exposureData,
       List<Holding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
@@ -83,22 +83,22 @@ public class EquityMarketCapCalculationServiceImpl
       defaultResult.setWarnings(warnings);
       return defaultResult;
     }
-    final Map<EquityMarketCapType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
-        EquityMarketCapType.values());
-    final Map<EquityMarketCapType, BigDecimal> reScaled = toUserScale(groupedResults(reScaleAbs(netProducts)));
+    final Map<EquityMarketCapitalizationType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
+        EquityMarketCapitalizationType.values());
+    final Map<EquityMarketCapitalizationType, BigDecimal> reScaled = toUserScale(groupedResults(reScaleAbs(netProducts)));
     EquityMarketCapResult result = new EquityMarketCapResult();
     result.setEquityMarketCapitalization(reScaled);
     result.setWarnings(warnings);
     return result;
   }
 
-  Map<EquityMarketCapType, BigDecimal> groupedResults(final Map<EquityMarketCapType, BigDecimal> netProducts) {
+  Map<EquityMarketCapitalizationType, BigDecimal> groupedResults(final Map<EquityMarketCapitalizationType, BigDecimal> netProducts) {
     return GROUPS.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> calculateSumWithinTheSameGroup(netProducts,
         e)));
   }
 
-  BigDecimal calculateSumWithinTheSameGroup(final Map<EquityMarketCapType, BigDecimal> netProducts,
-      final Map.Entry<EquityMarketCapType, Set<EquityMarketCapType>> e) {
+  BigDecimal calculateSumWithinTheSameGroup(final Map<EquityMarketCapitalizationType, BigDecimal> netProducts,
+      final Map.Entry<EquityMarketCapitalizationType, Set<EquityMarketCapitalizationType>> e) {
     return e.getValue().stream().map(type -> netProducts.getOrDefault(type, ZERO)).reduce(ZERO, BigDecimal::add);
   }
 

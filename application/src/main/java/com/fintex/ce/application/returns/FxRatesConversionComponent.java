@@ -1,15 +1,17 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.domain.model.FxRates;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import lombok.EqualsAndHashCode;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MFR_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
@@ -22,17 +24,17 @@ import static java.math.BigDecimal.ONE;
 public class FxRatesConversionComponent {
 
   private final Map<LocalDate, FxRates.FxRate> fxRates;
-  private final Currency toCurrency;
+  private final CurrencyType toCurrency;
 
   public FxRatesConversionComponent(final Map<LocalDate, FxRates.FxRate> fxRates,
-      final Currency toCurrency) {
+      final CurrencyType toCurrency) {
     this.fxRates = makeCopy(fxRates);
     this.toCurrency = toCurrency;
   }
 
   public Map<Holding, TreeMap<LocalDate, BigDecimal>> convert(
       final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns,
-      final Map<Holding, Currency> holdingCurrencies) {
+      final Map<Holding, CurrencyType> holdingCurrencies) {
     final Map<Holding, Map<LocalDate, BigDecimal>> mapperFxRates = PortfolioUtils.fxRatesForHoldings(holdingCurrencies,
         toCurrency, fxRates);
     return getHoldingMapMap(returns, mapperFxRates);

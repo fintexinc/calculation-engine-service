@@ -1,22 +1,23 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.exception.ReqValidationException;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.domain.model.enumeration.Currency.USD;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_DH_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MC_002;
+import static com.fintex.sm.model.domain.enumeration.CurrencyType.USD;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -66,7 +67,7 @@ class HoldingReqValidationTest {
     final CashHolding cashWithCurrency = new CashHolding();
     cashWithCurrency.setHoldingType(FinancialInstrumentType.CASH);
     cashWithCurrency.setValue(BigDecimal.ONE);
-    cashWithCurrency.setCurrency(Currency.CAD);
+    cashWithCurrency.setCurrency(CurrencyType.CAD);
 
     final List<Holding> holdings = List.of(cashWithoutCurrency, cashWithCurrency);
     final var sut = new HoldingReqValidation(holdings);

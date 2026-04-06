@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,13 +18,13 @@ import java.util.Map;
 @Accessors(chain = true)
 public class EquityMarketCapResDTO extends WarningDTO {
 
-  private Map<EquityMarketCapType, BigDecimal> equityMarketCapitalization;
+  private Map<EquityMarketCapitalizationType, BigDecimal> equityMarketCapitalization;
 
   public EquityMarketCapResDTO() {
 
   }
 
-  public EquityMarketCapResDTO(Map<EquityMarketCapType, BigDecimal> equityMarketCapitalization,
+  public EquityMarketCapResDTO(Map<EquityMarketCapitalizationType, BigDecimal> equityMarketCapitalization,
       List<Warning> warnings) {
     super(warnings);
     this.equityMarketCapitalization = equityMarketCapitalization;

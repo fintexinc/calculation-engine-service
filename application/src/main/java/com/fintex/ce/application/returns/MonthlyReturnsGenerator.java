@@ -1,10 +1,10 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.holding.MonthlyReturnGeneratableHolding;
 import com.fintex.ce.returns.ReturnsGenerator;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +64,7 @@ public class MonthlyReturnsGenerator implements ReturnsGenerator {
     return gicHolding.getInterestFreq().getFrequency();
   }
 
-  private HoldingMonthlyReturns createMonthlyReturns(TreeMap<LocalDate, BigDecimal> returns, Currency currency) {
+  private HoldingMonthlyReturns createMonthlyReturns(TreeMap<LocalDate, BigDecimal> returns, CurrencyType currency) {
     HoldingMonthlyReturns monthlyReturns = new HoldingMonthlyReturns();
     monthlyReturns.setReturns(returns);
     monthlyReturns.setCurrency(currency.name());

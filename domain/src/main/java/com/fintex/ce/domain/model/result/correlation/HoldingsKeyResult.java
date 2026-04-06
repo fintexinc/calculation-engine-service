@@ -1,17 +1,18 @@
 package com.fintex.ce.domain.model.result.correlation;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -24,7 +25,7 @@ public class HoldingsKeyResult {
   private String key;
   private BigDecimal allocation;
   private String name;
-  private Currency currency;
+  private CurrencyType currency;
 
   public static HoldingsKeyResult buildHoldingsKeyResult(final Holding holding) {
     return buildFromHolding(holding, null);

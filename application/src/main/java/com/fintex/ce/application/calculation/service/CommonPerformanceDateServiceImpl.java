@@ -7,9 +7,9 @@ import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.ValidationError;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -75,7 +75,7 @@ public class CommonPerformanceDateServiceImpl implements CalculationService<Comm
     if (CollectionUtils.isEmpty(holdings)) {
       return new Returns<>();
     }
-    return monthlyReturnsService.getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(holdings, Currency.CAD);
+    return monthlyReturnsService.getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(holdings, CurrencyType.CAD);
   }
 
 }

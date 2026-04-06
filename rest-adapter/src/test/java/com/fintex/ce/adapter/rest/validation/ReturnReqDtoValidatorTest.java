@@ -1,7 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.ReturnReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpedLastDayOfMonthReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpsdGreaterThanCpedReqValidation;
@@ -11,6 +9,8 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingValueR
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingsCouldNotBeEmptyReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotEmptyCurrencyReqValidator;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -23,11 +23,10 @@ class ReturnReqDtoValidatorTest {
 
   @Test
   void build_checkResult() {
-    // SETUP
     final var sut = new ReturnReqDtoValidator();
 
     final var reqDTO = new ReturnReqDTO();
-    reqDTO.setCurrency(Currency.CAD);
+    reqDTO.setCurrency(CurrencyType.CAD);
     reqDTO.setCustomPerformanceStartDate(LocalDate.now().plusMonths(1));
     reqDTO.setCustomPerformanceEndDate(LocalDate.now().minusMonths(1));
     reqDTO.setHoldings(List.of(mock(Holding.class)));
@@ -42,10 +41,8 @@ class ReturnReqDtoValidatorTest {
         .linkWith(new HoldingReqValidation(reqDTO.getHoldings()))
         .linkWith(new HoldingValueReqValidator(reqDTO.getHoldings()));
 
-    // ACT
     final ReqValidation actual = sut.build(reqDTO);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 

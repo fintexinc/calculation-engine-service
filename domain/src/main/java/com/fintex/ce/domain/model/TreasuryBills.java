@@ -1,7 +1,7 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.core.ProviderAware;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.Map;
 @Accessors(chain = true)
 public class TreasuryBills implements ProviderAware {
 
-  private Currency currency;
+  private CurrencyType currency;
   private Map<LocalDate, BigDecimal> monthlyReturns;
 
   // Common fields

@@ -2,15 +2,16 @@ package com.fintex.ce.domain.dto.calculation;
 
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.FxRates;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.enumeration.Rebalanced;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Data;
-import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
@@ -22,13 +23,13 @@ public class WeightedAverageInputDTO {
   private Rebalanced rebalanced;
   private CommonDates commonDates;
 
-  private Map<Holding, Currency> holdings;
+  private Map<Holding, CurrencyType> holdings;
 
   // already pre-formatted monthly returns
   private Map<Holding, Map<LocalDate, BigDecimal>> portfolioReturns;
   private Map<LocalDate, FxRates.FxRate> fxRates;
 
-  private Currency currency;
+  private CurrencyType currency;
 
   public WeightedAverageInputDTO() {
     this.rebalanced = Rebalanced.MONTHLY;

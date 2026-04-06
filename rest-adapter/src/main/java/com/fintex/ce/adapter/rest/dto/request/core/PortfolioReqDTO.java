@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.rest.dto.request.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -23,12 +23,12 @@ public class PortfolioReqDTO {
 
   private List<Holding> benchmarkHoldings;
 
-  private Currency currency;
+  private CurrencyType currency;
 
   public PortfolioReqDTO() {
   }
 
-  public PortfolioReqDTO(final List<Holding> holdings, final Currency currency) {
+  public PortfolioReqDTO(final List<Holding> holdings, final CurrencyType currency) {
     this.holdings = holdings;
     this.currency = currency;
   }

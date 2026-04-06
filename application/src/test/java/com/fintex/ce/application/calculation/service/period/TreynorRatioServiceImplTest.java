@@ -5,13 +5,15 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.TBillsFetcher;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
+
+import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -28,7 +30,6 @@ class TreynorRatioServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
@@ -45,16 +46,13 @@ class TreynorRatioServiceImplTest {
     when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
-    // ACT
     sut.defineCalculationMethod(req);
 
-    // VERIFY
     verify(sut, times(2)).buildCalculationDto(eq(req), any());
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
@@ -71,17 +69,14 @@ class TreynorRatioServiceImplTest {
     when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
-    // ACT
     sut.defineCalculationMethod(req);
 
-    // VERIFY
     verify(tBillsFetcher).fetch(CAD);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      // SETUP
       final var monthlyReturnsService = mock(MonthlyReturnsService.class);
       final var tBillsFetcher = mock(TBillsFetcher.class);
       final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
@@ -98,10 +93,8 @@ class TreynorRatioServiceImplTest {
       when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);
 
       doCallRealMethod().when(sut).defineCalculationMethod(req);
-      // ACT
       sut.defineCalculationMethod(req);
 
-      // VERIFY
       mockedPeriodCalculationAbstract.verify(() -> PeriodCalculationAbstract.calculateExcessReturn(treeMap, treeMap),
           Mockito.times(2));
     }

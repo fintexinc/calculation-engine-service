@@ -1,7 +1,5 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.adapter.rest.dto.request.BestWorstPeriodsReqDTO;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.BestWorstPeriodReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.CpedLastDayOfMonthReqValidation;
@@ -13,6 +11,8 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingsCould
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotEmptyCurrencyReqValidator;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -26,7 +26,6 @@ class BestWorstPeriodsReqValidatorTest {
 
   @Test
   void build_checkResult() {
-    // SETUP
     final var sut = new BestWorstPeriodsReqValidator();
 
     final BestWorstPeriodsReqDTO reqDTO = getBestWorstPeriodsReqDTO();
@@ -43,16 +42,14 @@ class BestWorstPeriodsReqValidatorTest {
         .linkWith(new HoldingReqValidation(reqDTO.getHoldings()))
         .linkWith(new HoldingValueReqValidator(reqDTO.getHoldings()));
 
-    // ACT
     final ReqValidation actual = sut.build(reqDTO);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   BestWorstPeriodsReqDTO getBestWorstPeriodsReqDTO() {
     final BestWorstPeriodsReqDTO reqDTO = new BestWorstPeriodsReqDTO();
-    reqDTO.setCurrency(Currency.CAD);
+    reqDTO.setCurrency(CurrencyType.CAD);
     reqDTO.setCustomPerformanceStartDate(LocalDate.of(2000, 5, 31));
     reqDTO.setCustomPerformanceEndDate(LocalDate.of(2020, 4, 30));
     reqDTO.setBestWorstTimeIntervalPeriods(Set.of(1L, 2L, 3L));

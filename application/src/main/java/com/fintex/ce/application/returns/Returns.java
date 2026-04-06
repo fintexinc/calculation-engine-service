@@ -13,10 +13,13 @@ import com.fintex.ce.domain.model.HistoricalNavPrices;
 import com.fintex.ce.domain.model.ReturnsData;
 import com.fintex.ce.domain.model.ValidationError;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.MapUtils;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -27,8 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_FDS_MC_002;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_NAV_PRICES_002;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MMR_001;
@@ -43,7 +45,7 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 public class Returns<T extends ReturnsData> {
   public Notification notification = new Notification();
-  public Map<Holding, Currency> holdingCurrencyMap;
+  public Map<Holding, CurrencyType> holdingCurrencyMap;
   public Map<Holding, TreeMap<LocalDate, BigDecimal>> returnsMap;
   @Getter
   public LocalDate ped;
@@ -324,7 +326,7 @@ public class Returns<T extends ReturnsData> {
     return findPed(this.returnsMap);
   }
 
-  public Map<Holding, Currency> retrieveHoldingCurrencies(Map<Holding, T> originalMReturns) {
+  public Map<Holding, CurrencyType> retrieveHoldingCurrencies(Map<Holding, T> originalMReturns) {
     Map<Boolean, Map<Holding, T>> partitionedHoldings = originalMReturns.entrySet()
         .stream()
         .collect(Collectors.partitioningBy(e -> Objects.nonNull(getCurrency(e)), Collectors.toMap(
@@ -336,9 +338,9 @@ public class Returns<T extends ReturnsData> {
         .collect(HashMap::new, (m, entry) -> m.put(entry.getKey(), getCurrency(entry)), HashMap::putAll);
   }
 
-  private Currency getCurrency(Map.Entry<Holding, T> e) {
+  private CurrencyType getCurrency(Map.Entry<Holding, T> e) {
     String currency = e.getValue().getCurrency();
-    return Currency.get(currency);
+    return CurrencyType.fromValueOrNull(currency);
   }
 
   public Map<Holding, TreeMap<LocalDate, BigDecimal>> retrieveReturns(Map<Holding, T> originalMReturns) {
