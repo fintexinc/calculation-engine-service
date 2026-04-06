@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeSectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
@@ -62,8 +62,8 @@ class FixedIncomeBondSecuritiesFetcherTest
   protected FixedIncomeBondSecurities createExpectedDomainModel(String holdingId) {
     return new FixedIncomeBondSecurities()
         .setFixedIncomeBondSectors(Map.of(
-            FixedIncomeSectorType.GOVERNMENT_BONDS, BigDecimal.valueOf(45.2),
-            FixedIncomeSectorType.CORPORATE_BONDS, BigDecimal.valueOf(35.5)))
+            FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(45.2),
+            FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS, BigDecimal.valueOf(35.5)))
         .setHoldingType(FinancialInstrumentType.ETF_CANADA)
         .setHoldingId(holdingId);
   }

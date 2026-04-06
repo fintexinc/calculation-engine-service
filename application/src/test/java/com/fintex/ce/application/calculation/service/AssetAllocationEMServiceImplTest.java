@@ -6,7 +6,7 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -38,7 +38,7 @@ import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.INTER
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
+import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;

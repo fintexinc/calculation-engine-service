@@ -65,7 +65,7 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.calculation.MaturityAllocationType;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
@@ -191,7 +191,7 @@ class CalculationTestDataProvider {
         breakdown(CalculationMetric.EQUITY_MARKET_CAPITALIZATION, new EquityMarketCapResult().setEquityMarketCapitalization(Map.of(EquityMarketCapitalizationType.GIANT, BigDecimal.valueOf(55.0))), EquityMarketCapResDTO.class),
         breakdown(CalculationMetric.FIXED_INCOME_COUNTRY_EXPOSURE, new CountryExposureResult().setCountryExposure(Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(80.0))), CountryExposureResDTO.class),
         breakdown(CalculationMetric.FIXED_INCOME_GEOGRAPHIC_EXPOSURE, new FixedIncomeGeographicExposureResult().setEquityGeographicExposure(Map.of(GeographicRegionType.OTHER, BigDecimal.valueOf(25.0))), GeographicExposureResDTO.class),
-        breakdown(CalculationMetric.FIXED_INCOME_BOND_SECTOR, new FixedIncomeSectorResult().setFixedIncomeSector(Map.of(FixedIncomeSectorType.GOVERNMENT_BONDS, BigDecimal.valueOf(35.0))), FixedIncomeSectorResDTO.class),
+        breakdown(CalculationMetric.FIXED_INCOME_BOND_SECTOR, new FixedIncomeSectorResult().setFixedIncomeSector(Map.of(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(35.0))), FixedIncomeSectorResDTO.class),
         breakdown(CalculationMetric.FIXED_INCOME_STYLEBOX_EXPOSURE, new FixedIncomeStyleboxExposureResult().setFixedIncomeStyleboxExposure(Map.of(FixedIncomeStyleBoxType.HIGH_LIMITED, BigDecimal.valueOf(20.0))), FixedIncomeStyleboxExposureResDto.class),
         breakdown(CalculationMetric.MATURITY_ALLOCATION, new MaturityAllocationResult().setMaturityAllocation(Map.of(MaturityAllocationType.MORE_THAN_TWENTY_YEARS, BigDecimal.valueOf(15.0))), MaturityAllocationResDto.class),
         breakdown(CalculationMetric.CLASSIFICATION_ALLOCATION, new ClassificationAllocationResult().setClassificationAllocation(Map.of(ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED, BigDecimal.valueOf(30.0))), ClassificationAllocationResDto.class),

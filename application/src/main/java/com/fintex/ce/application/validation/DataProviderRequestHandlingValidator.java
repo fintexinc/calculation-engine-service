@@ -1,7 +1,7 @@
 package com.fintex.ce.application.validation;
 
 import com.fintex.ce.domain.model.core.ProviderAware;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +26,13 @@ public class DataProviderRequestHandlingValidator {
       final BiFunction<T, U, T> actionFunction) {
     responseFromFds.forEach(value -> {
       final String providerStr = getterForProvider.apply(value);
-      final DataProvider dataProvider = StringUtils.isEmpty(providerStr) ? null : DataProvider.fromValue(providerStr);
+      DataProvider dataProvider = null;
+      if (!StringUtils.isEmpty(providerStr)) {
+        try { // todo remove when all dataProvider fields are migrated from String -> enum
+          dataProvider = DataProvider.valueOf(providerStr.toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+        }
+      }
       if (Objects.isNull(dataProvider) || !providers.contains(dataProvider)) {
         actionFunction.apply(value, null);
       }

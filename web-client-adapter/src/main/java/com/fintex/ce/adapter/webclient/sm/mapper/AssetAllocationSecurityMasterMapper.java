@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.AssetAllocation;
 import com.fintex.sm.model.domain.value.NameValue;
@@ -35,7 +34,7 @@ public class AssetAllocationSecurityMasterMapper
 
     Optional.ofNullable(smsResponse)
         .map(AssetAllocation::getDataProvider)
-        .ifPresent(dp -> result.setProvider(DataProvider.fromValue(dp.name()).name()));
+        .ifPresent(dp -> result.setProvider(dp.name()));
 
     return result;
   }

@@ -1,8 +1,8 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,18 +20,13 @@ import java.util.Map;
 public class FixedIncomeBondSecurities implements ProviderAware {
 
   private FinancialInstrumentType holdingType;
-  private Map<FixedIncomeSectorType, BigDecimal> fixedIncomeBondSectors;
+  private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeBondSectors;
 
   // Common fields
   private String holdingId;
   private String provider;
   private String providers;
   private List<ValidationError> errors = new ArrayList<>();
-
-  public FixedIncomeBondSecurities(FinancialInstrumentType holdingType, Map<FixedIncomeSectorType, BigDecimal> fixedIncomeBondSectors) {
-    this.holdingType = holdingType;
-    this.fixedIncomeBondSectors = fixedIncomeBondSectors;
-  }
 
   public boolean hasErrors() {
     return errors != null && !errors.isEmpty();

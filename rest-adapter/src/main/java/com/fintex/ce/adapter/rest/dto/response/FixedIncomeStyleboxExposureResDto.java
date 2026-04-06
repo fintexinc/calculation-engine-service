@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.List;

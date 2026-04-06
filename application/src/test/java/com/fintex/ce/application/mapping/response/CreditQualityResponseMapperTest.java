@@ -1,10 +1,10 @@
 package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.calculation.CreditQualityRating;
 import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ class CreditQualityResponseMapperTest {
   @Test
   void shouldThrowUnsupportedOperationException_whenMappingDomainWithRatings() {
     CreditQuality domain = new CreditQuality();
-    domain.setRatings(Map.of(CreditQualityRating.AAA, BigDecimal.ONE));
+    domain.setRatings(Map.of(CreditQualityRatingType.AAA, BigDecimal.ONE));
 
     assertThrows(UnsupportedOperationException.class, () -> mapper.toResponse(domain));
   }

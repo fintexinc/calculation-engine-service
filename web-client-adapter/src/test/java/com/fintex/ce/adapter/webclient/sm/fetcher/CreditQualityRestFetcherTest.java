@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 import com.fintex.ce.adapter.webclient.sm.mapper.CreditQualityMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.calculation.CreditQualityRating;
+import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.rating.CreditQualityRatings;
 import com.fintex.sm.model.domain.value.CreditQualityRatingTypeValue;
 import java.math.BigDecimal;
@@ -44,8 +44,8 @@ class CreditQualityRestFetcherTest
   protected CreditQualityRatings createSmsResponse() {
     var smsResponse = new CreditQualityRatings();
     smsResponse.setRatings(List.of(
-        new CreditQualityRatingTypeValue(CreditQualityRating.AAA.getRating(), BigDecimal.valueOf(15.5), List.of()),
-        new CreditQualityRatingTypeValue(CreditQualityRating.AA.getRating(), BigDecimal.valueOf(22.3), List.of())));
+        new CreditQualityRatingTypeValue(CreditQualityRatingType.AAA.name(), BigDecimal.valueOf(15.5), List.of()),
+        new CreditQualityRatingTypeValue(CreditQualityRatingType.AA.name(), BigDecimal.valueOf(22.3), List.of())));
     smsResponse.setAverageCreditQualityRating("A");
     return smsResponse;
   }
@@ -54,8 +54,8 @@ class CreditQualityRestFetcherTest
   protected CreditQuality createExpectedDomainModel(String holdingId) {
     return new CreditQuality()
         .setRatings(Map.of(
-            CreditQualityRating.AAA, BigDecimal.valueOf(15.5),
-            CreditQualityRating.AA, BigDecimal.valueOf(22.3)))
+            CreditQualityRatingType.AAA, BigDecimal.valueOf(15.5),
+            CreditQualityRatingType.AA, BigDecimal.valueOf(22.3)))
         .setHoldingId(holdingId);
   }
 

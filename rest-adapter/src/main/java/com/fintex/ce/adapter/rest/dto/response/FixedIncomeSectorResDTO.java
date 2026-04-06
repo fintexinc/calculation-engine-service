@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.ce.domain.model.core.Warning;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
@@ -20,13 +20,13 @@ import lombok.experimental.Accessors;
 public class FixedIncomeSectorResDTO extends WarningDTO {
 
   @Schema(description = "Fixed income allocation percentages by bond sector")
-  private Map<FixedIncomeSectorType, BigDecimal> fixedIncomeSector;
+  private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSector;
 
   public FixedIncomeSectorResDTO() {
 
   }
 
-  public FixedIncomeSectorResDTO(final Map<FixedIncomeSectorType, BigDecimal> fixedIncomeSector,
+  public FixedIncomeSectorResDTO(final Map<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSector,
       final List<Warning> warnings) {
     super(warnings);
     this.fixedIncomeSector = fixedIncomeSector;

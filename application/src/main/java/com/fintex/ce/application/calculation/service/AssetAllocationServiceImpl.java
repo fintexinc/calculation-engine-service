@@ -9,7 +9,7 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import static com.fintex.ce.domain.model.enumeration.DataProvider.MORNINGSTAR;
+import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service

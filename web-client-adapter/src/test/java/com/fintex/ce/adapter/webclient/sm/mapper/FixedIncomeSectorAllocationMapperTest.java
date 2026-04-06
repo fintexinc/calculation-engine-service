@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.SecurityIdentifier;
@@ -39,11 +39,11 @@ class FixedIncomeSectorAllocationMapperTest {
     FixedIncomeBondSecurities result = mapper.map(smsResponse, holding);
 
     assertThat(result.getFixedIncomeBondSectors()).hasSize(3);
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.GOVERNMENT_BONDS))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS))
         .isEqualByComparingTo("45.20");
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.CORPORATE_BONDS))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS))
         .isEqualByComparingTo("35.50");
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.MORTGAGE_BACKED_SECURITIES))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES))
         .isEqualByComparingTo("19.30");
     assertThat(result.getHoldingId()).isEqualTo("AGG");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
@@ -93,7 +93,7 @@ class FixedIncomeSectorAllocationMapperTest {
     FixedIncomeBondSecurities result = mapper.map(smsResponse, createHolding("TEST.ID", FinancialInstrumentType.ETF_CANADA));
 
     assertThat(result.getFixedIncomeBondSectors()).hasSize(1);
-    assertThat(result.getFixedIncomeBondSectors()).containsKey(FixedIncomeSectorType.OTHER_BONDS);
+    assertThat(result.getFixedIncomeBondSectors()).containsKey(FixedIncomeSecuritiesAllocationType.OTHER_BONDS);
   }
 
   @Test
@@ -112,17 +112,17 @@ class FixedIncomeSectorAllocationMapperTest {
     FixedIncomeBondSecurities result = mapper.map(smsResponse, createHolding("FULL.TEST", FinancialInstrumentType.ETF));
 
     assertThat(result.getFixedIncomeBondSectors()).hasSize(6);
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.GOVERNMENT_BONDS))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS))
         .isEqualByComparingTo("25.0");
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.CORPORATE_BONDS))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS))
         .isEqualByComparingTo("30.0");
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.ST_INVESTMENTS))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.ST_INVESTMENTS))
         .isEqualByComparingTo("10.0");
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.MORTGAGE_BACKED_SECURITIES))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES))
         .isEqualByComparingTo("15.0");
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.OTHER_BONDS))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.OTHER_BONDS))
         .isEqualByComparingTo("15.0");
-    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorType.ASSET_BACKED_SECURITIES))
+    assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.ASSET_BACKED_SECURITIES))
         .isEqualByComparingTo("5.0");
   }
 

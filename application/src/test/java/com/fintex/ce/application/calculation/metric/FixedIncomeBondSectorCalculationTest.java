@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.sm.model.domain.SecurityIdentifier;
@@ -21,8 +21,8 @@ class FixedIncomeBondSectorCalculationTest {
     final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US)
         .setSecurityIdentifier(new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
 
-    Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> exposures = new HashMap<>();
-    final HashMap<FixedIncomeSectorType, BigDecimal> fixedIncomeSectorTypes = getFixedIncomeSectorTypeOfAOM();
+    Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
+    final HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSectorTypes = getFixedIncomeSecuritiesAllocationTypeOfAOM();
     exposures.put(aom, fixedIncomeSectorTypes);
 
     Map<Holding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876));
@@ -38,38 +38,40 @@ class FixedIncomeBondSectorCalculationTest {
   }
 
   private FixedIncomeSectorResult getExpectedOfAom() {
-    final HashMap<FixedIncomeSectorType, BigDecimal> expectedResult = new HashMap<>();
-    expectedResult.put(FixedIncomeSectorType.MORTGAGE_BACKED_SECURITIES, BigDecimal.valueOf(0.1410290846));
-    expectedResult.put(FixedIncomeSectorType.OTHER_BONDS, BigDecimal.valueOf(0.0000935047));
-    expectedResult.put(FixedIncomeSectorType.CORPORATE_BONDS, BigDecimal.valueOf(0.2849409274));
-    expectedResult.put(FixedIncomeSectorType.ST_INVESTMENTS, BigDecimal.valueOf(0.1345309217));
-    expectedResult.put(FixedIncomeSectorType.ASSET_BACKED_SECURITIES, BigDecimal.valueOf(0.0026411354));
-    expectedResult.put(FixedIncomeSectorType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.4367644262));
+    final HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> expectedResult = new HashMap<>();
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES, BigDecimal.valueOf(0.1410290846));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.OTHER_BONDS, BigDecimal.valueOf(0.0000935047));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS, BigDecimal.valueOf(0.2849409274));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.ST_INVESTMENTS, BigDecimal.valueOf(0.1345309217));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.ASSET_BACKED_SECURITIES, BigDecimal.valueOf(0.0026411354));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.4367644262));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.SECURITIZED_DEBT, BigDecimal.valueOf(0.0000000000));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.DIRECT_MORTGAGES, BigDecimal.valueOf(0.0000000000));
     var expected = new FixedIncomeSectorResult();
     expected.setFixedIncomeSector(expectedResult);
     expected.setWarnings(List.of());
     return expected;
   }
 
-  private HashMap<FixedIncomeSectorType, BigDecimal> getFixedIncomeSectorTypeOfAOM() {
-    final HashMap<FixedIncomeSectorType, BigDecimal> fixedIncomeSectorTypes = new HashMap<>();
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.MORTGAGE_BACKED_SECURITIES, BigDecimal.valueOf(0.1401155072));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.OTHER_BONDS, BigDecimal.valueOf(0.000092899));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.CORPORATE_BONDS, BigDecimal.valueOf(0.2830950982));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.ST_INVESTMENTS, BigDecimal.valueOf(0.1336594389));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.ASSET_BACKED_SECURITIES, BigDecimal.valueOf(0.0026240263));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.433935094));
+  private HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> getFixedIncomeSecuritiesAllocationTypeOfAOM() {
+    final HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSectorTypes = new HashMap<>();
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES, BigDecimal.valueOf(0.1401155072));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.OTHER_BONDS, BigDecimal.valueOf(0.000092899));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS, BigDecimal.valueOf(0.2830950982));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.ST_INVESTMENTS, BigDecimal.valueOf(0.1336594389));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.ASSET_BACKED_SECURITIES, BigDecimal.valueOf(0.0026240263));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.433935094));
     return fixedIncomeSectorTypes;
   }
 
-  private HashMap<FixedIncomeSectorType, BigDecimal> getFixedIncomeSectorTypeOfRBF605() {
-    final HashMap<FixedIncomeSectorType, BigDecimal> fixedIncomeSectorTypes = new HashMap<>();
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.MORTGAGE_BACKED_SECURITIES, BigDecimal.valueOf(0.0));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.OTHER_BONDS, BigDecimal.valueOf(0.021217966381923));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.CORPORATE_BONDS, BigDecimal.valueOf(0.206117387710113));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.ST_INVESTMENTS, BigDecimal.valueOf(0.06585836318545));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.ASSET_BACKED_SECURITIES, BigDecimal.valueOf(0.0));
-    fixedIncomeSectorTypes.put(FixedIncomeSectorType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.706806282722513));
+  private HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> getFixedIncomeSecuritiesAllocationTypeOfRBF605() {
+    final HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSectorTypes = new HashMap<>();
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES, BigDecimal.valueOf(0.0));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.OTHER_BONDS, BigDecimal.valueOf(0.021217966381923));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS, BigDecimal.valueOf(0.206117387710113));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.ST_INVESTMENTS, BigDecimal.valueOf(0.06585836318545));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.ASSET_BACKED_SECURITIES, BigDecimal.valueOf(0.0));
+    fixedIncomeSectorTypes.put(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.706806282722513));
     return fixedIncomeSectorTypes;
   }
 
@@ -80,9 +82,9 @@ class FixedIncomeBondSectorCalculationTest {
     final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA)
         .setSecurityIdentifier(new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
 
-    Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> exposures = new HashMap<>();
-    exposures.put(rbf605, getFixedIncomeSectorTypeOfRBF605());
-    exposures.put(aom, getFixedIncomeSectorTypeOfAOM());
+    Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
+    exposures.put(rbf605, getFixedIncomeSecuritiesAllocationTypeOfRBF605());
+    exposures.put(aom, getFixedIncomeSecuritiesAllocationTypeOfAOM());
 
     Map<Holding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876), rbf605, BigDecimal
         .valueOf(0.3489427));
@@ -104,9 +106,9 @@ class FixedIncomeBondSectorCalculationTest {
     final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA)
         .setSecurityIdentifier(new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
 
-    Map<Holding, Map<FixedIncomeSectorType, BigDecimal>> exposures = new HashMap<>();
-    exposures.put(rbf605, getFixedIncomeSectorTypeOfRBF605());
-    exposures.put(aom, getFixedIncomeSectorTypeOfAOM());
+    Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
+    exposures.put(rbf605, getFixedIncomeSecuritiesAllocationTypeOfRBF605());
+    exposures.put(aom, getFixedIncomeSecuritiesAllocationTypeOfAOM());
 
     Map<Holding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876), rbf605, BigDecimal
         .valueOf(0.0));
@@ -122,13 +124,15 @@ class FixedIncomeBondSectorCalculationTest {
   }
 
   private FixedIncomeSectorResult getExpectedOfAomAndRbf605() {
-    final HashMap<FixedIncomeSectorType, BigDecimal> expectedResult = new HashMap<>();
-    expectedResult.put(FixedIncomeSectorType.MORTGAGE_BACKED_SECURITIES, BigDecimal.valueOf(0.0894013464));
-    expectedResult.put(FixedIncomeSectorType.OTHER_BONDS, BigDecimal.valueOf(0.0078267193));
-    expectedResult.put(FixedIncomeSectorType.CORPORATE_BONDS, BigDecimal.valueOf(0.2560853117));
-    expectedResult.put(FixedIncomeSectorType.ST_INVESTMENTS, BigDecimal.valueOf(0.1093913635));
-    expectedResult.put(FixedIncomeSectorType.ASSET_BACKED_SECURITIES, BigDecimal.valueOf(0.0016742721));
-    expectedResult.put(FixedIncomeSectorType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.535620987));
+    final HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> expectedResult = new HashMap<>();
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES, BigDecimal.valueOf(0.0894013464));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.OTHER_BONDS, BigDecimal.valueOf(0.0078267193));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS, BigDecimal.valueOf(0.2560853117));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.ST_INVESTMENTS, BigDecimal.valueOf(0.1093913635));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.ASSET_BACKED_SECURITIES, BigDecimal.valueOf(0.0016742721));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.535620987));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.SECURITIZED_DEBT, BigDecimal.valueOf(0.0000000000));
+    expectedResult.put(FixedIncomeSecuritiesAllocationType.DIRECT_MORTGAGES, BigDecimal.valueOf(0.0000000000));
     var result = new FixedIncomeSectorResult();
     result.setFixedIncomeSector(expectedResult);
     result.setWarnings(List.of());

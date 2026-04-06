@@ -1,11 +1,11 @@
 package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.mapping.ResponseMapper;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -89,5 +89,4 @@ public class FixedIncomeStyleboxExposureResponseMapper
     result.setWarnings(warnings);
     return result;
   }
-
 }

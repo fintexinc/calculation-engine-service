@@ -6,7 +6,7 @@ import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.model.FeeData;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.enumeration.DataProvider;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ManagementFeeResult;
@@ -54,7 +54,7 @@ public class ManagementFeeCalculationServiceImpl
           final AverageMerCommand reqDTO) {
     Map<Holding, FeeData> rawData = feesSecurityDataFetcher.fetch(
             reqDTO.getHoldings(),
-            getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.DEFAULT_PROVIDERS));
+            getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.MORNINGSTAR));
     return groupAndMap(rawData, reqDTO.getHoldings());
   }
 
