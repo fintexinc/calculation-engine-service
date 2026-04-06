@@ -5,15 +5,17 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.util.ReturnFactorScale;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.NavigableMap;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -26,7 +28,6 @@ class PeriodAbstractServiceTest {
 
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -35,16 +36,13 @@ class PeriodAbstractServiceTest {
     when(sut.defineCalculationMethod(any())).thenReturn(mock(PeriodCalculationAbstract.class));
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     sut.perform(dto);
 
-    // VERIFY
     verify(sut).defineCalculationMethod(dto);
   }
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -57,16 +55,13 @@ class PeriodAbstractServiceTest {
     when(sut.defineCalculationMethod(any())).thenReturn(pCalculation);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     sut.perform(dto);
 
-    // VERIFY
     verify(pCalculation).calculate(periods);
   }
 
   @Test
   void shouldPerform_whenCheckResult() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -82,16 +77,13 @@ class PeriodAbstractServiceTest {
     when(pCalculation.calculate(any())).thenReturn(expected);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     final PeriodResult actual = sut.perform(dto);
 
-    // VERIFY
     Assertions.assertSame(expected, actual);
   }
 
   @Test
   void shouldBuildCalculationDto_whenCheckResult() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -102,11 +94,11 @@ class PeriodAbstractServiceTest {
     final var portfolioTotalReturns = mock(NavigableMap.class);
 
     when(req.getHoldings()).thenReturn(new ArrayList<>());
-    when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
     when(req.getCustomPed()).thenReturn(LocalDate.now().plusMonths(5));
     when(req.getCustomIntervalPsd()).thenReturn(LocalDate.now().minusMonths(3));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), CurrencyType.CAD,
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
@@ -116,16 +108,13 @@ class PeriodAbstractServiceTest {
     expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    // ACT
     final CalculationDTO actual = sut.buildCalculationDto(req, returnFactorScale);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -136,11 +125,11 @@ class PeriodAbstractServiceTest {
     final var portfolioTotalReturns = mock(NavigableMap.class);
 
     when(req.getHoldings()).thenReturn(new ArrayList<>());
-    when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
     when(req.getCustomPed()).thenReturn(LocalDate.now().plusMonths(5));
     when(req.getCustomIntervalPsd()).thenReturn(LocalDate.now().minusMonths(3));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), CurrencyType.CAD,
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
@@ -150,17 +139,14 @@ class PeriodAbstractServiceTest {
     expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    // ACT
     sut.buildCalculationDto(req, returnFactorScale);
 
-    // VERIFY
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), CurrencyType.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
   }
 
   @Test
   void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpedValidation() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -171,11 +157,11 @@ class PeriodAbstractServiceTest {
     final var portfolioTotalReturns = mock(NavigableMap.class);
 
     when(req.getHoldings()).thenReturn(new ArrayList<>());
-    when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
     when(req.getCustomPed()).thenReturn(LocalDate.now().plusMonths(5));
     when(req.getCustomIntervalPsd()).thenReturn(LocalDate.now().minusMonths(3));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), CurrencyType.CAD,
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
@@ -185,10 +171,8 @@ class PeriodAbstractServiceTest {
     expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    // ACT
     sut.buildCalculationDto(req, returnFactorScale);
 
-    // VERIFY
     verify(monthlyReturnsService).getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed());
   }
 

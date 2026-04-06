@@ -4,15 +4,17 @@ import com.fintex.ce.application.calculation.metric.Growth10KCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.util.ReturnFactorScale;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +29,6 @@ class MaxDrawdownServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -38,20 +39,17 @@ class MaxDrawdownServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
-    when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
-    // ACT
     sut.defineCalculationMethod(req);
 
-    // VERIFY
     verify(sut).buildCalculationDto(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyInitializeGrowthOf10KMap() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -62,20 +60,17 @@ class MaxDrawdownServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
-    when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
-    // ACT
     sut.defineCalculationMethod(req);
 
-    // VERIFY
     verify(sut).initializeGrowthOf10KMap(eq(benchmarkCalculationDTO), any());
   }
 
   @Test
   void shouldInitializeGrowthOf10KMap_whenCheckResult() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -87,16 +82,13 @@ class MaxDrawdownServiceImplTest {
     when(inputDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).initializeGrowthOf10KMap(any(), any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.initializeGrowthOf10KMap(inputDTO, growth10KCalculation);
 
-    // VERIFY
     assertNotNull(actual.entrySet().stream().findFirst());
   }
 
   @Test
   void shouldInitializeGrowthOf10KMap_whenCheckResult2() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -108,10 +100,8 @@ class MaxDrawdownServiceImplTest {
     when(inputDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).initializeGrowthOf10KMap(any(), any());
-    // ACT
     final NavigableMap<LocalDate, BigDecimal> actual = sut.initializeGrowthOf10KMap(inputDTO, growth10KCalculation);
 
-    // VERIFY
     assertFalse(actual.entrySet().stream().findFirst().isPresent());
   }
 }

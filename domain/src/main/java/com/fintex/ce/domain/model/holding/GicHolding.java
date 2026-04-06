@@ -1,19 +1,20 @@
 package com.fintex.ce.domain.model.holding;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
-import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.enumeration.InterestFreq;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Objects;
-import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import static com.fintex.ce.domain.model.enumeration.Currency.CAD;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.UUID;
+
+import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 
 @Data
 @ToString(callSuper = true)
@@ -31,14 +32,14 @@ public class GicHolding extends Holding implements MonthlyReturnGeneratableHoldi
   }
 
   private UUID uuid = UUID.randomUUID();
-  private Currency currency;
+  private CurrencyType currency;
   private LocalDate investmentDate;
   private BigDecimal clientIntRate;
   private InterestFreq interestFreq;
   private BigDecimal term;
   private String name;
 
-  public Currency getCurrency() {
+  public CurrencyType getCurrency() {
     if (Objects.isNull(currency)) {
       return CAD;
     }

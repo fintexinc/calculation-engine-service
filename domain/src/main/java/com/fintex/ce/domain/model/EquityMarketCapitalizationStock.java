@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class EquityMarketCapitalizationStock extends EquityMarketCapitalization {
+public class EquityMarketCapitalizationStock extends HoldingEquityMarketCap {
 
   private String styleBox;
 

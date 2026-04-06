@@ -1,15 +1,16 @@
 package com.fintex.ce.adapter.rest.dto;
 
 import com.fintex.ce.adapter.rest.dto.response.correlation.HoldingsKeyDTO;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.util.List;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static com.fintex.ce.util.PortfolioUtils.createKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,14 +23,13 @@ class HoldingsKeyDTOTest {
 
   @Test
   void holdingsKeyDTO_buildHoldingsKeyDTO_checkResult() {
-    // SETUP
     final String testTicker = "TEST_TICKER";
     final String testFundServCode = "TEST_FUND_SER_CODE";
     final String exchangeCode = "ExchangeCode";
     final Holding usEtfHolding = new Holding().setSecurityIdentifier(new SecurityIdentifier(testTicker, FiIdentifierType.TICKER)).setHoldingType(FinancialInstrumentType.ETF_US);
     final Holding mutualFundsHolding = new Holding().setSecurityIdentifier(new SecurityIdentifier(testFundServCode, FiIdentifierType.FUNDSERV)).setHoldingType(
         FinancialInstrumentType.MUTUAL_FUND_CANADA);
-    final Holding cash = new CashHolding().setCurrency(Currency.CAD).setHoldingType(FinancialInstrumentType.CASH);
+    final Holding cash = new CashHolding().setCurrency(CurrencyType.CAD).setHoldingType(FinancialInstrumentType.CASH);
     final Holding canadaEtfHolding = new Holding().setSecurityIdentifier(new SecurityIdentifier(testTicker, FiIdentifierType.TICKER)).setHoldingType(FinancialInstrumentType.ETF_CANADA);
 
     final EquitySecurityIdentifier usStockSecId = mock(EquitySecurityIdentifier.class);
@@ -45,10 +45,8 @@ class HoldingsKeyDTOTest {
     final List<Holding> holdings = List.of(usEtfHolding, mutualFundsHolding, cash, canadaEtfHolding, usStockHolding,
         canadaStockHolding);
 
-    // ACT
     final List<HoldingsKeyDTO> results = holdings.stream().map(HoldingsKeyDTO::buildHoldingsKeyDTO).toList();
 
-    // VERIFY
     assertEquals(6, results.size());
 
     // US ETF - has SecurityIdentifier with ticker

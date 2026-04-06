@@ -3,14 +3,16 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.port.webclient.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -25,7 +27,6 @@ class BetaCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
-    // SETUP
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher, null));
 
@@ -33,23 +34,20 @@ class BetaCalculationServiceImplTest {
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
-    when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
-    // ACT
     sut.defineCalculationMethod(req);
 
-    // VERIFY
     verify(sut).buildCalculationDto(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
-    // SETUP
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(BetaCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
@@ -58,24 +56,21 @@ class BetaCalculationServiceImplTest {
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
-    when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
-    // ACT
     sut.defineCalculationMethod(req);
 
-    // VERIFY
-    verify(tBillsFetcher).fetch(Currency.CAD);
+    verify(tBillsFetcher).fetch(CurrencyType.CAD);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      // SETUP
       final var tBillsFetcher = mock(TBillsFetcher.class);
       final var sut = mock(BetaCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
           null));
@@ -84,17 +79,15 @@ class BetaCalculationServiceImplTest {
       final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>();
       final var req = mock(PeriodCommand.class);
 
-      when(req.getCurrency()).thenReturn(Currency.CAD);
+      when(req.getCurrency()).thenReturn(CurrencyType.CAD);
       when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
       when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
       when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);
 
       doCallRealMethod().when(sut).defineCalculationMethod(req);
-      // ACT
       sut.defineCalculationMethod(req);
 
-      // VERIFY
       mockedPeriodCalculationAbstract.verify(() -> PeriodCalculationAbstract.calculateExcessReturn(treeMap, treeMap),
           Mockito.times(2));
     }

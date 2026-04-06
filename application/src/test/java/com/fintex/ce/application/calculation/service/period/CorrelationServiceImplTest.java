@@ -5,14 +5,16 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.util.ReturnFactorScale;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -28,7 +30,6 @@ class CorrelationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyGetPortfolioMonthlyReturns() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CorrelationServiceImpl.class,
         withSettings().useConstructor(Set.of(), monthlyReturnsService));
@@ -42,7 +43,7 @@ class CorrelationServiceImplTest {
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getCustomIntervalPsd()).thenReturn(LocalDate.now());
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
+    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
 
@@ -56,16 +57,13 @@ class CorrelationServiceImplTest {
     when(monthlyReturns.cutByPsd().getWeightedAverage()).thenReturn(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
-    // ACT
     sut.defineCalculationMethod(reqDTO);
 
-    // VERIFY
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, ReturnFactorScale.SCALE_OF_TWO);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD, ReturnFactorScale.SCALE_OF_TWO);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenCheckResult() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CorrelationServiceImpl.class,
         withSettings().useConstructor(Set.of(), monthlyReturnsService));
@@ -79,7 +77,7 @@ class CorrelationServiceImplTest {
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getCustomIntervalPsd()).thenReturn(LocalDate.now());
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
+    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
 
@@ -97,16 +95,13 @@ class CorrelationServiceImplTest {
     final var expected = new CorrelationCalculation(calculationDTO, baseTotalReturns, Set.of());
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
-    // ACT
     final var actual = sut.defineCalculationMethod(reqDTO);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyReqDtoSetReqCurrencyToCashHolding() {
-    // SETUP
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CorrelationServiceImpl.class,
         withSettings().useConstructor(null, monthlyReturnsService));
@@ -120,16 +115,13 @@ class CorrelationServiceImplTest {
     when(inputDTO.getCipsd()).thenReturn(LocalDate.now());
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
-    // ACT
     sut.defineCalculationMethod(reqDTO);
 
-    // VERIFY
     verify(reqDTO).setReqCurrencyToCashHolding();
   }
 
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
-    // SETUP
     final var sut = mock(CorrelationServiceImpl.class, withSettings().useConstructor(Set.of(), null));
 
     final var periodsReqDTO = mock(PeriodCommand.class);
@@ -137,16 +129,13 @@ class CorrelationServiceImplTest {
     when(sut.defineCalculationMethod(any())).thenReturn(mock(CorrelationCalculation.class));
     doCallRealMethod().when(sut).perform(any());
 
-    // ACT
     sut.perform(periodsReqDTO);
 
-    // VERIFY
     verify(sut).defineCalculationMethod(periodsReqDTO);
   }
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
-    // SETUP
     final var sut = mock(CorrelationServiceImpl.class, withSettings().useConstructor(Set.of(), null));
 
     final var periodsReqDTO = mock(PeriodCommand.class);
@@ -157,10 +146,8 @@ class CorrelationServiceImplTest {
     when(sut.defineCalculationMethod(any())).thenReturn(correlationCalculation);
     doCallRealMethod().when(sut).perform(any());
 
-    // ACT
     sut.perform(periodsReqDTO);
 
-    // VERIFY
     verify(correlationCalculation).calculate(set);
   }
 }

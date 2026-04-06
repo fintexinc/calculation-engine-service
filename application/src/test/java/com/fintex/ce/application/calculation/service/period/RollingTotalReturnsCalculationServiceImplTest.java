@@ -6,20 +6,20 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.RollingTotalReturnsResult;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 
 import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.FUNDSERV;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +36,6 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
   @Test
   void shouldPerform_whenCheckResult() {
-    // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
@@ -48,7 +47,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
     req.setRollingPeriods(Set.of("12", "11", "10"));
-    req.setCurrency(Currency.CAD);
+    req.setCurrency(CurrencyType.CAD);
 
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
     final var expected = mock(RollingTotalReturnsResult.class);
@@ -57,16 +56,13 @@ class RollingTotalReturnsCalculationServiceImplTest {
     when(rollingCalculation.calculate(any())).thenReturn(expected);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     final var actual = sut.perform(req);
 
-    // VERIFY
     assertSame(expected, actual);
   }
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
-    // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
@@ -78,23 +74,20 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
     req.setRollingPeriods(Set.of("12", "11", "10"));
-    req.setCurrency(Currency.CAD);
+    req.setCurrency(CurrencyType.CAD);
 
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
 
     when(sut.defineCalculationMethod(any())).thenReturn(rollingCalculation);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     sut.perform(req);
 
-    // VERIFY
     verify(rollingCalculation).calculate(req.getRollingPeriods());
   }
 
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
-    // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
@@ -105,23 +98,20 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
-    req.setCurrency(Currency.CAD);
+    req.setCurrency(CurrencyType.CAD);
 
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
 
     when(sut.defineCalculationMethod(req)).thenReturn(rollingCalculation);
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     sut.perform(req);
 
-    // VERIFY
     verify(sut).defineCalculationMethod(req);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenCheckResult() {
-    // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of("10", "20")));
 
@@ -135,17 +125,14 @@ class RollingTotalReturnsCalculationServiceImplTest {
     when(inputDTO.getWeightedAveragePortfolioReturns()).thenReturn(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
-    // ACT
     final var actual = sut.defineCalculationMethod(req);
 
-    // VERIFY
     assertEquals(inputDTO.getWeightedAveragePortfolioReturns(), actual.getPortfolioTotalReturns());
     ComparisonUtils.compareCollections(Set.of("10", "20"), actual.getDefaultPeriods());
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
-    // SETUP
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
@@ -157,16 +144,13 @@ class RollingTotalReturnsCalculationServiceImplTest {
     when(sut.buildCalculationDto(req, returnFactorScale)).thenReturn(input);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
-    // ACT
     sut.defineCalculationMethod(req);
 
-    // VERIFY
     verify(sut).buildCalculationDto(req, returnFactorScale);
   }
 
   @Test
   void shouldBuildWeightedAverageInputDto_whenCheckResult() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
@@ -182,17 +166,14 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
 
-    // ACT
     final var actual = sut.buildCalculationDto(req, returnFactorScale);
 
-    // VERIFY
     final CalculationDTO expected = new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioBaseTotalReturns);
     Assertions.assertEquals(expected, actual);
   }
 
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, null));
@@ -203,22 +184,19 @@ class RollingTotalReturnsCalculationServiceImplTest {
     holding.setValue(BigDecimal.valueOf(50000));
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
-    req.setCurrency(Currency.CAD);
+    req.setCurrency(CurrencyType.CAD);
     req.setCustomPsd(LocalDate.now());
     req.setCustomPed(LocalDate.now().plusMonths(10));
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    // ACT
     sut.buildCalculationDto(req, returnFactorScale);
 
-    // VERIFY
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), req.getCurrency(), returnFactorScale);
   }
 
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, null));
@@ -229,7 +207,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
     holding.setValue(BigDecimal.valueOf(50000));
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
-    req.setCurrency(Currency.CAD);
+    req.setCurrency(CurrencyType.CAD);
     req.setCustomPsd(LocalDate.now());
     req.setCustomPed(LocalDate.now().plusMonths(10));
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
@@ -237,10 +215,8 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    // ACT
     sut.buildCalculationDto(req, returnFactorScale);
 
-    // VERIFY
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, req.getCustomPsd(), req
         .getCustomPed());
   }

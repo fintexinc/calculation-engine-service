@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ public class ReturnReqDTO {
   private LocalDate customPerformanceEndDate;
 
   @JsonProperty(value = "currency")
-  private Currency currency;
+  private CurrencyType currency;
 
   @JsonProperty(value = "holdings")
   private List<Holding> holdings;

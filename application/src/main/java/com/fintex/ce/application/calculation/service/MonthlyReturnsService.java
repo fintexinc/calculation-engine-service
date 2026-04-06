@@ -12,11 +12,11 @@ import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
 import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.webclient.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -63,7 +63,7 @@ public class MonthlyReturnsService {
         .getWeightedAverage();
   }
 
-  public Returns<HoldingMonthlyReturns> getMonthlyReturns(List<Holding> holdings, Currency currency) {
+  public Returns<HoldingMonthlyReturns> getMonthlyReturns(List<Holding> holdings, CurrencyType currency) {
     Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List.of());
     originalMonthlyReturns.putAll(monthlyReturnsGenerator.generateGicMonthlyReturns(holdings));
     return getMonthlyReturns(originalMonthlyReturns);
@@ -74,13 +74,13 @@ public class MonthlyReturnsService {
   }
 
   public Returns<HoldingMonthlyReturns> getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(List<Holding> holdings,
-      Currency currency) {
+      CurrencyType currency) {
     Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List.of());
     return Returns.initOnlyWithReturnsDataValidation(originalMonthlyReturns);
   }
 
   public Returns<HoldingMonthlyReturns> getPortfolioMonthlyReturns(final List<Holding> holdings,
-      final Currency currency,
+      final CurrencyType currency,
       final ReturnFactorScale returnFactorScale) throws FdsDataValidationException {
     Returns<HoldingMonthlyReturns> portfolioMonthlyReturns = getMonthlyReturns(holdings, currency);
 
@@ -95,7 +95,7 @@ public class MonthlyReturnsService {
   }
 
   public Returns<HoldingMonthlyReturns> getBenchmarkMonthlyReturns(final List<Holding> holdings,
-      final Currency currency,
+      final CurrencyType currency,
       final ReturnFactorScale returnFactorScale) {
     Returns<HoldingMonthlyReturns> benchmarkMonthlyReturns = getMonthlyReturns(holdings, currency);
 

@@ -84,7 +84,6 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
-import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.calculation.MaturityAllocationType;
@@ -135,6 +134,7 @@ import com.fintex.ce.domain.model.result.TrailingTotalReturnsResult;
 import com.fintex.ce.domain.model.result.TreynorRatioResult;
 import com.fintex.ce.domain.model.result.UpsideCaptureResult;
 import com.fintex.ce.domain.model.result.YieldResult;
+import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.sm.model.domain.enumeration.StyleBoxType;
@@ -185,7 +185,7 @@ public class PortfolioController {
   private final BreakdownCalculationService<CountryExposureResult, CountryRegionType> countryExposureCalculation;
   private final BreakdownCalculationService<GeographicExposureResult, GeographicRegionType> fixedIncomeGeographicExposureCalculation;
   private final BreakdownCalculationService<AssetAllocationResult, AssetAllocationRegion> assetAllocationService;
-  private final BreakdownCalculationService<EquityMarketCapResult, EquityMarketCapType> equityMarketCapCalculationService;
+  private final BreakdownCalculationService<EquityMarketCapResult, EquityMarketCapitalizationType> equityMarketCapCalculationService;
   private final BreakdownCalculationService<FixedIncomeSectorResult, FixedIncomeSectorType> fixedIncomeBondSectorCalculationService;
   private final BreakdownCalculationService<AssetAllocationEMResult, AssetAllocationRegionEmType> assetAllocationEMCalculation;
   private final CalculationService<Growth10KResult, ReturnCommand> growthOf10KCalculationService;
@@ -226,7 +226,7 @@ public class PortfolioController {
       BreakdownCalculationService<AssetAllocationResult, AssetAllocationRegion> assetAllocationService,
       BreakdownCalculationService<EquitySectorResult, EquitySectorAllocationType> equitySectorCalculation,
       CalculationService<AnnualReturnResult<Integer>, ReturnCommand> annualReturnService,
-      BreakdownCalculationService<EquityMarketCapResult, EquityMarketCapType> equityMarketCapCalculationService,
+      BreakdownCalculationService<EquityMarketCapResult, EquityMarketCapitalizationType> equityMarketCapCalculationService,
       BreakdownCalculationService<FixedIncomeSectorResult, FixedIncomeSectorType> fixedIncomeBondSectorCalculationService,
       BreakdownCalculationService<CountryExposureResult, CountryRegionType> countryExposureCalculation,
       @Qualifier("fixedIncomeGeographicExposureCalculationImpl") BreakdownCalculationService<GeographicExposureResult, GeographicRegionType> fixedIncomeGeographicExposureCalculation,

@@ -1,7 +1,7 @@
 package com.fintex.ce.domain.model.holding;
 
-import com.fintex.ce.domain.model.enumeration.Currency;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,6 +14,6 @@ public interface MonthlyReturnGeneratableHolding {
 
   BigDecimal getClientIntRate();
 
-  Currency getCurrency();
+  CurrencyType getCurrency();
 
 }
