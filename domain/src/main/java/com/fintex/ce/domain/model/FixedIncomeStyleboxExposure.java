@@ -2,14 +2,16 @@ package com.fintex.ce.domain.model;
 
 import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +20,7 @@ import lombok.experimental.Accessors;
 public class FixedIncomeStyleboxExposure implements ProviderAware {
 
   private FinancialInstrumentType holdingType;
-  private Map<String, BigDecimal> boxValues;
+  private Map<FixedIncomeStyleBoxType, BigDecimal> boxValues;
 
   // Common fields
   private String holdingId;

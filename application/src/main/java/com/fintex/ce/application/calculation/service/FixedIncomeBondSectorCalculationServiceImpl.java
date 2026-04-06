@@ -65,9 +65,9 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   public ExposureDataHolder<FixedIncomeSectorType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     Map<Holding, FixedIncomeBondSecurities> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    return AllocationMappingUtils.mapToAllocations(rawData,
-        FixedIncomeBondSecurities::getFixedIncomeBondSectors, FixedIncomeSectorType::fromValue,
-        ALLOCATION_DEFAULT_MAP, WRN_BS_BS_001, "FDS Fixed Income Sector Allocation");
+    return AllocationMappingUtils.mapTypedAllocations(rawData,
+        FixedIncomeBondSecurities::getFixedIncomeBondSectors,
+        ALLOCATION_DEFAULT_MAP, WRN_BS_BS_001);
   }
 
   @Override
@@ -100,8 +100,8 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   }
 
   private BigDecimal getFixedIncomePlusCashValue(Map.Entry<Holding, Map<AssetAllocationRegion, BigDecimal>> entry) {
-    BigDecimal fixedIncome = entry.getValue().get(FIXED_INCOME);
-    BigDecimal cash = entry.getValue().get(CASH);
+    BigDecimal fixedIncome = entry.getValue().getOrDefault(FIXED_INCOME, ZERO);
+    BigDecimal cash = entry.getValue().getOrDefault(CASH, ZERO);
     return fixedIncome.add(cash);
   }
 

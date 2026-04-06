@@ -4,13 +4,13 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.mapping.response.FixedIncomeStyleboxExposureResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
-import com.fintex.ce.domain.model.calculation.FixedIncomeStyleboxType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,13 +27,13 @@ import static java.util.stream.Collectors.toMap;
 @Service
 public class FixedIncomeStyleboxExposureCalculationServiceImpl
     extends
-      BreakdownAbstractService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleboxType> {
+      BreakdownAbstractService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleBoxType> {
 
-  static final Map<FixedIncomeStyleboxType, BigDecimal> DEFAULT_MAP;
+  static final Map<FixedIncomeStyleBoxType, BigDecimal> DEFAULT_MAP;
 
   static {
     DEFAULT_MAP = Collections.unmodifiableMap(
-        Stream.of(FixedIncomeStyleboxType.values()).collect(toMap(type -> type, type -> ZERO)));
+        Stream.of(FixedIncomeStyleBoxType.values()).collect(toMap(type -> type, type -> ZERO)));
   }
 
   private final SecurityDataFetcher<FixedIncomeStyleboxExposure> fixedIncomeStyleboxSecurityDataFetcher;
@@ -48,24 +48,24 @@ public class FixedIncomeStyleboxExposureCalculationServiceImpl
   }
 
   @Override
-  public FixedIncomeStyleboxExposureResult calculate(ExposureDataHolder<FixedIncomeStyleboxType> exposureData,
+  public FixedIncomeStyleboxExposureResult calculate(ExposureDataHolder<FixedIncomeStyleBoxType> exposureData,
       List<Holding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
       return responseMapper.toEmptyResponse(warnings);
     }
-    final Map<FixedIncomeStyleboxType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
-        FixedIncomeStyleboxType.values());
+    final Map<FixedIncomeStyleBoxType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
+        FixedIncomeStyleBoxType.values());
     return responseMapper.fromNetProducts(netProducts, warnings);
   }
 
   @Override
-  public ExposureDataHolder<FixedIncomeStyleboxType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
+  public ExposureDataHolder<FixedIncomeStyleBoxType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     Map<Holding, FixedIncomeStyleboxExposure> rawData = fixedIncomeStyleboxSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    return AllocationMappingUtils.mapToAllocations(rawData,
-        FixedIncomeStyleboxExposure::getBoxValues, FixedIncomeStyleboxType::fromValue,
-        DEFAULT_MAP, WRN_FIS_FISE_001, "FDS Get Fixed Income Stylebox Exposure");
+    return AllocationMappingUtils.mapTypedAllocations(rawData,
+        FixedIncomeStyleboxExposure::getBoxValues,
+        DEFAULT_MAP, WRN_FIS_FISE_001);
   }
 }

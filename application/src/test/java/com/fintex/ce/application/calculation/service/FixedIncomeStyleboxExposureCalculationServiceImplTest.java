@@ -3,12 +3,12 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.mapping.response.FixedIncomeStyleboxExposureResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
-import com.fintex.ce.domain.model.calculation.FixedIncomeStyleboxType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,7 +36,7 @@ class FixedIncomeStyleboxExposureCalculationServiceImplTest {
 
     final var holding = mock(Holding.class);
     final var exposure = new FixedIncomeStyleboxExposure();
-    exposure.setBoxValues(Map.of("HIGH_EXTENSIVE", BigDecimal.TEN));
+    exposure.setBoxValues(Map.of(FixedIncomeStyleBoxType.HIGH_EXTENSIVE, BigDecimal.TEN));
     final var rawData = Map.of(holding, exposure);
 
     when(fetcher.fetch(any(), any())).thenReturn(rawData);
@@ -57,12 +57,12 @@ class FixedIncomeStyleboxExposureCalculationServiceImplTest {
 
     final var holding = mock(Holding.class);
     final var holdings = List.of(holding);
-    final var exposures = Map.of(holding, Map.of(FixedIncomeStyleboxType.HIGH_EXTENSIVE, BigDecimal.TEN));
+    final var exposures = Map.of(holding, Map.of(FixedIncomeStyleBoxType.HIGH_EXTENSIVE, BigDecimal.TEN));
 
     doCallRealMethod().when(service).calculate(any(), any());
     service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
-    verify(service).calculateNetProducts(exposures, holdings, FixedIncomeStyleboxType.values());
+    verify(service).calculateNetProducts(exposures, holdings, FixedIncomeStyleBoxType.values());
   }
 
     @Test
@@ -74,9 +74,9 @@ class FixedIncomeStyleboxExposureCalculationServiceImplTest {
 
     final var holding = mock(Holding.class);
     final var holdings = List.of(holding);
-    final var exposures = Map.of(holding, Map.of(FixedIncomeStyleboxType.HIGH_EXTENSIVE, BigDecimal.TEN));
+    final var exposures = Map.of(holding, Map.of(FixedIncomeStyleBoxType.HIGH_EXTENSIVE, BigDecimal.TEN));
     final var netProducts = mock(Map.class);
-    when(service.calculateNetProducts(exposures, holdings, FixedIncomeStyleboxType.values())).thenReturn(netProducts);
+    when(service.calculateNetProducts(exposures, holdings, FixedIncomeStyleBoxType.values())).thenReturn(netProducts);
 
     doCallRealMethod().when(service).calculate(any(), any());
     service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
