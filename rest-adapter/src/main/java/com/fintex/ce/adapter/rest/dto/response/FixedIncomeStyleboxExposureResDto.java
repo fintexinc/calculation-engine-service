@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.model.calculation.FixedIncomeStyleboxType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
+import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,9 +20,9 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 public class FixedIncomeStyleboxExposureResDto extends WarningDTO {
 
-  private Map<FixedIncomeStyleboxType, BigDecimal> fixedIncomeStyleboxExposure;
+  private Map<FixedIncomeStyleBoxType, BigDecimal> fixedIncomeStyleboxExposure;
 
-  public FixedIncomeStyleboxExposureResDto(Map<FixedIncomeStyleboxType, BigDecimal> fixedIncomeStyleboxExposure,
+  public FixedIncomeStyleboxExposureResDto(Map<FixedIncomeStyleBoxType, BigDecimal> fixedIncomeStyleboxExposure,
       List<Warning> warnings) {
     super(warnings);
     this.fixedIncomeStyleboxExposure = fixedIncomeStyleboxExposure;

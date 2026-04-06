@@ -5,6 +5,7 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
+import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -82,7 +83,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
 
     final var holding = mock(Holding.class);
     final var rawData = new FixedIncomeBondSecurities();
-    rawData.setFixedIncomeBondSectors(Map.of("CORPORATE_BONDS", TEN));
+    rawData.setFixedIncomeBondSectors(Map.of(FixedIncomeSectorType.CORPORATE_BONDS, TEN));
 
     when(fixedIncomeFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawData));
     doCallRealMethod().when(service).fetchExposures(any());

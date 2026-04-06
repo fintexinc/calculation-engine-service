@@ -1,17 +1,19 @@
 package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
-import com.fintex.ce.domain.model.calculation.FixedIncomeStyleboxType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.mapping.ResponseMapper;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Component;
+
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 
 /**
@@ -23,10 +25,10 @@ public class FixedIncomeStyleboxExposureResponseMapper
     implements
       ResponseMapper<FixedIncomeStyleboxExposure, FixedIncomeStyleboxExposureResult> {
 
-  static final Map<FixedIncomeStyleboxType, BigDecimal> DEFAULT_MAP = new EnumMap<>(FixedIncomeStyleboxType.class);
+  static final Map<FixedIncomeStyleBoxType, BigDecimal> DEFAULT_MAP = new EnumMap<>(FixedIncomeStyleBoxType.class);
 
   static {
-    Stream.of(FixedIncomeStyleboxType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
+    Stream.of(FixedIncomeStyleBoxType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
   }
 
   @Override
@@ -37,10 +39,8 @@ public class FixedIncomeStyleboxExposureResponseMapper
       defaultResult.setWarnings(List.of());
       return defaultResult;
     }
-    // Domain model uses String keys - convert to enum
-    Map<FixedIncomeStyleboxType, BigDecimal> enumMap = convertToEnumMap(domain.getBoxValues());
     FixedIncomeStyleboxExposureResult result = new FixedIncomeStyleboxExposureResult();
-    result.setFixedIncomeStyleboxExposure(toUserScale(enumMap));
+    result.setFixedIncomeStyleboxExposure(toUserScale(domain.getBoxValues()));
     result.setWarnings(List.of());
     return result;
   }
@@ -62,7 +62,7 @@ public class FixedIncomeStyleboxExposureResponseMapper
    *          list of warnings to include in response
    * @return the response DTO with scaled values
    */
-  public FixedIncomeStyleboxExposureResult fromNetProducts(Map<FixedIncomeStyleboxType, BigDecimal> netProducts,
+  public FixedIncomeStyleboxExposureResult fromNetProducts(Map<FixedIncomeStyleBoxType, BigDecimal> netProducts,
       List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
       FixedIncomeStyleboxExposureResult defaultResult = new FixedIncomeStyleboxExposureResult();
@@ -90,19 +90,4 @@ public class FixedIncomeStyleboxExposureResponseMapper
     return result;
   }
 
-  /**
-   * Converts String-keyed map from domain model to enum-keyed map.
-   */
-  private Map<FixedIncomeStyleboxType, BigDecimal> convertToEnumMap(Map<String, BigDecimal> stringMap) {
-    Map<FixedIncomeStyleboxType, BigDecimal> result = new EnumMap<>(FixedIncomeStyleboxType.class);
-    for (Map.Entry<String, BigDecimal> entry : stringMap.entrySet()) {
-      try {
-        FixedIncomeStyleboxType type = FixedIncomeStyleboxType.valueOf(entry.getKey());
-        result.put(type, entry.getValue());
-      } catch (IllegalArgumentException ignored) {
-        // Skip unknown type keys
-      }
-    }
-    return result;
-  }
 }

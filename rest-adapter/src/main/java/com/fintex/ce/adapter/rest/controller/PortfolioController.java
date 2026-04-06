@@ -86,7 +86,6 @@ import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.calculation.EquityMarketCapType;
 import com.fintex.ce.domain.model.calculation.FixedIncomeSectorType;
-import com.fintex.ce.domain.model.calculation.FixedIncomeStyleboxType;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.calculation.MaturityAllocationType;
 import com.fintex.ce.domain.model.result.AlphaResult;
@@ -137,6 +136,7 @@ import com.fintex.ce.domain.model.result.TreynorRatioResult;
 import com.fintex.ce.domain.model.result.UpsideCaptureResult;
 import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -179,7 +179,7 @@ public class PortfolioController {
   private final CalculationService<IncomeForecastResult, IncomeForecastCommand> incomeForecastCalculationService;
   private final CalculationService<YieldResult, YieldCommand> yieldCalculationService;
   private final BreakdownCalculationService<MaturityAllocationResult, MaturityAllocationType> maturityAllocationCalculationService;
-  private final BreakdownCalculationService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleboxType> fixedIncomeStyleboxExposureCalculationService;
+  private final BreakdownCalculationService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleBoxType> fixedIncomeStyleboxExposureCalculationService;
   private final BreakdownCalculationService<ClassificationAllocationResult, ClassificationAllocationType> classificationAllocationCalculationService;
   private final BreakdownCalculationService<GeographicExposureResult, GeographicRegionType> equityGeographicExposureCalculationService;
   private final BreakdownCalculationService<CountryExposureResult, CountryRegionType> countryExposureCalculation;
@@ -241,7 +241,7 @@ public class PortfolioController {
       CalculationService<IncomeForecastResult, IncomeForecastCommand> incomeForecastCalculationService,
       CalculationService<YieldResult, YieldCommand> yieldCalculationService,
       BreakdownCalculationService<MaturityAllocationResult, MaturityAllocationType> maturityAllocationCalculationService,
-      BreakdownCalculationService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleboxType> fixedIncomeStyleboxExposureCalculationService,
+      BreakdownCalculationService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleBoxType> fixedIncomeStyleboxExposureCalculationService,
       BreakdownCalculationService<ClassificationAllocationResult, ClassificationAllocationType> classificationAllocationCalculationService,
       CalculationService<TopCommonHoldingsResult, TopCommonHoldingsCommand> commonHoldingsService,
       PeriodCalculationService<RollingStandardDeviationResult, RollingCalculationCommand> rollingStandardDeviationCalculationService,
