@@ -1,6 +1,7 @@
 package com.fintex.ce.domain.model.calculation;
 
 import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
+
 import java.util.Set;
 
 public enum FixedIncomeCreditQuality {

@@ -1,18 +1,21 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
+import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquitySectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.sm.model.domain.value.EquitySectorAllocationTypeNameValue;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 class EquitySectorAllocationFetcherTest
@@ -23,11 +26,12 @@ class EquitySectorAllocationFetcherTest
   @Mock
   private EquitySectorAllocationMapper mapper;
 
-  private EquitySectorAllocationFetcher fetcher;
+  private AbstractSecurityMasterFetcher<EquitySector, EquitySectorAllocation> fetcher;
 
   @BeforeEach
   void setUp() {
-    fetcher = new EquitySectorAllocationFetcher(client, mapper, ENDPOINT_PATH);
+    fetcher = new AbstractSecurityMasterFetcher<>(client, ENDPOINT_PATH, mapper,
+        new ParameterizedTypeReference<List<SecurityAttributeResult<EquitySectorAllocation>>>() {}) {};
   }
 
   @Override

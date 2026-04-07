@@ -18,8 +18,8 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AAA;
 import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
+import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AAA;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;

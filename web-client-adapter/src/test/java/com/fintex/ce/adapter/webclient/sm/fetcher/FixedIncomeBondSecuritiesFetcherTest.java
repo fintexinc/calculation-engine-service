@@ -1,17 +1,19 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
+import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeSectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.value.FixedIncomeSectorAllocationTypeNameValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,11 +28,12 @@ class FixedIncomeBondSecuritiesFetcherTest
   @Mock
   private FixedIncomeSectorAllocationMapper mapper;
 
-  private FixedIncomeBondSecuritiesFetcher fetcher;
+  private AbstractSecurityMasterFetcher<FixedIncomeBondSecurities, FixedIncomeSectorAllocation> fetcher;
 
   @BeforeEach
   void setUp() {
-    fetcher = new FixedIncomeBondSecuritiesFetcher(client, mapper, ENDPOINT_PATH);
+    fetcher = new AbstractSecurityMasterFetcher<>(client, ENDPOINT_PATH, mapper,
+        new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeSectorAllocation>>>() {}) {};
   }
 
   @Override

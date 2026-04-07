@@ -1,5 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
+import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquityMarketCapitalizationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.HoldingEquityMarketCap;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
@@ -24,11 +26,12 @@ class EquityMarketCapitalizationFetcherTest
   @Mock
   private EquityMarketCapitalizationMapper mapper;
 
-  private EquityMarketCapitalizationFetcher fetcher;
+  private AbstractSecurityMasterFetcher<HoldingEquityMarketCap, EquityMarketCapitalization> fetcher;
 
   @BeforeEach
   void setUp() {
-    fetcher = new EquityMarketCapitalizationFetcher(client, mapper, ENDPOINT_PATH);
+    fetcher = new AbstractSecurityMasterFetcher<>(client, ENDPOINT_PATH, mapper,
+        new ParameterizedTypeReference<List<SecurityAttributeResult<EquityMarketCapitalization>>>() {}) {};
   }
 
   @Override

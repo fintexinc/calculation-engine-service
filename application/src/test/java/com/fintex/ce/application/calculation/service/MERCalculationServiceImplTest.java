@@ -1,15 +1,15 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AverageMerResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

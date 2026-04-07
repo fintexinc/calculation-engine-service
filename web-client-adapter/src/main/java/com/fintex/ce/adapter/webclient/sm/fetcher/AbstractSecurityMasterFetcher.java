@@ -6,11 +6,15 @@ import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest;
 import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest.TypedIdentifiers;
 import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.util.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,45 +22,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.util.CollectionUtils;
+
 import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Abstract base class for fetching data from Security Master REST API.
  *
- * @param <DomainModel> Domain model type returned to the application (e.g., AssetAllocation)
- * @param <SmsResponse> SMS API response type that will be mapped to domain model
+ * @param <D> Domain model type returned to the application (e.g., AssetAllocation)
+ * @param <R> SMS API response type that will be mapped to domain model
  */
 @Slf4j
-public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> implements SecurityDataFetcher<DomainModel> {
+public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDataFetcher<D> {
 
     private static final String KEY_SEPARATOR = ":";
 
     protected final SecurityMasterWebClient client;
+    protected final String endpointPath;
+    protected final SecurityMasterResponseMapper<D, R> mapper;
+    protected final ParameterizedTypeReference<List<SecurityAttributeResult<R>>> responseType;
 
-    protected AbstractSecurityMasterFetcher(SecurityMasterWebClient client) {
+    protected AbstractSecurityMasterFetcher(SecurityMasterWebClient client, String endpointPath,
+        SecurityMasterResponseMapper<D, R> mapper,
+        ParameterizedTypeReference<List<SecurityAttributeResult<R>>> responseType) {
         this.client = client;
+        this.endpointPath = endpointPath;
+        this.mapper = mapper;
+        this.responseType = responseType;
     }
 
-    /**
-     * Returns the endpoint path for this fetcher.
-     */
-    protected abstract String endpointPath();
-
-    /**
-     * Returns the parameterized type reference for deserializing the response.
-     */
-    protected abstract ParameterizedTypeReference<List<SecurityAttributeResult<SmsResponse>>> responseType();
-
-    /**
-     * Returns the mapper for converting SMS response to domain model.
-     */
-    protected abstract SecurityMasterResponseMapper<DomainModel, SmsResponse> responseMapper();
-
     @Override
-    public Map<Holding, DomainModel> fetch(List<? extends Holding> holdings, List<DataProvider> providers) {
+    public Map<Holding, D> fetch(List<? extends Holding> holdings, List<DataProvider> providers) {
         if (CollectionUtils.isEmpty(holdings)) {
             return Collections.emptyMap();
         }
@@ -71,7 +66,7 @@ public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> im
         List<TypedIdentifiers> typedIdentifiers = buildTypedIdentifiers(groupedHoldings, identifierToHoldings);
 
         if (CollectionUtils.isEmpty(typedIdentifiers)) {
-            log.debug("No valid identifiers to fetch for endpoint: {}", endpointPath());
+            log.debug("No valid identifiers to fetch for endpoint: {}", endpointPath);
             return Collections.emptyMap();
         }
 
@@ -80,17 +75,17 @@ public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> im
                 .dataProviders(providers)
                 .build();
 
-        List<SecurityAttributeResult<SmsResponse>> responses = client.post(
-                endpointPath(),
+        List<SecurityAttributeResult<R>> responses = client.post(
+                endpointPath,
                 request,
-                responseType());
+                responseType);
 
-        Map<Holding, DomainModel> result = mapResponsesToHoldings(
+        Map<Holding, D> result = mapResponsesToHoldings(
                 responses != null ? responses : List.of(),
                 identifierToHoldings);
 
         log.debug("Fetched {} results for {} holdings from endpoint: {}",
-                result.size(), holdings.size(), endpointPath());
+                result.size(), holdings.size(), endpointPath);
 
         return result;
     }
@@ -138,8 +133,8 @@ public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> im
                 .build();
     }
 
-    private Map<Holding, DomainModel> mapResponsesToHoldings(
-            List<SecurityAttributeResult<SmsResponse>> responses,
+    private Map<Holding, D> mapResponsesToHoldings(
+            List<SecurityAttributeResult<R>> responses,
             Map<String, List<Holding>> identifierToHoldings) {
 
         if (CollectionUtils.isEmpty(responses)) {
@@ -155,8 +150,8 @@ public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> im
                         (existing, replacement) -> existing));
     }
 
-    private Map<Holding, DomainModel> mapResponseToHoldings(
-            SecurityAttributeResult<SmsResponse> response,
+    private Map<Holding, D> mapResponseToHoldings(
+            SecurityAttributeResult<R> response,
             Map<String, List<Holding>> identifierToHoldings) {
 
         String responseKey = buildKey(response.getIdentifier());
@@ -167,17 +162,16 @@ public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse> im
             return Collections.emptyMap();
         }
 
-        SecurityMasterResponseMapper<DomainModel, SmsResponse> mapper = responseMapper();
         return holdings.stream()
                 .map(holding -> {
-                    DomainModel mapped = mapper.map(response.getData(), holding);
+                    D mapped = mapper.map(response.getData(), holding);
                     return mapped != null ? Map.entry(holding, mapped) : null;
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private boolean isValidResponse(SecurityAttributeResult<SmsResponse> response) {
+    private boolean isValidResponse(SecurityAttributeResult<R> response) {
         return response != null && response.getIdentifier() != null && response.getData() != null;
     }
 

@@ -3,9 +3,13 @@ package com.fintex.ce.application.mapping;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.DataProvider;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -14,9 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.util.FilterUtils.CASH_PREDICATE;

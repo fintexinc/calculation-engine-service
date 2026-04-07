@@ -10,13 +10,16 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegionEmType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.sm.model.DataProvider;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationEMResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.ExposureDataHolder;
+import com.fintex.sm.model.DataProvider;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
@@ -38,11 +40,11 @@ import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.CountryRegionType.UNITED_STATES;
-import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.util.CalculationUtils.sum;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
+import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 import static java.math.BigDecimal.ZERO;
 
 @Service
