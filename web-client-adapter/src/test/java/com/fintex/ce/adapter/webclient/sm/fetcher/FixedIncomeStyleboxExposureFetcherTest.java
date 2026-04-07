@@ -1,5 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
+import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeStyleboxExposureMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,11 +27,12 @@ class FixedIncomeStyleboxExposureFetcherTest
   @Mock
   private FixedIncomeStyleboxExposureMapper mapper;
 
-  private FixedIncomeStyleboxExposureFetcher fetcher;
+  private AbstractSecurityMasterFetcher<FixedIncomeStyleboxExposure, FixedIncomeStyleBoxes> fetcher;
 
   @BeforeEach
   void setUp() {
-    fetcher = new FixedIncomeStyleboxExposureFetcher(client, mapper, ENDPOINT_PATH);
+    fetcher = new AbstractSecurityMasterFetcher<>(client, ENDPOINT_PATH, mapper,
+        new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeStyleBoxes>>>() {}) {};
   }
 
   @Override

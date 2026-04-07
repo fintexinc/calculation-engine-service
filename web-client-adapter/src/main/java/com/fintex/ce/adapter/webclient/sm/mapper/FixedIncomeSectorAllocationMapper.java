@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.value.FixedIncomeSectorAllocationTypeNameValue;
 import org.springframework.stereotype.Component;
 

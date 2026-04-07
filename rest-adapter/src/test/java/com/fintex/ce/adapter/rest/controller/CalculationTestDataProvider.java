@@ -65,7 +65,6 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.calculation.MaturityAllocationType;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
@@ -125,16 +124,18 @@ import com.fintex.ce.domain.model.result.core.RollingIntervalResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.sm.model.domain.enumeration.StyleBoxType;
+import lombok.experimental.UtilityClass;
+import org.junit.jupiter.params.provider.Arguments;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-import lombok.experimental.UtilityClass;
-import org.junit.jupiter.params.provider.Arguments;
 
 @UtilityClass
 class CalculationTestDataProvider {

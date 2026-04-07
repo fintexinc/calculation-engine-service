@@ -4,7 +4,6 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.mapping.response.EquityStyleboxExposureResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import com.fintex.ce.domain.model.holding.Holding;

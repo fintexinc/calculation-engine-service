@@ -4,12 +4,13 @@ import com.fintex.ce.domain.model.EquityCountryAllocation;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.CountryAllocation;
 import com.fintex.sm.model.domain.value.CountryValue;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 
 /**
  * Maps Security Master CountryAllocation response to EquityCountryAllocation domain model.

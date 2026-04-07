@@ -1,18 +1,21 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
+import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.CreditQualityMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.domain.model.CreditQuality;
 import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.rating.CreditQualityRatings;
 import com.fintex.sm.model.domain.value.CreditQualityRatingTypeValue;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 class CreditQualityRestFetcherTest
@@ -23,11 +26,12 @@ class CreditQualityRestFetcherTest
   @Mock
   private CreditQualityMapper mapper;
 
-  private CreditQualityRestFetcher fetcher;
+  private AbstractSecurityMasterFetcher<CreditQuality, CreditQualityRatings> fetcher;
 
   @BeforeEach
   void setUp() {
-    fetcher = new CreditQualityRestFetcher(client, mapper, ENDPOINT_PATH);
+    fetcher = new AbstractSecurityMasterFetcher<>(client, ENDPOINT_PATH, mapper,
+        new ParameterizedTypeReference<List<SecurityAttributeResult<CreditQualityRatings>>>() {}) {};
   }
 
   @Override

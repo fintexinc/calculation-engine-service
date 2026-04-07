@@ -5,13 +5,14 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.sm.model.domain.value.EquitySectorAllocationTypeNameValue;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 
 @Component
 public class EquitySectorAllocationMapper

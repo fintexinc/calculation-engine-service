@@ -14,15 +14,16 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_CQ_CQ_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CalculationUtils.sumProduct;
@@ -31,6 +32,7 @@ import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
 import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
+import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 
 @Service
 public class CreditQualityServiceImpl implements CalculationService<CreditQualityResult, PortfolioHoldingsCommand> {

@@ -4,6 +4,8 @@ import com.fintex.ce.domain.model.CreditQuality;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.rating.CreditQualityRatings;
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -13,7 +15,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 
 @Component
 public class CreditQualityMapper
