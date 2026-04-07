@@ -46,6 +46,7 @@ application:
   rest-template-enabled: true
 
 default:
+  data-providers: MORNINGSTAR
   periods:
     trailing-total-returns: "1,3,6,12,36,60,120,YEAR_TO_DATE,SINCE_PERFORMANCE_START_DATE"
     leading-total-returns: "1,3,6,12,36,60,120"

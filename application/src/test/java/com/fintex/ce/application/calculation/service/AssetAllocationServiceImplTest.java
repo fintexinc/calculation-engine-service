@@ -12,14 +12,14 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AssetAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 
+import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,7 +42,7 @@ class AssetAllocationServiceImplTest {
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
-        assetAllocationDataMapper, responseMapper, securityDataPort));
+        assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final var allocations = Map.of(holding, mock(HoldingAssetAllocation.class));
@@ -68,7 +68,7 @@ class AssetAllocationServiceImplTest {
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
-        assetAllocationDataMapper, responseMapper, securityDataPort));
+        assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
     final var allocations = Map.of(mock(Holding.class), mock(HoldingAssetAllocation.class));
     when(securityDataPort.fetch(anyList(), anyList())).thenReturn(allocations);
@@ -90,7 +90,7 @@ class AssetAllocationServiceImplTest {
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
-        assetAllocationDataMapper, responseMapper, securityDataPort));
+        assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final var holdings = List.of(holding);
@@ -112,7 +112,7 @@ class AssetAllocationServiceImplTest {
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
-        assetAllocationDataMapper, responseMapper, securityDataPort));
+        assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final var holdings = List.of(holding);
@@ -137,7 +137,7 @@ class AssetAllocationServiceImplTest {
     final var securityDataPort = mock(SecurityDataFetcher.class);
 
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
-        assetAllocationDataMapper, responseMapper, securityDataPort));
+        assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final var holdings = List.of(holding);

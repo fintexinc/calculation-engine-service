@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.FixedIncomeBondSectorCalculation;
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
+import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
@@ -15,9 +16,8 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,15 +25,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_BS_BS_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
-import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
+import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
 
 @Service
+@RequiredArgsConstructor
 public class FixedIncomeBondSectorCalculationServiceImpl
     extends
       BreakdownAbstractService<FixedIncomeSectorResult, FixedIncomeSecuritiesAllocationType> {
@@ -51,16 +54,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   private final SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSectorSecurityDataFetcher;
   private final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher;
   private final AssetAllocationDataMapper assetAllocationDataMapper;
-
-  public FixedIncomeBondSectorCalculationServiceImpl(
-      SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSectorSecurityDataFetcher,
-      SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher,
-      AssetAllocationDataMapper assetAllocationDataMapper) {
-    super();
-    this.fixedIncomeBondSectorSecurityDataFetcher = fixedIncomeBondSectorSecurityDataFetcher;
-    this.assetAllocationSecurityDataFetcher = assetAllocationSecurityDataFetcher;
-    this.assetAllocationDataMapper = assetAllocationDataMapper;
-  }
+  private final DefaultDataProperties defaultDataProperties;
 
   @Override
   public CalculationMetric getMetric() {
@@ -77,8 +71,21 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   }
 
   @Override
+  public FixedIncomeSectorResult perform(PortfolioHoldingsCommand command) {
+    ExposureDataHolder<FixedIncomeSecuritiesAllocationType> exposureData = fetchExposures(command);
+    List<DataProvider> providers = getSpecifiedIfEmpty(command.getDataProviders(),
+        defaultDataProperties.getDataProviders());
+    return calculate(exposureData, command.getHoldings(), providers);
+  }
+
+  @Override
   public FixedIncomeSectorResult calculate(ExposureDataHolder<FixedIncomeSecuritiesAllocationType> exposureData,
       List<Holding> holdings) {
+    return calculate(exposureData, holdings, defaultDataProperties.getDataProviders());
+  }
+
+  private FixedIncomeSectorResult calculate(ExposureDataHolder<FixedIncomeSecuritiesAllocationType> exposureData,
+      List<Holding> holdings, List<DataProvider> dataProviders) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
@@ -88,7 +95,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
       return defaultResult;
     }
 
-    Map<Holding, BigDecimal> fixedIncomePlusCash = getFixedIncomePlusCash(holdings, warnings);
+    Map<Holding, BigDecimal> fixedIncomePlusCash = getFixedIncomePlusCash(holdings, warnings, dataProviders);
 
     FixedIncomeBondSectorCalculation calculation = new FixedIncomeBondSectorCalculation(exposures, holdings, warnings,
         fixedIncomePlusCash);
@@ -96,9 +103,9 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   }
 
   private Map<Holding, BigDecimal> getFixedIncomePlusCash(final List<Holding> holdings,
-      final List<Warning> warnings) {
+      final List<Warning> warnings, final List<DataProvider> dataProviders) {
     final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
-        holdings, List.of(MORNINGSTAR));
+        holdings, dataProviders);
     var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
     return assetAllocations.entrySet()
         .stream()

@@ -55,4 +55,8 @@ public class FilterUtils {
     return list;
   }
 
+  public static <T> List<T> getSpecifiedIfEmpty(List<T> list, List<T> defaults) {
+    return list == null || list.isEmpty() ? defaults : list;
+  }
+
 }

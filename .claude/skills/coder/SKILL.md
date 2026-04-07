@@ -10,80 +10,77 @@ description: >
 
 # Coding Guidelines
 
-Portfolio calculation engine: fetches data from Security Master (SM) via REST, performs
-financial calculations. **No database, no cache, no GraphQL.**
+Portfolio calculation microservice: Java 21, Spring Boot 3.4.6, multi-module Maven, Hexagonal Architecture.
+Fetches data from Security Master (SM) via REST, performs financial calculations.
+**No database, no cache, no GraphQL.**
 
 ---
 
-## 1) CRITICAL: Think Hierarchy First
+## Build & Test
 
-**Before writing ANY class, ask: "Can this be abstracted?"**
-
-This codebase uses deep hierarchies. Example:
-
+```bash
+mvn clean install                          # Full build with tests
+mvn clean install -DskipTests=true         # Build without tests
+mvn test -pl application                   # Tests in one module
+mvn test -pl application -Dtest=SharpeRatioCalculationServiceImplTest  # Single test
+mvn compile -pl <module> -am              # Compile module with deps
+mvn spotless:apply                         # Format code
+mvn spotless:check                         # Check formatting
+mvn spring-boot:run -D"spring-boot.run.profiles"=dev  # Run locally
+mvn jib:build                              # Build Docker image
 ```
-Security (abstract)
-├── TradableSecurity (abstract)
-│   ├── Etf
-│   ├── Fund
-│   ├── Stock
-│   └── Index
-└── ...
-    └── ...
-```
+
+---
+
+## Module Structure & Rules
+
+| Module               | Purpose                                                   | Spring? |
+|----------------------|-----------------------------------------------------------|---------|
+| `domain`             | Pure domain models, enums, DTOs, calculation types        | No      |
+| `api`                | Port interfaces, shared utilities, service interfaces     | No      |
+| `application`        | Calculation orchestration, service impls, response mappers| Minimal |
+| `rest-adapter`       | REST controllers, request/response DTOs, validation chain | Yes     |
+| `web-client-adapter` | SM REST fetchers, mappers, stubs                          | Yes     |
+| `bootstrap`          | Spring Boot entry point, bean wiring, config              | Yes     |
+
+**Rules:**
+- `domain` and `api` must NOT depend on Spring Framework (no spring-context, no @Component)
+- Adapters must not call each other — communicate through ports
+- Application layer uses port interfaces, never concrete adapters
+- `@Service`/`@Component` for bean registration; `@Bean` in `@Configuration` only for factory/loop-created beans
+
+---
+
+## 1) Think Hierarchy First
+
+Before writing ANY class: "Can this be abstracted?"
 
 ### Template Method Pattern
 
 ```java
-// ONE abstract class with the algorithm
 public abstract class SecurityDataFetcher<T extends Security> {
-
     public final T fetch(String id) {
-        var rawData = fetchFromSM(id);      // Common
-        validate(rawData);                   // Common
-        return mapToSecurity(rawData);       // Abstract - each type implements
+        var rawData = fetchFromSM(id);
+        validate(rawData);
+        return mapToSecurity(rawData);
     }
-
     protected abstract T mapToSecurity(SMResponse data);
-    protected abstract Class<T> getSecurityType();
 }
-
 // Subclasses ONLY implement what's different
-public class EtfDataFetcher extends SecurityDataFetcher<Etf> {
-    @Override
-    protected Etf mapToSecurity(SMResponse data) {
-        return Etf.builder()/* ETF-specific mapping */.build();
-    }
-
-    @Override
-    protected Class<Etf> getSecurityType() { return Etf.class; }
-}
 ```
 
-### Strategy Pattern (for varying algorithms)
+### Strategy Pattern
 
 ```java
 public interface CalculationStrategy {
   boolean supports(SecurityType type);
-
   BigDecimal calculate(SecurityData data);
 }
 
-@Component
-public class EtfCalculationStrategy implements CalculationStrategy {
-  @Override
-  public boolean supports(SecurityType type) {
-    return type == SecurityType.ETF;
-  }
-  // ...
-}
-
-// Context selects strategy
 @Service
 @RequiredArgsConstructor
 public class CalculationService {
   private final List<CalculationStrategy> strategies;
-
   public BigDecimal calculate(Security security) {
     return strategies.stream()
             .filter(s -> s.supports(security.getType()))
@@ -94,210 +91,148 @@ public class CalculationService {
 }
 ```
 
-**Red flags (DON'T DO):**
-
-- 20 classes with identical method bodies
-- Copy-pasting code between similar classes
-- Generic subclass only changing the type parameter
-
 **Existing abstract classes to extend:**
-
-- `*CalculationAbstract` - calculations
-- `AbstractSecurityMasterFetcher<DomainModel, SmsResponse>` - SM REST fetchers (web-client-adapter)
+- `*CalculationAbstract` — calculations
+- `AbstractSecurityMasterFetcher<DomainModel, SmsResponse>` — SM REST fetchers
 
 ---
 
-## 2) Module Placement & Ports
+## 2) Calculation Architecture (Two-Layer Pattern)
 
-| Code                         | Module                 | Rule                               |
-|------------------------------|------------------------|------------------------------------|
-| Business logic, calculations | domain                 | No Spring, no adapters, no SM DTOs |
-| Use cases, orchestration     | application            | Uses ports only                    |
-| REST API                     | rest-adapter           | No business logic                  |
-| SM REST calls                | web-client-adapter     | Implements output ports            |
+Service -> Calculation two-layer design with Template Method:
 
-**Forbidden:** domain → Spring/adapters, adapter → another adapter
+### Service Layer (`application/.../service/calculation/`)
+- **`PeriodAbstractService<E, R>`** — period-based calculations (returns, ratios). `perform(command)` -> `defineCalculationMethod()` -> `calculate(periods)`
+- **`PeriodBenchmarkAbstractService<E, R>`** — adds benchmark data with `Notification` error handling
+- **`BreakdownAbstractService<T, E>`** — allocation/exposure. `fetchExposures()` -> `calculate()` -> `calculateNetProducts()`
 
-### Port Design
+### Calculation Layer (`application/.../calculation/core/`)
+Pure logic, no data fetching.
+- **`PeriodCalculationAbstract<T, V>`** — period resolution (months, YTD, SINCE_INCEPTION), date filtering
+- **`RollingAbstractCalculation<T>`** — rolling window calculations
+- **`AlphaBetaCalculationAbstract<T>`**, **`RSquaredCalculationAbstract<T>`** — regression
+- **`UpDownSideCalculationAbstract`** — capture ratios
+
+### Adding a New Calculation
+1. Domain result type in `domain/.../result/`
+2. Calculation class extending abstract base in `application/.../calculation/`
+3. Service impl extending abstract service in `application/.../service/calculation/`
+4. Response mapper in `application/.../mapper/response/`
+5. Endpoint + DTOs in `rest-adapter/.../dto/`
+6. Wire via `@Qualifier` in `PortfolioController`
+
+---
+
+## 3) REST Layer Flow
+
+```
+PortfolioController -> RequestValidationFacade (Chain of Responsibility)
+    -> RestCommandMapper (DTO -> command) -> CalculationService.perform(command)
+    -> RestResponseMapper (result -> response DTO)
+```
+
+All endpoints: POST `/portfolio/*`. Validation chain: `NotNullReqValidation` -> `HoldingsCouldNotBeEmptyReqValidation` -> `DateGreaterThanDateAbstractReqValidation` -> `LastDayOfMonthAbstractReqValidator`.
+
+---
+
+## 4) Module Placement & Ports
 
 ```java
-// Output port (in api module) - abstracts SM data fetching
+// Output port (api module)
 @FunctionalInterface
 public interface SecurityDataFetcher<T> {
   Map<Holding, T> fetch(List<? extends Holding> holdings, List<DataProvider> providers);
 }
 
-// Abstract fetcher (in web-client-adapter) - Template Method for all SM REST calls
+// Abstract fetcher (web-client-adapter) — Template Method for SM REST calls
 public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse>
     implements SecurityDataFetcher<DomainModel> {
   protected abstract String endpointPath();
   protected abstract ParameterizedTypeReference<List<SecurityAttributeResult<SmsResponse>>> responseType();
   protected abstract SecurityMasterResponseMapper<DomainModel, SmsResponse> responseMapper();
-  // fetch() handles grouping, batching, mapping automatically
-}
-
-// Concrete fetcher - only provides type-specific details
-@Component
-public class AssetAllocationSecurityMasterFetcher
-    extends AbstractSecurityMasterFetcher<AssetAllocationDto, AssetAllocation> {
-  // Provides: endpointPath, responseType, responseMapper
 }
 ```
 
-**Stubs:** Many `SecurityDataFetcher` implementations are currently stubs returning empty data (in `web-client-adapter/.../stub/`).
-When implementing a new fetcher, extend `AbstractSecurityMasterFetcher` and remove the corresponding stub.
+**Stubs** in `web-client-adapter/.../stub/`: return empty data. When implementing a real fetcher, extend `AbstractSecurityMasterFetcher` and remove the stub.
 
 ---
 
-## 3) External Calls (SM)
+## 5) External Calls (SM)
 
-### Never call SM in loops (N+1)
-
-```java
-// BAD: N+1 calls
-items.forEach(i -> smClient.fetch(i.getId()));
-
-// GOOD: Batch
-List<String> ids = items.stream().map(Item::getId).toList();
-smClient.fetchBatch(ids);
-```
-
-### Always use Resilience4j
+**Never call SM in loops (N+1)** — always batch.
+**Always use Resilience4j:**
 
 ```java
-
 @CircuitBreaker(name = "securityMaster", fallbackMethod = "fetchFallback")
 @Retry(name = "securityMaster")
 @Bulkhead(name = "securityMaster")
-public SecurityData fetch(String id) {
-  return restClient.fetch(id);
-}
-
-public SecurityData fetchFallback(String id, Exception e) {
-  log.warn("SM unavailable for {}", id);
-  throw new SecurityDataUnavailableException(id, e);
-}
 ```
 
-### Configuration in application.yaml
-
-```yaml
-resilience4j:
-  circuitbreaker:
-    instances:
-      securityMaster:
-        slidingWindowSize: 10
-        failureRateThreshold: 50
-        waitDurationInOpenState: 30s
-
-  retry:
-    instances:
-      securityMaster:
-        maxAttempts: 3
-        waitDuration: 1s
-        retryExceptions:
-          - java.io.IOException
-          - java.util.concurrent.TimeoutException
-
-  bulkhead:
-    instances:
-      securityMaster:
-        maxConcurrentCalls: 20
-```
-
-No hardcoded timeouts, URLs, retry counts in code.
+No hardcoded timeouts, URLs, retry counts — configure in `application.yaml`.
 
 ---
 
-## 4) Null Safety
+## 6) Null Safety & Exceptions
 
-- Return `Optional<T>` for things that might not exist
-- Validate SM data at adapter boundary:
-
-```java
-public SecurityData mapFromSM(SMResponse response) {
-  Objects.requireNonNull(response, "SM response is null");
-
-  return SecurityData.builder()
-          .id(requireNonBlank(response.getId(), "Security ID"))
-          .name(response.getName())
-          .price(Optional.ofNullable(response.getPrice()).orElse(BigDecimal.ZERO))
-          .build();
-}
-```
-
-- Never return null collections - use `List.of()`
+- Return `Optional<T>` for optional values
+- Validate SM data at adapter boundary with `Objects.requireNonNull`
+- Never return null collections — use `List.of()`
+- Translate exceptions at adapter boundaries with meaningful context messages
 
 ---
 
-## 5) Exception Handling
+## 7) Code Style & Conventions
 
-### Translate at adapter boundary
-
-```java
-try {
-  return smClient.fetch(request);
-} catch (RestClientException e) {
-  if (e.isNotFound()) {
-    throw new SecurityNotFoundException(securityId);
-  }
-  throw new SecurityDataUnavailableException(
-      "Failed to fetch " + securityId + " from SM", e);
-}
-```
-
-### Meaningful messages with context
-
-```java
-throw new CalculationException(String.format(
-                "Failed to calculate returns for security %s: insufficient data (got %d, need %d)",
-        securityId, actualCount, requiredCount));
-```
+- **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `mvn spotless:apply`
+- **BigDecimal:** `BigDecimal.valueOf()` for literals, never `new BigDecimal(double)`. `new BigDecimal(String)` is fine
+- **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
+- **Ternary:** use for simple single-expression returns/assignments instead of if/else
+- **No `final`** on method parameters/variables unless class fields or explicit constants
+- **No fully qualified class names** — always use imports
+- **No magic strings** — extract to constants or enums
+- **Enum factory methods:** always name `fromValue(value)`
+- **DI:** `@RequiredArgsConstructor` with final fields, not `@AllArgsConstructor`
+- **Max 5-7 deps** per class; max 3 nesting levels (early returns)
+- **Tests:** JUnit 5 + Mockito, no Spring context for unit tests. Naming: `shouldDoSomething_whenCondition`
+- **Commits:** Conventional Commits: `<type>(<scope>): <subject>` with `refs: CE-123`
+- **PRs:** 1-2 squashed commits, rebase onto main, fast-forward merge
 
 ---
 
-## 6) Clean Code
+## 8) Key Packages Reference
 
-- Max 5-7 dependencies per class (split if more)
-- Max 3 nesting levels (use early returns)
-- Use enums instead of strings/booleans for types.
-- Always name enum factory methods `fromValue(value)` (e.g., `SecurityType.fromValue(String value)`).
-- **Extract strings into constants or enums** - no magic strings
-- **Extract repeated code into utility methods** - same 3+ lines twice → create util
-- **BigDecimal:** use `BigDecimal.valueOf()` for numeric literals, never `new BigDecimal(double)` (avoids floating-point representation issues). `new BigDecimal(String)` is fine.
-- **Collections:** always use Stream API with `Collectors` to build/transform collections — never use for-loops or `forEach` with manual `add()`/`put()` into a new collection
-- Don't use `final` for variables and parameters without a need. Only for class fields or explicit constants.
-- Prefer using @RequiredArgsConstructor with final fields for bean dependencies over @AllArgsConstructor.
-- **Never use fully qualified class names in code** (e.g., `java.util.Collectors`, `java.util.List`). Always use imports. If two classes share the same simple name, import one and use the fully qualified name only for the other — but first consider renaming one of the conflicting classes/interfaces/enums to avoid the conflict entirely.
-
-```java
-// BAD: for-loop with manual add
-List<String> names = new ArrayList<>();
-for (Security s : securities) {
-    names.add(s.getName());
-}
-
-// GOOD: Stream API
-List<String> names = securities.stream()
-        .map(Security::getName)
-        .toList();
-
-// BAD: forEach with manual put
-Map<String, Security> map = new HashMap<>();
-securities.forEach(s -> map.put(s.getId(), s));
-
-// GOOD: Stream API with Collectors
-Map<String, Security> map = securities.stream()
-        .collect(Collectors.toMap(Security::getId, Function.identity()));
-```
+- Port interfaces (SM): `api/.../port/sm/`
+- Port interfaces (other): `api/.../port/`
+- Service interfaces: `api/.../service/calculation/`
+- Utilities: `api/.../util/` — `AllocationMappingUtils`, `CalculationUtils`, `DecimalUtils`, `DateTimeUtils`, `PortfolioUtils`, `FilterUtils`
+- Domain commands: `domain/.../dto/command/`
+- Domain results: `domain/.../model/result/` — 40+ result types
+- Allocation enums: `domain/.../model/calculation/`
+- REST DTOs: `rest-adapter/.../adapter/rest/dto/`
+- Validators: `rest-adapter/.../adapter/rest/validation/chainofresponsibility/`
+- SM fetchers: `web-client-adapter/.../sm/fetcher/`
+- SM client: `web-client-adapter/.../sm/client/SecurityMasterWebClient`
+- Bootstrap configs: `bootstrap/.../config/`
 
 ---
 
-## 7) Before Writing Code
+## 9) Dependencies & Gotchas
 
-1. Does similar code exist? → Extend/reuse it
-2. Can this be abstracted? → Create hierarchy with Template Method
-3. Correct module? → Domain has no Spring
-4. Batch SM calls? → No loops
-5. Resilience configured? → CircuitBreaker, Retry, Bulkhead
-6. Config in YAML? → No hardcoded values
+**sm-domain:** `com.fintex.wm:domain:2.0.0-SNAPSHOT` provides: StyleBoxValue, StyleBoxes, PaymentFrequencyType, SalesChargeType, FxRate, SecurityIdentifier. Version must be explicit in `domain/pom.xml`.
+
+**Gotchas:**
+- Lombok `@Accessors(chain=true)` on parent: setter returns parent type, breaks fluent chains in subclasses
+- Holding class hierarchy cannot be mocked (ByteBuddy can't instrument sm-domain SecurityIdentifier)
+- When removing constructor params from services, update ALL test files using `useConstructor()`
+- Removing transitive dependencies may require adding explicit deps (slf4j-api, spring-web)
+
+---
+
+## Before Writing Code Checklist
+
+1. Does similar code exist? -> Extend/reuse
+2. Can this be abstracted? -> Template Method hierarchy
+3. Correct module? -> Domain has no Spring
+4. Batch SM calls? -> No loops
+5. Resilience configured? -> CircuitBreaker, Retry, Bulkhead
+6. Config in YAML? -> No hardcoded values

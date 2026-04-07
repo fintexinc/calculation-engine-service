@@ -1,5 +1,6 @@
 package com.fintex.ce.application.calculation.service;
 
+import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
@@ -10,10 +11,7 @@ import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ManagementFeeResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +19,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MF_MF_001;
@@ -29,16 +29,13 @@ import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service
+@RequiredArgsConstructor
 public class ManagementFeeCalculationServiceImpl
         extends
         AverageManagementExpenseCalculationService<ManagementFeeResult> {
 
   private final SecurityDataFetcher<FeeData> feesSecurityDataFetcher;
-
-  public ManagementFeeCalculationServiceImpl(final SecurityDataFetcher<FeeData> feesSecurityDataFetcher) {
-    super();
-    this.feesSecurityDataFetcher = feesSecurityDataFetcher;
-  }
+  private final DefaultDataProperties defaultDataProperties;
 
   @Override
   public CalculationMetric getMetric() {
@@ -56,7 +53,7 @@ public class ManagementFeeCalculationServiceImpl
           final AverageMerCommand reqDTO) {
     Map<Holding, FeeData> rawData = feesSecurityDataFetcher.fetch(
             reqDTO.getHoldings(),
-            getSpecifiedIfEmpty(reqDTO.getDataProviders(), DataProvider.MORNINGSTAR));
+            getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
     return groupAndMap(rawData, reqDTO.getHoldings());
   }
 

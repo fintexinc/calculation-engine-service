@@ -16,18 +16,18 @@ import com.fintex.ce.util.FilterUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
@@ -65,7 +65,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final Holding h = mock(Holding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
@@ -141,7 +141,8 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldEmForInternationalEquity_whenCheckResult() {
     // SETUP
-    final AssetAllocationEMServiceImpl a = new AssetAllocationEMServiceImpl(null, null, null, null);
+    final AssetAllocationEMServiceImpl a = new AssetAllocationEMServiceImpl(null, null, null, null,
+            DEFAULT_DATA_PROPERTIES);
 
     final Holding h = mock(Holding.class);
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
@@ -463,7 +464,7 @@ class AssetAllocationEMServiceImplTest {
   @Test
   void shouldGetEmergingMarketValue_whenVerifyUNCLASSIFIED() {
     // SETUP
-    final var a = new AssetAllocationEMServiceImpl(null, null, null, null);
+    final var a = new AssetAllocationEMServiceImpl(null, null, null, null, DEFAULT_DATA_PROPERTIES);
     final var expected = new BigDecimal("1.1");
     final var map = Map.<AssetAllocationRegion, BigDecimal>of(UNCLASSIFIED, expected);
     final var pair = new ImmutablePair<>(DataProvider.MORNINGSTAR, map);
@@ -578,7 +579,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final var providers = mock(List.class);
 
@@ -610,7 +611,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final var providers = mock(List.class);
 
@@ -648,7 +649,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final var providers = mock(List.class);
 
@@ -690,7 +691,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final Holding h = mock(Holding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
@@ -717,7 +718,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final PortfolioHoldingsCommand reqDto = mock(PortfolioHoldingsCommand.class);
     final List<Holding> holdings = List.of(mock(Holding.class));
@@ -742,7 +743,7 @@ class AssetAllocationEMServiceImplTest {
 
       final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
           countryAllocationFetcher, assetAllocationFetcher,
-          assetAllocationDataMapper, countryAllocationMappingService));
+          assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
       final var holding = mock(Holding.class);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
@@ -768,7 +769,7 @@ class AssetAllocationEMServiceImplTest {
 
       final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
           countryAllocationFetcher, assetAllocationFetcher,
-          assetAllocationDataMapper, countryAllocationMappingService));
+          assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
       final var req = mock(PortfolioHoldingsCommand.class);
       final List<Warning> warnings = List.of();
@@ -795,7 +796,7 @@ class AssetAllocationEMServiceImplTest {
 
       final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
           countryAllocationFetcher, assetAllocationFetcher,
-          assetAllocationDataMapper, countryAllocationMappingService));
+          assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
       final var req = mock(PortfolioHoldingsCommand.class);
       final List<Warning> warnings = List.of();
@@ -821,7 +822,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final var req = mock(PortfolioHoldingsCommand.class);
     final var providers = List.of(DataProvider.MORNINGSTAR, DataProvider.MORNINGSTAR);
@@ -848,7 +849,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final var portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
@@ -877,7 +878,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, countryAllocationMappingService));
+        assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final Map assetAllocations = mock(Map.class);
@@ -910,7 +911,7 @@ class AssetAllocationEMServiceImplTest {
 
       final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
           countryAllocationFetcher, assetAllocationFetcher,
-          assetAllocationDataMapper, countryAllocationMappingService));
+          assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
       final var holding = mock(Holding.class);
       final Map assetAllocations = mock(Map.class);
@@ -927,7 +928,7 @@ class AssetAllocationEMServiceImplTest {
       service.fetchExposures(portfolioHoldingsReqDTO);
 
       // VERIFY
-      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, MORNINGSTAR), Mockito.times(2));
+      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, List.of(MORNINGSTAR)), Mockito.times(2));
     }
   }
 
