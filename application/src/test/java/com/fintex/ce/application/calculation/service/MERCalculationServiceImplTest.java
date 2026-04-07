@@ -11,16 +11,16 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_MER_001;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
@@ -51,7 +51,8 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenCheckResult() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher));
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+            DEFAULT_DATA_PROPERTIES));
 
     final var resDto = mock(AverageMerResult.class);
 
@@ -69,7 +70,8 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyLoad() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher));
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+            DEFAULT_DATA_PROPERTIES));
 
     final var reqDTO = mock(AverageMerCommand.class);
     final List<Holding> holdings = List.of();
@@ -94,7 +96,8 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyResDTOSetWarnings() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher));
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+            DEFAULT_DATA_PROPERTIES));
 
     final var reqDTO = mock(AverageMerCommand.class);
     final var resDTO = mock(AverageMerResult.class);
@@ -116,7 +119,8 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifySetInitialFeeAndModifiedFeeValues() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher));
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+            DEFAULT_DATA_PROPERTIES));
 
     final var reqDTO = mock(AverageMerCommand.class);
     final var resDTO = mock(AverageMerResult.class);
@@ -139,7 +143,8 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyGetResultAndSetNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher));
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+            DEFAULT_DATA_PROPERTIES));
 
     final var resDto = mock(AverageMerResult.class);
     final var reqDTO = mock(AverageMerCommand.class);
@@ -163,7 +168,8 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyCalculateAverageMER() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher));
+    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+            DEFAULT_DATA_PROPERTIES));
 
     final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     final var reqDTO = mock(AverageMerCommand.class);
@@ -186,7 +192,8 @@ class MERCalculationServiceImplTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var feesFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher));
+      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+              DEFAULT_DATA_PROPERTIES));
 
       final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
@@ -210,7 +217,8 @@ class MERCalculationServiceImplTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var feesFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher));
+      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+              DEFAULT_DATA_PROPERTIES));
 
       final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
@@ -227,7 +235,7 @@ class MERCalculationServiceImplTest {
       sut.perform(reqDTO);
 
       // VERIFY
-      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, DataProvider.MORNINGSTAR));
+      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, List.of(DataProvider.MORNINGSTAR)));
     }
   }
 

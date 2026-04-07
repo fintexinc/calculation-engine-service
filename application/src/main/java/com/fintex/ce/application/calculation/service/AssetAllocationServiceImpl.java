@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
+import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapping.response.AssetAllocationResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
@@ -13,17 +14,15 @@ import com.fintex.ce.domain.model.result.AssetAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.sm.model.DataProvider;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
-import static com.fintex.sm.model.DataProvider.MORNINGSTAR;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +31,7 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
   private final AssetAllocationDataMapper assetAllocationDataMapper;
   private final AssetAllocationResponseMapper responseMapper;
   private final SecurityDataFetcher<HoldingAssetAllocation> securityDataPort;
+  private final DefaultDataProperties defaultDataProperties;
 
   @Override
   public CalculationMetric getMetric() {
@@ -50,7 +50,8 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
 
   @Override
   public ExposureDataHolder<AssetAllocationRegion> fetchExposures(PortfolioHoldingsCommand reqDTO) {
-    List<DataProvider> providers = getSpecifiedIfEmpty(reqDTO.getDataProviders(), MORNINGSTAR);
+    List<DataProvider> providers = getSpecifiedIfEmpty(reqDTO.getDataProviders(),
+        defaultDataProperties.getDataProviders());
     Map<Holding, HoldingAssetAllocation> allocations = securityDataPort.fetch(reqDTO.getHoldings(), providers);
     return new ExposureDataHolder<>(assetAllocationDataMapper.toRegionExposures(allocations), List.of());
   }

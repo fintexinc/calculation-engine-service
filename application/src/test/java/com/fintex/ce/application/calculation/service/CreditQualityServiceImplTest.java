@@ -16,15 +16,15 @@ import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality.HIGH_YIELD;
 import static com.fintex.ce.util.CollectorUtils.toMap;
@@ -62,7 +62,7 @@ class CreditQualityServiceImplTest {
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, responseMapper));
+        assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
     final Holding h = mock(Holding.class);
     final List<Holding> holdings = List.of(h);
@@ -87,7 +87,7 @@ class CreditQualityServiceImplTest {
 
       final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
           creditQualityFetcher, assetAllocationFetcher,
-          assetAllocationDataMapper, responseMapper));
+          assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
       final Holding h = mock(Holding.class);
       when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
@@ -113,7 +113,7 @@ class CreditQualityServiceImplTest {
 
       final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
           creditQualityFetcher, assetAllocationFetcher,
-          assetAllocationDataMapper, responseMapper));
+          assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
       final Holding h = mock(Holding.class);
       when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
@@ -139,7 +139,7 @@ class CreditQualityServiceImplTest {
 
       final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
           creditQualityFetcher, assetAllocationFetcher,
-          assetAllocationDataMapper, responseMapper));
+          assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
       final Holding h = mock(Holding.class);
       final List<Holding> holdings = List.of(h);
@@ -170,7 +170,7 @@ class CreditQualityServiceImplTest {
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, responseMapper));
+        assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final CreditQuality rawCq = new CreditQuality();
@@ -195,7 +195,7 @@ class CreditQualityServiceImplTest {
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, responseMapper));
+        assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final CreditQuality rawCq = new CreditQuality();
@@ -223,7 +223,7 @@ class CreditQualityServiceImplTest {
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, responseMapper));
+        assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
     final Holding h = mock(Holding.class);
     final List<Warning> warnings = List.of(mock(Warning.class));
@@ -252,23 +252,23 @@ class CreditQualityServiceImplTest {
 
       final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
           creditQualityFetcher, assetAllocationFetcher,
-          assetAllocationDataMapper, responseMapper));
+          assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
       final var warnings = List.of(mock(Warning.class));
       final var reqDTO = mock(PortfolioHoldingsCommand.class);
       final var providers = List.of(DataProvider.MORNINGSTAR);
-      final DataProvider[] specifiedProviders = {DataProvider.MORNINGSTAR};
+      final List<DataProvider> defaultProviders = List.of(DataProvider.MORNINGSTAR);
 
       when(reqDTO.getDataProviders()).thenReturn(providers);
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of());
-      mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(providers, specifiedProviders)).thenReturn(
+      mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(providers, defaultProviders)).thenReturn(
           providers);
 
       doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
       sut.getFixedIncomeCreditQuality(reqDTO, warnings);
 
-      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, specifiedProviders));
+      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, defaultProviders));
     }
   }
 
@@ -281,7 +281,7 @@ class CreditQualityServiceImplTest {
 
     final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
-        assetAllocationDataMapper, responseMapper));
+        assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
     final Holding h = mock(Holding.class);
     final Map<AssetAllocationRegion, BigDecimal> asset = Map.of(AssetAllocationRegion.ASIA_PACIFIC_EQUITIES, TEN,
