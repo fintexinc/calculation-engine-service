@@ -36,7 +36,7 @@ class ClassificationAllocationCalculationServiceImplTest {
     final var holding = mock(Holding.class);
     final var classificationAllocation = new ClassificationAllocation()
         .setSecurityClassificationValues(Map.of(
-            ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL.name(), BigDecimal.TEN));
+            ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL, BigDecimal.TEN));
     final var rawData = Map.of(holding, classificationAllocation);
 
     when(fetcher.fetch(any(), any())).thenReturn(rawData);

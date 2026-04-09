@@ -16,8 +16,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Maps SM FixedIncomeSectorAllocation (Morningstar SuperSector) to CE FixedIncomeBondSecurities.
- * SM sector types are translated to CE FixedIncomeSecuritiesAllocationType-compatible string keys.
+ * Maps SM FixedIncomeSectorAllocation (Morningstar SuperSector) to PCE FixedIncomeBondSecurities.
+ * SM sector types are translated to PCE FixedIncomeSecuritiesAllocationType-compatible string keys.
  */
 @Component
 public class FixedIncomeSectorAllocationMapper
