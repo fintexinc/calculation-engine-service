@@ -1,11 +1,10 @@
 package com.fintex.ce.domain.model.result.bestworstperiods;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor

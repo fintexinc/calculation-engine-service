@@ -8,13 +8,16 @@ import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.sm.model.domain.rating.FixedIncomeStyleBoxes;
 import com.fintex.sm.model.domain.value.FixedIncomeStyleBoxValue;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FixedIncomeStyleboxExposureMapperTest {
@@ -75,12 +78,14 @@ class FixedIncomeStyleboxExposureMapperTest {
   void shouldFilterOutEntriesWithNullTypeOrValue() {
     var validEntry = createEntry(FixedIncomeStyleBoxType.LOW_LIMITED, "10.0");
     var nullTypeEntry = FixedIncomeStyleBoxValue.builder().styleBoxType(null).value(BigDecimal.valueOf(5.0)).build();
-    var nullValueEntry = FixedIncomeStyleBoxValue.builder().styleBoxType(FixedIncomeStyleBoxType.LOW_MODERATE).value(null).build();
+    var nullValueEntry = FixedIncomeStyleBoxValue.builder().styleBoxType(FixedIncomeStyleBoxType.LOW_MODERATE).value(
+        null).build();
 
     var smsResponse = new FixedIncomeStyleBoxes();
     smsResponse.setBoxValues(List.of(validEntry, nullTypeEntry, nullValueEntry));
 
-    FixedIncomeStyleboxExposure result = mapper.map(smsResponse, createHolding("TEST.ID", FinancialInstrumentType.ETF_CANADA));
+    FixedIncomeStyleboxExposure result = mapper.map(smsResponse, createHolding("TEST.ID",
+        FinancialInstrumentType.ETF_CANADA));
 
     assertThat(result.getBoxValues()).hasSize(1);
     assertThat(result.getBoxValues()).containsKey(FixedIncomeStyleBoxType.LOW_LIMITED);
@@ -103,7 +108,8 @@ class FixedIncomeStyleboxExposureMapperTest {
     var smsResponse = new FixedIncomeStyleBoxes();
     smsResponse.setBoxValues(entries);
 
-    FixedIncomeStyleboxExposure result = mapper.map(smsResponse, createHolding("FULL.TEST", FinancialInstrumentType.ETF));
+    FixedIncomeStyleboxExposure result = mapper.map(smsResponse, createHolding("FULL.TEST",
+        FinancialInstrumentType.ETF));
 
     assertThat(result.getBoxValues()).hasSize(9);
     assertThat(result.getBoxValues().get(FixedIncomeStyleBoxType.HIGH_LIMITED)).isEqualByComparingTo("10.0");

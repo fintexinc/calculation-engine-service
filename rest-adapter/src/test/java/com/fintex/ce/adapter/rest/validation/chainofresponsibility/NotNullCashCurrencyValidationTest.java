@@ -3,8 +3,11 @@ package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import java.util.List;
+
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MC_002;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;

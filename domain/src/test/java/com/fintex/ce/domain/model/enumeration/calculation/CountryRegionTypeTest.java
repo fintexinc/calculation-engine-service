@@ -2,8 +2,10 @@ package com.fintex.ce.domain.model.enumeration.calculation;
 
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.domain.model.calculation.CountryRegionType.CANADA;
 import static com.fintex.ce.domain.model.calculation.CountryRegionType.INTERNATIONAL_DEVELOPED;
 import static org.junit.jupiter.api.Assertions.assertEquals;

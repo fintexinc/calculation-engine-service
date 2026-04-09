@@ -3,6 +3,7 @@ package com.fintex.ce.domain.model.holding;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -12,6 +13,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+
 import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalEquals;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 

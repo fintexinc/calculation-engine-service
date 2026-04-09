@@ -1,13 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.model.enumeration.DailyResultType;
-import com.fintex.ce.domain.model.calculation.ReturnsAnsDistributionReceived;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.fintex.ce.domain.model.calculation.ReturnsAnsDistributionReceived;
+import com.fintex.ce.domain.model.enumeration.DailyResultType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

@@ -12,6 +12,7 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.datapoint.Fees;
 import com.fintex.sm.model.domain.datapoint.Income;
 import com.fintex.sm.model.domain.datapoint.SalesChargeData;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

@@ -2,7 +2,9 @@ package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import com.fintex.ce.domain.dto.IncomeForecastDto;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

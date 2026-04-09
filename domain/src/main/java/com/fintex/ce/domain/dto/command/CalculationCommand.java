@@ -1,10 +1,13 @@
 package com.fintex.ce.domain.dto.command;
 
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 

@@ -27,14 +27,15 @@ import com.fintex.ce.domain.model.MaturityAllocation;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.allocation.AssetAllocation;
 import com.fintex.sm.model.domain.allocation.CountryAllocation;
-import com.fintex.sm.model.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
 import com.fintex.sm.model.domain.allocation.FixedIncomeSectorAllocation;
+import com.fintex.sm.model.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.sm.model.domain.datapoint.EquityMarketCapitalization;
 import com.fintex.sm.model.domain.datapoint.Maturities;
 import com.fintex.sm.model.domain.rating.CreditQualityRatings;
 import com.fintex.sm.model.domain.rating.FixedIncomeStyleBoxes;
 import com.fintex.sm.model.domain.rating.StyleBoxes;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

@@ -9,6 +9,7 @@ import com.fintex.ce.domain.model.enumeration.ParameterType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.WarningResult;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
@@ -34,7 +36,8 @@ import static java.math.BigDecimal.ZERO;
  *          result type. Return type of 'perform' method.
  */
 public abstract class AverageManagementExpenseCalculationService<R extends WarningResult>
-    implements CalculationService<R, AverageMerCommand> {
+    implements
+      CalculationService<R, AverageMerCommand> {
 
   protected AverageManagementExpenseCalculationService() {
   }

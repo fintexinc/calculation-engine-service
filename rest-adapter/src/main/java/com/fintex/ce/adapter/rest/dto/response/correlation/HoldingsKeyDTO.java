@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.dto.response.correlation;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fintex.ce.adapter.rest.dto.response.commonholdings.ParentHoldingDTO;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.GicHolding;
@@ -9,13 +8,15 @@ import com.fintex.ce.util.FilterUtils;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
 
 import static com.fintex.ce.util.PortfolioUtils.createKey;
 

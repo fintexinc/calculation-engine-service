@@ -10,14 +10,16 @@ import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.MaxDrawdownResult;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.ReturnFactorScale;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Service
 public class MaxDrawdownServiceImpl extends PeriodAbstractService<MaxDrawdownResult, PeriodCommand> {

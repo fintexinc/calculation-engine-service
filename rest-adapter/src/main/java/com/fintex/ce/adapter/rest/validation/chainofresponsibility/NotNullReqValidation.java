@@ -1,8 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import lombok.EqualsAndHashCode;
-
 import java.util.Objects;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class NotNullReqValidation extends ReqValidation {

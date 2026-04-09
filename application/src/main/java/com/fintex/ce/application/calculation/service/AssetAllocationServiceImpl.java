@@ -14,13 +14,15 @@ import com.fintex.ce.domain.model.result.AssetAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.sm.model.DataProvider;
+
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 

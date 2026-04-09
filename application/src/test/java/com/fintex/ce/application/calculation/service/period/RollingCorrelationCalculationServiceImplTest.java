@@ -8,6 +8,7 @@ import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -129,7 +130,8 @@ class RollingCorrelationCalculationServiceImplTest {
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(mock(Returns.class));
     when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(Returns.class));
-    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(ReturnFactorScale.class));
+    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(
+        ReturnFactorScale.class));
 
     sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
@@ -150,7 +152,8 @@ class RollingCorrelationCalculationServiceImplTest {
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(mock(Returns.class));
     when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(Returns.class));
-    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(ReturnFactorScale.class));
+    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(
+        ReturnFactorScale.class));
 
     sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
@@ -174,7 +177,8 @@ class RollingCorrelationCalculationServiceImplTest {
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(portfolioMonthlyReturns);
     when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(benchmarkMonthlyReturns);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(ReturnFactorScale.class));
+    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(
+        ReturnFactorScale.class));
 
     sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
@@ -198,7 +202,8 @@ class RollingCorrelationCalculationServiceImplTest {
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(portfolioMonthlyReturns);
     when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(benchmarkMonthlyReturns);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(ReturnFactorScale.class));
+    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(
+        ReturnFactorScale.class));
 
     sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
@@ -224,7 +229,8 @@ class RollingCorrelationCalculationServiceImplTest {
     final var portfolioMonthlyReturnsAfterCut = mock(Returns.class);
     when(portfolioMonthlyReturns.cutArgumentToTheSameEndDate(any())).thenReturn(portfolioMonthlyReturnsAfterCut);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(ReturnFactorScale.class));
+    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(
+        ReturnFactorScale.class));
 
     sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
@@ -251,7 +257,8 @@ class RollingCorrelationCalculationServiceImplTest {
     final var benchmarkMonthlyReturnsAfterCut = mock(Returns.class);
     when(benchmarkMonthlyReturns.cutArgumentToTheSameEndDate(any())).thenReturn(benchmarkMonthlyReturnsAfterCut);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(ReturnFactorScale.class));
+    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(
+        ReturnFactorScale.class));
 
     sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
@@ -290,7 +297,8 @@ class RollingCorrelationCalculationServiceImplTest {
         benchmarkMonthlyReturns, LOCAL_DATE_NOW, LOCAL_DATE_NOW.plusMonths(1)))
         .thenReturn(benchmarkTotalReturns);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(ReturnFactorScale.class));
+    doCallRealMethod().when(sut).buildCalculationDto(any(RollingCalculationCommand.class), any(
+        ReturnFactorScale.class));
 
     final var actual = sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 

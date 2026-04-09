@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.model.enumeration.Period;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
-import lombok.EqualsAndHashCode;
+import com.fintex.ce.domain.model.enumeration.Period;
 
 import java.util.Set;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class PeriodsNotContainingYearToDateReqValidation extends PeriodsNotContainingAbstractReqValidation {

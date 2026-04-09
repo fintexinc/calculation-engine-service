@@ -5,6 +5,7 @@ import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -48,8 +49,7 @@ class CreditQualityResponseMapperTest {
     List<Warning> warnings = List.of(new Warning("w1", "warning"));
     Map<FixedIncomeCreditQuality, BigDecimal> calculated = Map.of(
         FixedIncomeCreditQuality.AAA, new BigDecimal("0.12345678901"),
-        FixedIncomeCreditQuality.HIGH_YIELD, new BigDecimal("0.2")
-    );
+        FixedIncomeCreditQuality.HIGH_YIELD, new BigDecimal("0.2"));
 
     CreditQualityResult result = mapper.fromCalculatedValues(calculated, warnings);
 
@@ -71,4 +71,3 @@ class CreditQualityResponseMapperTest {
     assertNull(result.getCreditQuality().get(FixedIncomeCreditQuality.NOT_RATED));
   }
 }
-

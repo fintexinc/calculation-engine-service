@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
 import com.fintex.ce.domain.exception.ReqValidationException;
-import lombok.EqualsAndHashCode;
 
 import java.util.LinkedList;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public abstract class ReqValidation {

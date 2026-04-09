@@ -8,8 +8,10 @@ import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.SalesChargeResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import java.util.Map;
+
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class SalesChargeServiceImpl implements CalculationService<SalesChargeResult, PortfolioHoldingsCommand> {

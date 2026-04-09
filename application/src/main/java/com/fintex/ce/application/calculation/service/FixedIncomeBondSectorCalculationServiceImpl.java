@@ -18,6 +18,9 @@ import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
+
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
@@ -48,7 +50,8 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   static {
     Stream.of(FixedIncomeSecuritiesAllocationType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
     ALLOCATION_DEFAULT_MAP = Collections.unmodifiableMap(
-        Stream.of(FixedIncomeSecuritiesAllocationType.values()).collect(java.util.stream.Collectors.toMap(type -> type, type -> ZERO)));
+        Stream.of(FixedIncomeSecuritiesAllocationType.values()).collect(java.util.stream.Collectors.toMap(type -> type,
+            type -> ZERO)));
   }
 
   private final SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSectorSecurityDataFetcher;

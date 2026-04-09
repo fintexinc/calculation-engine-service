@@ -1,13 +1,13 @@
 package com.fintex.ce.domain.exception.notification.pattern;
 
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
-import lombok.Data;
+import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import lombok.Data;
 
 /**
  * A Notification collect together errors

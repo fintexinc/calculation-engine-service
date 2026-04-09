@@ -6,6 +6,7 @@ import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.domain.model.enumeration.Rebalanced;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

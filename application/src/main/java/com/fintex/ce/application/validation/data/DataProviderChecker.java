@@ -3,6 +3,7 @@ package com.fintex.ce.application.validation.data;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.sm.model.DataProvider;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;

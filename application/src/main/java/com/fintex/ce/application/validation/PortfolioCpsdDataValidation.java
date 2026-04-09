@@ -1,6 +1,7 @@
 package com.fintex.ce.application.validation;
 
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
+
 import lombok.EqualsAndHashCode;
 
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_CPSD_002;

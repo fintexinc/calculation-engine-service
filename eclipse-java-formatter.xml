@@ -10,6 +10,12 @@
     <!-- Line width -->
     <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="120"/>
 
+    <!-- Anonymous classes: keep empty body on same line -->
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_anonymous_type_declaration" value="end_of_line"/>
+    <setting id="org.eclipse.jdt.core.formatter.keep_empty_anonymous_type_body_on_one_line" value="one_line_always"/>
+    <setting id="org.eclipse.jdt.core.formatter.insert_new_line_before_closing_brace_in_anonymous_type_declaration" value="do not insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.keep_anonymous_type_declaration_on_one_line" value="one_line_always"/>
+
     <!-- Braces: Google places braces on same line -->
     <setting id="org.eclipse.jdt.core.formatter.brace_position_for_type_declaration" value="end_of_line"/>
     <setting id="org.eclipse.jdt.core.formatter.brace_position_for_method_declaration" value="end_of_line"/>

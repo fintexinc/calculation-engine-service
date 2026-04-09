@@ -1,11 +1,12 @@
 package com.fintex.ce.domain.model.result;
 
 import com.fintex.ce.domain.model.result.distributionofreturns.DistributionOfReturnsIntervalResult;
+
 import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
 @ToString(callSuper = true)

@@ -2,10 +2,11 @@ package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.enumeration.Period;
-import lombok.EqualsAndHashCode;
+
 import org.springframework.util.CollectionUtils;
 
 import java.util.Set;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class PeriodContainYearToDateReqValidation extends ReqValidation {

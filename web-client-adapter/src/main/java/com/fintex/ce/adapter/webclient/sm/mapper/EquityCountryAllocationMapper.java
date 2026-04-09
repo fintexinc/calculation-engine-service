@@ -4,6 +4,7 @@ import com.fintex.ce.domain.model.EquityCountryAllocation;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.CountryAllocation;
 import com.fintex.sm.model.domain.value.CountryValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class EquityCountryAllocationMapper
-    implements SecurityMasterResponseMapper<EquityCountryAllocation, CountryAllocation> {
+    implements
+      SecurityMasterResponseMapper<EquityCountryAllocation, CountryAllocation> {
 
   @Override
   public EquityCountryAllocation map(CountryAllocation smsResponse, Holding holding) {

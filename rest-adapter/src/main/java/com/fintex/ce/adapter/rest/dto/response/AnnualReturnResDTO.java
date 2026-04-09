@@ -3,7 +3,9 @@ package com.fintex.ce.adapter.rest.dto.response;
 import com.fintex.ce.adapter.rest.dto.response.core.DatesResDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.KeyValueDTO;
 import com.fintex.ce.domain.model.core.Warning;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;

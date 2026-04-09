@@ -1,9 +1,8 @@
 package com.fintex.ce.domain.model.calculation;
 
-import lombok.Getter;
-
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.Getter;
 
 @Getter
 public enum MaturityAllocationType {

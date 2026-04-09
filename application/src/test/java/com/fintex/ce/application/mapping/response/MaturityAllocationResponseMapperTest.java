@@ -4,10 +4,13 @@ import com.fintex.ce.domain.model.MaturityAllocation;
 import com.fintex.ce.domain.model.calculation.MaturityAllocationType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.MaturityAllocationResult;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,14 +35,15 @@ class MaturityAllocationResponseMapperTest {
     domain.setMaturityDurationValues(Map.of(
         "UNDER_ONE_YEAR", new BigDecimal("0.12345678901"),
         "ONE_TO_THREE_YEARS", new BigDecimal("0.2"),
-        "UNKNOWN_KEY", new BigDecimal("0.9")
-    ));
+        "UNKNOWN_KEY", new BigDecimal("0.9")));
 
     MaturityAllocationResult result = mapper.toResponse(domain);
 
     assertEquals(2, result.getMaturityAllocation().size());
-    assertEquals(0, result.getMaturityAllocation().get(MaturityAllocationType.UNDER_ONE_YEAR).compareTo(new BigDecimal("0.1234567890")));
-    assertEquals(0, result.getMaturityAllocation().get(MaturityAllocationType.ONE_TO_THREE_YEARS).compareTo(new BigDecimal("0.2000000000")));
+    assertEquals(0, result.getMaturityAllocation().get(MaturityAllocationType.UNDER_ONE_YEAR).compareTo(new BigDecimal(
+        "0.1234567890")));
+    assertEquals(0, result.getMaturityAllocation().get(MaturityAllocationType.ONE_TO_THREE_YEARS).compareTo(
+        new BigDecimal("0.2000000000")));
     assertTrue(result.getWarnings().isEmpty());
   }
 
@@ -59,14 +63,15 @@ class MaturityAllocationResponseMapperTest {
     List<Warning> warnings = List.of(new Warning("w1", "warning"));
     Map<MaturityAllocationType, BigDecimal> netProducts = Map.of(
         MaturityAllocationType.UNDER_ONE_YEAR, new BigDecimal("0.1"),
-        MaturityAllocationType.ONE_TO_THREE_YEARS, new BigDecimal("0.2")
-    );
+        MaturityAllocationType.ONE_TO_THREE_YEARS, new BigDecimal("0.2"));
 
     MaturityAllocationResult result = mapper.fromNetProducts(netProducts, warnings);
 
     assertEquals(warnings, result.getWarnings());
-    assertEquals(0, result.getMaturityAllocation().get(MaturityAllocationType.UNDER_ONE_YEAR).compareTo(new BigDecimal("0.1000000000")));
-    assertEquals(0, result.getMaturityAllocation().get(MaturityAllocationType.ONE_TO_THREE_YEARS).compareTo(new BigDecimal("0.2000000000")));
+    assertEquals(0, result.getMaturityAllocation().get(MaturityAllocationType.UNDER_ONE_YEAR).compareTo(new BigDecimal(
+        "0.1000000000")));
+    assertEquals(0, result.getMaturityAllocation().get(MaturityAllocationType.ONE_TO_THREE_YEARS).compareTo(
+        new BigDecimal("0.2000000000")));
   }
 
   @Test
@@ -74,4 +79,3 @@ class MaturityAllocationResponseMapperTest {
     assertThrows(UnsupportedOperationException.class, () -> mapper.toResponse(Map.of(), List.of()));
   }
 }
-

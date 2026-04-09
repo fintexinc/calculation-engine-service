@@ -1,8 +1,10 @@
 package com.fintex.ce.domain.dto.command;
 
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Data;

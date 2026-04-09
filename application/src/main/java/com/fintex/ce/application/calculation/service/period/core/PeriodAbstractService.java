@@ -11,8 +11,10 @@ import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.enumeration.Period;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.util.ReturnFactorScale;
-import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.util.CollectionUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

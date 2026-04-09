@@ -4,6 +4,7 @@ import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.performance.MonthlyReturns;
 import com.fintex.sm.model.domain.value.DateBigDecimalValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -18,7 +19,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class MonthlyReturnsMapper
-    implements SecurityMasterResponseMapper<HoldingMonthlyReturns, MonthlyReturns> {
+    implements
+      SecurityMasterResponseMapper<HoldingMonthlyReturns, MonthlyReturns> {
 
   @Override
   public HoldingMonthlyReturns map(MonthlyReturns smsResponse, Holding holding) {

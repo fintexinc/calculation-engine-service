@@ -5,6 +5,7 @@ import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.sm.model.domain.classification.SecurityClassificationTypeValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -15,12 +16,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Maps SM SecurityClassificationAllocation to PCE ClassificationAllocation.
- * Combines levelOne and levelTwo into a ClassificationAllocationType enum key.
+ * Maps SM SecurityClassificationAllocation to PCE ClassificationAllocation. Combines levelOne and levelTwo into a
+ * ClassificationAllocationType enum key.
  */
 @Component
 public class ClassificationAllocationMapper
-    implements SecurityMasterResponseMapper<ClassificationAllocation, SecurityClassificationAllocation> {
+    implements
+      SecurityMasterResponseMapper<ClassificationAllocation, SecurityClassificationAllocation> {
 
   @Override
   public ClassificationAllocation map(SecurityClassificationAllocation smsResponse, Holding holding) {

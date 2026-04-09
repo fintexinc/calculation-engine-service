@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.webclient.mapper;
 
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import java.util.Set;
 
 public final class HoldingTypeMapper {
@@ -14,8 +15,8 @@ public final class HoldingTypeMapper {
   }
 
   /**
-   * Converts FinancialInstrumentType to its string representation for API requests.
-   * Uses the enum name directly as it already matches the SMS API format.
+   * Converts FinancialInstrumentType to its string representation for API requests. Uses the enum name directly as it
+   * already matches the SMS API format.
    */
   public static String toApiType(FinancialInstrumentType instrumentType) {
     if (instrumentType == null) {

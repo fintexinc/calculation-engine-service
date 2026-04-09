@@ -3,7 +3,6 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.HoldingEquityMarketCap;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityMarketCapResult;
@@ -12,6 +11,7 @@ import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -92,14 +92,16 @@ public class EquityMarketCapCalculationServiceImpl
     }
     final Map<EquityMarketCapitalizationType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
         EquityMarketCapitalizationType.values());
-    final Map<EquityMarketCapitalizationType, BigDecimal> reScaled = toUserScale(groupedResults(reScaleAbs(netProducts)));
+    final Map<EquityMarketCapitalizationType, BigDecimal> reScaled = toUserScale(groupedResults(reScaleAbs(
+        netProducts)));
     EquityMarketCapResult result = new EquityMarketCapResult();
     result.setEquityMarketCapitalization(reScaled);
     result.setWarnings(warnings);
     return result;
   }
 
-  Map<EquityMarketCapitalizationType, BigDecimal> groupedResults(final Map<EquityMarketCapitalizationType, BigDecimal> netProducts) {
+  Map<EquityMarketCapitalizationType, BigDecimal> groupedResults(
+      final Map<EquityMarketCapitalizationType, BigDecimal> netProducts) {
     return GROUPS.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> calculateSumWithinTheSameGroup(netProducts,
         e)));
   }

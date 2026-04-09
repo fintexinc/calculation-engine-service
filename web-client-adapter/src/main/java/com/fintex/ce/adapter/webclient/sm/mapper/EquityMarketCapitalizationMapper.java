@@ -5,6 +5,7 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.datapoint.EquityMarketCapitalization;
 import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import com.fintex.sm.model.domain.value.EquityMarketCapitalizationTypeValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class EquityMarketCapitalizationMapper
-    implements SecurityMasterResponseMapper<HoldingEquityMarketCap, EquityMarketCapitalization> {
+    implements
+      SecurityMasterResponseMapper<HoldingEquityMarketCap, EquityMarketCapitalization> {
 
   @Override
   public HoldingEquityMarketCap map(EquityMarketCapitalization smsResponse, Holding holding) {

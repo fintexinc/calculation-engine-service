@@ -4,6 +4,7 @@ import com.fintex.ce.domain.model.BusinessCountry;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.DataProvider;
+
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,8 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Stub implementation for BusinessCountry SecurityDataFetcher.
- * TODO: Replace with actual REST implementation.
+ * Stub implementation for BusinessCountry SecurityDataFetcher. TODO: Replace with actual REST implementation.
  */
 @Component
 public class BusinessCountryFetcher implements SecurityDataFetcher<BusinessCountry> {

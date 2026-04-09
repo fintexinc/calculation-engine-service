@@ -1,17 +1,17 @@
 package com.fintex.ce.domain.model.result;
 
-import com.fintex.ce.domain.model.enumeration.DailyResultType;
 import com.fintex.ce.domain.model.calculation.DistributionData;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import com.fintex.ce.domain.model.enumeration.DailyResultType;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

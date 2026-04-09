@@ -10,9 +10,12 @@ import com.fintex.sm.model.domain.classification.SecurityClassificationLevelOne;
 import com.fintex.sm.model.domain.classification.SecurityClassificationLevelTwo;
 import com.fintex.sm.model.domain.classification.SecurityClassificationTypeValue;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClassificationAllocationMapperTest {

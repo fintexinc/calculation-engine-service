@@ -1,16 +1,19 @@
 package com.fintex.ce.adapter.rest.aop;
 
-import jakarta.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.nio.charset.StandardCharsets;
 
 @Aspect
 @Component
@@ -30,8 +33,8 @@ public class LogRequestAspect {
     var start = System.currentTimeMillis();
     var req = getRequestArgumentByType(joinPoint.getArgs(), HttpServletRequest.class);
     if (req == null) {
-      req = ((org.springframework.web.context.request.ServletRequestAttributes)
-          org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()).getRequest();
+      req = ((org.springframework.web.context.request.ServletRequestAttributes) org.springframework.web.context.request.RequestContextHolder
+          .currentRequestAttributes()).getRequest();
     }
 
     var request = req;

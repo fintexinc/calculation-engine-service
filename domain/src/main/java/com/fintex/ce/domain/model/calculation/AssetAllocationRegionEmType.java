@@ -2,6 +2,7 @@ package com.fintex.ce.domain.model.calculation;
 
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
+
 import lombok.Getter;
 
 // AssetAllocationEmergingMarket

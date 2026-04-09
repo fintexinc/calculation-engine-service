@@ -1,12 +1,13 @@
 package com.fintex.ce.domain.dto.command;
 
 import com.fintex.sm.model.DataProvider;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

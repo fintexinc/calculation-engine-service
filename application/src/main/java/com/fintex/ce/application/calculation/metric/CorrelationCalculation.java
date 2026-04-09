@@ -8,6 +8,11 @@ import com.fintex.ce.domain.model.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.domain.model.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.util.CalculationUtils;
+
+import org.springframework.util.CollectionUtils;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,8 +23,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DecimalUtils.divide;
@@ -29,7 +33,9 @@ import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.PortfolioUtils.createKey;
 
 @EqualsAndHashCode(callSuper = true)
-public class CorrelationCalculation extends PeriodCalculationAbstract<CorrelationResult, List<CorrelationPeriodResult>> {
+public class CorrelationCalculation
+    extends
+      PeriodCalculationAbstract<CorrelationResult, List<CorrelationPeriodResult>> {
 
   private final Map<Holding, Map<LocalDate, BigDecimal>> portfolioBaseTotalReturn;
 

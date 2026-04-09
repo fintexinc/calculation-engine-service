@@ -1,9 +1,9 @@
 package com.fintex.ce.domain.model.calculation;
 
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;

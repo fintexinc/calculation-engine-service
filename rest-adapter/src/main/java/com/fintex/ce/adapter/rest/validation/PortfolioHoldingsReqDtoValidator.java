@@ -6,6 +6,7 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingsCould
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotEmptyGicTermReqValidator;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+
 import org.springframework.stereotype.Component;
 
 @Component

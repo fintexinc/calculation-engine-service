@@ -5,9 +5,11 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
-import org.junit.jupiter.api.Test;
 
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_ALL_GTZ_001;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

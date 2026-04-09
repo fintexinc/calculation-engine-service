@@ -16,13 +16,15 @@ import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
@@ -344,8 +346,9 @@ class CreditQualityServiceImplTest {
     final int fixedIncomeValue = 3;
     final int weightValue = 10;
 
-    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = Map.of(h, Map.of(AAA, BigDecimal.valueOf(
-        creditQValue)));
+    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = Map.of(h, Map.of(AAA, BigDecimal
+        .valueOf(
+            creditQValue)));
     final Map<Holding, BigDecimal> fixedIncomeCreditQuality = Map.of(h, BigDecimal.valueOf(fixedIncomeValue));
     final Map<Holding, BigDecimal> weights = Map.of(h, BigDecimal.valueOf(weightValue), h2, BigDecimal.ONE);
 

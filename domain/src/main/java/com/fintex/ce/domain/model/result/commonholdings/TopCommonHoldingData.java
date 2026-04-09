@@ -1,12 +1,12 @@
 package com.fintex.ce.domain.model.result.commonholdings;
 
 import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor

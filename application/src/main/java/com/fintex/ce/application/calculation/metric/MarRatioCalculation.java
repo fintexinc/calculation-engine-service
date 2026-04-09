@@ -6,10 +6,13 @@ import com.fintex.ce.domain.model.result.MARRatioResult;
 import com.fintex.ce.domain.model.result.core.MaxDrawdownEntry;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import com.fintex.ce.util.DecimalUtils;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.DecimalUtils.abs;
 

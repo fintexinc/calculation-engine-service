@@ -9,6 +9,7 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -81,7 +82,8 @@ class EquitySectorCalculationImplTest {
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
-      when(service.calculateNetProducts(exposures, holdings, EquitySectorAllocationType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, EquitySectorAllocationType.values())).thenReturn(
+          netProducts);
 
       doCallRealMethod().when(service).calculate(any(), any());
       service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);

@@ -4,7 +4,12 @@ import com.fintex.ce.adapter.rest.dto.exception.ErrorRes2DTO;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
@@ -60,8 +63,8 @@ public class RestExceptionHandlingServiceImpl implements RestExceptionHandlingSe
 
   /**
    * Copies properties from source to target, including Map properties with different generic types.
-   * BeanUtils.copyProperties skips Map properties when generic type parameters differ, even if the
-   * raw types are compatible. This method handles that case by checking raw type compatibility.
+   * BeanUtils.copyProperties skips Map properties when generic type parameters differ, even if the raw types are
+   * compatible. This method handles that case by checking raw type compatibility.
    */
   @SuppressWarnings({"rawtypes"})
   private void copyPropertiesIncludingMaps(Object source, Object target) {

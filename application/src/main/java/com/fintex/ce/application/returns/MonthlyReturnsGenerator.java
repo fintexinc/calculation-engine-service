@@ -6,6 +6,7 @@ import com.fintex.ce.domain.model.holding.MonthlyReturnGeneratableHolding;
 import com.fintex.ce.returns.ReturnsGenerator;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

@@ -5,9 +5,12 @@ import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.USD;
 import static org.junit.jupiter.api.Assertions.assertEquals;

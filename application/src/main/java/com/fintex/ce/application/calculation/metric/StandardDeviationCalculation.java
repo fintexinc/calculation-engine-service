@@ -7,6 +7,9 @@ import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.domain.model.result.StandardDeviationResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import com.fintex.ce.util.CalculationUtils;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
@@ -15,7 +18,7 @@ import java.util.SortedMap;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.tuple.Pair;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.DecimalUtils.INTERNAL_SCALE;
 import static com.fintex.ce.util.DecimalUtils.divide;

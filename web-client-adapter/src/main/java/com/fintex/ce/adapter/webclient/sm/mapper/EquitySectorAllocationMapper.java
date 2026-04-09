@@ -5,6 +5,7 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.sm.model.domain.value.EquitySectorAllocationTypeNameValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class EquitySectorAllocationMapper
-    implements SecurityMasterResponseMapper<EquitySector, EquitySectorAllocation> {
+    implements
+      SecurityMasterResponseMapper<EquitySector, EquitySectorAllocation> {
 
   @Override
   public EquitySector map(EquitySectorAllocation smsResponse, Holding holding) {

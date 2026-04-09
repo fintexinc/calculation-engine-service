@@ -12,6 +12,7 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.Growth10KResult;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

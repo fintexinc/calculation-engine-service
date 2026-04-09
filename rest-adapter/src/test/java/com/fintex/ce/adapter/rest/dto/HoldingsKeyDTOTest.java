@@ -8,8 +8,11 @@ import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.util.List;
+
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static com.fintex.ce.util.PortfolioUtils.createKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;

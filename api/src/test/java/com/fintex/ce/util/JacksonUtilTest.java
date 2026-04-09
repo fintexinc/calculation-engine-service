@@ -1,7 +1,8 @@
 package com.fintex.ce.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -38,8 +39,7 @@ class JacksonUtilTest {
     final var byteArrayInputStream = new ByteArrayInputStream(jsonValue.getBytes());
 
     // ACT
-    final String deserializedValue = JacksonUtil.deserialize(byteArrayInputStream, new TypeReference<String>() {
-    });
+    final String deserializedValue = JacksonUtil.deserialize(byteArrayInputStream, new TypeReference<String>() {});
 
     // VERIFY
     assertEquals(stringValue, deserializedValue);
@@ -47,8 +47,7 @@ class JacksonUtilTest {
 
   @Test
   void deserialize_fromInputStream_whenValueIsNull() {
-    assertNull(JacksonUtil.deserialize((InputStream) null, new TypeReference<String>() {
-    }));
+    assertNull(JacksonUtil.deserialize((InputStream) null, new TypeReference<String>() {}));
   }
 
   @Test
@@ -57,16 +56,14 @@ class JacksonUtilTest {
     final var byteArrayInputStream = new ByteArrayInputStream(jsonValue.getBytes());
 
     // ACT
-    TypeReference<Integer> typeReference = new TypeReference<>() {
-    };
+    TypeReference<Integer> typeReference = new TypeReference<>() {};
     assertThrows(IllegalStateException.class, () -> JacksonUtil.deserialize(byteArrayInputStream, typeReference));
   }
 
   @Test
   void deserialize_toTypeReference_checkResult() {
     // ACT
-    final String deserializedValue = JacksonUtil.deserialize(jsonValue, new TypeReference<String>() {
-    });
+    final String deserializedValue = JacksonUtil.deserialize(jsonValue, new TypeReference<String>() {});
 
     // VERIFY
     assertEquals(stringValue, deserializedValue);
@@ -74,14 +71,12 @@ class JacksonUtilTest {
 
   @Test
   void deserialize_toTypeReference_whenValueIsNull() {
-    assertNull(JacksonUtil.deserialize((String) null, new TypeReference<String>() {
-    }));
+    assertNull(JacksonUtil.deserialize((String) null, new TypeReference<String>() {}));
   }
 
   @Test
   void deserialize_toTypeReference_verifyExceptionWhenInvalidJson() {
-    TypeReference<Integer> typeReference = new TypeReference<>() {
-    };
+    TypeReference<Integer> typeReference = new TypeReference<>() {};
     assertThrows(IllegalStateException.class, () -> JacksonUtil.deserialize(jsonValue, typeReference));
   }
 

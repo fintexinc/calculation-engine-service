@@ -11,14 +11,16 @@ import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.MARRatioResult;
 import com.fintex.ce.util.ReturnFactorScale;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 @Service
 public class MarRatioCalculationServiceImpl extends PeriodAbstractService<MARRatioResult, PeriodCommand> {

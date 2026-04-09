@@ -3,6 +3,7 @@ package com.fintex.ce.util;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -282,10 +283,11 @@ class FilterUtilsTest {
     assertEquals(List.of(h5), actual);
   }
 
-  // TODO: PAG_GUIDED_PORTFOLIO is not present in FinancialInstrumentType. Re-enable when business requirements are clarified.
+  // TODO: PAG_GUIDED_PORTFOLIO is not present in FinancialInstrumentType. Re-enable when business requirements are
+  // clarified.
   // @Test
   // void filterHoldings_pagGuidedPortfolioCheckResult() {
-  //   // PAG_GUIDED_PORTFOLIO not in FinancialInstrumentType - test disabled
+  // // PAG_GUIDED_PORTFOLIO not in FinancialInstrumentType - test disabled
   // }
 
   @Test

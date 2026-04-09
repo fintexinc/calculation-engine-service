@@ -16,10 +16,13 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodReqVali
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.domain.model.holding.Holding;
+
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 

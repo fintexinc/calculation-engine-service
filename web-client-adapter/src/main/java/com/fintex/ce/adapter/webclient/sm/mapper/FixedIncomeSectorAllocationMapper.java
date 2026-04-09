@@ -6,6 +6,7 @@ import com.fintex.sm.model.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.value.FixedIncomeSectorAllocationTypeNameValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -16,23 +17,28 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Maps SM FixedIncomeSectorAllocation (Morningstar SuperSector) to PCE FixedIncomeBondSecurities.
- * SM sector types are translated to PCE FixedIncomeSecuritiesAllocationType-compatible string keys.
+ * Maps SM FixedIncomeSectorAllocation (Morningstar SuperSector) to CE FixedIncomeBondSecurities. SM sector types are
+ * translated to CE FixedIncomeSecuritiesAllocationType-compatible string keys.
  */
 @Component
 public class FixedIncomeSectorAllocationMapper
-    implements SecurityMasterResponseMapper<FixedIncomeBondSecurities, FixedIncomeSectorAllocation> {
+    implements
+      SecurityMasterResponseMapper<FixedIncomeBondSecurities, FixedIncomeSectorAllocation> {
 
   private static final Map<FixedIncomeSectorAllocationType, FixedIncomeSecuritiesAllocationType> SECTOR_TYPE_MAPPING;
 
   static {
     SECTOR_TYPE_MAPPING = new EnumMap<>(FixedIncomeSectorAllocationType.class);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.GOVERNMENT, FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.CORPORATE, FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.GOVERNMENT,
+        FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.CORPORATE,
+        FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS);
     SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.CASH, FixedIncomeSecuritiesAllocationType.ST_INVESTMENTS);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.SECURITIZED, FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.SECURITIZED,
+        FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES);
     SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.MUNICIPAL, FixedIncomeSecuritiesAllocationType.OTHER_BONDS);
-    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.DERIVATIVE, FixedIncomeSecuritiesAllocationType.ASSET_BACKED_SECURITIES);
+    SECTOR_TYPE_MAPPING.put(FixedIncomeSectorAllocationType.DERIVATIVE,
+        FixedIncomeSecuritiesAllocationType.ASSET_BACKED_SECURITIES);
   }
 
   @Override

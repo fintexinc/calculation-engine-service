@@ -1,6 +1,7 @@
 package com.fintex.ce.domain.model;
 
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

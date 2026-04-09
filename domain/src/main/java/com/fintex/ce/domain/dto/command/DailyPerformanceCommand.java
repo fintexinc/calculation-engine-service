@@ -1,11 +1,11 @@
 package com.fintex.ce.domain.dto.command;
 
 import com.fintex.ce.domain.dto.calculation.HoldingForDailyCalculationDTO;
-import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)

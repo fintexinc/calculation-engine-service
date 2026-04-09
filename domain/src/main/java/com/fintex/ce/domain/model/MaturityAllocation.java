@@ -2,6 +2,7 @@ package com.fintex.ce.domain.model;
 
 import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;

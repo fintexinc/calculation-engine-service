@@ -4,13 +4,13 @@ import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MFR_001;

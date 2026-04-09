@@ -4,11 +4,14 @@ import com.fintex.ce.application.calculation.metric.core.UpDownSideCalculationAb
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.model.result.DownsideCaptureResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.tuple.Pair;
+
 import static java.math.BigDecimal.ZERO;
 
 public class DownsideCaptureCalculation extends UpDownSideCalculationAbstract<DownsideCaptureResult> {

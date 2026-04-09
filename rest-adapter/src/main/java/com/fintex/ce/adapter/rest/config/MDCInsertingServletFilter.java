@@ -1,10 +1,11 @@
 package com.fintex.ce.adapter.rest.config;
 
+import org.springframework.stereotype.Component;
+
+import org.slf4j.MDC;
+
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
-import lombok.RequiredArgsConstructor;
-import org.slf4j.MDC;
-import org.springframework.stereotype.Component;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -12,17 +13,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 
 import static java.util.Objects.nonNull;
 
 /**
  * Servlet filter that integrates incoming TraceId header with Micrometer Tracing.
  *
- * <p>When Micrometer Tracing is active, traceId and spanId are automatically propagated
- * to MDC and downstream WebClient calls. This filter additionally reads a custom
- * {@code TraceId} header from inbound requests and places it in MDC for backward
- * compatibility with existing log correlation.</p>
+ * <p>
+ * When Micrometer Tracing is active, traceId and spanId are automatically propagated to MDC and downstream WebClient
+ * calls. This filter additionally reads a custom {@code TraceId} header from inbound requests and places it in MDC for
+ * backward compatibility with existing log correlation.
+ * </p>
  */
 @Component
 @RequiredArgsConstructor

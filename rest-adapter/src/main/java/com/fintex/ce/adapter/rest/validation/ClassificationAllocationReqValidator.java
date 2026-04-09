@@ -8,6 +8,7 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullCashCu
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+
 import org.springframework.stereotype.Component;
 
 @Component

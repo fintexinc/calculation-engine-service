@@ -2,9 +2,13 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.validation.CpedDataValidation;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import java.time.LocalDate;
-import org.junit.jupiter.api.Test;
+
 import org.springframework.http.HttpStatus;
+
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_CPED_002;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_CPED_003;
 import static org.junit.jupiter.api.Assertions.assertTrue;

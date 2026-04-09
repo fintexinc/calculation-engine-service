@@ -10,6 +10,7 @@ import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -72,7 +73,7 @@ class CountryExposureCalculationImplTest {
   @SuppressWarnings("unchecked")
   @Test
   void shouldFetch_whenCheckResult() {
-      final var storage = mock(SecurityDataFetcher.class);
+    final var storage = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(CountryExposureResponseMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
     final var service = mock(CountryExposureCalculationImpl.class,

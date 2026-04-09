@@ -7,11 +7,13 @@ import com.fintex.ce.domain.model.HoldingEquityMarketCap;
 import com.fintex.sm.model.domain.datapoint.EquityMarketCapitalization;
 import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import com.fintex.sm.model.domain.value.EquityMarketCapitalizationTypeValue;
+
+import org.springframework.core.ParameterizedTypeReference;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
@@ -19,7 +21,8 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class EquityMarketCapitalizationFetcherTest
-    extends AbstractSecurityMasterFetcherTest<HoldingEquityMarketCap, EquityMarketCapitalization> {
+    extends
+      AbstractSecurityMasterFetcherTest<HoldingEquityMarketCap, EquityMarketCapitalization> {
 
   private static final String ENDPOINT_PATH = "/api/v1/wealth/securities/allocations/equity-market-cap";
 

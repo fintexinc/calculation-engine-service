@@ -6,6 +6,9 @@ import com.fintex.ce.domain.model.result.bestworstperiods.IntervalResult;
 import com.fintex.ce.domain.model.result.bestworstperiods.PeriodDateResult;
 import com.fintex.ce.domain.model.result.bestworstperiods.PeriodValueResult;
 import com.fintex.ce.util.DecimalUtils;
+
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -15,7 +18,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import lombok.EqualsAndHashCode;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ZERO;
 

@@ -5,10 +5,13 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -44,8 +47,7 @@ class YieldResponseMapperTest {
     Map<Holding, Yield> domainMap = Map.of(
         stock, new Yield().setDividendYield(new BigDecimal("0.1")),
         gic, new Yield().setDividendYield(new BigDecimal("5")),
-        skipped, new Yield().setDividendYield(null)
-    );
+        skipped, new Yield().setDividendYield(null));
     List<Warning> warnings = List.of(new Warning("w1", "warning"));
 
     YieldResult result = mapper.toResponse(domainMap, warnings);
@@ -66,4 +68,3 @@ class YieldResponseMapperTest {
     assertEquals(0, result.getWarnings().size());
   }
 }
-

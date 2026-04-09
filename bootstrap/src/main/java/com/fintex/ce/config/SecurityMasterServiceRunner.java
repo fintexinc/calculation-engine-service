@@ -1,12 +1,12 @@
 package com.fintex.ce.config;
 
-import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.Setter;
 
 @Profile("dev")
 @Component
@@ -64,7 +65,8 @@ public class SecurityMasterServiceRunner implements SmartLifecycle {
 
       boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("win");
       String[] command = isWindows
-          ? new String[] {"cmd.exe", "/c", "mvn", "spring-boot:run", "-pl", "bootstrap", "-Dspring-boot.run.profiles=dev"}
+          ? new String[] {"cmd.exe", "/c", "mvn", "spring-boot:run", "-pl", "bootstrap",
+              "-Dspring-boot.run.profiles=dev"}
           : new String[] {"sh", "-c", "mvn spring-boot:run -pl bootstrap -Dspring-boot.run.profiles=dev"};
       ProcessBuilder pb = new ProcessBuilder(command);
       pb.directory(smsDir);

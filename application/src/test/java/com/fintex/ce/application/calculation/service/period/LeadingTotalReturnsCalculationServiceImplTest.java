@@ -7,6 +7,7 @@ import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

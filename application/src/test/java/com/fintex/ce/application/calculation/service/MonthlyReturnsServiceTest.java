@@ -13,6 +13,7 @@ import com.fintex.ce.port.webclient.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
@@ -307,7 +308,6 @@ class MonthlyReturnsServiceTest {
     final var fxRates = mock(Map.class);
     when(fxRatesFetcher.fetch()).thenReturn(fxRates);
     doCallRealMethod().when(sut).getFxRates();
-
 
     final var actual = sut.getFxRates();
 

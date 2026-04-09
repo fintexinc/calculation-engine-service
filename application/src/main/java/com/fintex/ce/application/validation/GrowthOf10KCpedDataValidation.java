@@ -1,9 +1,9 @@
 package com.fintex.ce.application.validation;
 
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public class GrowthOf10KCpedDataValidation extends PortfolioCpedDataValidation {

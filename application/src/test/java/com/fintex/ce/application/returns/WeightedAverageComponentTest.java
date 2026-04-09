@@ -5,14 +5,17 @@ import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.ReturnFactorScale;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

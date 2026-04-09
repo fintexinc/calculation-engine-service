@@ -6,9 +6,11 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.DataProvider;
-import org.apache.commons.lang3.tuple.Pair;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -126,7 +128,8 @@ public class AssetAllocationDataMapper {
   /**
    * Maps asset allocations directly from REST API response to region exposures.
    *
-   * @param allocations map of holdings to their asset allocation data
+   * @param allocations
+   *          map of holdings to their asset allocation data
    * @return map of holdings to their region-based allocation breakdown
    */
   public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> toRegionExposures(
@@ -159,7 +162,8 @@ public class AssetAllocationDataMapper {
   /**
    * Maps asset allocations from REST API response to region exposures with provider info.
    *
-   * @param allocations map of holdings to their asset allocation data
+   * @param allocations
+   *          map of holdings to their asset allocation data
    * @return map of holdings to pairs of data provider and region-based allocation breakdown
    */
   public Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> toRegionExposuresWithProvider(

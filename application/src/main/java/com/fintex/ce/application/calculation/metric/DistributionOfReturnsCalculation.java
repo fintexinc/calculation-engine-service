@@ -4,6 +4,7 @@ import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.domain.model.result.DistributionOfReturnsResult;
 import com.fintex.ce.domain.model.result.distributionofreturns.DistributionOfReturnsIntervalResult;
 import com.fintex.ce.domain.model.result.distributionofreturns.DistributionRangeResult;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NavigableMap;
 import java.util.Objects;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.DecimalUtils.getMaxValue;

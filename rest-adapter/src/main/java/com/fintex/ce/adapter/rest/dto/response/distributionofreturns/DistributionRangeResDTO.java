@@ -1,11 +1,10 @@
 package com.fintex.ce.adapter.rest.dto.response.distributionofreturns;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor

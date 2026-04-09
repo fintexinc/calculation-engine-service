@@ -11,8 +11,10 @@ import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.dto.command.ReturnCommand;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor

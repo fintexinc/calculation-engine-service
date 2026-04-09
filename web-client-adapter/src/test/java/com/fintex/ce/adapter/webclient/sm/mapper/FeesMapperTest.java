@@ -8,8 +8,11 @@ import com.fintex.sm.model.domain.datapoint.Fees;
 import com.fintex.sm.model.domain.datapoint.FloatDatapoint;
 import com.fintex.sm.model.domain.datapoint.ManagementFeeDatapoint;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FeesMapperTest {

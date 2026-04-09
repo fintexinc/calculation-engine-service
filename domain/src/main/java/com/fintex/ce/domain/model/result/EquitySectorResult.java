@@ -1,6 +1,7 @@
 package com.fintex.ce.domain.model.result;
 
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+
 import java.math.BigDecimal;
 import java.util.Map;
 import lombok.Data;

@@ -3,12 +3,13 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.mapping.response.EquityStyleboxExposureResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
-import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.EquityStyleboxExposureResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.StyleBoxType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -49,7 +50,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
   }
 
   @Test
-  void shouldCalculate_whenVerifyCalculateNetProducts(){
+  void shouldCalculate_whenVerifyCalculateNetProducts() {
     final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
     final var service = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()

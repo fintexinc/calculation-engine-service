@@ -6,13 +6,16 @@ import com.fintex.ce.domain.model.result.ExcessReturnsResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
-import org.apache.commons.lang3.tuple.Pair;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
 
 public class ExcessReturnsCalculation extends BenchmarkWeightedAverageCalculation<ExcessReturnsResult, BigDecimal> {

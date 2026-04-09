@@ -1,6 +1,5 @@
 package com.fintex.ce.application.mapping;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fintex.ce.domain.dto.GeographicAllocationDTO;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
@@ -10,13 +9,18 @@ import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.util.JacksonUtil;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 
@@ -92,8 +96,7 @@ public class GeographicAllocationMappingServiceImpl implements GeographicAllocat
           GEOGRAPHIC_ALLOCATION_MAPPING_PATH);
       throw new SystemException(message, ErrorCode.INTERNAL_SERVER_ERROR);
     }
-    final List<GeographicAllocationDTO> list = JacksonUtil.deserialize(in, new TypeReference<>() {
-    });
+    final List<GeographicAllocationDTO> list = JacksonUtil.deserialize(in, new TypeReference<>() {});
     return list.stream().filter(e -> e.getRegion() != null).collect(toMap(GeographicAllocationDTO::getCountryId,
         e -> e));
   }

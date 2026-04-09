@@ -5,6 +5,9 @@ import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.result.DownsideDeviationResult;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -12,7 +15,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.lang3.tuple.Pair;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.CalculationUtils.sum;

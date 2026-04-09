@@ -9,10 +9,12 @@ import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
 
 @Service
 public class YieldCalculationServiceImpl implements CalculationService<YieldResult, YieldCommand> {

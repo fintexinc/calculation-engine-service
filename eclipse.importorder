@@ -1,0 +1,10 @@
+#Organize Import Order
+#Internal first, then frameworks, libs, other libs, java core, static last
+0=com.fintex
+1=org.springframework
+2=org
+3=com
+4=io
+5=jakarta
+6=java|javax|lombok
+7=\#

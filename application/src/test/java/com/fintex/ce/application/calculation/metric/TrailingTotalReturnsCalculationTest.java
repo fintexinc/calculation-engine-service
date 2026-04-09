@@ -2,11 +2,14 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.domain.model.result.TrailingTotalReturnsResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Test;
+
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;

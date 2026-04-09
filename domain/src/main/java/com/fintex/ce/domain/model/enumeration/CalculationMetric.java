@@ -1,7 +1,5 @@
 package com.fintex.ce.domain.model.enumeration;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fintex.ce.domain.dto.command.AverageMerCommand;
 import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.domain.dto.command.CalculationCommand;
@@ -17,7 +15,12 @@ import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.dto.command.RollingCorrelationCommand;
 import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.dto.command.YieldCommand;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;

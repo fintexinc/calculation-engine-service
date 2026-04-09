@@ -8,17 +8,21 @@ import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.ValidationError;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
-import java.util.List;
-import java.util.Set;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.util.List;
+import java.util.Set;
+
 @Service
-public class CommonPerformanceDateServiceImpl implements CalculationService<CommonPerformanceDatesResult, MultiplePortfoliosCommand> {
+public class CommonPerformanceDateServiceImpl
+    implements
+      CalculationService<CommonPerformanceDatesResult, MultiplePortfoliosCommand> {
 
   private final MonthlyReturnsService monthlyReturnsService;
 
@@ -40,8 +44,9 @@ public class CommonPerformanceDateServiceImpl implements CalculationService<Comm
         portfolioHoldings));
     CommonDates commonPerformanceDateForPortfolios = notification.tryCatch(() -> commonPerformanceDateFor(
         monthlyReturnsForPortfolios));
-    Returns<HoldingMonthlyReturns> monthlyReturnsForBenchmark = notification.tryCatch(() -> getPortfolioMonthlyReturns(mReqDTO
-        .getBenchmarkHoldings()));
+    Returns<HoldingMonthlyReturns> monthlyReturnsForBenchmark = notification.tryCatch(() -> getPortfolioMonthlyReturns(
+        mReqDTO
+            .getBenchmarkHoldings()));
     CommonDates commonPerformanceDatesForBenchmarks = notification.tryCatch(() -> commonPerformanceDateFor(
         monthlyReturnsForBenchmark));
     notification.ifAnyErrorThrowException();

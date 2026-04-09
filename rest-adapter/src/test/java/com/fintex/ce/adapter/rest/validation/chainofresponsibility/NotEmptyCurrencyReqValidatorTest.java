@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

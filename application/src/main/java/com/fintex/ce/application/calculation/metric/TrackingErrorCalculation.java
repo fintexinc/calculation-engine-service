@@ -6,6 +6,9 @@ import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.model.result.TrackingErrorResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import com.fintex.ce.util.DecimalUtils;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -14,7 +17,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.Pair;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;

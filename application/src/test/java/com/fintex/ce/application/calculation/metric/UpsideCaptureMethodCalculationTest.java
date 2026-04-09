@@ -3,14 +3,17 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.model.result.UpsideCaptureResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static java.math.BigDecimal.TEN;

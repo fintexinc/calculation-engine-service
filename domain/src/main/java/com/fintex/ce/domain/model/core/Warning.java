@@ -1,8 +1,7 @@
 package com.fintex.ce.domain.model.core;
 
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 @Data
 public class Warning implements Serializable {

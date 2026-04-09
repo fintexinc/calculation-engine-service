@@ -3,9 +3,12 @@ package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.holding.Holding;
+
+import org.junit.jupiter.api.Test;
+
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_TCH_AHT_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_TCH_NFM_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_TCH_NFM_002;

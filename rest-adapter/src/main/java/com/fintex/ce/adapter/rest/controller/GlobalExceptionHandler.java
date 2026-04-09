@@ -5,10 +5,7 @@ import com.fintex.ce.adapter.rest.dto.exception.RuntimeExceptionDTO;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.exception.SystemException;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -16,6 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
@@ -33,7 +36,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(value = {NullPointerException.class})
   @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
   public RuntimeExceptionDTO globalExceptionHandler12(final NullPointerException e, final HttpServletRequest request) {
-      log.error("Occurred error", e);
+    log.error("Occurred error", e);
     final HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
     return new RuntimeExceptionDTO(List.of(new ErrorRes2DTO(status.name(), e.getMessage())));
   }
@@ -49,7 +52,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(SystemException.class)
   @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
   public RuntimeExceptionDTO generalExceptionHandler14(final SystemException e, final HttpServletRequest request) {
-      log.error("Occurred error", e);
+    log.error("Occurred error", e);
     final HttpStatus status = HttpStatus.resolve(e.getErrorCode().getHttpStatusCode());
     return new RuntimeExceptionDTO(List.of(new ErrorRes2DTO(status.name(), e.getMessage())));
   }

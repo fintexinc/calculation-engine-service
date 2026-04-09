@@ -1,11 +1,12 @@
 package com.fintex.ce.application.util;
 
+import org.junit.jupiter.api.Assertions;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 
 public class ComparisonUtils {
   private static final double DIFF_8x = 0.000_000_01;

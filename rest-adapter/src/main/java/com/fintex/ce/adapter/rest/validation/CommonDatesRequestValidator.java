@@ -3,10 +3,12 @@ package com.fintex.ce.adapter.rest.validation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingReqValidation;
 import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.domain.model.holding.Holding;
-import java.util.List;
-import java.util.Set;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class CommonDatesRequestValidator {

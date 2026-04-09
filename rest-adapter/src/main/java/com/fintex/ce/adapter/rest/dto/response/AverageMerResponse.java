@@ -2,7 +2,9 @@ package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import com.fintex.ce.domain.model.enumeration.ParameterType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;

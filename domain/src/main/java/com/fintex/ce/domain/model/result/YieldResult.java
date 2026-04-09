@@ -1,12 +1,11 @@
 package com.fintex.ce.domain.model.result;
 
+import java.math.BigDecimal;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 
 @Data
 @ToString(callSuper = true)

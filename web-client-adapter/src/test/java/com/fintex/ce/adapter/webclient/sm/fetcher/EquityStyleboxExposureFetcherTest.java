@@ -7,11 +7,13 @@ import com.fintex.ce.domain.model.EquityStyleboxExposure;
 import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import com.fintex.sm.model.domain.rating.StyleBoxes;
 import com.fintex.sm.model.domain.value.StyleBoxValue;
+
+import org.springframework.core.ParameterizedTypeReference;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,7 +21,8 @@ import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 class EquityStyleboxExposureFetcherTest
-    extends AbstractSecurityMasterFetcherTest<EquityStyleboxExposure, StyleBoxes> {
+    extends
+      AbstractSecurityMasterFetcherTest<EquityStyleboxExposure, StyleBoxes> {
 
   private static final String ENDPOINT_PATH = "/api/v1/wealth/securities/allocations/equity-stylebox";
 

@@ -1,14 +1,16 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import com.fintex.ce.domain.model.enumeration.Period;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
-import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.math.NumberUtils;
+import com.fintex.ce.domain.model.enumeration.Period;
+
 import org.springframework.util.CollectionUtils;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.EqualsAndHashCode;
 
 import static org.apache.commons.lang3.StringUtils.isNumeric;
 

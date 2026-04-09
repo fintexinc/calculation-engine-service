@@ -11,10 +11,12 @@ import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.InformationRatioResult;
 import com.fintex.ce.util.ReturnFactorScale;
-import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class InformationRatioCalculationServiceImpl

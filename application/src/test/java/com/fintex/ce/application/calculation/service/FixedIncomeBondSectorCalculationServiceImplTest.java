@@ -11,11 +11,13 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static java.math.BigDecimal.TEN;
@@ -37,7 +39,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
 
       final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
-          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper, DEFAULT_DATA_PROPERTIES));
+          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper,
+              DEFAULT_DATA_PROPERTIES));
 
       final var exposures = mock(Map.class);
 
@@ -56,7 +59,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
 
       final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
-          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper, DEFAULT_DATA_PROPERTIES));
+          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper,
+              DEFAULT_DATA_PROPERTIES));
 
       final var exposures = mock(Map.class);
       final var expected = new FixedIncomeSectorResult();
@@ -79,7 +83,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
     final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
 
     final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
-        .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper, DEFAULT_DATA_PROPERTIES));
+        .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper,
+            DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(Holding.class);
     final var rawData = new FixedIncomeBondSecurities();
@@ -102,7 +107,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final Holding fundSeriesHolding = mock(Holding.class);
 
       final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
-          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper, DEFAULT_DATA_PROPERTIES));
+          .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper,
+              DEFAULT_DATA_PROPERTIES));
 
       final var exposures = mock(Map.class);
 
@@ -117,7 +123,8 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
                   AssetAllocationRegion.CASH, BigDecimal.ONE)));
 
       doCallRealMethod().when(service).calculate(any(), any());
-      final FixedIncomeSectorResult result = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of(fundSeriesHolding));
+      final FixedIncomeSectorResult result = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of(
+          fundSeriesHolding));
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesZerosInMap(exposures));
     }

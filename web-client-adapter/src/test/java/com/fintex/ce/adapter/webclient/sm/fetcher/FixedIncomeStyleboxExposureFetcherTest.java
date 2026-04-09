@@ -8,11 +8,13 @@ import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.sm.model.domain.rating.FixedIncomeStyleBoxes;
 import com.fintex.sm.model.domain.value.FixedIncomeStyleBoxValue;
+
+import org.springframework.core.ParameterizedTypeReference;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,7 +22,8 @@ import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 class FixedIncomeStyleboxExposureFetcherTest
-    extends AbstractSecurityMasterFetcherTest<FixedIncomeStyleboxExposure, FixedIncomeStyleBoxes> {
+    extends
+      AbstractSecurityMasterFetcherTest<FixedIncomeStyleboxExposure, FixedIncomeStyleBoxes> {
 
   private static final String ENDPOINT_PATH = "/api/v1/wealth/securities/allocations/fixed-income-stylebox";
 

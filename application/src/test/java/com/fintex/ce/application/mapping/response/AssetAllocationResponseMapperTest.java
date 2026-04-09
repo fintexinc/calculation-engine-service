@@ -5,11 +5,12 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.AssetAllocationResult;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -36,8 +37,7 @@ class AssetAllocationResponseMapperTest {
         "US_EQUITIES", new BigDecimal("0.2"),
         "EUROPEAN_EQUITIES", new BigDecimal("0.3"),
         "ASIA_PACIFIC_EQUITIES", new BigDecimal("0.4"),
-        "UNKNOWN_KEY", new BigDecimal("0.9999")
-    ));
+        "UNKNOWN_KEY", new BigDecimal("0.9999")));
 
     AssetAllocationResult result = mapper.toResponse(domain);
     Map<AssetAllocationRegionType, BigDecimal> actual = result.getAssetAllocation();
@@ -58,8 +58,7 @@ class AssetAllocationResponseMapperTest {
     Map<AssetAllocationRegion, BigDecimal> netProducts = Map.of(
         AssetAllocationRegion.CANADIAN_EQUITIES, new BigDecimal("0.1"),
         AssetAllocationRegion.US_EQUITIES, new BigDecimal("0.2"),
-        AssetAllocationRegion.ASIA_PACIFIC_EQUITIES, new BigDecimal("0.3")
-    );
+        AssetAllocationRegion.ASIA_PACIFIC_EQUITIES, new BigDecimal("0.3"));
 
     AssetAllocationResult result = mapper.fromNetProducts(netProducts, warnings);
 
@@ -77,4 +76,3 @@ class AssetAllocationResponseMapperTest {
     assertThrows(UnsupportedOperationException.class, () -> mapper.toResponse(Map.of(), List.of()));
   }
 }
-

@@ -31,7 +31,8 @@ public class PortfolioUtils {
   }
 
   public static Map<Holding, Map<LocalDate, BigDecimal>> fxRatesForHoldings(
-      final Map<Holding, CurrencyType> holdings, final CurrencyType toCurrency, final Map<LocalDate, FxRates.FxRate> fxRates) {
+      final Map<Holding, CurrencyType> holdings, final CurrencyType toCurrency,
+      final Map<LocalDate, FxRates.FxRate> fxRates) {
     return holdings.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> fxRatesForHolding(fxRates, entry
         .getValue(), toCurrency)));
   }
@@ -42,7 +43,8 @@ public class PortfolioUtils {
         from, to)));
   }
 
-  private static Function<Map.Entry<LocalDate, FxRates.FxRate>, BigDecimal> mapFxRateBasedOnCurrency(final CurrencyType from,
+  private static Function<Map.Entry<LocalDate, FxRates.FxRate>, BigDecimal> mapFxRateBasedOnCurrency(
+      final CurrencyType from,
       final CurrencyType to) {
     return entry -> {
       if (CurrencyType.USD.equals(from) && CurrencyType.CAD.equals(to)) {
@@ -50,10 +52,11 @@ public class PortfolioUtils {
       } else if (CurrencyType.CAD.equals(from) && CurrencyType.USD.equals(to)) {
         return entry.getValue().getCadUsd();
       } else
-        if (CurrencyType.CAD.equals(from) && CurrencyType.CAD.equals(to) || CurrencyType.USD.equals(from) && CurrencyType.USD.equals(
-            to)) {
-              return ONE;
-            }
+        if (CurrencyType.CAD.equals(from) && CurrencyType.CAD.equals(to) || CurrencyType.USD.equals(from)
+            && CurrencyType.USD.equals(
+                to)) {
+                  return ONE;
+                }
       final String message = String.format("Currency exchange %s->%s not supported", from, to);
       throw new SystemException(message, ErrorCode.INTERNAL_SERVER_ERROR);
     };

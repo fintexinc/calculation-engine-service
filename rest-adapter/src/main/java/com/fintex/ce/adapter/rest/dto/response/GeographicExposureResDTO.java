@@ -3,7 +3,9 @@ package com.fintex.ce.adapter.rest.dto.response;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.core.Warning;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;

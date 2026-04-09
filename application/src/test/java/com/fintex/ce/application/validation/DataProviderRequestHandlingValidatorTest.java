@@ -2,6 +2,7 @@ package com.fintex.ce.application.validation;
 
 import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.sm.model.DataProvider;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

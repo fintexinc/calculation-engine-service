@@ -15,14 +15,16 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_CQ_CQ_001;
@@ -54,7 +56,8 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     final ArrayList<Warning> warnings = new ArrayList<>();
     final Map<Holding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(rawCreditQuality, warnings);
+    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(rawCreditQuality,
+        warnings);
     if (areAllValuesInMapEmpty(creditQuality)) {
       return responseMapper.toEmptyResponse(warnings);
     }
@@ -112,7 +115,8 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     return ratingMap;
   }
 
-  public BigDecimal calculateSumProductRating(final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
+  public BigDecimal calculateSumProductRating(
+      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
       final Map<Holding, BigDecimal> fixedIncomeCreditQuality,
       final Map<Holding, BigDecimal> weights,
       final CreditQualityRatingType rating) {

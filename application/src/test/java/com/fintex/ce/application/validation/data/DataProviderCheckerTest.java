@@ -3,11 +3,12 @@ package com.fintex.ce.application.validation.data;
 import com.fintex.ce.application.validation.DataProviderRequestHandlingValidator;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
-import java.util.List;
-import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;

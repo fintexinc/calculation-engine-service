@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
-import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class CipsdGreaterThanCpedReqValidation extends DateGreaterThanDateAbstractReqValidation {

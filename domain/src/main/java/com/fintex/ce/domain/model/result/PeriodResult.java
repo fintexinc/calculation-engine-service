@@ -1,11 +1,10 @@
 package com.fintex.ce.domain.model.result;
 
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.time.LocalDate;
 
 @Data
 @ToString(callSuper = true)

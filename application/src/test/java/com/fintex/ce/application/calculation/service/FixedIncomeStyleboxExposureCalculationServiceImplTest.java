@@ -3,12 +3,13 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.mapping.response.FixedIncomeStyleboxExposureResponseMapper;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -65,8 +66,8 @@ class FixedIncomeStyleboxExposureCalculationServiceImplTest {
     verify(service).calculateNetProducts(exposures, holdings, FixedIncomeStyleBoxType.values());
   }
 
-    @Test
-    void shouldCalculate_whenVerifyResponseMapperFromNetProducts() {
+  @Test
+  void shouldCalculate_whenVerifyResponseMapperFromNetProducts() {
     final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(FixedIncomeStyleboxExposureResponseMapper.class);
     final var service = mock(FixedIncomeStyleboxExposureCalculationServiceImpl.class, withSettings()

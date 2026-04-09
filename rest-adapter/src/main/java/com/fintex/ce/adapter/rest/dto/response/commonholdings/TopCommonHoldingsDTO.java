@@ -1,14 +1,15 @@
 package com.fintex.ce.adapter.rest.dto.response.commonholdings;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fintex.ce.adapter.rest.dto.response.correlation.HoldingsKeyDTO;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.math.BigDecimal;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.math.BigDecimal;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor

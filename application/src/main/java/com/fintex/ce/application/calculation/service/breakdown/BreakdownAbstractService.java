@@ -31,8 +31,8 @@ public abstract class BreakdownAbstractService<E extends WarningResult, T>
   public abstract E calculate(ExposureDataHolder<T> exposureData, List<Holding> holdings);
 
   /**
-   * Fetches exposure data for holdings. Returns an immutable result containing both
-   * the mapped allocations and any warnings produced during fetching and mapping.
+   * Fetches exposure data for holdings. Returns an immutable result containing both the mapped allocations and any
+   * warnings produced during fetching and mapping.
    */
   public abstract ExposureDataHolder<T> fetchExposures(PortfolioHoldingsCommand command);
 
