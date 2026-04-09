@@ -1,18 +1,19 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
 import com.fintex.ce.adapter.rest.service.RestExceptionHandlingServiceImpl;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.command.CalculationCommand;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.ErrorResult;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.stream.Stream;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,12 +21,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.BeanUtils;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationController.BASE_PATH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -77,9 +82,9 @@ class PortfolioCalculationControllerTest {
     String requestBody = objectMapper.writeValueAsString(command);
 
     MvcResult mvcResult = mockMvc.perform(
-            post(BASE_PATH + "/" + metric.getValue())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+        post(BASE_PATH + "/" + metric.getValue())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody))
         .andExpect(result -> {
           if (result.getResolvedException() != null) {
             throw new AssertionError("Controller threw: " + result.getResolvedException().getMessage(),
@@ -109,14 +114,13 @@ class PortfolioCalculationControllerTest {
   @Test
   void shouldThrowException_whenUnknownMetricRequested() {
     String requestBody = """
-            {"metric": "trailing-total-returns"}
-            """;
+        {"metric": "trailing-total-returns"}
+        """;
 
-    assertThatThrownBy(() ->
-        mockMvc.perform(
-            post(BASE_PATH + "/unknown-metric")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)))
+    assertThatThrownBy(() -> mockMvc.perform(
+        post(BASE_PATH + "/unknown-metric")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)))
         .hasCauseInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("unknown-metric");
   }
@@ -124,14 +128,13 @@ class PortfolioCalculationControllerTest {
   @Test
   void shouldThrowException_whenMetricInBodyMismatchesPathParameter() {
     String requestBody = """
-            {"metric": "sharpe-ratio", "holdings": []}
-            """;
+        {"metric": "sharpe-ratio", "holdings": []}
+        """;
 
-    assertThatThrownBy(() ->
-        mockMvc.perform(
-            post(BASE_PATH + "/trailing-total-returns")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)))
+    assertThatThrownBy(() -> mockMvc.perform(
+        post(BASE_PATH + "/trailing-total-returns")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody)))
         .hasCauseInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("Metric mismatch");
   }
@@ -139,9 +142,9 @@ class PortfolioCalculationControllerTest {
   @Test
   void shouldReturn415_whenContentTypeIsNotJson() throws Exception {
     mockMvc.perform(
-            post(BASE_PATH + "/trailing-total-returns")
-                .contentType(MediaType.TEXT_PLAIN)
-                .content("not json"))
+        post(BASE_PATH + "/trailing-total-returns")
+            .contentType(MediaType.TEXT_PLAIN)
+            .content("not json"))
         .andExpect(status().isUnsupportedMediaType());
   }
 

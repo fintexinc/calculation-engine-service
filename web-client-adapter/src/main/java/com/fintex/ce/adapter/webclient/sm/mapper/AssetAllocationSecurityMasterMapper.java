@@ -4,6 +4,7 @@ import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.allocation.AssetAllocation;
 import com.fintex.sm.model.domain.value.NameValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,10 +18,12 @@ import java.util.stream.Collectors;
  */
 @Component
 public class AssetAllocationSecurityMasterMapper
-    implements SecurityMasterResponseMapper<HoldingAssetAllocation, AssetAllocation> {
+    implements
+      SecurityMasterResponseMapper<HoldingAssetAllocation, AssetAllocation> {
 
   @Override
-  public HoldingAssetAllocation map(com.fintex.sm.model.domain.allocation.AssetAllocation smsResponse, Holding holding) {
+  public HoldingAssetAllocation map(com.fintex.sm.model.domain.allocation.AssetAllocation smsResponse,
+      Holding holding) {
     Map<String, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
         .map(AssetAllocation::getAllocation)
         .orElse(List.of())

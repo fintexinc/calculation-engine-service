@@ -10,6 +10,12 @@ import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.domain.model.result.TrailingTotalReturnsResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -20,10 +26,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;

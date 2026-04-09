@@ -25,7 +25,8 @@ public class FixedIncomeBondSectorCalculation {
   private final List<Warning> warnings;
   private final Map<Holding, BigDecimal> fixedIncomePlusCash;
 
-  public FixedIncomeBondSectorCalculation(final Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures,
+  public FixedIncomeBondSectorCalculation(
+      final Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures,
       final List<Holding> holdings,
       final List<Warning> warnings,
       final Map<Holding, BigDecimal> fixedIncomePlusCash) {
@@ -36,7 +37,8 @@ public class FixedIncomeBondSectorCalculation {
   }
 
   public FixedIncomeSectorResult calculate() {
-    final Map<FixedIncomeSecuritiesAllocationType, BigDecimal> netProducts = calculateFixedIncomeSectorAllocation(holdings, exposures,
+    final Map<FixedIncomeSecuritiesAllocationType, BigDecimal> netProducts = calculateFixedIncomeSectorAllocation(
+        holdings, exposures,
         fixedIncomePlusCash);
     final Map<FixedIncomeSecuritiesAllocationType, BigDecimal> reScaledValues = toUserScale(reScaleAbs(netProducts));
     FixedIncomeSectorResult result = new FixedIncomeSectorResult();
@@ -45,7 +47,8 @@ public class FixedIncomeBondSectorCalculation {
     return result;
   }
 
-  private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> calculateFixedIncomeSectorAllocation(final List<Holding> holdings,
+  private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> calculateFixedIncomeSectorAllocation(
+      final List<Holding> holdings,
       final Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> fixedIncome,
       final Map<Holding, BigDecimal> fixedIncomePlusCash) {
     final Map<Holding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);

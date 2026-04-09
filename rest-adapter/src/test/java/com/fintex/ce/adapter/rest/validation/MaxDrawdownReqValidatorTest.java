@@ -10,7 +10,9 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotEmptyCurre
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MaxDrawdownReqValidatorTest {

@@ -1,9 +1,10 @@
 package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.domain.model.EquityStyleboxExposure;
-import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.EquityStyleboxExposureResult;
+import com.fintex.sm.model.domain.enumeration.StyleBoxType;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -38,8 +39,10 @@ class EquityStyleboxExposureResponseMapperTest {
     EquityStyleboxExposureResult result = mapper.toResponse(domain);
 
     assertEquals(2, result.getEquityStyleboxExposure().size());
-    assertEquals(0, result.getEquityStyleboxExposure().get(StyleBoxType.LARGE_CORE).compareTo(new BigDecimal("0.1234567890")));
-    assertEquals(0, result.getEquityStyleboxExposure().get(StyleBoxType.SMALL_VALUE).compareTo(new BigDecimal("0.2000000000")));
+    assertEquals(0, result.getEquityStyleboxExposure().get(StyleBoxType.LARGE_CORE).compareTo(new BigDecimal(
+        "0.1234567890")));
+    assertEquals(0, result.getEquityStyleboxExposure().get(StyleBoxType.SMALL_VALUE).compareTo(new BigDecimal(
+        "0.2000000000")));
     assertTrue(result.getWarnings().isEmpty());
   }
 
@@ -59,14 +62,15 @@ class EquityStyleboxExposureResponseMapperTest {
     List<Warning> warnings = List.of(new Warning("w1", "warning"));
     Map<StyleBoxType, BigDecimal> netProducts = Map.of(
         StyleBoxType.LARGE_CORE, new BigDecimal("0.1"),
-        StyleBoxType.SMALL_VALUE, new BigDecimal("0.2")
-    );
+        StyleBoxType.SMALL_VALUE, new BigDecimal("0.2"));
 
     EquityStyleboxExposureResult result = mapper.fromNetProducts(netProducts, warnings);
 
     assertEquals(warnings, result.getWarnings());
-    assertEquals(0, result.getEquityStyleboxExposure().get(StyleBoxType.LARGE_CORE).compareTo(new BigDecimal("0.1000000000")));
-    assertEquals(0, result.getEquityStyleboxExposure().get(StyleBoxType.SMALL_VALUE).compareTo(new BigDecimal("0.2000000000")));
+    assertEquals(0, result.getEquityStyleboxExposure().get(StyleBoxType.LARGE_CORE).compareTo(new BigDecimal(
+        "0.1000000000")));
+    assertEquals(0, result.getEquityStyleboxExposure().get(StyleBoxType.SMALL_VALUE).compareTo(new BigDecimal(
+        "0.2000000000")));
   }
 
   @Test
@@ -74,4 +78,3 @@ class EquityStyleboxExposureResponseMapperTest {
     assertThrows(UnsupportedOperationException.class, () -> mapper.toResponse(Map.of(), List.of()));
   }
 }
-

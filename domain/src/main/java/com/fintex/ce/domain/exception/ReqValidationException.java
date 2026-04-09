@@ -1,9 +1,8 @@
 package com.fintex.ce.domain.exception;
 
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @EqualsAndHashCode

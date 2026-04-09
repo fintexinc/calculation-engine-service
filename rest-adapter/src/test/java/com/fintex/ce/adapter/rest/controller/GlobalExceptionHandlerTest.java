@@ -7,10 +7,15 @@ import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+
 import org.springframework.http.HttpStatus;
+
+import org.junit.jupiter.api.Test;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;

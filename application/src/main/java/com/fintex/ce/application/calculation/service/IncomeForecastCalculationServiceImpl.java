@@ -17,6 +17,12 @@ import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.MonthDay;
@@ -33,9 +39,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Service
 public class IncomeForecastCalculationServiceImpl
@@ -51,7 +54,8 @@ public class IncomeForecastCalculationServiceImpl
 
   private final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher;
 
-  public IncomeForecastCalculationServiceImpl(final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher) {
+  public IncomeForecastCalculationServiceImpl(
+      final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher) {
     this.incomeForecastSecurityDataFetcher = incomeForecastSecurityDataFetcher;
   }
 

@@ -1,8 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import lombok.EqualsAndHashCode;
-
 import java.time.LocalDate;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public abstract class DateGreaterThanDateAbstractReqValidation extends ReqValidation {

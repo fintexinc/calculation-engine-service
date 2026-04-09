@@ -4,6 +4,9 @@ import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.Growth10KResult;
 import com.fintex.ce.domain.model.result.core.KeyValueResult;
+
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -11,7 +14,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TEN_THOUSAND;
 import static com.fintex.ce.util.DateTimeUtils.addOneMonth;
 import static com.fintex.ce.util.DateTimeUtils.minusOneMonth;

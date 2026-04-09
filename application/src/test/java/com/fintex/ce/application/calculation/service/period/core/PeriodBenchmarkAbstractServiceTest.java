@@ -5,6 +5,7 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

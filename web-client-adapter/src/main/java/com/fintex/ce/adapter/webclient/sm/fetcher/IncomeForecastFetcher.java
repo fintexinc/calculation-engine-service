@@ -4,6 +4,7 @@ import com.fintex.ce.domain.model.IncomeForecast;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.DataProvider;
+
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

@@ -1,6 +1,7 @@
 package com.fintex.ce.domain.model.calculation;
 
 import com.fintex.sm.model.domain.enumeration.SalesChargeType;
+
 import java.util.Set;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 public enum SalesChargeCategory {
 
   NO_LOAD_INITIAL_SALES_CHARGE(Set.of(SalesChargeType.FRONT_END_CHARGE, SalesChargeType.VOLUME_SALES_CHARGE,
-          SalesChargeType.FORMULA_ONE, SalesChargeType.NO_SALES_OR_REDEMPTION_CHARGE, SalesChargeType.NO_LOAD,
-          SalesChargeType.INITIAL_SALES_CHARGE)),
+      SalesChargeType.FORMULA_ONE, SalesChargeType.NO_SALES_OR_REDEMPTION_CHARGE, SalesChargeType.NO_LOAD,
+      SalesChargeType.INITIAL_SALES_CHARGE)),
   LOW_LOAD_SALES_CHARGE(Set.of(SalesChargeType.LOW_SALES_CHARGE, SalesChargeType.LOW_LOAD_SALES_CHARGE)),
   DEFERRED_SALES_CHARGE(Set.of(SalesChargeType.DEFERRED_SALES_CHARGE_ON_MARKET_VALUE,
-          SalesChargeType.DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT, SalesChargeType.DEFERRED_SALES_CHARGE,
-          SalesChargeType.GROUP_SALES_CHARGE, SalesChargeType.REDEMPTION_CHARGE));
+      SalesChargeType.DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT, SalesChargeType.DEFERRED_SALES_CHARGE,
+      SalesChargeType.GROUP_SALES_CHARGE, SalesChargeType.REDEMPTION_CHARGE));
 
   private final Set<SalesChargeType> types;
 

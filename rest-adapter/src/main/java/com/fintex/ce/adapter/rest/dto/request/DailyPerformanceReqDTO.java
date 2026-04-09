@@ -1,11 +1,12 @@
 package com.fintex.ce.adapter.rest.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fintex.ce.domain.dto.calculation.HoldingForDailyCalculationDTO;
-import lombok.Data;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class DailyPerformanceReqDTO {

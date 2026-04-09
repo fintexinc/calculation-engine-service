@@ -1,14 +1,14 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.domain.dto.calculation.InflationDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
+import com.fintex.ce.domain.dto.calculation.InflationDTO;
+
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.util.Map;
 
 @Data
 @ToString(callSuper = true)

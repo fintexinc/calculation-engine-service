@@ -9,11 +9,13 @@ import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.value.FixedIncomeSectorAllocationTypeNameValue;
+
+import org.springframework.core.ParameterizedTypeReference;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,7 +23,8 @@ import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 class FixedIncomeBondSecuritiesFetcherTest
-    extends AbstractSecurityMasterFetcherTest<FixedIncomeBondSecurities, FixedIncomeSectorAllocation> {
+    extends
+      AbstractSecurityMasterFetcherTest<FixedIncomeBondSecurities, FixedIncomeSectorAllocation> {
 
   private static final String ENDPOINT_PATH = "/api/v1/wealth/securities/allocations/fixed-income-sector";
 

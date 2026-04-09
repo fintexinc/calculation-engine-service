@@ -5,12 +5,15 @@ import com.fintex.ce.domain.model.result.MARRatioResult;
 import com.fintex.ce.domain.model.result.core.MaxDrawdownEntry;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
 import com.fintex.ce.util.DecimalUtils;
-import java.math.BigDecimal;
-import java.util.Set;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.math.BigDecimal;
+import java.util.Set;
+
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;

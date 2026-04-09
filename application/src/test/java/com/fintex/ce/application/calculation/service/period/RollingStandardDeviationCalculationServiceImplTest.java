@@ -8,6 +8,7 @@ import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

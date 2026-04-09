@@ -53,17 +53,7 @@ import com.fintex.ce.adapter.rest.util.ResponseMappingUtils;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.command.CalculationCommand;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -71,12 +61,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @RestController
 @RequestMapping(PortfolioCalculationController.BASE_PATH)
-@Tag(name = "Portfolio Calculations",
-    description = "Unified endpoint for all portfolio calculation metrics: "
-        + "returns, risk, benchmark comparison, allocations, fees, and income")
+@Tag(name = "Portfolio Calculations", description = "Unified endpoint for all portfolio calculation metrics: "
+    + "returns, risk, benchmark comparison, allocations, fees, and income")
 public class PortfolioCalculationController {
   public static final String BASE_PATH = "/api/v1/portfolio/calculations";
 
@@ -95,48 +97,40 @@ public class PortfolioCalculationController {
     this.restExceptionHandler = restExceptionHandler;
   }
 
-  @Operation(
-      summary = "Execute a portfolio calculation",
-      description = "Performs the specified calculation metric on the provided portfolio holdings. "
-          + "The request body schema depends on the metric — period-based metrics require time intervals, "
-          + "breakdown metrics require holdings, and fee metrics require parameter types.")
-  @ApiResponse(responseCode = "200", description = "Calculation result",
-      content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-          schema = @Schema(oneOf = {
-              TrailingTotalReturnsResDTO.class, LeadingTotalReturnsResDTO.class,
-              RollingTotalReturnsResDTO.class, ExcessReturnsResDTO.class,
-              AnnualReturnResDTO.class, Growth10KResDTO.class,
-              BestWorstPeriodsResponseDTO.class, DistributionOfReturnsResDTO.class,
-              StandardDeviationResDTO.class, RollingStandardDeviationResDTO.class,
-              MeanResDTO.class, SharpeRatioResDTO.class,
-              RollingSharpeRatioResDTO.class, SortinoRatioResDTO.class,
-              MaxDrawdownResDTO.class, DownsideDeviationResDTO.class,
-              MARRatioResDTO.class, TreynorRatioResDTO.class,
-              InformationRatioResDTO.class, TrackingErrorResDTO.class,
-              AlphaResDTO.class, BetaResDTO.class,
-              RSquaredResDTO.class, CorrelationResDTO.class,
-              RollingCorrelationResDTO.class, UpsideCaptureResDTO.class,
-              DownsideCaptureResDTO.class,
-              AssetAllocationResDTO.class, AssetAllocationEMResDTO.class,
-              EquitySectorResDTO.class, EquityCountryExposureResDTO.class,
-              EquityStyleboxExposureResDto.class, GeographicExposureResDTO.class,
-              EquityMarketCapResDTO.class, CountryExposureResDTO.class,
-              FixedIncomeSectorResDTO.class, FixedIncomeStyleboxExposureResDto.class,
-              MaturityAllocationResDto.class, ClassificationAllocationResDto.class,
-              AverageMerResponse.class, ManagementFeeResponse.class,
-              SalesChargeResDtos.class,
-              IncomeForecastResDto.class, YieldResDto.class,
-              CommonPerformanceDatesResDTO.class, TopCommonHoldingsResDTO.class,
-              CreditQualityResDTO.class
-          })))
+  @Operation(summary = "Execute a portfolio calculation", description = "Performs the specified calculation metric on the provided portfolio holdings. "
+      + "The request body schema depends on the metric — period-based metrics require time intervals, "
+      + "breakdown metrics require holdings, and fee metrics require parameter types.")
+  @ApiResponse(responseCode = "200", description = "Calculation result", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(oneOf = {
+      TrailingTotalReturnsResDTO.class, LeadingTotalReturnsResDTO.class,
+      RollingTotalReturnsResDTO.class, ExcessReturnsResDTO.class,
+      AnnualReturnResDTO.class, Growth10KResDTO.class,
+      BestWorstPeriodsResponseDTO.class, DistributionOfReturnsResDTO.class,
+      StandardDeviationResDTO.class, RollingStandardDeviationResDTO.class,
+      MeanResDTO.class, SharpeRatioResDTO.class,
+      RollingSharpeRatioResDTO.class, SortinoRatioResDTO.class,
+      MaxDrawdownResDTO.class, DownsideDeviationResDTO.class,
+      MARRatioResDTO.class, TreynorRatioResDTO.class,
+      InformationRatioResDTO.class, TrackingErrorResDTO.class,
+      AlphaResDTO.class, BetaResDTO.class,
+      RSquaredResDTO.class, CorrelationResDTO.class,
+      RollingCorrelationResDTO.class, UpsideCaptureResDTO.class,
+      DownsideCaptureResDTO.class,
+      AssetAllocationResDTO.class, AssetAllocationEMResDTO.class,
+      EquitySectorResDTO.class, EquityCountryExposureResDTO.class,
+      EquityStyleboxExposureResDto.class, GeographicExposureResDTO.class,
+      EquityMarketCapResDTO.class, CountryExposureResDTO.class,
+      FixedIncomeSectorResDTO.class, FixedIncomeStyleboxExposureResDto.class,
+      MaturityAllocationResDto.class, ClassificationAllocationResDto.class,
+      AverageMerResponse.class, ManagementFeeResponse.class,
+      SalesChargeResDtos.class,
+      IncomeForecastResDto.class, YieldResDto.class,
+      CommonPerformanceDatesResDTO.class, TopCommonHoldingsResDTO.class,
+      CreditQualityResDTO.class
+  })))
   @PostMapping("/{metricName}")
   @SuppressWarnings("unchecked")
   public ErrorDTO calculate(
-      @Parameter(
-          description = "Calculation metric to execute",
-          required = true,
-          schema = @Schema(implementation = CalculationMetric.class))
-      @PathVariable String metricName,
+      @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable String metricName,
       @RequestBody CalculationCommand command) {
     CalculationMetric metric = CalculationMetric.from(metricName);
     if (!serviceMap.containsKey(metric)) {
@@ -146,7 +140,7 @@ public class PortfolioCalculationController {
     if (command.getMetric() != null && command.getMetric() != metric) {
       throw new IllegalArgumentException(
           "Metric mismatch: path parameter is '" + metricName + "' but request body contains '" +
-                  command.getMetric().getValue() + "'");
+              command.getMetric().getValue() + "'");
     }
 
     // TODO refactor the validators at TMI-315

@@ -7,7 +7,9 @@ import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.datapoint.SalesChargeData;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.SalesChargeType;
+
 import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

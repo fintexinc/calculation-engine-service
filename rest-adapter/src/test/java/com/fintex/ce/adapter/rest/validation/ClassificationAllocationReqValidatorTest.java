@@ -9,8 +9,11 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqVal
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.holding.CashHolding;
-import java.util.List;
+
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ClassificationAllocationReqValidatorTest {

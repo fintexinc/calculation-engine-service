@@ -1,12 +1,12 @@
 package com.fintex.ce.domain.dto.calculation;
 
 import com.fintex.ce.domain.model.holding.Holding;
+
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor

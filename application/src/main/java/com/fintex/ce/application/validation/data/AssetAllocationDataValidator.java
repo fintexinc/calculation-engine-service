@@ -6,10 +6,12 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
+
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
 @Component
 public class AssetAllocationDataValidator {

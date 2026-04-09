@@ -4,10 +4,13 @@ import com.fintex.ce.domain.model.EquitySector;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.EquitySectorResult;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,8 +33,7 @@ class EquitySectorResponseMapperTest {
     EquitySector domain = new EquitySector();
     domain.setAllocations(Map.of(
         EquitySectorAllocationType.ENERGY, new BigDecimal("0.12345678901"),
-        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2")
-    ));
+        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2")));
 
     EquitySectorResult result = mapper.toResponse(domain);
 
@@ -55,14 +57,15 @@ class EquitySectorResponseMapperTest {
     List<Warning> warnings = List.of(new Warning("w1", "warning"));
     Map<EquitySectorAllocationType, BigDecimal> netProducts = Map.of(
         EquitySectorAllocationType.ENERGY, new BigDecimal("0.1"),
-        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2")
-    );
+        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2"));
 
     EquitySectorResult result = mapper.fromNetProducts(netProducts, warnings);
 
     assertEquals(warnings, result.getWarnings());
-    assertEquals(0, result.getEquitySector().get(EquitySectorAllocationType.ENERGY).compareTo(new BigDecimal("0.1000000000")));
-    assertEquals(0, result.getEquitySector().get(EquitySectorAllocationType.TECHNOLOGY).compareTo(new BigDecimal("0.2000000000")));
+    assertEquals(0, result.getEquitySector().get(EquitySectorAllocationType.ENERGY).compareTo(new BigDecimal(
+        "0.1000000000")));
+    assertEquals(0, result.getEquitySector().get(EquitySectorAllocationType.TECHNOLOGY).compareTo(new BigDecimal(
+        "0.2000000000")));
   }
 
   @Test

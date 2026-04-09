@@ -2,14 +2,15 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.port.webclient.FxRatesFetcher;
+
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
 /**
- * Stub implementation for FxRatesPort.
- * TODO: Replace with actual REST implementation.
+ * Stub implementation for FxRatesPort. TODO: Replace with actual REST implementation.
  */
 @Component
 public class FxRatesFetcherImpl implements FxRatesFetcher {

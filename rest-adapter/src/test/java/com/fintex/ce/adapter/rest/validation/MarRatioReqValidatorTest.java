@@ -13,7 +13,9 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodLessTha
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.PeriodsNotContainingYearToDateReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
+
 import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.adapter.rest.validation.TrailingTotalReturnsReqValidatorTest.getPeriodCommand;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

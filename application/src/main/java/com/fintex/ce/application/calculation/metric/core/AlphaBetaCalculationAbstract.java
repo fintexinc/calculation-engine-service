@@ -4,11 +4,13 @@ import com.fintex.ce.domain.constant.BigDecimalConstants;
 import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.util.DecimalUtils;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
+
 import static com.fintex.ce.util.CalculationUtils.average;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ZERO;

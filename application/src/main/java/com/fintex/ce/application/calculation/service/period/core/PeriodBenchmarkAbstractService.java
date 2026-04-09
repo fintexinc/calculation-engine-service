@@ -7,6 +7,7 @@ import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.util.ReturnFactorScale;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;

@@ -2,6 +2,9 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.domain.model.result.AnnualReturnResult;
 import com.fintex.ce.domain.model.result.core.KeyValueResult;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -11,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
@@ -183,7 +186,8 @@ class AnnualReturnCalculationTest {
     final TreeMap<Integer, BigDecimal> years = new TreeMap<>();
     when(sut.calculateAnnualReturns(any(), any())).thenReturn(years);
 
-    final List<KeyValueResult> keyValueDTOS = years.entrySet().stream().map(e -> new KeyValueResult(e.getKey(), e.getValue()))
+    final List<KeyValueResult> keyValueDTOS = years.entrySet().stream().map(e -> new KeyValueResult(e.getKey(), e
+        .getValue()))
         .collect(Collectors.toList());
 
     doCallRealMethod().when(sut).calculate();

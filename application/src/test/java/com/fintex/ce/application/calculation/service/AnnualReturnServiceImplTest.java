@@ -8,6 +8,7 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AnnualReturnResult;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -130,8 +131,9 @@ class AnnualReturnServiceImplTest {
     final var holdings = List.of(mock(Holding.class));
     final var monthlyReturns = mock(Returns.class);
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(CurrencyType.class), eq(SCALE_OF_TWO))).thenReturn(
-        monthlyReturns);
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(CurrencyType.class), eq(SCALE_OF_TWO)))
+        .thenReturn(
+            monthlyReturns);
 
     final var annual = mock(ReturnCommand.class);
     when(annual.getCurrency()).thenReturn(CurrencyType.CAD);

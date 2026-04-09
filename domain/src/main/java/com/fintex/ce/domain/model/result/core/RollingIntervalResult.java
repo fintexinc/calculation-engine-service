@@ -1,11 +1,10 @@
 package com.fintex.ce.domain.model.result.core;
 
+import java.util.Set;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor

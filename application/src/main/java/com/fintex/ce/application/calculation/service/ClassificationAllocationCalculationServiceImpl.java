@@ -4,7 +4,6 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.domain.model.ClassificationAllocation;
 import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
-import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ClassificationAllocationResult;
@@ -13,22 +12,18 @@ import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_CA_CA_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
 import static com.fintex.ce.util.CalculationUtils.reScale;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ZERO;
@@ -39,7 +34,8 @@ public class ClassificationAllocationCalculationServiceImpl
     extends
       BreakdownAbstractService<ClassificationAllocationResult, ClassificationAllocationType> {
 
-  protected static final Map<ClassificationAllocationType, BigDecimal> DEFAULT_MAP = new EnumMap<>(ClassificationAllocationType.class);
+  protected static final Map<ClassificationAllocationType, BigDecimal> DEFAULT_MAP = new EnumMap<>(
+      ClassificationAllocationType.class);
 
   static final Map<ClassificationAllocationType, BigDecimal> ALLOCATION_DEFAULT_MAP;
 

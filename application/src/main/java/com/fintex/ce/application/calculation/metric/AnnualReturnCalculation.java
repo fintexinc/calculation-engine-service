@@ -4,6 +4,7 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.result.AnnualReturnResult;
 import com.fintex.ce.domain.model.result.core.KeyValueResult;
 import com.fintex.ce.util.DecimalUtils;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
+
 import static com.fintex.ce.util.CalculationUtils.product;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;

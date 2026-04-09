@@ -1,7 +1,9 @@
 package com.fintex.ce.domain.dto.command;
 
 import com.fintex.ce.domain.model.holding.Holding;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

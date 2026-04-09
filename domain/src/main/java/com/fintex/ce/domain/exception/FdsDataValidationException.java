@@ -1,8 +1,7 @@
 package com.fintex.ce.domain.exception;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class FdsDataValidationException extends RuntimeException {

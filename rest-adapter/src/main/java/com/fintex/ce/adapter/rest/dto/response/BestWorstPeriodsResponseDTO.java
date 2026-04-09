@@ -1,9 +1,12 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fintex.ce.adapter.rest.dto.response.bestworstperiods.BestWorstPeriodDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;

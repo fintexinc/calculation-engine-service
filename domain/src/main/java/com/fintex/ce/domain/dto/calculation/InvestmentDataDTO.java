@@ -1,13 +1,14 @@
 package com.fintex.ce.domain.dto.calculation;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fintex.ce.domain.model.enumeration.Frequency;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TEN_THOUSAND;
 

@@ -1,11 +1,10 @@
 package com.fintex.ce.domain.model.result.correlation;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor

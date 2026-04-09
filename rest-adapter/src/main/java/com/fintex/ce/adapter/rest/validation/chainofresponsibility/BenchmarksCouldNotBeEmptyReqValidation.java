@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
 import com.fintex.ce.domain.model.holding.Holding;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 public class BenchmarksCouldNotBeEmptyReqValidation extends HoldingsCouldNotBeEmptyAbstractReqValidation {

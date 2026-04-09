@@ -6,6 +6,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.MonthlyReturnsMapper;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.performance.MonthlyReturns;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

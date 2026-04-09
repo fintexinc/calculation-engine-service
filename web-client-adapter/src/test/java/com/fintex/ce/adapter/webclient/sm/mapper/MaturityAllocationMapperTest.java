@@ -8,9 +8,12 @@ import com.fintex.sm.model.domain.datapoint.Maturities;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.TimeDuration;
 import com.fintex.sm.model.domain.value.MaturityDurationValue;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MaturityAllocationMapperTest {

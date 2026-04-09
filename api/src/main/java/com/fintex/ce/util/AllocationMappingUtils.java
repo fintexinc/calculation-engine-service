@@ -19,21 +19,23 @@ import static com.fintex.ce.util.CollectorUtils.toMap;
 /**
  * Pure utility methods for mapping raw security data into typed allocation maps.
  *
- * <p>Three overloads handle different mapping scenarios:
+ * <p>
+ * Three overloads handle different mapping scenarios:
  * <ul>
- *   <li>{@link #mapToAllocations(Map, Function, Function, Map, ExceptionCode, String, BiConsumer)} —
- *       maps string-keyed raw values to enum-keyed allocations with a custom accumulator
- *       (e.g., for maturity allocations that merge multiple raw keys into one display type).</li>
- *   <li>{@link #mapToAllocations(Map, Function, Function, Map, ExceptionCode, String)} —
- *       simplified version using {@code Map.put} as the default accumulator
- *       (e.g., for equity market cap where each raw key maps 1:1 to an enum value).</li>
- *   <li>{@link #mapTypedAllocations(Map, Function, Map, ExceptionCode)} —
- *       for domain models where values are already enum-keyed and need no string resolution
- *       (e.g., for fixed income sector allocations mapped by the SM REST fetcher).</li>
+ * <li>{@link #mapToAllocations(Map, Function, Function, Map, ExceptionCode, String, BiConsumer)} — maps string-keyed
+ * raw values to enum-keyed allocations with a custom accumulator (e.g., for maturity allocations that merge multiple
+ * raw keys into one display type).</li>
+ * <li>{@link #mapToAllocations(Map, Function, Function, Map, ExceptionCode, String)} — simplified version using
+ * {@code Map.put} as the default accumulator (e.g., for equity market cap where each raw key maps 1:1 to an enum
+ * value).</li>
+ * <li>{@link #mapTypedAllocations(Map, Function, Map, ExceptionCode)} — for domain models where values are already
+ * enum-keyed and need no string resolution (e.g., for fixed income sector allocations mapped by the SM REST
+ * fetcher).</li>
  * </ul>
  *
- * <p>All methods return an {@link ExposureDataHolder} containing both the mapped allocations
- * and any warnings produced during mapping, keeping the functions pure and side-effect free.
+ * <p>
+ * All methods return an {@link ExposureDataHolder} containing both the mapped allocations and any warnings produced
+ * during mapping, keeping the functions pure and side-effect free.
  */
 public final class AllocationMappingUtils {
 
@@ -41,8 +43,8 @@ public final class AllocationMappingUtils {
   }
 
   /**
-   * Maps string-keyed raw values to enum-keyed allocations with a custom accumulator.
-   * Use when multiple raw keys can map to the same enum value and need custom merging logic.
+   * Maps string-keyed raw values to enum-keyed allocations with a custom accumulator. Use when multiple raw keys can
+   * map to the same enum value and need custom merging logic.
    */
   public static <E extends Enum<E>, D> ExposureDataHolder<E> mapToAllocations(
       Map<Holding, D> rawData,
@@ -63,8 +65,8 @@ public final class AllocationMappingUtils {
   }
 
   /**
-   * Maps string-keyed raw values to enum-keyed allocations using simple put semantics.
-   * Use when each raw key maps 1:1 to an enum value with no merging needed.
+   * Maps string-keyed raw values to enum-keyed allocations using simple put semantics. Use when each raw key maps 1:1
+   * to an enum value with no merging needed.
    */
   public static <E extends Enum<E>, D> ExposureDataHolder<E> mapToAllocations(
       Map<Holding, D> rawData,
@@ -79,8 +81,8 @@ public final class AllocationMappingUtils {
   }
 
   /**
-   * Maps already enum-keyed values to allocations with no string resolution needed.
-   * Use when the domain model already contains typed enum keys (e.g., from SM REST fetcher mappers).
+   * Maps already enum-keyed values to allocations with no string resolution needed. Use when the domain model already
+   * contains typed enum keys (e.g., from SM REST fetcher mappers).
    */
   public static <E extends Enum<E>, D> ExposureDataHolder<E> mapTypedAllocations(
       Map<Holding, D> rawData,

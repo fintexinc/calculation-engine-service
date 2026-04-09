@@ -11,14 +11,17 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.TEN;

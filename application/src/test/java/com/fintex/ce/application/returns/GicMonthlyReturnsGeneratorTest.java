@@ -5,13 +5,16 @@ import com.fintex.ce.domain.model.enumeration.InterestFreq;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.util.DateTimeUtils.rangeWithLastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -204,7 +207,8 @@ class GicMonthlyReturnsGeneratorTest {
     assertEquals(expected, actual);
   }
 
-  private HashMap<Holding, HoldingMonthlyReturns> getExpected(final GicHolding gicHolding, final BigDecimal gicReturnValue) {
+  private HashMap<Holding, HoldingMonthlyReturns> getExpected(final GicHolding gicHolding,
+      final BigDecimal gicReturnValue) {
     final HashMap<Holding, HoldingMonthlyReturns> result = new HashMap<>();
 
     final TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>();

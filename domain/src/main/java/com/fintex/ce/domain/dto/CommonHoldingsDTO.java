@@ -2,14 +2,14 @@ package com.fintex.ce.domain.dto;
 
 import com.fintex.ce.domain.model.HoldingAggregator;
 import com.fintex.ce.domain.model.holding.Holding;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor

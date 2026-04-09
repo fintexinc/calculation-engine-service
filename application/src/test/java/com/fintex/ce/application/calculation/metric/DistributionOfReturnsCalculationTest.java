@@ -6,13 +6,16 @@ import com.fintex.ce.domain.model.result.DistributionOfReturnsResult;
 import com.fintex.ce.domain.model.result.distributionofreturns.DistributionOfReturnsIntervalResult;
 import com.fintex.ce.domain.model.result.distributionofreturns.DistributionRangeResult;
 import com.fintex.ce.util.DecimalUtils;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TEN_THOUSAND;
@@ -390,7 +393,8 @@ class DistributionOfReturnsCalculationTest {
     final DistributionOfReturnsResult actual = sut.initializeResponseDTO(calculatedMonthlyReturns,
         calculatedAnnualReturns, returns);
 
-    final var expected = new DistributionOfReturnsResult().setMonthlyReturns(calculatedMonthlyReturns).setYearlyReturns(calculatedAnnualReturns);
+    final var expected = new DistributionOfReturnsResult().setMonthlyReturns(calculatedMonthlyReturns).setYearlyReturns(
+        calculatedAnnualReturns);
     assertEquals(expected.getMonthlyReturns().getDistributionIncrement(), actual.getMonthlyReturns()
         .getDistributionIncrement());
   }

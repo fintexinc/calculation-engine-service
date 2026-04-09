@@ -10,6 +10,10 @@ import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -17,8 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MR_002;
@@ -385,10 +388,14 @@ class MonthlyReturnsTest {
   void shouldValidateMonthlyReturns_whenCheckExceptionCase1() {
     final var sut = new Returns();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
-    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1", FiIdentifierType.TICKER));
-    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2", FiIdentifierType.TICKER));
-    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1", FiIdentifierType.TICKER));
-    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2", FiIdentifierType.TICKER));
+    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
+        FiIdentifierType.TICKER));
+    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
+        FiIdentifierType.TICKER));
+    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
+        FiIdentifierType.TICKER));
+    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
+        FiIdentifierType.TICKER));
     monthlyReturns.put(h1, new TreeMap<>(Map.of(
         LocalDate.of(2020, 1, 1), ONE,
         LocalDate.of(2020, 2, 1), ONE)));
@@ -419,10 +426,14 @@ class MonthlyReturnsTest {
   void shouldValidateMonthlyReturns_whenCheckExceptionCase2() {
     final var sut = new Returns();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
-    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1", FiIdentifierType.TICKER));
-    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2", FiIdentifierType.TICKER));
-    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1", FiIdentifierType.TICKER));
-    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2", FiIdentifierType.TICKER));
+    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
+        FiIdentifierType.TICKER));
+    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
+        FiIdentifierType.TICKER));
+    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
+        FiIdentifierType.TICKER));
+    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
+        FiIdentifierType.TICKER));
     monthlyReturns.put(h1, new TreeMap<>(Map.of(
         LocalDate.of(2020, 1, 1), ONE,
         LocalDate.of(2020, 2, 1), ONE)));
@@ -454,10 +465,14 @@ class MonthlyReturnsTest {
   void shouldValidateMonthlyReturns_whenCheckExceptionCase3() {
     final var sut = new Returns();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
-    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1", FiIdentifierType.TICKER));
-    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2", FiIdentifierType.TICKER));
-    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1", FiIdentifierType.TICKER));
-    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2", FiIdentifierType.TICKER));
+    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
+        FiIdentifierType.TICKER));
+    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
+        FiIdentifierType.TICKER));
+    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
+        FiIdentifierType.TICKER));
+    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
+        FiIdentifierType.TICKER));
     monthlyReturns.put(h1, new TreeMap<>(Map.of(
         LocalDate.of(2020, 12, 1), ONE,
         LocalDate.of(2021, 1, 1), ONE)));
@@ -488,10 +503,14 @@ class MonthlyReturnsTest {
   void shouldValidateMonthlyReturns_whenCase4NoExceptionThrown() {
     final var sut = new Returns();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
-    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1", FiIdentifierType.TICKER));
-    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2", FiIdentifierType.TICKER));
-    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1", FiIdentifierType.TICKER));
-    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2", FiIdentifierType.TICKER));
+    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
+        FiIdentifierType.TICKER));
+    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
+        FiIdentifierType.TICKER));
+    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
+        FiIdentifierType.TICKER));
+    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
+        FiIdentifierType.TICKER));
     monthlyReturns.put(h1, new TreeMap<>(Map.of(
         LocalDate.of(2020, 1, 1), ONE,
         LocalDate.of(2020, 2, 1), ONE)));
@@ -613,7 +632,6 @@ class MonthlyReturnsTest {
     doCallRealMethod().when(sut).retrieveHoldingCurrencies(anyMap());
 
     final var actual = sut.retrieveHoldingCurrencies(originalMReturns);
-
 
     final var expected = new HashMap<Holding, CurrencyType>();
     expected.put(holding2, CurrencyType.USD);

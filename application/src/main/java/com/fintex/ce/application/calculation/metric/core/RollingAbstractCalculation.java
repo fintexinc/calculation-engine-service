@@ -4,6 +4,9 @@ import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.domain.model.result.core.IntervalResult;
 import com.fintex.ce.domain.model.result.core.RollingIntervalResult;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -13,7 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.Pair;
+
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 
 public abstract class RollingAbstractCalculation<T extends PeriodResult>

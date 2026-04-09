@@ -1,11 +1,10 @@
 package com.fintex.ce.domain.model.result.correlation;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor

@@ -315,15 +315,15 @@
 
                 <configuration>
                     <java>
-                        <excludes>
-                            <exclude>src/**</exclude>
-                        </excludes>
+                        <importOrder>
+                            <file>${session.topLevelProject.basedir}/eclipse.importorder</file>
+                        </importOrder>
+
+                        <removeUnusedImports/>
 
                         <eclipse>
                             <file>${session.topLevelProject.basedir}/eclipse-java-formatter.xml</file>
                         </eclipse>
-
-                        <removeUnusedImports/>
                     </java>
                 </configuration>
             </plugin>

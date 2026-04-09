@@ -1,13 +1,13 @@
 package com.fintex.ce.domain.model.result;
 
 import com.fintex.ce.domain.dto.calculation.InflationDTO;
+
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.util.Map;
 
 @Data
 @ToString(callSuper = true)

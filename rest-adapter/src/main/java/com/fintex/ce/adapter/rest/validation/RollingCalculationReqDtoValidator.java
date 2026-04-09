@@ -16,6 +16,7 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriodsLessThan12ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriodsReqValidation;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
+
 import org.springframework.stereotype.Component;
 
 @Component

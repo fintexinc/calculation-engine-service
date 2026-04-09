@@ -2,7 +2,9 @@ package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.PeriodResDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.TimeIntervalResDTO;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;

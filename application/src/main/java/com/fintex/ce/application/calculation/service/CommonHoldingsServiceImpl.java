@@ -13,7 +13,13 @@ import com.fintex.ce.domain.model.result.commonholdings.TopCommonHoldingData;
 import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import com.google.common.base.Strings;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,9 +31,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.util.CollectorUtils.toLinkedHashMap;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
@@ -37,7 +41,9 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 @Service
-public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHoldingsResult, TopCommonHoldingsCommand> {
+public class CommonHoldingsServiceImpl
+    implements
+      CalculationService<TopCommonHoldingsResult, TopCommonHoldingsCommand> {
 
   private static final int DEFAULT_NUMBER_OF_FUNDS_MIN = 1;
   private static final int DEFAULT_NUMBER_OF_TOP_COMMON_HOLDINGS = 10;
@@ -112,7 +118,8 @@ public class CommonHoldingsServiceImpl implements CalculationService<TopCommonHo
     final Set<Holding> parentHoldings = sameLeaves
         .stream().map(CommonHoldingsDTO::getHolding).collect(Collectors.toSet());
     final Set<HoldingsKeyResult> parents = parentHoldings.stream()
-        .map(h -> HoldingsKeyResult.buildFromHolding(h, calculateWeightWithinSameLeaves(sameLeaves, h))).collect(toSet());
+        .map(h -> HoldingsKeyResult.buildFromHolding(h, calculateWeightWithinSameLeaves(sameLeaves, h))).collect(
+            toSet());
 
     return new TopCommonHoldingData()
         .setName(sortedLeafEntry.getKey().getNameOrCompanyName())

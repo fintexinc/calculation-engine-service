@@ -17,8 +17,6 @@ import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.MapUtils;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,6 +28,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_FDS_MC_002;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_NAV_PRICES_002;

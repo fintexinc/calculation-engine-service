@@ -7,8 +7,11 @@ import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.datapoint.FloatDatapoint;
 import com.fintex.sm.model.domain.datapoint.Income;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class YieldMapperTest {

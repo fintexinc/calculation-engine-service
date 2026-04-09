@@ -10,6 +10,7 @@ import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -49,7 +50,6 @@ class EquityMarketCapCalculationServiceImplTest {
         MEDIUM, Set.of(MEDIUM),
         SMALL, Set.of(SMALL, MICRO));
 
-
     Assertions.assertNotNull(groupsExpected);
     ComparisonUtils.compareMaps(groupsExpected, GROUPS);
   }
@@ -61,7 +61,6 @@ class EquityMarketCapCalculationServiceImplTest {
     defaultMapExpected.put(LARGE, null);
     defaultMapExpected.put(MEDIUM, null);
     defaultMapExpected.put(SMALL, null);
-
 
     Assertions.assertNotNull(defaultMapExpected);
     ComparisonUtils.compareMaps(defaultMapExpected, DEFAULT_MAP);
@@ -152,7 +151,8 @@ class EquityMarketCapCalculationServiceImplTest {
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(false);
-      when(service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values())).thenReturn(
+          netProducts);
 
       doCallRealMethod().when(service).calculate(any(), any());
       service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
@@ -174,7 +174,8 @@ class EquityMarketCapCalculationServiceImplTest {
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(false);
       mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(netProducts)).thenReturn(reScaled);
-      when(service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values())).thenReturn(netProducts);
+      when(service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values())).thenReturn(
+          netProducts);
 
       doCallRealMethod().when(service).calculate(any(), any());
       service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);

@@ -1,10 +1,13 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fintex.ce.adapter.rest.dto.response.commonholdings.TopCommonHoldingsDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
 import com.fintex.ce.domain.model.core.Warning;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,7 @@
 package com.fintex.ce.domain.model.result;
 
 import com.fintex.ce.domain.model.calculation.SalesChargeCategory;
+
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.Map;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
 import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalEquals;
 import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalHashCode;
 

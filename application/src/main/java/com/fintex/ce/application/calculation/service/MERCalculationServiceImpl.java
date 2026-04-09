@@ -12,7 +12,7 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.AverageMerResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_MERMF_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_NERGER_001;
@@ -60,21 +61,21 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
   protected AverageManagementExpenseCalculation mapFeeDataToDto(Holding holding, FeeData fees) {
     FinancialInstrumentType type = holding.getHoldingType();
     var builder = AverageManagementExpenseCalculation.builder()
-            .marketValue(holding.getValue())
-            .holdingType(type);
+        .marketValue(holding.getValue())
+        .holdingType(type);
     if (type == FinancialInstrumentType.ETF_US || type == FinancialInstrumentType.MUTUAL_FUND_US) {
       builder.netExpenseRatio(fees.getNetExpenseRatio())
-              .grossExpenseRatio(fees.getGrossExpenseRatio());
+          .grossExpenseRatio(fees.getGrossExpenseRatio());
     } else {
       builder.managementExpenseRatio(fees.getManagementExpenseRatio())
-              .actualManagementFee(fees.getManagementFee());
+          .actualManagementFee(fees.getManagementFee());
     }
     return builder.build();
   }
 
   @Override
   public List<Warning> setInitialFeeAndModifiedFeeValues(
-          final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> groupOfMers) {
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> groupOfMers) {
     var notification = new Notification();
     // TODO TMI-369: refactor this logic. Many types are/were simply not handled in the initial impl.
     // Therefore we must investigate:
@@ -82,67 +83,68 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
     // What processing logic must happen for each type?
     // This requires more detailed info on calculation logic.
     List<Warning> warnings = groupOfMers.entrySet().stream()
-            .flatMap(entry -> {
-              FinancialInstrumentType holdingType = entry.getKey();
-              if (FinancialInstrumentType.ETF_CANADA.equals(holdingType)
-                      || FinancialInstrumentType.MUTUAL_FUND_CANADA.equals(holdingType)
-                      || FinancialInstrumentType.SEGREGATED_FUND_CANADA.equals(holdingType)
-                      || FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holdingType)) {
-                return entry.getValue().entrySet().stream()
-                        .map(e -> handleFeeDataForCanadaMutualHedgeFundsAndEtf(e.getValue(), e.getKey(), notification))
-                        .flatMap(Optional::stream)
-                        .flatMap(Collection::stream);
-              } else if (FinancialInstrumentType.ETF_US.equals(holdingType)
-                      || FinancialInstrumentType.MUTUAL_FUND_US.equals(holdingType)) {
-                return entry.getValue().entrySet().stream()
-                        .map(e -> handleFeeDataForUsEtfAndMutualFund(e.getValue(), e.getKey(), notification))
-                        .flatMap(Optional::stream);
-              }
-              return Stream.empty();
-            })
-            .collect(Collectors.toList());
+        .flatMap(entry -> {
+          FinancialInstrumentType holdingType = entry.getKey();
+          if (FinancialInstrumentType.ETF_CANADA.equals(holdingType)
+              || FinancialInstrumentType.MUTUAL_FUND_CANADA.equals(holdingType)
+              || FinancialInstrumentType.SEGREGATED_FUND_CANADA.equals(holdingType)
+              || FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holdingType)) {
+            return entry.getValue().entrySet().stream()
+                .map(e -> handleFeeDataForCanadaMutualHedgeFundsAndEtf(e.getValue(), e.getKey(), notification))
+                .flatMap(Optional::stream)
+                .flatMap(Collection::stream);
+          } else
+            if (FinancialInstrumentType.ETF_US.equals(holdingType)
+                || FinancialInstrumentType.MUTUAL_FUND_US.equals(holdingType)) {
+                  return entry.getValue().entrySet().stream()
+                      .map(e -> handleFeeDataForUsEtfAndMutualFund(e.getValue(), e.getKey(), notification))
+                      .flatMap(Optional::stream);
+                }
+          return Stream.empty();
+        })
+        .collect(Collectors.toList());
 
     notification.ifAnyErrorThrowException();
     return warnings;
   }
 
   public Optional<List<Warning>> handleFeeDataForCanadaMutualHedgeFundsAndEtf(
-          AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
-          Holding holding,
-          Notification notification) {
+      AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
+      Holding holding,
+      Notification notification) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getManagementExpenseRatio()) &&
-            Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
+        Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
       if (FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holding.getHoldingType())) {
         setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
-                .getManagementExpenseRatio());
+            .getManagementExpenseRatio());
         return Optional.of(List.of(WRN_MER_MER_001.warning(holding), WRN_MER_AMF_001.warning(holding)));
       } else {
         notification.addError(ERR_MER_MERMF_001.error(holding));
       }
     } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getManagementExpenseRatio())) {
       setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
-              .getActualManagementFee());
+          .getActualManagementFee());
       return Optional.of(List.of(WRN_MER_MER_001.warning(holding)));
     } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
       setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
-              .getManagementExpenseRatio());
+          .getManagementExpenseRatio());
       return Optional.of(List.of(WRN_MER_AMF_001.warning(holding)));
     }
     setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
-            .getManagementExpenseRatio());
+        .getManagementExpenseRatio());
     return Optional.empty();
   }
 
   public Optional<Warning> handleFeeDataForUsEtfAndMutualFund(
-          AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
-          Holding holding,
-          Notification notification) {
+      AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
+      Holding holding,
+      Notification notification) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getNetExpenseRatio()) &&
-            Objects.isNull(averageManagementExpenseCalculationDTO.getGrossExpenseRatio())) {
+        Objects.isNull(averageManagementExpenseCalculationDTO.getGrossExpenseRatio())) {
       notification.addError(ERR_MER_NERGER_001.error(holding));
     } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getNetExpenseRatio())) {
       setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
-              .getGrossExpenseRatio());
+          .getGrossExpenseRatio());
       return Optional.of(WRN_MER_NER_001.warning(holding));
     } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getGrossExpenseRatio())) {
       setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO.getNetExpenseRatio());
@@ -154,7 +156,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   @Override
   public AverageMerResult calculateAverageValue(final List<ParameterType> parameterTypes,
-          final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
+      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
     final var resDTO = new AverageMerResult();
     if (parameterTypes.contains(SCALED)) {
       final BigDecimal scaledAverageMer = getScaledAverageMer(averageMerCalculationDtos);
@@ -173,7 +175,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   @Override
   public void setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(final AverageMerResult response,
-          final AverageMerCommand reqDTO) {
+      final AverageMerCommand reqDTO) {
     setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(response.getManagementExpenseRatio(), reqDTO);
   }
 }

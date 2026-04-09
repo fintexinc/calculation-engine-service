@@ -7,13 +7,16 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;

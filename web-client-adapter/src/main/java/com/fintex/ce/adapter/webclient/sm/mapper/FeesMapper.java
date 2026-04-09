@@ -6,10 +6,12 @@ import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.datapoint.Fees;
 import com.fintex.sm.model.domain.datapoint.FloatDatapoint;
 import com.fintex.sm.model.domain.datapoint.ManagementFeeDatapoint;
+
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.springframework.stereotype.Component;
 
 /**
  * Maps Security Master Fees response to Fees domain model.
@@ -20,7 +22,7 @@ public class FeesMapper implements SecurityMasterResponseMapper<FeeData, Fees> {
   @Override
   public FeeData map(Fees smsResponse, Holding holding) {
     FeeData result = new FeeData()
-            .setHoldingId(holding.getSecurityIdentifier().getId());
+        .setHoldingId(holding.getSecurityIdentifier().getId());
 
     if (smsResponse == null) {
       return result;
@@ -28,32 +30,32 @@ public class FeesMapper implements SecurityMasterResponseMapper<FeeData, Fees> {
 
     mapManagementFee(smsResponse.getManagementFee(), result);
     mapFloatDatapoint(smsResponse.getManagementExpenseRatio(), result::setManagementExpenseRatio,
-            result::setManagementExpenseRatioProvider);
+        result::setManagementExpenseRatioProvider);
     mapFloatDatapoint(smsResponse.getNetExpenseRatio(), result::setNetExpenseRatio,
-            result::setNetExpenseRatioProvider);
+        result::setNetExpenseRatioProvider);
     mapFloatDatapoint(smsResponse.getGrossExpenseRatio(), result::setGrossExpenseRatio,
-            result::setGrossExpenseRatioProvider);
+        result::setGrossExpenseRatioProvider);
     mapFloatDatapoint(smsResponse.getActual12B1Fee(), result::setActual12B1Fee,
-            result::setActual12B1FeeProvider);
+        result::setActual12B1FeeProvider);
 
     return result;
   }
 
   private void mapManagementFee(ManagementFeeDatapoint datapoint, FeeData result) {
     Optional.ofNullable(datapoint)
-            .ifPresent(dp -> {
-              result.setManagementFee(dp.getValue());
-              result.setManagementFeeProvider(dp.getDataProvider());
-            });
+        .ifPresent(dp -> {
+          result.setManagementFee(dp.getValue());
+          result.setManagementFeeProvider(dp.getDataProvider());
+        });
   }
 
   private void mapFloatDatapoint(FloatDatapoint datapoint,
-          Consumer<BigDecimal> valueSetter,
-          Consumer<DataProvider> providerSetter) {
+      Consumer<BigDecimal> valueSetter,
+      Consumer<DataProvider> providerSetter) {
     Optional.ofNullable(datapoint)
-            .ifPresent(dp -> {
-              valueSetter.accept(dp.getValue());
-              providerSetter.accept(dp.getDataProvider());
-            });
+        .ifPresent(dp -> {
+          valueSetter.accept(dp.getValue());
+          providerSetter.accept(dp.getDataProvider());
+        });
   }
 }

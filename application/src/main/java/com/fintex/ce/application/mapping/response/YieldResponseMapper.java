@@ -7,11 +7,13 @@ import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.springframework.stereotype.Component;
 
 @Component
 public class YieldResponseMapper implements ResponseMapper<Yield, YieldResult> {

@@ -12,12 +12,15 @@ import com.fintex.ce.domain.dto.command.ReturnCommand;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.model.holding.Holding;
-import java.util.List;
-import java.util.Set;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.List;
+import java.util.Set;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

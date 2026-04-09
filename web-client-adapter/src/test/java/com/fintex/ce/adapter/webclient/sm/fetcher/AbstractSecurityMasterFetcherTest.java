@@ -8,9 +8,11 @@ import com.fintex.sm.model.DataProvider;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.springframework.core.ParameterizedTypeReference;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,11 +26,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Abstract test class for SecurityMasterFetcher implementations.
- * Subclasses provide the concrete fetcher, SM response, and domain model instances.
+ * Abstract test class for SecurityMasterFetcher implementations. Subclasses provide the concrete fetcher, SM response,
+ * and domain model instances.
  *
- * @param <D> CE domain model type
- * @param <R> SM API response type
+ * @param <D>
+ *          CE domain model type
+ * @param <R>
+ *          SM API response type
  */
 abstract class AbstractSecurityMasterFetcherTest<D, R> {
 

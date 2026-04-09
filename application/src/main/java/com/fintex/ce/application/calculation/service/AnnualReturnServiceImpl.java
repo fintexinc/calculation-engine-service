@@ -8,11 +8,14 @@ import com.fintex.ce.domain.dto.command.ReturnCommand;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.AnnualReturnResult;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
 import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
 
 @Service

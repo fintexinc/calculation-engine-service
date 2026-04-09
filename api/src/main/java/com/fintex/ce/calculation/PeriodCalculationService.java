@@ -12,6 +12,8 @@ import com.fintex.ce.domain.model.result.PeriodResult;
  * @param <R>
  *          The command type extending PeriodCommand
  */
-public interface PeriodCalculationService<E extends PeriodResult, R extends PeriodCommand> extends CalculationService<E, R> {
+public interface PeriodCalculationService<E extends PeriodResult, R extends PeriodCommand>
+    extends
+      CalculationService<E, R> {
 
 }

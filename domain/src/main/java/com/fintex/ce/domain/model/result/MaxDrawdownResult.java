@@ -1,13 +1,13 @@
 package com.fintex.ce.domain.model.result;
 
 import com.fintex.ce.domain.model.result.core.MaxDrawdownEntry;
+
+import java.util.List;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.util.List;
+import lombok.experimental.Accessors;
 
 @Data
 @ToString(callSuper = true)

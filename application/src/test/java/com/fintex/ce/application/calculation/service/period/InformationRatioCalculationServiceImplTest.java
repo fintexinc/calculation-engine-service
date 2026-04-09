@@ -6,10 +6,13 @@ import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.domain.model.result.InformationRatioResult;
 import com.fintex.ce.util.ReturnFactorScale;
+
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Test;
+
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;

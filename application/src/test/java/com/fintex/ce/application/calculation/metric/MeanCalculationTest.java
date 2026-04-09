@@ -2,14 +2,17 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.domain.model.result.MeanResult;
 import com.fintex.ce.util.CalculationUtils;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;

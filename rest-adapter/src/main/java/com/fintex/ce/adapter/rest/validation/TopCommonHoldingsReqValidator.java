@@ -7,6 +7,7 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotNullReqVal
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.TopCommonHoldingsReqValidation;
 import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
+
 import org.springframework.stereotype.Component;
 
 @Component

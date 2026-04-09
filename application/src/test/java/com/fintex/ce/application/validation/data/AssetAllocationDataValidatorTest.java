@@ -4,13 +4,14 @@ import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
+
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
-
 
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_AA_AA_001;
 import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;

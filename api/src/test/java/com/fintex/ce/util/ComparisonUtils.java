@@ -1,6 +1,5 @@
 package com.fintex.ce.util;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Precision;
 import org.junit.jupiter.api.Assertions;
 
@@ -9,6 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ComparisonUtils {

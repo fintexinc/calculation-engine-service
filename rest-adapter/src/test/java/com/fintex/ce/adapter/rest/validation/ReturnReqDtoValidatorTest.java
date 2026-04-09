@@ -9,11 +9,14 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.HoldingsCould
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.NotEmptyCurrencyReqValidator;
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.ReqValidation;
 import com.fintex.ce.domain.dto.command.ReturnCommand;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 

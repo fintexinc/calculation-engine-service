@@ -17,10 +17,13 @@ import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriod
 import com.fintex.ce.adapter.rest.validation.chainofresponsibility.RollingPeriodsReqValidation;
 import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
 import com.fintex.ce.domain.model.holding.Holding;
+
+import org.junit.jupiter.api.Test;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;

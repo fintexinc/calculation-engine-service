@@ -12,11 +12,14 @@ import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,7 +36,8 @@ class EquityCountryExposureCalculationServiceImplTest {
 
   @SuppressWarnings("unchecked")
   private final SecurityDataFetcher<EquityCountryAllocation> securityDataPort = mock(SecurityDataFetcher.class);
-  private final CountryAllocationMappingService countryAllocationMappingService = mock(CountryAllocationMappingService.class);
+  private final CountryAllocationMappingService countryAllocationMappingService = mock(
+      CountryAllocationMappingService.class);
 
   @Test
   void shouldPerform_whenVerifyValidateHoldings() {

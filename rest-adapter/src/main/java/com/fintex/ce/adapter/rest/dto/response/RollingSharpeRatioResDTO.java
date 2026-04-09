@@ -1,8 +1,11 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fintex.ce.adapter.rest.dto.response.core.PeriodResDTO;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;

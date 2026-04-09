@@ -9,13 +9,16 @@ import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
 import com.fintex.sm.model.domain.value.FixedIncomeSectorAllocationTypeNameValue;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FixedIncomeSectorAllocationMapperTest {
@@ -88,7 +91,8 @@ class FixedIncomeSectorAllocationMapperTest {
     var smsResponse = new FixedIncomeSectorAllocation();
     smsResponse.setAllocation(List.of(validEntry, nullTypeEntry, nullValueEntry));
 
-    FixedIncomeBondSecurities result = mapper.map(smsResponse, createHolding("TEST.ID", FinancialInstrumentType.ETF_CANADA));
+    FixedIncomeBondSecurities result = mapper.map(smsResponse, createHolding("TEST.ID",
+        FinancialInstrumentType.ETF_CANADA));
 
     assertThat(result.getFixedIncomeBondSectors()).hasSize(1);
     assertThat(result.getFixedIncomeBondSectors()).containsKey(FixedIncomeSecuritiesAllocationType.OTHER_BONDS);

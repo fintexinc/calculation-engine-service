@@ -1,8 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
-import lombok.EqualsAndHashCode;
-
 import java.time.LocalDate;
+import lombok.EqualsAndHashCode;
 
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 

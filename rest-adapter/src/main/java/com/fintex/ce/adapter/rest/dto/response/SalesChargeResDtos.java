@@ -1,9 +1,12 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
 import com.fintex.ce.domain.model.calculation.SalesChargeCategory;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.Map;
@@ -75,8 +78,8 @@ public class SalesChargeResDtos extends ErrorDTO {
       if (fundServCode != null ? !fundServCode.equals(that.fundServCode) : that.fundServCode != null)
         return false;
       return mutualFundAllocation != null
-              ? (mutualFundAllocation.compareTo(that.mutualFundAllocation) == 0)
-              : that.mutualFundAllocation == null;
+          ? (mutualFundAllocation.compareTo(that.mutualFundAllocation) == 0)
+          : that.mutualFundAllocation == null;
     }
 
     @Override

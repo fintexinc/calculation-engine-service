@@ -10,9 +10,11 @@ import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.result.SharpeRatioResult;
 import com.fintex.ce.port.webclient.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
-import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class SharpeRatioCalculationServiceImpl extends PeriodAbstractService<SharpeRatioResult, PeriodCommand> {

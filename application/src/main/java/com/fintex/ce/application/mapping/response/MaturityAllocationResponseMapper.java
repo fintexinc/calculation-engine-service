@@ -6,12 +6,15 @@ import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.MaturityAllocationResult;
 import com.fintex.ce.mapping.ResponseMapper;
+
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.springframework.stereotype.Component;
+
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 
 /**

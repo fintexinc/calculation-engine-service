@@ -1,9 +1,8 @@
 package com.fintex.ce.domain.model;
 
-import lombok.Data;
-
 import java.util.Objects;
 import java.util.UUID;
+import lombok.Data;
 
 @Data
 public class HoldingAggregator {

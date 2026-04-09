@@ -1,9 +1,8 @@
 package com.fintex.ce.domain.exception;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 
 /**
  * Exception for GraphQL transport errors. Stores error messages without external dependencies.

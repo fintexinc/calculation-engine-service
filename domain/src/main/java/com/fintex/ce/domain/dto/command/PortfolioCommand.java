@@ -1,11 +1,14 @@
 package com.fintex.ce.domain.dto.command;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

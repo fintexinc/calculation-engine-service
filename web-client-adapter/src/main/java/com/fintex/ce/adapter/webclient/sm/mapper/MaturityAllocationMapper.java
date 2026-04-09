@@ -4,6 +4,7 @@ import com.fintex.ce.domain.model.MaturityAllocation;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.datapoint.Maturities;
 import com.fintex.sm.model.domain.value.MaturityDurationValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class MaturityAllocationMapper
-    implements SecurityMasterResponseMapper<MaturityAllocation, Maturities> {
+    implements
+      SecurityMasterResponseMapper<MaturityAllocation, Maturities> {
 
   @Override
   public MaturityAllocation map(Maturities smsResponse, Holding holding) {

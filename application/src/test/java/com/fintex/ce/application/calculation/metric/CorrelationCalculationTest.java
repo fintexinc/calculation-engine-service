@@ -10,15 +10,18 @@ import com.fintex.ce.domain.model.result.correlation.CorrelationPeriodResult;
 import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
@@ -474,7 +477,8 @@ class CorrelationCalculationTest {
     final var argument = List.of(correlationPeriodDTO);
 
     final var correlationPeriodDTOExpected = new CorrelationPeriodResult();
-    final var correlationKeyValueResultExpected = new CorrelationKeyValueResult().setValue(new BigDecimal("0.1234567891"));
+    final var correlationKeyValueResultExpected = new CorrelationKeyValueResult().setValue(new BigDecimal(
+        "0.1234567891"));
     correlationPeriodDTOExpected.setCorrelations(List.of(correlationKeyValueResultExpected));
     final var expected = List.of(correlationPeriodDTOExpected);
 

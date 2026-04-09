@@ -1,19 +1,23 @@
 package com.fintex.ce.domain.model.holding;
 
+import com.fintex.sm.model.domain.EquitySecurityIdentifier;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fintex.sm.model.domain.EquitySecurityIdentifier;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+
 import static com.fintex.ce.domain.constant.ErrorMessage.NOT_NULL_MSG;
 import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalEquals;
 import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalHashCode;

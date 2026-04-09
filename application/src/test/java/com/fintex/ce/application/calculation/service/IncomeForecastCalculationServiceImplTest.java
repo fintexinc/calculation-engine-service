@@ -13,13 +13,7 @@ import com.fintex.sm.model.domain.SecurityIdentifier;
 import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +21,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -74,7 +76,6 @@ class IncomeForecastCalculationServiceImplTest {
     assertTrue(incomes.stream().allMatch(income -> income.getAmount().equals(BigDecimal.ZERO)));
   }
 
-
   @Test
   void shouldPerformFundSeries_whenVerify() {
     // SETUP
@@ -90,7 +91,8 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(fundSeriesHolding.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     Mockito.when(fundSeriesHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
-    Mockito.when(fundSeriesHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("FUNDSERV_CODE", FiIdentifierType.FUNDSERV));
+    Mockito.when(fundSeriesHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("FUNDSERV_CODE",
+        FiIdentifierType.FUNDSERV));
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
@@ -100,7 +102,8 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), FinancialInstrumentType.MUTUAL_FUND_CANADA.name());
+    Assertions.assertEquals(result.getIncomeForecast().get(0).getType(), FinancialInstrumentType.MUTUAL_FUND_CANADA
+        .name());
     Assertions.assertEquals(result.getIncomeForecast().get(0).getHoldingIdentifier(), FiIdentifierType.FUNDSERV
         .name());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
@@ -138,7 +141,8 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(fundSeriesHolding.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     Mockito.when(fundSeriesHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
-    Mockito.when(fundSeriesHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("FUNDSERV_CODE", FiIdentifierType.FUNDSERV));
+    Mockito.when(fundSeriesHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("FUNDSERV_CODE",
+        FiIdentifierType.FUNDSERV));
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
@@ -148,7 +152,8 @@ class IncomeForecastCalculationServiceImplTest {
     // VERIFY
     Assertions.assertNotNull(result);
     Assertions.assertEquals(1, result.getIncomeForecast().size());
-    Assertions.assertEquals(FinancialInstrumentType.MUTUAL_FUND_CANADA.name(), result.getIncomeForecast().get(0).getType());
+    Assertions.assertEquals(FinancialInstrumentType.MUTUAL_FUND_CANADA.name(), result.getIncomeForecast().get(0)
+        .getType());
     Assertions.assertEquals(FiIdentifierType.FUNDSERV.name(), result.getIncomeForecast().get(0)
         .getHoldingIdentifier());
     final List<Income> income = result.getIncomeForecast().get(0).getIncome();
@@ -184,7 +189,8 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(fixedIncomeHolding.getHoldingType()).thenReturn(FinancialInstrumentType.FIXED_INCOME);
     Mockito.when(fixedIncomeHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
-    Mockito.when(fixedIncomeHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("CUSIP_ID", FiIdentifierType.CUSIP));
+    Mockito.when(fixedIncomeHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("CUSIP_ID",
+        FiIdentifierType.CUSIP));
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
@@ -230,7 +236,8 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(fixedIncomeHolding.getHoldingType()).thenReturn(FinancialInstrumentType.FIXED_INCOME);
     Mockito.when(fixedIncomeHolding.getValue()).thenReturn(holdingValue);
     Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
-    Mockito.when(fixedIncomeHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("CUSIP_ID", FiIdentifierType.CUSIP));
+    Mockito.when(fixedIncomeHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("CUSIP_ID",
+        FiIdentifierType.CUSIP));
     Mockito.when(incomeForecast.getSchedule()).thenReturn(null);
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getIssueDate()).thenReturn("2023-01-01");

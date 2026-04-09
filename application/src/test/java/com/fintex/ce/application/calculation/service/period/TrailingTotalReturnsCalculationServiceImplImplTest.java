@@ -4,8 +4,11 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
-import java.util.Set;
+
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
+
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;

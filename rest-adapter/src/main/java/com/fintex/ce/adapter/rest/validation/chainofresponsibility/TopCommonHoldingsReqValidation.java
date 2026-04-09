@@ -4,11 +4,14 @@ import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
+
+import org.springframework.util.CollectionUtils;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.EqualsAndHashCode;
-import org.springframework.util.CollectionUtils;
+
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.filterHoldings;
 

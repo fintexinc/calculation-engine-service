@@ -1,8 +1,7 @@
 package com.fintex.ce.domain.model.enumeration;
 
-import lombok.Getter;
-
 import java.math.BigDecimal;
+import lombok.Getter;
 
 @Getter
 public enum InterestFreq {

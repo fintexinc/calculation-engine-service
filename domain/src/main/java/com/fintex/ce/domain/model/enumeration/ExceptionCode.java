@@ -4,9 +4,9 @@ import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.core.Warning;
 import com.fintex.ce.domain.model.holding.Holding;
-import lombok.Getter;
 
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public enum ExceptionCode {

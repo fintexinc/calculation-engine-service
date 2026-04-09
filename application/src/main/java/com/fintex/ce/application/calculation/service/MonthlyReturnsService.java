@@ -17,6 +17,7 @@ import com.fintex.ce.port.webclient.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -64,7 +65,8 @@ public class MonthlyReturnsService {
   }
 
   public Returns<HoldingMonthlyReturns> getMonthlyReturns(List<Holding> holdings, CurrencyType currency) {
-    Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List.of());
+    Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List
+        .of());
     originalMonthlyReturns.putAll(monthlyReturnsGenerator.generateGicMonthlyReturns(holdings));
     return getMonthlyReturns(originalMonthlyReturns);
   }
@@ -75,7 +77,8 @@ public class MonthlyReturnsService {
 
   public Returns<HoldingMonthlyReturns> getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(List<Holding> holdings,
       CurrencyType currency) {
-    Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List.of());
+    Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List
+        .of());
     return Returns.initOnlyWithReturnsDataValidation(originalMonthlyReturns);
   }
 

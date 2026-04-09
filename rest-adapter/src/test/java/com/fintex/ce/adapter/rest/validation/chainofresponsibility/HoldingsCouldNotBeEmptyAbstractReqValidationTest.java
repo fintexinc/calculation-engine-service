@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.rest.validation.chainofresponsibility;
 
 import com.fintex.ce.domain.exception.ReqValidationException;
 import com.fintex.ce.domain.model.holding.Holding;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

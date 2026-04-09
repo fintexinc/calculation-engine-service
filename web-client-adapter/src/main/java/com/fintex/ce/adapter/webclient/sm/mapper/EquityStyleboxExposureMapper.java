@@ -5,6 +5,7 @@ import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.enumeration.StyleBoxType;
 import com.fintex.sm.model.domain.rating.StyleBoxes;
 import com.fintex.sm.model.domain.value.StyleBoxValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -14,12 +15,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Maps SM StyleBoxes (equity style box) response to PCE EquityStyleboxExposure domain model.
- * SM StyleBoxType values are mapped to PCE StyleBoxType enum keys.
+ * Maps SM StyleBoxes (equity style box) response to CE EquityStyleboxExposure domain model. SM StyleBoxType values are
+ * mapped to CE StyleBoxType enum keys.
  */
 @Component
 public class EquityStyleboxExposureMapper
-    implements SecurityMasterResponseMapper<EquityStyleboxExposure, StyleBoxes> {
+    implements
+      SecurityMasterResponseMapper<EquityStyleboxExposure, StyleBoxes> {
 
   @Override
   public EquityStyleboxExposure map(StyleBoxes smsResponse, Holding holding) {

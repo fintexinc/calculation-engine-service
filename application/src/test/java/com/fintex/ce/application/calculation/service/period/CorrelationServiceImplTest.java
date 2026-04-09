@@ -7,6 +7,7 @@ import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -59,7 +60,8 @@ class CorrelationServiceImplTest {
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     sut.defineCalculationMethod(reqDTO);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD, ReturnFactorScale.SCALE_OF_TWO);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD,
+        ReturnFactorScale.SCALE_OF_TWO);
   }
 
   @Test

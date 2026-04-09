@@ -9,6 +9,7 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -48,7 +49,8 @@ class ClassificationAllocationCalculationServiceImplTest {
     // VERIFY
     Assertions.assertEquals(1, actual.size());
     Assertions.assertTrue(actual.containsKey(holding));
-    Assertions.assertEquals(BigDecimal.TEN, actual.get(holding).get(ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL));
+    Assertions.assertEquals(BigDecimal.TEN, actual.get(holding).get(
+        ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL));
   }
 
   @Test
@@ -114,7 +116,7 @@ class ClassificationAllocationCalculationServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var service = mock(ClassificationAllocationCalculationServiceImpl.class, withSettings()
-          .useConstructor( fetcher));
+          .useConstructor(fetcher));
 
       final var exposures = mock(Map.class);
       final var expected = new ClassificationAllocationResult();

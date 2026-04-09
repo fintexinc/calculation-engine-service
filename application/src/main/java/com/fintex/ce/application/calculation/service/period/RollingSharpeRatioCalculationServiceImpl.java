@@ -13,12 +13,14 @@ import com.fintex.ce.domain.model.result.RollingSharpeRatioResult;
 import com.fintex.ce.domain.model.result.SharpeRatioResult;
 import com.fintex.ce.port.webclient.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 @Service
 public class RollingSharpeRatioCalculationServiceImpl

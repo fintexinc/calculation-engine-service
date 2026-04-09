@@ -2,10 +2,13 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.domain.model.result.BetaResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
-import java.math.BigDecimal;
-import java.util.Set;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.Set;
+
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.anySet;
