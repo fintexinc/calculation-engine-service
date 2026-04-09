@@ -14,7 +14,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
- * Maps Security Master MonthlyReturns response to CE HoldingMonthlyReturns domain model.
+ * Maps Security Master MonthlyReturns response to PCE HoldingMonthlyReturns domain model.
  */
 @Component
 public class MonthlyReturnsMapper

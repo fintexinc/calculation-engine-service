@@ -1,5 +1,6 @@
 package com.fintex.ce.domain.model;
 
+import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ import lombok.experimental.Accessors;
 public class ClassificationAllocation implements ProviderAware {
 
   private FinancialInstrumentType holdingType;
-  private Map<String, BigDecimal> securityClassificationValues;
+  private Map<ClassificationAllocationType, BigDecimal> securityClassificationValues;
 
   // Common fields
   private String holdingId;

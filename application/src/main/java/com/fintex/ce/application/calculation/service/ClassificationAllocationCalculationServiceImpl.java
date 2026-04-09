@@ -9,6 +9,7 @@ import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ClassificationAllocationResult;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
@@ -100,40 +101,9 @@ public class ClassificationAllocationCalculationServiceImpl
   public ExposureDataHolder<ClassificationAllocationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
     Map<Holding, ClassificationAllocation> rawData = classificationAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    List<Warning> warnings = new ArrayList<>();
-    Map<Holding, Map<ClassificationAllocationType, BigDecimal>> allocations = mapToAllocations(rawData, warnings);
-    return new ExposureDataHolder<>(allocations, warnings);
-  }
-
-  private Map<Holding, Map<ClassificationAllocationType, BigDecimal>> mapToAllocations(
-      final Map<Holding, ClassificationAllocation> rawData,
-      final List<Warning> warnings) {
-    Map<Holding, Map<ClassificationAllocationType, BigDecimal>> result = new HashMap<>();
-    rawData.forEach((holding, allocation) -> {
-      Map<ClassificationAllocationType, BigDecimal> map = new EnumMap<>(ALLOCATION_DEFAULT_MAP);
-
-      if (Objects.isNull(allocation) || CollectionUtils.isEmpty(allocation.getSecurityClassificationValues())) {
-        Optional.ofNullable(holding.getHoldingType())
-            .map(UNCLASSIFIED_MAP::get)
-            .ifPresentOrElse(type -> map.put(type, BigDecimal.ONE),
-                () -> warnings.add(WRN_CA_CA_001.warning(holding)));
-        result.put(holding, map);
-        return;
-      }
-
-      allocation.getSecurityClassificationValues()
-          .forEach((typeStr, value) -> {
-            ClassificationAllocationType type = ClassificationAllocationType.fromValue(typeStr);
-            Optional.ofNullable(type)
-                .ifPresentOrElse(
-                    classificationAllocationType -> map.put(classificationAllocationType, value),
-                    () -> warnings.add(
-                        WRN_UNKNOWN_001.warning(holding, typeStr, "FDS Get Calculation Allocation")));
-          });
-
-      result.put(holding, map);
-    });
-    return result;
+    return AllocationMappingUtils.mapTypedAllocations(rawData,
+        ClassificationAllocation::getSecurityClassificationValues,
+        ALLOCATION_DEFAULT_MAP, WRN_CA_CA_001);
   }
 
 }

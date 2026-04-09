@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.AssetAllocationSecurityMasterMapper;
+import com.fintex.ce.adapter.webclient.sm.mapper.ClassificationAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.CountryExposureMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.CreditQualityMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquityCountryAllocationMapper;
@@ -12,6 +13,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.EquityStyleboxExposureMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeSectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeStyleboxExposureMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.MaturityAllocationMapper;
+import com.fintex.ce.domain.model.ClassificationAllocation;
 import com.fintex.ce.domain.model.CountryExposure;
 import com.fintex.ce.domain.model.CreditQuality;
 import com.fintex.ce.domain.model.EquityCountryAllocation;
@@ -25,6 +27,7 @@ import com.fintex.ce.domain.model.MaturityAllocation;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.sm.model.domain.allocation.AssetAllocation;
 import com.fintex.sm.model.domain.allocation.CountryAllocation;
+import com.fintex.sm.model.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
 import com.fintex.sm.model.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.sm.model.domain.datapoint.EquityMarketCapitalization;
@@ -125,5 +128,13 @@ public class AllocationFetchers {
       @Value("${external-services.security-master.rest.endpoints.allocations.country}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
         new ParameterizedTypeReference<List<SecurityAttributeResult<CountryAllocation>>>() {}) {};
+  }
+
+  @Bean
+  SecurityDataFetcher<ClassificationAllocation> classificationAllocationFetcher(
+      SecurityMasterWebClient client, ClassificationAllocationMapper mapper,
+      @Value("${external-services.security-master.rest.endpoints.allocations.classification}") String endpointPath) {
+    return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
+        new ParameterizedTypeReference<List<SecurityAttributeResult<SecurityClassificationAllocation>>>() {}) {};
   }
 }

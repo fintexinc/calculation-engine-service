@@ -14,8 +14,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Maps SM StyleBoxes (equity style box) response to CE EquityStyleboxExposure domain model.
- * SM StyleBoxType values are mapped to CE StyleBoxType enum keys.
+ * Maps SM StyleBoxes (equity style box) response to PCE EquityStyleboxExposure domain model.
+ * SM StyleBoxType values are mapped to PCE StyleBoxType enum keys.
  */
 @Component
 public class EquityStyleboxExposureMapper
