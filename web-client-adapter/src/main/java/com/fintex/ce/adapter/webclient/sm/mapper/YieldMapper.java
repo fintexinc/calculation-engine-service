@@ -6,6 +6,7 @@ import com.fintex.sm.model.domain.datapoint.Income;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,7 +28,7 @@ public class YieldMapper implements SecurityMasterResponseMapper<Yield, Income> 
         .ifPresent(dp -> {
           result.setDividendYield(dp.getValue());
           Optional.ofNullable(dp.getDataProvider())
-              .ifPresent(provider -> result.setProvider(provider.name()));
+              .ifPresent(provider -> result.setProviders(List.of(provider)));
         });
 
     return result;

@@ -37,7 +37,7 @@ public class AssetAllocationSecurityMasterMapper
 
     Optional.ofNullable(smsResponse)
         .map(AssetAllocation::getDataProvider)
-        .ifPresent(dp -> result.setProvider(dp.name()));
+        .ifPresent(dp -> result.setProviders(List.of(dp)));
 
     return result;
   }

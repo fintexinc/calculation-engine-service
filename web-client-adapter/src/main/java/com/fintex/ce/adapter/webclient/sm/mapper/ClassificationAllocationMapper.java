@@ -45,7 +45,7 @@ public class ClassificationAllocationMapper
 
     Optional.ofNullable(smsResponse)
         .map(SecurityClassificationAllocation::getDataProvider)
-        .ifPresent(dp -> result.setProvider(dp.name()));
+        .ifPresent(dp -> result.setProviders(List.of(dp)));
 
     return result;
   }

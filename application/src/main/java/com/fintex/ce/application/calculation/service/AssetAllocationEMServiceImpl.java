@@ -21,8 +21,6 @@ import com.fintex.sm.model.DataProvider;
 
 import org.springframework.stereotype.Service;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +83,7 @@ public class AssetAllocationEMServiceImpl
     final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
-    final var assetAllocations = assetAllocationDataMapper.toRegionExposuresWithProvider(rawData);
+    final var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
 
     return calculateAssetAllocationEMarketMap(
         reqDTO.getHoldings(),
@@ -93,14 +91,9 @@ public class AssetAllocationEMServiceImpl
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
   }
 
-  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> retrieveAssetAllocations(
-      final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> assetAllocations) {
-    return assetAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
-  }
-
   public ExposureDataHolder<AssetAllocationRegionEmType> calculateAssetAllocationEMarketMap(
       final List<Holding> holdings,
-      final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> assetAllocations,
+      final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
       final List<DataProvider> providers) {
     List<Warning> warnings = new ArrayList<>();
     Map<Holding, EquityCountryAllocation> rawCountryAllocations = countryAllocationSecurityDataFetcher.fetch(
@@ -110,7 +103,7 @@ public class AssetAllocationEMServiceImpl
     final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = countryAllocationMappingService
         .mapToCountryRegions(holdingAllocations, warnings, WRN_RRC_ECE_001);
     final Map<Holding, BigDecimal> equityDifference = calculateEquityDifference(
-        holdings, countryAllocationsMap, retrieveAssetAllocations(assetAllocations));
+        holdings, countryAllocationsMap, assetAllocations);
     Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> allocations = holdings.stream().collect(
         toMap(
             h -> h,
@@ -119,30 +112,29 @@ public class AssetAllocationEMServiceImpl
   }
 
   public Map<AssetAllocationRegionEmType, BigDecimal> calculateEmergingMarket(
-      final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> assetAllocations,
+      final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
       final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap,
       final Map<Holding, BigDecimal> equityDifference,
       final Holding holding) {
     final Map<CountryRegionType, BigDecimal> countryAllocations = countryAllocationsMap.get(holding);
-    final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> assetAllocationsPair = assetAllocations.get(
-        holding);
+    final Map<AssetAllocationRegion, BigDecimal> holdingAssetAllocations = assetAllocations.get(holding);
     return Stream.of(AssetAllocationRegionEmType.values())
-        .collect(toMap(t -> t, t -> getEmergingMarketValue(holding, assetAllocationsPair, countryAllocations,
+        .collect(toMap(t -> t, t -> getEmergingMarketValue(holding, holdingAssetAllocations, countryAllocations,
             equityDifference, t)));
   }
 
   public BigDecimal getEmergingMarketValue(final Holding holding,
-      final Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> assetPair,
+      final Map<AssetAllocationRegion, BigDecimal> assetAllocations,
       final Map<CountryRegionType, BigDecimal> countryAllocations,
       final Map<Holding, BigDecimal> equityDifference,
       final AssetAllocationRegionEmType type) {
-    if (assetPair.getValue().isEmpty()) {
+    if (assetAllocations.isEmpty()) {
       return ZERO;
     }
     if (AssetAllocationRegionEmType.CASH.equals(type)) {
-      return assetPair.getValue().get(CASH);
+      return assetAllocations.get(CASH);
     } else if (AssetAllocationRegionEmType.FIXED_INCOME.equals(type)) {
-      return assetPair.getValue().get(FIXED_INCOME);
+      return assetAllocations.get(FIXED_INCOME);
     } else if (AssetAllocationRegionEmType.CANADIAN_EQUITY.equals(type)) {
       return Objects.requireNonNull(getCountryValue(countryAllocations, CountryRegionType.CANADA));
     } else if (AssetAllocationRegionEmType.US_EQUITY.equals(type)) {
@@ -153,9 +145,9 @@ public class AssetAllocationEMServiceImpl
       return Objects.requireNonNull(Optional.ofNullable(countryAllocations)
           .map(p -> p.get(CountryRegionType.EMERGING_MARKET)).orElse(ZERO));
     } else if (AssetAllocationRegionEmType.UNCLASSIFIED.equals(type)) {
-      return Objects.requireNonNull(assetPair.getValue().get(UNCLASSIFIED));
+      return Objects.requireNonNull(assetAllocations.get(UNCLASSIFIED));
     } else {
-      return Objects.requireNonNull(assetPair.getValue().get(OTHER));
+      return Objects.requireNonNull(assetAllocations.get(OTHER));
     }
   }
 

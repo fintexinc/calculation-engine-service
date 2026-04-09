@@ -31,7 +31,7 @@ class YieldMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getDividendYield()).isEqualByComparingTo("0.035");
-    assertThat(result.getProvider()).isEqualTo("MORNINGSTAR");
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   @Test
@@ -40,7 +40,7 @@ class YieldMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getDividendYield()).isNull();
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
@@ -52,7 +52,7 @@ class YieldMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-003");
     assertThat(result.getDividendYield()).isNull();
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
@@ -67,7 +67,7 @@ class YieldMapperTest {
     Yield result = sut.map(smsResponse, createHolding("SEC-004"));
 
     assertThat(result.getDividendYield()).isEqualByComparingTo("0.025");
-    assertThat(result.getProvider()).isEqualTo("MORNINGSTAR");
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   private Holding createHolding(String securityId) {

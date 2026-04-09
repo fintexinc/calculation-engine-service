@@ -30,7 +30,7 @@ class SalesChargeTypeMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getType()).isEqualTo(SalesChargeType.DEFERRED_SALES_CHARGE);
-    assertThat(result.getProvider()).isEqualTo("MORNINGSTAR");
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   @Test
@@ -39,7 +39,7 @@ class SalesChargeTypeMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getType()).isNull();
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
@@ -51,7 +51,7 @@ class SalesChargeTypeMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-003");
     assertThat(result.getType()).isNull();
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
@@ -65,7 +65,7 @@ class SalesChargeTypeMapperTest {
     SalesCharge result = sut.map(smsResponse, createHolding("SEC-004"));
 
     assertThat(result.getType()).isEqualTo(SalesChargeType.FRONT_END_CHARGE);
-    assertThat(result.getProvider()).isEqualTo("MORNINGSTAR");
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   private Holding createHolding(String securityId) {

@@ -5,12 +5,9 @@ import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.holding.GicHolding;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -40,23 +37,7 @@ public class AssetAllocationDataMapper {
   }
 
   public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForAA(AssetAllocationDataDTO dto) {
-    final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> result = map(dto);
-    return removeLeftPairElement(result);
-  }
-
-  public Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> mapForAAEM(
-      AssetAllocationDataDTO dto) {
-    return map(dto);
-  }
-
-  private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> removeLeftPairElement(
-      final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> result) {
-    return result.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
-  }
-
-  private Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> map(
-      final AssetAllocationDataDTO dto) {
-    final Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> result = new HashMap<>();
+    final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> result = new HashMap<>();
     result.putAll(mapForNoneStock(dto.getEtfUsFdsResponse()));
     result.putAll(mapForNoneStock(dto.getEtfCanadaFdsResponse()));
     result.putAll(mapForNoneStock(dto.getMutualFundFdsResponse()));
@@ -72,57 +53,35 @@ public class AssetAllocationDataMapper {
     return result;
   }
 
-  private Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> mapForStock(
+  private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForStock(
       final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> stockFdsResponse) {
     return stockFdsResponse.entrySet().stream().collect(
         toMap(
             Map.Entry::getKey,
-            e -> Pair.of(null, overrideDefaultValues(DEFAULT_MAP, e.getValue()))));
+            e -> overrideDefaultValues(DEFAULT_MAP, e.getValue())));
   }
 
-  private Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> mapForCash(
-      final List<Holding> holdings) {
+  private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForCash(final List<Holding> holdings) {
     return holdings.stream().collect(Collectors.toMap(
         k -> k,
-        v -> Pair.of(null, overrideDefaultValues(DEFAULT_MAP, Map.of(AssetAllocationRegion.CASH, BigDecimal.ONE)))));
+        v -> overrideDefaultValues(DEFAULT_MAP, Map.of(AssetAllocationRegion.CASH, BigDecimal.ONE))));
   }
 
-  private Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> mapForGic(
-      final List<Holding> holdings) {
-
-    final HashMap<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> result = new HashMap<>();
+  private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForGic(final List<Holding> holdings) {
+    final HashMap<Holding, Map<AssetAllocationRegion, BigDecimal>> result = new HashMap<>();
     for (final var holding : holdings) {
       final var gic = (GicHolding) holding;
-      result.put(gic, Pair.of(null, overrideDefaultValues(DEFAULT_MAP, Map.of(gic.getAssetAllocation(),
-          BigDecimal.ONE))));
+      result.put(gic, overrideDefaultValues(DEFAULT_MAP, Map.of(gic.getAssetAllocation(), BigDecimal.ONE)));
     }
     return result;
   }
 
-  private <H extends Holding> Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> mapForNoneStock(
+  private <H extends Holding> Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForNoneStock(
       final Map<H, HoldingAssetAllocation> holdings) {
     return holdings.entrySet().stream().collect(
         toMap(
             Map.Entry::getKey,
-            e -> mapToRegions(Pair.of(safeValueOf(e.getValue().getProvider()), e.getValue()
-                .getAllocations()))));
-  }
-
-  private Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>> mapToRegions(
-      final Pair<DataProvider, Map<String, BigDecimal>> pair) {
-    if (CollectionUtils.isEmpty(pair.getValue())) {
-      final var result = new EnumMap<>(DEFAULT_MAP);
-      result.put(UNCLASSIFIED, BigDecimal.ONE);
-      return Pair.of(pair.getKey(), result);
-    }
-    final Map<AssetAllocationRegion, BigDecimal> result = new EnumMap<>(AssetAllocationRegion.class);
-    pair.getValue().forEach((region, value) -> {
-      final var assetAllocationRegion = AssetAllocationRegion.fromValue(region);
-      if (assetAllocationRegion != null && assetAllocationRegion.getName() != null) {
-        result.put(assetAllocationRegion, value);
-      }
-    });
-    return Pair.of(pair.getKey(), overrideDefaultValues(DEFAULT_MAP, result));
+            e -> mapAllocationToRegions(e.getValue())));
   }
 
   /**
@@ -157,37 +116,5 @@ public class AssetAllocationDataMapper {
       }
     });
     return overrideDefaultValues(DEFAULT_MAP, result);
-  }
-
-  /**
-   * Maps asset allocations from REST API response to region exposures with provider info.
-   *
-   * @param allocations
-   *          map of holdings to their asset allocation data
-   * @return map of holdings to pairs of data provider and region-based allocation breakdown
-   */
-  public Map<Holding, Pair<DataProvider, Map<AssetAllocationRegion, BigDecimal>>> toRegionExposuresWithProvider(
-      Map<Holding, HoldingAssetAllocation> allocations) {
-    if (CollectionUtils.isEmpty(allocations)) {
-      return Collections.emptyMap();
-    }
-    return allocations.entrySet().stream()
-        .collect(toMap(
-            Map.Entry::getKey,
-            e -> Pair.of(
-                safeValueOf(e.getValue().getProvider()),
-                mapAllocationToRegions(e.getValue()))));
-  }
-
-  // todo remove when all dataProvider fields are migrated from String -> enum
-  private static DataProvider safeValueOf(String provider) {
-    if (provider == null) {
-      return null;
-    }
-    try {
-      return DataProvider.valueOf(provider.toUpperCase());
-    } catch (IllegalArgumentException e) {
-      return null;
-    }
   }
 }

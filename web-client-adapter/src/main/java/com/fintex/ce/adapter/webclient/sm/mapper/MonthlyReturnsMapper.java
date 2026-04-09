@@ -42,7 +42,7 @@ public class MonthlyReturnsMapper
 
     Optional.ofNullable(smsResponse)
         .map(MonthlyReturns::getDataProvider)
-        .ifPresent(dp -> result.setProvider(dp.name()));
+        .ifPresent(dp -> result.setProviders(List.of(dp)));
 
     return result;
   }

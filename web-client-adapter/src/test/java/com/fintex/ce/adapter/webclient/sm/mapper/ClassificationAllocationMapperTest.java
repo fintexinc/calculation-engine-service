@@ -43,7 +43,7 @@ class ClassificationAllocationMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.MUTUAL_FUND_CANADA);
-    assertThat(result.getProvider()).isEqualTo(DataProvider.MORNINGSTAR.name());
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getSecurityClassificationValues()).hasSize(2);
     assertThat(result.getSecurityClassificationValues())
         .containsEntry(ClassificationAllocationType.EQUITY__CANADA, BigDecimal.valueOf(0.45));
@@ -56,7 +56,7 @@ class ClassificationAllocationMapperTest {
     ClassificationAllocation result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-002");
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
     assertThat(result.getSecurityClassificationValues()).isEmpty();
   }
 
@@ -78,7 +78,7 @@ class ClassificationAllocationMapperTest {
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
 
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test

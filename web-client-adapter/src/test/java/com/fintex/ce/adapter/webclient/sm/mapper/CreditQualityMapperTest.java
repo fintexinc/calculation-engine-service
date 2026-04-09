@@ -59,7 +59,7 @@ class CreditQualityMapperTest {
     assertThat(result.getRatings().get(B)).isEqualByComparingTo("4.2");
     assertThat(result.getRatings().get(BELOW_B)).isEqualByComparingTo("2.4");
     assertThat(result.getHoldingId()).isEqualTo("AGG.US");
-    assertThat(result.getProvider()).isEqualTo(DataProvider.MORNINGSTAR.name());
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   @ParameterizedTest
@@ -71,7 +71,7 @@ class CreditQualityMapperTest {
 
     assertThat(result.getRatings()).isEmpty();
     assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   static Stream<Arguments> nullAndEmptyResponses() {

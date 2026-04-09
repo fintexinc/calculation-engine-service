@@ -1,24 +1,23 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.sm.model.DataProvider;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
  * Combined fee data including management expense ratio, expense ratios, and management fee. Maps from /fees response.
  */
 @Data
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @NoArgsConstructor
 @Accessors(chain = true)
-public class FeeData implements ProviderAware {
+public class FeeData extends BaseCalculationData<FeeData> {
 
   private BigDecimal managementFee;
   private DataProvider managementFeeProvider;
@@ -34,14 +33,4 @@ public class FeeData implements ProviderAware {
 
   private BigDecimal actual12B1Fee;
   private DataProvider actual12B1FeeProvider;
-
-  // Common fields
-  private String holdingId;
-  private String provider;
-  private String providers;
-  private List<ValidationError> errors = new ArrayList<>();
-
-  public boolean hasErrors() {
-    return errors != null && !errors.isEmpty();
-  }
 }

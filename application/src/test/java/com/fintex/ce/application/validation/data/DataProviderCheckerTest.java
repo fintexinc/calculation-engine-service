@@ -1,8 +1,10 @@
 package com.fintex.ce.application.validation.data;
 
+import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.validation.DataProviderRequestHandlingValidator;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
+import com.fintex.sm.model.DataProvider;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,15 +22,14 @@ import static org.mockito.Mockito.when;
 
 class DataProviderCheckerTest {
 
-  DataProviderCheckerTest() {
-  }
-
   @Test
   void check_verifyMethodCalls() {
     try (var mockedDataProviderRequestHandlingValidator = Mockito.mockStatic(
         DataProviderRequestHandlingValidator.class)) {
       // SETUP
-      final var sut = new DataProviderChecker();
+      final var defaults = List.of(DataProvider.MORNINGSTAR);
+      final var defaultDataProperties = new DefaultDataProperties(defaults);
+      final var sut = new DataProviderChecker(defaultDataProperties);
       final var map = mock(Map.class);
       final var list = mock(List.class);
       when(map.values()).thenReturn(list);
@@ -38,22 +39,25 @@ class DataProviderCheckerTest {
       when(assetAllocationData.getEtfCanadaFdsResponse()).thenReturn(map);
       when(assetAllocationData.getEtfUsFdsResponse()).thenReturn(map);
       when(assetAllocationData.getMutualFundFdsResponse()).thenReturn(map);
+      when(assetAllocationData.getCanadaPooledFundFdsResponse()).thenReturn(map);
+      when(assetAllocationData.getCanadaHedgeFundsFdsResponse()).thenReturn(map);
+      when(assetAllocationData.getUsFundsFdsResponse()).thenReturn(map);
 
       // ACT
       sut.check(list, assetAllocationData);
 
       // VERIFY
-      verify(map, times(4)).values();
+      verify(map, times(7)).values();
 
       mockedDataProviderRequestHandlingValidator.verify(() -> DataProviderRequestHandlingValidator
-          .dataProviderCheckValidation(eq(list), eq(list), any()), Mockito.times(4));
+          .dataProviderCheckValidation(eq(list), eq(list), any(), eq(defaults), any()), Mockito.times(7));
     }
   }
 
   @Test
   void clearAssetAllocation_checkResult() {
     // SETUP
-    final var sut = new DataProviderChecker();
+    final var sut = new DataProviderChecker(new DefaultDataProperties(List.of()));
     final HoldingAssetAllocation assetAllocation = mock(HoldingAssetAllocation.class);
 
     // ACT
