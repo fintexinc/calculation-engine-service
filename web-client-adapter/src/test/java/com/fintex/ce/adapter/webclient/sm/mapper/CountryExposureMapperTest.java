@@ -10,7 +10,6 @@ import com.fintex.sm.model.domain.value.CountryValue;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CountryExposureMapperTest {
@@ -110,8 +109,6 @@ class CountryExposureMapperTest {
   }
 
   private Holding createHolding(String securityId) {
-    return new Holding()
-        .setHoldingType(FinancialInstrumentType.ETF_CANADA)
-        .setSecurityIdentifier(new SecurityIdentifier(securityId, null));
+    return new Holding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
   }
 }

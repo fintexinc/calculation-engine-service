@@ -1,7 +1,5 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fintex.ce.domain.model.ClassificationAllocation;
 import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -15,6 +13,7 @@ import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ClassificationAllocationMapperTest {
 
@@ -131,8 +130,6 @@ class ClassificationAllocationMapperTest {
   }
 
   private Holding createHolding(String securityId) {
-    return new Holding()
-        .setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
-        .setSecurityIdentifier(new SecurityIdentifier(securityId, null));
+    return new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, new SecurityIdentifier(securityId, null));
   }
 }
