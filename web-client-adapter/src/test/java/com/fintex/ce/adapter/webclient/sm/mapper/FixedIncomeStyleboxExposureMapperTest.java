@@ -44,7 +44,7 @@ class FixedIncomeStyleboxExposureMapperTest {
     assertThat(result.getBoxValues().get(FixedIncomeStyleBoxType.MEDIUM_EXTENSIVE)).isEqualByComparingTo("18.75");
     assertThat(result.getHoldingId()).isEqualTo("AGG");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
-    assertThat(result.getProvider()).isEqualTo(DataProvider.MORNINGSTAR.name());
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   @ParameterizedTest
@@ -58,7 +58,7 @@ class FixedIncomeStyleboxExposureMapperTest {
     assertThat(result.getBoxValues()).isEmpty();
     assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.FUND);
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   static Stream<Arguments> nullAndEmptyResponses() {

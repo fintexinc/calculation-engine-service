@@ -36,7 +36,7 @@ class EquityCountryAllocationMapperTest {
     EquityCountryAllocation result = sut.map(smsResponse, createHolding("SEC-001"));
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-001");
-    assertThat(result.getProvider()).isEqualTo("MORNINGSTAR");
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getAllocations()).hasSize(2);
     assertThat(result.getAllocations()).containsEntry("CAN", BigDecimal.valueOf(0.65));
     assertThat(result.getAllocations()).containsEntry("USA", BigDecimal.valueOf(0.35));
@@ -47,7 +47,7 @@ class EquityCountryAllocationMapperTest {
     EquityCountryAllocation result = sut.map(null, createHolding("SEC-002"));
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-002");
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
     assertThat(result.getAllocations()).isEmpty();
   }
 
@@ -59,7 +59,7 @@ class EquityCountryAllocationMapperTest {
     EquityCountryAllocation result = sut.map(smsResponse, createHolding("SEC-003"));
 
     assertThat(result.getAllocations()).isEmpty();
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
@@ -70,7 +70,7 @@ class EquityCountryAllocationMapperTest {
 
     EquityCountryAllocation result = sut.map(smsResponse, createHolding("SEC-004"));
 
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   private Holding createHolding(String securityId) {

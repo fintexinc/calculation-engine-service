@@ -40,7 +40,7 @@ public class FixedIncomeStyleboxExposureMapper
 
     Optional.ofNullable(smsResponse)
         .map(FixedIncomeStyleBoxes::getDataProvider)
-        .ifPresent(dp -> result.setProvider(dp.name()));
+        .ifPresent(dp -> result.setProviders(List.of(dp)));
 
     return result;
   }

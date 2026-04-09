@@ -1,43 +1,25 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeMap;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Data
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @NoArgsConstructor
 @Accessors(chain = true)
-public class HoldingMonthlyReturns implements ReturnsData, ProviderAware {
+public class HoldingMonthlyReturns extends BaseCalculationData<HoldingMonthlyReturns> implements ReturnsData {
 
   private String currency;
   private FinancialInstrumentType holdingType;
   private TreeMap<LocalDate, BigDecimal> returns;
-
-  // Common fields
-  private String holdingId;
-  private String provider;
-  private String providers;
-  private List<ValidationError> errors = new ArrayList<>();
-
-  public boolean hasErrors() {
-    return errors != null && !errors.isEmpty();
-  }
-
-  public void addError(ValidationError error) {
-    if (errors == null) {
-      errors = new ArrayList<>();
-    }
-    errors.add(error);
-  }
 
 }

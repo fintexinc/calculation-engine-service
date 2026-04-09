@@ -39,7 +39,7 @@ public class EquityMarketCapitalizationMapper
 
     Optional.ofNullable(smsResponse)
         .map(EquityMarketCapitalization::getDataProvider)
-        .ifPresent(dp -> result.setProvider(dp.name()));
+        .ifPresent(dp -> result.setProviders(List.of(dp)));
 
     return result;
   }

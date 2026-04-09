@@ -48,7 +48,7 @@ class FixedIncomeSectorAllocationMapperTest {
         .isEqualByComparingTo("19.30");
     assertThat(result.getHoldingId()).isEqualTo("AGG");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
-    assertThat(result.getProvider()).isEqualTo(DataProvider.MORNINGSTAR.name());
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   @ParameterizedTest
@@ -62,7 +62,7 @@ class FixedIncomeSectorAllocationMapperTest {
     assertThat(result.getFixedIncomeBondSectors()).isEmpty();
     assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.FUND);
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   static Stream<Arguments> nullAndEmptyResponses() {

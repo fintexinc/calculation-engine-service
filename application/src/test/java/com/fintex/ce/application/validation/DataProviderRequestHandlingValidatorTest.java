@@ -1,6 +1,5 @@
 package com.fintex.ce.application.validation;
 
-import com.fintex.ce.domain.model.core.ProviderAware;
 import com.fintex.sm.model.DataProvider;
 
 import org.junit.jupiter.api.Test;
@@ -16,67 +15,93 @@ import static org.mockito.Mockito.verifyNoInteractions;
 class DataProviderRequestHandlingValidatorTest {
 
   @Test
-  void dataProviderCheckValidation_whenProviderIsNullWithDefaultProviders() {
-    // SETUP
+  void dataProviderCheckValidation_whenProvidersIsNullAndNoDefaults_shouldTriggerAction() {
     final BiFunction function = mock(BiFunction.class);
 
-    // ACT
     DataProviderRequestHandlingValidator.dataProviderCheckValidation(
         List.of(DataProvider.values()),
-        List.of(buildProviderAware(null)),
-        function);
-
-    // VERIFY
-    verify(function).apply(any(), any());
-  }
-
-  @Test
-  void dataProviderCheckValidation_whenProviderIsEmptyWithDefaultProviders() {
-    // SETUP
-    final BiFunction function = mock(BiFunction.class);
-
-    // ACT
-    DataProviderRequestHandlingValidator.dataProviderCheckValidation(
-        List.of(DataProvider.values()),
-        List.of(buildProviderAware("")),
-        function);
-
-    // VERIFY
-    verify(function).apply(any(), any());
-  }
-
-  @Test
-  void dataProviderCheckValidation_whenProviderExistsWithEmptyProviders() {
-    // SETUP
-    final BiFunction function = mock(BiFunction.class);
-
-    // ACT
-    DataProviderRequestHandlingValidator.dataProviderCheckValidation(
+        List.of(new Item(null)),
+        Item::getProviders,
         List.of(),
-        List.of(buildProviderAware("MORNINGSTAR")),
         function);
 
-    // VERIFY
     verify(function).apply(any(), any());
   }
 
   @Test
-  void dataProviderCheckValidation_whenProviderExistsWithDefaultProviders() {
-    // SETUP
+  void dataProviderCheckValidation_whenProvidersIsEmptyAndNoDefaults_shouldTriggerAction() {
     final BiFunction function = mock(BiFunction.class);
 
-    // ACT
     DataProviderRequestHandlingValidator.dataProviderCheckValidation(
         List.of(DataProvider.values()),
-        List.of(buildProviderAware("MORNINGSTAR")),
+        List.of(new Item(List.of())),
+        Item::getProviders,
+        List.of(),
         function);
 
-    // VERIFY
+    verify(function).apply(any(), any());
+  }
+
+  @Test
+  void dataProviderCheckValidation_whenProvidersIsNullAndDefaultsMatchAllowed_shouldNotTriggerAction() {
+    final BiFunction function = mock(BiFunction.class);
+
+    DataProviderRequestHandlingValidator.dataProviderCheckValidation(
+        List.of(DataProvider.values()),
+        List.of(new Item(null)),
+        Item::getProviders,
+        List.of(DataProvider.MORNINGSTAR),
+        function);
+
     verifyNoInteractions(function);
   }
 
-  private ProviderAware buildProviderAware(final String provider) {
-    return () -> provider;
+  @Test
+  void dataProviderCheckValidation_whenProvidersIsEmptyAndDefaultsMatchAllowed_shouldNotTriggerAction() {
+    final BiFunction function = mock(BiFunction.class);
+
+    DataProviderRequestHandlingValidator.dataProviderCheckValidation(
+        List.of(DataProvider.values()),
+        List.of(new Item(List.of())),
+        Item::getProviders,
+        List.of(DataProvider.MORNINGSTAR),
+        function);
+
+    verifyNoInteractions(function);
+  }
+
+  @Test
+  void dataProviderCheckValidation_whenProviderExistsWithEmptyAllowed_shouldTriggerAction() {
+    final BiFunction function = mock(BiFunction.class);
+
+    DataProviderRequestHandlingValidator.dataProviderCheckValidation(
+        List.of(),
+        List.of(new Item(List.of(DataProvider.MORNINGSTAR))),
+        Item::getProviders,
+        List.of(DataProvider.MORNINGSTAR),
+        function);
+
+    verify(function).apply(any(), any());
+  }
+
+  @Test
+  void dataProviderCheckValidation_whenProviderExistsAndMatchesAllowed_shouldNotTriggerAction() {
+    final BiFunction function = mock(BiFunction.class);
+
+    DataProviderRequestHandlingValidator.dataProviderCheckValidation(
+        List.of(DataProvider.values()),
+        List.of(new Item(List.of(DataProvider.MORNINGSTAR))),
+        Item::getProviders,
+        List.of(),
+        function);
+
+    verifyNoInteractions(function);
+  }
+
+  private record Item(List<DataProvider> providers) {
+    List<DataProvider> getProviders() {
+      return providers;
+    }
   }
 
 }

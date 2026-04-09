@@ -40,7 +40,7 @@ public class MaturityAllocationMapper
 
     Optional.ofNullable(smsResponse)
         .map(Maturities::getDataProvider)
-        .ifPresent(dp -> result.setProvider(dp.name()));
+        .ifPresent(dp -> result.setProviders(List.of(dp)));
 
     return result;
   }

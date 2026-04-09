@@ -55,12 +55,9 @@ class SalesChargeTypeCalculationTest {
     final Holding holding1 = createHolding("RBF605", 10_000);
     final Holding holding2 = createHolding("RBF606", 20_000);
     final Holding holding3 = createHolding("RBF607", 70_000);
-    dataFromFds.put(holding1, new SalesCharge(DEFERRED_SALES_CHARGE_ON_MARKET_VALUE,
-        null, null, null, null));
-    dataFromFds.put(holding2, new SalesCharge(FRONT_END_CHARGE, null, null, null,
-        null));
-    dataFromFds.put(holding3, new SalesCharge(LOW_SALES_CHARGE, null, null, null,
-        null));
+    dataFromFds.put(holding1, SalesCharge.builder().type(DEFERRED_SALES_CHARGE_ON_MARKET_VALUE).build());
+    dataFromFds.put(holding2, SalesCharge.builder().type(FRONT_END_CHARGE).build());
+    dataFromFds.put(holding3, SalesCharge.builder().type(LOW_SALES_CHARGE).build());
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
@@ -92,10 +89,8 @@ class SalesChargeTypeCalculationTest {
     final Map<Holding, SalesCharge> dataFromFds = new HashMap<>();
     final Holding holding2 = createHolding("RBF606", 51_000);
     final Holding holding3 = createHolding("RBF607", 49_000);
-    dataFromFds.put(holding2, new SalesCharge(VOLUME_SALES_CHARGE, null, null, null,
-        null));
-    dataFromFds.put(holding3, new SalesCharge(DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT,
-        null, null, null, null));
+    dataFromFds.put(holding2, SalesCharge.builder().type(VOLUME_SALES_CHARGE).build());
+    dataFromFds.put(holding3, SalesCharge.builder().type(DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT).build());
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
@@ -217,7 +212,7 @@ class SalesChargeTypeCalculationTest {
     final Holding holding = new Holding(BigDecimal.valueOf(value), FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV));
 
-    dataFromFds.put(holding, new SalesCharge(frontEndCharge, null, null, null, null));
+    dataFromFds.put(holding, SalesCharge.builder().type(frontEndCharge).build());
   }
 
   @Test

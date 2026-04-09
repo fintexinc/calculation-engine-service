@@ -33,7 +33,7 @@ class MaturityAllocationMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
-    assertThat(result.getProvider()).isEqualTo("MORNINGSTAR");
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getMaturityDurationValues()).hasSize(3);
     assertThat(result.getMaturityDurationValues())
         .containsEntry("ONE_TO_SEVEN_DAYS", BigDecimal.valueOf(10.5));
@@ -48,7 +48,7 @@ class MaturityAllocationMapperTest {
     MaturityAllocation result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-002");
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
     assertThat(result.getMaturityDurationValues()).isEmpty();
   }
 
@@ -60,7 +60,7 @@ class MaturityAllocationMapperTest {
     MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
 
     assertThat(result.getMaturityDurationValues()).isEmpty();
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
@@ -71,7 +71,7 @@ class MaturityAllocationMapperTest {
 
     MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
 
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test

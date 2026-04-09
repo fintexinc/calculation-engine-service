@@ -32,7 +32,7 @@ class MonthlyReturnsMapperTest {
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
-    assertThat(result.getProvider()).isEqualTo("MORNINGSTAR");
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getReturns()).hasSize(2);
     assertThat(result.getReturns().get(LocalDate.of(2025, 1, 31)))
         .isEqualByComparingTo("0.0125");
@@ -45,7 +45,7 @@ class MonthlyReturnsMapperTest {
     HoldingMonthlyReturns result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getHoldingId()).isEqualTo("SEC-002");
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
     assertThat(result.getReturns()).isEmpty();
   }
 
@@ -57,7 +57,7 @@ class MonthlyReturnsMapperTest {
     HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-003"));
 
     assertThat(result.getReturns()).isEmpty();
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
@@ -68,7 +68,7 @@ class MonthlyReturnsMapperTest {
 
     HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-004"));
 
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   @Test

@@ -44,7 +44,7 @@ class EquityMarketCapitalizationMapperTest {
     assertThat(result.getRatings().get(EquityMarketCapitalizationType.SMALL)).isEqualByComparingTo("8.50");
     assertThat(result.getRatings().get(EquityMarketCapitalizationType.MICRO)).isEqualByComparingTo("3.50");
     assertThat(result.getHoldingId()).isEqualTo("VTI");
-    assertThat(result.getProvider()).isEqualTo("MORNINGSTAR");
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   @ParameterizedTest
@@ -55,7 +55,7 @@ class EquityMarketCapitalizationMapperTest {
 
     assertThat(result.getRatings()).isEmpty();
     assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   static Stream<Arguments> nullAndEmptyResponses() {
@@ -101,7 +101,7 @@ class EquityMarketCapitalizationMapperTest {
 
     HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   private EquityMarketCapitalizationTypeValue createEntry(

@@ -1,39 +1,29 @@
 package com.fintex.ce.domain.model;
 
-import com.fintex.ce.domain.model.core.ProviderAware;
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Data
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @NoArgsConstructor
 @Accessors(chain = true)
-public class CommonHoldings implements ProviderAware {
+public class CommonHoldings extends BaseCalculationData<CommonHoldings> {
 
   private List<CommonHolding> holdings;
 
   // For compatibility with R* serialization format
   private String holdingsJson;
 
-  // Common fields
-  private String holdingId;
-  private String provider;
-  private String providers;
-  private List<ValidationError> errors = new ArrayList<>();
-
   public CommonHoldings(String holdingsJson) {
     this.holdingsJson = holdingsJson;
-  }
-
-  public boolean hasErrors() {
-    return errors != null && !errors.isEmpty();
   }
 
   @Data

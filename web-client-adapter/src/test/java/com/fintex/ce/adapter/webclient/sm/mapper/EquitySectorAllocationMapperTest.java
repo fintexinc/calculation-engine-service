@@ -43,7 +43,7 @@ class EquitySectorAllocationMapperTest {
     assertThat(result.getAllocations().get(EquitySectorAllocationType.HEALTHCARE)).isEqualByComparingTo("15.3");
     assertThat(result.getAllocations().get(EquitySectorAllocationType.ENERGY)).isEqualByComparingTo("8.7");
     assertThat(result.getHoldingId()).isEqualTo("XIU.TO");
-    assertThat(result.getProvider()).isEqualTo(DataProvider.MORNINGSTAR.name());
+    assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   @ParameterizedTest
@@ -56,7 +56,7 @@ class EquitySectorAllocationMapperTest {
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
-    assertThat(result.getProvider()).isNull();
+    assertThat(result.getProviders()).isEmpty();
   }
 
   static Stream<Arguments> nullAndEmptyResponses() {

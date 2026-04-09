@@ -186,6 +186,8 @@ No hardcoded timeouts, URLs, retry counts — configure in `application.yaml`.
 - **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `mvn spotless:apply`
 - **BigDecimal:** `BigDecimal.valueOf()` for literals, never `new BigDecimal(double)`. `new BigDecimal(String)` is fine
 - **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
+- **Collection null/empty checks:** use `org.springframework.util.CollectionUtils.isEmpty(col)` instead of `col == null || col.isEmpty()`. Never perform the same `null || isEmpty` check twice in a row — collapse to a single `CollectionUtils.isEmpty` call
+- **Object construction:** prefer Lombok builders (`@Builder` / `@SuperBuilder`) over chained accessors (`new Foo().setX(..).setY(..)`). Accessors are fine for incremental mutation inside mappers with conditional branches, but tests and one-shot construction must use the builder
 - **Ternary:** use for simple single-expression returns/assignments instead of if/else
 - **No `final`** on method parameters/variables unless class fields or explicit constants
 - **No fully qualified class names** — always use imports
