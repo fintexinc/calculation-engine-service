@@ -82,7 +82,7 @@ public class SalesChargeCalculation {
   private Set<SalesChargeResult.SalesChargeHoldingEntry> getSalesChargeHoldingResDtos(final Set<Holding> holdingSet,
       final BigDecimal totalMarketValues) {
     return holdingSet.stream()
-        .map(holding -> new SalesChargeResult.SalesChargeHoldingEntry(holding.generateUserIdentifier(),
+        .map(holding -> new SalesChargeResult.SalesChargeHoldingEntry(holding.getIdsString(),
             getMutualFundAllocation(holding, totalMarketValues)))
         .collect(Collectors.toSet());
   }

@@ -3,10 +3,10 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.domain.exception.DataErrorException;
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.CommonDates;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.ValidationError;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
 
@@ -120,8 +120,8 @@ class CommonPerformanceDateServiceImplTest {
         withSettings().useConstructor(monthlyReturnsService));
     final MultiplePortfoliosCommand request = mock(MultiplePortfoliosCommand.class);
     final Set portfolios = mock(Set.class);
-    final DataErrorException error = new DataErrorException("message", "id", ExceptionCode.ERR_RRC_MR_002);
-    final ValidationError resError = new ValidationError("id", ExceptionCode.ERR_RRC_MR_002.toString(), "message");
+    final DataErrorException error = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
+    final ValidationError resError = new ValidationError("id", ErrorCode.ERR_RRC_MR_002.toString(), "message");
     final List<DataErrorException> errors = List.of(error);
     final Returns<HoldingMonthlyReturns> returns = mock(Returns.class);
 

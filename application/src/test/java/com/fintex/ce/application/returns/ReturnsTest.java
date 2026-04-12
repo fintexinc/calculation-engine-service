@@ -5,11 +5,11 @@ import com.fintex.ce.application.validation.CpsdDataValidation;
 import com.fintex.ce.domain.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.HistoricalNavPrices;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
 import com.fintex.ce.domain.model.ValidationError;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ class ReturnsTest {
     final Holding holdingMissingReturns = mock(Holding.class);
     final HoldingMonthlyReturns monthlyReturns = mock(HoldingMonthlyReturns.class);
     final HoldingMonthlyReturns monthlyReturnsMissing = mock(HoldingMonthlyReturns.class);
-    monthlyReturnsMissing.setErrors(List.of(new ValidationError("id", ExceptionCode.ERR_RRC_MR_002.name(), "message")));
+    monthlyReturnsMissing.setErrors(List.of(new ValidationError("id", ErrorCode.ERR_RRC_MR_002.name(), "message")));
 
     final Returns sut = new Returns();
     Mockito.when(monthlyReturns.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
@@ -98,7 +98,7 @@ class ReturnsTest {
     Mockito.when(monthlyReturns.hasMonthlyReturnsErrors()).thenReturn(false);
     Mockito.when(monthlyReturnsMissing.hasMonthlyReturnsErrors()).thenReturn(true);
     Mockito.when(monthlyReturnsMissing.getOnlyMonthlyReturnsErrors()).thenReturn(
-        List.of(new ValidationError("id", ExceptionCode.ERR_RRC_CPED_003.name(), "message")));
+        List.of(new ValidationError("id", ErrorCode.ERR_RRC_CPED_003.name(), "message")));
 
     // VERIFY
     assertThrows(FdsDataValidationException.class, () -> sut.initOnlyWithReturnsDataValidation(Map.of(holding,
@@ -172,7 +172,7 @@ class ReturnsTest {
   @Test
   void shouldGetErrors_whenReturnsListOfErrorsWhenErrorsExist() {
     Returns<HoldingMonthlyReturns> sut = new Returns<>();
-    DataErrorException error = new DataErrorException("message", "id", ExceptionCode.ERR_RRC_MR_002);
+    DataErrorException error = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
     sut.notification.addError(error);
     List<DataErrorException> errors = sut.getErrors();
     assertEquals(1, errors.size());
@@ -182,8 +182,8 @@ class ReturnsTest {
   @Test
   void shouldGetErrors_whenReturnsMultipleErrorsWhenMultipleErrorsExist() {
     Returns<HoldingMonthlyReturns> sut = new Returns<>();
-    DataErrorException error1 = new DataErrorException("message", "id", ExceptionCode.ERR_RRC_MR_002);
-    DataErrorException error2 = new DataErrorException("message", "id2", ExceptionCode.ERR_RRC_MR_002);
+    DataErrorException error1 = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
+    DataErrorException error2 = new DataErrorException("message", "id2", ErrorCode.ERR_RRC_MR_002);
     sut.notification.addError(error1);
     sut.notification.addError(error2);
     List<DataErrorException> errors = sut.getErrors();
@@ -226,7 +226,7 @@ class ReturnsTest {
   @Test
   void shouldGetErrorsAsWarnings_whenReturnsListOfWarningsWhenErrorsExist() {
     Returns<HoldingMonthlyReturns> sut = new Returns<>();
-    DataErrorException error = new DataErrorException("message", "id", ExceptionCode.ERR_RRC_MR_002);
+    DataErrorException error = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
     sut.notification.addError(error);
     List<Warning> warnings = sut.getErrorsAsWarnings();
     assertEquals(1, warnings.size());

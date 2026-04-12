@@ -27,7 +27,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_CQ_CQ_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_CQ_CQ_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CalculationUtils.sumProduct;
 import static com.fintex.ce.util.CollectorUtils.toMap;

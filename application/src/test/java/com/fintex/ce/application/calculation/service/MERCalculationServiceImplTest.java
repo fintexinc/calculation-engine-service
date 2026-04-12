@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_MER_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_AMF_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_MER_001;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
@@ -364,7 +364,7 @@ class MERCalculationServiceImplTest {
     // VERIFY
     assertEquals(1, notification.getErrors().stream().filter(e -> e.getMessage().equals(
         "The holding is missing both MER and Management Fee")).count());
-    verify(h).generateUserIdentifier();
+    verify(h).getIdsString();
   }
 
   @Test
@@ -382,7 +382,7 @@ class MERCalculationServiceImplTest {
     // VERIFY
     assertEquals(1, notification.getErrors().stream().filter(e -> e.getMessage().equals(
         "The holding is missing both Net Expense Ratio and Gross Expense Ratio")).count());
-    verify(h).generateUserIdentifier();
+    verify(h).getIdsString();
     // assertEquals("The holding is missing both Net Expense Ratio and Gross Expense Ratio", e.getMessage());
   }
 
@@ -424,7 +424,7 @@ class MERCalculationServiceImplTest {
         notification);
 
     // VERIFY
-    verify(h).generateUserIdentifier();
+    verify(h).getIdsString();
     verify(a, times(2)).getActualManagementFee();
     assertTrue(warning.isPresent());
     assertEquals(List.of(new Warning(null, "The holding is missing Management Expense Ratio", "WRN_MER_MER_001")),
@@ -465,7 +465,7 @@ class MERCalculationServiceImplTest {
     final Optional<Warning> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h, notification);
 
     // VERIFY
-    verify(h).generateUserIdentifier();
+    verify(h).getIdsString();
     verify(a, times(2)).getGrossExpenseRatio();
     assertTrue(warning.isPresent());
     assertEquals(new Warning(null, "The holding is missing Net Expense Ratio", "WRN_MER_NER_001"), warning.get());

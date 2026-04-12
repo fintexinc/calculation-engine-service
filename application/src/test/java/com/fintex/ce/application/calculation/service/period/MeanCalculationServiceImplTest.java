@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_TIP_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_TIP_002;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_TIP_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_TIP_002;
 import static com.fintex.ce.domain.model.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
 import static com.fintex.ce.util.DecimalUtils.OUTPUT_SCALE;
 import static org.junit.jupiter.api.Assertions.assertEquals;

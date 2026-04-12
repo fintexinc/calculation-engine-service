@@ -1,5 +1,13 @@
 package com.fintex.ce.adapter.rest.validation;
 
-public interface RequestValidator<T> {
-  void validate(T t);
+import com.fintex.ce.domain.dto.command.CalculationCommand;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+
+import java.util.List;
+
+public interface RequestValidator {
+
+  List<CalculationMetric> supportedMetrics();
+
+  void validate(CalculationCommand command);
 }

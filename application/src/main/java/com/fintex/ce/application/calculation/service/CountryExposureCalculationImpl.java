@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_FICQ_BCE_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_FICQ_BCE_001;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
 import static java.util.stream.Collectors.toMap;
 

@@ -1,8 +1,8 @@
 package com.fintex.ce.application.mapping;
 
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,7 @@ class GeographicAllocationMappingServiceImplTest {
     holdingAllocations.put(holding, allocations);
 
     Map<Holding, Map<GeographicRegionType, BigDecimal>> result = geographicAllocationMappingServiceImpl
-        .mapToGeographicRegions(holdingAllocations, new ArrayList<>(), ExceptionCode.WRN_UNKNOWN_001);
+        .mapToGeographicRegions(holdingAllocations, new ArrayList<>(), ErrorCode.WRN_UNKNOWN_001);
 
     assertTrue(result.containsKey(holding));
     assertFalse(result.get(holding).containsKey(GeographicRegionType.ASIA));
@@ -54,10 +54,10 @@ class GeographicAllocationMappingServiceImplTest {
 
     List<Warning> warnings = new ArrayList<>();
     geographicAllocationMappingServiceImpl.mapToGeographicRegions(holdingAllocations, warnings,
-        ExceptionCode.WRN_UNKNOWN_001);
+        ErrorCode.WRN_UNKNOWN_001);
 
     assertEquals(1, warnings.size());
-    assertEquals(ExceptionCode.WRN_UNKNOWN_001.toString(), warnings.get(0).getCode());
+    assertEquals(ErrorCode.WRN_UNKNOWN_001.toString(), warnings.get(0).getCode());
   }
 
   @Test
@@ -69,9 +69,9 @@ class GeographicAllocationMappingServiceImplTest {
 
     List<Warning> warnings = new ArrayList<>();
     geographicAllocationMappingServiceImpl.mapToGeographicRegions(holdingAllocations, warnings,
-        ExceptionCode.WRN_UNKNOWN_001);
+        ErrorCode.WRN_UNKNOWN_001);
 
     assertEquals(1, warnings.size());
-    assertEquals(ExceptionCode.WRN_UNKNOWN_001.toString(), warnings.get(0).getCode());
+    assertEquals(ErrorCode.WRN_UNKNOWN_001.toString(), warnings.get(0).getCode());
   }
 }

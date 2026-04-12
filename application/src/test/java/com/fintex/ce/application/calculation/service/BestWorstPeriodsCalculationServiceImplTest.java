@@ -195,8 +195,8 @@ class BestWorstPeriodsCalculationServiceImplTest {
 
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
     when(bestWorstPeriodCommand.getCurrency()).thenReturn(CurrencyType.CAD);
-    when(bestWorstPeriodCommand.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(bestWorstPeriodCommand.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(1));
+    when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(1));
     when(sut.buildBestWorstPeriodCalculation(any(), any())).thenReturn(bestWorstPeriodCalculation);
     when(bestWorstPeriodCalculation.calculate()).thenReturn(resDTO);
 
@@ -218,8 +218,8 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
     when(bestWorstPeriodCommand.getCurrency()).thenReturn(CurrencyType.CAD);
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
-    when(bestWorstPeriodCommand.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(bestWorstPeriodCommand.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     sut.buildWeightedAverageInputDto(bestWorstPeriodCommand);
@@ -243,8 +243,8 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
     when(bestWorstPeriodCommand.getCurrency()).thenReturn(CurrencyType.CAD);
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
-    when(bestWorstPeriodCommand.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(bestWorstPeriodCommand.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     sut.buildWeightedAverageInputDto(bestWorstPeriodCommand);
@@ -269,8 +269,8 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
     when(bestWorstPeriodCommand.getCurrency()).thenReturn(CurrencyType.CAD);
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
-    when(bestWorstPeriodCommand.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(bestWorstPeriodCommand.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     final CalculationDTO actual = sut.buildWeightedAverageInputDto(bestWorstPeriodCommand);

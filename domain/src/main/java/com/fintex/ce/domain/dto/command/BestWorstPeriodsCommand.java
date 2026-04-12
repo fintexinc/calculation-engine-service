@@ -1,6 +1,11 @@
 package com.fintex.ce.domain.dto.command;
 
+import com.fintex.ce.domain.exception.code.ErrorCode;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import java.util.Set;
 import lombok.Data;
@@ -15,5 +20,5 @@ import lombok.experimental.Accessors;
 @Schema(description = "Command for best and worst performance periods analysis. Supports metric: best-worst-periods")
 public class BestWorstPeriodsCommand extends ReturnCommand {
   @Schema(description = "Time interval periods in months for best/worst analysis", example = "[12, 36]")
-  private Set<Long> bestWorstTimeIntervalPeriods;
+  private Set<@Min(value = 1, message = ErrorCode.Names.ERR_BWP_BWPTIP_001) @Max(value = 300, message = ErrorCode.Names.ERR_BWP_BWPTIP_002) Long> bestWorstTimeIntervalPeriods;
 }

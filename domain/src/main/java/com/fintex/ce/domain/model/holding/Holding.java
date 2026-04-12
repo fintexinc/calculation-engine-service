@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import static com.fintex.ce.domain.constant.ErrorMessage.NOT_NULL_MSG;
+import static com.fintex.ce.domain.exception.code.ErrorCode.Names.ERR_VAL_NN_001;
 import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalEquals;
 import static com.fintex.ce.domain.util.BigDecimalUtils.bigDecimalHashCode;
 
@@ -36,10 +36,10 @@ public class Holding {
 
   private final BigDecimal value;
 
-  @NotNull(message = NOT_NULL_MSG)
+  @NotNull(message = ERR_VAL_NN_001)
   private final FinancialInstrumentType holdingType;
 
-  @NotNull(message = NOT_NULL_MSG)
+  @NotNull(message = ERR_VAL_NN_001)
   @Valid
   private final SecurityIdentifier securityIdentifier;
 
@@ -53,7 +53,7 @@ public class Holding {
     this.securityIdentifier = securityIdentifier;
   }
 
-  public String generateUserIdentifier() {
+  public String getIdsString() {
     if (securityIdentifier == null) {
       return holdingType + DELIMITER + value;
     }

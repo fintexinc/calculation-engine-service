@@ -67,7 +67,7 @@ class GrowthOf10KCalculationServiceImplTest {
     final var holdings = List.of(mock(Holding.class));
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
     when(returnReqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
-    when(returnReqDTO.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
+    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
 
     final var growth10KCalculation = mock(Growth10KCalculation.class, withSettings()
         .useConstructor(new TreeMap<>(), mock(CommonDates.class), false, List.of()));
@@ -103,8 +103,8 @@ class GrowthOf10KCalculationServiceImplTest {
     final ReturnCommand returnReqDTO = mock(ReturnCommand.class);
     when(returnReqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildCalculationDto(any());
     sut.buildCalculationDto(returnReqDTO);
@@ -135,8 +135,8 @@ class GrowthOf10KCalculationServiceImplTest {
     final var returnReqDTO = mock(ReturnCommand.class);
     when(returnReqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildCalculationDto(any());
     final CalculationDTO actual = sut.buildCalculationDto(returnReqDTO);
@@ -166,8 +166,8 @@ class GrowthOf10KCalculationServiceImplTest {
     final var returnReqDTO = mock(ReturnCommand.class);
     when(returnReqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildCalculationDto(any());
     final CalculationDTO actual = sut.buildCalculationDto(returnReqDTO);
@@ -191,8 +191,8 @@ class GrowthOf10KCalculationServiceImplTest {
     final var returnReqDTO = mock(ReturnCommand.class);
     when(returnReqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildCalculationDto(any());
     sut.buildCalculationDto(returnReqDTO);
@@ -217,8 +217,8 @@ class GrowthOf10KCalculationServiceImplTest {
     final var returnReqDTO = mock(ReturnCommand.class);
     when(returnReqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildCalculationDto(any());
     sut.buildCalculationDto(returnReqDTO);
@@ -259,8 +259,8 @@ class GrowthOf10KCalculationServiceImplTest {
 
       final Growth10KCalculation actual = sut.buildGrowth10kCalculation(returnReqDTO, calculationDTO);
 
-      verify(returnReqDTO).getCustomPerformanceStartDate();
-      verify(returnReqDTO).getCustomPerformanceEndDate();
+      verify(returnReqDTO).getCustomPsd();
+      verify(returnReqDTO).getCustomPed();
 
       final List<CommonDates> constructed = mockedCommonDates.constructed();
 

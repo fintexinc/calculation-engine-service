@@ -1,6 +1,6 @@
 package com.fintex.ce.domain.exception;
 
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
+import com.fintex.ce.domain.exception.code.ErrorCode;
 
 import lombok.Getter;
 
@@ -8,10 +8,10 @@ import lombok.Getter;
 public class DataErrorException extends GeneralRuntimeException {
 
   private final String id;
-  private final ExceptionCode code;
+  private final ErrorCode code;
   private final int httpStatusCode = 200;
 
-  public DataErrorException(final String message, final String id, final ExceptionCode code) {
+  public DataErrorException(final String message, final String id, final ErrorCode code) {
     super(message);
     this.id = id;
     this.code = code;

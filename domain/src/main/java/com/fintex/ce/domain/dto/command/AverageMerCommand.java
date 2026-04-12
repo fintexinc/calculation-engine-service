@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 @ToString(callSuper = true)
 @Accessors(chain = true)
 @Schema(description = "Command for fee ratio calculations. Supports metrics: mer, management-fee")
-public class AverageMerCommand extends DataProviderCommand {
+public class AverageMerCommand extends DataProviderCommand implements HoldingsProvider {
   @Schema(description = "Fee parameter types to calculate", example = "[\"scaled\", \"absolute\"]")
   private List<ParameterType> parameterTypes;
   @Schema(description = "Portfolio holdings")

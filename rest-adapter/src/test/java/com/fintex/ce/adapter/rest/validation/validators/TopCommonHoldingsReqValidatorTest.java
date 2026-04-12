@@ -1,0 +1,115 @@
+package com.fintex.ce.adapter.rest.validation.validators;
+
+import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
+import com.fintex.ce.domain.exception.ReqValidationException;
+import com.fintex.ce.domain.model.holding.GicHolding;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+class TopCommonHoldingsReqValidatorTest {
+
+  private final TopCommonHoldingsReqValidator validator = new TopCommonHoldingsReqValidator();
+
+  @Test
+  void shouldThrow_whenNumOfFundsMinIsLessThanOne() {
+    TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
+    command.setHoldings(List.of(createHolding("ID1"), createHolding("ID2")));
+    command.setNumOfFundsMin(0);
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ReqValidationException.class)
+        .satisfies(ex -> {
+          ReqValidationException rve = (ReqValidationException) ex;
+          assertThat(rve.getCode()).isEqualTo("ERR_TCH_NFM_001");
+        });
+  }
+
+  @Test
+  void shouldThrow_whenNumOfFundsMinExceedsHoldingsSize() {
+    TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
+    command.setHoldings(List.of(createHolding("ID1")));
+    command.setNumOfFundsMin(5);
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ReqValidationException.class)
+        .satisfies(ex -> {
+          ReqValidationException rve = (ReqValidationException) ex;
+          assertThat(rve.getCode()).isEqualTo("ERR_TCH_NFM_002");
+        });
+  }
+
+  @Test
+  void shouldThrow_whenAccumulateHoldingTypesExceedsTwelve() {
+    Set<String> thirteenTypes = IntStream.rangeClosed(1, 13)
+        .mapToObj(i -> "TYPE_" + i)
+        .collect(Collectors.toSet());
+
+    TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
+    command.setHoldings(List.of(createHolding("ID1")));
+    command.setNumOfFundsMin(1);
+    command.setAccumulateHoldingTypes(thirteenTypes);
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ReqValidationException.class)
+        .satisfies(ex -> {
+          ReqValidationException rve = (ReqValidationException) ex;
+          assertThat(rve.getCode()).isEqualTo("ERR_TCH_AHT_001");
+        });
+  }
+
+  @Test
+  void shouldThrow_whenGicHoldingHasNoName() {
+    GicHolding gicHolding = GicHolding.builder()
+        .value(BigDecimal.TEN)
+        .holdingType(FinancialInstrumentType.GIC)
+        .build();
+
+    TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
+    command.setHoldings(List.of(gicHolding));
+    command.setNumOfFundsMin(1);
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ReqValidationException.class)
+        .satisfies(ex -> {
+          ReqValidationException rve = (ReqValidationException) ex;
+          assertThat(rve.getCode()).isEqualTo("ERR_TCH_GNM_003");
+        });
+  }
+
+  @Test
+  void shouldNotThrow_whenCommandIsValid() {
+    GicHolding gicHolding = GicHolding.builder()
+        .value(BigDecimal.TEN)
+        .holdingType(FinancialInstrumentType.GIC)
+        .name("My GIC")
+        .build();
+
+    TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
+    command.setHoldings(List.of(createHolding("ID1"), createHolding("ID2"), gicHolding));
+    command.setNumOfFundsMin(2);
+    command.setAccumulateHoldingTypes(Set.of("TYPE_1", "TYPE_2"));
+
+    assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
+  }
+
+  private Holding createHolding(String id) {
+    return new Holding(
+        BigDecimal.TEN,
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier(id, FiIdentifierType.TICKER));
+  }
+}

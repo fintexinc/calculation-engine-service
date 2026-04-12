@@ -62,7 +62,7 @@ public class DateTimeUtils {
     return localDate.isBefore(quincentenaryBeforeNow);
   }
 
-  // Value of startDate is already verified in HoldingReqValidation::validateGicHolding and can't be quincentenary
+  // Value of startDate is already verified in HoldingReqValidator::validateGicHolding and can't be quincentenary
   // before now
   // But checkmarx is not able to see this and forces to add double check
   private static LocalDate limitStartDate(final LocalDate startDate, final LocalDate endDate) {

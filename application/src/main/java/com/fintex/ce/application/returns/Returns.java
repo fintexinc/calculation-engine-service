@@ -8,12 +8,12 @@ import com.fintex.ce.domain.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.domain.exception.code.HttpCode;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
 import com.fintex.ce.domain.model.HistoricalNavPrices;
 import com.fintex.ce.domain.model.ReturnsData;
 import com.fintex.ce.domain.model.ValidationError;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.util.MapUtils;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
@@ -31,10 +31,10 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_FDS_MC_002;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_NAV_PRICES_002;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MMR_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MR_002;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_FDS_MC_002;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_NAV_PRICES_002;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_MMR_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_MR_002;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.PATTERN_1;
@@ -119,7 +119,7 @@ public class Returns<T extends ReturnsData> {
     }
     return errors.stream()
         .map(e -> new DataErrorException(e.getId(), e.getMessage(),
-            ExceptionCode.valueOf(e.getCode())))
+            ErrorCode.valueOf(e.getCode())))
         .toList();
   }
 
@@ -259,7 +259,7 @@ public class Returns<T extends ReturnsData> {
       throw new SystemException(
           "Can't obtain Earliest Available Date. Missed one of the parameters. Start Date: %s. Value: %s".formatted(
               startDate, value),
-          ErrorCode.INTERNAL_SERVER_ERROR);
+          HttpCode.INTERNAL_SERVER_ERROR);
     }
 
     for (LocalDate date = startDate; date.isBefore(value.lastKey()); date = date.plusDays(1)) {
@@ -276,7 +276,7 @@ public class Returns<T extends ReturnsData> {
       throw new SystemException(
           "Can't obtain Latest Available Date. Missed one of the parameters. End Date: %s. Value: %s".formatted(endDate,
               value),
-          ErrorCode.INTERNAL_SERVER_ERROR);
+          HttpCode.INTERNAL_SERVER_ERROR);
     }
 
     for (LocalDate date = endDate; date.isAfter(value.firstKey()); date = date.minusDays(1)) {

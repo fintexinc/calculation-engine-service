@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @Schema(description = "Command for rolling window calculations. Supports metrics: rolling-total-returns, rolling-standard-deviation, rolling-sharpe-ratio")
-public class RollingCalculationCommand extends PeriodCommand {
+public class RollingCalculationCommand extends PeriodCommand implements CustomPsdProvider {
   @Schema(description = "Custom performance start date for rolling window")
   @JsonProperty("customPerformanceStartDate")
   private LocalDate customPsd;

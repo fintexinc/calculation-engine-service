@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MA_MA_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MA_MA_001;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 

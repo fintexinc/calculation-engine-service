@@ -1,6 +1,6 @@
 package com.fintex.ce.domain.exception;
 
-import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.domain.exception.code.HttpCode;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,37 +10,37 @@ public class SystemException extends RuntimeException {
 
   private static final long serialVersionUID = 7153808129776996908L;
 
-  private final ErrorCode errorCode;
+  private final HttpCode httpCode;
   private String errorEnum;
   private final HashMap<String, Object> properties = new LinkedHashMap<>();
 
-  public SystemException(final ErrorCode errorCode) {
-    this.errorCode = errorCode;
+  public SystemException(final HttpCode httpCode) {
+    this.httpCode = httpCode;
   }
 
-  public SystemException(final String message, final ErrorCode errorCode) {
+  public SystemException(final String message, final HttpCode httpCode) {
     super(message);
-    this.errorCode = errorCode;
+    this.httpCode = httpCode;
   }
 
-  public SystemException(final String message, final ErrorCode errorCode, final String errorEnum) {
+  public SystemException(final String message, final HttpCode httpCode, final String errorEnum) {
     super(message);
-    this.errorCode = errorCode;
+    this.httpCode = httpCode;
     this.errorEnum = errorEnum;
   }
 
-  public SystemException(final String message, final Throwable exception, final ErrorCode errorCode) {
+  public SystemException(final String message, final Throwable exception, final HttpCode httpCode) {
     super(message, exception);
-    this.errorCode = errorCode;
+    this.httpCode = httpCode;
   }
 
-  public SystemException(final Throwable exception, final ErrorCode errorCode) {
+  public SystemException(final Throwable exception, final HttpCode httpCode) {
     super(exception);
-    this.errorCode = errorCode;
+    this.httpCode = httpCode;
   }
 
-  public ErrorCode getErrorCode() {
-    return errorCode;
+  public HttpCode getErrorCode() {
+    return httpCode;
   }
 
   public String getErrorEnum() {
@@ -70,6 +70,6 @@ public class SystemException extends RuntimeException {
   @Override
   public String toString() {
     return new StringBuilder().append("Original message: ").append(super.getMessage()).append("\n Error Code: ")
-        .append(errorCode).append("\n properties: ").append(properties).toString();
+        .append(httpCode).append("\n properties: ").append(properties).toString();
   }
 }

@@ -2,10 +2,10 @@ package com.fintex.ce.application.mapping;
 
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.domain.exception.code.HttpCode;
 import com.fintex.ce.domain.model.CountryAllocation;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.util.JacksonUtil;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_UNKNOWN_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 
 @Service
@@ -49,7 +49,7 @@ public class CountryAllocationMappingServiceImpl implements CountryAllocationMap
   @Override
   public Map<Holding, Map<CountryRegionType, BigDecimal>> mapToCountryRegions(
       final Map<Holding, Map<String, BigDecimal>> holdingAllocations,
-      final List<Warning> warnings, final ExceptionCode errorCode) {
+      final List<Warning> warnings, final ErrorCode errorCode) {
     return holdingAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> mapToRegions(e.getKey(), e
         .getValue(), warnings, errorCode)));
   }
@@ -67,7 +67,7 @@ public class CountryAllocationMappingServiceImpl implements CountryAllocationMap
    */
   public Map<CountryRegionType, BigDecimal> mapToRegions(final Holding holding,
       final Map<String, BigDecimal> allocations,
-      final List<Warning> warnings, final ExceptionCode errorCode) {
+      final List<Warning> warnings, final ErrorCode errorCode) {
     final Map<CountryRegionType, BigDecimal> map = new HashMap<>();
     if (CollectionUtils.isEmpty(allocations)) {
       warnings.add(errorCode.warning(holding));
@@ -95,7 +95,7 @@ public class CountryAllocationMappingServiceImpl implements CountryAllocationMap
     if (in == null) {
       final String message = String.format("Country Allocation Mapping is missing from path %s",
           COUNTRY_ALLOCATION_MAPPING_PATH);
-      throw new SystemException(message, ErrorCode.INTERNAL_SERVER_ERROR);
+      throw new SystemException(message, HttpCode.INTERNAL_SERVER_ERROR);
     }
     final List<CountryAllocation> list = JacksonUtil.deserialize(in, new TypeReference<>() {});
     Map<String, CountryAllocation> map = new HashMap<>();

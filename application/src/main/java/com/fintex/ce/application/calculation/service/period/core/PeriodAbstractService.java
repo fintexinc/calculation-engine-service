@@ -6,8 +6,8 @@ import com.fintex.ce.application.returns.Returns;
 import com.fintex.ce.calculation.PeriodCalculationService;
 import com.fintex.ce.domain.dto.calculation.CalculationDTO;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.HoldingMonthlyReturns;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.enumeration.Period;
 import com.fintex.ce.domain.model.result.PeriodResult;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -61,10 +61,10 @@ public abstract class PeriodAbstractService<E extends PeriodResult, R extends Pe
     }
     for (String period : command.getPeriods()) {
       if (StringUtils.isNumeric(period) && Integer.parseInt(period) < 12) {
-        throw ExceptionCode.ERR_RRC_TIP_001.reqValidationError();
+        throw ErrorCode.ERR_RRC_TIP_001.reqValidationError();
       }
       if (Period.YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
-        throw ExceptionCode.ERR_RRC_TIP_002.reqValidationError();
+        throw ErrorCode.ERR_RRC_TIP_002.reqValidationError();
       }
     }
   }

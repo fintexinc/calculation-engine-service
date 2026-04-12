@@ -1,7 +1,7 @@
 package com.fintex.ce.application.validation;
 
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 
 import java.time.LocalDate;
 
@@ -26,8 +26,8 @@ public abstract class CpedDataValidation {
     }
   }
 
-  public abstract ExceptionCode getCpedIsAfterPedExceptionCode();
+  public abstract ErrorCode getCpedIsAfterPedExceptionCode();
 
-  public abstract ExceptionCode getCpedIsBeforePsdExceptionCode();
+  public abstract ErrorCode getCpedIsBeforePsdExceptionCode();
 
 }

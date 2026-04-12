@@ -1,10 +1,10 @@
 package com.fintex.ce.application.validation.data;
 
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.HoldingAssetAllocation;
 import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 
 import org.springframework.stereotype.Component;
@@ -43,13 +43,13 @@ public class AssetAllocationDataValidator {
     assetAllocations.keySet().forEach(region -> {
       final var assetAllocationRegion = AssetAllocationRegion.fromValue(region);
       if (assetAllocationRegion == null || assetAllocationRegion.getName() == null) {
-        warnings.add(ExceptionCode.WRN_UNKNOWN_001.warning(holding, region, "Asset Allocation"));
+        warnings.add(ErrorCode.WRN_UNKNOWN_001.warning(holding, region, "Asset Allocation"));
       }
     });
   }
 
   public void validateWhenAssetAllocationIsEmpty(final Holding holding, final List<Warning> warnings) {
-    warnings.add(ExceptionCode.WRN_AA_AA_001.warning(holding));
+    warnings.add(ErrorCode.WRN_AA_AA_001.warning(holding));
   }
 
 }

@@ -2,7 +2,7 @@ package com.fintex.ce.util;
 
 import com.fintex.ce.domain.dto.IncomeForecastDto;
 import com.fintex.ce.domain.exception.SystemException;
-import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.domain.exception.code.HttpCode;
 import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
@@ -58,7 +58,7 @@ public class PortfolioUtils {
                   return ONE;
                 }
       final String message = String.format("Currency exchange %s->%s not supported", from, to);
-      throw new SystemException(message, ErrorCode.INTERNAL_SERVER_ERROR);
+      throw new SystemException(message, HttpCode.INTERNAL_SERVER_ERROR);
     };
   }
 

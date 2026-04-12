@@ -67,7 +67,7 @@ public class GicHolding extends Holding implements MonthlyReturnGeneratableHoldi
   }
 
   @Override
-  public String generateUserIdentifier() {
+  public String getIdsString() {
     return getHoldingType() + Holding.DELIMITER + getCurrency() + Holding.DELIMITER + getValue();
   }
 

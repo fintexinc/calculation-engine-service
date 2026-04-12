@@ -2,7 +2,7 @@ package com.fintex.ce.domain.exception.notification.pattern;
 
 import com.fintex.ce.domain.exception.DataErrorException;
 import com.fintex.ce.domain.exception.FdsDataValidationException;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
+import com.fintex.ce.domain.exception.code.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,13 +44,13 @@ public class Notification {
     }
   }
 
-  public void ifAnyNonAllowedErrorThrowException(List<ExceptionCode> allowedErrors) {
+  public void ifAnyNonAllowedErrorThrowException(List<ErrorCode> allowedErrors) {
     if (hasErrors() && hasNonAllowedErrors(allowedErrors)) {
       throw new FdsDataValidationException(getErrors());
     }
   }
 
-  private boolean hasNonAllowedErrors(List<ExceptionCode> allowedErrors) {
+  private boolean hasNonAllowedErrors(List<ErrorCode> allowedErrors) {
     return errors.stream().anyMatch(error -> !allowedErrors.contains(error.getCode()));
   }
 }

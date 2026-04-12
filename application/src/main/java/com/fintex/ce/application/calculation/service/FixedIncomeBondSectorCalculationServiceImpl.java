@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_BS_BS_001;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_BS_BS_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
