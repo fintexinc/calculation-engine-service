@@ -56,8 +56,8 @@ public class BestWorstPeriodsCalculationServiceImpl
         .getCurrency(), SCALE_OF_TWO);
 
     final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPerformanceStartDate(), reqDTO
-            .getCustomPerformanceEndDate());
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(), reqDTO
+            .getCustomPed());
 
     return new CalculationDTO().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns);
   }

@@ -50,7 +50,7 @@ public class GrowthOf10KCalculationServiceImpl implements CalculationService<Gro
   public Growth10KCalculation buildGrowth10kCalculation(ReturnCommand reqDTO, CalculationDTO inputDTO) {
     return new Growth10KCalculation(
         inputDTO.getWeightedAveragePortfolioReturns(),
-        new CommonDates(reqDTO.getCustomPerformanceStartDate(), reqDTO.getCustomPerformanceEndDate()),
+        new CommonDates(reqDTO.getCustomPsd(), reqDTO.getCustomPed()),
         false,
         inputDTO.getWarnings());
   }
@@ -64,8 +64,8 @@ public class GrowthOf10KCalculationServiceImpl implements CalculationService<Gro
         .setCpsdDataValidation(new PortfolioCpsdDataValidation());
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPerformanceStartDate(), reqDTO
-            .getCustomPerformanceEndDate());
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(), reqDTO
+            .getCustomPed());
 
     return new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns).setWarnings(monthlyReturns
         .getErrorsAsWarnings());

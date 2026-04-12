@@ -3,9 +3,9 @@ package com.fintex.ce.application.mapping;
 import com.fintex.ce.domain.dto.GeographicAllocationDTO;
 import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.domain.exception.code.HttpCode;
 import com.fintex.ce.domain.model.calculation.GeographicRegionType;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.util.JacksonUtil;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_UNKNOWN_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 
 @Service
@@ -48,7 +48,7 @@ public class GeographicAllocationMappingServiceImpl implements GeographicAllocat
   @Override
   public Map<Holding, Map<GeographicRegionType, BigDecimal>> mapToGeographicRegions(
       final Map<Holding, Map<String, BigDecimal>> holdingAllocations,
-      final List<Warning> warnings, final ExceptionCode errorCode) {
+      final List<Warning> warnings, final ErrorCode errorCode) {
     return holdingAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> mapToRegions(e.getKey(), e
         .getValue(), warnings, errorCode)));
   }
@@ -66,7 +66,7 @@ public class GeographicAllocationMappingServiceImpl implements GeographicAllocat
    */
   private Map<GeographicRegionType, BigDecimal> mapToRegions(final Holding holding,
       final Map<String, BigDecimal> allocations,
-      final List<Warning> warnings, final ExceptionCode errorCode) {
+      final List<Warning> warnings, final ErrorCode errorCode) {
     final Map<GeographicRegionType, BigDecimal> map = new HashMap<>();
     if (CollectionUtils.isEmpty(allocations)) {
       warnings.add(errorCode.warning(holding));
@@ -94,7 +94,7 @@ public class GeographicAllocationMappingServiceImpl implements GeographicAllocat
     if (in == null) {
       final String message = String.format("Geographic Allocation Mapping is missing from path %s",
           GEOGRAPHIC_ALLOCATION_MAPPING_PATH);
-      throw new SystemException(message, ErrorCode.INTERNAL_SERVER_ERROR);
+      throw new SystemException(message, HttpCode.INTERNAL_SERVER_ERROR);
     }
     final List<GeographicAllocationDTO> list = JacksonUtil.deserialize(in, new TypeReference<>() {});
     return list.stream().filter(e -> e.getRegion() != null).collect(toMap(GeographicAllocationDTO::getCountryId,

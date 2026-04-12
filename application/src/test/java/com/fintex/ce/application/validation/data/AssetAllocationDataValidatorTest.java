@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_AA_AA_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_AA_AA_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_UNKNOWN_001;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -132,7 +132,7 @@ class AssetAllocationDataValidatorTest {
     final var holding = mock(Holding.class);
     final var warnings = new ArrayList<Warning>();
 
-    when(holding.generateUserIdentifier()).thenReturn("generateUserIdentifier");
+    when(holding.getIdsString()).thenReturn("generateUserIdentifier");
 
     doCallRealMethod().when(sut).validateWhenAssetAllocationIsEmpty(any(), anyList());
     // ACT

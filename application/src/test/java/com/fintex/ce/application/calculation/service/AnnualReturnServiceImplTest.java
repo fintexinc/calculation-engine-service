@@ -61,7 +61,7 @@ class AnnualReturnServiceImplTest {
     final var holdings = List.of(mock(Holding.class));
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
     when(returnReqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
-    when(returnReqDTO.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
+    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
 
     final var calculationDTO = mock(CalculationDTO.class);
     when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
@@ -88,8 +88,8 @@ class AnnualReturnServiceImplTest {
     final var monthlyReturns = mock(Returns.class);
     when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
-    when(annual.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(annual.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturns);
 
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
@@ -113,8 +113,8 @@ class AnnualReturnServiceImplTest {
     final var annual = mock(ReturnCommand.class);
     when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
-    when(annual.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(annual.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     final CalculationDTO actual = sut.buildWeightedAverageInputDto(annual);
@@ -138,8 +138,8 @@ class AnnualReturnServiceImplTest {
     final var annual = mock(ReturnCommand.class);
     when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
-    when(annual.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(annual.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     sut.buildWeightedAverageInputDto(annual);
@@ -161,8 +161,8 @@ class AnnualReturnServiceImplTest {
     final var annual = mock(ReturnCommand.class);
     when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
-    when(annual.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(annual.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     sut.buildWeightedAverageInputDto(annual);
@@ -207,8 +207,8 @@ class AnnualReturnServiceImplTest {
     final var annual = mock(ReturnCommand.class);
     when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
-    when(annual.getCustomPerformanceEndDate()).thenReturn(LOCAL_DATE_NOW);
-    when(annual.getCustomPerformanceStartDate()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     final CalculationDTO actual = sut.buildWeightedAverageInputDto(annual);

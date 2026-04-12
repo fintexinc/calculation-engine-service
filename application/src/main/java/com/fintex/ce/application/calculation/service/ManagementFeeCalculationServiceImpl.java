@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MF_MF_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_MF_MF_001;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;

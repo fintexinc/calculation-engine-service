@@ -122,6 +122,7 @@ import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.ce.domain.model.result.core.IntervalResult;
 import com.fintex.ce.domain.model.result.core.RollingIntervalResult;
 import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
 import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
 import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
 import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
@@ -293,6 +294,7 @@ class CalculationTestDataProvider {
   static PeriodCommand periodCommand() {
     PeriodCommand cmd = new PeriodCommand();
     cmd.setHoldings(List.of());
+    cmd.setCurrency(CurrencyType.CAD);
     cmd.setPeriods(Set.of("12M", "36M"));
     return cmd;
   }
@@ -300,6 +302,7 @@ class CalculationTestDataProvider {
   private static RollingCalculationCommand rollingCommand() {
     RollingCalculationCommand cmd = new RollingCalculationCommand();
     cmd.setHoldings(List.of());
+    cmd.setCurrency(CurrencyType.CAD);
     cmd.setPeriods(Set.of("12M"));
     cmd.setRollingPeriods(Set.of("12M"));
     return cmd;
@@ -309,6 +312,7 @@ class CalculationTestDataProvider {
     RollingCorrelationCommand cmd = new RollingCorrelationCommand();
     cmd.setHoldings(List.of());
     cmd.setBenchmarkHoldings(List.of());
+    cmd.setCurrency(CurrencyType.CAD);
     cmd.setPeriods(Set.of("12M"));
     cmd.setRollingPeriods(Set.of("12M"));
     return cmd;
@@ -330,16 +334,18 @@ class CalculationTestDataProvider {
   private static ReturnCommand returnCommand() {
     ReturnCommand cmd = new ReturnCommand();
     cmd.setHoldings(List.of());
-    cmd.setCustomPerformanceStartDate(PSD);
-    cmd.setCustomPerformanceEndDate(PED);
+    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCustomPsd(PSD);
+    cmd.setCustomPed(PED);
     return cmd;
   }
 
   private static BestWorstPeriodsCommand bestWorstPeriodsCommand() {
     BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
     cmd.setHoldings(List.of());
-    cmd.setCustomPerformanceStartDate(PSD);
-    cmd.setCustomPerformanceEndDate(PED);
+    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCustomPsd(PSD);
+    cmd.setCustomPed(PED);
     cmd.setBestWorstTimeIntervalPeriods(Set.of(12L, 36L));
     return cmd;
   }

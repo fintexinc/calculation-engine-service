@@ -1,0 +1,63 @@
+package com.fintex.ce.adapter.rest.validation.validators;
+
+import com.fintex.ce.adapter.rest.validation.RequestValidator;
+import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.domain.exception.ReqValidationException;
+import com.fintex.ce.domain.model.holding.GicHolding;
+import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+abstract class AbstractGicFieldReqValidatorTest {
+
+  abstract RequestValidator createValidator();
+
+  abstract GicHolding createInvalidGicHolding();
+
+  abstract GicHolding createValidGicHolding();
+
+  abstract String expectedErrorCode();
+
+  @Test
+  void shouldThrow_whenGicHoldingMissingRequiredField() {
+    var cmd = new PortfolioHoldingsCommand();
+    cmd.setHoldings(List.of(createInvalidGicHolding()));
+
+    assertThatThrownBy(() -> createValidator().validate(cmd))
+        .isInstanceOf(ReqValidationException.class)
+        .satisfies(ex -> {
+          ReqValidationException rve = (ReqValidationException) ex;
+          assertThat(rve.getCode()).isEqualTo(expectedErrorCode());
+        });
+  }
+
+  @Test
+  void shouldNotThrow_whenGicHoldingHasRequiredField() {
+    var cmd = new PortfolioHoldingsCommand();
+    cmd.setHoldings(List.of(createValidGicHolding()));
+
+    assertThatCode(() -> createValidator().validate(cmd)).doesNotThrowAnyException();
+  }
+
+  @Test
+  void shouldNotThrow_whenNoGicHoldings() {
+    Holding holding = new Holding(
+        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+
+    var cmd = new PortfolioHoldingsCommand();
+    cmd.setHoldings(List.of(holding));
+
+    assertThatCode(() -> createValidator().validate(cmd)).doesNotThrowAnyException();
+  }
+}

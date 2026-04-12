@@ -25,12 +25,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_MERMF_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_MER_NERGER_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_AMF_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_GER_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_MER_001;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_MER_NER_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_MER_MERMF_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_MER_NERGER_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_AMF_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_GER_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_MER_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_NER_001;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
 import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;

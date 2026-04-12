@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MR_002;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_MR_002;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

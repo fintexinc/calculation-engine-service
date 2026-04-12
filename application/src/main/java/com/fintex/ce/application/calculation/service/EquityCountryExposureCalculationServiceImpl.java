@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;

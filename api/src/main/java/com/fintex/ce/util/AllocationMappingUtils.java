@@ -1,7 +1,7 @@
 package com.fintex.ce.util;
 
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 
 import java.math.BigDecimal;
@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_UNKNOWN_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_UNKNOWN_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 
 /**
@@ -22,13 +22,13 @@ import static com.fintex.ce.util.CollectorUtils.toMap;
  * <p>
  * Three overloads handle different mapping scenarios:
  * <ul>
- * <li>{@link #mapToAllocations(Map, Function, Function, Map, ExceptionCode, String, BiConsumer)} — maps string-keyed
- * raw values to enum-keyed allocations with a custom accumulator (e.g., for maturity allocations that merge multiple
- * raw keys into one display type).</li>
- * <li>{@link #mapToAllocations(Map, Function, Function, Map, ExceptionCode, String)} — simplified version using
+ * <li>{@link #mapToAllocations(Map, Function, Function, Map, ErrorCode, String, BiConsumer)} — maps string-keyed raw
+ * values to enum-keyed allocations with a custom accumulator (e.g., for maturity allocations that merge multiple raw
+ * keys into one display type).</li>
+ * <li>{@link #mapToAllocations(Map, Function, Function, Map, ErrorCode, String)} — simplified version using
  * {@code Map.put} as the default accumulator (e.g., for equity market cap where each raw key maps 1:1 to an enum
  * value).</li>
- * <li>{@link #mapTypedAllocations(Map, Function, Map, ExceptionCode)} — for domain models where values are already
+ * <li>{@link #mapTypedAllocations(Map, Function, Map, ErrorCode)} — for domain models where values are already
  * enum-keyed and need no string resolution (e.g., for fixed income sector allocations mapped by the SM REST
  * fetcher).</li>
  * </ul>
@@ -51,7 +51,7 @@ public final class AllocationMappingUtils {
       Function<D, Map<String, BigDecimal>> valueExtractor,
       Function<String, E> typeResolver,
       Map<E, BigDecimal> defaultMap,
-      ExceptionCode emptyWarningCode,
+      ErrorCode emptyWarningCode,
       String fdsServiceName,
       BiConsumer<Map<E, BigDecimal>, Map.Entry<E, BigDecimal>> accumulator) {
     List<Warning> warnings = new ArrayList<>();
@@ -73,7 +73,7 @@ public final class AllocationMappingUtils {
       Function<D, Map<String, BigDecimal>> valueExtractor,
       Function<String, E> typeResolver,
       Map<E, BigDecimal> defaultMap,
-      ExceptionCode emptyWarningCode,
+      ErrorCode emptyWarningCode,
       String fdsServiceName) {
     return mapToAllocations(rawData, valueExtractor, typeResolver, defaultMap,
         emptyWarningCode, fdsServiceName,
@@ -88,7 +88,7 @@ public final class AllocationMappingUtils {
       Map<Holding, D> rawData,
       Function<D, Map<E, BigDecimal>> valueExtractor,
       Map<E, BigDecimal> defaultMap,
-      ExceptionCode emptyWarningCode) {
+      ErrorCode emptyWarningCode) {
     List<Warning> warnings = new ArrayList<>();
     Map<Holding, Map<E, BigDecimal>> allocations = rawData.entrySet().stream()
         .collect(toMap(
@@ -111,7 +111,7 @@ public final class AllocationMappingUtils {
       Map<String, BigDecimal> rawValues,
       Function<String, E> typeResolver,
       Map<E, BigDecimal> defaultMap,
-      ExceptionCode emptyWarningCode,
+      ErrorCode emptyWarningCode,
       String fdsServiceName,
       BiConsumer<Map<E, BigDecimal>, Map.Entry<E, BigDecimal>> accumulator,
       List<Warning> warnings) {

@@ -50,8 +50,10 @@ import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
 import com.fintex.ce.adapter.rest.dto.response.distributionofreturns.DistributionOfReturnsResDTO;
 import com.fintex.ce.adapter.rest.service.RestExceptionHandlingServiceImpl;
 import com.fintex.ce.adapter.rest.util.ResponseMappingUtils;
+import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.domain.dto.command.CalculationCommand;
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 
 import org.springframework.http.MediaType;
@@ -67,6 +69,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -84,10 +89,12 @@ public class PortfolioCalculationController {
 
   private final Map<CalculationMetric, CalculationService<?, ?>> serviceMap;
   private final RestExceptionHandlingServiceImpl restExceptionHandler;
+  private final RequestValidationFacade validationFacade;
 
   public PortfolioCalculationController(
       List<CalculationService<?, ?>> calculationServices,
-      RestExceptionHandlingServiceImpl restExceptionHandler) {
+      RestExceptionHandlingServiceImpl restExceptionHandler,
+      RequestValidationFacade validationFacade) {
     this.serviceMap = calculationServices.stream()
         .collect(Collectors.toMap(CalculationService::getMetric, Function.identity(),
             (existing, duplicate) -> {
@@ -95,6 +102,7 @@ public class PortfolioCalculationController {
                   "Duplicate CalculationService registered for metric: " + existing.getMetric());
             }));
     this.restExceptionHandler = restExceptionHandler;
+    this.validationFacade = validationFacade;
   }
 
   @Operation(summary = "Execute a portfolio calculation", description = "Performs the specified calculation metric on the provided portfolio holdings. "
@@ -131,7 +139,7 @@ public class PortfolioCalculationController {
   @SuppressWarnings("unchecked")
   public ErrorDTO calculate(
       @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable String metricName,
-      @RequestBody CalculationCommand command) {
+      @RequestBody @NotNull(message = ErrorCode.Names.ERR_VAL_NN_001) @Valid CalculationCommand command) {
     CalculationMetric metric = CalculationMetric.from(metricName);
     if (!serviceMap.containsKey(metric)) {
       throw new IllegalArgumentException("Metric " + metricName + " is not supported");
@@ -143,7 +151,8 @@ public class PortfolioCalculationController {
               command.getMetric().getValue() + "'");
     }
 
-    // TODO refactor the validators at TMI-315
+    validationFacade.validate(command, metric);
+
     CalculationService<?, ?> service = serviceMap.get(metric);
     return restExceptionHandler.handleWithResultMapping(
         () -> ((CalculationService<?, CalculationCommand>) service).perform(command),

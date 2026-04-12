@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -180,6 +181,35 @@ public enum CalculationMetric {
   @JsonValue
   private final String value;
   private final Class<? extends CalculationCommand> commandType;
+
+  public static final List<CalculationMetric> BENCHMARK_METRICS = List.of(
+      EXCESS_RETURNS, TREYNOR_RATIO, INFORMATION_RATIO, TRACKING_ERROR, ALPHA,
+      BETA, R_SQUARED, UPSIDE_CAPTURE, DOWNSIDE_CAPTURE, ROLLING_CORRELATION);
+
+  public static final List<CalculationMetric> ROLLING_METRICS = List.of(
+      ROLLING_TOTAL_RETURNS, ROLLING_STANDARD_DEVIATION, ROLLING_SHARPE_RATIO,
+      ROLLING_CORRELATION);
+
+  public static final List<CalculationMetric> ROLLING_AND_LEADING_METRICS = List.of(
+      ROLLING_TOTAL_RETURNS, ROLLING_STANDARD_DEVIATION, ROLLING_SHARPE_RATIO,
+      ROLLING_CORRELATION, LEADING_TOTAL_RETURNS);
+
+  public static final List<CalculationMetric> TWELVE_MONTH_MINIMUM_METRICS = List.of(
+      STANDARD_DEVIATION, MEAN, SHARPE_RATIO, SORTINO_RATIO, DOWNSIDE_DEVIATION,
+      EXCESS_RETURNS, TREYNOR_RATIO, INFORMATION_RATIO, TRACKING_ERROR, ALPHA, BETA,
+      R_SQUARED, UPSIDE_CAPTURE, DOWNSIDE_CAPTURE, MAR_RATIO, CORRELATION);
+
+  public static final List<CalculationMetric> CIPSD_SUPPORTED_METRICS = List.of(
+      TRAILING_TOTAL_RETURNS, STANDARD_DEVIATION, MEAN, SHARPE_RATIO, SORTINO_RATIO,
+      DOWNSIDE_DEVIATION, EXCESS_RETURNS, TREYNOR_RATIO, INFORMATION_RATIO, TRACKING_ERROR,
+      ALPHA, BETA, R_SQUARED, UPSIDE_CAPTURE, DOWNSIDE_CAPTURE, MAX_DRAWDOWN, MAR_RATIO,
+      CORRELATION, DISTRIBUTION_OF_MONTHLY_RETURNS);
+
+  public static final List<CalculationMetric> PERIOD_METRICS = List.of(
+      TRAILING_TOTAL_RETURNS, STANDARD_DEVIATION, MEAN, SHARPE_RATIO, SORTINO_RATIO,
+      DOWNSIDE_DEVIATION, EXCESS_RETURNS, TREYNOR_RATIO, INFORMATION_RATIO, TRACKING_ERROR,
+      ALPHA, BETA, R_SQUARED, UPSIDE_CAPTURE, DOWNSIDE_CAPTURE, MAX_DRAWDOWN, MAR_RATIO,
+      CORRELATION, DISTRIBUTION_OF_MONTHLY_RETURNS, LEADING_TOTAL_RETURNS);
 
   private static final Map<String, CalculationMetric> VALUE_MAP = Arrays.stream(values())
       .collect(Collectors.toMap(CalculationMetric::getValue, Function.identity()));

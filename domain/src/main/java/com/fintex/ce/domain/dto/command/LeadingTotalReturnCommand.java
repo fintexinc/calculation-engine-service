@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @Schema(description = "Command for leading (forward-looking) total return calculation. Supports metric: leading-total-return")
-public class LeadingTotalReturnCommand extends PeriodCommand {
+public class LeadingTotalReturnCommand extends PeriodCommand implements CustomPsdProvider {
   @Schema(description = "Custom performance start date")
   @JsonProperty("customPerformanceStartDate")
   private LocalDate customPsd;

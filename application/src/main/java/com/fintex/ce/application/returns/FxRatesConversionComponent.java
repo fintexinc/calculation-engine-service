@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.ERR_RRC_MFR_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_MFR_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;

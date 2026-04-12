@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @Schema(description = "Command for cross-portfolio analysis with multiple portfolios. Supports metric: common-performance-dates")
-public class MultiplePortfoliosCommand extends CalculationCommand {
+public class MultiplePortfoliosCommand extends CalculationCommand implements BenchmarkHoldingsProvider {
   @Schema(description = "Set of portfolios to compare")
   private Set<Portfolio> portfolios;
   @Schema(description = "Benchmark holdings for comparison")

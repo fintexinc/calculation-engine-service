@@ -1,7 +1,7 @@
 package com.fintex.ce.domain.model.calculation;
 
 import com.fintex.ce.domain.exception.SystemException;
-import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.domain.exception.code.HttpCode;
 
 import lombok.Getter;
 
@@ -30,7 +30,7 @@ public enum AssetAllocationRegionEmType {
       }
     }
     final String message = String.format("Could not find such Asset Allocation Em region %s", region);
-    throw new SystemException(message, ErrorCode.INTERNAL_SERVER_ERROR);
+    throw new SystemException(message, HttpCode.INTERNAL_SERVER_ERROR);
   }
 
 }

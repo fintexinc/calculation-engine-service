@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CANADIAN_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
@@ -42,7 +43,6 @@ import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.OTHER
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.US_EQUITIES;
 import static com.fintex.ce.domain.model.calculation.CountryRegionType.UNITED_STATES;
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_RRC_ECE_001;
 import static com.fintex.ce.util.CalculationUtils.sum;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;

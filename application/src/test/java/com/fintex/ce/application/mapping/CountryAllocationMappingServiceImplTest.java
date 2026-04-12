@@ -1,10 +1,10 @@
 package com.fintex.ce.application.mapping;
 
 import com.fintex.ce.domain.exception.SystemException;
+import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.model.CountryAllocation;
 import com.fintex.ce.domain.model.calculation.CountryRegionType;
 import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.ExceptionCode;
 import com.fintex.ce.domain.model.holding.Holding;
 
 import org.junit.jupiter.api.Test;
@@ -109,7 +109,7 @@ class CountryAllocationMappingServiceImplTest {
 
     // ACT
     final ArrayList<Warning> warnings = new ArrayList<>();
-    sut.mapToRegions(mock(Holding.class), allocations, warnings, ExceptionCode.ERR_RRC_MC_001);
+    sut.mapToRegions(mock(Holding.class), allocations, warnings, ErrorCode.ERR_RRC_MC_001);
 
     // VERIFY
     assertEquals(1, warnings.size());
@@ -129,7 +129,7 @@ class CountryAllocationMappingServiceImplTest {
 
     // ACT
     final ArrayList<Warning> warnings = new ArrayList<>();
-    sut.mapToRegions(mock(Holding.class), allocations, warnings, ExceptionCode.ERR_RRC_MC_001);
+    sut.mapToRegions(mock(Holding.class), allocations, warnings, ErrorCode.ERR_RRC_MC_001);
 
     // VERIFY
     assertEquals(1, warnings.size());
@@ -150,7 +150,7 @@ class CountryAllocationMappingServiceImplTest {
 
     // ACT
     final ArrayList<Warning> warnings = new ArrayList<>();
-    sut.mapToRegions(mock(Holding.class), allocations, warnings, ExceptionCode.ERR_RRC_MC_001);
+    sut.mapToRegions(mock(Holding.class), allocations, warnings, ErrorCode.ERR_RRC_MC_001);
 
     // VERIFY
     assertEquals(1, warnings.size());
@@ -172,7 +172,7 @@ class CountryAllocationMappingServiceImplTest {
     doCallRealMethod().when(sut).mapToRegions(any(), any(), any(), any());
 
     // ACT
-    sut.mapToRegions(mock(Holding.class), allocations, new ArrayList<>(), ExceptionCode.ERR_RRC_MC_001);
+    sut.mapToRegions(mock(Holding.class), allocations, new ArrayList<>(), ErrorCode.ERR_RRC_MC_001);
 
     // VERIFY
     verify(sut).sumAllocations(argThat(Map::isEmpty), eq(BigDecimal.ONE), eq(CountryRegionType.CANADA));
@@ -190,10 +190,10 @@ class CountryAllocationMappingServiceImplTest {
 
     // ACT
     final List<Warning> warnings = List.of(mock(Warning.class));
-    sut.mapToCountryRegions(Map.of(h, allocations), warnings, ExceptionCode.ERR_RRC_MC_001);
+    sut.mapToCountryRegions(Map.of(h, allocations), warnings, ErrorCode.ERR_RRC_MC_001);
 
     // VERIFY
-    verify(sut).mapToRegions(h, allocations, warnings, ExceptionCode.ERR_RRC_MC_001);
+    verify(sut).mapToRegions(h, allocations, warnings, ErrorCode.ERR_RRC_MC_001);
   }
 
   @Test
@@ -206,13 +206,13 @@ class CountryAllocationMappingServiceImplTest {
     final List<Warning> warnings = List.of(mock(Warning.class));
 
     final Map<CountryRegionType, BigDecimal> emergingMarket = Map.of(CountryRegionType.EMERGING_MARKET, BigDecimal.ONE);
-    when(sut.mapToRegions(h, allocations, warnings, ExceptionCode.ERR_RRC_MC_001)).thenReturn(emergingMarket);
+    when(sut.mapToRegions(h, allocations, warnings, ErrorCode.ERR_RRC_MC_001)).thenReturn(emergingMarket);
 
     doCallRealMethod().when(sut).mapToCountryRegions(any(), any(), any());
 
     // ACT
     final Map<Holding, Map<CountryRegionType, BigDecimal>> actual = sut.mapToCountryRegions(Map.of(h, allocations),
-        warnings, ExceptionCode.ERR_RRC_MC_001);
+        warnings, ErrorCode.ERR_RRC_MC_001);
 
     // VERIFY
     assertEquals(Map.of(h, emergingMarket), actual);

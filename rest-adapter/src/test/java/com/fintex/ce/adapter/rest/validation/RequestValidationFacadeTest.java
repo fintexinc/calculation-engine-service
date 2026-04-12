@@ -1,233 +1,106 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.dto.command.AverageMerCommand;
-import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
-import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
-import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
-import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
-import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
+import com.fintex.ce.domain.dto.command.CalculationCommand;
 import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.dto.command.ReturnCommand;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.domain.exception.ReqValidationException;
+import com.fintex.ce.domain.model.enumeration.CalculationMetric;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class RequestValidationFacadeTest {
 
-  @Mock
-  private PeriodsReqDtoValidator periodsReqDtoValidator;
-  @Mock
-  private PeriodReqDtoForBenchmarkCalculationsValidator benchmarkPeriodsValidator;
-  @Mock
-  private TrailingTotalReturnsReqValidator trailingTotalReturnsValidator;
-  @Mock
-  private MaxDrawdownReqValidator maxDrawdownValidator;
-  @Mock
-  private MarRatioReqValidator marRatioValidator;
-  @Mock
-  private CorrelationReqValidator correlationValidator;
-  @Mock
-  private RollingTotalReturnsCalculationReqValidator rollingTotalReturnsValidator;
-  @Mock
-  private RollingCalculationReqDtoValidator rollingCalculationValidator;
-  @Mock
-  private RollingCorrelationReqValidator rollingCorrelationValidator;
-  @Mock
-  private LeadingTotalReturnsReqValidator leadingTotalReturnsValidator;
-  @Mock
-  private PortfolioHoldingsReqDtoValidator portfolioHoldingsValidator;
-  @Mock
-  private ReturnReqDtoValidator returnValidator;
-  @Mock
-  private AverageMerRequestValidator averageMerValidator;
-  @Mock
-  private CommonDatesRequestValidator commonDatesValidator;
-  @Mock
-  private BestWorstPeriodsReqValidator bestWorstPeriodsValidator;
-  @Mock
-  private TopCommonHoldingsReqValidator topCommonHoldingsValidator;
-  @Mock
-  private ClassificationAllocationReqValidator classificationAllocationValidator;
-  @Mock
-  private DistributionOfReturnsReqValidator distributionOfReturnsValidator;
-  @Mock
-  private IncomeForecastReqValidation incomeForecastValidator;
+  @Test
+  void shouldNotThrow_whenNoValidatorsRegisteredForMetric() {
+    RequestValidationFacade facade = new RequestValidationFacade(List.of());
+    PeriodCommand command = new PeriodCommand();
 
-  private RequestValidationFacade facade;
-
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-    facade = new RequestValidationFacade(
-        periodsReqDtoValidator,
-        benchmarkPeriodsValidator,
-        trailingTotalReturnsValidator,
-        maxDrawdownValidator,
-        marRatioValidator,
-        correlationValidator,
-        rollingTotalReturnsValidator,
-        rollingCalculationValidator,
-        rollingCorrelationValidator,
-        leadingTotalReturnsValidator,
-        portfolioHoldingsValidator,
-        returnValidator,
-        averageMerValidator,
-        commonDatesValidator,
-        bestWorstPeriodsValidator,
-        topCommonHoldingsValidator,
-        classificationAllocationValidator,
-        distributionOfReturnsValidator,
-        incomeForecastValidator);
+    assertThatCode(() -> facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS))
+        .doesNotThrowAnyException();
   }
 
   @Test
-  void validatePeriodsRequest_delegatesToPeriodsValidator() {
-    PeriodCommand dto = mock(PeriodCommand.class);
-    facade.validatePeriodsRequest(dto);
-    verify(periodsReqDtoValidator).validate(dto);
+  void shouldCallValidator_whenMetricMatches() {
+    RequestValidator validator = mock(RequestValidator.class);
+    when(validator.supportedMetrics()).thenReturn(List.of(CalculationMetric.TRAILING_TOTAL_RETURNS));
+    doNothing().when(validator).validate(any());
+
+    RequestValidationFacade facade = new RequestValidationFacade(List.of(validator));
+    PeriodCommand command = new PeriodCommand();
+
+    facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS);
+
+    verify(validator).validate(command);
   }
 
   @Test
-  void validateBenchmarkPeriodsRequest_delegatesToBenchmarkValidator() {
-    PeriodCommand dto = mock(PeriodCommand.class);
-    facade.validateBenchmarkPeriodsRequest(dto);
-    verify(benchmarkPeriodsValidator).validate(dto);
+  void shouldCollectAllErrors_whenMultipleValidatorsFail() {
+    RequestValidator validator1 = mock(RequestValidator.class);
+    RequestValidator validator2 = mock(RequestValidator.class);
+    when(validator1.supportedMetrics()).thenReturn(List.of(CalculationMetric.TRAILING_TOTAL_RETURNS));
+    when(validator2.supportedMetrics()).thenReturn(List.of(CalculationMetric.TRAILING_TOTAL_RETURNS));
+
+    ReqValidationException error1 = new ReqValidationException("Error 1");
+    ReqValidationException error2 = new ReqValidationException("Error 2");
+    doThrow(error1).when(validator1).validate(any());
+    doThrow(error2).when(validator2).validate(any());
+
+    RequestValidationFacade facade = new RequestValidationFacade(List.of(validator1, validator2));
+    PeriodCommand command = new PeriodCommand();
+
+    assertThatThrownBy(() -> facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS))
+        .isInstanceOf(ReqValidationException.class)
+        .satisfies(ex -> {
+          ReqValidationException composite = (ReqValidationException) ex;
+          assertThat(composite.getReqValidationExceptions()).hasSize(2);
+          assertThat(composite.getReqValidationExceptions()).containsExactly(error1, error2);
+        });
   }
 
   @Test
-  void validateTrailingTotalReturn_delegatesToTrailingValidator() {
-    PeriodCommand dto = mock(PeriodCommand.class);
-    facade.validateTrailingTotalReturn(dto);
-    verify(trailingTotalReturnsValidator).validate(dto);
+  void shouldNotThrow_whenAllValidatorsPass() {
+    RequestValidator validator1 = mock(RequestValidator.class);
+    RequestValidator validator2 = mock(RequestValidator.class);
+    when(validator1.supportedMetrics()).thenReturn(List.of(CalculationMetric.SHARPE_RATIO));
+    when(validator2.supportedMetrics()).thenReturn(List.of(CalculationMetric.SHARPE_RATIO));
+    doNothing().when(validator1).validate(any());
+    doNothing().when(validator2).validate(any());
+
+    RequestValidationFacade facade = new RequestValidationFacade(List.of(validator1, validator2));
+    PeriodCommand command = new PeriodCommand();
+
+    assertThatCode(() -> facade.validate(command, CalculationMetric.SHARPE_RATIO))
+        .doesNotThrowAnyException();
+
+    verify(validator1).validate(command);
+    verify(validator2).validate(command);
   }
 
   @Test
-  void validateMaxDrawdown_delegatesToMaxDrawdownValidator() {
-    PeriodCommand dto = mock(PeriodCommand.class);
-    facade.validateMaxDrawdown(dto);
-    verify(maxDrawdownValidator).validate(dto);
-  }
+  void shouldOnlyCallValidatorsForRequestedMetric() {
+    RequestValidator trailingValidator = mock(RequestValidator.class);
+    RequestValidator sharpeValidator = mock(RequestValidator.class);
+    when(trailingValidator.supportedMetrics()).thenReturn(List.of(CalculationMetric.TRAILING_TOTAL_RETURNS));
+    when(sharpeValidator.supportedMetrics()).thenReturn(List.of(CalculationMetric.SHARPE_RATIO));
 
-  @Test
-  void validateMarRatio_delegatesToMarRatioValidator() {
-    PeriodCommand dto = mock(PeriodCommand.class);
-    facade.validateMarRatio(dto);
-    verify(marRatioValidator).validate(dto);
-  }
+    RequestValidationFacade facade = new RequestValidationFacade(List.of(trailingValidator, sharpeValidator));
+    PeriodCommand command = new PeriodCommand();
 
-  @Test
-  void validateCorrelation_delegatesToCorrelationValidator() {
-    PeriodCommand dto = mock(PeriodCommand.class);
-    facade.validateCorrelation(dto);
-    verify(correlationValidator).validate(dto);
-  }
+    facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS);
 
-  @Test
-  void validateRollingTotalReturns_delegatesToRollingTotalReturnsValidator() {
-    RollingCalculationCommand dto = mock(RollingCalculationCommand.class);
-    facade.validateRollingTotalReturns(dto);
-    verify(rollingTotalReturnsValidator).validate(dto);
-  }
-
-  @Test
-  void validateRollingCalculation_delegatesToRollingCalculationValidator() {
-    RollingCalculationCommand dto = mock(RollingCalculationCommand.class);
-    facade.validateRollingCalculation(dto);
-    verify(rollingCalculationValidator).validate(dto);
-  }
-
-  @Test
-  void validateRollingCorrelation_delegatesToRollingCorrelationValidator() {
-    RollingCalculationCommand dto = mock(RollingCalculationCommand.class);
-    facade.validateRollingCorrelation(dto);
-    verify(rollingCorrelationValidator).validate(dto);
-  }
-
-  @Test
-  void validateLeadingTotalReturn_delegatesToLeadingTotalReturnsValidator() {
-    LeadingTotalReturnCommand dto = mock(LeadingTotalReturnCommand.class);
-    facade.validateLeadingTotalReturn(dto);
-    verify(leadingTotalReturnsValidator).validate(dto);
-  }
-
-  @Test
-  void validatePortfolioHoldingsRequest_delegatesToPortfolioHoldingsValidator() {
-    PortfolioHoldingsCommand dto = mock(PortfolioHoldingsCommand.class);
-    facade.validatePortfolioHoldingsRequest(dto);
-    verify(portfolioHoldingsValidator).validate(dto);
-  }
-
-  @Test
-  void validateReturnRequest_delegatesToReturnValidator() {
-    ReturnCommand dto = mock(ReturnCommand.class);
-    facade.validateReturnRequest(dto);
-    verify(returnValidator).validate(dto);
-  }
-
-  @Test
-  void validateAverageMerRequest_delegatesToAverageMerValidator() {
-    AverageMerCommand dto = mock(AverageMerCommand.class);
-    facade.validateAverageMerRequest(dto);
-    verify(averageMerValidator).validate(dto);
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  void validateCommonDatesRequest_delegatesToCommonDatesValidator() {
-    MultiplePortfoliosCommand dto = mock(MultiplePortfoliosCommand.class);
-    List<Holding> benchmarkHoldings = mock(List.class);
-    Set<MultiplePortfoliosCommand.Portfolio> portfolios = mock(Set.class);
-    when(dto.getBenchmarkHoldings()).thenReturn(benchmarkHoldings);
-    when(dto.getPortfolios()).thenReturn(portfolios);
-    facade.validateCommonDatesRequest(dto);
-    verify(commonDatesValidator).validate(benchmarkHoldings, portfolios);
-  }
-
-  @Test
-  void validateBestWorstPeriods_delegatesToBestWorstPeriodsValidator() {
-    BestWorstPeriodsCommand dto = mock(BestWorstPeriodsCommand.class);
-    facade.validateBestWorstPeriods(dto);
-    verify(bestWorstPeriodsValidator).validate(dto);
-  }
-
-  @Test
-  void validateTopCommonHoldings_delegatesToTopCommonHoldingsValidator() {
-    TopCommonHoldingsCommand dto = mock(TopCommonHoldingsCommand.class);
-    facade.validateTopCommonHoldings(dto);
-    verify(topCommonHoldingsValidator).validate(dto);
-  }
-
-  @Test
-  void validateClassificationAllocation_delegatesToClassificationAllocationValidator() {
-    PortfolioHoldingsCommand dto = mock(PortfolioHoldingsCommand.class);
-    facade.validateClassificationAllocation(dto);
-    verify(classificationAllocationValidator).validate(dto);
-  }
-
-  @Test
-  void validateDistributionOfReturns_delegatesToDistributionOfReturnsValidator() {
-    DistributionOfReturnsCommand dto = mock(DistributionOfReturnsCommand.class);
-    facade.validateDistributionOfReturns(dto);
-    verify(distributionOfReturnsValidator).validate(dto);
-  }
-
-  @Test
-  void validateIncomeForecast_delegatesToIncomeForecastValidator() {
-    IncomeForecastCommand dto = mock(IncomeForecastCommand.class);
-    facade.validateIncomeForecast(dto);
-    verify(incomeForecastValidator).validate(dto);
+    verify(trailingValidator).validate(command);
+    verify(sharpeValidator, never()).validate(any(CalculationCommand.class));
   }
 }

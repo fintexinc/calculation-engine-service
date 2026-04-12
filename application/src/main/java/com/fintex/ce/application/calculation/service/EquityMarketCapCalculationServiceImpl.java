@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.domain.model.enumeration.ExceptionCode.WRN_EMC_EMC_001;
+import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_EMC_EMC_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;

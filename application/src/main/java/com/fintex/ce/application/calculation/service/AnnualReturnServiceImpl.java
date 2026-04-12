@@ -48,8 +48,8 @@ public class AnnualReturnServiceImpl implements CalculationService<AnnualReturnR
         .getHoldings(), reqDTO.getCurrency(), SCALE_OF_TWO);
 
     final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPerformanceStartDate(), reqDTO
-            .getCustomPerformanceEndDate());
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(), reqDTO
+            .getCustomPed());
 
     return new CalculationDTO().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns).setWarnings(
         monthlyReturns.getErrorsAsWarnings());

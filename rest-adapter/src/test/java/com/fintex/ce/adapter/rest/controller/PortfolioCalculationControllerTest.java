@@ -2,10 +2,24 @@ package com.fintex.ce.adapter.rest.controller;
 
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
 import com.fintex.ce.adapter.rest.service.RestExceptionHandlingServiceImpl;
+import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
+import com.fintex.ce.adapter.rest.validation.RequestValidator;
+import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqValidator;
+import com.fintex.ce.adapter.rest.validation.validators.HoldingReqValidator;
+import com.fintex.ce.adapter.rest.validation.validators.PeriodReqValidator;
 import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.domain.dto.command.CalculationCommand;
+import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
+import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
+import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.domain.dto.command.ReturnCommand;
 import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+import com.fintex.ce.domain.model.holding.CashHolding;
+import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.domain.model.result.ErrorResult;
+import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
@@ -13,8 +27,10 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,9 +42,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationController.BASE_PATH;
@@ -61,7 +80,8 @@ class PortfolioCalculationControllerTest {
         .toList();
 
     var controller = new PortfolioCalculationController(
-        serviceList, new RestExceptionHandlingServiceImpl());
+        serviceList, new RestExceptionHandlingServiceImpl(),
+        new com.fintex.ce.adapter.rest.validation.RequestValidationFacade(java.util.List.of()));
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -114,7 +134,7 @@ class PortfolioCalculationControllerTest {
   @Test
   void shouldThrowException_whenUnknownMetricRequested() {
     String requestBody = """
-        {"metric": "trailing-total-returns"}
+        {"metric": "trailing-total-returns", "currency": "CAD"}
         """;
 
     assertThatThrownBy(() -> mockMvc.perform(
@@ -128,7 +148,7 @@ class PortfolioCalculationControllerTest {
   @Test
   void shouldThrowException_whenMetricInBodyMismatchesPathParameter() {
     String requestBody = """
-        {"metric": "sharpe-ratio", "holdings": []}
+        {"metric": "sharpe-ratio", "holdings": [], "currency": "CAD"}
         """;
 
     assertThatThrownBy(() -> mockMvc.perform(
@@ -159,5 +179,294 @@ class PortfolioCalculationControllerTest {
 
   static Stream<Arguments> calculationMetricArguments() {
     return CalculationTestDataProvider.calculationMetricArguments();
+  }
+
+  @Nested
+  class ValidationIntegration {
+
+    private MockMvc validatingMockMvc;
+    private ObjectMapper om;
+
+    @BeforeEach
+    void setUp() {
+      om = new ObjectMapper()
+          .registerModule(new JavaTimeModule())
+          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+      List<RequestValidator> validators = List.of(
+          new PeriodReqValidator(),
+          new CipsdGreaterThanCpedReqValidator(),
+          new HoldingReqValidator());
+      var facade = new RequestValidationFacade(validators);
+
+      List<CalculationService<?, ?>> services = new java.util.ArrayList<>();
+      for (CalculationMetric m : CalculationMetric.values()) {
+        CalculationService svc = mock(CalculationService.class);
+        lenient().when(svc.getMetric()).thenReturn(m);
+        lenient().when(svc.perform(any())).thenReturn(new ErrorResult() {});
+        services.add(svc);
+      }
+
+      var controller = new PortfolioCalculationController(services, new RestExceptionHandlingServiceImpl(), facade);
+      LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+      validator.afterPropertiesSet();
+      validatingMockMvc = MockMvcBuilders.standaloneSetup(controller)
+          .setControllerAdvice(new GlobalExceptionHandler())
+          .setMessageConverters(new MappingJackson2HttpMessageConverter(om))
+          .setValidator(validator)
+          .build();
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenPeriodIsInvalid() throws Exception {
+      PeriodCommand cmd = new PeriodCommand();
+      cmd.setMetric(CalculationMetric.STANDARD_DEVIATION);
+      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setHoldings(List.of());
+      cmd.setPeriods(Set.of("INVALID_PERIOD"));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/standard-deviation")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenCipsdIsAfterCped() throws Exception {
+      PeriodCommand cmd = new PeriodCommand();
+      cmd.setMetric(CalculationMetric.SHARPE_RATIO);
+      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setHoldings(List.of());
+      cmd.setPeriods(Set.of("12"));
+      cmd.setCustomIntervalPsd(LocalDate.of(2025, 12, 31));
+      cmd.setCustomPed(LocalDate.of(2024, 1, 31));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/sharpe-ratio")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenCashHoldingHasNullCurrency() throws Exception {
+      Holding cashHolding = CashHolding.builder()
+          .value(BigDecimal.valueOf(100))
+          .holdingType(FinancialInstrumentType.CASH)
+          .build();
+
+      PeriodCommand cmd = new PeriodCommand();
+      cmd.setMetric(CalculationMetric.TRAILING_TOTAL_RETURNS);
+      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setPeriods(Set.of("12"));
+      cmd.setHoldings(List.of(cashHolding));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/trailing-total-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenBestWorstPeriodExceedsLimit() throws Exception {
+      BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
+      cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
+      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setHoldings(List.of());
+      cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
+      cmd.setCustomPed(LocalDate.of(2024, 12, 31));
+      cmd.setBestWorstTimeIntervalPeriods(Set.of(301L));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/best-worst-periods")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("ERR_BWP_BWPTIP_002")));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenCustomNumberOfBinsBelowMinimum() throws Exception {
+      DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
+      cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
+      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setHoldings(List.of());
+      cmd.setPeriods(Set.of("12"));
+      cmd.setCustomNumberOfBins(4);
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/distribution-of-monthly-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("ERR_RRC_CNOB_001")));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenCustomNumberOfBinsAboveMaximum() throws Exception {
+      DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
+      cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
+      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setHoldings(List.of());
+      cmd.setPeriods(Set.of("12"));
+      cmd.setCustomNumberOfBins(31);
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/distribution-of-monthly-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("ERR_RRC_CNOB_002")));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenIncomeForecastTimeIntervalIsZero() throws Exception {
+      IncomeForecastCommand cmd = new IncomeForecastCommand();
+      cmd.setMetric(CalculationMetric.INCOME_FORECAST);
+      cmd.setTimeIntervalPeriods(0);
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/income-forecast")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("ERR_RRC_TIP_003")));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenIncomeForecastTimeIntervalIsNegative() throws Exception {
+      IncomeForecastCommand cmd = new IncomeForecastCommand();
+      cmd.setMetric(CalculationMetric.INCOME_FORECAST);
+      cmd.setTimeIntervalPeriods(-12);
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/income-forecast")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("ERR_RRC_TIP_003")));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenBestWorstPeriodIsZero() throws Exception {
+      BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
+      cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
+      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setHoldings(List.of());
+      cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
+      cmd.setCustomPed(LocalDate.of(2024, 12, 31));
+      cmd.setBestWorstTimeIntervalPeriods(Set.of(0L));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/best-worst-periods")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("ERR_BWP_BWPTIP_001")));
+    }
+
+    @Test
+    void shouldPassValidation_whenBestWorstPeriodIsAtBoundaryValues() throws Exception {
+      BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
+      cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
+      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setHoldings(List.of());
+      cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
+      cmd.setCustomPed(LocalDate.of(2024, 12, 31));
+      cmd.setBestWorstTimeIntervalPeriods(Set.of(1L, 300L));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/best-worst-periods")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldPassValidation_whenNumberOfBinsIsAtBoundaryValues() throws Exception {
+      DistributionOfReturnsCommand lowerBoundCmd = new DistributionOfReturnsCommand();
+      lowerBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
+      lowerBoundCmd.setCurrency(CurrencyType.CAD);
+      lowerBoundCmd.setHoldings(List.of());
+      lowerBoundCmd.setPeriods(Set.of("12"));
+      lowerBoundCmd.setCustomNumberOfBins(5);
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/distribution-of-monthly-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(lowerBoundCmd)))
+          .andExpect(status().isOk());
+
+      DistributionOfReturnsCommand upperBoundCmd = new DistributionOfReturnsCommand();
+      upperBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
+      upperBoundCmd.setCurrency(CurrencyType.CAD);
+      upperBoundCmd.setHoldings(List.of());
+      upperBoundCmd.setPeriods(Set.of("12"));
+      upperBoundCmd.setCustomNumberOfBins(30);
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/distribution-of-monthly-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(upperBoundCmd)))
+          .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenPortfolioCommandCurrencyIsMissing() throws Exception {
+      PeriodCommand cmd = new PeriodCommand();
+      cmd.setMetric(CalculationMetric.SHARPE_RATIO);
+      cmd.setHoldings(List.of());
+      cmd.setPeriods(Set.of("12"));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/sharpe-ratio")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("must not be null")));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenReturnCommandCurrencyIsMissing() throws Exception {
+      ReturnCommand cmd = new ReturnCommand();
+      cmd.setMetric(CalculationMetric.ANNUAL_RETURNS);
+      cmd.setHoldings(List.of());
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/annual-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("must not be null")));
+    }
+
+    @Test
+    void shouldReturnAllViolations_whenMultipleJakartaConstraintsFailOnOneRequest() throws Exception {
+      DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
+      cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
+      cmd.setHoldings(List.of());
+      cmd.setPeriods(Set.of("12"));
+      cmd.setCustomNumberOfBins(999);
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/distribution-of-monthly-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("ERR_RRC_CNOB_002")))
+          .andExpect(content().string(
+              org.hamcrest.Matchers.containsString("must not be null")));
+    }
   }
 }
