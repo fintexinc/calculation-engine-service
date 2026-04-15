@@ -5,9 +5,6 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -17,14 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Profile("dev")
 @Component
 @ConfigurationProperties(prefix = "sms.runner")
 @Setter
 public class SecurityMasterServiceRunner implements SmartLifecycle {
-
-  private static final Logger log = LoggerFactory.getLogger(SecurityMasterServiceRunner.class);
 
   private String path = "../security-master-service-v2";
   private String envFile = "environment-v2/.env";
@@ -105,7 +102,7 @@ public class SecurityMasterServiceRunner implements SmartLifecycle {
     try (BufferedReader reader = Files.newBufferedReader(path)) {
       return reader.lines()
           .map(String::trim)
-          .filter(line -> !line.isEmpty() && !line.startsWith("#") && line.contains("="))
+          .filter(line -> !line.startsWith("#") && line.contains("="))
           .collect(Collectors.toMap(
               line -> line.substring(0, line.indexOf('=')),
               line -> line.substring(line.indexOf('=') + 1),

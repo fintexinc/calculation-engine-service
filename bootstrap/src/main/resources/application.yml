@@ -92,10 +92,14 @@ management:
 
 logging:
   pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-},%X{requestId:-}]"
   level:
     root: INFO
     com.fintex.ce: DEBUG
+  http:
+    # Defaults for headers/query/payload logging are intentionally `false`
+    # (see HttpLoggingProperties). Override per environment to opt in.
+    enabled: true
 
 springdoc:
   api-docs:
@@ -103,6 +107,3 @@ springdoc:
     version: openapi_3_0
   swagger-ui:
     path: /api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui
-
-performance-monitor-duration:
-  info-threshold: 59000 #59 seconds

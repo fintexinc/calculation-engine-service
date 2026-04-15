@@ -1,5 +1,7 @@
-package com.fintex.ce.adapter.rest.config;
+package com.fintex.ce.adapter.rest.logging;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import org.slf4j.MDC;
@@ -30,6 +32,8 @@ import static java.util.Objects.nonNull;
  */
 @Component
 @RequiredArgsConstructor
+@Order(Ordered.HIGHEST_PRECEDENCE)
+// TODO: in TMI-359 for implementing TNG headers and tracing between services remove this or adapt.
 public class MDCInsertingServletFilter implements Filter {
 
   public static final String TRACE_ID = "TraceId";
