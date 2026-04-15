@@ -32,24 +32,10 @@
         </dependency>
 
 
-
-
         <!-- Micrometer Tracing API -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-tracing</artifactId>
-        </dependency>
-
-        <!-- AspectJ for AOP -->
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-        </dependency>
-
-        <!-- Spring AOP -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <!-- Lombok -->

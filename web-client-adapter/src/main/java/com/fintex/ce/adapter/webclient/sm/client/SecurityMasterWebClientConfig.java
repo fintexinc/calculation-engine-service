@@ -37,7 +37,7 @@ public class SecurityMasterWebClientConfig {
 
     if (properties.isLogBody()) {
       httpClient = httpClient.wiretap(
-          "reactor.netty.http.client.HttpClient", LogLevel.DEBUG, AdvancedByteBufFormat.TEXTUAL);
+          "reactor.netty.http.client.HttpClient", LogLevel.TRACE, AdvancedByteBufFormat.TEXTUAL);
     }
 
     WebClient.Builder builder = webClientBuilder

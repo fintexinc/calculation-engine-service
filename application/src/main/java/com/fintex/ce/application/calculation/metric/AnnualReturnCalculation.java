@@ -13,13 +13,13 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import static com.fintex.ce.util.CalculationUtils.product;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
 
-@Log4j2
+@Slf4j
 public class AnnualReturnCalculation {
 
   private final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns;
@@ -63,8 +63,7 @@ public class AnnualReturnCalculation {
       }
       final NavigableMap<LocalDate, BigDecimal> subMap = portfolioReturns.subMap(startDate, true, endDate, true);
       if (subMap.size() < 12) {
-        log.warn(String.format("Portfolio Returns are missing a few months between period: %s - %s", startDate,
-            endDate));
+        log.warn("Portfolio Returns are missing a few months between period: {} - {}", startDate, endDate);
         continue;
       }
       final BigDecimal product = product(subMap).subtract(ONE);

@@ -1,22 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <!-- Use Spring Boot default appender for dev profile -->
-    <springProfile name="dev">
-        <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    </springProfile>
-
-    <!-- Use default console appender for other profiles -->
-    <springProfile name="!dev">
-        <root level="DEBUG">
-            <appender-ref ref="consoleAppender"/>
-        </root>
-    </springProfile>
+    <!--
+      Delegate to Spring Boot's default logback configuration so that
+      `logging.level.*` and `logging.pattern.*` from application.yml
+      (including MDC fields like traceId/spanId/requestId) are respected
+      uniformly across all profiles. Per-environment level/pattern
+      overrides belong in the application-*.yml files, not here.
+    -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
 </configuration>
