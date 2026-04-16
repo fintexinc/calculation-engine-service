@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
-import com.fintex.sm.model.domain.rating.CreditQualityRatings;
+import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatings;
 
 import org.springframework.stereotype.Component;
 

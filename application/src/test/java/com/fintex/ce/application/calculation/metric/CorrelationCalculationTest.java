@@ -1,15 +1,15 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.CorrelationResult;
-import com.fintex.ce.domain.model.result.correlation.CorrelationKeyValueResult;
-import com.fintex.ce.domain.model.result.correlation.CorrelationPeriodResult;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
+import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
+import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.util.BigDecimalConstants;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
+import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

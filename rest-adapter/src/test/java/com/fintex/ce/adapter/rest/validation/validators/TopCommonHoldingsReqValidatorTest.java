@@ -1,12 +1,12 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.holding.GicHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 

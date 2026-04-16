@@ -1,6 +1,6 @@
 package com.fintex.ce.application.returns;
 
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

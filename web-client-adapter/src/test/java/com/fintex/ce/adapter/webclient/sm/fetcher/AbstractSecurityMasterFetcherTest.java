@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -60,7 +60,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     identifier.setIdType(FiIdentifierType.TICKER);
 
     when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
-        .thenReturn(List.of(new SecurityAttributeResult<>(identifier, smsResponse)));
+        .thenReturn(List.of(securityAttributeResult(identifier, smsResponse)));
     when(mapper().map(smsResponse, holding)).thenReturn(expected);
 
     Map<Holding, D> result = fetcher().fetch(
@@ -130,7 +130,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     identifier.setIdType(FiIdentifierType.TICKER);
 
     when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
-        .thenReturn(List.of(new SecurityAttributeResult<>(identifier, smsResponse)));
+        .thenReturn(List.of(securityAttributeResult(identifier, smsResponse)));
     when(mapper().map(smsResponse, validHolding)).thenReturn(expected);
 
     Map<Holding, D> result = fetcher().fetch(
@@ -160,8 +160,8 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
     when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(List.of(
-            new SecurityAttributeResult<>(id1, smsResponse1),
-            new SecurityAttributeResult<>(id2, smsResponse2)));
+            securityAttributeResult(id1, smsResponse1),
+            securityAttributeResult(id2, smsResponse2)));
     when(mapper().map(smsResponse1, holding1)).thenReturn(expected1);
     when(mapper().map(smsResponse2, holding2)).thenReturn(expected2);
 
@@ -178,5 +178,12 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     identifier.setId(id);
     identifier.setIdType(idType);
     return new Holding(null, holdingType, identifier);
+  }
+
+  private static <T> SecurityAttributeResult<T> securityAttributeResult(SecurityIdentifier identifier, T data) {
+    SecurityAttributeResult<T> result = new SecurityAttributeResult<>();
+    result.setIdentifier(identifier);
+    result.setData(data);
+    return result;
   }
 }

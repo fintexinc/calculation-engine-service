@@ -4,11 +4,11 @@ import com.fintex.ce.application.calculation.metric.RollingTotalReturnsCalculati
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.result.RollingTotalReturnsResult;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -50,11 +50,12 @@ public class RollingTotalReturnsCalculationServiceImpl
   @Override
   public CalculationDTO buildCalculationDto(final RollingCalculationCommand reqDTO,
       final ReturnFactorScale returnFactorScale) {
-    final Returns monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(
+    final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
         reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale);
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(), reqDTO.getCustomPed());
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+            .getCustomPed());
 
     return new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
   }

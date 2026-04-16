@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.RollingAbstractCalculation;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.model.result.RollingSharpeRatioResult;
+import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 

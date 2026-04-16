@@ -1,12 +1,12 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.BestWorstPeriodCalculation;
-import com.fintex.ce.application.returns.Returns;
+import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.calculation.CalculationService;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.result.BestWorstPeriodsResult;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,11 +52,12 @@ public class BestWorstPeriodsCalculationServiceImpl
   }
 
   public CalculationDTO buildWeightedAverageInputDto(final BestWorstPeriodsCommand reqDTO) {
-    final Returns monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO
-        .getCurrency(), SCALE_OF_TWO);
+    final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO
+        .getHoldings(), reqDTO
+            .getCurrency(), SCALE_OF_TWO);
 
     final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
             .getCustomPed());
 
     return new CalculationDTO().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns);

@@ -4,16 +4,16 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapping.response.AssetAllocationResponseMapper;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.AssetAllocationResult;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
-import com.fintex.sm.model.DataProvider;
+import com.fintex.wm.commons.domain.DataProvider;
 
 import org.springframework.stereotype.Service;
 

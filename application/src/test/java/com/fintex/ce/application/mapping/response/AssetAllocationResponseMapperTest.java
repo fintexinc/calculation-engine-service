@@ -1,10 +1,10 @@
 package com.fintex.ce.application.mapping.response;
 
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegionType;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.result.AssetAllocationResult;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
+import com.fintex.ce.model.error.Warning;
 
 import org.junit.jupiter.api.Test;
 

@@ -2,12 +2,12 @@ package com.fintex.ce.application.calculation.service.period.core;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.result.PeriodResult;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.result.PeriodResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -91,15 +91,15 @@ class PeriodAbstractServiceTest {
 
     final var req = mock(PeriodCommand.class);
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
     final var portfolioTotalReturns = mock(NavigableMap.class);
 
     when(req.getHoldings()).thenReturn(new ArrayList<>());
-    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(req.getCurrency()).thenReturn(Currency.CAD);
     when(req.getCustomPed()).thenReturn(LocalDate.now().plusMonths(5));
     when(req.getCustomIntervalPsd()).thenReturn(LocalDate.now().minusMonths(3));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), CurrencyType.CAD,
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
@@ -122,15 +122,15 @@ class PeriodAbstractServiceTest {
 
     final var req = mock(PeriodCommand.class);
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
     final var portfolioTotalReturns = mock(NavigableMap.class);
 
     when(req.getHoldings()).thenReturn(new ArrayList<>());
-    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(req.getCurrency()).thenReturn(Currency.CAD);
     when(req.getCustomPed()).thenReturn(LocalDate.now().plusMonths(5));
     when(req.getCustomIntervalPsd()).thenReturn(LocalDate.now().minusMonths(3));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), CurrencyType.CAD,
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
@@ -142,7 +142,7 @@ class PeriodAbstractServiceTest {
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
     sut.buildCalculationDto(req, returnFactorScale);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), CurrencyType.CAD,
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
   }
 
@@ -154,15 +154,15 @@ class PeriodAbstractServiceTest {
 
     final var req = mock(PeriodCommand.class);
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
     final var portfolioTotalReturns = mock(NavigableMap.class);
 
     when(req.getHoldings()).thenReturn(new ArrayList<>());
-    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(req.getCurrency()).thenReturn(Currency.CAD);
     when(req.getCustomPed()).thenReturn(LocalDate.now().plusMonths(5));
     when(req.getCustomIntervalPsd()).thenReturn(LocalDate.now().minusMonths(3));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), CurrencyType.CAD,
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);

@@ -4,13 +4,13 @@ import com.fintex.ce.application.calculation.metric.CorrelationCalculation;
 import com.fintex.ce.application.calculation.metric.RollingCorrelationCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.RollingCorrelationResult;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
+import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
+import com.fintex.ce.model.error.Notification;
 import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -54,10 +54,11 @@ public class RollingCorrelationCalculationServiceImpl
   }
 
   public Map<Holding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand reqDTO) {
-    Returns monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO
-        .getCurrency(), ReturnFactorScale.SCALE_OF_TWO);
+    ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(),
+        reqDTO
+            .getCurrency(), ReturnFactorScale.SCALE_OF_TWO);
 
-    return monthlyReturns
+    return monthlyReturnsAggregate
         .validateCped(reqDTO.getCustomPed())
         .cutByCpedIfCpedEmptyCutByPed(reqDTO.getCustomPed())
         .fxRatesApplied()
@@ -69,20 +70,20 @@ public class RollingCorrelationCalculationServiceImpl
       ReturnFactorScale returnFactorScale) {
     Notification notification = new Notification();
 
-    Returns portfolioMonthlyReturns = notification.tryCatch(() -> monthlyReturnsService
+    ReturnsAggregate portfolioMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
         .getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale));
-    Returns benchmarkMonthlyReturns = notification.tryCatch(() -> monthlyReturnsService
+    ReturnsAggregate benchmarkMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
         .getBenchmarkMonthlyReturns(reqDTO.getBenchmarkHoldings(), reqDTO.getCurrency(), returnFactorScale));
     notification.ifAnyErrorThrowException();
 
-    portfolioMonthlyReturns.cutArgumentToTheSameEndDate(benchmarkMonthlyReturns);
-    benchmarkMonthlyReturns.cutArgumentToTheSameEndDate(portfolioMonthlyReturns);
+    portfolioMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate);
+    benchmarkMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate);
 
     NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = notification.tryCatch(() -> monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturns, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
             .getCustomPed()));
     NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = notification.tryCatch(() -> monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(benchmarkMonthlyReturns, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(benchmarkMonthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
             .getCustomPed()));
     notification.ifAnyErrorThrowException();
 

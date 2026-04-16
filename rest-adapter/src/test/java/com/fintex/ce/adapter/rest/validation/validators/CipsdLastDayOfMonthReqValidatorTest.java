@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import java.time.LocalDate;
 
@@ -18,7 +18,7 @@ class CipsdLastDayOfMonthReqValidatorTest extends AbstractLastDayOfMonthReqValid
   CalculationCommand createCommandWithDate(LocalDate date) {
     PeriodCommand command = new PeriodCommand();
     command.setCustomIntervalPsd(date);
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
     return command;
   }
 

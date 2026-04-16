@@ -1,11 +1,11 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
-import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.model.result.PeriodResult;
-import com.fintex.ce.domain.model.result.StandardDeviationResult;
-import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.PeriodResult;
+import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.util.BigDecimalConstants;
 import com.fintex.ce.util.CalculationUtils;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -19,7 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.DecimalUtils.INTERNAL_SCALE;
 import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.DecimalUtils.pow;

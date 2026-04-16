@@ -2,11 +2,11 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.CorrelationCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ class CorrelationServiceImplTest {
     final var sut = mock(CorrelationServiceImpl.class,
         withSettings().useConstructor(Set.of(), monthlyReturnsService));
 
-    final Returns monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     final Map baseTotalReturns = mock(Map.class);
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
 
@@ -44,23 +44,23 @@ class CorrelationServiceImplTest {
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getCustomIntervalPsd()).thenReturn(LocalDate.now());
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturnsAggregate);
 
-    when(monthlyReturns
+    when(monthlyReturnsAggregate
         .validateCped(reqDTO.getCustomPed())
         .validateReturns()
         .cutByCpedIfCpedEmptyCutByPed(reqDTO.getCustomPed())
         .fxRatesApplied()
         .getReturnsMap()).thenReturn(baseTotalReturns);
 
-    when(monthlyReturns.cutByPsd().getWeightedAverage()).thenReturn(portfolioTotalReturns);
+    when(monthlyReturnsAggregate.cutByPsd().getWeightedAverage()).thenReturn(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     sut.defineCalculationMethod(reqDTO);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD,
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
   }
 
@@ -70,7 +70,7 @@ class CorrelationServiceImplTest {
     final var sut = mock(CorrelationServiceImpl.class,
         withSettings().useConstructor(Set.of(), monthlyReturnsService));
 
-    final Returns monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     final Map baseTotalReturns = mock(Map.class);
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
 
@@ -79,17 +79,17 @@ class CorrelationServiceImplTest {
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getCustomIntervalPsd()).thenReturn(LocalDate.now());
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturnsAggregate);
 
-    when(monthlyReturns
+    when(monthlyReturnsAggregate
         .validateCped(reqDTO.getCustomPed())
         .cutByCpedIfCpedEmptyCutByPed(reqDTO.getCustomPed())
         .fxRatesApplied()
         .getReturnsMap()).thenReturn(baseTotalReturns);
 
-    when(monthlyReturns.cutByPsd().getWeightedAverage()).thenReturn(portfolioTotalReturns);
+    when(monthlyReturnsAggregate.cutByPsd().getWeightedAverage()).thenReturn(portfolioTotalReturns);
 
     final CalculationDTO calculationDTO = new CalculationDTO()
         .setCipsd(reqDTO.getCustomIntervalPsd())
@@ -111,7 +111,7 @@ class CorrelationServiceImplTest {
     CalculationDTO inputDTO = mock(CalculationDTO.class);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any()))
-        .thenReturn(mock(Returns.class, RETURNS_SELF));
+        .thenReturn(mock(ReturnsAggregate.class, RETURNS_SELF));
 
     when(sut.buildCalculationDto(any(), any())).thenReturn(inputDTO);
     when(inputDTO.getCipsd()).thenReturn(LocalDate.now());

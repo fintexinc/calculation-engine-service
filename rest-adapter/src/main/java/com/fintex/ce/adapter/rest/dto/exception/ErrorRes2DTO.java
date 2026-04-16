@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.dto.exception;
 
-import com.fintex.ce.domain.exception.DataErrorException;
+import com.fintex.ce.model.error.exceptions.DataErrorException;
 
 import lombok.Data;
 

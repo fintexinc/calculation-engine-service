@@ -1,14 +1,14 @@
 package com.fintex.ce.adapter.webclient.sm.integration;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.integration.fixture.FeesSmsResponseAppender;
 import com.fintex.ce.adapter.webclient.sm.integration.fixture.FeesSmsResponseAppender.FeesValues;
-import com.fintex.ce.domain.model.FeeData;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.calculation.fee.FeeData;
+import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.domain.datapoint.Fees;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.financial.Fees;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

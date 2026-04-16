@@ -1,12 +1,12 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.CorrelationResult;
-import com.fintex.ce.domain.model.result.correlation.CorrelationKeyValueResult;
-import com.fintex.ce.domain.model.result.correlation.CorrelationPeriodResult;
-import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
+import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
+import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
+import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.util.CalculationUtils;
 
 import org.springframework.util.CollectionUtils;
@@ -24,8 +24,8 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.DecimalUtils.pow;
 import static com.fintex.ce.util.DecimalUtils.squareRoot;

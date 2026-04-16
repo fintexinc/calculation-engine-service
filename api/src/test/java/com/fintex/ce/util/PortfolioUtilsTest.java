@@ -1,13 +1,13 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.EquitySecurityIdentifier;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
-import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,8 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AAA;
-import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
+import static com.fintex.wm.commons.domain.currency.Currency.CAD;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.AAA;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
@@ -62,10 +62,8 @@ class PortfolioUtilsTest {
 
   @Test
   void areAllValuesZerosInMap_checkResultWhenAllValuesInMapAreZeros() {
-    // SETUP
     final Map<Holding, Map<EquityMarketCapitalizationType, BigDecimal>> map = Map.of(new Holding(null, null, null), Map
         .of(EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO));
-    // ACT
     final boolean actual = PortfolioUtils.areAllValuesZerosInMap(map);
 
     assertTrue(actual);
@@ -73,11 +71,9 @@ class PortfolioUtilsTest {
 
   @Test
   void areAllValuesZerosInMap_checkResultWhenNotAllValuesInMapAreZeros() {
-    // SETUP
     final Map<Holding, Map<EquityMarketCapitalizationType, BigDecimal>> map = Map.of(new Holding(null, null, null), Map
         .of(EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO,
             EquityMarketCapitalizationType.LARGE, ONE));
-    // ACT
     final boolean actual = PortfolioUtils.areAllValuesZerosInMap(map);
 
     assertFalse(actual);

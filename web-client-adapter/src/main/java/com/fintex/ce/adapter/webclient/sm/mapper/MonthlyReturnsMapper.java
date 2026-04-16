@@ -1,11 +1,11 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.HoldingMonthlyReturns;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.enumeration.Country;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import com.fintex.sm.model.domain.performance.MonthlyReturns;
-import com.fintex.sm.model.domain.value.DateBigDecimalValue;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.performance.MonthlyReturns;
+import com.fintex.wm.commons.domain.value.DateBigDecimalValue;
 
 import org.springframework.stereotype.Component;
 
@@ -17,17 +17,14 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-/**
- * Maps Security Master MonthlyReturns response to PCE HoldingMonthlyReturns domain model.
- */
 @Component
 public class MonthlyReturnsMapper
     implements
       SecurityMasterResponseMapper<HoldingMonthlyReturns, MonthlyReturns> {
 
-  private static final Map<Country, CurrencyType> COUNTRY_CURRENCY_MAP = Map.of(
-      Country.CANADA, CurrencyType.CAD,
-      Country.USA, CurrencyType.USD);
+  private static final Map<Country, Currency> COUNTRY_CURRENCY_MAP = Map.of(
+      Country.CANADA, Currency.CAD,
+      Country.USA, Currency.USD);
 
   @Override
   public HoldingMonthlyReturns map(MonthlyReturns smsResponse, Holding holding) {
@@ -59,7 +56,7 @@ public class MonthlyReturnsMapper
     return Optional.ofNullable(holding.getHoldingType())
         .map(type -> type.getCountry())
         .map(COUNTRY_CURRENCY_MAP::get)
-        .map(CurrencyType::name)
+        .map(Currency::name)
         .orElse(null);
   }
 }

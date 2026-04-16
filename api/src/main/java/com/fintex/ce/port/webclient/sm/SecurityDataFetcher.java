@@ -1,7 +1,7 @@
 package com.fintex.ce.port.webclient.sm;
 
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.DataProvider;
 
 import java.util.List;
 import java.util.Map;

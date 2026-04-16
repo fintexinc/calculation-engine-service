@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.integration.fixture;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
 
 import java.util.List;
 

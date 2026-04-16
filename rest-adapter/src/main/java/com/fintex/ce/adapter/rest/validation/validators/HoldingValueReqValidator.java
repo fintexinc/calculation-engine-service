@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.HoldingsProvider;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.dto.command.HoldingsProvider;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static com.fintex.ce.domain.model.enumeration.CalculationMetric.*;
+import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 
 @Component
 @Order(410)

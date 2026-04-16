@@ -1,16 +1,16 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.command.AverageMerCommand;
-import com.fintex.ce.domain.exception.FdsDataValidationException;
-import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
-import com.fintex.ce.domain.model.enumeration.ParameterType;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.ManagementFeeResult;
+import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
+import com.fintex.ce.model.domain.enumeration.ParameterType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
+import com.fintex.ce.model.dto.command.AverageMerCommand;
+import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.exceptions.FdsDataValidationException;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,13 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_MF_MF_001;
-import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
-import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
-import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.ETF_CANADA;
-import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.ETF_US;
-import static com.fintex.sm.model.domain.enumeration.FinancialInstrumentType.MUTUAL_FUND_CANADA;
+import static com.fintex.ce.model.domain.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.model.domain.enumeration.ParameterType.SCALED;
+import static com.fintex.ce.model.error.ErrorCode.ERR_MF_MF_001;
+import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
+import static com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType.ETF_CANADA;
+import static com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType.ETF_US;
+import static com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType.MUTUAL_FUND_CANADA;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;

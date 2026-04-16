@@ -1,15 +1,15 @@
 package com.fintex.ce.adapter.webclient.sm.integration;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.integration.fixture.AssetAllocationSmsResponseAppender;
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.allocation.AssetAllocation;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.value.NameValue;
+import com.fintex.wm.commons.domain.allocation.AssetAllocation;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.domain.value.NameValue;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -138,6 +138,6 @@ class AssetAllocationSecurityDataFetcherTest
     SecurityIdentifier identifier = createSecurityIdentifier("NOT_REQUESTED", FiIdentifierType.TICKER);
     AssetAllocation allocation = new AssetAllocation();
     allocation.setAllocation(List.of(new NameValue("EQUITY", new BigDecimal("1.0"))));
-    return new SecurityAttributeResult<>(identifier, allocation);
+    return securityAttributeResult(identifier, allocation);
   }
 }

@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.allocation.AssetAllocation;
-import com.fintex.sm.model.domain.value.NameValue;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.allocation.AssetAllocation;
+import com.fintex.wm.commons.domain.value.NameValue;
 
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class AssetAllocationSecurityMasterMapper
       SecurityMasterResponseMapper<HoldingAssetAllocation, AssetAllocation> {
 
   @Override
-  public HoldingAssetAllocation map(com.fintex.sm.model.domain.allocation.AssetAllocation smsResponse,
+  public HoldingAssetAllocation map(AssetAllocation smsResponse,
       Holding holding) {
     Map<String, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
         .map(AssetAllocation::getAllocation)

@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.EquitySector;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.allocation.EquitySectorAllocation;
-import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
-import com.fintex.sm.model.domain.value.EquitySectorAllocationTypeNameValue;
+import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeNameValue;
 
 import org.springframework.stereotype.Component;
 

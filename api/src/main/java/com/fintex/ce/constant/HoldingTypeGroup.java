@@ -1,6 +1,6 @@
 package com.fintex.ce.constant;
 
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.util.Set;
 import lombok.experimental.UtilityClass;

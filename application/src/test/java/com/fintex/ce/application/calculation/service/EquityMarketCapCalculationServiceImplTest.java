@@ -1,15 +1,15 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.EquityMarketCapResult;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,11 +24,11 @@ import java.util.Set;
 
 import static com.fintex.ce.application.calculation.service.EquityMarketCapCalculationServiceImpl.DEFAULT_MAP;
 import static com.fintex.ce.application.calculation.service.EquityMarketCapCalculationServiceImpl.GROUPS;
-import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.GIANT;
-import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.LARGE;
-import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.MEDIUM;
-import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.MICRO;
-import static com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType.SMALL;
+import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.GIANT;
+import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.LARGE;
+import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.MEDIUM;
+import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.MICRO;
+import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.SMALL;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;

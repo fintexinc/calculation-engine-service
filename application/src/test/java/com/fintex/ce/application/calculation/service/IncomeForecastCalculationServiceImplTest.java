@@ -1,18 +1,17 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
-import com.fintex.ce.domain.model.Income;
-import com.fintex.ce.domain.model.IncomeForecast;
-import com.fintex.ce.domain.model.enumeration.InterestFreq;
-import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.IncomeForecastResult;
+import com.fintex.ce.model.domain.calculation.distribution.Income;
+import com.fintex.ce.model.domain.calculation.yield.IncomeForecast;
+import com.fintex.ce.model.domain.enumeration.InterestFreq;
+import com.fintex.ce.model.domain.holding.GicHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
+import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -242,7 +241,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getIssueDate()).thenReturn("2023-01-01");
     Mockito.when(incomeForecast.getMaturityDate()).thenReturn("2025-12-30");
-    Mockito.when(incomeForecast.getPaymentFrequencyType()).thenReturn(PaymentFrequencyType.AT_MATURITY.name());
+    Mockito.when(incomeForecast.getPaymentFrequencyType()).thenReturn("AT_MATURITY");
 
     // ACT
     final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);

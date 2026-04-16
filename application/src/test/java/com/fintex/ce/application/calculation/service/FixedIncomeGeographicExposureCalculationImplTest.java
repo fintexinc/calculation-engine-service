@@ -1,11 +1,11 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.CountryExposure;
-import com.fintex.ce.domain.model.calculation.GeographicRegionType;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.FixedIncomeGeographicExposureResult;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
+import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
+import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.exposure.FixedIncomeGeographicExposureResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;

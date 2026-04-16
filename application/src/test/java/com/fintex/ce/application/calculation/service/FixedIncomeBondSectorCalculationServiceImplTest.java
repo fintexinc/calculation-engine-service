@@ -1,16 +1,16 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
+import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

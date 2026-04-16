@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
-import com.fintex.ce.domain.model.calculation.DistributionData;
-import com.fintex.ce.domain.model.enumeration.DailyResultType;
+import com.fintex.ce.model.domain.calculation.distribution.DistributionData;
+import com.fintex.ce.model.domain.enumeration.DailyResultType;
 
 import java.time.LocalDate;
 import java.util.HashMap;

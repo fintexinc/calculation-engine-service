@@ -1,17 +1,17 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.config.DefaultDataProperties;
-import com.fintex.ce.domain.dto.command.AverageMerCommand;
-import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.domain.model.AverageManagementExpenseCalculation;
-import com.fintex.ce.domain.model.FeeData;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.enumeration.ParameterType;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.AverageMerResult;
+import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
+import com.fintex.ce.model.domain.calculation.fee.FeeData;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.ParameterType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.fee.AverageMerResult;
+import com.fintex.ce.model.dto.command.AverageMerCommand;
+import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.stereotype.Service;
 
@@ -25,15 +25,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_MER_MERMF_001;
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_MER_NERGER_001;
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_AMF_001;
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_GER_001;
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_MER_001;
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MER_NER_001;
-import static com.fintex.ce.domain.model.enumeration.ParameterType.ABSOLUTE;
-import static com.fintex.ce.domain.model.enumeration.ParameterType.FORCE_REPORT_FEE;
-import static com.fintex.ce.domain.model.enumeration.ParameterType.SCALED;
+import static com.fintex.ce.model.domain.enumeration.ParameterType.ABSOLUTE;
+import static com.fintex.ce.model.domain.enumeration.ParameterType.FORCE_REPORT_FEE;
+import static com.fintex.ce.model.domain.enumeration.ParameterType.SCALED;
+import static com.fintex.ce.model.error.ErrorCode.ERR_MER_MERMF_001;
+import static com.fintex.ce.model.error.ErrorCode.ERR_MER_NERGER_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_MER_AMF_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_MER_GER_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_MER_MER_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_MER_NER_001;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service

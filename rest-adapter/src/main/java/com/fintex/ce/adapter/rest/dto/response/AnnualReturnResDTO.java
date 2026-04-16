@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.DatesResDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.KeyValueDTO;
-import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.model.error.Warning;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

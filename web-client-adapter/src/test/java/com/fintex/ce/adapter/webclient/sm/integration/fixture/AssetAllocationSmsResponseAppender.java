@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.webclient.sm.integration.fixture;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.allocation.AssetAllocation;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.value.NameValue;
+import com.fintex.wm.commons.domain.allocation.AssetAllocation;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.domain.value.NameValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,19 @@ public final class AssetAllocationSmsResponseAppender implements SmsResponseAppe
     AssetAllocation allocation = new AssetAllocation();
     allocation.setAllocation(allocationRows);
 
-    rows.add(new SecurityAttributeResult<>(identifier, allocation));
+    rows.add(securityAttributeResult(identifier, allocation));
     return this;
   }
 
   @Override
   public List<SecurityAttributeResult<AssetAllocation>> build() {
     return List.copyOf(rows);
+  }
+
+  private static <T> SecurityAttributeResult<T> securityAttributeResult(SecurityIdentifier identifier, T data) {
+    SecurityAttributeResult<T> result = new SecurityAttributeResult<>();
+    result.setIdentifier(identifier);
+    result.setData(data);
+    return result;
   }
 }

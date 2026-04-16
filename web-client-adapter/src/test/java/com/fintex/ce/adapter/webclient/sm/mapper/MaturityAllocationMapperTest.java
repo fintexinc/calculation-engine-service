@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.MaturityAllocation;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.datapoint.Maturities;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.enumeration.TimeDuration;
-import com.fintex.sm.model.domain.value.MaturityDurationValue;
+import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.allocation.Maturities;
+import com.fintex.wm.commons.domain.allocation.MaturityDurationValue;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimeDuration;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,17 +1,17 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.EquityCountryAllocation;
-import com.fintex.ce.domain.model.calculation.CountryRegionType;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.EquityCountryExposureResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
+import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
+import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

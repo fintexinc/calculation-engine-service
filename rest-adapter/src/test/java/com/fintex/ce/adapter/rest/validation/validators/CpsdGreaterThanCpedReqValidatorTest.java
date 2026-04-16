@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.ReturnCommand;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ class CpsdGreaterThanCpedReqValidatorTest {
     RollingCalculationCommand command = new RollingCalculationCommand();
     command.setCustomPsd(LocalDate.of(2025, 6, 30));
     command.setCustomPed(LocalDate.of(2025, 1, 31));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ReqValidationException.class)
@@ -38,7 +38,7 @@ class CpsdGreaterThanCpedReqValidatorTest {
     ReturnCommand command = new ReturnCommand();
     command.setCustomPsd(LocalDate.of(2025, 12, 31));
     command.setCustomPed(LocalDate.of(2025, 3, 31));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ReqValidationException.class)
@@ -53,7 +53,7 @@ class CpsdGreaterThanCpedReqValidatorTest {
     RollingCalculationCommand command = new RollingCalculationCommand();
     command.setCustomPsd(LocalDate.of(2025, 1, 31));
     command.setCustomPed(LocalDate.of(2025, 6, 30));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
@@ -63,7 +63,7 @@ class CpsdGreaterThanCpedReqValidatorTest {
     RollingCalculationCommand command = new RollingCalculationCommand();
     command.setCustomPsd(null);
     command.setCustomPed(null);
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
@@ -73,14 +73,14 @@ class CpsdGreaterThanCpedReqValidatorTest {
     RollingCalculationCommand commandWithPsdOnly = new RollingCalculationCommand();
     commandWithPsdOnly.setCustomPsd(LocalDate.of(2025, 6, 30));
     commandWithPsdOnly.setCustomPed(null);
-    commandWithPsdOnly.setCurrency(CurrencyType.CAD);
+    commandWithPsdOnly.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(commandWithPsdOnly)).doesNotThrowAnyException();
 
     ReturnCommand commandWithPedOnly = new ReturnCommand();
     commandWithPedOnly.setCustomPsd(null);
     commandWithPedOnly.setCustomPed(LocalDate.of(2025, 6, 30));
-    commandWithPedOnly.setCurrency(CurrencyType.CAD);
+    commandWithPedOnly.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(commandWithPedOnly)).doesNotThrowAnyException();
   }

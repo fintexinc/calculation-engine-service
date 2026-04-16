@@ -1,9 +1,9 @@
 package com.fintex.ce.application.mapping.response;
 
-import com.fintex.ce.domain.model.EquitySector;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.result.EquitySectorResult;
-import com.fintex.sm.model.domain.enumeration.EquitySectorAllocationType;
+import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
+import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
+import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 
 import org.junit.jupiter.api.Test;
 

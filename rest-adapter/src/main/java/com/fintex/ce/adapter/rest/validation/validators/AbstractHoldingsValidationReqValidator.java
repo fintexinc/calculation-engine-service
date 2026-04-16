@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.CalculationCommand;
 
 import java.util.List;
 import java.util.function.Consumer;

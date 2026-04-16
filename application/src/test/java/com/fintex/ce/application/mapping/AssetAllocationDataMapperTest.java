@@ -1,14 +1,14 @@
 package com.fintex.ce.application.mapping;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.GicHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

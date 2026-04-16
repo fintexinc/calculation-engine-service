@@ -1,14 +1,14 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.response.EquityStyleboxExposureResponseMapper;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.EquityStyleboxExposure;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.EquityStyleboxExposureResult;
+import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.sm.model.domain.enumeration.StyleBoxType;
+import com.fintex.wm.commons.domain.rating.StyleBoxType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

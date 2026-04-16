@@ -1,7 +1,7 @@
 package com.fintex.ce.calculation;
 
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.result.WarningResult;
+import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 
 /**
  * Port interface for breakdown calculation services. Implementations handle calculations like asset allocation, equity

@@ -1,8 +1,8 @@
 package com.fintex.ce.returns;
 
-import com.fintex.ce.domain.model.HoldingMonthlyReturns;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.MonthlyReturnGeneratableHolding;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.MonthlyReturnGeneratableHolding;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,7 +29,7 @@ class PeriodReqValidatorTest {
   void shouldNotThrow_whenPeriodsAreValid(String period) {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of(period));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
@@ -43,7 +43,7 @@ class PeriodReqValidatorTest {
   void shouldThrow_whenNumericPeriodIsZeroOrNegative(String period) {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of(period));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ReqValidationException.class)
@@ -57,7 +57,7 @@ class PeriodReqValidatorTest {
   void shouldThrow_whenNonNumericPeriodIsInvalid() {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of("INVALID_PERIOD"));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ReqValidationException.class)
@@ -68,7 +68,7 @@ class PeriodReqValidatorTest {
   void shouldNotThrow_whenPeriodsAreEmpty() {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Collections.emptySet());
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }

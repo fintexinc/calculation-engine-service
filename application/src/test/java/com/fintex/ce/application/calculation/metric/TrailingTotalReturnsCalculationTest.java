@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.result.TrailingTotalReturnsResult;
-import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;

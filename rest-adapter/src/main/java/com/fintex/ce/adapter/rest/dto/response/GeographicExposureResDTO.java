@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
-import com.fintex.ce.domain.model.calculation.GeographicRegionType;
-import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
+import com.fintex.ce.model.error.Warning;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

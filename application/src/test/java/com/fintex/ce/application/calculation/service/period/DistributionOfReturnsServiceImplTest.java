@@ -1,12 +1,12 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
+import com.fintex.ce.model.util.BigDecimalConstants;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,12 +35,12 @@ class DistributionOfReturnsServiceImplTest {
 
     final var reqDTO = mock(DistributionOfReturnsCommand.class);
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
     sut.buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(reqDTO.getHoldings(), CurrencyType.CAD,
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(reqDTO.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
   }
 
@@ -50,21 +50,22 @@ class DistributionOfReturnsServiceImplTest {
     final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
     final List holdings = mock(List.class);
-    final Returns monthlyReturns = mock(Returns.class);
+    final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
 
     final var reqDTO = mock(DistributionOfReturnsCommand.class);
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
     when(reqDTO.getCustomPsd()).thenReturn(LocalDate.now());
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO.getCurrency(),
-        ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
+        ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturnsAggregate);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
     sut.buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
 
-    verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(),
+    verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO
+        .getCustomPsd(),
         reqDTO.getCustomPed());
   }
 
@@ -74,20 +75,21 @@ class DistributionOfReturnsServiceImplTest {
     final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
     final List holdings = mock(List.class);
-    final Returns monthlyReturns = mock(Returns.class);
+    final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
 
     final var reqDTO = mock(DistributionOfReturnsCommand.class);
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
     when(reqDTO.getCustomPsd()).thenReturn(LocalDate.now());
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
     when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(2));
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO.getCurrency(),
-        ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturns);
-    when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(), reqDTO
-        .getCustomPed())).thenReturn(portfolioTotalReturns);
+        ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturnsAggregate);
+    when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO
+        .getCustomPsd(), reqDTO
+            .getCustomPed())).thenReturn(portfolioTotalReturns);
 
     final CalculationDTO expected = new CalculationDTO();
     expected.setCipsd(reqDTO.getCustomIntervalPsd());

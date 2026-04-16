@@ -1,11 +1,11 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.MonthlyReturnsMapper;
-import com.fintex.ce.domain.model.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.domain.performance.MonthlyReturns;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.performance.MonthlyReturns;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

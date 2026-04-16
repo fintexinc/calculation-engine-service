@@ -1,16 +1,16 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.adapter.webclient.mapper.HoldingTypeMapper;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
-import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest;
-import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest.TypedIdentifiers;
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
+import com.fintex.ce.adapter.webclient.sm.mapper.HoldingMappingUtils;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.dto.request.IdsAndDataProvidersRequest;
+import com.fintex.wm.commons.dto.search.TypedIdentifiers;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.CollectionUtils;
@@ -100,7 +100,7 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
   }
 
   private boolean hasValidHoldingType(Holding holding) {
-    return holding.getHoldingType() != null && !HoldingTypeMapper.isSkipped(holding.getHoldingType());
+    return holding.getHoldingType() != null && !HoldingMappingUtils.isSkipped(holding.getHoldingType());
   }
 
   private List<TypedIdentifiers> buildTypedIdentifiers(
@@ -131,7 +131,7 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
     }
 
     return TypedIdentifiers.builder()
-        .type(entry.getKey().name())
+        .type(entry.getKey())
         .ids(identifiers)
         .build();
   }

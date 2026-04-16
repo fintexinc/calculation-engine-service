@@ -1,10 +1,10 @@
 package com.fintex.ce.application.calculation.service.period.core;
 
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,24 +34,28 @@ class PeriodBenchmarkAbstractServiceTest {
     final PeriodCommand req = new PeriodCommand();
     req.setHoldings(portfolioHoldings);
     req.setBenchmarkHoldings(benchmarkHoldings);
-    req.setCurrency(CurrencyType.CAD);
+    req.setCurrency(Currency.CAD);
     req.setCustomPed(LocalDate.now());
     req.setCustomIntervalPsd(LocalDate.now().minusMonths(1));
 
-    final Returns portfolioMonthlyReturns = mock(Returns.class);
-    final Returns benchmarkMonthlyReturns = mock(Returns.class);
-    final Returns portfolio1 = mock(Returns.class);
-    final Returns benchmark1 = mock(Returns.class);
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(portfolioMonthlyReturns);
-    when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(benchmarkMonthlyReturns);
-    when(portfolioMonthlyReturns.cutArgumentToTheSameEndDate(benchmarkMonthlyReturns)).thenReturn(portfolio1);
-    when(benchmarkMonthlyReturns.cutArgumentToTheSameEndDate(portfolioMonthlyReturns)).thenReturn(benchmark1);
+    final ReturnsAggregate portfolioMonthlyReturnsAggregate = mock(ReturnsAggregate.class);
+    final ReturnsAggregate benchmarkMonthlyReturnsAggregate = mock(ReturnsAggregate.class);
+    final ReturnsAggregate portfolio1 = mock(ReturnsAggregate.class);
+    final ReturnsAggregate benchmark1 = mock(ReturnsAggregate.class);
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(
+        portfolioMonthlyReturnsAggregate);
+    when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(
+        benchmarkMonthlyReturnsAggregate);
+    when(portfolioMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate)).thenReturn(
+        portfolio1);
+    when(benchmarkMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate)).thenReturn(
+        benchmark1);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
     sut.buildCalculationDto(req, returnFactorScale);
 
-    verify(portfolioMonthlyReturns).cutArgumentToTheSameEndDate(benchmarkMonthlyReturns);
-    verify(benchmarkMonthlyReturns).cutArgumentToTheSameEndDate(portfolioMonthlyReturns);
+    verify(portfolioMonthlyReturnsAggregate).cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate);
+    verify(benchmarkMonthlyReturnsAggregate).cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate);
   }
 
   @Test
@@ -67,17 +71,19 @@ class PeriodBenchmarkAbstractServiceTest {
     final PeriodCommand req = new PeriodCommand();
     req.setHoldings(portfolioHoldings);
     req.setBenchmarkHoldings(benchmarkHoldings);
-    req.setCurrency(CurrencyType.CAD);
+    req.setCurrency(Currency.CAD);
     req.setCustomPed(LocalDate.now());
     req.setCustomIntervalPsd(LocalDate.now().minusMonths(1));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(mock(Returns.class));
-    when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(Returns.class));
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(mock(
+        ReturnsAggregate.class));
+    when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(
+        ReturnsAggregate.class));
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
     sut.buildCalculationDto(req, returnFactorScale);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(portfolioHoldings, CurrencyType.CAD, returnFactorScale);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(portfolioHoldings, Currency.CAD, returnFactorScale);
   }
 
   @Test
@@ -93,17 +99,19 @@ class PeriodBenchmarkAbstractServiceTest {
     final PeriodCommand req = new PeriodCommand();
     req.setHoldings(portfolioHoldings);
     req.setBenchmarkHoldings(benchmarkHoldings);
-    req.setCurrency(CurrencyType.CAD);
+    req.setCurrency(Currency.CAD);
     req.setCustomPed(LocalDate.now());
     req.setCustomIntervalPsd(LocalDate.now().minusMonths(1));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(mock(Returns.class));
-    when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(Returns.class));
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(mock(
+        ReturnsAggregate.class));
+    when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(
+        ReturnsAggregate.class));
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
     sut.buildCalculationDto(req, returnFactorScale);
 
-    verify(monthlyReturnsService).getBenchmarkMonthlyReturns(benchmarkHoldings, CurrencyType.CAD, returnFactorScale);
+    verify(monthlyReturnsService).getBenchmarkMonthlyReturns(benchmarkHoldings, Currency.CAD, returnFactorScale);
   }
 
 }

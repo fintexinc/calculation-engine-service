@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.HoldingEquityMarketCap;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.datapoint.EquityMarketCapitalization;
-import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
-import com.fintex.sm.model.domain.value.EquityMarketCapitalizationTypeValue;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationTypeValue;
 
 import org.springframework.stereotype.Component;
 

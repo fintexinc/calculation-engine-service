@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
 
 import org.springframework.stereotype.Component;
 

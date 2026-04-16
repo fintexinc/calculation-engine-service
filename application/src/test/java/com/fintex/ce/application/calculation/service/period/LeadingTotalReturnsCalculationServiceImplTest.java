@@ -2,11 +2,11 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.LeadingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
+import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.LeadingTotalReturnCommand;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -115,18 +115,18 @@ class LeadingTotalReturnsCalculationServiceImplTest {
 
     final var reqDTO = mock(LeadingTotalReturnCommand.class);
     final var holdings = mock(List.class);
-    final var currency = CurrencyType.CAD;
+    final var currency = Currency.CAD;
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getCurrency()).thenReturn(currency);
 
-    final var monthlyReturns = mock(Returns.class, RETURNS_SELF);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_SELF);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
 
     sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD, SCALE_OF_TWO);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
 
   @Test
@@ -138,7 +138,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
     final var reqDTO = mock(LeadingTotalReturnCommand.class);
     when(reqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW);
 
-    final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
 
     when(monthlyReturns
         .validateCpsd(reqDTO.getCustomPsd())
@@ -163,7 +163,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
     final var reqDTO = mock(LeadingTotalReturnCommand.class);
     when(reqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW);
 
-    final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturn = mock(NavigableMap.class);
     when(monthlyReturns
         .validateCpsd(reqDTO.getCustomPsd())

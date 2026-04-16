@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.CommonDates;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.result.Growth10KResult;
-import com.fintex.ce.domain.model.result.core.KeyValueResult;
+import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.model.domain.result.KeyValueResult;
+import com.fintex.ce.model.domain.result.returns.Growth10KResult;
+import com.fintex.ce.model.error.Warning;
 
 import org.springframework.util.CollectionUtils;
 
@@ -15,7 +15,7 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TEN_THOUSAND;
+import static com.fintex.ce.model.util.BigDecimalConstants.TEN_THOUSAND;
 import static com.fintex.ce.util.DateTimeUtils.addOneMonth;
 import static com.fintex.ce.util.DateTimeUtils.minusOneMonth;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
@@ -24,25 +24,25 @@ import static com.fintex.ce.util.DecimalUtils.toUserScale;
 public class Growth10KCalculation {
 
   private final NavigableMap<LocalDate, BigDecimal> portfolioReturns;
-  private final CommonDates commonDates;
+  private final DateRange dateRange;
   private final boolean calculateForNAV;
   private final List<Warning> warnings;
 
   public Growth10KCalculation(final NavigableMap<LocalDate, BigDecimal> portfolioReturns,
-      final CommonDates commonDates,
+      final DateRange dateRange,
       final boolean calculateForNAV) {
     this.portfolioReturns = portfolioReturns;
-    this.commonDates = commonDates;
+    this.dateRange = dateRange;
     this.calculateForNAV = calculateForNAV;
     this.warnings = List.of();
   }
 
   public Growth10KCalculation(final NavigableMap<LocalDate, BigDecimal> portfolioReturns,
-      final CommonDates commonDates,
+      final DateRange dateRange,
       final boolean calculateForNAV,
       final List<Warning> warnings) {
     this.portfolioReturns = portfolioReturns;
-    this.commonDates = commonDates;
+    this.dateRange = dateRange;
     this.calculateForNAV = calculateForNAV;
     this.warnings = warnings;
   }
@@ -117,14 +117,14 @@ public class Growth10KCalculation {
   }
 
   public LocalDate getPortfolioEndDate(final NavigableMap<LocalDate, BigDecimal> portfolioReturns) {
-    return Objects.nonNull(commonDates) && Objects.nonNull(commonDates.getEnd())
-        ? commonDates.getEnd()
+    return Objects.nonNull(dateRange) && Objects.nonNull(dateRange.end())
+        ? dateRange.end()
         : portfolioReturns.lastKey();
   }
 
   public LocalDate getPortfolioStartDate(final NavigableMap<LocalDate, BigDecimal> portfolioReturns) {
-    return Objects.nonNull(commonDates) && Objects.nonNull(commonDates.getStart())
-        ? commonDates.getStart()
+    return Objects.nonNull(dateRange) && Objects.nonNull(dateRange.start())
+        ? dateRange.start()
         : portfolioReturns.firstKey();
   }
 

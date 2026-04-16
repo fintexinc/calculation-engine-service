@@ -1,12 +1,12 @@
 package com.fintex.ce.application.calculation.service.breakdown;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

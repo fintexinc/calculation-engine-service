@@ -2,21 +2,20 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.constant.GeneralConstants;
-import com.fintex.ce.domain.dto.IncomeForecastDto;
-import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
-import com.fintex.ce.domain.model.Income;
-import com.fintex.ce.domain.model.IncomeForecast;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.enumeration.InterestFreq;
-import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.IncomeForecastResult;
+import com.fintex.ce.model.domain.calculation.distribution.Income;
+import com.fintex.ce.model.domain.calculation.yield.IncomeForecast;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.InterestFreq;
+import com.fintex.ce.model.domain.holding.GicHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
+import com.fintex.ce.model.dto.IncomeForecastDto;
+import com.fintex.ce.model.dto.command.IncomeForecastCommand;
+import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.enumeration.PaymentFrequencyType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -49,6 +48,7 @@ public class IncomeForecastCalculationServiceImpl
   private static final int TWO_SYMBOLS = 2;
   private static final int TWELVE_MONTH = 12;
   private static final int ONE_HUNDRED = 100;
+  private static final String AT_MATURITY_PAYMENT_FREQUENCY = "AT_MATURITY";
   private static final Set<InterestFreq> MONTHLY_FREQUENCY = Set.of(InterestFreq.DAILY, InterestFreq.WEEKLY,
       InterestFreq.BI_WEEKLY);
 
@@ -147,7 +147,7 @@ public class IncomeForecastCalculationServiceImpl
         Objects.isNull(rIncomeForecast.getSchedule()) &&
         ObjectUtils.allNotNull(rIncomeForecast.getDividendYield(), rIncomeForecast.getPaymentFrequencyType(),
             rIncomeForecast.getMaturityDate(), rIncomeForecast.getIssueDate()) &&
-        Objects.equals(PaymentFrequencyType.AT_MATURITY.name(), rIncomeForecast.getPaymentFrequencyType());
+        Objects.equals(AT_MATURITY_PAYMENT_FREQUENCY, rIncomeForecast.getPaymentFrequencyType());
   }
 
   private static IncomeForecastDto getIncomeForecastDto(final Holding holding) {

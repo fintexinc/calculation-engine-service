@@ -1,14 +1,14 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.EquityCountryAllocation;
-import com.fintex.ce.domain.model.calculation.GeographicRegionType;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.EquityGeographicExposureResult;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
+import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
+import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.exposure.EquityGeographicExposureResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_RRC_EGE_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_RRC_EGE_001;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;

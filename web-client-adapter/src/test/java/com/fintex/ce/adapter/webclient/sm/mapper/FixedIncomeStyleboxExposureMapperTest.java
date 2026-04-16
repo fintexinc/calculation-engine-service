@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
-import com.fintex.sm.model.domain.rating.FixedIncomeStyleBoxes;
-import com.fintex.sm.model.domain.value.FixedIncomeStyleBoxValue;
+import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
+import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxValue;
+import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxes;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

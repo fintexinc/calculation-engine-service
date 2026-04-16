@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.error.ErrorCode;
 
 import org.springframework.util.CollectionUtils;
 

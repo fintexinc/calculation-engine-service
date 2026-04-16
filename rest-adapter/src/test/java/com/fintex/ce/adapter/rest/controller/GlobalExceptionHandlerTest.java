@@ -2,11 +2,11 @@ package com.fintex.ce.adapter.rest.controller;
 
 import com.fintex.ce.adapter.rest.dto.exception.ErrorRes2DTO;
 import com.fintex.ce.adapter.rest.dto.exception.RuntimeExceptionDTO;
-import com.fintex.ce.domain.exception.DataErrorException;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.exception.SystemException;
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.exception.code.HttpCode;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.HttpCode;
+import com.fintex.ce.model.error.exceptions.DataErrorException;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.SystemException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BeanPropertyBindingResult;

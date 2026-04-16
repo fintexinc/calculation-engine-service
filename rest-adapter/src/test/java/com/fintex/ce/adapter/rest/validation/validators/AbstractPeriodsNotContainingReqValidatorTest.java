@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ abstract class AbstractPeriodsNotContainingReqValidatorTest {
   void shouldThrow_whenPeriodsContainDisallowedValue() {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of(disallowedPeriodName()));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> createValidator().validate(command))
         .isInstanceOf(ReqValidationException.class)
@@ -40,7 +40,7 @@ abstract class AbstractPeriodsNotContainingReqValidatorTest {
   void shouldThrow_whenRollingPeriodsContainDisallowedValue() {
     RollingCalculationCommand command = new RollingCalculationCommand();
     command.setRollingPeriods(Set.of(disallowedPeriodName()));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> createValidator().validate(command))
         .isInstanceOf(ReqValidationException.class)
@@ -54,7 +54,7 @@ abstract class AbstractPeriodsNotContainingReqValidatorTest {
   void shouldNotThrow_whenPeriodsContainOnlyNumericValues() {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of("12", "36"));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> createValidator().validate(command)).doesNotThrowAnyException();
   }
@@ -63,7 +63,7 @@ abstract class AbstractPeriodsNotContainingReqValidatorTest {
   void shouldNotThrow_whenPeriodsAreEmpty() {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of());
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> createValidator().validate(command)).doesNotThrowAnyException();
   }

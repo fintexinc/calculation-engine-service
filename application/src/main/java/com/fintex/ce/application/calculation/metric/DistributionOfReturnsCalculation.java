@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
-import com.fintex.ce.domain.model.result.DistributionOfReturnsResult;
-import com.fintex.ce.domain.model.result.distributionofreturns.DistributionOfReturnsIntervalResult;
-import com.fintex.ce.domain.model.result.distributionofreturns.DistributionRangeResult;
+import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsIntervalResult;
+import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
+import com.fintex.ce.model.domain.result.distribution.DistributionRangeResult;
+import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.Objects;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.DecimalUtils.getMaxValue;
 import static com.fintex.ce.util.DecimalUtils.getMinValue;

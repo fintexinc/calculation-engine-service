@@ -2,8 +2,8 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.TBillsFetcher;
 
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
+import static com.fintex.wm.commons.domain.currency.Currency.CAD;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;

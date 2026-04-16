@@ -1,7 +1,7 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.util.List;
 import java.util.function.Predicate;

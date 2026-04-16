@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
+import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

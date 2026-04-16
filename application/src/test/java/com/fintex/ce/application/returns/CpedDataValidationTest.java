@@ -1,7 +1,7 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.validation.CpedDataValidation;
-import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.model.error.Notification;
 
 import org.springframework.http.HttpStatus;
 
@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_CPED_002;
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_CPED_003;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPED_002;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPED_003;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;

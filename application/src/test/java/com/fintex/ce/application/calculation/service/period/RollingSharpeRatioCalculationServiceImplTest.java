@@ -2,13 +2,13 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.RollingSharpeRatioCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.port.webclient.TBillsFetcher;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +42,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final var holdings = List.of(mock(Holding.class));
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
     when(sut.defineCalculationMethod(reqDTO)).thenReturn(mock(RollingSharpeRatioCalculation.class));
 
     doCallRealMethod().when(sut).perform(any());
@@ -87,7 +87,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final var input = mock(BenchmarkCalculationDTO.class);
 
     when(sut.buildCalculationDto(any(), any())).thenReturn(input);
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
@@ -126,11 +126,11 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final var holdings = mock(List.class);
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
 
     sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD, SCALE_OF_TWO);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
 
   @Test
@@ -144,7 +144,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     when(reqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW);
     when(reqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW.plusMonths(1));
 
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());

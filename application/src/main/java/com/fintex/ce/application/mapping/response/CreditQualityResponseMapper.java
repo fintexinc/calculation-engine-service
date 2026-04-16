@@ -1,11 +1,11 @@
 package com.fintex.ce.application.mapping.response;
 
-import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.CreditQualityResult;
 import com.fintex.ce.mapping.ResponseMapper;
+import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
+import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
+import com.fintex.ce.model.error.Warning;
 
 import org.springframework.stereotype.Component;
 

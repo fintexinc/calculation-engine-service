@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.holding.GicHolding;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.math.BigDecimal;
 

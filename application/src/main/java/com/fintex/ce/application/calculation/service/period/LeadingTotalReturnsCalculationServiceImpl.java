@@ -3,11 +3,11 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.LeadingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.LeadingTotalReturnCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.result.LeadingTotalReturnsResult;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.LeadingTotalReturnCommand;
 import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +50,10 @@ public class LeadingTotalReturnsCalculationServiceImpl
   @Override
   public CalculationDTO buildCalculationDto(final LeadingTotalReturnCommand reqDTO,
       final ReturnFactorScale returnFactorScale) {
-    final Returns portfolioMonthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(
+    final ReturnsAggregate portfolioMonthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
         reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale);
 
-    final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = portfolioMonthlyReturns
+    final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = portfolioMonthlyReturnsAggregate
         .validateCpsd(reqDTO.getCustomPsd())
         .cutByPed()
         .cutByCpsdIfCpsdEmptyCutByPsd(reqDTO.getCustomPsd())

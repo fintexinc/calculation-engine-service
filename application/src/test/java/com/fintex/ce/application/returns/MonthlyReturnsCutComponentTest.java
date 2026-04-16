@@ -1,7 +1,7 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

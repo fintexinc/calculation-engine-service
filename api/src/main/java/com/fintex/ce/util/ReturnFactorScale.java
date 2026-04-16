@@ -1,6 +1,6 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.constant.BigDecimalConstants;
+import com.fintex.ce.model.util.BigDecimalConstants;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

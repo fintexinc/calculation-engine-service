@@ -1,16 +1,16 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.returns.Returns;
+import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.calculation.CalculationService;
-import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
-import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.domain.model.CommonDates;
-import com.fintex.ce.domain.model.HoldingMonthlyReturns;
-import com.fintex.ce.domain.model.ValidationError;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
+import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
+import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.ValidationError;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -40,25 +40,27 @@ public class CommonPerformanceDateServiceImpl
     List<Holding> portfolioHoldings = collectAllPortfolioHoldings(mReqDTO.getPortfolios());
 
     var notification = new Notification();
-    Returns<HoldingMonthlyReturns> monthlyReturnsForPortfolios = notification.tryCatch(() -> getPortfolioMonthlyReturns(
-        portfolioHoldings));
-    CommonDates commonPerformanceDateForPortfolios = notification.tryCatch(() -> commonPerformanceDateFor(
-        monthlyReturnsForPortfolios));
-    Returns<HoldingMonthlyReturns> monthlyReturnsForBenchmark = notification.tryCatch(() -> getPortfolioMonthlyReturns(
-        mReqDTO
-            .getBenchmarkHoldings()));
-    CommonDates commonPerformanceDatesForBenchmarks = notification.tryCatch(() -> commonPerformanceDateFor(
-        monthlyReturnsForBenchmark));
+    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForPortfolios = notification.tryCatch(
+        () -> getPortfolioMonthlyReturns(
+            portfolioHoldings));
+    DateRange commonPerformanceDateForPortfolios = notification.tryCatch(() -> commonPerformanceDateFor(
+        monthlyReturnsAggregateForPortfolios));
+    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForBenchmark = notification.tryCatch(
+        () -> getPortfolioMonthlyReturns(
+            mReqDTO
+                .getBenchmarkHoldings()));
+    DateRange commonPerformanceDatesForBenchmarks = notification.tryCatch(() -> commonPerformanceDateFor(
+        monthlyReturnsAggregateForBenchmark));
     notification.ifAnyErrorThrowException();
 
     CommonPerformanceDatesResult res = new CommonPerformanceDatesResult()
-        .setCommonPerformanceStartDatePf(commonPerformanceDateForPortfolios.getStart())
-        .setCommonPerformanceEndDatePf(commonPerformanceDateForPortfolios.getEnd())
-        .setCommonPerformanceStartDateBm(commonPerformanceDatesForBenchmarks.getStart())
-        .setCommonPerformanceEndDateBm(commonPerformanceDatesForBenchmarks.getEnd());
+        .setCommonPerformanceStartDatePf(commonPerformanceDateForPortfolios.start())
+        .setCommonPerformanceEndDatePf(commonPerformanceDateForPortfolios.end())
+        .setCommonPerformanceStartDateBm(commonPerformanceDatesForBenchmarks.start())
+        .setCommonPerformanceEndDateBm(commonPerformanceDatesForBenchmarks.end());
 
-    if (!ObjectUtils.isEmpty(monthlyReturnsForPortfolios)) {
-      res.setErrors(notification.tryCatch(monthlyReturnsForPortfolios.getErrors().stream().map(
+    if (!ObjectUtils.isEmpty(monthlyReturnsAggregateForPortfolios)) {
+      res.setErrors(notification.tryCatch(monthlyReturnsAggregateForPortfolios.getErrors().stream().map(
           err -> new ValidationError(err.getId(), err.getCode().name(), err.getMessage()))::toList));
     }
 
@@ -72,20 +74,18 @@ public class CommonPerformanceDateServiceImpl
     return portfolios.stream().flatMap(p -> p.getHoldings().stream()).toList();
   }
 
-  CommonDates commonPerformanceDateFor(Returns<HoldingMonthlyReturns> monthlyReturns) {
-    if (ObjectUtils.isEmpty(monthlyReturns)) {
-      return new CommonDates();
+  DateRange commonPerformanceDateFor(ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate) {
+    if (ObjectUtils.isEmpty(monthlyReturnsAggregate)) {
+      return DateRange.UNBOUNDED;
     }
-    return new CommonDates()
-        .setStart(monthlyReturns.getPsd())
-        .setEnd(monthlyReturns.getPed());
+    return new DateRange(monthlyReturnsAggregate.getPsd(), monthlyReturnsAggregate.getPed());
   }
 
-  Returns<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<Holding> holdings) {
+  ReturnsAggregate<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<Holding> holdings) {
     if (CollectionUtils.isEmpty(holdings)) {
-      return new Returns<>();
+      return new ReturnsAggregate<>();
     }
-    return monthlyReturnsService.getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(holdings, CurrencyType.CAD);
+    return monthlyReturnsService.getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(holdings, Currency.CAD);
   }
 
 }

@@ -1,11 +1,11 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
-import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,7 +35,7 @@ class AlphaCalculationServiceImplTest {
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
-    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(req.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
@@ -56,7 +56,7 @@ class AlphaCalculationServiceImplTest {
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
-    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(req.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
     when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
@@ -65,7 +65,7 @@ class AlphaCalculationServiceImplTest {
     doCallRealMethod().when(sut).defineCalculationMethod(req);
     sut.defineCalculationMethod(req);
 
-    verify(tBillsFetcher).fetch(CurrencyType.CAD);
+    verify(tBillsFetcher).fetch(Currency.CAD);
   }
 
   @Test
@@ -79,7 +79,7 @@ class AlphaCalculationServiceImplTest {
       final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>();
       final var req = mock(PeriodCommand.class);
 
-      when(req.getCurrency()).thenReturn(CurrencyType.CAD);
+      when(req.getCurrency()).thenReturn(Currency.CAD);
       when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
       when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
       when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);

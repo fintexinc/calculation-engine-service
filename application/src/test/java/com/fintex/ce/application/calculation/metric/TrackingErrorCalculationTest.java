@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.result.TrackingErrorResult;
-import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.risk.TrackingErrorResult;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -12,9 +12,9 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
+import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;

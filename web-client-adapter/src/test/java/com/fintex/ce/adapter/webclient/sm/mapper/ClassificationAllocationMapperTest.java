@@ -1,15 +1,15 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.ClassificationAllocation;
-import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.allocation.SecurityClassificationAllocation;
-import com.fintex.sm.model.domain.classification.SecurityClassificationLevelOne;
-import com.fintex.sm.model.domain.classification.SecurityClassificationLevelTwo;
-import com.fintex.sm.model.domain.classification.SecurityClassificationTypeValue;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
+import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
+import com.fintex.wm.commons.domain.classification.SecurityClassificationLevelOne;
+import com.fintex.wm.commons.domain.classification.SecurityClassificationLevelTwo;
+import com.fintex.wm.commons.domain.classification.SecurityClassificationTypeValue;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 

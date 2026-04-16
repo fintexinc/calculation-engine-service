@@ -52,9 +52,9 @@ import com.fintex.ce.adapter.rest.service.RestExceptionHandlingServiceImpl;
 import com.fintex.ce.adapter.rest.util.ResponseMappingUtils;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.calculation.CalculationService;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.error.ErrorCode;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;

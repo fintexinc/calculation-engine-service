@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.domain.model.result.UpsideCaptureResult;
-import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.risk.UpsideCaptureResult;
+import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.ONE;
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;

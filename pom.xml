@@ -36,7 +36,7 @@
         <surefire.argLine></surefire.argLine>
 
         <!-- Internal dependencies -->
-        <sm-domain.version>2.0.0-SNAPSHOT</sm-domain.version>
+        <catalog-investment-commons.version>0.0.1-SNAPSHOT</catalog-investment-commons.version>
 
         <!-- External dependencies -->
         <spring-openapi.version>2.8.6</spring-openapi.version>
@@ -123,6 +123,13 @@
                 <groupId>com.fintex</groupId>
                 <artifactId>bootstrap</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <!-- Catalog Investment Commons (shared WM domain library) -->
+            <dependency>
+                <groupId>com.fintex.wm</groupId>
+                <artifactId>catalog-investment-commons</artifactId>
+                <version>${catalog-investment-commons.version}</version>
             </dependency>
 
             <!-- External dependencies -->

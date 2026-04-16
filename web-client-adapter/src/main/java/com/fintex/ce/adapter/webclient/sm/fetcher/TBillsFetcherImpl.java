@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.port.webclient.TBillsFetcher;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.util.TreeMap;
 public class TBillsFetcherImpl implements TBillsFetcher {
 
   @Override
-  public NavigableMap<LocalDate, BigDecimal> fetch(CurrencyType currency) {
+  public NavigableMap<LocalDate, BigDecimal> fetch(Currency currency) {
     return new TreeMap<>();
   }
 }

@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.SalesCharge;
-import com.fintex.ce.domain.model.calculation.SalesChargeCategory;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.SalesChargeResult;
+import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
+import com.fintex.ce.model.domain.enumeration.SalesChargeCategory;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
 
 import org.springframework.util.CollectionUtils;
 

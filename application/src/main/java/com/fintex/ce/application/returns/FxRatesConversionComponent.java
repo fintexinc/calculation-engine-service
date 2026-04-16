@@ -1,8 +1,8 @@
 package com.fintex.ce.application.returns;
 
-import com.fintex.ce.domain.model.CurrencyExchangePair;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.domain.CurrencyExchangePair;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_MFR_001;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_MFR_001;
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
@@ -22,11 +22,11 @@ public class FxRatesConversionComponent {
 
   public Map<Holding, TreeMap<LocalDate, BigDecimal>> convert(
       final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns,
-      final Map<Holding, CurrencyType> holdingCurrencies,
+      final Map<Holding, Currency> holdingCurrencies,
       final Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates,
-      final CurrencyType toCurrency) {
+      final Currency toCurrency) {
     return returns.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> {
-      CurrencyType fromCurrency = holdingCurrencies.get(entry.getKey());
+      Currency fromCurrency = holdingCurrencies.get(entry.getKey());
       if (fromCurrency == null || fromCurrency.equals(toCurrency)) {
         return entry.getValue();
       }

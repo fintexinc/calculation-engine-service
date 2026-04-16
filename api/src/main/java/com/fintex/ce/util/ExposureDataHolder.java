@@ -1,7 +1,7 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.error.Warning;
 
 import java.math.BigDecimal;
 import java.util.List;

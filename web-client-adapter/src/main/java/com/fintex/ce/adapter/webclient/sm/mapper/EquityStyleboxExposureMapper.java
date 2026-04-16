@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.EquityStyleboxExposure;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.enumeration.StyleBoxType;
-import com.fintex.sm.model.domain.rating.StyleBoxes;
-import com.fintex.sm.model.domain.value.StyleBoxValue;
+import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.rating.StyleBoxType;
+import com.fintex.wm.commons.domain.rating.StyleBoxValue;
+import com.fintex.wm.commons.domain.rating.StyleBoxes;
 
 import org.springframework.stereotype.Component;
 
