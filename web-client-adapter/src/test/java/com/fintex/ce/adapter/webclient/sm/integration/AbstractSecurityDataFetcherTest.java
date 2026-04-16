@@ -221,4 +221,15 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
     result.setData(data);
     return result;
   }
+
+  protected final void enqueueSmsJsonResponse(String jsonBody) {
+    smsMockServer.enqueue(
+        new MockResponse()
+            .setBody(jsonBody)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+  }
+
+  protected final RecordedRequest takeSmsRequest() throws InterruptedException {
+    return smsMockServer.takeRequest();
+  }
 }

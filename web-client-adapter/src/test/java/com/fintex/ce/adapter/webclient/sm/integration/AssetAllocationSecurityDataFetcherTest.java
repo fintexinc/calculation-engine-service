@@ -4,6 +4,7 @@ import com.fintex.ce.adapter.webclient.sm.integration.fixture.AssetAllocationSms
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.DirtiesContext;
 
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -139,5 +141,26 @@ class AssetAllocationSecurityDataFetcherTest
     AssetAllocation allocation = new AssetAllocation();
     allocation.setAllocation(List.of(new NameValue("EQUITY", new BigDecimal("1.0"))));
     return securityAttributeResult(identifier, allocation);
+  }
+
+  @Test
+  void shouldMapProviders_whenSmsReturnsDataProvider() throws Exception {
+    PortfolioHolding holding = createHolding(etf1MorningstarId, FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.ETF_CANADA);
+    AssetAllocation allocation = new AssetAllocation();
+    allocation.setAllocation(List.of(new NameValue("EQUITY", new BigDecimal("100.0"))));
+    allocation.setDataProvider(DataProvider.MORNINGSTAR);
+
+    SecurityIdentifier identifier = createSecurityIdentifier(etf1MorningstarId, FiIdentifierType.MORNINGSTAR_ID);
+    enqueueSmsJsonResponse(objectMapper.writeValueAsString(
+        List.of(securityAttributeResult(identifier, allocation))));
+
+    Map<PortfolioHolding, HoldingAssetAllocation> result = fetcherUnderTest().fetch(List.of(holding),
+        providersForComplexScenario());
+
+    assertThat(takeSmsRequest().getPath()).isEqualTo("/api/v1/wealth/securities" + endpointPath());
+    assertThat(result).containsOnlyKeys(holding);
+    assertThat(result.get(holding).getProviders()).containsExactly(DataProvider.MORNINGSTAR);
+    assertThat(result.get(holding).getAllocations()).containsEntry("EQUITY", new BigDecimal("100.0"));
   }
 }
