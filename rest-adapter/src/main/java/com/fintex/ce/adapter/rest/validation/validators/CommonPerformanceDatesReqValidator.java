@@ -1,10 +1,10 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-import static com.fintex.ce.domain.model.enumeration.CalculationMetric.*;
+import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 
 @Component
 @Order(400)

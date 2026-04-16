@@ -1,9 +1,9 @@
 package com.fintex.ce.application.validation.data;
 
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.error.Warning;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_AA_AA_001;
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_UNKNOWN_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_AA_AA_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_UNKNOWN_001;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;

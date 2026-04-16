@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
-import com.fintex.ce.domain.model.calculation.SalesChargeCategory;
+import com.fintex.ce.model.domain.enumeration.SalesChargeCategory;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

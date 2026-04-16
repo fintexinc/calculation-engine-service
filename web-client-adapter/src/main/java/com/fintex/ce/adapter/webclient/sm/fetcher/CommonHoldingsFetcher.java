@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.domain.model.CommonHoldings;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.calculation.holding.CommonHoldings;
+import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.DataProvider;
+import com.fintex.wm.commons.domain.DataProvider;
 
 import org.springframework.stereotype.Component;
 

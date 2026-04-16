@@ -1,14 +1,14 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeSectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
-import com.fintex.sm.model.domain.allocation.FixedIncomeSectorAllocation;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSectorAllocationType;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
-import com.fintex.sm.model.domain.value.FixedIncomeSectorAllocationTypeNameValue;
+import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeNameValue;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.core.ParameterizedTypeReference;
 

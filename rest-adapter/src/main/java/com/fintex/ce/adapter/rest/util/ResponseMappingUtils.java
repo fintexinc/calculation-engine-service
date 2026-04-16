@@ -48,7 +48,7 @@ import com.fintex.ce.adapter.rest.dto.response.UpsideCaptureResDTO;
 import com.fintex.ce.adapter.rest.dto.response.YieldResDto;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
 import com.fintex.ce.adapter.rest.dto.response.distributionofreturns.DistributionOfReturnsResDTO;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 
 import java.util.Map;
 import java.util.function.Supplier;

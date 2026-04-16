@@ -1,12 +1,12 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.BestWorstPeriodCalculation;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.BestWorstPeriodsResult;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -194,7 +194,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var resDTO = mock(BestWorstPeriodsResult.class);
 
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
-    when(bestWorstPeriodCommand.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(bestWorstPeriodCommand.getCurrency()).thenReturn(Currency.CAD);
     when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(1));
     when(sut.buildBestWorstPeriodCalculation(any(), any())).thenReturn(bestWorstPeriodCalculation);
@@ -216,7 +216,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var holdings = List.of(mock(Holding.class));
 
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
-    when(bestWorstPeriodCommand.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(bestWorstPeriodCommand.getCurrency()).thenReturn(Currency.CAD);
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
     when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
@@ -224,7 +224,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     sut.buildWeightedAverageInputDto(bestWorstPeriodCommand);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD, SCALE_OF_TWO);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
 
   @Test
@@ -235,13 +235,13 @@ class BestWorstPeriodsCalculationServiceImplTest {
 
     final var holdings = List.of(mock(Holding.class));
 
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(mock(
         NavigableMap.class));
 
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
-    when(bestWorstPeriodCommand.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(bestWorstPeriodCommand.getCurrency()).thenReturn(Currency.CAD);
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
     when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
@@ -267,7 +267,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
         portfolioTotalReturns);
 
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
-    when(bestWorstPeriodCommand.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(bestWorstPeriodCommand.getCurrency()).thenReturn(Currency.CAD);
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
     when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));

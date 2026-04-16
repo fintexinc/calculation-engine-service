@@ -1,12 +1,12 @@
 package com.fintex.ce.adapter.webclient.sm.integration.fixture;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.datapoint.Fees;
-import com.fintex.sm.model.domain.datapoint.FloatDatapoint;
-import com.fintex.sm.model.domain.datapoint.ManagementFeeDatapoint;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
+import com.fintex.wm.commons.domain.financial.Fees;
+import com.fintex.wm.commons.domain.financial.ManagementFeeDatapoint;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public final class FeesSmsResponseAppender implements SmsResponseAppender<Fees, 
     fees.setGrossExpenseRatio(floatDatapoint(values.grossExpenseRatio()));
     fees.setActual12B1Fee(floatDatapoint(values.actual12B1Fee()));
 
-    rows.add(new SecurityAttributeResult<>(identifier, fees));
+    rows.add(securityAttributeResult(identifier, fees));
     return this;
   }
 
@@ -61,5 +61,12 @@ public final class FeesSmsResponseAppender implements SmsResponseAppender<Fees, 
     dp.setValue(new BigDecimal(value));
     dp.setDataProvider(DataProvider.MORNINGSTAR);
     return dp;
+  }
+
+  private static <T> SecurityAttributeResult<T> securityAttributeResult(SecurityIdentifier identifier, T data) {
+    SecurityAttributeResult<T> result = new SecurityAttributeResult<>();
+    result.setIdentifier(identifier);
+    result.setData(data);
+    return result;
   }
 }

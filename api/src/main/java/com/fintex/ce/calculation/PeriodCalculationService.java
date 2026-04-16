@@ -1,7 +1,7 @@
 package com.fintex.ce.calculation;
 
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.result.PeriodResult;
+import com.fintex.ce.model.domain.result.PeriodResult;
+import com.fintex.ce.model.dto.command.PeriodCommand;
 
 /**
  * Port interface for period-based calculation services. Implementations handle calculations like trailing returns,

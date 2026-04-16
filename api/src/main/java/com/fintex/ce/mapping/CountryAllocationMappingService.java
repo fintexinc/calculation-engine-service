@@ -1,9 +1,9 @@
 package com.fintex.ce.mapping;
 
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.model.calculation.CountryRegionType;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.Warning;
 
 import java.math.BigDecimal;
 import java.util.List;

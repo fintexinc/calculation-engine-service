@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric.core;
 
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.model.result.PeriodResult;
-import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.PeriodResult;
+import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
 import com.fintex.ce.util.DecimalUtils;
 
 import org.springframework.util.CollectionUtils;
@@ -21,11 +21,11 @@ import java.util.SortedMap;
 import java.util.stream.Collectors;
 import lombok.Getter;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.domain.model.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
-import static com.fintex.ce.domain.model.enumeration.Period.SINCE_PERFORMANCE_START_DATE;
-import static com.fintex.ce.domain.model.enumeration.Period.YEAR_TO_DATE;
+import static com.fintex.ce.model.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
+import static com.fintex.ce.model.domain.enumeration.Period.SINCE_PERFORMANCE_START_DATE;
+import static com.fintex.ce.model.domain.enumeration.Period.YEAR_TO_DATE;
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.CalculationUtils.product;
 import static com.fintex.ce.util.CalculationUtils.sum;
 import static com.fintex.ce.util.CollectorUtils.toTreeMap;

@@ -1,7 +1,7 @@
 package com.fintex.ce.application.validation;
 
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.Notification;
 
 import java.time.LocalDate;
 

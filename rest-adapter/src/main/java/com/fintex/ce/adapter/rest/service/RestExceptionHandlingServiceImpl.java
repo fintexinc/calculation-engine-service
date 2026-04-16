@@ -2,8 +2,8 @@ package com.fintex.ce.adapter.rest.service;
 
 import com.fintex.ce.adapter.rest.dto.exception.ErrorRes2DTO;
 import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
-import com.fintex.ce.domain.exception.DataErrorException;
-import com.fintex.ce.domain.exception.FdsDataValidationException;
+import com.fintex.ce.model.error.exceptions.DataErrorException;
+import com.fintex.ce.model.error.exceptions.FdsDataValidationException;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

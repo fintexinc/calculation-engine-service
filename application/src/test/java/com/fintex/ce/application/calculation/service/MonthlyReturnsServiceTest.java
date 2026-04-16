@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.returns.MonthlyReturnsGenerator;
-import com.fintex.ce.application.returns.Returns;
+import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.returns.ReturnsCutComponent;
 import com.fintex.ce.application.returns.WeightedAverageComponent;
 import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
@@ -11,7 +11,7 @@ import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.port.webclient.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
@@ -26,7 +26,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static com.fintex.sm.model.domain.enumeration.CurrencyType.CAD;
+import static com.fintex.wm.commons.domain.currency.Currency.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,7 +46,7 @@ class MonthlyReturnsServiceTest {
   @Test
   void shouldGetWeightedAverageWithCpsdAndCpedValidation_whenVerifyGetWeightedAverage() {
     final var service = mock(MonthlyReturnsService.class);
-    final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturns
@@ -66,7 +66,7 @@ class MonthlyReturnsServiceTest {
   @Test
   void shouldGetWeightedAverageWithCpsdAndCpedValidation_whenCheckResult() {
     final var service = mock(MonthlyReturnsService.class);
-    final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturns
@@ -88,7 +88,7 @@ class MonthlyReturnsServiceTest {
   @Test
   void shouldGetWeightedAverageWithCpedValidation_whenVerifyGetWeightedAverage() {
     final var service = mock(MonthlyReturnsService.class);
-    final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturns
@@ -107,7 +107,7 @@ class MonthlyReturnsServiceTest {
   @Test
   void shouldGetWeightedAverageWithCpedValidation_whenCheckResult() {
     final var service = mock(MonthlyReturnsService.class);
-    final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturns
@@ -127,7 +127,7 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetMonthlyReturns_whenVerifyLoad() {
-    try (MockedConstruction<Returns> mocked = Mockito.mockConstruction(Returns.class)) {
+    try (MockedConstruction<ReturnsAggregate> mocked = Mockito.mockConstruction(ReturnsAggregate.class)) {
       final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
       final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
       final var service = mock(MonthlyReturnsService.class, withSettings()
@@ -153,12 +153,12 @@ class MonthlyReturnsServiceTest {
 
     final var originalMonthlyReturns = mock(Map.class);
     when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(originalMonthlyReturns);
-    final Returns expected = mock(Returns.class);
+    final ReturnsAggregate expected = mock(ReturnsAggregate.class);
     when(service.getMonthlyReturns(originalMonthlyReturns)).thenReturn(expected);
 
     doCallRealMethod().when(service).getMonthlyReturns(anyList(), any());
 
-    final var actual = service.getMonthlyReturns(mock(List.class), CurrencyType.CAD);
+    final var actual = service.getMonthlyReturns(mock(List.class), Currency.CAD);
 
     assertEquals(expected, actual);
   }
@@ -177,7 +177,7 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(service).getMonthlyReturns(anyList(), any());
 
-    service.getMonthlyReturns(mock(List.class), CurrencyType.CAD);
+    service.getMonthlyReturns(mock(List.class), Currency.CAD);
 
     verify(originalMonthlyReturns).putAll(gicOriginalMonthlyReturns);
   }
@@ -189,7 +189,7 @@ class MonthlyReturnsServiceTest {
         .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
 
     final var holdings = mock(List.class);
-    final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     monthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(monthlyReturns);
 
@@ -206,7 +206,7 @@ class MonthlyReturnsServiceTest {
     final var service = mock(MonthlyReturnsService.class, withSettings()
         .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
 
-    final var monthlyReturns = mock(Returns.class, RETURNS_SELF);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_SELF);
     monthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(monthlyReturns);
 
@@ -231,7 +231,7 @@ class MonthlyReturnsServiceTest {
         .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
 
     final var holdings = mock(List.class);
-    final var monthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     monthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(monthlyReturns);
 
@@ -249,7 +249,7 @@ class MonthlyReturnsServiceTest {
         .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
 
     final var holdings = mock(List.class);
-    final var benchmarkMonthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var benchmarkMonthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     benchmarkMonthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(benchmarkMonthlyReturns);
 
@@ -266,7 +266,7 @@ class MonthlyReturnsServiceTest {
     final var service = mock(MonthlyReturnsService.class, withSettings()
         .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
 
-    final var monthlyReturns = mock(Returns.class, RETURNS_SELF);
+    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_SELF);
     monthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(monthlyReturns);
 
@@ -291,7 +291,7 @@ class MonthlyReturnsServiceTest {
         .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
 
     final var holdings = mock(List.class);
-    final var benchmarkMonthlyReturns = mock(Returns.class, RETURNS_DEEP_STUBS);
+    final var benchmarkMonthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     benchmarkMonthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(benchmarkMonthlyReturns);
 

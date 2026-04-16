@@ -1,17 +1,17 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.FeesMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SalesChargeMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.YieldMapper;
-import com.fintex.ce.domain.model.FeeData;
-import com.fintex.ce.domain.model.SalesCharge;
-import com.fintex.ce.domain.model.Yield;
+import com.fintex.ce.model.domain.calculation.fee.FeeData;
+import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
+import com.fintex.ce.model.domain.calculation.yield.Yield;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.domain.datapoint.Fees;
-import com.fintex.sm.model.domain.datapoint.Income;
-import com.fintex.sm.model.domain.datapoint.SalesChargeData;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.financial.Fees;
+import com.fintex.wm.commons.domain.financial.Income;
+import com.fintex.wm.commons.domain.sales.SalesChargeData;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

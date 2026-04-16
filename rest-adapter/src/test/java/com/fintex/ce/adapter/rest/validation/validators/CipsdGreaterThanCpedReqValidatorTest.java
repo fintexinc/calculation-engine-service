@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class CipsdGreaterThanCpedReqValidatorTest {
     PeriodCommand command = new PeriodCommand();
     command.setCustomIntervalPsd(LocalDate.of(2025, 6, 30));
     command.setCustomPed(LocalDate.of(2025, 1, 31));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ReqValidationException.class)
@@ -36,7 +36,7 @@ class CipsdGreaterThanCpedReqValidatorTest {
     PeriodCommand command = new PeriodCommand();
     command.setCustomIntervalPsd(LocalDate.of(2025, 1, 31));
     command.setCustomPed(LocalDate.of(2025, 6, 30));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
@@ -46,7 +46,7 @@ class CipsdGreaterThanCpedReqValidatorTest {
     PeriodCommand command = new PeriodCommand();
     command.setCustomIntervalPsd(null);
     command.setCustomPed(null);
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
@@ -56,14 +56,14 @@ class CipsdGreaterThanCpedReqValidatorTest {
     PeriodCommand commandWithCipsdOnly = new PeriodCommand();
     commandWithCipsdOnly.setCustomIntervalPsd(LocalDate.of(2025, 6, 30));
     commandWithCipsdOnly.setCustomPed(null);
-    commandWithCipsdOnly.setCurrency(CurrencyType.CAD);
+    commandWithCipsdOnly.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(commandWithCipsdOnly)).doesNotThrowAnyException();
 
     PeriodCommand commandWithCpedOnly = new PeriodCommand();
     commandWithCpedOnly.setCustomIntervalPsd(null);
     commandWithCpedOnly.setCustomPed(LocalDate.of(2025, 6, 30));
-    commandWithCpedOnly.setCurrency(CurrencyType.CAD);
+    commandWithCpedOnly.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(commandWithCpedOnly)).doesNotThrowAnyException();
   }

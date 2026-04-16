@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.service.breakdown;
 
 import com.fintex.ce.calculation.BreakdownCalculationService;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.WarningResult;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.util.ExposureDataHolder;
 
 import java.math.BigDecimal;

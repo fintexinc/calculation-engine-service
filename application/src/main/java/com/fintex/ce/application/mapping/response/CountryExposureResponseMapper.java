@@ -1,11 +1,11 @@
 package com.fintex.ce.application.mapping.response;
 
-import com.fintex.ce.domain.model.CountryExposure;
-import com.fintex.ce.domain.model.calculation.CountryRegionType;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.CountryExposureResult;
 import com.fintex.ce.mapping.ResponseMapper;
+import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
+import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
+import com.fintex.ce.model.error.Warning;
 
 import org.springframework.stereotype.Component;
 

@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.domain.model.result.AlphaResult;
-import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.risk.AlphaResult;
+import com.fintex.ce.model.util.BigDecimalConstants;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;

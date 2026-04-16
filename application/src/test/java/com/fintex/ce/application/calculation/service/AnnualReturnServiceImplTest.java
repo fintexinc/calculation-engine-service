@@ -1,13 +1,13 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.AnnualReturnCalculation;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.ReturnCommand;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.AnnualReturnResult;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +60,7 @@ class AnnualReturnServiceImplTest {
     final var returnReqDTO = mock(ReturnCommand.class);
     final var holdings = List.of(mock(Holding.class));
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
     when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
 
     final var calculationDTO = mock(CalculationDTO.class);
@@ -85,8 +85,8 @@ class AnnualReturnServiceImplTest {
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
     final var holdings = List.of(mock(Holding.class));
     final var annual = mock(ReturnCommand.class);
-    final var monthlyReturns = mock(Returns.class);
-    when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
+    when(annual.getCurrency()).thenReturn(Currency.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
@@ -95,7 +95,7 @@ class AnnualReturnServiceImplTest {
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     sut.buildWeightedAverageInputDto(annual);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD, SCALE_OF_TWO);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
 
   @Test
@@ -105,13 +105,13 @@ class AnnualReturnServiceImplTest {
 
     final var holdings = List.of(mock(Holding.class));
     final NavigableMap map = new TreeMap<>();
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
 
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(map);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturns);
 
     final var annual = mock(ReturnCommand.class);
-    when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(annual.getCurrency()).thenReturn(Currency.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
@@ -129,14 +129,14 @@ class AnnualReturnServiceImplTest {
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
     final var holdings = List.of(mock(Holding.class));
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(CurrencyType.class), eq(SCALE_OF_TWO)))
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(Currency.class), eq(SCALE_OF_TWO)))
         .thenReturn(
             monthlyReturns);
 
     final var annual = mock(ReturnCommand.class);
-    when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(annual.getCurrency()).thenReturn(Currency.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
@@ -154,12 +154,12 @@ class AnnualReturnServiceImplTest {
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
     final var holdings = List.of(mock(Holding.class));
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturns);
 
     final var annual = mock(ReturnCommand.class);
-    when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(annual.getCurrency()).thenReturn(Currency.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
@@ -167,7 +167,7 @@ class AnnualReturnServiceImplTest {
     doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
     sut.buildWeightedAverageInputDto(annual);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD, SCALE_OF_TWO);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
 
   @Test
@@ -197,7 +197,7 @@ class AnnualReturnServiceImplTest {
 
     final var holdings = List.of(mock(Holding.class));
     final NavigableMap map = new TreeMap<>();
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
     final var warnings = List.of(mock(Warning.class));
 
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(map);
@@ -205,7 +205,7 @@ class AnnualReturnServiceImplTest {
     when(monthlyReturns.getErrorsAsWarnings()).thenReturn(warnings);
 
     final var annual = mock(ReturnCommand.class);
-    when(annual.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(annual.getCurrency()).thenReturn(Currency.CAD);
     when(annual.getHoldings()).thenReturn(holdings);
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));

@@ -2,12 +2,12 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.application.mapping.response.MaturityAllocationResponseMapper;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.MaturityAllocation;
-import com.fintex.ce.domain.model.calculation.MaturityAllocationType;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.MaturityAllocationResult;
+import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
+import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_MA_MA_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_MA_MA_001;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 

@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
 
 /**
  * Interface for mapping Security Master API responses to domain models.

@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.rating.CreditQualityRatings;
-import com.fintex.sm.model.domain.value.CreditQualityRatingTypeValue;
+import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatingTypeValue;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatings;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,14 +18,14 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.A;
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AA;
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.AAA;
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.B;
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BB;
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BBB;
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.BELOW_B;
-import static com.fintex.sm.model.domain.enumeration.CreditQualityRatingType.NOT_RATED;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.A;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.AA;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.AAA;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.B;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.BB;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.BBB;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.BELOW_B;
+import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.NOT_RATED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CreditQualityMapperTest {

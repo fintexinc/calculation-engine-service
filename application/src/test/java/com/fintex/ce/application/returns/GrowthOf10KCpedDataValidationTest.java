@@ -1,7 +1,7 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.validation.GrowthOf10KCpedDataValidation;
-import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.model.error.Notification;
 
 import org.junit.jupiter.api.Test;
 

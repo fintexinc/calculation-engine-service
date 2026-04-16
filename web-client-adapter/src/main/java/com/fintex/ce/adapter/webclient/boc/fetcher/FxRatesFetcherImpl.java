@@ -6,8 +6,8 @@ import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaWebClient;
 import com.fintex.ce.adapter.webclient.boc.client.FxRateSource;
 import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse;
 import com.fintex.ce.adapter.webclient.boc.mapper.BankOfCanadaFxRateMapper;
-import com.fintex.ce.domain.model.CurrencyExchangePair;
-import com.fintex.ce.domain.model.DateRange;
+import com.fintex.ce.model.domain.CurrencyExchangePair;
+import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.port.webclient.FxRatesFetcher;
 
 import org.springframework.stereotype.Component;
@@ -54,8 +54,8 @@ public class FxRatesFetcherImpl implements FxRatesFetcher {
     String directKey = currencyPair.from().name() + PAIR_SEPARATOR + currencyPair.to().name();
     String inverseKey = currencyPair.to().name() + PAIR_SEPARATOR + currencyPair.from().name();
 
-    LocalDate startDate = dateRange != null ? dateRange.from() : null;
-    LocalDate endDate = dateRange != null ? dateRange.to() : null;
+    LocalDate startDate = dateRange != null ? dateRange.start() : null;
+    LocalDate endDate = dateRange != null ? dateRange.end() : null;
 
     CurrencyPairConfig directConfig = properties.getCurrencyPairs().get(directKey);
     if (directConfig != null) {

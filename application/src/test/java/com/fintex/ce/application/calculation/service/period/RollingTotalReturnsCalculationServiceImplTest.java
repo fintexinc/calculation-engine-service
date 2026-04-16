@@ -2,16 +2,16 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.RollingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
+import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.RollingTotalReturnsResult;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.sm.model.domain.enumeration.FiIdentifierType.FUNDSERV;
+import static com.fintex.wm.commons.domain.id.FiIdentifierType.FUNDSERV;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.any;
@@ -46,7 +46,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
     req.setRollingPeriods(Set.of("12", "11", "10"));
-    req.setCurrency(CurrencyType.CAD);
+    req.setCurrency(Currency.CAD);
 
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
     final var expected = mock(RollingTotalReturnsResult.class);
@@ -71,7 +71,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
     req.setRollingPeriods(Set.of("12", "11", "10"));
-    req.setCurrency(CurrencyType.CAD);
+    req.setCurrency(Currency.CAD);
 
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
 
@@ -93,7 +93,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
-    req.setCurrency(CurrencyType.CAD);
+    req.setCurrency(Currency.CAD);
 
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
 
@@ -153,7 +153,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var req = new RollingCalculationCommand();
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
 
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
     final var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any()))
@@ -177,7 +177,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
         new SecurityIdentifier("RBF605", FUNDSERV));
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
-    req.setCurrency(CurrencyType.CAD);
+    req.setCurrency(Currency.CAD);
     req.setCustomPsd(LocalDate.now());
     req.setCustomPed(LocalDate.now().plusMonths(10));
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
@@ -198,11 +198,11 @@ class RollingTotalReturnsCalculationServiceImplTest {
         new SecurityIdentifier("RBF605", FUNDSERV));
     final var req = new RollingCalculationCommand();
     req.setHoldings(List.of(holding));
-    req.setCurrency(CurrencyType.CAD);
+    req.setCurrency(Currency.CAD);
     req.setCustomPsd(LocalDate.now());
     req.setCustomPed(LocalDate.now().plusMonths(10));
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
-    final var monthlyReturns = mock(Returns.class);
+    final var monthlyReturns = mock(ReturnsAggregate.class);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());

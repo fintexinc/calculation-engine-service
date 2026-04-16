@@ -1,12 +1,12 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquityMarketCapitalizationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.model.HoldingEquityMarketCap;
-import com.fintex.sm.model.domain.datapoint.EquityMarketCapitalization;
-import com.fintex.sm.model.domain.enumeration.EquityMarketCapitalizationType;
-import com.fintex.sm.model.domain.value.EquityMarketCapitalizationTypeValue;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
+import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationTypeValue;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 
 import org.springframework.core.ParameterizedTypeReference;
 

@@ -1,10 +1,10 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.dto.IncomeForecastDto;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.EquitySecurityIdentifier;
-import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.IncomeForecastDto;
+import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -40,9 +40,6 @@ public class PortfolioUtils {
     }
   }
 
-  /**
-   * return true if no holdings in the portfolio contain any value
-   */
   public static <T> boolean areAllValuesInMapEmpty(final Map<Holding, Map<T, BigDecimal>> map) {
     for (final Map.Entry<Holding, Map<T, BigDecimal>> entry : map.entrySet()) {
       if (entry.getValue() != null && !entry.getValue().isEmpty()) {
@@ -52,14 +49,6 @@ public class PortfolioUtils {
     return true;
   }
 
-  /**
-   * return true if all holdings in the portfolio contain BigDecimal.ZERO values
-   *
-   * @param map
-   *          contains Map with values for each Holding type
-   * @param <T>
-   *          generic key
-   */
   public static <T> boolean areAllValuesZerosInMap(final Map<Holding, Map<T, BigDecimal>> map) {
     return map.values().stream().flatMap(e -> e.values().stream()).allMatch(v -> v.compareTo(ZERO) == 0);
   }

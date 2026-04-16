@@ -1,8 +1,8 @@
 package com.fintex.ce.calculation;
 
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.result.ErrorResult;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.result.ErrorResult;
+import com.fintex.ce.model.dto.command.CalculationCommand;
 
 /**
  * Base interface for all calculation services. Used for services that follow the pattern: perform(command) -> result

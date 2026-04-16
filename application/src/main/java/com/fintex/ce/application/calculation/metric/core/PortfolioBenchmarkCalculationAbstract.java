@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric.core;
 
-import com.fintex.ce.domain.constant.BigDecimalConstants;
-import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.domain.model.result.PeriodResult;
+import com.fintex.ce.model.domain.result.PeriodResult;
+import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.util.BigDecimalConstants;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,12 +1,12 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.CreditQualityMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
-import com.fintex.sm.model.domain.rating.CreditQualityRatings;
-import com.fintex.sm.model.domain.value.CreditQualityRatingTypeValue;
+import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatingTypeValue;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatings;
 
 import org.springframework.core.ParameterizedTypeReference;
 

@@ -1,6 +1,6 @@
 package com.fintex.ce.application.config;
 
-import com.fintex.sm.model.DataProvider;
+import com.fintex.wm.commons.domain.DataProvider;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

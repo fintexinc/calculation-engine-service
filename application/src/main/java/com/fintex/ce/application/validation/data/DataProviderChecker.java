@@ -1,9 +1,9 @@
 package com.fintex.ce.application.validation.data;
 
 import com.fintex.ce.application.config.DefaultDataProperties;
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
-import com.fintex.sm.model.DataProvider;
+import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.wm.commons.domain.DataProvider;
 
 import org.springframework.stereotype.Component;
 

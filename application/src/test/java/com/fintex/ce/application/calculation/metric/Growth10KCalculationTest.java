@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.CommonDates;
-import com.fintex.ce.domain.model.result.core.KeyValueResult;
+import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.model.domain.result.KeyValueResult;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +32,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldCalculate_whenVerifyCalculateGrowth10K() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     doCallRealMethod().when(sut).calculate();
@@ -45,8 +45,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldCalculate_whenVerifyGetPortfolioEndDate() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     when(sut.calculateGrowth10K(portfolioReturns)).thenReturn(mock(List.class));
@@ -60,8 +60,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldCalculate_whenVerifyGetPortfolioStartDate() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     when(sut.calculateGrowth10K(portfolioReturns)).thenReturn(mock(List.class));
@@ -75,8 +75,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldCalculateGrowth10K_whenVerifySetFirstGrowth10KValue() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     doCallRealMethod().when(sut).calculateGrowth10K(portfolioReturns);
@@ -88,8 +88,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldCalculateGrowth10K_whenVerifyCalculateGrowth10K() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     doCallRealMethod().when(sut).calculateGrowth10K(portfolioReturns);
@@ -101,8 +101,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldCalculateGrowth10K_whenVerifyPopulateGrowth10KValuesAfterLastDate() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     doCallRealMethod().when(sut).calculateGrowth10K(portfolioReturns);
@@ -186,8 +186,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldPopulateGrowth10KValuesAfterLastDate_whenVerifyGetNextPortfolioReturnsMonth() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     when(sut.getPortfolioEndDate(any())).thenReturn(toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
@@ -204,8 +204,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldPopulateGrowth10KValuesAfterLastDate_whenVerifyPutDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     when(sut.getPortfolioEndDate(any())).thenReturn(toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
@@ -233,8 +233,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldGetPortfolioEndDate_whenCheckResultWhenCustomEndDateIsNull() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     doCallRealMethod().when(sut).getPortfolioEndDate(any());
@@ -246,10 +246,10 @@ class Growth10KCalculationTest {
   @Test
   void shouldGetPortfolioEndDate_whenCheckResultWhenCustomEndDateIsPopulated() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = new CommonDates(
+    final var dateRange = new DateRange(
         toLastDayOfMonth(LocalDate.of(2020, 5, 1)),
         toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     doCallRealMethod().when(sut).getPortfolioEndDate(any());
@@ -261,8 +261,8 @@ class Growth10KCalculationTest {
   @Test
   void shouldGetPortfolioStartDate_whenCheckResultWhenCustomStartDateIsNull() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = mock(CommonDates.class);
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var dateRange = DateRange.UNBOUNDED;
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     doCallRealMethod().when(sut).getPortfolioStartDate(any());
@@ -274,10 +274,10 @@ class Growth10KCalculationTest {
   @Test
   void shouldGetPortfolioStartDate_whenCheckResultWhenCustomStartDateIsPopulated() {
     final var portfolioReturns = getPortfolioReturns();
-    final var commonDates = new CommonDates(
+    final var dateRange = new DateRange(
         toLastDayOfMonth(LocalDate.of(2020, 5, 1)),
         toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, commonDates,
+    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
     doCallRealMethod().when(sut).getPortfolioStartDate(any());

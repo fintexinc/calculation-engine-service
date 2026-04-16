@@ -1,11 +1,11 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.dto.command.ReturnCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ class CpedLastDayOfMonthReqValidatorTest extends AbstractLastDayOfMonthReqValida
   CalculationCommand createCommandWithDate(LocalDate date) {
     PeriodCommand command = new PeriodCommand();
     command.setCustomPed(date);
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
     return command;
   }
 
@@ -41,7 +41,7 @@ class CpedLastDayOfMonthReqValidatorTest extends AbstractLastDayOfMonthReqValida
   void shouldNotThrow_whenReturnCommandDateIsLastDayOfMonth() {
     ReturnCommand command = new ReturnCommand();
     command.setCustomPed(LocalDate.of(2025, 1, 31));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
@@ -50,7 +50,7 @@ class CpedLastDayOfMonthReqValidatorTest extends AbstractLastDayOfMonthReqValida
   void shouldThrow_whenReturnCommandDateIsNotLastDayOfMonth() {
     ReturnCommand command = new ReturnCommand();
     command.setCustomPed(LocalDate.of(2025, 1, 15));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ReqValidationException.class)

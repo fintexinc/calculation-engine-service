@@ -1,11 +1,11 @@
 package com.fintex.ce.application.validation.data;
 
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationDataDTO;
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.Warning;
 
 import org.springframework.stereotype.Component;
 

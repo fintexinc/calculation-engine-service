@@ -1,10 +1,10 @@
 package com.fintex.ce.application.calculation.service.period;
 
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ class SharpeRatioCalculationServiceImplTest {
 
     final var weightedAverageInputDTO = mock(CalculationDTO.class);
     final PeriodCommand req = mock(PeriodCommand.class);
-    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(req.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(sut.buildCalculationDto(any(), any())).thenReturn(weightedAverageInputDTO);
 
@@ -46,13 +46,13 @@ class SharpeRatioCalculationServiceImplTest {
     final var calculationDTO = mock(CalculationDTO.class);
     final PeriodCommand req = mock(PeriodCommand.class);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
-    when(req.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(req.getCurrency()).thenReturn(Currency.CAD);
     when(sut.buildCalculationDto(any(), any())).thenReturn(calculationDTO);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     sut.defineCalculationMethod(req);
 
-    verify(tBillsFetcher).fetch(CurrencyType.CAD);
+    verify(tBillsFetcher).fetch(Currency.CAD);
   }
 
 }

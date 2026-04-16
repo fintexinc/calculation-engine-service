@@ -1,10 +1,10 @@
 package com.fintex.ce.application.mapping.response;
 
-import com.fintex.ce.domain.model.CreditQuality;
-import com.fintex.ce.domain.model.calculation.FixedIncomeCreditQuality;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.result.CreditQualityResult;
-import com.fintex.sm.model.domain.enumeration.CreditQualityRatingType;
+import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
+import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
+import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
+import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
 
 import org.junit.jupiter.api.Test;
 

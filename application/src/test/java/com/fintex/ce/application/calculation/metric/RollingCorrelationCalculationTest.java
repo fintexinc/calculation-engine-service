@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.model.result.RollingCorrelationResult;
-import com.fintex.ce.domain.model.result.core.IntervalResult;
-import com.fintex.ce.domain.model.result.core.RollingIntervalResult;
+import com.fintex.ce.model.domain.result.IntervalResult;
+import com.fintex.ce.model.domain.result.RollingIntervalResult;
+import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -18,9 +18,9 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TEN_THOUSAND;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.model.util.BigDecimalConstants.TEN_THOUSAND;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertFalse;

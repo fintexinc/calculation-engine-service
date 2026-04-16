@@ -2,14 +2,14 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
-import com.fintex.ce.domain.exception.notification.pattern.Notification;
-import com.fintex.ce.domain.model.ReturnsData;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.calculation.returns.ReturnsData;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.error.Notification;
 import com.fintex.ce.util.MapUtils;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,8 +23,8 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.TWO;
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_MR_002;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_MR_002;
+import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -48,8 +48,8 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVeryfyNoActionWhenThisPedIsAfterOtherPed() {
-    final var sut = mock(Returns.class);
-    final var other = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
+    final var other = mock(ReturnsAggregate.class);
 
     sut.ped = LOCAL_DATE_NOW;
     other.ped = LOCAL_DATE_NOW.minusMonths(1);
@@ -66,8 +66,8 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenCheckResultWhenThisPedIsAfterOtherPed() {
-    final var sut = mock(Returns.class);
-    final var other = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
+    final var other = mock(ReturnsAggregate.class);
 
     sut.ped = LOCAL_DATE_NOW;
     other.ped = LOCAL_DATE_NOW.minusMonths(1);
@@ -82,8 +82,8 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVerifyCutReturnsByEndDateWhenThisPedIsBeforeOtherPed() {
-    final var sut = mock(Returns.class);
-    final var other = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
+    final var other = mock(ReturnsAggregate.class);
 
     final var otherMonthlyReturns = mock(Map.class);
     other.returnsMap = otherMonthlyReturns;
@@ -105,8 +105,8 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVerifyInitWhenThisPedIsBeforeOtherPed() {
-    final var sut = mock(Returns.class);
-    final var other = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
+    final var other = mock(ReturnsAggregate.class);
 
     other.returnsMap = mock(Map.class);
 
@@ -127,8 +127,8 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenCheckResult2WhenThisPedIsBeforeOtherPed() {
-    final var sut = mock(Returns.class);
-    final var other = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
+    final var other = mock(ReturnsAggregate.class);
 
     other.returnsMap = mock(Map.class);
 
@@ -142,8 +142,8 @@ class MonthlyReturnsTest {
     when(monthlyReturnsCutComponent.cutReturnsByEndDate(any(), any())).thenReturn(cutedMonthlyReturns);
     sut.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    final var clonedOther = mock(Returns.class);
-    final var initedOther = mock(Returns.class);
+    final var clonedOther = mock(ReturnsAggregate.class);
+    final var initedOther = mock(ReturnsAggregate.class);
     when(other.findPedAndPsd()).thenReturn(initedOther);
     doCallRealMethod().when(sut).cutArgumentToTheSameEndDate(any());
 
@@ -154,7 +154,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldFxRatesApplied_whenVerifyConvert() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     final var holdingCurrency = mock(Map.class);
@@ -167,7 +167,7 @@ class MonthlyReturnsTest {
     doCallRealMethod().when(sut).setFxRates(any(), any());
     final var fxRatesConversionComponent = mock(FxRatesConversionComponent.class);
     sut.setFxRatesConversionComponent(fxRatesConversionComponent);
-    sut.setFxRates(Map.of(), CurrencyType.CAD);
+    sut.setFxRates(Map.of(), Currency.CAD);
 
     doCallRealMethod().when(sut).fxRatesApplied();
 
@@ -179,7 +179,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByCpedIfCpedEmptyCutByPed_whenVerifyCutReturnsByEndDateWhenCpedIsNotNull() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
@@ -199,7 +199,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByCpedIfCpedEmptyCutByPed_whenVerifyCutReturnsByEndDateWhenCpedIsNull() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
@@ -219,7 +219,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByPed_whenVerifyCutReturnsByEndDate() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
@@ -239,7 +239,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByPsd_whenVerifyCutReturnsByEndDate() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
@@ -259,7 +259,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByCpsdIfCpsdEmptyCutByPsd_whenVerifyCutReturnsByEndDateWhenCpedIsNotNull() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
@@ -279,7 +279,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByCpsdIfCpsdEmptyCutByPsd_whenVerifyCutReturnsByEndDateWhenCpedIsNull() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
@@ -299,7 +299,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldGetWeightedAverage_whenVerifyGetWeightedAverage() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
@@ -318,7 +318,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldGetWeightedAverage_whenCheckResult() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
@@ -340,7 +340,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateCped_whenVerifyValidatePortfolioCped() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
     Notification notification = mock(Notification.class);
     sut.notification = notification;
 
@@ -364,7 +364,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateCpsd_whenVerifyValidatePortfolioCped() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
     Notification notification = mock(Notification.class);
     sut.notification = notification;
 
@@ -388,7 +388,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase1() {
-    final var sut = new Returns();
+    final var sut = new ReturnsAggregate();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
     var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
@@ -426,7 +426,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase2() {
-    final var sut = new Returns();
+    final var sut = new ReturnsAggregate();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
     var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
@@ -465,7 +465,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase3() {
-    final var sut = new Returns();
+    final var sut = new ReturnsAggregate();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
     var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
@@ -503,7 +503,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateMonthlyReturns_whenCase4NoExceptionThrown() {
-    final var sut = new Returns();
+    final var sut = new ReturnsAggregate();
     var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
     var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
@@ -535,7 +535,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldGetMonthlyReturns_whenCheckResult() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
     final var monthlyReturns = Map.of(mock(Holding.class), new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE)));
     sut.returnsMap = monthlyReturns;
 
@@ -549,7 +549,7 @@ class MonthlyReturnsTest {
   @Test
   void shouldGetMonthlyReturns_whenVerifyCopy() {
     try (var mapUtilsMock = mockStatic(MapUtils.class)) {
-      final var sut = mock(Returns.class);
+      final var sut = mock(ReturnsAggregate.class);
       final var monthlyReturns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE));
       final var holdingMonthlyReturns = Map.of(mock(Holding.class), monthlyReturns);
       sut.returnsMap = holdingMonthlyReturns;
@@ -565,7 +565,7 @@ class MonthlyReturnsTest {
   @Test
   void shouldFindPsdAmongHoldings_whenCheckResult() {
     final var holding = mock(Holding.class);
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     sut.returnsMap = Map.of(holding,
         new TreeMap<>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE, toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)),
@@ -580,7 +580,7 @@ class MonthlyReturnsTest {
   @Test
   void shouldFindPedAmongHoldings_whenCheckResult() {
     final var holding = mock(Holding.class);
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
     sut.returnsMap = Map.of(holding,
         new TreeMap<>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE, toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)),
             ONE)));
@@ -594,16 +594,16 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldRetrieveHoldingCurrencies_whenCheckResult() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
     sut.notification = new Notification();
 
     final var holding1 = mock(Holding.class);
     final var holding2 = mock(Holding.class);
 
     final var rMonthlyReturns1 = mock(ReturnsData.class);
-    when(rMonthlyReturns1.getCurrency()).thenReturn(CurrencyType.CAD.name());
+    when(rMonthlyReturns1.getCurrency()).thenReturn(Currency.CAD.name());
     final var rMonthlyReturns2 = mock(ReturnsData.class);
-    when(rMonthlyReturns2.getCurrency()).thenReturn(CurrencyType.USD.name());
+    when(rMonthlyReturns2.getCurrency()).thenReturn(Currency.USD.name());
 
     final var originalMReturns = Map.of(holding1, rMonthlyReturns1, holding2, rMonthlyReturns2);
 
@@ -611,14 +611,14 @@ class MonthlyReturnsTest {
 
     final var actual = sut.retrieveHoldingCurrencies(originalMReturns);
 
-    final var expected = Map.of(holding1, CurrencyType.CAD, holding2, CurrencyType.USD);
+    final var expected = Map.of(holding1, Currency.CAD, holding2, Currency.USD);
     assertEquals(expected, actual);
     assertTrue(sut.notification.getErrors().isEmpty());
   }
 
   @Test
   void shouldRetrieveHoldingCurrencies_whenCurrencyIsNull() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
     sut.notification = new Notification();
 
     final var holding1 = mock(Holding.class);
@@ -627,7 +627,7 @@ class MonthlyReturnsTest {
     final var rMonthlyReturns1 = mock(ReturnsData.class);
     when(rMonthlyReturns1.getCurrency()).thenReturn(null);
     final var rMonthlyReturns2 = mock(ReturnsData.class);
-    when(rMonthlyReturns2.getCurrency()).thenReturn(CurrencyType.USD.name());
+    when(rMonthlyReturns2.getCurrency()).thenReturn(Currency.USD.name());
 
     final var originalMReturns = Map.of(holding1, rMonthlyReturns1, holding2, rMonthlyReturns2);
 
@@ -635,15 +635,15 @@ class MonthlyReturnsTest {
 
     final var actual = sut.retrieveHoldingCurrencies(originalMReturns);
 
-    final var expected = new HashMap<Holding, CurrencyType>();
-    expected.put(holding2, CurrencyType.USD);
+    final var expected = new HashMap<Holding, Currency>();
+    expected.put(holding2, Currency.USD);
     assertEquals(expected, actual);
     assertFalse(sut.notification.getErrors().isEmpty());
   }
 
   @Test
   void shouldRetrieveReturns_whenCheckResult() {
-    final var sut = mock(Returns.class);
+    final var sut = mock(ReturnsAggregate.class);
 
     final var holding1 = mock(Holding.class);
     final var holding2 = mock(Holding.class);
@@ -670,16 +670,16 @@ class MonthlyReturnsTest {
   void shouldMonthlyReturns_whenCheckResult() {
     final var rMonthlyReturns = mock(ReturnsData.class);
     final var monthlyReturns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    when(rMonthlyReturns.getCurrency()).thenReturn(CurrencyType.CAD.name());
+    when(rMonthlyReturns.getCurrency()).thenReturn(Currency.CAD.name());
     when(rMonthlyReturns.getReturns()).thenReturn(monthlyReturns);
 
     final var holding = mock(Holding.class);
 
     final var rMonthlyReturnsMap = Map.of(holding, rMonthlyReturns);
 
-    final var sut = new Returns(rMonthlyReturnsMap);
+    final var sut = new ReturnsAggregate(rMonthlyReturnsMap);
 
-    assertEquals(Map.of(holding, CurrencyType.CAD), sut.holdingCurrencyMap);
+    assertEquals(Map.of(holding, Currency.CAD), sut.holdingCurrencyMap);
     assertEquals(Map.of(holding, monthlyReturns), sut.returnsMap);
   }
 

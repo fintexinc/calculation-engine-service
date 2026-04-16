@@ -4,12 +4,12 @@ import com.fintex.ce.application.calculation.metric.DistributionOfReturnsCalcula
 import com.fintex.ce.application.calculation.metric.RollingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
+import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.calculation.CalculationService;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.result.DistributionOfReturnsResult;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.stereotype.Service;
@@ -48,11 +48,11 @@ public class DistributionOfReturnsServiceImpl
 
   public CalculationDTO buildCalculationDto(final DistributionOfReturnsCommand reqDTO,
       final ReturnFactorScale returnFactorScale) {
-    final Returns portfolioMonthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(
+    final ReturnsAggregate portfolioMonthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
         reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale);
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturns, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
             .getCustomPed());
 
     return new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns);

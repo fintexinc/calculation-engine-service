@@ -1,12 +1,12 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.response.YieldResponseMapper;
-import com.fintex.ce.domain.dto.command.YieldCommand;
-import com.fintex.ce.domain.model.Yield;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.YieldResult;
+import com.fintex.ce.model.domain.calculation.yield.Yield;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.income.YieldResult;
+import com.fintex.ce.model.dto.command.YieldCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

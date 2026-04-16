@@ -1,6 +1,6 @@
 package com.fintex.ce.util;
 
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

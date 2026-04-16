@@ -6,9 +6,9 @@ import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaWebClient;
 import com.fintex.ce.adapter.webclient.boc.client.FxRateSource;
 import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse;
 import com.fintex.ce.adapter.webclient.boc.mapper.BankOfCanadaFxRateMapper;
-import com.fintex.ce.domain.model.CurrencyExchangePair;
-import com.fintex.ce.domain.model.DateRange;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.domain.CurrencyExchangePair;
+import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,9 +32,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class FxRatesFetcherImplTest {
 
-  private static final CurrencyExchangePair USD_CAD = new CurrencyExchangePair(CurrencyType.USD, CurrencyType.CAD);
-  private static final CurrencyExchangePair CAD_USD = new CurrencyExchangePair(CurrencyType.CAD, CurrencyType.USD);
-  private static final CurrencyExchangePair EUR_CAD = new CurrencyExchangePair(CurrencyType.EUR, CurrencyType.CAD);
+  private static final CurrencyExchangePair USD_CAD = new CurrencyExchangePair(Currency.USD, Currency.CAD);
+  private static final CurrencyExchangePair CAD_USD = new CurrencyExchangePair(Currency.CAD, Currency.USD);
+  private static final CurrencyExchangePair EUR_CAD = new CurrencyExchangePair(Currency.EUR, Currency.CAD);
   private static final DateRange DATE_RANGE = new DateRange(
       LocalDate.of(2020, 1, 1), LocalDate.of(2024, 12, 31));
 
@@ -90,7 +90,7 @@ class FxRatesFetcherImplTest {
 
   @Test
   void shouldReturnEmptyMapWhenSameCurrency() {
-    var result = fetcher.fetch(new CurrencyExchangePair(CurrencyType.CAD, CurrencyType.CAD), DATE_RANGE);
+    var result = fetcher.fetch(new CurrencyExchangePair(Currency.CAD, Currency.CAD), DATE_RANGE);
 
     assertThat(result).isEmpty();
     verifyNoInteractions(client);

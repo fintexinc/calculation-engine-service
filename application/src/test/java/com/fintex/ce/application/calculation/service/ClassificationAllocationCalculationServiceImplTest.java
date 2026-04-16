@@ -1,10 +1,10 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.ClassificationAllocation;
-import com.fintex.ce.domain.model.calculation.ClassificationAllocationType;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.ClassificationAllocationResult;
+import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
+import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ExposureDataHolder;

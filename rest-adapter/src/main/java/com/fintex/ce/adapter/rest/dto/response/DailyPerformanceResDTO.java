@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
-import com.fintex.ce.domain.model.calculation.ReturnsAnsDistributionReceived;
-import com.fintex.ce.domain.model.enumeration.DailyResultType;
+import com.fintex.ce.model.domain.calculation.returns.ReturnsAndDistributionReceived;
+import com.fintex.ce.model.domain.enumeration.DailyResultType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,11 +25,11 @@ public class DailyPerformanceResDTO extends WarningDTO {
 
   public static final String AGGREGATED_RESULT = "AGGREGATED_RESULT";
 
-  private Map<DailyResultType, Map<String, ReturnsAnsDistributionReceived>> dailyPerformance = new HashMap<>();
+  private Map<DailyResultType, Map<String, ReturnsAndDistributionReceived>> dailyPerformance = new HashMap<>();
   private LocalDate performanceStartDate;
   private LocalDate performanceEndDate;
 
-  public DailyPerformanceResDTO add(DailyResultType type, Map<String, ReturnsAnsDistributionReceived> result) {
+  public DailyPerformanceResDTO add(DailyResultType type, Map<String, ReturnsAndDistributionReceived> result) {
     this.dailyPerformance.put(type, result);
     return this;
   }
@@ -44,14 +44,14 @@ public class DailyPerformanceResDTO extends WarningDTO {
     var dailyPerformanceAndDistributionReceived = this.dailyPerformance.get(reinvestWithPacAndWithdrawal);
 
     TreeMap<LocalDate, BigDecimal> aggregatedReturns = aggregateReturns(dailyPerformanceAndDistributionReceived);
-    ReturnsAnsDistributionReceived aggregatedRes = sumAllAdditionalFields(dailyPerformanceAndDistributionReceived);
+    ReturnsAndDistributionReceived aggregatedRes = sumAllAdditionalFields(dailyPerformanceAndDistributionReceived);
     aggregatedRes.setReturns(aggregatedReturns);
 
     dailyPerformanceAndDistributionReceived.put(AGGREGATED_RESULT, aggregatedRes);
   }
 
   private TreeMap<LocalDate, BigDecimal> aggregateReturns(
-      Map<String, ReturnsAnsDistributionReceived> dailyPerformanceAndDistributionReceived) {
+      Map<String, ReturnsAndDistributionReceived> dailyPerformanceAndDistributionReceived) {
     var returns = dailyPerformanceAndDistributionReceived
         .entrySet()
         .stream()
@@ -64,15 +64,15 @@ public class DailyPerformanceResDTO extends WarningDTO {
     return aggregatedReturns;
   }
 
-  private ReturnsAnsDistributionReceived sumAllAdditionalFields(
-      Map<String, ReturnsAnsDistributionReceived> dailyPerformanceAndDistributionReceived) {
+  private ReturnsAndDistributionReceived sumAllAdditionalFields(
+      Map<String, ReturnsAndDistributionReceived> dailyPerformanceAndDistributionReceived) {
     BigDecimal distributionReceived = BigDecimal.ZERO;
     BigDecimal totalContribution = BigDecimal.ZERO;
     BigDecimal totalWithdrawal = BigDecimal.ZERO;
     BigDecimal subsequentContribution = BigDecimal.ZERO;
 
-    for (Map.Entry<String, ReturnsAnsDistributionReceived> entry : dailyPerformanceAndDistributionReceived.entrySet()) {
-      ReturnsAnsDistributionReceived res = entry.getValue();
+    for (Map.Entry<String, ReturnsAndDistributionReceived> entry : dailyPerformanceAndDistributionReceived.entrySet()) {
+      ReturnsAndDistributionReceived res = entry.getValue();
 
       distributionReceived = distributionReceived.add(res.getDistributionReceived());
       totalContribution = totalContribution.add(res.getTotalContribution());
@@ -80,7 +80,7 @@ public class DailyPerformanceResDTO extends WarningDTO {
       subsequentContribution = subsequentContribution.add(res.getSubsequentContribution());
     }
 
-    var aggregatedRes = new ReturnsAnsDistributionReceived();
+    var aggregatedRes = new ReturnsAndDistributionReceived();
     aggregatedRes.setDistributionReceived(distributionReceived);
     aggregatedRes.setTotalContribution(totalContribution);
     aggregatedRes.setTotalWithdrawal(totalWithdrawal);

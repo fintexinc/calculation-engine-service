@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ class BenchmarkHoldingReqValidatorTest {
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
 
     PeriodCommand cmd = new PeriodCommand();
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
     cmd.setBenchmarkHoldings(List.of(h1, h2));
 
     assertThatThrownBy(() -> validator.validate(cmd))
@@ -53,7 +53,7 @@ class BenchmarkHoldingReqValidatorTest {
         .build();
 
     PeriodCommand cmd = new PeriodCommand();
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
     cmd.setBenchmarkHoldings(List.of(cashHolding));
 
     assertThatThrownBy(() -> validator.validate(cmd))
@@ -74,7 +74,7 @@ class BenchmarkHoldingReqValidatorTest {
         new SecurityIdentifier("ID2", FiIdentifierType.TICKER));
 
     PeriodCommand cmd = new PeriodCommand();
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
     cmd.setBenchmarkHoldings(List.of(h1, h2));
 
     assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
@@ -83,7 +83,7 @@ class BenchmarkHoldingReqValidatorTest {
   @Test
   void shouldNotThrow_whenBenchmarkHoldingsAreEmpty() {
     PeriodCommand cmd = new PeriodCommand();
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
     cmd.setBenchmarkHoldings(Collections.emptyList());
 
     assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();

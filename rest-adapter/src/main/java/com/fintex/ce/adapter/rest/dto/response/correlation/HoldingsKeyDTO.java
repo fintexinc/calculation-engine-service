@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.rest.dto.response.correlation;
 
 import com.fintex.ce.adapter.rest.dto.response.commonholdings.ParentHoldingDTO;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.GicHolding;
+import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.util.FilterUtils;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -33,7 +33,7 @@ public class HoldingsKeyDTO {
   private String key;
   private BigDecimal allocation;
   private String name;
-  private CurrencyType currency;
+  private Currency currency;
 
   public static HoldingsKeyDTO buildHoldingsKeyDTO(final Holding holding) {
     return buildDTO(holding, new HoldingsKeyDTO());

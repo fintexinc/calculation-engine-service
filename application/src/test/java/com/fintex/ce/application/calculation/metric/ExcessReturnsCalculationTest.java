@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.result.ExcessReturnsResult;
-import com.fintex.ce.domain.model.result.core.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.returns.ExcessReturnsResult;
 import com.fintex.ce.util.DecimalUtils;
 
 import org.apache.commons.lang3.tuple.Pair;

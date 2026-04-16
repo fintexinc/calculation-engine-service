@@ -4,20 +4,20 @@ import com.fintex.ce.application.calculation.metric.FixedIncomeBondSectorCalcula
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.FixedIncomeBondSecurities;
-import com.fintex.ce.domain.model.HoldingAssetAllocation;
-import com.fintex.ce.domain.model.calculation.AssetAllocationRegion;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
+import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.AllocationMappingUtils;
 import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 
 import org.springframework.stereotype.Service;
 
@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_BS_BS_001;
-import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.CASH;
-import static com.fintex.ce.domain.model.calculation.AssetAllocationRegion.FIXED_INCOME;
+import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.CASH;
+import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.FIXED_INCOME;
+import static com.fintex.ce.model.error.ErrorCode.WRN_BS_BS_001;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;

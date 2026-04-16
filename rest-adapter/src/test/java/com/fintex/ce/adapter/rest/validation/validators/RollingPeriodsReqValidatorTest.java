@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +24,7 @@ class RollingPeriodsReqValidatorTest {
   void shouldThrow_whenRollingPeriodIsNonNumeric() {
     var cmd = new RollingCalculationCommand();
     cmd.setRollingPeriods(Set.of("abc"));
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(cmd))
         .isInstanceOf(ReqValidationException.class)
@@ -39,7 +39,7 @@ class RollingPeriodsReqValidatorTest {
   void shouldThrow_whenRollingPeriodIsZeroOrNegative(String period) {
     var cmd = new RollingCalculationCommand();
     cmd.setRollingPeriods(Set.of(period));
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(cmd))
         .isInstanceOf(ReqValidationException.class)
@@ -53,7 +53,7 @@ class RollingPeriodsReqValidatorTest {
   void shouldNotThrow_whenRollingPeriodsAreValid() {
     var cmd = new RollingCalculationCommand();
     cmd.setRollingPeriods(Set.of("12", "36"));
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
   }
@@ -62,7 +62,7 @@ class RollingPeriodsReqValidatorTest {
   void shouldNotThrow_whenRollingPeriodsAreEmpty() {
     var cmd = new RollingCalculationCommand();
     cmd.setRollingPeriods(Collections.emptySet());
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
   }
@@ -70,7 +70,7 @@ class RollingPeriodsReqValidatorTest {
   @Test
   void shouldNotThrow_whenCommandIsNotRollingCommand() {
     var cmd = new PeriodCommand();
-    cmd.setCurrency(CurrencyType.CAD);
+    cmd.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
   }

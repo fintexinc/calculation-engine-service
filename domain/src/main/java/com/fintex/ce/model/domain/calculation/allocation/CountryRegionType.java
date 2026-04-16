@@ -1,0 +1,32 @@
+package com.fintex.ce.model.domain.calculation.allocation;
+
+import com.fintex.ce.model.error.HttpCode;
+import com.fintex.ce.model.error.exceptions.SystemException;
+
+import lombok.Getter;
+
+@Getter
+public enum CountryRegionType {
+
+  CANADA("Canada"),
+  UNITED_STATES("United States"),
+  INTERNATIONAL_DEVELOPED("International-Developed"),
+  EMERGING_MARKET("Emerging Market");
+
+  private final String region;
+
+  CountryRegionType(String region) {
+    this.region = region;
+  }
+
+  public static CountryRegionType fromValue(final String region) {
+    for (CountryRegionType value : values()) {
+      if (value.name().equalsIgnoreCase(region) || value.region.equalsIgnoreCase(region)) {
+        return value;
+      }
+    }
+    final String message = String.format("Could not find region for %s", region);
+    throw new SystemException(message, HttpCode.INTERNAL_SERVER_ERROR);
+  }
+
+}

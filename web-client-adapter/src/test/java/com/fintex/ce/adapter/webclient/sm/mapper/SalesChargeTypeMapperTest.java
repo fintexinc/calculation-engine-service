@@ -1,12 +1,12 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.SalesCharge;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.datapoint.SalesChargeData;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.enumeration.SalesChargeType;
+import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.domain.sales.SalesChargeData;
+import com.fintex.wm.commons.domain.sales.SalesChargeType;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ class SalesChargeTypeMapperTest {
   @Test
   void shouldMapValueAndProvider_whenResponseHasValues() {
     var smsResponse = mock(SalesChargeData.class);
-    var salesCharge = mock(com.fintex.sm.model.domain.datapoint.SalesCharge.class);
+    var salesCharge = mock(com.fintex.wm.commons.domain.sales.SalesCharge.class);
     when(smsResponse.getSalesCharge()).thenReturn(salesCharge);
     when(salesCharge.getValue()).thenReturn(SalesChargeType.DEFERRED_SALES_CHARGE);
     when(salesCharge.getDataProvider()).thenReturn(DataProvider.MORNINGSTAR);
@@ -57,7 +57,7 @@ class SalesChargeTypeMapperTest {
   @Test
   void shouldMapDifferentSalesChargeTypes() {
     var smsResponse = mock(SalesChargeData.class);
-    var salesCharge = mock(com.fintex.sm.model.domain.datapoint.SalesCharge.class);
+    var salesCharge = mock(com.fintex.wm.commons.domain.sales.SalesCharge.class);
     when(smsResponse.getSalesCharge()).thenReturn(salesCharge);
     when(salesCharge.getValue()).thenReturn(SalesChargeType.FRONT_END_CHARGE);
     when(salesCharge.getDataProvider()).thenReturn(DataProvider.MORNINGSTAR);

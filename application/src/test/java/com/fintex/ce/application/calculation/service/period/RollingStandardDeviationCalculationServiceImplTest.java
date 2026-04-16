@@ -2,12 +2,12 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.RollingStandardDeviationCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -117,12 +117,12 @@ class RollingStandardDeviationCalculationServiceImplTest {
     final var reqDTO = mock(RollingCalculationCommand.class);
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(CurrencyType.CAD);
+    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
     final CalculationDTO actual = sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, CurrencyType.CAD, SCALE_OF_TWO);
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
 
   @Test
@@ -138,13 +138,13 @@ class RollingStandardDeviationCalculationServiceImplTest {
     when(reqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW);
     when(reqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW.plusMonths(1));
 
-    final Returns monthlyReturns = mock(Returns.class);
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
+    final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturnsAggregate);
 
     doCallRealMethod().when(sut).buildCalculationDto(any(), any());
     final CalculationDTO actual = sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
 
-    verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, LOCAL_DATE_NOW,
+    verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, LOCAL_DATE_NOW,
         LOCAL_DATE_NOW.plusMonths(1));
   }
 

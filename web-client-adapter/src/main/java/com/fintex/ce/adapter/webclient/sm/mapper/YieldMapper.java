@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.Yield;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.datapoint.Income;
+import com.fintex.ce.model.domain.calculation.yield.Yield;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.financial.Income;
 
 import org.springframework.stereotype.Component;
 

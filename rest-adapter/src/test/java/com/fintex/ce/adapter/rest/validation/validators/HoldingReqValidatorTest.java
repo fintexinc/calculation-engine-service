@@ -1,14 +1,14 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.dto.command.ReturnCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ class HoldingReqValidatorTest {
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
 
     PeriodCommand command = new PeriodCommand();
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
     command.setHoldings(List.of(holding1, holding2));
 
     assertThatThrownBy(() -> validator.validate(command))
@@ -56,7 +56,7 @@ class HoldingReqValidatorTest {
         .build();
 
     ReturnCommand command = new ReturnCommand();
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
     command.setHoldings(List.of(cashHolding));
 
     assertThatThrownBy(() -> validator.validate(command))
@@ -80,11 +80,11 @@ class HoldingReqValidatorTest {
     CashHolding cashHolding = CashHolding.builder()
         .value(BigDecimal.TEN)
         .holdingType(FinancialInstrumentType.CASH)
-        .currency(CurrencyType.CAD)
+        .currency(Currency.CAD)
         .build();
 
     PeriodCommand command = new PeriodCommand();
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
     command.setHoldings(List.of(holding1, holding2, cashHolding));
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
@@ -93,7 +93,7 @@ class HoldingReqValidatorTest {
   @Test
   void shouldNotThrow_whenHoldingsAreEmpty() {
     PeriodCommand command = new PeriodCommand();
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
     command.setHoldings(Collections.emptyList());
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
@@ -101,7 +101,7 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenCommandIsNotHoldingsProvider() {
-    com.fintex.ce.domain.dto.command.CalculationCommand command = new com.fintex.ce.domain.dto.command.CalculationCommand() {};
+    com.fintex.ce.model.dto.command.CalculationCommand command = new com.fintex.ce.model.dto.command.CalculationCommand() {};
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }

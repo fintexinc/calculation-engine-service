@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import java.time.LocalDate;
 
@@ -18,7 +18,7 @@ class NotIncludeCpedReqValidatorTest extends AbstractNotIncludePropertyReqValida
   CalculationCommand createCommandWithProperty() {
     PeriodCommand command = new PeriodCommand();
     command.setCustomPed(LocalDate.of(2025, 1, 31));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
     return command;
   }
 
@@ -26,7 +26,7 @@ class NotIncludeCpedReqValidatorTest extends AbstractNotIncludePropertyReqValida
   CalculationCommand createCommandWithoutProperty() {
     PeriodCommand command = new PeriodCommand();
     command.setCustomPed(null);
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
     return command;
   }
 

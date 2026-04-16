@@ -1,0 +1,17 @@
+package com.fintex.ce.model.domain.result;
+
+import java.time.LocalDate;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+public class PeriodResult extends WarningResult {
+  protected LocalDate ped;
+  protected LocalDate psd;
+  protected LocalDate customIpsd;
+}

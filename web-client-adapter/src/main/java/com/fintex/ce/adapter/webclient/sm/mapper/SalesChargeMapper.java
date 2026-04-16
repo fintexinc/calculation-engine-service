@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.domain.model.SalesCharge;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.datapoint.SalesChargeData;
+import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.wm.commons.domain.sales.SalesChargeData;
 
 import org.springframework.stereotype.Component;
 

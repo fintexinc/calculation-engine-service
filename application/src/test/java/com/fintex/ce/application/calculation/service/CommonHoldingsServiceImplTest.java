@@ -1,16 +1,17 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.CommonHoldingsDTO;
-import com.fintex.ce.domain.dto.command.TopCommonHoldingsCommand;
-import com.fintex.ce.domain.model.HoldingAggregator;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.TopCommonHoldingsResult;
-import com.fintex.ce.domain.model.result.commonholdings.TopCommonHoldingData;
-import com.fintex.ce.domain.model.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.model.domain.calculation.holding.CommonHoldings;
+import com.fintex.ce.model.domain.calculation.holding.HoldingAggregator;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
+import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
+import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
+import com.fintex.ce.model.dto.CommonHoldingsDTO;
+import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.DecimalUtils;
 import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -155,7 +156,7 @@ class CommonHoldingsServiceImplTest {
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
-      final var rawCommonHoldings = new com.fintex.ce.domain.model.CommonHoldings();
+      final var rawCommonHoldings = new CommonHoldings();
       rawCommonHoldings.setHoldings(List.of());
       final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
@@ -190,7 +191,7 @@ class CommonHoldingsServiceImplTest {
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
-      final var rawCommonHoldings = new com.fintex.ce.domain.model.CommonHoldings();
+      final var rawCommonHoldings = new CommonHoldings();
       rawCommonHoldings.setHoldings(List.of());
       final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
@@ -226,7 +227,7 @@ class CommonHoldingsServiceImplTest {
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
-      final var rawCommonHoldings = new com.fintex.ce.domain.model.CommonHoldings();
+      final var rawCommonHoldings = new CommonHoldings();
       rawCommonHoldings.setHoldings(List.of());
       final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
@@ -263,7 +264,7 @@ class CommonHoldingsServiceImplTest {
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(Holding.class));
 
-      final var rawCommonHoldings = new com.fintex.ce.domain.model.CommonHoldings();
+      final var rawCommonHoldings = new CommonHoldings();
       rawCommonHoldings.setHoldings(List.of());
       final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));

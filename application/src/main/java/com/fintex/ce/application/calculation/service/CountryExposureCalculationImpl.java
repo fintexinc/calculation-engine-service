@@ -2,14 +2,14 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.application.mapping.response.CountryExposureResponseMapper;
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.CountryExposure;
-import com.fintex.ce.domain.model.calculation.CountryRegionType;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.CountryExposureResult;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
+import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
+import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ExposureDataHolder;
 
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.WRN_FICQ_BCE_001;
+import static com.fintex.ce.model.error.ErrorCode.WRN_FICQ_BCE_001;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
 import static java.util.stream.Collectors.toMap;
 

@@ -42,11 +42,10 @@
             <artifactId>guava</artifactId>
         </dependency>
 
-        <!-- Security Master Domain (SecurityIdentifier, FiIdentifierType) -->
+        <!-- Catalog Investment Commons (SecurityIdentifier, FiIdentifierType, enums, domain models) -->
         <dependency>
             <groupId>com.fintex.wm</groupId>
-            <artifactId>sm-domain</artifactId>
-            <version>${sm-domain.version}</version>
+            <artifactId>catalog-investment-commons</artifactId>
         </dependency>
 
         <!-- Test dependencies -->

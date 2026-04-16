@@ -1,12 +1,12 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
-import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.model.error.ErrorCode;
 
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_CPSD_002;
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_CPSD_003;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPSD_002;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPSD_003;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PortfolioCpsdDataValidationTest {

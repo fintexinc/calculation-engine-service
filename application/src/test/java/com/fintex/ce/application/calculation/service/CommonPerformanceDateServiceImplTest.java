@@ -1,14 +1,14 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.command.MultiplePortfoliosCommand;
-import com.fintex.ce.domain.exception.DataErrorException;
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.model.CommonDates;
-import com.fintex.ce.domain.model.HoldingMonthlyReturns;
-import com.fintex.ce.domain.model.ValidationError;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.CommonPerformanceDatesResult;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
+import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ValidationError;
+import com.fintex.ce.model.error.exceptions.DataErrorException;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,26 +33,22 @@ class CommonPerformanceDateServiceImplTest {
 
   @Test
   void shouldCommonPerformanceDateFor_whenHoldingsIsEmpty() {
-    // SETUP
     final var sut = mock(CommonPerformanceDateServiceImpl.class);
-    final var expected = new CommonDates();
+    final var expected = DateRange.UNBOUNDED;
 
     final List holdings = List.of();
     doCallRealMethod().when(sut).getPortfolioMonthlyReturns(anyList());
     doCallRealMethod().when(sut).commonPerformanceDateFor(any());
 
-    final Returns<HoldingMonthlyReturns> monthlyReturns = sut.getPortfolioMonthlyReturns(holdings);
+    final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = sut.getPortfolioMonthlyReturns(holdings);
 
-    // ACT
-    final CommonDates actual = sut.commonPerformanceDateFor(monthlyReturns);
+    final DateRange actual = sut.commonPerformanceDateFor(monthlyReturnsAggregate);
 
-    // VERIFY
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldCommonPerformanceDate_whenVerifyValidate() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CommonPerformanceDateServiceImpl.class,
         withSettings().useConstructor(monthlyReturnsService));
@@ -63,32 +59,25 @@ class CommonPerformanceDateServiceImplTest {
 
     doReturn(benchmarkHoldings).when(request).getBenchmarkHoldings();
     doReturn(portfolios).when(request).getPortfolios();
-    doReturn(mock(CommonDates.class)).when(sut).commonPerformanceDateFor(any());
+    doReturn(DateRange.UNBOUNDED).when(sut).commonPerformanceDateFor(any());
 
     doCallRealMethod().when(sut).perform(any());
-    // ACT
     sut.perform(request);
-
-    // VERIFY
   }
 
   @Test
   void shouldCollectAllPortfolioHoldings_whenCheckResultIsEmptyWhenPortfolioIsEmpty() {
-    // SETUP
     final var sut = mock(CommonPerformanceDateServiceImpl.class);
 
     doCallRealMethod().when(sut).collectAllPortfolioHoldings(anySet());
 
-    // ACT
     final List<Holding> actual = sut.collectAllPortfolioHoldings(Set.of());
 
-    // VERIFY
     assertTrue(actual.isEmpty());
   }
 
   @Test
   void shouldCollectAllPortfolioHoldings_whenCheckResult() {
-    // SETUP
     final var sut = mock(CommonPerformanceDateServiceImpl.class);
     final var portfolio1 = mock(MultiplePortfoliosCommand.Portfolio.class);
     final var portfolio2 = mock(MultiplePortfoliosCommand.Portfolio.class);
@@ -104,17 +93,14 @@ class CommonPerformanceDateServiceImplTest {
 
     doCallRealMethod().when(sut).collectAllPortfolioHoldings(anySet());
 
-    // ACT
     final List<Holding> actual = sut.collectAllPortfolioHoldings(Set.of(portfolio1, portfolio2));
 
-    // VERIFY
     assertEquals(2, actual.size());
     assertTrue(List.of(holding1, holding2).containsAll(actual));
   }
 
   @Test
   void shouldCommonPerformanceDate_whenErrorResponse() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CommonPerformanceDateServiceImpl.class,
         withSettings().useConstructor(monthlyReturnsService));
@@ -123,59 +109,49 @@ class CommonPerformanceDateServiceImplTest {
     final DataErrorException error = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
     final ValidationError resError = new ValidationError("id", ErrorCode.ERR_RRC_MR_002.toString(), "message");
     final List<DataErrorException> errors = List.of(error);
-    final Returns<HoldingMonthlyReturns> returns = mock(Returns.class);
+    final ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = mock(ReturnsAggregate.class);
 
     doReturn(portfolios).when(request).getPortfolios();
-    doReturn(mock(CommonDates.class)).when(sut).commonPerformanceDateFor(any());
-    doReturn(returns).when(sut).getPortfolioMonthlyReturns(any());
-    doReturn(errors).when(returns).getErrors();
+    doReturn(DateRange.UNBOUNDED).when(sut).commonPerformanceDateFor(any());
+    doReturn(returnsAggregate).when(sut).getPortfolioMonthlyReturns(any());
+    doReturn(errors).when(returnsAggregate).getErrors();
     doCallRealMethod().when(sut).perform(any());
 
-    // ACT
     CommonPerformanceDatesResult actual = sut.perform(request);
 
-    // VERIFY
     assertEquals(List.of(resError), actual.getErrors());
-
   }
 
   @Test
   void shouldCommonPerformanceDateFor_whenEmptyMonthlyReturns() {
-    // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(CommonPerformanceDateServiceImpl.class,
         withSettings().useConstructor(monthlyReturnsService));
-    final var returns = new Returns<HoldingMonthlyReturns>();
+    final var returns = new ReturnsAggregate<HoldingMonthlyReturns>();
     doCallRealMethod().when(sut).commonPerformanceDateFor(any());
 
-    // ACT
-    CommonDates commonDates = sut.commonPerformanceDateFor(returns);
+    DateRange dateRange = sut.commonPerformanceDateFor(returns);
 
-    // VERIFY
-    assertNotNull(commonDates);
-    assertNull(commonDates.getEnd());
-    assertNull(commonDates.getStart());
+    assertNotNull(dateRange);
+    assertNull(dateRange.end());
+    assertNull(dateRange.start());
   }
 
-  private CommonDates getCommonDatesForBenchmarkHoldings() {
-    return new CommonDates()
-        .setEnd(LocalDate.of(2020, 10, 31))
-        .setStart(LocalDate.of(2020, 5, 31));
+  private DateRange getDateRangeForBenchmarkHoldings() {
+    return new DateRange(LocalDate.of(2020, 5, 31), LocalDate.of(2020, 10, 31));
   }
 
-  private CommonDates getCommonDatesForPortfolioHoldings() {
-    return new CommonDates()
-        .setEnd(LocalDate.of(2020, 8, 31))
-        .setStart(LocalDate.of(2020, 4, 30));
+  private DateRange getDateRangeForPortfolioHoldings() {
+    return new DateRange(LocalDate.of(2020, 4, 30), LocalDate.of(2020, 8, 31));
   }
 
-  private CommonPerformanceDatesResult getExpected(CommonDates commonDatesForBenchmarkHoldings,
-      CommonDates commonDatesForPortfolioHoldings) {
+  private CommonPerformanceDatesResult getExpected(DateRange dateRangeForBenchmarkHoldings,
+      DateRange dateRangeForPortfolioHoldings) {
     return new CommonPerformanceDatesResult()
-        .setCommonPerformanceEndDatePf(commonDatesForPortfolioHoldings.getEnd())
-        .setCommonPerformanceStartDatePf(commonDatesForPortfolioHoldings.getStart())
-        .setCommonPerformanceEndDateBm(commonDatesForBenchmarkHoldings.getEnd())
-        .setCommonPerformanceStartDateBm(commonDatesForBenchmarkHoldings.getStart());
+        .setCommonPerformanceEndDatePf(dateRangeForPortfolioHoldings.end())
+        .setCommonPerformanceStartDatePf(dateRangeForPortfolioHoldings.start())
+        .setCommonPerformanceEndDateBm(dateRangeForBenchmarkHoldings.end())
+        .setCommonPerformanceStartDateBm(dateRangeForBenchmarkHoldings.start());
   }
 
 }

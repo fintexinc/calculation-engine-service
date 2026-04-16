@@ -2,15 +2,15 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.validation.CpedDataValidation;
 import com.fintex.ce.application.validation.CpsdDataValidation;
-import com.fintex.ce.domain.dto.command.DailyPerformanceCommand;
-import com.fintex.ce.domain.exception.DataErrorException;
-import com.fintex.ce.domain.exception.FdsDataValidationException;
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.model.HistoricalNavPrices;
-import com.fintex.ce.domain.model.HoldingMonthlyReturns;
-import com.fintex.ce.domain.model.ValidationError;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.calculation.returns.HistoricalNavPrices;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.DailyPerformanceCommand;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ValidationError;
+import com.fintex.ce.model.error.Warning;
+import com.fintex.ce.model.error.exceptions.DataErrorException;
+import com.fintex.ce.model.error.exceptions.FdsDataValidationException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -37,11 +37,11 @@ class ReturnsTest {
     final Holding holding = mock(Holding.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
 
-    final Returns sut = new Returns();
+    final ReturnsAggregate sut = new ReturnsAggregate();
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
 
     // ACT
-    final Returns actual = sut.initForNavPrices(Map.of(holding, historicalNavPrices));
+    final ReturnsAggregate actual = sut.initForNavPrices(Map.of(holding, historicalNavPrices));
 
     // VERIFY
     assertNotNull(actual);
@@ -53,11 +53,11 @@ class ReturnsTest {
     final Holding holding = mock(Holding.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
 
-    final Returns sut = new Returns();
+    final ReturnsAggregate sut = new ReturnsAggregate();
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
 
     // ACT
-    final Returns actual = sut.initOnlyWithReturnsDataValidation(Map.of(holding, historicalNavPrices));
+    final ReturnsAggregate actual = sut.initOnlyWithReturnsDataValidation(Map.of(holding, historicalNavPrices));
 
     // VERIFY
     assertNotNull(actual);
@@ -72,12 +72,13 @@ class ReturnsTest {
     final HoldingMonthlyReturns monthlyReturnsMissing = mock(HoldingMonthlyReturns.class);
     monthlyReturnsMissing.setErrors(List.of(new ValidationError("id", ErrorCode.ERR_RRC_MR_002.name(), "message")));
 
-    final Returns sut = new Returns();
+    final ReturnsAggregate sut = new ReturnsAggregate();
     Mockito.when(monthlyReturns.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
     Mockito.when(monthlyReturnsMissing.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
 
     // ACT
-    final Returns actual = sut.initOnlyWithReturnsDataValidation(Map.of(holding, monthlyReturns, holdingMissingReturns,
+    final ReturnsAggregate actual = sut.initOnlyWithReturnsDataValidation(Map.of(holding, monthlyReturns,
+        holdingMissingReturns,
         monthlyReturnsMissing));
 
     // VERIFY
@@ -92,7 +93,7 @@ class ReturnsTest {
     final HoldingMonthlyReturns monthlyReturns = mock(HoldingMonthlyReturns.class);
     final HoldingMonthlyReturns monthlyReturnsMissing = mock(HoldingMonthlyReturns.class);
 
-    final Returns sut = new Returns();
+    final ReturnsAggregate sut = new ReturnsAggregate();
     Mockito.when(monthlyReturns.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
     Mockito.when(monthlyReturnsMissing.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
     Mockito.when(monthlyReturns.hasMonthlyReturnsErrors()).thenReturn(false);
@@ -115,7 +116,7 @@ class ReturnsTest {
     final CpsdDataValidation cpsdDataValidation = mock(CpsdDataValidation.class);
     final CpedDataValidation cpedDataValidation = mock(CpedDataValidation.class);
 
-    final Returns sut = new Returns();
+    final ReturnsAggregate sut = new ReturnsAggregate();
     final TreeMap returns = new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE));
 
     sut.setCpsdDataValidation(cpsdDataValidation);
@@ -128,7 +129,7 @@ class ReturnsTest {
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(returns);
 
     // ACT
-    final Returns actual = sut.validateAndUpdateCpsdAndCped(Map.of(holding, historicalNavPrices),
+    final ReturnsAggregate actual = sut.validateAndUpdateCpsdAndCped(Map.of(holding, historicalNavPrices),
         dailyPerformanceReqDTO);
 
     // VERIFY
@@ -144,7 +145,7 @@ class ReturnsTest {
     final CpsdDataValidation cpsdDataValidation = mock(CpsdDataValidation.class);
     final CpedDataValidation cpedDataValidation = mock(CpedDataValidation.class);
 
-    final Returns sut = new Returns();
+    final ReturnsAggregate sut = new ReturnsAggregate();
     final TreeMap returns = new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE));
 
     sut.setCpsdDataValidation(cpsdDataValidation);
@@ -157,7 +158,8 @@ class ReturnsTest {
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(returns);
 
     // ACT
-    final Returns actual = sut.validateMonthlyDataMissing(Map.of(holding, historicalNavPrices), dailyPerformanceReqDTO);
+    final ReturnsAggregate actual = sut.validateMonthlyDataMissing(Map.of(holding, historicalNavPrices),
+        dailyPerformanceReqDTO);
 
     // VERIFY
     assertNotNull(actual);
@@ -165,13 +167,13 @@ class ReturnsTest {
 
   @Test
   void shouldGetErrors_whenReturnsEmptyListWhenNoErrors() {
-    Returns<HoldingMonthlyReturns> sut = new Returns<>();
+    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
     assertTrue(sut.getErrors().isEmpty());
   }
 
   @Test
   void shouldGetErrors_whenReturnsListOfErrorsWhenErrorsExist() {
-    Returns<HoldingMonthlyReturns> sut = new Returns<>();
+    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
     DataErrorException error = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
     sut.notification.addError(error);
     List<DataErrorException> errors = sut.getErrors();
@@ -181,7 +183,7 @@ class ReturnsTest {
 
   @Test
   void shouldGetErrors_whenReturnsMultipleErrorsWhenMultipleErrorsExist() {
-    Returns<HoldingMonthlyReturns> sut = new Returns<>();
+    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
     DataErrorException error1 = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
     DataErrorException error2 = new DataErrorException("message", "id2", ErrorCode.ERR_RRC_MR_002);
     sut.notification.addError(error1);
@@ -194,7 +196,7 @@ class ReturnsTest {
 
   @Test
   void shouldValidateReturns_whenRemovesEntriesWithInvalidDates() {
-    Returns<HoldingMonthlyReturns> sut = new Returns<>();
+    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
     Holding holding1 = mock(Holding.class);
     Holding holding2 = mock(Holding.class);
     TreeMap<LocalDate, BigDecimal> returns1 = new TreeMap<>(Map.of(
@@ -218,14 +220,14 @@ class ReturnsTest {
 
   @Test
   void shouldGetErrorsAsWarnings_whenReturnsEmptyListWhenNoErrors() {
-    Returns<HoldingMonthlyReturns> sut = new Returns<>();
+    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
     List<Warning> warnings = sut.getErrorsAsWarnings();
     assertTrue(warnings.isEmpty());
   }
 
   @Test
   void shouldGetErrorsAsWarnings_whenReturnsListOfWarningsWhenErrorsExist() {
-    Returns<HoldingMonthlyReturns> sut = new Returns<>();
+    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
     DataErrorException error = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
     sut.notification.addError(error);
     List<Warning> warnings = sut.getErrorsAsWarnings();

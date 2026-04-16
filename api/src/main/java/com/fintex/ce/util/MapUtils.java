@@ -1,12 +1,11 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.domain.model.CommonDates;
+import com.fintex.ce.model.domain.calculation.DateRange;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Supplier;
 
@@ -15,23 +14,19 @@ public class MapUtils {
   private MapUtils() {
   }
 
-  public static <K, V> Map<K, Map<LocalDate, V>> filterWithinRange(final CommonDates dates,
+  public static <K, V> Map<K, Map<LocalDate, V>> filterWithinRange(final DateRange dateRange,
       final Map<K, Map<LocalDate, V>> map) {
-    if (dates.hasNoDates()) {
+    if (dateRange.isUnbounded()) {
       return map;
     }
     return map.entrySet().stream().collect(CollectorUtils.toMap(Map.Entry::getKey, entry -> filterDatesWithinRange(
-        dates, entry.getValue())));
+        dateRange, entry.getValue())));
   }
 
-  public static <V> Map<LocalDate, V> filterDatesWithinRange(final CommonDates dates, final Map<LocalDate, V> map) {
-    return map.entrySet().stream().filter(entry -> isWithinTheRange(dates, entry.getKey())).collect(CollectorUtils
+  public static <V> Map<LocalDate, V> filterDatesWithinRange(final DateRange dateRange,
+      final Map<LocalDate, V> map) {
+    return map.entrySet().stream().filter(entry -> dateRange.contains(entry.getKey())).collect(CollectorUtils
         .toTreeMap());
-  }
-
-  static boolean isWithinTheRange(final CommonDates dates, final LocalDate date) {
-    return Optional.ofNullable(dates.getStart()).map(date::compareTo).orElse(1) >= 0
-        && Optional.ofNullable(dates.getEnd()).map(date::compareTo).orElse(-1) <= 0;
   }
 
   /**

@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class PeriodContainYearToDateReqValidatorTest {
   void shouldThrow_whenPeriodsContainYearToDate() {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of("YEAR_TO_DATE"));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ReqValidationException.class)
@@ -34,7 +34,7 @@ class PeriodContainYearToDateReqValidatorTest {
   void shouldNotThrow_whenPeriodsDoNotContainYearToDate() {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of("12", "36"));
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
@@ -43,7 +43,7 @@ class PeriodContainYearToDateReqValidatorTest {
   void shouldNotThrow_whenPeriodsAreEmpty() {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(Set.of());
-    command.setCurrency(CurrencyType.CAD);
+    command.setCurrency(Currency.CAD);
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }

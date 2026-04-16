@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.commonholdings.TopCommonHoldingsDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
-import com.fintex.ce.domain.model.core.Warning;
+import com.fintex.ce.model.error.Warning;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

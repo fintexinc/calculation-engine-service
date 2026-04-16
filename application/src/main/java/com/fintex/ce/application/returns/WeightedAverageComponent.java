@@ -1,7 +1,7 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.calculation.metric.formula.SumProduct;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.ReturnFactorScale;
 

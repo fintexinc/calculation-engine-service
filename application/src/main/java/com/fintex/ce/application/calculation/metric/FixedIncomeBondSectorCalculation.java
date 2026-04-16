@@ -1,16 +1,16 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.FixedIncomeSectorResult;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeSecuritiesAllocationType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
+import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CalculationUtils.sumProduct;
 import static com.fintex.ce.util.CollectorUtils.toMap;

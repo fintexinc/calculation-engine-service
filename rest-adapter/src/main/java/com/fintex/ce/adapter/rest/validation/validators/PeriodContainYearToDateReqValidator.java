@@ -1,11 +1,11 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.enumeration.Period;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.Period;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.ErrorCode;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -13,8 +13,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Set;
-
-import static com.fintex.ce.domain.model.enumeration.CalculationMetric.*;
 
 @Component
 @Order(311)

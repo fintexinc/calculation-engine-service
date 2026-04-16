@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
 
 import org.springframework.util.CollectionUtils;
 
@@ -12,8 +12,8 @@ import java.util.function.Function;
 
 /**
  * Base validator that fails when the list of holdings extracted from the command is null or empty. Subclasses supply
- * the carrier type (e.g. {@link com.fintex.ce.domain.dto.command.HoldingsProvider} or
- * {@link com.fintex.ce.domain.dto.command.BenchmarkHoldingsProvider}), the accessor, and the error message.
+ * the carrier type (e.g. {@link com.fintex.ce.model.dto.command.HoldingsProvider} or
+ * {@link com.fintex.ce.model.dto.command.BenchmarkHoldingsProvider}), the accessor, and the error message.
  */
 public abstract class AbstractHoldingsNotEmptyReqValidator<T> implements RequestValidator {
 

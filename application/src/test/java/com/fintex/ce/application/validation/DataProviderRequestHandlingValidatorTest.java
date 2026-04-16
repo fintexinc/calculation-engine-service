@@ -1,6 +1,6 @@
 package com.fintex.ce.application.validation;
 
-import com.fintex.sm.model.DataProvider;
+import com.fintex.wm.commons.domain.DataProvider;
 
 import org.junit.jupiter.api.Test;
 

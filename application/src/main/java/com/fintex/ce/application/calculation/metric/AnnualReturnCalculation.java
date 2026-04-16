@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.result.AnnualReturnResult;
-import com.fintex.ce.domain.model.result.core.KeyValueResult;
+import com.fintex.ce.model.domain.result.KeyValueResult;
+import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
+import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.util.DecimalUtils;
 
 import java.math.BigDecimal;

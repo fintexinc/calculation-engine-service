@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.dto.response.commonholdings;
 
 import com.fintex.ce.adapter.rest.dto.response.correlation.HoldingsKeyDTO;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

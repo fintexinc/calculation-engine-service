@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation;
 
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.dto.command.CalculationCommand;
 
 import java.util.List;
 

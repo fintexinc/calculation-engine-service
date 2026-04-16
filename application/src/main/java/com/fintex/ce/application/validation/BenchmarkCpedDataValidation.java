@@ -1,11 +1,11 @@
 package com.fintex.ce.application.validation;
 
-import com.fintex.ce.domain.exception.code.ErrorCode;
+import com.fintex.ce.model.error.ErrorCode;
 
 import lombok.EqualsAndHashCode;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_BMPED_002;
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_BMPED_003;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_BMPED_002;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_BMPED_003;
 
 @EqualsAndHashCode
 public class BenchmarkCpedDataValidation extends CpedDataValidation {

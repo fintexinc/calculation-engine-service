@@ -10,7 +10,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static com.fintex.ce.util.DecimalUtils.pow;
 import static java.math.BigDecimal.ONE;

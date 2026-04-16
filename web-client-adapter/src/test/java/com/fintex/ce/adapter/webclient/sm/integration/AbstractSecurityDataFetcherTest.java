@@ -1,14 +1,15 @@
 package com.fintex.ce.adapter.webclient.sm.integration;
 
-import com.fintex.ce.adapter.webclient.sm.dto.IdsAndDataProvidersRequest;
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
-import com.fintex.ce.domain.model.holding.Holding;
+import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.sm.model.DataProvider;
-import com.fintex.sm.model.domain.EquitySecurityIdentifier;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.dto.request.IdsAndDataProvidersRequest;
+import com.fintex.wm.commons.dto.search.TypedIdentifiers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -157,18 +158,18 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
 
     assertThat(body.getDataProviders()).containsExactlyElementsOf(providersForComplexScenario());
     assertThat(body.getTypedIdentifiers())
-        .extracting(IdsAndDataProvidersRequest.TypedIdentifiers::getType)
+        .extracting(TypedIdentifiers::getType)
         .containsExactlyInAnyOrderElementsOf(
-            holdings.stream().map(Holding::getHoldingType).map(Enum::name).distinct().toList());
+            holdings.stream().map(Holding::getHoldingType).distinct().toList());
 
     assertThat(body.getTypedIdentifiers())
-        .flatExtracting(IdsAndDataProvidersRequest.TypedIdentifiers::getIds)
+        .flatExtracting(TypedIdentifiers::getIds)
         .extracting(SecurityIdentifier::getIdType)
         .containsExactlyInAnyOrderElementsOf(
             holdings.stream().map(h -> h.getSecurityIdentifier().getIdType()).toList());
 
     assertThat(body.getTypedIdentifiers())
-        .flatExtracting(IdsAndDataProvidersRequest.TypedIdentifiers::getIds)
+        .flatExtracting(TypedIdentifiers::getIds)
         .extracting(SecurityIdentifier::getId)
         .containsExactlyInAnyOrderElementsOf(
             holdings.stream().map(h -> h.getSecurityIdentifier().getId()).toList());
@@ -211,5 +212,12 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
 
   protected static SecurityIdentifier createSecurityIdentifier(String id, FiIdentifierType idType) {
     return new SecurityIdentifier(id, idType);
+  }
+
+  protected static <T> SecurityAttributeResult<T> securityAttributeResult(SecurityIdentifier identifier, T data) {
+    SecurityAttributeResult<T> result = new SecurityAttributeResult<>();
+    result.setIdentifier(identifier);
+    result.setData(data);
+    return result;
   }
 }

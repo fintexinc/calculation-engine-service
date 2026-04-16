@@ -1,13 +1,13 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.domain.model.SalesCharge;
-import com.fintex.ce.domain.model.calculation.SalesChargeCategory;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.SalesChargeResult;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.enumeration.SalesChargeType;
+import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
+import com.fintex.ce.model.domain.enumeration.SalesChargeCategory;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.domain.sales.SalesChargeType;
 
 import org.junit.jupiter.api.Test;
 
@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.calculation.metric.SalesChargeCalculation.DEFAULT_MAP;
 import static com.fintex.ce.application.calculation.metric.SalesChargeCalculation.DEFAULT_SALES_CHARGE_DTO;
-import static com.fintex.sm.model.domain.enumeration.SalesChargeType.DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT;
-import static com.fintex.sm.model.domain.enumeration.SalesChargeType.DEFERRED_SALES_CHARGE_ON_MARKET_VALUE;
-import static com.fintex.sm.model.domain.enumeration.SalesChargeType.FORMULA_ONE;
-import static com.fintex.sm.model.domain.enumeration.SalesChargeType.FRONT_END_CHARGE;
-import static com.fintex.sm.model.domain.enumeration.SalesChargeType.LOW_SALES_CHARGE;
-import static com.fintex.sm.model.domain.enumeration.SalesChargeType.VOLUME_SALES_CHARGE;
+import static com.fintex.wm.commons.domain.sales.SalesChargeType.DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT;
+import static com.fintex.wm.commons.domain.sales.SalesChargeType.DEFERRED_SALES_CHARGE_ON_MARKET_VALUE;
+import static com.fintex.wm.commons.domain.sales.SalesChargeType.FORMULA_ONE;
+import static com.fintex.wm.commons.domain.sales.SalesChargeType.FRONT_END_CHARGE;
+import static com.fintex.wm.commons.domain.sales.SalesChargeType.LOW_SALES_CHARGE;
+import static com.fintex.wm.commons.domain.sales.SalesChargeType.VOLUME_SALES_CHARGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

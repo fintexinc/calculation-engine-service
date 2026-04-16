@@ -4,12 +4,12 @@ import com.fintex.ce.application.calculation.metric.CorrelationCalculation;
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.CorrelationResult;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -43,16 +43,16 @@ public class CorrelationServiceImpl extends PeriodAbstractService<CorrelationRes
 
   public CorrelationCalculation defineCalculationMethod(final PeriodCommand reqDTO) {
     reqDTO.setReqCurrencyToCashHolding();
-    final Returns monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(
+    final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
         reqDTO.getHoldings(), reqDTO.getCurrency(), ReturnFactorScale.SCALE_OF_TWO);
 
-    final Map<Holding, Map<LocalDate, BigDecimal>> baseTotalReturns = monthlyReturns
+    final Map<Holding, Map<LocalDate, BigDecimal>> baseTotalReturns = monthlyReturnsAggregate
         .validateCped(reqDTO.getCustomPed())
         .cutByCpedIfCpedEmptyCutByPed(reqDTO.getCustomPed())
         .fxRatesApplied()
         .getReturnsMap();
 
-    final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturns
+    final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsAggregate
         .cutByPsd()
         .getWeightedAverage();
 

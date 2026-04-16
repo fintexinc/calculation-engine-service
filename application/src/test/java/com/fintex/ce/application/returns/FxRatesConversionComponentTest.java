@@ -1,11 +1,11 @@
 package com.fintex.ce.application.returns;
 
-import com.fintex.ce.domain.exception.DataErrorException;
-import com.fintex.ce.domain.model.CurrencyExchangePair;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import com.fintex.sm.model.domain.enumeration.FiIdentifierType;
+import com.fintex.ce.model.domain.CurrencyExchangePair;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.error.exceptions.DataErrorException;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_MFR_001;
+import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_MFR_001;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,14 +28,14 @@ class FxRatesConversionComponentTest {
   @Test
   void shouldConvert_whenCheckResultConvertUsdToCad() {
     var fxRates = Map.of(
-        new CurrencyExchangePair(CurrencyType.USD, CurrencyType.CAD),
+        new CurrencyExchangePair(Currency.USD, Currency.CAD),
         (NavigableMap<LocalDate, BigDecimal>) getUsdToCadRates());
 
     final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, CurrencyType> holdingCurrencies = Map.of(etfHolding, CurrencyType.USD);
+    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.USD);
 
-    final var actual = component.convert(returns, holdingCurrencies, fxRates, CurrencyType.CAD);
+    final var actual = component.convert(returns, holdingCurrencies, fxRates, Currency.CAD);
 
     assertEquals(0, BigDecimal.valueOf(102).compareTo(
         actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(1)))));
@@ -46,14 +46,14 @@ class FxRatesConversionComponentTest {
   @Test
   void shouldConvert_whenCheckResultConvertCadToUsd() {
     var fxRates = Map.of(
-        new CurrencyExchangePair(CurrencyType.CAD, CurrencyType.USD),
+        new CurrencyExchangePair(Currency.CAD, Currency.USD),
         (NavigableMap<LocalDate, BigDecimal>) getCadToUsdRates());
 
     final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, CurrencyType> holdingCurrencies = Map.of(etfHolding, CurrencyType.CAD);
+    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
 
-    final var actual = component.convert(returns, holdingCurrencies, fxRates, CurrencyType.USD);
+    final var actual = component.convert(returns, holdingCurrencies, fxRates, Currency.USD);
 
     assertEquals(0, BigDecimal.valueOf(102).compareTo(
         actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(1)))));
@@ -64,18 +64,18 @@ class FxRatesConversionComponentTest {
   @Test
   void shouldConvert_whenFxRateIsNullThrowError() {
     var fxRates = Map.of(
-        new CurrencyExchangePair(CurrencyType.CAD, CurrencyType.USD),
+        new CurrencyExchangePair(Currency.CAD, Currency.USD),
         (NavigableMap<LocalDate, BigDecimal>) getIncompleteRates());
 
     final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
     final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, CurrencyType> holdingCurrencies = Map.of(etfHolding, CurrencyType.CAD);
+    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
 
     final LocalDate date = toLastDayOfMonth(LocalDate.now().plusMonths(1));
     final DataErrorException expected = ERR_RRC_MFR_001.error(date);
 
     final DataErrorException actual = assertThrows(DataErrorException.class,
-        () -> component.convert(returns, holdingCurrencies, fxRates, CurrencyType.USD));
+        () -> component.convert(returns, holdingCurrencies, fxRates, Currency.USD));
 
     assertEquals(expected, actual);
   }

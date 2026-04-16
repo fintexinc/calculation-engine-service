@@ -5,12 +5,12 @@ import com.fintex.ce.application.calculation.metric.SharpeRatioCalculation;
 import com.fintex.ce.application.calculation.metric.StandardDeviationCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
-import com.fintex.ce.application.returns.Returns;
-import com.fintex.ce.domain.dto.calculation.CalculationDTO;
-import com.fintex.ce.domain.dto.command.RollingCalculationCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.result.RollingSharpeRatioResult;
-import com.fintex.ce.domain.model.result.SharpeRatioResult;
+import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
+import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
+import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.port.webclient.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
 
@@ -63,11 +63,12 @@ public class RollingSharpeRatioCalculationServiceImpl
   @Override
   public CalculationDTO buildCalculationDto(final RollingCalculationCommand reqDTO,
       final ReturnFactorScale returnFactorScale) {
-    final Returns monthlyReturns = monthlyReturnsService.getPortfolioMonthlyReturns(
+    final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
         reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale);
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, reqDTO.getCustomPsd(), reqDTO.getCustomPed());
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+            .getCustomPed());
 
     return new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
   }

@@ -1,7 +1,7 @@
 package com.fintex.ce.port.webclient;
 
-import com.fintex.ce.domain.model.CurrencyExchangePair;
-import com.fintex.ce.domain.model.DateRange;
+import com.fintex.ce.model.domain.CurrencyExchangePair;
+import com.fintex.ce.model.domain.calculation.DateRange;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

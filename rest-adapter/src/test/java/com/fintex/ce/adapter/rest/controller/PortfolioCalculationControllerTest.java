@@ -8,18 +8,18 @@ import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqV
 import com.fintex.ce.adapter.rest.validation.validators.HoldingReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.PeriodReqValidator;
 import com.fintex.ce.calculation.CalculationService;
-import com.fintex.ce.domain.dto.command.BestWorstPeriodsCommand;
-import com.fintex.ce.domain.dto.command.CalculationCommand;
-import com.fintex.ce.domain.dto.command.DistributionOfReturnsCommand;
-import com.fintex.ce.domain.dto.command.IncomeForecastCommand;
-import com.fintex.ce.domain.dto.command.PeriodCommand;
-import com.fintex.ce.domain.dto.command.ReturnCommand;
-import com.fintex.ce.domain.model.enumeration.CalculationMetric;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.ErrorResult;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.ErrorResult;
+import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
+import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
+import com.fintex.ce.model.dto.command.IncomeForecastCommand;
+import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
@@ -221,7 +221,7 @@ class PortfolioCalculationControllerTest {
     void shouldReturnBadRequest_whenPeriodIsInvalid() throws Exception {
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.STANDARD_DEVIATION);
-      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
       cmd.setPeriods(Set.of("INVALID_PERIOD"));
 
@@ -236,7 +236,7 @@ class PortfolioCalculationControllerTest {
     void shouldReturnBadRequest_whenCipsdIsAfterCped() throws Exception {
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.SHARPE_RATIO);
-      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
       cmd.setPeriods(Set.of("12"));
       cmd.setCustomIntervalPsd(LocalDate.of(2025, 12, 31));
@@ -258,7 +258,7 @@ class PortfolioCalculationControllerTest {
 
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.TRAILING_TOTAL_RETURNS);
-      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setCurrency(Currency.CAD);
       cmd.setPeriods(Set.of("12"));
       cmd.setHoldings(List.of(cashHolding));
 
@@ -273,7 +273,7 @@ class PortfolioCalculationControllerTest {
     void shouldReturnBadRequest_whenBestWorstPeriodExceedsLimit() throws Exception {
       BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
       cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
-      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
       cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
       cmd.setCustomPed(LocalDate.of(2024, 12, 31));
@@ -292,7 +292,7 @@ class PortfolioCalculationControllerTest {
     void shouldReturnBadRequest_whenCustomNumberOfBinsBelowMinimum() throws Exception {
       DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
       cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
       cmd.setPeriods(Set.of("12"));
       cmd.setCustomNumberOfBins(4);
@@ -310,7 +310,7 @@ class PortfolioCalculationControllerTest {
     void shouldReturnBadRequest_whenCustomNumberOfBinsAboveMaximum() throws Exception {
       DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
       cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
       cmd.setPeriods(Set.of("12"));
       cmd.setCustomNumberOfBins(31);
@@ -358,7 +358,7 @@ class PortfolioCalculationControllerTest {
     void shouldReturnBadRequest_whenBestWorstPeriodIsZero() throws Exception {
       BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
       cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
-      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
       cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
       cmd.setCustomPed(LocalDate.of(2024, 12, 31));
@@ -377,7 +377,7 @@ class PortfolioCalculationControllerTest {
     void shouldPassValidation_whenBestWorstPeriodIsAtBoundaryValues() throws Exception {
       BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
       cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
-      cmd.setCurrency(CurrencyType.CAD);
+      cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
       cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
       cmd.setCustomPed(LocalDate.of(2024, 12, 31));
@@ -394,7 +394,7 @@ class PortfolioCalculationControllerTest {
     void shouldPassValidation_whenNumberOfBinsIsAtBoundaryValues() throws Exception {
       DistributionOfReturnsCommand lowerBoundCmd = new DistributionOfReturnsCommand();
       lowerBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      lowerBoundCmd.setCurrency(CurrencyType.CAD);
+      lowerBoundCmd.setCurrency(Currency.CAD);
       lowerBoundCmd.setHoldings(List.of());
       lowerBoundCmd.setPeriods(Set.of("12"));
       lowerBoundCmd.setCustomNumberOfBins(5);
@@ -407,7 +407,7 @@ class PortfolioCalculationControllerTest {
 
       DistributionOfReturnsCommand upperBoundCmd = new DistributionOfReturnsCommand();
       upperBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      upperBoundCmd.setCurrency(CurrencyType.CAD);
+      upperBoundCmd.setCurrency(Currency.CAD);
       upperBoundCmd.setHoldings(List.of());
       upperBoundCmd.setPeriods(Set.of("12"));
       upperBoundCmd.setCustomNumberOfBins(30);

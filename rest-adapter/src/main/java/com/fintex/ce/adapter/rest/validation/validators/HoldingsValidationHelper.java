@@ -1,14 +1,14 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.domain.exception.ReqValidationException;
-import com.fintex.ce.domain.exception.code.ErrorCode;
-import com.fintex.ce.domain.model.holding.CashHolding;
-import com.fintex.ce.domain.model.holding.GicHolding;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.holding.MonthlyReturnGeneratableHolding;
+import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.GicHolding;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.MonthlyReturnGeneratableHolding;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.ReqValidationException;
 import com.fintex.ce.util.DateTimeUtils;
 import com.fintex.ce.util.FilterUtils;
-import com.fintex.sm.model.domain.SecurityIdentifier;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.util.CollectionUtils;
 

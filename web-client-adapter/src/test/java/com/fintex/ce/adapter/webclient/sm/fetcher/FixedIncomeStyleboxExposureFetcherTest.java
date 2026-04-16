@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.adapter.webclient.sm.dto.SecurityAttributeResult;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeStyleboxExposureMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.domain.model.FixedIncomeStyleboxExposure;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
-import com.fintex.sm.model.domain.enumeration.FixedIncomeStyleBoxType;
-import com.fintex.sm.model.domain.rating.FixedIncomeStyleBoxes;
-import com.fintex.sm.model.domain.value.FixedIncomeStyleBoxValue;
+import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
+import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxValue;
+import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxes;
 
 import org.springframework.core.ParameterizedTypeReference;
 

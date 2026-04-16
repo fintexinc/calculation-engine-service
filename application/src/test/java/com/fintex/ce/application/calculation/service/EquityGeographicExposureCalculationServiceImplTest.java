@@ -1,10 +1,10 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.domain.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.domain.model.EquityCountryAllocation;
-import com.fintex.ce.domain.model.calculation.GeographicRegionType;
-import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
+import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
+import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.DecimalUtils;

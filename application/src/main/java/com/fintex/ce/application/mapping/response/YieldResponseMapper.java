@@ -1,12 +1,12 @@
 package com.fintex.ce.application.mapping.response;
 
-import com.fintex.ce.domain.model.Yield;
-import com.fintex.ce.domain.model.core.Warning;
-import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.domain.model.result.YieldResult;
 import com.fintex.ce.mapping.ResponseMapper;
+import com.fintex.ce.model.domain.calculation.yield.Yield;
+import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.result.income.YieldResult;
+import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.util.DecimalUtils;
-import com.fintex.sm.model.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.stereotype.Component;
 
