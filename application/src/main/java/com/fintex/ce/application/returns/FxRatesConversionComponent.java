@@ -1,16 +1,14 @@
 package com.fintex.ce.application.returns;
 
-import com.fintex.ce.domain.model.FxRates;
+import com.fintex.ce.domain.model.CurrencyExchangePair;
 import com.fintex.ce.domain.model.holding.Holding;
-import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-import lombok.EqualsAndHashCode;
 
 import static com.fintex.ce.domain.constant.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.domain.exception.code.ErrorCode.ERR_RRC_MFR_001;
@@ -20,45 +18,45 @@ import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static com.fintex.ce.util.DecimalUtils.divide;
 import static java.math.BigDecimal.ONE;
 
-@EqualsAndHashCode
 public class FxRatesConversionComponent {
-
-  private final Map<LocalDate, FxRates.FxRate> fxRates;
-  private final CurrencyType toCurrency;
-
-  public FxRatesConversionComponent(final Map<LocalDate, FxRates.FxRate> fxRates,
-      final CurrencyType toCurrency) {
-    this.fxRates = makeCopy(fxRates);
-    this.toCurrency = toCurrency;
-  }
 
   public Map<Holding, TreeMap<LocalDate, BigDecimal>> convert(
       final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns,
-      final Map<Holding, CurrencyType> holdingCurrencies) {
-    final Map<Holding, Map<LocalDate, BigDecimal>> mapperFxRates = PortfolioUtils.fxRatesForHoldings(holdingCurrencies,
-        toCurrency, fxRates);
-    return getHoldingMapMap(returns, mapperFxRates);
+      final Map<Holding, CurrencyType> holdingCurrencies,
+      final Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates,
+      final CurrencyType toCurrency) {
+    return returns.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> {
+      CurrencyType fromCurrency = holdingCurrencies.get(entry.getKey());
+      if (fromCurrency == null || fromCurrency.equals(toCurrency)) {
+        return entry.getValue();
+      }
+      NavigableMap<LocalDate, BigDecimal> rates = fxRates.get(new CurrencyExchangePair(fromCurrency, toCurrency));
+      if (rates == null) {
+        return entry.getValue();
+      }
+      return holdingPortfolioBaseTotalReturn(rates, entry.getValue());
+    }));
   }
 
-  private Map<Holding, TreeMap<LocalDate, BigDecimal>> getHoldingMapMap(
-      Map<Holding, TreeMap<LocalDate, BigDecimal>> mReturns, Map<Holding, Map<LocalDate, BigDecimal>> mappedFxRates) {
-    return mReturns.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> holdingPortfolioBaseTotalReturn(
-        mappedFxRates.get(entry.getKey()), entry.getValue())));
-  }
-
-  private TreeMap<LocalDate, BigDecimal> holdingPortfolioBaseTotalReturn(final Map<LocalDate, BigDecimal> fxRates,
+  private TreeMap<LocalDate, BigDecimal> holdingPortfolioBaseTotalReturn(
+      final NavigableMap<LocalDate, BigDecimal> fxRates,
       final Map<LocalDate, BigDecimal> pReturns) {
     return pReturns.entrySet().stream().collect(toTreeMap(Map.Entry::getKey,
         entry -> holdingPortfolioBaseTotalReturnFormula(entry.getKey(), entry.getValue(), fxRates)));
   }
 
   private BigDecimal holdingPortfolioBaseTotalReturnFormula(final LocalDate date, final BigDecimal value,
-      final Map<LocalDate, BigDecimal> fxRates) {
+      final NavigableMap<LocalDate, BigDecimal> fxRates) {
     final LocalDate previousDate = toLastDayOfMonth(date.minusMonths(1));
-    final BigDecimal fxRateValue = validateFxRates(date, fxRates.get(date));
-    final BigDecimal previousFxValue = validateFxRates(previousDate, fxRates.get(previousDate));
+    final BigDecimal fxRateValue = validateFxRates(date, lookupRate(fxRates, date));
+    final BigDecimal previousFxValue = validateFxRates(previousDate, lookupRate(fxRates, previousDate));
     final BigDecimal subtract = ONE.add(value).multiply(divide(fxRateValue, previousFxValue)).subtract(ONE);
     return subtract.multiply(HUNDRED);
+  }
+
+  private BigDecimal lookupRate(NavigableMap<LocalDate, BigDecimal> rates, LocalDate date) {
+    var entry = rates.floorEntry(date);
+    return entry != null ? entry.getValue() : null;
   }
 
   private BigDecimal validateFxRates(final LocalDate date, final BigDecimal fxRateValue) {
@@ -66,12 +64,5 @@ public class FxRatesConversionComponent {
       throw ERR_RRC_MFR_001.error(date);
     }
     return fxRateValue;
-  }
-
-  private Map<LocalDate, FxRates.FxRate> makeCopy(final Map<LocalDate, FxRates.FxRate> fxRates) {
-    return fxRates.entrySet().stream().collect(
-        Collectors.toMap(
-            Map.Entry::getKey,
-            entry -> new FxRates.FxRate(entry.getValue().getUsdCad(), entry.getValue().getCadUsd())));
   }
 }

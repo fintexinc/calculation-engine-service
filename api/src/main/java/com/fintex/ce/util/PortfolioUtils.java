@@ -1,22 +1,15 @@
 package com.fintex.ce.util;
 
 import com.fintex.ce.domain.dto.IncomeForecastDto;
-import com.fintex.ce.domain.exception.SystemException;
-import com.fintex.ce.domain.exception.code.HttpCode;
-import com.fintex.ce.domain.model.FxRates;
 import com.fintex.ce.domain.model.holding.CashHolding;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.EquitySecurityIdentifier;
 import com.fintex.sm.model.domain.SecurityIdentifier;
-import com.fintex.sm.model.domain.enumeration.CurrencyType;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Function;
 
-import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 
@@ -28,38 +21,6 @@ public class PortfolioUtils {
   public static Map<Holding, BigDecimal> calculateInitialPortfolioWeight(final Collection<Holding> holdings) {
     final BigDecimal sum = holdings.stream().map(Holding::getValue).reduce(ZERO, BigDecimal::add);
     return holdings.stream().collect(toMap(e -> e, e -> DecimalUtils.divide(e.getValue(), sum)));
-  }
-
-  public static Map<Holding, Map<LocalDate, BigDecimal>> fxRatesForHoldings(
-      final Map<Holding, CurrencyType> holdings, final CurrencyType toCurrency,
-      final Map<LocalDate, FxRates.FxRate> fxRates) {
-    return holdings.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> fxRatesForHolding(fxRates, entry
-        .getValue(), toCurrency)));
-  }
-
-  public static Map<LocalDate, BigDecimal> fxRatesForHolding(final Map<LocalDate, FxRates.FxRate> fxRates,
-      final CurrencyType from, final CurrencyType to) {
-    return fxRates.entrySet().stream().collect(CollectorUtils.toTreeMap(Map.Entry::getKey, mapFxRateBasedOnCurrency(
-        from, to)));
-  }
-
-  private static Function<Map.Entry<LocalDate, FxRates.FxRate>, BigDecimal> mapFxRateBasedOnCurrency(
-      final CurrencyType from,
-      final CurrencyType to) {
-    return entry -> {
-      if (CurrencyType.USD.equals(from) && CurrencyType.CAD.equals(to)) {
-        return entry.getValue().getUsdCad();
-      } else if (CurrencyType.CAD.equals(from) && CurrencyType.USD.equals(to)) {
-        return entry.getValue().getCadUsd();
-      } else
-        if (CurrencyType.CAD.equals(from) && CurrencyType.CAD.equals(to) || CurrencyType.USD.equals(from)
-            && CurrencyType.USD.equals(
-                to)) {
-                  return ONE;
-                }
-      final String message = String.format("Currency exchange %s->%s not supported", from, to);
-      throw new SystemException(message, HttpCode.INTERNAL_SERVER_ERROR);
-    };
   }
 
   public static void setHoldingResponseDetails(final Holding holding,
