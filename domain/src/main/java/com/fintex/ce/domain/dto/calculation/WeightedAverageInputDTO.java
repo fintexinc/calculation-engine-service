@@ -1,7 +1,7 @@
 package com.fintex.ce.domain.dto.calculation;
 
 import com.fintex.ce.domain.model.CommonDates;
-import com.fintex.ce.domain.model.FxRates;
+import com.fintex.ce.domain.model.CurrencyExchangePair;
 import com.fintex.ce.domain.model.enumeration.Rebalanced;
 import com.fintex.ce.domain.model.holding.Holding;
 import com.fintex.sm.model.domain.enumeration.CurrencyType;
@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableMap;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -27,7 +28,7 @@ public class WeightedAverageInputDTO {
 
   // already pre-formatted monthly returns
   private Map<Holding, Map<LocalDate, BigDecimal>> portfolioReturns;
-  private Map<LocalDate, FxRates.FxRate> fxRates;
+  private Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates;
 
   private CurrencyType currency;
 

@@ -164,15 +164,17 @@ class MonthlyReturnsTest {
     sut.holdingCurrencyMap = holdingCurrency;
 
     doCallRealMethod().when(sut).setFxRatesConversionComponent(any());
+    doCallRealMethod().when(sut).setFxRates(any(), any());
     final var fxRatesConversionComponent = mock(FxRatesConversionComponent.class);
     sut.setFxRatesConversionComponent(fxRatesConversionComponent);
+    sut.setFxRates(Map.of(), CurrencyType.CAD);
 
     doCallRealMethod().when(sut).fxRatesApplied();
 
     sut.fxRatesApplied();
 
     Assertions.assertNotNull(monthlyReturns);
-    fxRatesConversionComponent.convert(monthlyReturns, holdingCurrency);
+    verify(fxRatesConversionComponent).convert(eq(monthlyReturns), eq(holdingCurrency), any(), any());
   }
 
   @Test

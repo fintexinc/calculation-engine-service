@@ -10,6 +10,7 @@ import com.fintex.ce.domain.exception.SystemException;
 import com.fintex.ce.domain.exception.code.ErrorCode;
 import com.fintex.ce.domain.exception.code.HttpCode;
 import com.fintex.ce.domain.exception.notification.pattern.Notification;
+import com.fintex.ce.domain.model.CurrencyExchangePair;
 import com.fintex.ce.domain.model.HistoricalNavPrices;
 import com.fintex.ce.domain.model.ReturnsData;
 import com.fintex.ce.domain.model.ValidationError;
@@ -54,6 +55,8 @@ public class Returns<T extends ReturnsData> {
 
   private ReturnsCutComponent monthlyReturnsCutComponent = new ReturnsCutComponent();
   private FxRatesConversionComponent fxRatesConversionComponent;
+  private Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates;
+  private CurrencyType fxTargetCurrency;
   private WeightedAverageComponent weightedAverageComponent;
   private CpedDataValidation cpedDataValidation;
   private CpsdDataValidation cpsdDataValidation;
@@ -142,6 +145,13 @@ public class Returns<T extends ReturnsData> {
     return this;
   }
 
+  public Returns<T> setFxRates(Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates,
+      CurrencyType toCurrency) {
+    this.fxRates = fxRates;
+    this.fxTargetCurrency = toCurrency;
+    return this;
+  }
+
   public Returns<T> setMonthlyReturnsCutComponent(ReturnsCutComponent monthlyReturnsCutComponent) {
     this.monthlyReturnsCutComponent = monthlyReturnsCutComponent;
     return this;
@@ -164,7 +174,7 @@ public class Returns<T extends ReturnsData> {
 
   public Returns<T> fxRatesApplied() {
     ifAnyErrorsThrowException();
-    returnsMap = fxRatesConversionComponent.convert(returnsMap, holdingCurrencyMap);
+    returnsMap = fxRatesConversionComponent.convert(returnsMap, holdingCurrencyMap, fxRates, fxTargetCurrency);
     return this;
   }
 

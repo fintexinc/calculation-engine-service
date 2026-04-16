@@ -10,6 +10,22 @@ spring:
           enabled: false
 
 external-services:
+  bank-of-canada:
+    base-url: https://www.bankofcanada.ca/valet
+    timeout: 30000
+    currency-pairs:
+      USD_CAD:
+        rate-sources:
+          - path: /observations/FXUSDCAD/json
+            series-names:
+              - FXUSDCAD   # daily USD/CAD rate (2017+)
+            start-date: "2017-01-01"
+            frequency: DAILY
+          - path: /observations/IEXM0101/json
+            series-names:
+              - IEXM0101   # monthly USD/CAD noon rate (1999–2017)
+            end-date: "2016-12-31"
+            frequency: MONTHLY
   security-master:
     api-type: rest  # "rest" (default) or "graphql"
     rest:
