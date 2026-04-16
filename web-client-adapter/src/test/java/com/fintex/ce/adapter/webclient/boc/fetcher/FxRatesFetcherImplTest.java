@@ -44,13 +44,12 @@ class FxRatesFetcherImplTest {
   @Mock
   private BankOfCanadaFxRateMapper mapper;
 
-  private BankOfCanadaProperties properties;
+  private final BankOfCanadaProperties properties = new BankOfCanadaProperties();
 
   private FxRatesFetcherImpl fetcher;
 
   @BeforeEach
   void setUp() {
-    properties = new BankOfCanadaProperties();
     fetcher = new FxRatesFetcherImpl(client, mapper, properties);
   }
 
