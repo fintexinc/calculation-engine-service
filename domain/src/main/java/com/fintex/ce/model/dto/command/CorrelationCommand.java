@@ -1,6 +1,6 @@
 package com.fintex.ce.model.dto.command;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -15,9 +15,9 @@ import lombok.ToString;
 public class CorrelationCommand extends PeriodCommand {
 
   @Override
-  public PortfolioCommand setHoldings(final List<Holding> holdings) {
+  public PortfolioCommand setHoldings(final List<PortfolioHolding> holdings) {
     return super.setHoldings(holdings.stream()
-        .map(holding -> (Holding) holding.toBuilder().value(BigDecimal.ONE).build())
+        .map(holding -> (PortfolioHolding) holding.toBuilder().value(BigDecimal.ONE).build())
         .toList());
   }
 }

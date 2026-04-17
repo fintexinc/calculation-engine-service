@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.mapping.response.MaturityAllocationResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
@@ -36,7 +36,7 @@ class MaturityAllocationCalculationServiceImplTest {
     final var service = mock(MaturityAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var maturityAllocation = new MaturityAllocation();
     maturityAllocation.setMaturityDurationValues(Map.of("FIVE_TO_SEVEN_YEARS", BigDecimal.TEN));
     final var rawData = Map.of(holding, maturityAllocation);
@@ -57,7 +57,7 @@ class MaturityAllocationCalculationServiceImplTest {
     final var service = mock(MaturityAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(MaturityAllocationType.FIVE_TO_SEVEN_YEARS, BigDecimal.TEN));
 
@@ -74,7 +74,7 @@ class MaturityAllocationCalculationServiceImplTest {
     final var service = mock(MaturityAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(MaturityAllocationType.FIVE_TO_SEVEN_YEARS, BigDecimal.TEN));
     final var netProducts = mock(Map.class);

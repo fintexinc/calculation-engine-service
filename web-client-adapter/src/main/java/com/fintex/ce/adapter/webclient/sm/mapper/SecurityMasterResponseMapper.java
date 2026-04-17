@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 /**
  * Interface for mapping Security Master API responses to domain models.
@@ -22,5 +22,5 @@ public interface SecurityMasterResponseMapper<D, R> {
    *          the holding context for the mapping
    * @return the mapped domain model
    */
-  D map(R response, Holding holding);
+  D map(R response, PortfolioHolding holding);
 }

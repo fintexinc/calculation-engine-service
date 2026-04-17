@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.yield.Yield;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -70,9 +70,9 @@ class YieldMapperTest {
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
-  private Holding createHolding(String securityId) {
+  private PortfolioHolding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding(null, FinancialInstrumentType.ETF_CANADA, identifier);
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, identifier);
   }
 }

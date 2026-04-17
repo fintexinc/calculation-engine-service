@@ -1,6 +1,6 @@
 package com.fintex.ce.model.dto.command;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -20,12 +20,12 @@ public class MultiplePortfoliosCommand extends CalculationCommand implements Ben
   @Schema(description = "Set of portfolios to compare")
   private Set<Portfolio> portfolios;
   @Schema(description = "Benchmark holdings for comparison")
-  private List<Holding> benchmarkHoldings;
+  private List<PortfolioHolding> benchmarkHoldings;
 
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
   public static class Portfolio {
-    private List<Holding> holdings;
+    private List<PortfolioHolding> holdings;
   }
 }

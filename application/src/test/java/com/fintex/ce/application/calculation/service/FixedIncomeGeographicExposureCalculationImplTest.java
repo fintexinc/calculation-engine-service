@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeGeographicExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -74,7 +74,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
     final var service = mock(FixedIncomeGeographicExposureCalculationImpl.class,
         withSettings().useConstructor(storage, geographicAllocationMappingService));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var countryExposure = new CountryExposure();
     countryExposure.setAllocations(Map.of("CA", TEN));
     final var rawData = Map.of(holding, countryExposure);
@@ -97,7 +97,7 @@ class FixedIncomeGeographicExposureCalculationImplTest {
       final var service = mock(FixedIncomeGeographicExposureCalculationImpl.class,
           withSettings().useConstructor(storage, geographicAllocationMappingService));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(GeographicRegionType.CANADA, TEN));
 

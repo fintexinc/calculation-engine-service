@@ -3,7 +3,7 @@ package com.fintex.ce.application.returns;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.InterestFreq;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.Test;
@@ -40,10 +40,11 @@ class GicMonthlyReturnsGeneratorTest {
         .investmentDate(LocalDate.of(2020, 5, 1))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_2_PERCENT_ANNUAL);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_2_PERCENT_ANNUAL);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -58,10 +59,11 @@ class GicMonthlyReturnsGeneratorTest {
         .clientIntRate(BigDecimal.valueOf(10))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_10_PERCENT_ANNUAL);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_10_PERCENT_ANNUAL);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -78,10 +80,11 @@ class GicMonthlyReturnsGeneratorTest {
         .investmentDate(LocalDate.of(2005, 2, 1))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_5_PERCENT_SEMI_ANNUAL);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_5_PERCENT_SEMI_ANNUAL);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -98,10 +101,11 @@ class GicMonthlyReturnsGeneratorTest {
         .investmentDate(LocalDate.of(2018, 9, 28))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_5_PERCENT_QUARTERLY);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_5_PERCENT_QUARTERLY);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -118,10 +122,11 @@ class GicMonthlyReturnsGeneratorTest {
         .investmentDate(LocalDate.of(2000, 3, 15))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_5_PERCENT_MONTHLY);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_5_PERCENT_MONTHLY);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -138,10 +143,11 @@ class GicMonthlyReturnsGeneratorTest {
         .investmentDate(LocalDate.of(2020, 1, 1))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_5_PERCENT_BI_MONTHLY);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_5_PERCENT_BI_MONTHLY);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -158,10 +164,11 @@ class GicMonthlyReturnsGeneratorTest {
         .investmentDate(LocalDate.of(2019, 7, 15))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_5_PERCENT_WEEKLY);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_5_PERCENT_WEEKLY);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -178,10 +185,11 @@ class GicMonthlyReturnsGeneratorTest {
         .investmentDate(LocalDate.of(2020, 5, 31))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_5_PERCENT_BI_WEEKLY);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_5_PERCENT_BI_WEEKLY);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -198,18 +206,19 @@ class GicMonthlyReturnsGeneratorTest {
         .investmentDate(LocalDate.of(2019, 6, 12))
         .build();
 
-    final HashMap<Holding, HoldingMonthlyReturns> expected = getExpected(gicHolding, RETURN_OF_5_PERCENT_DAILY);
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> expected = getExpected(gicHolding,
+        RETURN_OF_5_PERCENT_DAILY);
 
     // ACT
-    final Map<Holding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
   }
 
-  private HashMap<Holding, HoldingMonthlyReturns> getExpected(final GicHolding gicHolding,
+  private HashMap<PortfolioHolding, HoldingMonthlyReturns> getExpected(final GicHolding gicHolding,
       final BigDecimal gicReturnValue) {
-    final HashMap<Holding, HoldingMonthlyReturns> result = new HashMap<>();
+    final HashMap<PortfolioHolding, HoldingMonthlyReturns> result = new HashMap<>();
 
     final TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>();
     rangeWithLastDayOfMonth(gicHolding.getInvestmentDate(), LocalDate.now())

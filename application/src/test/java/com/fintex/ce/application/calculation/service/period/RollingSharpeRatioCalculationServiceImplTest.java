@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.RollingSharpeRatioCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
@@ -39,7 +39,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService, tBillsFetcher, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
@@ -61,7 +61,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService, tBillsFetcher, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var rollingCorrelationCalculation = mock(RollingSharpeRatioCalculation.class);
     final var rollingPeriods = Set.of("12");
 

@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
@@ -34,7 +34,7 @@ class EquitySectorAllocationMapperTest {
     smsResponse.setAllocation(List.of(techEntry, healthEntry, energyEntry));
     smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
 
-    Holding holding = createHolding("XIU.TO");
+    PortfolioHolding holding = createHolding("XIU.TO");
 
     EquitySector result = mapper.map(smsResponse, holding);
 
@@ -50,7 +50,7 @@ class EquitySectorAllocationMapperTest {
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyAllocations_whenResponseIsNullOrHasNoAllocation(
       EquitySectorAllocation smsResponse) {
-    Holding holding = createHolding("TEST.ID");
+    PortfolioHolding holding = createHolding("TEST.ID");
 
     EquitySector result = mapper.map(smsResponse, holding);
 
@@ -132,9 +132,9 @@ class EquitySectorAllocationMapperTest {
     return entry;
   }
 
-  private Holding createHolding(String securityId) {
+  private PortfolioHolding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding(null, FinancialInstrumentType.ETF_CANADA, identifier);
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, identifier);
   }
 }

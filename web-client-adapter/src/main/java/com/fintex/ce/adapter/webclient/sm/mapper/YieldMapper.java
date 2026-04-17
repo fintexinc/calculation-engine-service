@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.yield.Yield;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.financial.Income;
 
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class YieldMapper implements SecurityMasterResponseMapper<Yield, Income> {
 
   @Override
-  public Yield map(Income smsResponse, Holding holding) {
+  public Yield map(Income smsResponse, PortfolioHolding holding) {
     Yield result = new Yield()
         .setHoldingId(holding.getSecurityIdentifier().getId());
 

@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
@@ -20,16 +20,16 @@ import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
 
 public class FixedIncomeBondSectorCalculation {
 
-  private final Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures;
-  private final List<Holding> holdings;
+  private final Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures;
+  private final List<PortfolioHolding> holdings;
   private final List<Warning> warnings;
-  private final Map<Holding, BigDecimal> fixedIncomePlusCash;
+  private final Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash;
 
   public FixedIncomeBondSectorCalculation(
-      final Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures,
-      final List<Holding> holdings,
+      final Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures,
+      final List<PortfolioHolding> holdings,
       final List<Warning> warnings,
-      final Map<Holding, BigDecimal> fixedIncomePlusCash) {
+      final Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash) {
     this.exposures = exposures;
     this.holdings = holdings;
     this.warnings = warnings;
@@ -48,10 +48,10 @@ public class FixedIncomeBondSectorCalculation {
   }
 
   private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> calculateFixedIncomeSectorAllocation(
-      final List<Holding> holdings,
-      final Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> fixedIncome,
-      final Map<Holding, BigDecimal> fixedIncomePlusCash) {
-    final Map<Holding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
+      final List<PortfolioHolding> holdings,
+      final Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> fixedIncome,
+      final Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash) {
+    final Map<PortfolioHolding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
     final Map<FixedIncomeSecuritiesAllocationType, BigDecimal> result = new HashMap<>();
     for (FixedIncomeSecuritiesAllocationType type : FixedIncomeSecuritiesAllocationType.values()) {
       final BigDecimal sumProduct = calculateSumProduct(fixedIncome, fixedIncomePlusCash, weights, type);
@@ -61,11 +61,11 @@ public class FixedIncomeBondSectorCalculation {
   }
 
   private BigDecimal calculateSumProduct(
-      final Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> fixedIncomeSectorType,
-      final Map<Holding, BigDecimal> fixedIncomePlusCash,
-      final Map<Holding, BigDecimal> weights,
+      final Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> fixedIncomeSectorType,
+      final Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash,
+      final Map<PortfolioHolding, BigDecimal> weights,
       final FixedIncomeSecuritiesAllocationType type) {
-    final Map<Holding, BigDecimal> fixedIncomeType = fixedIncomeSectorType.entrySet().stream()
+    final Map<PortfolioHolding, BigDecimal> fixedIncomeType = fixedIncomeSectorType.entrySet().stream()
         .filter(e -> e.getValue().containsKey(type))
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().get(type)));
     return sumProduct(fixedIncomeType, fixedIncomePlusCash, weights);

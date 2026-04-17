@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.response.FixedIncomeStyleboxExposureResponseMapper;
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -35,7 +35,7 @@ class FixedIncomeStyleboxExposureCalculationServiceImplTest {
     final var service = mock(FixedIncomeStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var exposure = new FixedIncomeStyleboxExposure();
     exposure.setBoxValues(Map.of(FixedIncomeStyleBoxType.HIGH_EXTENSIVE, BigDecimal.TEN));
     final var rawData = Map.of(holding, exposure);
@@ -56,7 +56,7 @@ class FixedIncomeStyleboxExposureCalculationServiceImplTest {
     final var service = mock(FixedIncomeStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(FixedIncomeStyleBoxType.HIGH_EXTENSIVE, BigDecimal.TEN));
 
@@ -73,7 +73,7 @@ class FixedIncomeStyleboxExposureCalculationServiceImplTest {
     final var service = mock(FixedIncomeStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(FixedIncomeStyleBoxType.HIGH_EXTENSIVE, BigDecimal.TEN));
     final var netProducts = mock(Map.class);

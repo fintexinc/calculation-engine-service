@@ -3,7 +3,7 @@ package com.fintex.ce.application.returns;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.model.domain.calculation.returns.ReturnsData;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.Notification;
 import com.fintex.ce.util.MapUtils;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -389,14 +389,14 @@ class MonthlyReturnsTest {
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase1() {
     final var sut = new ReturnsAggregate();
-    var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
-    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
+    var monthlyReturns = new HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>();
+    var h1 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
-    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
+    var h2 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
         FiIdentifierType.TICKER));
-    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
+    var h3 = new PortfolioHolding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
         FiIdentifierType.TICKER));
-    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
+    var h4 = new PortfolioHolding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
         FiIdentifierType.TICKER));
     monthlyReturns.put(h1, new TreeMap<>(Map.of(
         LocalDate.of(2020, 1, 1), ONE,
@@ -427,14 +427,14 @@ class MonthlyReturnsTest {
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase2() {
     final var sut = new ReturnsAggregate();
-    var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
-    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
+    var monthlyReturns = new HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>();
+    var h1 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
-    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
+    var h2 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
         FiIdentifierType.TICKER));
-    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
+    var h3 = new PortfolioHolding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
         FiIdentifierType.TICKER));
-    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
+    var h4 = new PortfolioHolding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
         FiIdentifierType.TICKER));
     monthlyReturns.put(h1, new TreeMap<>(Map.of(
         LocalDate.of(2020, 1, 1), ONE,
@@ -466,14 +466,14 @@ class MonthlyReturnsTest {
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase3() {
     final var sut = new ReturnsAggregate();
-    var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
-    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
+    var monthlyReturns = new HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>();
+    var h1 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
-    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
+    var h2 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
         FiIdentifierType.TICKER));
-    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
+    var h3 = new PortfolioHolding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
         FiIdentifierType.TICKER));
-    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
+    var h4 = new PortfolioHolding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
         FiIdentifierType.TICKER));
     monthlyReturns.put(h1, new TreeMap<>(Map.of(
         LocalDate.of(2020, 12, 1), ONE,
@@ -504,14 +504,14 @@ class MonthlyReturnsTest {
   @Test
   void shouldValidateMonthlyReturns_whenCase4NoExceptionThrown() {
     final var sut = new ReturnsAggregate();
-    var monthlyReturns = new HashMap<Holding, TreeMap<LocalDate, BigDecimal>>();
-    var h1 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
+    var monthlyReturns = new HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>();
+    var h1 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
-    var h2 = new Holding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
+    var h2 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf2",
         FiIdentifierType.TICKER));
-    var h3 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
+    var h3 = new PortfolioHolding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf1",
         FiIdentifierType.TICKER));
-    var h4 = new Holding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
+    var h4 = new PortfolioHolding(ONE, FinancialInstrumentType.ETF_US, new SecurityIdentifier("usEtf2",
         FiIdentifierType.TICKER));
     monthlyReturns.put(h1, new TreeMap<>(Map.of(
         LocalDate.of(2020, 1, 1), ONE,
@@ -536,7 +536,8 @@ class MonthlyReturnsTest {
   @Test
   void shouldGetMonthlyReturns_whenCheckResult() {
     final var sut = mock(ReturnsAggregate.class);
-    final var monthlyReturns = Map.of(mock(Holding.class), new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE)));
+    final var monthlyReturns = Map.of(mock(PortfolioHolding.class), new TreeMap<>(Map.of(LOCAL_DATE_NOW,
+        BigDecimal.ONE)));
     sut.returnsMap = monthlyReturns;
 
     doCallRealMethod().when(sut).getReturnsMap();
@@ -551,7 +552,7 @@ class MonthlyReturnsTest {
     try (var mapUtilsMock = mockStatic(MapUtils.class)) {
       final var sut = mock(ReturnsAggregate.class);
       final var monthlyReturns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE));
-      final var holdingMonthlyReturns = Map.of(mock(Holding.class), monthlyReturns);
+      final var holdingMonthlyReturns = Map.of(mock(PortfolioHolding.class), monthlyReturns);
       sut.returnsMap = holdingMonthlyReturns;
 
       doCallRealMethod().when(sut).getReturnsMap();
@@ -564,7 +565,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldFindPsdAmongHoldings_whenCheckResult() {
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var sut = mock(ReturnsAggregate.class);
 
     sut.returnsMap = Map.of(holding,
@@ -579,7 +580,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldFindPedAmongHoldings_whenCheckResult() {
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var sut = mock(ReturnsAggregate.class);
     sut.returnsMap = Map.of(holding,
         new TreeMap<>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE, toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)),
@@ -597,8 +598,8 @@ class MonthlyReturnsTest {
     final var sut = mock(ReturnsAggregate.class);
     sut.notification = new Notification();
 
-    final var holding1 = mock(Holding.class);
-    final var holding2 = mock(Holding.class);
+    final var holding1 = mock(PortfolioHolding.class);
+    final var holding2 = mock(PortfolioHolding.class);
 
     final var rMonthlyReturns1 = mock(ReturnsData.class);
     when(rMonthlyReturns1.getCurrency()).thenReturn(Currency.CAD.name());
@@ -621,8 +622,8 @@ class MonthlyReturnsTest {
     final var sut = mock(ReturnsAggregate.class);
     sut.notification = new Notification();
 
-    final var holding1 = mock(Holding.class);
-    final var holding2 = mock(Holding.class);
+    final var holding1 = mock(PortfolioHolding.class);
+    final var holding2 = mock(PortfolioHolding.class);
 
     final var rMonthlyReturns1 = mock(ReturnsData.class);
     when(rMonthlyReturns1.getCurrency()).thenReturn(null);
@@ -635,7 +636,7 @@ class MonthlyReturnsTest {
 
     final var actual = sut.retrieveHoldingCurrencies(originalMReturns);
 
-    final var expected = new HashMap<Holding, Currency>();
+    final var expected = new HashMap<PortfolioHolding, Currency>();
     expected.put(holding2, Currency.USD);
     assertEquals(expected, actual);
     assertFalse(sut.notification.getErrors().isEmpty());
@@ -645,8 +646,8 @@ class MonthlyReturnsTest {
   void shouldRetrieveReturns_whenCheckResult() {
     final var sut = mock(ReturnsAggregate.class);
 
-    final var holding1 = mock(Holding.class);
-    final var holding2 = mock(Holding.class);
+    final var holding1 = mock(PortfolioHolding.class);
+    final var holding2 = mock(PortfolioHolding.class);
 
     final var rMonthlyReturns1 = mock(ReturnsData.class);
     final var monthlyReturn1 = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
@@ -673,7 +674,7 @@ class MonthlyReturnsTest {
     when(rMonthlyReturns.getCurrency()).thenReturn(Currency.CAD.name());
     when(rMonthlyReturns.getReturns()).thenReturn(monthlyReturns);
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
 
     final var rMonthlyReturnsMap = Map.of(holding, rMonthlyReturns);
 

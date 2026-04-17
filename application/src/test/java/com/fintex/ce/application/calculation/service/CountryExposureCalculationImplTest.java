@@ -4,7 +4,7 @@ import com.fintex.ce.application.mapping.response.CountryExposureResponseMapper;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -79,7 +79,7 @@ class CountryExposureCalculationImplTest {
     final var service = mock(CountryExposureCalculationImpl.class,
         withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var countryExposure = new CountryExposure();
     countryExposure.setAllocations(Map.of("CA", TEN));
     final var rawData = Map.of(holding, countryExposure);
@@ -103,7 +103,7 @@ class CountryExposureCalculationImplTest {
       final var service = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
 
@@ -124,7 +124,7 @@ class CountryExposureCalculationImplTest {
       final var service = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
       final var netProducts = mock(Map.class);
@@ -148,7 +148,7 @@ class CountryExposureCalculationImplTest {
       final var service = mock(CountryExposureCalculationImpl.class,
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
       final var netProducts = mock(Map.class);

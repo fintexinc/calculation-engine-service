@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.BestWorstPeriodCalculation;
 import com.fintex.ce.application.returns.ReturnsAggregate;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
@@ -38,7 +38,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
 
     final var calculationDTO = mock(CalculationDTO.class);
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var portfolioTotalReturns = mock(TreeMap.class);
     final BestWorstPeriodCalculation bestWorstPeriodCalculation = mock(BestWorstPeriodCalculation.class, withSettings()
         .useConstructor(portfolioTotalReturns, Set.of()));
@@ -65,7 +65,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var calculationDTO = mock(CalculationDTO.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final BestWorstPeriodCalculation bestWorstPeriodCalculation = mock(BestWorstPeriodCalculation.class, withSettings()
         .useConstructor(portfolioTotalReturns, Set.of()));
 
@@ -88,7 +88,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
 
     final var calculationDTO = mock(CalculationDTO.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
     final BestWorstPeriodCalculation bestWorstPeriodCalculation = mock(BestWorstPeriodCalculation.class, withSettings()
         .useConstructor(portfolioTotalReturns, Set.of()));
@@ -110,7 +110,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
 
     final var calculationDTO = mock(CalculationDTO.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
 
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
@@ -128,7 +128,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class);
 
     final var calculationDTO = mock(CalculationDTO.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
 
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
@@ -189,7 +189,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
 
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var bestWorstPeriodCalculation = mock(BestWorstPeriodCalculation.class);
     final var resDTO = mock(BestWorstPeriodsResult.class);
 
@@ -213,7 +213,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
     when(bestWorstPeriodCommand.getCurrency()).thenReturn(Currency.CAD);
@@ -233,7 +233,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     final var monthlyReturns = mock(ReturnsAggregate.class);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturns);
@@ -259,7 +259,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     final var portfolioTotalReturns = mock(NavigableMap.class);
     final var expected = new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns);

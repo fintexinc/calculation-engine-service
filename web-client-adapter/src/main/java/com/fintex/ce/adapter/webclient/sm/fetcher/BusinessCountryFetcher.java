@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.model.domain.calculation.BusinessCountry;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 
@@ -18,7 +18,8 @@ import java.util.Map;
 public class BusinessCountryFetcher implements SecurityDataFetcher<BusinessCountry> {
 
   @Override
-  public Map<Holding, BusinessCountry> fetch(List<? extends Holding> holdings, List<DataProvider> providers) {
+  public Map<PortfolioHolding, BusinessCountry> fetch(List<? extends PortfolioHolding> holdings,
+      List<DataProvider> providers) {
     return new HashMap<>();
   }
 }

@@ -3,7 +3,7 @@ package com.fintex.ce.application.validation.data;
 import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.Warning;
 
@@ -28,12 +28,12 @@ public class AssetAllocationDataValidator {
     validateNonStock(assetAllocationDataDto.getSeparatelyManagedAccountFdsResponse(), warnings);
   }
 
-  <H extends Holding> void validateNonStock(final Map<H, HoldingAssetAllocation> holdings,
+  <H extends PortfolioHolding> void validateNonStock(final Map<H, HoldingAssetAllocation> holdings,
       final List<Warning> warnings) {
     holdings.forEach((holding, assetAllocation) -> validate(holding, assetAllocation.getAllocations(), warnings));
   }
 
-  void validate(final Holding holding,
+  void validate(final PortfolioHolding holding,
       final Map<String, BigDecimal> assetAllocations,
       final List<Warning> warnings) {
     if (assetAllocations == null || assetAllocations.isEmpty()) {
@@ -48,7 +48,7 @@ public class AssetAllocationDataValidator {
     });
   }
 
-  public void validateWhenAssetAllocationIsEmpty(final Holding holding, final List<Warning> warnings) {
+  public void validateWhenAssetAllocationIsEmpty(final PortfolioHolding holding, final List<Warning> warnings) {
     warnings.add(ErrorCode.WRN_AA_AA_001.warning(holding));
   }
 

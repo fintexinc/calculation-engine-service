@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 
@@ -28,7 +28,7 @@ public class CommonPerformanceDatesReqValidator implements RequestValidator {
     if (!(command instanceof MultiplePortfoliosCommand mpc)) {
       return;
     }
-    List<Holding> benchmarkHoldings = mpc.getBenchmarkHoldings();
+    List<PortfolioHolding> benchmarkHoldings = mpc.getBenchmarkHoldings();
     if (!CollectionUtils.isEmpty(benchmarkHoldings)) {
       HoldingsValidationHelper.validate(benchmarkHoldings);
     }

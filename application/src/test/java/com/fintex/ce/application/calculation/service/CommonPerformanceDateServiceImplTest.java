@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.error.ErrorCode;
@@ -71,7 +71,7 @@ class CommonPerformanceDateServiceImplTest {
 
     doCallRealMethod().when(sut).collectAllPortfolioHoldings(anySet());
 
-    final List<Holding> actual = sut.collectAllPortfolioHoldings(Set.of());
+    final List<PortfolioHolding> actual = sut.collectAllPortfolioHoldings(Set.of());
 
     assertTrue(actual.isEmpty());
   }
@@ -82,8 +82,8 @@ class CommonPerformanceDateServiceImplTest {
     final var portfolio1 = mock(MultiplePortfoliosCommand.Portfolio.class);
     final var portfolio2 = mock(MultiplePortfoliosCommand.Portfolio.class);
 
-    final var holding1 = mock(Holding.class);
-    final var holding2 = mock(Holding.class);
+    final var holding1 = mock(PortfolioHolding.class);
+    final var holding2 = mock(PortfolioHolding.class);
 
     final var holdings1 = List.of(holding1);
     final var holdings2 = List.of(holding2);
@@ -93,7 +93,7 @@ class CommonPerformanceDateServiceImplTest {
 
     doCallRealMethod().when(sut).collectAllPortfolioHoldings(anySet());
 
-    final List<Holding> actual = sut.collectAllPortfolioHoldings(Set.of(portfolio1, portfolio2));
+    final List<PortfolioHolding> actual = sut.collectAllPortfolioHoldings(Set.of(portfolio1, portfolio2));
 
     assertEquals(2, actual.size());
     assertTrue(List.of(holding1, holding2).containsAll(actual));

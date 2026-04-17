@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
@@ -37,10 +37,10 @@ public class CorrelationCalculation
     extends
       PeriodCalculationAbstract<CorrelationResult, List<CorrelationPeriodResult>> {
 
-  private final Map<Holding, Map<LocalDate, BigDecimal>> portfolioBaseTotalReturn;
+  private final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> portfolioBaseTotalReturn;
 
   public CorrelationCalculation(final CalculationDTO calculationDTO,
-      final Map<Holding, Map<LocalDate, BigDecimal>> portfolioBaseTotalReturn,
+      final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> portfolioBaseTotalReturn,
       final Set<String> defaultPeriods) {
     super(calculationDTO, defaultPeriods);
     this.portfolioBaseTotalReturn = portfolioBaseTotalReturn;
@@ -51,7 +51,7 @@ public class CorrelationCalculation
     if (numberOfMonths < TWELVE.intValue()) {
       return null;
     }
-    final Map<Holding, Map<LocalDate, BigDecimal>> returns = portfolioBaseTotalReturn.entrySet().stream()
+    final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> returns = portfolioBaseTotalReturn.entrySet().stream()
         .filter(holdingReturns -> hasEnoughReturns(numberOfMonths, holdingReturns))
         .collect(Collectors.toMap(Map.Entry::getKey, e -> calculatePortfolioBaseTotalReturnValuesByPeriod(
             numberOfMonths, e.getValue())));
@@ -61,7 +61,7 @@ public class CorrelationCalculation
   }
 
   public boolean hasEnoughReturns(int numberOfMonths,
-      final Map.Entry<Holding, Map<LocalDate, BigDecimal>> holdingReturns) {
+      final Map.Entry<PortfolioHolding, Map<LocalDate, BigDecimal>> holdingReturns) {
     return holdingReturns.getValue().size() >= numberOfMonths;
   }
 
@@ -138,11 +138,11 @@ public class CorrelationCalculation
    * @param numberOfMonths
    * @return mapped CorrelationPeriodResult
    */
-  public CorrelationPeriodResult getCorrelationPeriod(final Holding keyHolding,
-      final Map<Holding, Map<LocalDate, BigDecimal>> returns,
+  public CorrelationPeriodResult getCorrelationPeriod(final PortfolioHolding keyHolding,
+      final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> returns,
       final int numberOfMonths) {
     final Map<LocalDate, BigDecimal> keyHoldingValues = returns.get(keyHolding);
-    final Map<Holding, BigDecimal> correlations = returns.entrySet().stream()
+    final Map<PortfolioHolding, BigDecimal> correlations = returns.entrySet().stream()
         .filter(e -> !e.getKey().equals(keyHolding))
         .collect(Collectors.toMap(Map.Entry::getKey, e -> calculateCorrelation(keyHoldingValues, e.getValue())));
     return mapToCorrelationPeriodResult(keyHolding, numberOfMonths, correlations);
@@ -157,9 +157,9 @@ public class CorrelationCalculation
    *          calculated correlations
    * @return CorrelationPeriodResult
    */
-  public CorrelationPeriodResult mapToCorrelationPeriodResult(final Holding keyHolding,
+  public CorrelationPeriodResult mapToCorrelationPeriodResult(final PortfolioHolding keyHolding,
       final int numberOfMonths,
-      final Map<Holding, BigDecimal> correlations) {
+      final Map<PortfolioHolding, BigDecimal> correlations) {
     return new CorrelationPeriodResult()
         .setPeriod(String.valueOf(numberOfMonths))
         .setKey(createKey(keyHolding))

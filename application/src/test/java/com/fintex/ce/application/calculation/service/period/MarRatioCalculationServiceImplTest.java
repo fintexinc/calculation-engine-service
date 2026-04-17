@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.MarRatioCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -33,7 +33,7 @@ class MarRatioCalculationServiceImplTest {
     final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
     final var reqDTO = mock(PeriodCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(sut.defineCalculationMethod(any())).thenReturn(mock(MarRatioCalculation.class));
@@ -51,7 +51,7 @@ class MarRatioCalculationServiceImplTest {
     final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
     final var reqDTO = mock(PeriodCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(sut.defineCalculationMethod(any())).thenReturn(mock(MarRatioCalculation.class));
@@ -69,7 +69,7 @@ class MarRatioCalculationServiceImplTest {
     final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
     final var reqDTO = mock(PeriodCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
     final var calculationMethod = mock(MarRatioCalculation.class);

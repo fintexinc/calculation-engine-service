@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.allocation.Maturities;
 import com.fintex.wm.commons.domain.allocation.MaturityDurationValue;
 
@@ -22,7 +22,7 @@ public class MaturityAllocationMapper
       SecurityMasterResponseMapper<MaturityAllocation, Maturities> {
 
   @Override
-  public MaturityAllocation map(Maturities smsResponse, Holding holding) {
+  public MaturityAllocation map(Maturities smsResponse, PortfolioHolding holding) {
     Map<String, BigDecimal> durationMap = Optional.ofNullable(smsResponse)
         .map(Maturities::getPeriods)
         .orElse(List.of())

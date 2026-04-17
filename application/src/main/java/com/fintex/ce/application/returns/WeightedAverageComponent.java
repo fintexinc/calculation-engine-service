@@ -1,7 +1,7 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.calculation.metric.formula.SumProduct;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.ReturnFactorScale;
 
@@ -29,14 +29,15 @@ public class WeightedAverageComponent {
   }
 
   public NavigableMap<LocalDate, BigDecimal> calculateWeightedAverage(
-      final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns) {
-    final Map<Holding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight = calculateEndingPortfolioWeight(returns);
+      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns) {
+    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight = calculateEndingPortfolioWeight(
+        returns);
     return new TreeMap<>(calculateTotalPortfolioReturnFactor(returns, endingPortfolioWeight));
   }
 
   public Map<LocalDate, BigDecimal> calculateTotalPortfolioReturnFactor(
-      final Map<Holding, TreeMap<LocalDate, BigDecimal>> portfolioBaseTotalReturn,
-      final Map<Holding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight) {
+      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> portfolioBaseTotalReturn,
+      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight) {
     final NavigableMap<LocalDate, BigDecimal> calculate = new SumProduct<>(portfolioBaseTotalReturn,
         endingPortfolioWeight)
         .setMap2KeyFinder(date -> toLastDayOfMonth(date.minusMonths(1)))
@@ -44,10 +45,11 @@ public class WeightedAverageComponent {
     return calculate.entrySet().stream().collect(toTreeMap(Map.Entry::getKey, returnFactorScale.getFormula()));
   }
 
-  public Map<Holding, TreeMap<LocalDate, BigDecimal>> calculateEndingPortfolioWeight(
-      final Map<Holding, TreeMap<LocalDate, BigDecimal>> pBaseTotalReturn) {
-    final Map<Holding, BigDecimal> initialWeights = PortfolioUtils.calculateInitialPortfolioWeight(pBaseTotalReturn
-        .keySet());
+  public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> calculateEndingPortfolioWeight(
+      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> pBaseTotalReturn) {
+    final Map<PortfolioHolding, BigDecimal> initialWeights = PortfolioUtils.calculateInitialPortfolioWeight(
+        pBaseTotalReturn
+            .keySet());
     return pBaseTotalReturn.entrySet().stream().collect(toMap(Map.Entry::getKey, collectMonthlyWeightEntries(
         initialWeights)));
   }
@@ -59,8 +61,8 @@ public class WeightedAverageComponent {
    *          initial holdings weights of portfolio
    * @return function to collect starting portfolio holdings weights for each time period for single holding
    */
-  public Function<Map.Entry<Holding, TreeMap<LocalDate, BigDecimal>>, TreeMap<LocalDate, BigDecimal>> collectMonthlyWeightEntries(
-      Map<Holding, BigDecimal> initialWeights) {
+  public Function<Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>, TreeMap<LocalDate, BigDecimal>> collectMonthlyWeightEntries(
+      Map<PortfolioHolding, BigDecimal> initialWeights) {
     return topEntry -> {
       final Map<LocalDate, BigDecimal> hBaseTotalReturns = new HashMap<>(topEntry.getValue());
       final LocalDate initDate = topEntry.getValue().keySet().stream().min(LocalDate::compareTo).orElseThrow();

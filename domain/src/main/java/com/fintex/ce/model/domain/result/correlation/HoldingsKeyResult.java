@@ -2,7 +2,7 @@ package com.fintex.ce.model.domain.result.correlation;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
@@ -27,11 +27,11 @@ public class HoldingsKeyResult {
   private String name;
   private Currency currency;
 
-  public static HoldingsKeyResult buildHoldingsKeyResult(final Holding holding) {
+  public static HoldingsKeyResult buildHoldingsKeyResult(final PortfolioHolding holding) {
     return buildFromHolding(holding, null);
   }
 
-  public static HoldingsKeyResult buildFromHolding(final Holding holding, final BigDecimal allocation) {
+  public static HoldingsKeyResult buildFromHolding(final PortfolioHolding holding, final BigDecimal allocation) {
     HoldingsKeyResult result = new HoldingsKeyResult();
     result.setType(holding.getHoldingType());
     result.setSecurityIdentifier(holding.getSecurityIdentifier());
@@ -47,7 +47,7 @@ public class HoldingsKeyResult {
     return result;
   }
 
-  private static String createKey(final Holding holding) {
+  private static String createKey(final PortfolioHolding holding) {
     String result;
     SecurityIdentifier secId = holding.getSecurityIdentifier();
 

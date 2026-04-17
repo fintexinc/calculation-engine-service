@@ -1,7 +1,7 @@
 package com.fintex.ce.model.dto.command;
 
 import com.fintex.ce.model.domain.enumeration.ParameterType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -20,5 +20,5 @@ public class AverageMerCommand extends DataProviderCommand implements HoldingsPr
   @Schema(description = "Fee parameter types to calculate", example = "[\"scaled\", \"absolute\"]")
   private List<ParameterType> parameterTypes;
   @Schema(description = "Portfolio holdings")
-  private List<Holding> holdings;
+  private List<PortfolioHolding> holdings;
 }

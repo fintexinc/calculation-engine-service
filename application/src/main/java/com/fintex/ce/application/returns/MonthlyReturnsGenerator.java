@@ -1,8 +1,8 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.model.domain.holding.MonthlyReturnGeneratableHolding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.returns.ReturnsGenerator;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -26,10 +26,10 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 public class MonthlyReturnsGenerator implements ReturnsGenerator {
 
   @Override
-  public Map<Holding, HoldingMonthlyReturns> generateGicMonthlyReturns(List<Holding> holdings) {
-    Map<Holding, HoldingMonthlyReturns> result = new HashMap<>();
-    List<Holding> filteredHoldings = filterHoldings(holdings, GIC_PREDICATE);
-    for (Holding h : filteredHoldings) {
+  public Map<PortfolioHolding, HoldingMonthlyReturns> generateGicMonthlyReturns(List<PortfolioHolding> holdings) {
+    Map<PortfolioHolding, HoldingMonthlyReturns> result = new HashMap<>();
+    List<PortfolioHolding> filteredHoldings = filterHoldings(holdings, GIC_PREDICATE);
+    for (PortfolioHolding h : filteredHoldings) {
       result.put(h, generatedMonthlyReturns((MonthlyReturnGeneratableHolding) h));
     }
     return result;

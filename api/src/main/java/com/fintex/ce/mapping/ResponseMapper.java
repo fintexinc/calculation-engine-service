@@ -1,6 +1,6 @@
 package com.fintex.ce.mapping;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.Warning;
 
 import java.util.List;
@@ -36,6 +36,6 @@ public interface ResponseMapper<D, R> {
    *          list of warnings to include in response
    * @return the aggregated response DTO
    */
-  R toResponse(Map<Holding, D> domainMap, List<Warning> warnings);
+  R toResponse(Map<PortfolioHolding, D> domainMap, List<Warning> warnings);
 
 }

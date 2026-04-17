@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationTypeValue;
@@ -21,7 +21,7 @@ public class EquityMarketCapitalizationMapper
       SecurityMasterResponseMapper<HoldingEquityMarketCap, EquityMarketCapitalization> {
 
   @Override
-  public HoldingEquityMarketCap map(EquityMarketCapitalization smsResponse, Holding holding) {
+  public HoldingEquityMarketCap map(EquityMarketCapitalization smsResponse, PortfolioHolding holding) {
     Map<EquityMarketCapitalizationType, BigDecimal> ratingsMap = Optional.ofNullable(smsResponse)
         .map(EquityMarketCapitalization::getValues)
         .orElse(List.of())

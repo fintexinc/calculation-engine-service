@@ -6,7 +6,7 @@ import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
@@ -46,7 +46,7 @@ class AssetAllocationServiceImplTest {
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var allocations = Map.of(holding, mock(HoldingAssetAllocation.class));
     final var expected = Map.of(holding, Map.of(AssetAllocationRegion.OTHER, TEN));
 
@@ -72,7 +72,7 @@ class AssetAllocationServiceImplTest {
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
-    final var allocations = Map.of(mock(Holding.class), mock(HoldingAssetAllocation.class));
+    final var allocations = Map.of(mock(PortfolioHolding.class), mock(HoldingAssetAllocation.class));
     when(securityDataPort.fetch(anyList(), anyList())).thenReturn(allocations);
 
     doCallRealMethod().when(service).fetchExposures(any());
@@ -94,7 +94,7 @@ class AssetAllocationServiceImplTest {
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegion.OTHER, TEN));
     doCallRealMethod().when(service).calculate(any(), any());
@@ -116,7 +116,7 @@ class AssetAllocationServiceImplTest {
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final Map netProducts = mock(Map.class);
     final List<Warning> warnings = List.of();
@@ -141,7 +141,7 @@ class AssetAllocationServiceImplTest {
     final var service = mock(AssetAllocationServiceImpl.class, withSettings().useConstructor(
         assetAllocationDataMapper, responseMapper, securityDataPort, DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegion.FIXED_INCOME, TEN));
     final var netProducts = mock(Map.class);

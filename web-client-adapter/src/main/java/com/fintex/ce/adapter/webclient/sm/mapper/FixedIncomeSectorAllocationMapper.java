@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeNameValue;
@@ -42,7 +42,7 @@ public class FixedIncomeSectorAllocationMapper
   }
 
   @Override
-  public FixedIncomeBondSecurities map(FixedIncomeSectorAllocation smsResponse, Holding holding) {
+  public FixedIncomeBondSecurities map(FixedIncomeSectorAllocation smsResponse, PortfolioHolding holding) {
     Map<FixedIncomeSecuritiesAllocationType, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
         .map(FixedIncomeSectorAllocation::getAllocation)
         .orElse(List.of())

@@ -22,7 +22,7 @@ import static com.fintex.ce.model.error.ErrorCode.Names.ERR_VAL_NN_001;
 import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalEquals;
 import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalHashCode;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "holdingType", visible = true, defaultImpl = Holding.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "holdingType", visible = true, defaultImpl = PortfolioHolding.class)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CashHolding.class, name = "CASH"),
     @JsonSubTypes.Type(value = GicHolding.class, name = "GIC")
@@ -30,7 +30,7 @@ import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalHashCode;
 @Getter
 @ToString
 @SuperBuilder(toBuilder = true)
-public class Holding {
+public class PortfolioHolding {
 
   public static final String DELIMITER = "-";
 
@@ -44,7 +44,7 @@ public class Holding {
   private final SecurityIdentifier securityIdentifier;
 
   @JsonCreator
-  public Holding(
+  public PortfolioHolding(
       @JsonProperty("value") BigDecimal value,
       @JsonProperty("holdingType") FinancialInstrumentType holdingType,
       @JsonProperty("securityIdentifier") SecurityIdentifier securityIdentifier) {
@@ -67,7 +67,7 @@ public class Holding {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    Holding holding = (Holding) o;
+    PortfolioHolding holding = (PortfolioHolding) o;
     return bigDecimalEquals(value, holding.value)
         && Objects.equals(holdingType, holding.holdingType)
         && Objects.equals(securityIdentifier, holding.securityIdentifier);

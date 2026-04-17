@@ -1,7 +1,7 @@
 package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.model.domain.calculation.yield.Yield;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -40,11 +40,11 @@ class YieldResponseMapperTest {
 
   @Test
   void shouldCalculateWeightedAverageYield_whenMappingPortfolioDomainMap() {
-    Holding stock = new Holding(new BigDecimal("2"), FinancialInstrumentType.STOCK_US, null);
-    Holding gic = new Holding(new BigDecimal("3"), FinancialInstrumentType.GIC, null);
-    Holding skipped = new Holding(new BigDecimal("5"), FinancialInstrumentType.STOCK_CANADA, null);
+    PortfolioHolding stock = new PortfolioHolding(new BigDecimal("2"), FinancialInstrumentType.STOCK_US, null);
+    PortfolioHolding gic = new PortfolioHolding(new BigDecimal("3"), FinancialInstrumentType.GIC, null);
+    PortfolioHolding skipped = new PortfolioHolding(new BigDecimal("5"), FinancialInstrumentType.STOCK_CANADA, null);
 
-    Map<Holding, Yield> domainMap = Map.of(
+    Map<PortfolioHolding, Yield> domainMap = Map.of(
         stock, new Yield().setDividendYield(new BigDecimal("0.1")),
         gic, new Yield().setDividendYield(new BigDecimal("5")),
         skipped, new Yield().setDividendYield(null));
@@ -59,8 +59,8 @@ class YieldResponseMapperTest {
 
   @Test
   void shouldReturnZeroYield_whenNoValidEntriesProvided() {
-    Holding invalid = new Holding(null, FinancialInstrumentType.STOCK_US, null);
-    Map<Holding, Yield> domainMap = Map.of(invalid, new Yield().setDividendYield(new BigDecimal("0.1")));
+    PortfolioHolding invalid = new PortfolioHolding(null, FinancialInstrumentType.STOCK_US, null);
+    Map<PortfolioHolding, Yield> domainMap = Map.of(invalid, new Yield().setDividendYield(new BigDecimal("0.1")));
 
     YieldResult result = mapper.toResponse(domainMap, List.of());
 

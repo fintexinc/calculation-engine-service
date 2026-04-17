@@ -2,7 +2,7 @@ package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.rating.StyleBoxType;
@@ -47,7 +47,7 @@ public class EquityStyleboxExposureResponseMapper
   }
 
   @Override
-  public EquityStyleboxExposureResult toResponse(Map<Holding, EquityStyleboxExposure> domainMap,
+  public EquityStyleboxExposureResult toResponse(Map<PortfolioHolding, EquityStyleboxExposure> domainMap,
       List<Warning> warnings) {
     // This method requires complex aggregation with holding weights
     // Delegate to service for now

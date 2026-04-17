@@ -1,7 +1,7 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.model.domain.CurrencyExchangePair;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.exceptions.DataErrorException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -31,9 +31,10 @@ class FxRatesConversionComponentTest {
         new CurrencyExchangePair(Currency.USD, Currency.CAD),
         (NavigableMap<LocalDate, BigDecimal>) getUsdToCadRates());
 
-    final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
-    final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.USD);
+    final PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER));
+    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
+    final Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.USD);
 
     final var actual = component.convert(returns, holdingCurrencies, fxRates, Currency.CAD);
 
@@ -49,9 +50,10 @@ class FxRatesConversionComponentTest {
         new CurrencyExchangePair(Currency.CAD, Currency.USD),
         (NavigableMap<LocalDate, BigDecimal>) getCadToUsdRates());
 
-    final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
-    final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
+    final PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER));
+    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
+    final Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
 
     final var actual = component.convert(returns, holdingCurrencies, fxRates, Currency.USD);
 
@@ -67,9 +69,10 @@ class FxRatesConversionComponentTest {
         new CurrencyExchangePair(Currency.CAD, Currency.USD),
         (NavigableMap<LocalDate, BigDecimal>) getIncompleteRates());
 
-    final Holding etfHolding = new Holding(null, null, new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
-    final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
-    final Map<Holding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
+    final PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER));
+    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
+    final Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
 
     final LocalDate date = toLastDayOfMonth(LocalDate.now().plusMonths(1));
     final DataErrorException expected = ERR_RRC_MFR_001.error(date);
@@ -80,8 +83,8 @@ class FxRatesConversionComponentTest {
     assertEquals(expected, actual);
   }
 
-  private Map<Holding, TreeMap<LocalDate, BigDecimal>> getReturns(final Holding etfHolding) {
-    final HashMap<Holding, TreeMap<LocalDate, BigDecimal>> returns = new HashMap<>();
+  private Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> getReturns(final PortfolioHolding etfHolding) {
+    final HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = new HashMap<>();
     final TreeMap<LocalDate, BigDecimal> returnsPerHolding = new TreeMap<>();
     returnsPerHolding.put(toLastDayOfMonth(LocalDate.now().plusMonths(1)), BigDecimal.valueOf(0.01));
     returnsPerHolding.put(toLastDayOfMonth(LocalDate.now().plusMonths(2)), BigDecimal.valueOf(0.02));

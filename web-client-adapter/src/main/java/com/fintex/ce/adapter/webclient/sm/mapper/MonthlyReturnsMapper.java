@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
@@ -27,7 +27,7 @@ public class MonthlyReturnsMapper
       Country.USA, Currency.USD);
 
   @Override
-  public HoldingMonthlyReturns map(MonthlyReturns smsResponse, Holding holding) {
+  public HoldingMonthlyReturns map(MonthlyReturns smsResponse, PortfolioHolding holding) {
     TreeMap<LocalDate, BigDecimal> returnsMap = Optional.ofNullable(smsResponse)
         .map(MonthlyReturns::getReturns)
         .orElse(List.of())
@@ -52,7 +52,7 @@ public class MonthlyReturnsMapper
     return result;
   }
 
-  private String resolveCurrency(Holding holding) {
+  private String resolveCurrency(PortfolioHolding holding) {
     return Optional.ofNullable(holding.getHoldingType())
         .map(type -> type.getCountry())
         .map(COUNTRY_CURRENCY_MAP::get)

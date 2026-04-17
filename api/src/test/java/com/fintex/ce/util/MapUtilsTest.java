@@ -1,7 +1,7 @@
 package com.fintex.ce.util;
 
 import com.fintex.ce.model.domain.calculation.DateRange;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,14 +20,14 @@ class MapUtilsTest {
   @Test
   void filterWithinRange_isWorking() {
     final DateRange dateRange = new DateRange(LOCAL_DATE_NOW.minusMonths(1), LOCAL_DATE_NOW);
-    final Holding holding = mock(Holding.class);
-    final Map<Holding, Map<LocalDate, BigDecimal>> mock = Map.of(holding, Map.of(
+    final PortfolioHolding holding = mock(PortfolioHolding.class);
+    final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> mock = Map.of(holding, Map.of(
         LOCAL_DATE_NOW.minusMonths(1), ONE,
         LOCAL_DATE_NOW.minusMonths(2), ONE,
         LOCAL_DATE_NOW.plusMonths(3), ONE,
         LOCAL_DATE_NOW.plusMonths(1), ONE));
 
-    final Map<Holding, Map<LocalDate, BigDecimal>> actual = MapUtils.filterWithinRange(dateRange, mock);
+    final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> actual = MapUtils.filterWithinRange(dateRange, mock);
 
     Assertions.assertNotNull(actual);
     ComparisonUtils.compareMaps(actual, Map.of(holding, Map.of(

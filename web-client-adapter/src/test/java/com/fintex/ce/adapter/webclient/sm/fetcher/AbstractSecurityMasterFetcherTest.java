@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -51,7 +51,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   @Test
   void shouldReturnMappedResults_whenSmReturnsData() {
-    Holding holding = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding holding = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
     R smsResponse = createSmsResponse();
     D expected = createExpectedDomainModel("XIU.TO");
 
@@ -63,7 +63,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
         .thenReturn(List.of(securityAttributeResult(identifier, smsResponse)));
     when(mapper().map(smsResponse, holding)).thenReturn(expected);
 
-    Map<Holding, D> result = fetcher().fetch(
+    Map<PortfolioHolding, D> result = fetcher().fetch(
         List.of(holding), List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).hasSize(1);
@@ -75,7 +75,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   @Test
   void shouldReturnEmptyMap_whenHoldingsListIsEmpty() {
-    Map<Holding, D> result = fetcher().fetch(
+    Map<PortfolioHolding, D> result = fetcher().fetch(
         Collections.emptyList(), List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).isEmpty();
@@ -84,7 +84,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   @Test
   void shouldReturnEmptyMap_whenHoldingsListIsNull() {
-    Map<Holding, D> result = fetcher().fetch(
+    Map<PortfolioHolding, D> result = fetcher().fetch(
         null, List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).isEmpty();
@@ -93,12 +93,12 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   @Test
   void shouldReturnEmptyMap_whenSmReturnsNull() {
-    Holding holding = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding holding = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
 
     when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(null);
 
-    Map<Holding, D> result = fetcher().fetch(
+    Map<PortfolioHolding, D> result = fetcher().fetch(
         List.of(holding), List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).isEmpty();
@@ -106,12 +106,12 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   @Test
   void shouldReturnEmptyMap_whenSmReturnsEmptyList() {
-    Holding holding = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding holding = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
 
     when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(Collections.emptyList());
 
-    Map<Holding, D> result = fetcher().fetch(
+    Map<PortfolioHolding, D> result = fetcher().fetch(
         List.of(holding), List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).isEmpty();
@@ -119,8 +119,9 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   @Test
   void shouldSkipHoldingsWithNullHoldingType() {
-    Holding validHolding = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
-    Holding nullTypeHolding = createHolding("SKIP.ID", FiIdentifierType.TICKER, null);
+    PortfolioHolding validHolding = createHolding("XIU.TO", FiIdentifierType.TICKER,
+        FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding nullTypeHolding = createHolding("SKIP.ID", FiIdentifierType.TICKER, null);
 
     R smsResponse = createSmsResponse();
     D expected = createExpectedDomainModel("XIU.TO");
@@ -133,7 +134,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
         .thenReturn(List.of(securityAttributeResult(identifier, smsResponse)));
     when(mapper().map(smsResponse, validHolding)).thenReturn(expected);
 
-    Map<Holding, D> result = fetcher().fetch(
+    Map<PortfolioHolding, D> result = fetcher().fetch(
         List.of(validHolding, nullTypeHolding), List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).hasSize(1);
@@ -143,8 +144,8 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   @Test
   void shouldMapMultipleHoldingsFromSameResponse() {
-    Holding holding1 = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
-    Holding holding2 = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding holding1 = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding holding2 = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
 
     R smsResponse1 = createSmsResponse();
     R smsResponse2 = createSmsResponse();
@@ -165,7 +166,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     when(mapper().map(smsResponse1, holding1)).thenReturn(expected1);
     when(mapper().map(smsResponse2, holding2)).thenReturn(expected2);
 
-    Map<Holding, D> result = fetcher().fetch(
+    Map<PortfolioHolding, D> result = fetcher().fetch(
         List.of(holding1, holding2), List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).hasSize(2);
@@ -173,11 +174,11 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     assertThat(result.get(holding2)).isEqualTo(expected2);
   }
 
-  protected Holding createHolding(String id, FiIdentifierType idType, FinancialInstrumentType holdingType) {
+  protected PortfolioHolding createHolding(String id, FiIdentifierType idType, FinancialInstrumentType holdingType) {
     var identifier = new SecurityIdentifier();
     identifier.setId(id);
     identifier.setIdType(idType);
-    return new Holding(null, holdingType, identifier);
+    return new PortfolioHolding(null, holdingType, identifier);
   }
 
   private static <T> SecurityAttributeResult<T> securityAttributeResult(SecurityIdentifier identifier, T data) {

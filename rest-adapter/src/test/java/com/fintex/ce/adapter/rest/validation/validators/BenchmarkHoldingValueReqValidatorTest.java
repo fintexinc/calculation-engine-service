@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.exceptions.ReqValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -24,7 +24,7 @@ class BenchmarkHoldingValueReqValidatorTest {
 
   @Test
   void shouldThrow_whenBenchmarkHoldingValueIsNull() {
-    Holding holding = new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
+    PortfolioHolding holding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
 
     PeriodCommand cmd = new PeriodCommand();
     cmd.setCurrency(Currency.CAD);
@@ -40,7 +40,7 @@ class BenchmarkHoldingValueReqValidatorTest {
 
   @Test
   void shouldThrow_whenBenchmarkHoldingValueIsNegative() {
-    Holding holding = new Holding(
+    PortfolioHolding holding = new PortfolioHolding(
         BigDecimal.valueOf(-1), FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
 
@@ -58,7 +58,7 @@ class BenchmarkHoldingValueReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenBenchmarkHoldingValuesArePositive() {
-    Holding holding = new Holding(
+    PortfolioHolding holding = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
 

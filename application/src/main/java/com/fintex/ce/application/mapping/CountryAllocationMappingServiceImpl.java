@@ -3,7 +3,7 @@ package com.fintex.ce.application.mapping;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.CountryAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.HttpCode;
 import com.fintex.ce.model.error.Warning;
@@ -47,8 +47,8 @@ public class CountryAllocationMappingServiceImpl implements CountryAllocationMap
    * @return holdings that are grouped by regions
    */
   @Override
-  public Map<Holding, Map<CountryRegionType, BigDecimal>> mapToCountryRegions(
-      final Map<Holding, Map<String, BigDecimal>> holdingAllocations,
+  public Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> mapToCountryRegions(
+      final Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations,
       final List<Warning> warnings, final ErrorCode errorCode) {
     return holdingAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> mapToRegions(e.getKey(), e
         .getValue(), warnings, errorCode)));
@@ -65,7 +65,7 @@ public class CountryAllocationMappingServiceImpl implements CountryAllocationMap
    *          error code when response is empty
    * @return grouped by regions
    */
-  public Map<CountryRegionType, BigDecimal> mapToRegions(final Holding holding,
+  public Map<CountryRegionType, BigDecimal> mapToRegions(final PortfolioHolding holding,
       final Map<String, BigDecimal> allocations,
       final List<Warning> warnings, final ErrorCode errorCode) {
     final Map<CountryRegionType, BigDecimal> map = new HashMap<>();

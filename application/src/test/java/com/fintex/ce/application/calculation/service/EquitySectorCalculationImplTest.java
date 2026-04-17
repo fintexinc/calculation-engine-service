@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.response.EquitySectorResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -35,7 +35,7 @@ class EquitySectorCalculationImplTest {
     final var service = mock(EquitySectorCalculationImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var equitySector = new EquitySector(Map.of(EquitySectorAllocationType.TECHNOLOGY, TEN));
     when(fetcher.fetch(any(), any())).thenReturn(Map.of(holding, equitySector));
 
@@ -55,7 +55,7 @@ class EquitySectorCalculationImplTest {
       final var service = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(fetcher, responseMapper));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(EquitySectorAllocationType.CONSUMER_DEFENSIVE, TEN));
 
@@ -75,7 +75,7 @@ class EquitySectorCalculationImplTest {
       final var service = mock(EquitySectorCalculationImpl.class, withSettings()
           .useConstructor(fetcher, responseMapper));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(EquitySectorAllocationType.CONSUMER_DEFENSIVE, TEN));
       @SuppressWarnings("unchecked")

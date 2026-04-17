@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
@@ -35,7 +35,7 @@ class FixedIncomeSectorAllocationMapperTest {
     smsResponse.setAllocation(List.of(governmentEntry, corporateEntry, securitizedEntry));
     smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
 
-    Holding holding = createHolding("AGG", FinancialInstrumentType.ETF);
+    PortfolioHolding holding = createHolding("AGG", FinancialInstrumentType.ETF);
 
     FixedIncomeBondSecurities result = mapper.map(smsResponse, holding);
 
@@ -55,7 +55,7 @@ class FixedIncomeSectorAllocationMapperTest {
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyAllocations_whenResponseIsNullOrHasNoAllocation(
       FixedIncomeSectorAllocation smsResponse) {
-    Holding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
+    PortfolioHolding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
 
     FixedIncomeBondSecurities result = mapper.map(smsResponse, holding);
 
@@ -136,9 +136,9 @@ class FixedIncomeSectorAllocationMapperTest {
     return entry;
   }
 
-  private Holding createHolding(String securityId, FinancialInstrumentType holdingType) {
+  private PortfolioHolding createHolding(String securityId, FinancialInstrumentType holdingType) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding(null, holdingType, identifier);
+    return new PortfolioHolding(null, holdingType, identifier);
   }
 }

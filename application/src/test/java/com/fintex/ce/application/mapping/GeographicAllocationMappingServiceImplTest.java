@@ -1,7 +1,7 @@
 package com.fintex.ce.application.mapping;
 
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.Warning;
 
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GeographicAllocationMappingServiceImplTest {
 
   @Mock
-  private Holding holding;
+  private PortfolioHolding holding;
 
   private GeographicAllocationMappingServiceImpl geographicAllocationMappingServiceImpl;
 
@@ -37,10 +37,10 @@ class GeographicAllocationMappingServiceImplTest {
   void shouldMapToGeographicRegions_whenReturnsExpectedResultsWhenValidDataProvided() {
     Map<String, BigDecimal> allocations = new HashMap<>();
     allocations.put("countryId", BigDecimal.ONE);
-    Map<Holding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
+    Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
     holdingAllocations.put(holding, allocations);
 
-    Map<Holding, Map<GeographicRegionType, BigDecimal>> result = geographicAllocationMappingServiceImpl
+    Map<PortfolioHolding, Map<GeographicRegionType, BigDecimal>> result = geographicAllocationMappingServiceImpl
         .mapToGeographicRegions(holdingAllocations, new ArrayList<>(), ErrorCode.WRN_UNKNOWN_001);
 
     assertTrue(result.containsKey(holding));
@@ -49,7 +49,7 @@ class GeographicAllocationMappingServiceImplTest {
 
   @Test
   void shouldMapToGeographicRegions_whenReturnsWarningResultsWhenNoDataProvided() {
-    Map<Holding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
+    Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
     holdingAllocations.put(holding, new HashMap<>());
 
     List<Warning> warnings = new ArrayList<>();
@@ -64,7 +64,7 @@ class GeographicAllocationMappingServiceImplTest {
   void shouldMapToGeographicRegions_whenReturnsWarningResultsWhenUnknownCountryId() {
     Map<String, BigDecimal> allocations = new HashMap<>();
     allocations.put("unknownCountryId", BigDecimal.ONE);
-    Map<Holding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
+    Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
     holdingAllocations.put(holding, allocations);
 
     List<Warning> warnings = new ArrayList<>();

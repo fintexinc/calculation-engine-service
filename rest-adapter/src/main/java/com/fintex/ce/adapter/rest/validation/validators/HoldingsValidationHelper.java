@@ -2,8 +2,8 @@ package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
 import com.fintex.ce.model.domain.holding.MonthlyReturnGeneratableHolding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ReqValidationException;
 import com.fintex.ce.util.DateTimeUtils;
@@ -26,7 +26,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class HoldingsValidationHelper {
 
-  public static void validate(List<Holding> holdings) {
+  public static void validate(List<PortfolioHolding> holdings) {
     if (CollectionUtils.isEmpty(holdings)) {
       return;
     }
@@ -35,11 +35,11 @@ public class HoldingsValidationHelper {
     validateCashHoldingCurrencies(holdings);
   }
 
-  public static void validateHoldingValues(List<Holding> holdings) {
+  public static void validateHoldingValues(List<PortfolioHolding> holdings) {
     if (CollectionUtils.isEmpty(holdings)) {
       return;
     }
-    for (Holding holding : holdings) {
+    for (PortfolioHolding holding : holdings) {
       BigDecimal value = holding.getValue();
       if (value == null) {
         throw buildValueMissingException(holding);
@@ -50,8 +50,8 @@ public class HoldingsValidationHelper {
     }
   }
 
-  private static void validateNoDuplicateHoldings(List<Holding> holdings) {
-    List<Holding> nonGicHoldings = holdings.stream()
+  private static void validateNoDuplicateHoldings(List<PortfolioHolding> holdings) {
+    List<PortfolioHolding> nonGicHoldings = holdings.stream()
         .filter(h -> !(h instanceof GicHolding))
         .toList();
     if (new HashSet<>(nonGicHoldings).size() != nonGicHoldings.size()) {
@@ -59,8 +59,8 @@ public class HoldingsValidationHelper {
     }
   }
 
-  private static void validateGicInvestmentDates(List<Holding> holdings) {
-    for (Holding holding : holdings) {
+  private static void validateGicInvestmentDates(List<PortfolioHolding> holdings) {
+    for (PortfolioHolding holding : holdings) {
       Optional.of(holding)
           .filter(FilterUtils.GIC_PREDICATE)
           .map(MonthlyReturnGeneratableHolding.class::cast)
@@ -72,7 +72,7 @@ public class HoldingsValidationHelper {
     }
   }
 
-  private static void validateCashHoldingCurrencies(List<Holding> holdings) {
+  private static void validateCashHoldingCurrencies(List<PortfolioHolding> holdings) {
     holdings.stream()
         .filter(CashHolding.class::isInstance)
         .map(CashHolding.class::cast)
@@ -83,14 +83,14 @@ public class HoldingsValidationHelper {
         });
   }
 
-  private static ReqValidationException buildInvestmentDateException(Holding holding) {
-    String code = Optional.ofNullable(holding).map(Holding::getIdsString).orElse("");
+  private static ReqValidationException buildInvestmentDateException(PortfolioHolding holding) {
+    String code = Optional.ofNullable(holding).map(PortfolioHolding::getIdsString).orElse("");
     String message = String.format("Investment date could not be before %s years ago",
         DateTimeUtils.QUINCENTENARY);
     return new ReqValidationException(code, message);
   }
 
-  private static ReqValidationException buildValueMissingException(Holding holding) {
+  private static ReqValidationException buildValueMissingException(PortfolioHolding holding) {
     SecurityIdentifier secId = holding.getSecurityIdentifier();
     if (secId != null && secId.getId() != null) {
       return ErrorCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(secId.getId());

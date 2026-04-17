@@ -5,7 +5,7 @@ import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.error.Notification;
@@ -37,7 +37,7 @@ public class CommonPerformanceDateServiceImpl
 
   @Override
   public CommonPerformanceDatesResult perform(MultiplePortfoliosCommand mReqDTO) {
-    List<Holding> portfolioHoldings = collectAllPortfolioHoldings(mReqDTO.getPortfolios());
+    List<PortfolioHolding> portfolioHoldings = collectAllPortfolioHoldings(mReqDTO.getPortfolios());
 
     var notification = new Notification();
     ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForPortfolios = notification.tryCatch(
@@ -67,7 +67,7 @@ public class CommonPerformanceDateServiceImpl
     return res;
   }
 
-  List<Holding> collectAllPortfolioHoldings(Set<MultiplePortfoliosCommand.Portfolio> portfolios) {
+  List<PortfolioHolding> collectAllPortfolioHoldings(Set<MultiplePortfoliosCommand.Portfolio> portfolios) {
     if (CollectionUtils.isEmpty(portfolios)) {
       return List.of();
     }
@@ -81,7 +81,7 @@ public class CommonPerformanceDateServiceImpl
     return new DateRange(monthlyReturnsAggregate.getPsd(), monthlyReturnsAggregate.getPed());
   }
 
-  ReturnsAggregate<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<Holding> holdings) {
+  ReturnsAggregate<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<PortfolioHolding> holdings) {
     if (CollectionUtils.isEmpty(holdings)) {
       return new ReturnsAggregate<>();
     }

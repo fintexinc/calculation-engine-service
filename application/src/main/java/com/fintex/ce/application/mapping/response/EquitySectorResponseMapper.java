@@ -2,7 +2,7 @@ package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
@@ -41,7 +41,7 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
   }
 
   @Override
-  public EquitySectorResult toResponse(Map<Holding, EquitySector> domainMap, List<Warning> warnings) {
+  public EquitySectorResult toResponse(Map<PortfolioHolding, EquitySector> domainMap, List<Warning> warnings) {
     throw new UnsupportedOperationException("Use service-level aggregation for EquitySector");
   }
 

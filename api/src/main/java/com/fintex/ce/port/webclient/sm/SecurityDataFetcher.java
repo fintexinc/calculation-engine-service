@@ -1,6 +1,6 @@
 package com.fintex.ce.port.webclient.sm;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 
 import java.util.List;
@@ -15,6 +15,6 @@ import java.util.Map;
 @FunctionalInterface
 public interface SecurityDataFetcher<T> {
 
-  Map<Holding, T> fetch(List<? extends Holding> holdings, List<DataProvider> providers);
+  Map<PortfolioHolding, T> fetch(List<? extends PortfolioHolding> holdings, List<DataProvider> providers);
 
 }

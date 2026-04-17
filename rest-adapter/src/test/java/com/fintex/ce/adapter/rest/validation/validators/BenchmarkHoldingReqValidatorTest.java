@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.exceptions.ReqValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -25,10 +25,10 @@ class BenchmarkHoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenBenchmarkHasDuplicateNonGicHoldings() {
-    Holding h1 = new Holding(
+    PortfolioHolding h1 = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-    Holding h2 = new Holding(
+    PortfolioHolding h2 = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
 
@@ -66,10 +66,10 @@ class BenchmarkHoldingReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenBenchmarkHoldingsAreValid() {
-    Holding h1 = new Holding(
+    PortfolioHolding h1 = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-    Holding h2 = new Holding(
+    PortfolioHolding h2 = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.ETF_CANADA,
         new SecurityIdentifier("ID2", FiIdentifierType.TICKER));
 

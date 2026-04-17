@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalcul
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.ParameterType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.Notification;
@@ -51,16 +51,16 @@ public class ManagementFeeCalculationServiceImpl
   }
 
   @Override
-  public Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> fetchData(
+  public Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> fetchData(
       final AverageMerCommand reqDTO) {
-    Map<Holding, FeeData> rawData = feesSecurityDataFetcher.fetch(
+    Map<PortfolioHolding, FeeData> rawData = feesSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
     return groupAndMap(rawData, reqDTO.getHoldings());
   }
 
   @Override
-  protected AverageManagementExpenseCalculation mapFeeDataToDto(Holding holding, FeeData fees) {
+  protected AverageManagementExpenseCalculation mapFeeDataToDto(PortfolioHolding holding, FeeData fees) {
     return AverageManagementExpenseCalculation.builder()
         .marketValue(holding.getValue())
         .holdingType(holding.getHoldingType())
@@ -70,7 +70,7 @@ public class ManagementFeeCalculationServiceImpl
 
   @Override
   public List<Warning> setInitialFeeAndModifiedFeeValues(
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> groupOfMers) {
+      final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupOfMers) {
     var notification = new Notification();
     List<Warning> warnings = groupOfMers.entrySet().stream()
         .filter(e -> FUNDS.contains(e.getKey()))
@@ -85,7 +85,7 @@ public class ManagementFeeCalculationServiceImpl
 
   public Optional<List<Warning>> validateManagementFee(
       AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
-      Holding holding,
+      PortfolioHolding holding,
       Notification notification) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
       notification.addError(ERR_MF_MF_001.error(holding, org.springframework.http.HttpStatus.BAD_REQUEST));
@@ -97,7 +97,7 @@ public class ManagementFeeCalculationServiceImpl
 
   @Override
   public ManagementFeeResult calculateAverageValue(List<ParameterType> parameterTypes,
-      Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
+      Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
     final var resDTO = new ManagementFeeResult();
     if (parameterTypes.contains(SCALED)) {
       final BigDecimal scaledAverageMer = getScaledAverageMer(averageMerCalculationDtos);

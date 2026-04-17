@@ -10,7 +10,7 @@ import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
@@ -67,7 +67,7 @@ public class AssetAllocationEMServiceImpl
 
   @Override
   public AssetAllocationEMResult calculate(ExposureDataHolder<AssetAllocationRegionEmType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     final Map<AssetAllocationRegionEmType, BigDecimal> result = calculateNetProducts(exposures, holdings,
@@ -80,7 +80,7 @@ public class AssetAllocationEMServiceImpl
 
   @Override
   public ExposureDataHolder<AssetAllocationRegionEmType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
-    final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
+    final Map<PortfolioHolding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
     final var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
@@ -92,19 +92,19 @@ public class AssetAllocationEMServiceImpl
   }
 
   public ExposureDataHolder<AssetAllocationRegionEmType> calculateAssetAllocationEMarketMap(
-      final List<Holding> holdings,
-      final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
+      final List<PortfolioHolding> holdings,
+      final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
       final List<DataProvider> providers) {
     List<Warning> warnings = new ArrayList<>();
-    Map<Holding, EquityCountryAllocation> rawCountryAllocations = countryAllocationSecurityDataFetcher.fetch(
+    Map<PortfolioHolding, EquityCountryAllocation> rawCountryAllocations = countryAllocationSecurityDataFetcher.fetch(
         holdings, providers);
-    Map<Holding, Map<String, BigDecimal>> holdingAllocations = rawCountryAllocations.entrySet().stream()
+    Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = rawCountryAllocations.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
-    final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = countryAllocationMappingService
+    final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = countryAllocationMappingService
         .mapToCountryRegions(holdingAllocations, warnings, WRN_RRC_ECE_001);
-    final Map<Holding, BigDecimal> equityDifference = calculateEquityDifference(
+    final Map<PortfolioHolding, BigDecimal> equityDifference = calculateEquityDifference(
         holdings, countryAllocationsMap, assetAllocations);
-    Map<Holding, Map<AssetAllocationRegionEmType, BigDecimal>> allocations = holdings.stream().collect(
+    Map<PortfolioHolding, Map<AssetAllocationRegionEmType, BigDecimal>> allocations = holdings.stream().collect(
         toMap(
             h -> h,
             h -> calculateEmergingMarket(assetAllocations, countryAllocationsMap, equityDifference, h)));
@@ -112,10 +112,10 @@ public class AssetAllocationEMServiceImpl
   }
 
   public Map<AssetAllocationRegionEmType, BigDecimal> calculateEmergingMarket(
-      final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
-      final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap,
-      final Map<Holding, BigDecimal> equityDifference,
-      final Holding holding) {
+      final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
+      final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap,
+      final Map<PortfolioHolding, BigDecimal> equityDifference,
+      final PortfolioHolding holding) {
     final Map<CountryRegionType, BigDecimal> countryAllocations = countryAllocationsMap.get(holding);
     final Map<AssetAllocationRegion, BigDecimal> holdingAssetAllocations = assetAllocations.get(holding);
     return Stream.of(AssetAllocationRegionEmType.values())
@@ -123,10 +123,10 @@ public class AssetAllocationEMServiceImpl
             equityDifference, t)));
   }
 
-  public BigDecimal getEmergingMarketValue(final Holding holding,
+  public BigDecimal getEmergingMarketValue(final PortfolioHolding holding,
       final Map<AssetAllocationRegion, BigDecimal> assetAllocations,
       final Map<CountryRegionType, BigDecimal> countryAllocations,
-      final Map<Holding, BigDecimal> equityDifference,
+      final Map<PortfolioHolding, BigDecimal> equityDifference,
       final AssetAllocationRegionEmType type) {
     if (assetAllocations.isEmpty()) {
       return ZERO;
@@ -156,28 +156,29 @@ public class AssetAllocationEMServiceImpl
     return Optional.ofNullable(countryAllocations).map(p -> p.get(type)).orElse(ZERO);
   }
 
-  public BigDecimal emForInternationalEquity(final Holding holding,
+  public BigDecimal emForInternationalEquity(final PortfolioHolding holding,
       final Map<CountryRegionType, BigDecimal> countryAllocations,
-      final Map<Holding, BigDecimal> equityDifference) {
+      final Map<PortfolioHolding, BigDecimal> equityDifference) {
     final BigDecimal equityDiff = equityDifference.get(holding);
     final BigDecimal internationalValue = Optional.ofNullable(countryAllocations)
         .map(p -> p.get(CountryRegionType.INTERNATIONAL_DEVELOPED)).orElse(ZERO);
     return internationalValue.add(equityDiff);
   }
 
-  public Map<Holding, BigDecimal> calculateEquityDifference(final List<Holding> holdings,
-      final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations,
-      final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations) {
+  public Map<PortfolioHolding, BigDecimal> calculateEquityDifference(final List<PortfolioHolding> holdings,
+      final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocations,
+      final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations) {
     final Set<AssetAllocationRegion> equities = Set.of(CANADIAN_EQUITIES, US_EQUITIES, EUROPEAN_EQUITIES,
         ASIA_PACIFIC_EQUITIES, EM_EQUITIES, INTERNATIONAL_EQUITIES);
     return holdings.stream().collect(toMap(h -> h, h -> calculateEquityDiff(countryAllocations, assetAllocations,
         equities, h)));
   }
 
-  public BigDecimal calculateEquityDiff(final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations,
-      final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
+  public BigDecimal calculateEquityDiff(
+      final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocations,
+      final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
       final Set<AssetAllocationRegion> equities,
-      final Holding holding) {
+      final PortfolioHolding holding) {
     final BigDecimal equityCountrySum = countryAllocations.containsKey(holding)
         ? sum(countryAllocations.get(holding))
         : ZERO;

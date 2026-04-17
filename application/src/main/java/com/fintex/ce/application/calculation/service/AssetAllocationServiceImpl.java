@@ -8,7 +8,7 @@ import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -42,7 +42,7 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
 
   @Override
   public AssetAllocationResult calculate(ExposureDataHolder<AssetAllocationRegion> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     final Map<AssetAllocationRegion, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
@@ -54,7 +54,7 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
   public ExposureDataHolder<AssetAllocationRegion> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     List<DataProvider> providers = getSpecifiedIfEmpty(reqDTO.getDataProviders(),
         defaultDataProperties.getDataProviders());
-    Map<Holding, HoldingAssetAllocation> allocations = securityDataPort.fetch(reqDTO.getHoldings(), providers);
+    Map<PortfolioHolding, HoldingAssetAllocation> allocations = securityDataPort.fetch(reqDTO.getHoldings(), providers);
     return new ExposureDataHolder<>(assetAllocationDataMapper.toRegionExposures(allocations), List.of());
   }
 

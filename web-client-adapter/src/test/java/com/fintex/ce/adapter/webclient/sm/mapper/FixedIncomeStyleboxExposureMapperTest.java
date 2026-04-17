@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -34,7 +34,7 @@ class FixedIncomeStyleboxExposureMapperTest {
     smsResponse.setBoxValues(List.of(highLimited, highModerate, mediumExtensive));
     smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
 
-    Holding holding = createHolding("AGG", FinancialInstrumentType.ETF);
+    PortfolioHolding holding = createHolding("AGG", FinancialInstrumentType.ETF);
 
     FixedIncomeStyleboxExposure result = mapper.map(smsResponse, holding);
 
@@ -51,7 +51,7 @@ class FixedIncomeStyleboxExposureMapperTest {
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyBoxValues_whenResponseIsNullOrHasNoBoxValues(
       FixedIncomeStyleBoxes smsResponse) {
-    Holding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
+    PortfolioHolding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
 
     FixedIncomeStyleboxExposure result = mapper.map(smsResponse, holding);
 
@@ -130,9 +130,9 @@ class FixedIncomeStyleboxExposureMapperTest {
         .build();
   }
 
-  private Holding createHolding(String securityId, FinancialInstrumentType holdingType) {
+  private PortfolioHolding createHolding(String securityId, FinancialInstrumentType holdingType) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding(null, holdingType, identifier);
+    return new PortfolioHolding(null, holdingType, identifier);
   }
 }

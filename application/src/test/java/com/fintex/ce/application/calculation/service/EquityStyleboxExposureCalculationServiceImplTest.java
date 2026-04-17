@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.response.EquityStyleboxExposureResponseMapper;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -35,7 +35,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
     final var service = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var exposure = new EquityStyleboxExposure();
     exposure.setBoxValues(Map.of(StyleBoxType.LARGE_VALUE, BigDecimal.TEN));
     final var rawData = Map.of(holding, exposure);
@@ -56,7 +56,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
     final var service = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(StyleBoxType.LARGE_VALUE, BigDecimal.TEN));
 
@@ -73,7 +73,7 @@ class EquityStyleboxExposureCalculationServiceImplTest {
     final var service = mock(EquityStyleboxExposureCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, responseMapper));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(StyleBoxType.LARGE_VALUE, BigDecimal.TEN));
     final var netProducts = mock(Map.class);

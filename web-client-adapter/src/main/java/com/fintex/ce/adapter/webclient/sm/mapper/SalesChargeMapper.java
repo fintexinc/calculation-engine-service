@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.sales.SalesChargeData;
 
 import org.springframework.stereotype.Component;
@@ -18,7 +18,7 @@ public class SalesChargeMapper
       SecurityMasterResponseMapper<SalesCharge, SalesChargeData> {
 
   @Override
-  public SalesCharge map(SalesChargeData smsResponse, Holding holding) {
+  public SalesCharge map(SalesChargeData smsResponse, PortfolioHolding holding) {
     SalesCharge result = new SalesCharge()
         .setHoldingId(holding.getSecurityIdentifier().getId());
 

@@ -1,10 +1,10 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.calculation.CalculationService;
-import com.fintex.ce.model.domain.calculation.holding.CommonHoldings;
+import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
 import com.fintex.ce.model.domain.calculation.holding.HoldingAggregator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
@@ -13,6 +13,8 @@ import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.IdentifierTypeValue;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -48,9 +50,9 @@ public class CommonHoldingsServiceImpl
   private static final int DEFAULT_NUMBER_OF_FUNDS_MIN = 1;
   private static final int DEFAULT_NUMBER_OF_TOP_COMMON_HOLDINGS = 10;
   final Set<String> defaultAccumulateTypes;
-  private final SecurityDataFetcher<CommonHoldings> commonHoldingsSecurityDataFetcher;
+  private final SecurityDataFetcher<CommonTopHoldings> commonHoldingsSecurityDataFetcher;
 
-  public CommonHoldingsServiceImpl(final SecurityDataFetcher<CommonHoldings> commonHoldingsSecurityDataFetcher,
+  public CommonHoldingsServiceImpl(final SecurityDataFetcher<CommonTopHoldings> commonHoldingsSecurityDataFetcher,
       @Value("#{'${default.top-common-holdings.accumulate-types}'.split(',')}") final Set<String> defaultAccumulateTypes) {
     this.commonHoldingsSecurityDataFetcher = commonHoldingsSecurityDataFetcher;
     this.defaultAccumulateTypes = defaultAccumulateTypes;
@@ -65,11 +67,11 @@ public class CommonHoldingsServiceImpl
   public TopCommonHoldingsResult perform(final TopCommonHoldingsCommand reqDTO) {
 
     final List<Warning> warnings = new ArrayList<>();
-    final Map<Holding, BigDecimal> allocations = calculateInitialPortfolioWeight(reqDTO.getHoldings());
+    final Map<PortfolioHolding, BigDecimal> allocations = calculateInitialPortfolioWeight(reqDTO.getHoldings());
 
-    final Map<Holding, CommonHoldings> rawHoldings = commonHoldingsSecurityDataFetcher.fetch(
+    final Map<PortfolioHolding, CommonTopHoldings> rawHoldings = commonHoldingsSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    final Map<Holding, List<CommonHoldingsDTO>> holdings = mapToCommonHoldingsDTOs(rawHoldings);
+    final Map<PortfolioHolding, List<CommonHoldingsDTO>> holdings = mapToCommonHoldingsDTOs(rawHoldings);
 
     final int numberOfMin = getNumOfFundsMin(reqDTO);
     final int numberOfTopCommonHoldings = getTopCommonHoldingsNumber(reqDTO);
@@ -115,7 +117,7 @@ public class CommonHoldingsServiceImpl
     final List<CommonHoldingsDTO> sameLeaves = leaves.get(sortedLeafEntry.getKey());
     final CommonHoldingsDTO leaf = sameLeaves.stream().findFirst().orElseThrow();
 
-    final Set<Holding> parentHoldings = sameLeaves
+    final Set<PortfolioHolding> parentHoldings = sameLeaves
         .stream().map(CommonHoldingsDTO::getHolding).collect(Collectors.toSet());
     final Set<HoldingsKeyResult> parents = parentHoldings.stream()
         .map(h -> HoldingsKeyResult.buildFromHolding(h, calculateWeightWithinSameLeaves(sameLeaves, h))).collect(
@@ -140,7 +142,8 @@ public class CommonHoldingsServiceImpl
    *          parent.
    * @return calculated weight.
    */
-  BigDecimal calculateWeightWithinSameLeaves(final List<CommonHoldingsDTO> sameLeaves, final Holding parentHolding) {
+  BigDecimal calculateWeightWithinSameLeaves(final List<CommonHoldingsDTO> sameLeaves,
+      final PortfolioHolding parentHolding) {
     return toUserScale(sameLeaves.stream()
         .filter(dto -> dto.getHolding().equals(parentHolding))
         .map(CommonHoldingsDTO::getWeight)
@@ -163,8 +166,8 @@ public class CommonHoldingsServiceImpl
    * @return map of aggregated holdings where the key is aggregator and the value - List of common holdings;
    */
   public Map<HoldingAggregator, List<CommonHoldingsDTO>> calculateTopCommonHoldings(
-      final Map<Holding, List<CommonHoldingsDTO>> holdings,
-      final Map<Holding, BigDecimal> allocations,
+      final Map<PortfolioHolding, List<CommonHoldingsDTO>> holdings,
+      final Map<PortfolioHolding, BigDecimal> allocations,
       final Set<String> accumulateTypes) {
     return holdings.entrySet().stream()
         // calculate leafs of first level(underlying holdings of 1 lvl which doesn't have 2 lvl underlying holdings)
@@ -191,8 +194,8 @@ public class CommonHoldingsServiceImpl
    * @return stream of grouped first lvl holdings. The first level holding is a "leaf" if it doesn't have second lvl
    *         underlying holdings.
    */
-  Stream<CommonHoldingsDTO> firstLevelLeaves(final Map<Holding, BigDecimal> allocations,
-      final Holding holding, final List<CommonHoldingsDTO> firstLevelChildren) {
+  Stream<CommonHoldingsDTO> firstLevelLeaves(final Map<PortfolioHolding, BigDecimal> allocations,
+      final PortfolioHolding holding, final List<CommonHoldingsDTO> firstLevelChildren) {
     return firstLevelChildren.stream().peek(child -> setParentAndCalculateWeight(allocations, holding, child));
   }
 
@@ -325,8 +328,8 @@ public class CommonHoldingsServiceImpl
    *          child holding. Can be 1lvl of 2lvl holding.
    * @return mapped DTO with calculated weight and set parent.
    */
-  CommonHoldingsDTO setParentAndCalculateWeight(final Map<Holding, BigDecimal> allocations,
-      final Holding parent,
+  CommonHoldingsDTO setParentAndCalculateWeight(final Map<PortfolioHolding, BigDecimal> allocations,
+      final PortfolioHolding parent,
       final CommonHoldingsDTO child) {
     if (isLeafStock(parent, child)) {
       return child.setHolding(parent).setWeight(toUserScale(child.getValue()));
@@ -339,11 +342,11 @@ public class CommonHoldingsServiceImpl
         .setWeight(toUserScale(childWeight));
   }
 
-  boolean isLeafStock(final Holding parent, final CommonHoldingsDTO child) {
+  boolean isLeafStock(final PortfolioHolding parent, final CommonHoldingsDTO child) {
     return isStockHolding(parent) && child.getCompanyName() != null && child.getType().equals("E");
   }
 
-  private boolean isStockHolding(final Holding holding) {
+  private boolean isStockHolding(final PortfolioHolding holding) {
     return FinancialInstrumentType.STOCK_CANADA.equals(holding.getHoldingType())
         || FinancialInstrumentType.STOCK_US.equals(holding.getHoldingType());
   }
@@ -368,25 +371,34 @@ public class CommonHoldingsServiceImpl
         .setWeight(toUserScale(childWeight));
   }
 
-  private Map<Holding, List<CommonHoldingsDTO>> mapToCommonHoldingsDTOs(
-      final Map<Holding, CommonHoldings> rawData) {
+  private Map<PortfolioHolding, List<CommonHoldingsDTO>> mapToCommonHoldingsDTOs(
+      final Map<PortfolioHolding, CommonTopHoldings> rawData) {
     return rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> mapHoldingsToDTO(e.getValue().getHoldings())));
   }
 
-  private List<CommonHoldingsDTO> mapHoldingsToDTO(final List<CommonHoldings.CommonHolding> holdings) {
+  private String extractIdentifier(CommonTopHoldings.CommonTopHolding holding, FiIdentifierType type) {
+    return Optional.ofNullable(holding.getIdentifiers())
+        .orElse(List.of())
+        .stream()
+        .filter(id -> type.equals(id.getType()))
+        .map(IdentifierTypeValue::getValue)
+        .findFirst()
+        .orElse(null);
+  }
+
+  private List<CommonHoldingsDTO> mapHoldingsToDTO(final List<CommonTopHoldings.CommonTopHolding> holdings) {
     if (holdings == null) {
       return List.of();
     }
     return holdings.stream()
         .map(h -> {
           var dto = new CommonHoldingsDTO();
-          dto.setUuid(h.getUuid());
           dto.setName(h.getName());
           dto.setType(h.getType());
           dto.setValue(h.getValue());
-          dto.setTicker(h.getTicker());
-          dto.setExchangeCode(h.getExchangeCode());
+          dto.setTicker(extractIdentifier(h, FiIdentifierType.TICKER));
+          dto.setExchangeCode(extractIdentifier(h, FiIdentifierType.EXCHANGE_ID));
           dto.setUnderlyingHoldings(mapHoldingsToDTO(h.getUnderlyingHoldings()));
           return dto;
         })

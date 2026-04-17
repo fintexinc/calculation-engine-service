@@ -1,7 +1,7 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.model.domain.CurrencyExchangePair;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import java.math.BigDecimal;
@@ -20,9 +20,9 @@ import static java.math.BigDecimal.ONE;
 
 public class FxRatesConversionComponent {
 
-  public Map<Holding, TreeMap<LocalDate, BigDecimal>> convert(
-      final Map<Holding, TreeMap<LocalDate, BigDecimal>> returns,
-      final Map<Holding, Currency> holdingCurrencies,
+  public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> convert(
+      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns,
+      final Map<PortfolioHolding, Currency> holdingCurrencies,
       final Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates,
       final Currency toCurrency) {
     return returns.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> {

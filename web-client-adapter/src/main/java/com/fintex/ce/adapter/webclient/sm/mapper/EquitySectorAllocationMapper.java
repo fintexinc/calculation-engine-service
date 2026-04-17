@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeNameValue;
@@ -21,7 +21,7 @@ public class EquitySectorAllocationMapper
       SecurityMasterResponseMapper<EquitySector, EquitySectorAllocation> {
 
   @Override
-  public EquitySector map(EquitySectorAllocation smsResponse, Holding holding) {
+  public EquitySector map(EquitySectorAllocation smsResponse, PortfolioHolding holding) {
     Map<EquitySectorAllocationType, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
         .map(EquitySectorAllocation::getAllocation)
         .orElse(List.of())

@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalcul
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.ParameterType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.Notification;
@@ -49,16 +49,16 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
   }
 
   @Override
-  public Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> fetchData(
+  public Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> fetchData(
       final AverageMerCommand reqDTO) {
-    Map<Holding, FeeData> rawData = feesSecurityDataFetcher.fetch(
+    Map<PortfolioHolding, FeeData> rawData = feesSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
     return groupAndMap(rawData, reqDTO.getHoldings());
   }
 
   @Override
-  protected AverageManagementExpenseCalculation mapFeeDataToDto(Holding holding, FeeData fees) {
+  protected AverageManagementExpenseCalculation mapFeeDataToDto(PortfolioHolding holding, FeeData fees) {
     FinancialInstrumentType type = holding.getHoldingType();
     var builder = AverageManagementExpenseCalculation.builder()
         .marketValue(holding.getValue())
@@ -75,7 +75,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   @Override
   public List<Warning> setInitialFeeAndModifiedFeeValues(
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> groupOfMers) {
+      final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupOfMers) {
     var notification = new Notification();
     // TODO TMI-369: refactor this logic. Many types are/were simply not handled in the initial impl.
     // Therefore we must investigate:
@@ -110,7 +110,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   public Optional<List<Warning>> handleFeeDataForCanadaMutualHedgeFundsAndEtf(
       AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
-      Holding holding,
+      PortfolioHolding holding,
       Notification notification) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getManagementExpenseRatio()) &&
         Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
@@ -137,7 +137,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   public Optional<Warning> handleFeeDataForUsEtfAndMutualFund(
       AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
-      Holding holding,
+      PortfolioHolding holding,
       Notification notification) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getNetExpenseRatio()) &&
         Objects.isNull(averageManagementExpenseCalculationDTO.getGrossExpenseRatio())) {
@@ -156,7 +156,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   @Override
   public AverageMerResult calculateAverageValue(final List<ParameterType> parameterTypes,
-      final Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
+      final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
     final var resDTO = new AverageMerResult();
     if (parameterTypes.contains(SCALED)) {
       final BigDecimal scaledAverageMer = getScaledAverageMer(averageMerCalculationDtos);

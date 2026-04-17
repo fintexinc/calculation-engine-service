@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.integration;
 
 import com.fintex.ce.adapter.webclient.sm.integration.fixture.AssetAllocationSmsResponseAppender;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
@@ -49,7 +49,7 @@ class AssetAllocationSecurityDataFetcherTest
   }
 
   @Override
-  protected List<Holding> holdingsForComplexScenario() {
+  protected List<PortfolioHolding> holdingsForComplexScenario() {
     return List.of(
         createHolding(etf1MorningstarId, FiIdentifierType.MORNINGSTAR_ID, FinancialInstrumentType.ETF_CANADA),
         createHolding("ETF2", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA),
@@ -93,10 +93,10 @@ class AssetAllocationSecurityDataFetcherTest
   }
 
   @Override
-  protected void assertComplexScenario(Map<Holding, HoldingAssetAllocation> result) {
-    Holding etf1 = holdingsForComplexScenario().get(0);
-    Holding fund1 = holdingsForComplexScenario().get(2);
-    Holding stock1 = holdingsForComplexScenario().get(3);
+  protected void assertComplexScenario(Map<PortfolioHolding, HoldingAssetAllocation> result) {
+    PortfolioHolding etf1 = holdingsForComplexScenario().get(0);
+    PortfolioHolding fund1 = holdingsForComplexScenario().get(2);
+    PortfolioHolding stock1 = holdingsForComplexScenario().get(3);
 
     assertThat(result).containsOnlyKeys(etf1, fund1, stock1);
 
@@ -129,7 +129,7 @@ class AssetAllocationSecurityDataFetcherTest
   }
 
   @Override
-  protected Holding holdingForEmptyResponseScenario() {
+  protected PortfolioHolding holdingForEmptyResponseScenario() {
     return createHolding("SEC-001", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
   }
 

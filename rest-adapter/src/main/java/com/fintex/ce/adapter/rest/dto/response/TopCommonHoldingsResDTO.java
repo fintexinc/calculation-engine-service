@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
-import com.fintex.ce.adapter.rest.dto.response.commonholdings.TopCommonHoldingsDTO;
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
+import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
 import com.fintex.ce.model.error.Warning;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -27,9 +27,9 @@ import lombok.experimental.Accessors;
 public class TopCommonHoldingsResDTO extends WarningDTO {
 
   @Schema(description = "Top common holdings shared across portfolio funds")
-  private List<TopCommonHoldingsDTO> commonHoldings;
+  private List<TopCommonHoldingData> commonHoldings;
 
-  public TopCommonHoldingsResDTO(final List<TopCommonHoldingsDTO> commonHoldings, final List<Warning> warnings) {
+  public TopCommonHoldingsResDTO(final List<TopCommonHoldingData> commonHoldings, final List<Warning> warnings) {
     super(warnings);
     this.commonHoldings = commonHoldings;
   }

@@ -2,7 +2,7 @@ package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.yield.Yield;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.util.DecimalUtils;
@@ -28,7 +28,7 @@ public class YieldResponseMapper implements ResponseMapper<Yield, YieldResult> {
   }
 
   @Override
-  public YieldResult toResponse(Map<Holding, Yield> domainMap, List<Warning> warnings) {
+  public YieldResult toResponse(Map<PortfolioHolding, Yield> domainMap, List<Warning> warnings) {
     BigDecimal weightedYield = calculateWeightedAverageYield(domainMap);
     YieldResult response = new YieldResult();
     response.setYield(weightedYield);
@@ -36,12 +36,12 @@ public class YieldResponseMapper implements ResponseMapper<Yield, YieldResult> {
     return response;
   }
 
-  private BigDecimal calculateWeightedAverageYield(Map<Holding, Yield> holdingYieldMap) {
+  private BigDecimal calculateWeightedAverageYield(Map<PortfolioHolding, Yield> holdingYieldMap) {
     BigDecimal weightedSum = BigDecimal.ZERO;
     BigDecimal totalWeight = BigDecimal.ZERO;
 
-    for (Map.Entry<Holding, Yield> entry : holdingYieldMap.entrySet()) {
-      Holding holding = entry.getKey();
+    for (Map.Entry<PortfolioHolding, Yield> entry : holdingYieldMap.entrySet()) {
+      PortfolioHolding holding = entry.getKey();
       Yield yield = entry.getValue();
 
       if (yield == null || yield.getDividendYield() == null || holding.getValue() == null) {
@@ -60,7 +60,7 @@ public class YieldResponseMapper implements ResponseMapper<Yield, YieldResult> {
         : BigDecimal.ZERO;
   }
 
-  private BigDecimal getDividendYield(Holding holding, Yield yield) {
+  private BigDecimal getDividendYield(PortfolioHolding holding, Yield yield) {
     if (Objects.nonNull(yield.getDividendYield()) && FinancialInstrumentType.GIC.equals(holding.getHoldingType())) {
       return DecimalUtils.divide(yield.getDividendYield(), new BigDecimal(100));
     }

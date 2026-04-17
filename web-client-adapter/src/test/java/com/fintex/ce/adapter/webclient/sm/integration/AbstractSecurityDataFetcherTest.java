@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.integration;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
@@ -99,7 +99,7 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
 
   protected abstract String endpointPath();
 
-  protected abstract List<Holding> holdingsForComplexScenario();
+  protected abstract List<PortfolioHolding> holdingsForComplexScenario();
 
   protected List<DataProvider> providersForComplexScenario() {
     return List.of(DataProvider.MORNINGSTAR);
@@ -107,15 +107,15 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
 
   protected abstract List<SecurityAttributeResult<R>> smsResponseForComplexScenario();
 
-  protected abstract void assertComplexScenario(Map<Holding, D> result);
+  protected abstract void assertComplexScenario(Map<PortfolioHolding, D> result);
 
-  protected abstract Holding holdingForEmptyResponseScenario();
+  protected abstract PortfolioHolding holdingForEmptyResponseScenario();
 
   protected abstract SecurityAttributeResult<R> responseForIdentifierNotPresentInRequest();
 
   @Test
   void shouldNotIssueHttpRequest_whenHoldingsListIsEmpty() throws Exception {
-    Map<Holding, D> result = fetcherUnderTest().fetch(List.of(), providersForComplexScenario());
+    Map<PortfolioHolding, D> result = fetcherUnderTest().fetch(List.of(), providersForComplexScenario());
 
     assertThat(result).isEmpty();
     assertThat(smsMockServer.takeRequest(200, TimeUnit.MILLISECONDS)).isNull();
@@ -123,13 +123,13 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
 
   @Test
   void shouldReturnEmptyMap_whenSmsReturnsEmptyJsonArray() throws Exception {
-    Holding holding = holdingForEmptyResponseScenario();
+    PortfolioHolding holding = holdingForEmptyResponseScenario();
     smsMockServer.enqueue(
         new MockResponse()
             .setBody("[]")
             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
-    Map<Holding, D> result = fetcherUnderTest().fetch(List.of(holding), providersForComplexScenario());
+    Map<PortfolioHolding, D> result = fetcherUnderTest().fetch(List.of(holding), providersForComplexScenario());
 
     RecordedRequest recorded = smsMockServer.takeRequest();
     assertThat(recorded.getMethod()).isEqualTo("POST");
@@ -139,7 +139,7 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
 
   @Test
   void shouldPostTypedIdentifiersAndMapHoldings_whenSmsReturnsMatchingAttributes() throws Exception {
-    List<Holding> holdings = holdingsForComplexScenario();
+    List<PortfolioHolding> holdings = holdingsForComplexScenario();
     List<SecurityAttributeResult<R>> smsResponses = smsResponseForComplexScenario();
 
     smsMockServer.enqueue(
@@ -147,7 +147,7 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
             .setBody(objectMapper.writeValueAsString(smsResponses))
             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
-    Map<Holding, D> result = fetcherUnderTest().fetch(holdings, providersForComplexScenario());
+    Map<PortfolioHolding, D> result = fetcherUnderTest().fetch(holdings, providersForComplexScenario());
 
     RecordedRequest recorded = smsMockServer.takeRequest();
     assertThat(recorded.getMethod()).isEqualTo("POST");
@@ -160,7 +160,7 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
     assertThat(body.getTypedIdentifiers())
         .extracting(TypedIdentifiers::getType)
         .containsExactlyInAnyOrderElementsOf(
-            holdings.stream().map(Holding::getHoldingType).distinct().toList());
+            holdings.stream().map(PortfolioHolding::getHoldingType).distinct().toList());
 
     assertThat(body.getTypedIdentifiers())
         .flatExtracting(TypedIdentifiers::getIds)
@@ -179,7 +179,7 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
 
   @Test
   void shouldIgnoreExtraSmsRows_whenIdentifierNotRequestedInHoldings() throws Exception {
-    List<Holding> holdings = holdingsForComplexScenario();
+    List<PortfolioHolding> holdings = holdingsForComplexScenario();
 
     List<SecurityAttributeResult<R>> smsResponses = new java.util.ArrayList<>(smsResponseForComplexScenario());
     smsResponses.add(responseForIdentifierNotPresentInRequest());
@@ -189,7 +189,7 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
             .setBody(objectMapper.writeValueAsString(smsResponses))
             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
-    Map<Holding, D> result = fetcherUnderTest().fetch(holdings, providersForComplexScenario());
+    Map<PortfolioHolding, D> result = fetcherUnderTest().fetch(holdings, providersForComplexScenario());
 
     RecordedRequest recorded = smsMockServer.takeRequest();
     assertThat(recorded.getMethod()).isEqualTo("POST");
@@ -197,17 +197,18 @@ abstract class AbstractSecurityDataFetcherTest<D, R> {
     assertComplexScenario(result);
   }
 
-  protected static Holding createHolding(String id, FiIdentifierType idType, FinancialInstrumentType holdingType) {
-    return new Holding(testHoldingValue, holdingType, new SecurityIdentifier(id, idType));
+  protected static PortfolioHolding createHolding(String id, FiIdentifierType idType,
+      FinancialInstrumentType holdingType) {
+    return new PortfolioHolding(testHoldingValue, holdingType, new SecurityIdentifier(id, idType));
   }
 
-  protected static Holding createEquityHolding(
+  protected static PortfolioHolding createEquityHolding(
       String id, FiIdentifierType idType, String exchangeId, FinancialInstrumentType holdingType) {
     EquitySecurityIdentifier identifier = new EquitySecurityIdentifier();
     identifier.setId(id);
     identifier.setIdType(idType);
     identifier.setExchangeId(exchangeId);
-    return new Holding(testHoldingValue, holdingType, identifier);
+    return new PortfolioHolding(testHoldingValue, holdingType, identifier);
   }
 
   protected static SecurityIdentifier createSecurityIdentifier(String id, FiIdentifierType idType) {

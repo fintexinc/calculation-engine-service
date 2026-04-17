@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.error.exceptions.ReqValidationException;
 
@@ -18,11 +18,11 @@ import java.util.function.Function;
 public abstract class AbstractHoldingsNotEmptyReqValidator<T> implements RequestValidator {
 
   private final Class<T> carrierType;
-  private final Function<T, List<Holding>> accessor;
+  private final Function<T, List<PortfolioHolding>> accessor;
   private final String errorMessage;
 
   protected AbstractHoldingsNotEmptyReqValidator(Class<T> carrierType,
-      Function<T, List<Holding>> accessor,
+      Function<T, List<PortfolioHolding>> accessor,
       String errorMessage) {
     this.carrierType = carrierType;
     this.accessor = accessor;

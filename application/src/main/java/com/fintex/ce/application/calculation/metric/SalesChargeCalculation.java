@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
 import com.fintex.ce.model.domain.enumeration.SalesChargeCategory;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
 
 import org.springframework.util.CollectionUtils;
@@ -23,7 +23,7 @@ import static java.util.stream.Collectors.toSet;
 
 public class SalesChargeCalculation {
 
-  private final Map<Holding, SalesCharge> salesCharges;
+  private final Map<PortfolioHolding, SalesCharge> salesCharges;
 
   public static final SalesChargeResult.SalesChargeEntry DEFAULT_SALES_CHARGE_DTO = new SalesChargeResult.SalesChargeEntry(
       ZERO, ZERO, Set.of());
@@ -34,7 +34,7 @@ public class SalesChargeCalculation {
     Stream.of(SalesChargeCategory.values()).forEach(type -> DEFAULT_MAP.put(type, DEFAULT_SALES_CHARGE_DTO));
   }
 
-  public SalesChargeCalculation(final Map<Holding, SalesCharge> salesCharges) {
+  public SalesChargeCalculation(final Map<PortfolioHolding, SalesCharge> salesCharges) {
     this.salesCharges = salesCharges;
   }
 
@@ -55,12 +55,12 @@ public class SalesChargeCalculation {
   private SalesChargeResult calculateSalesCharge() {
     final Map<SalesChargeCategory, SalesChargeResult.SalesChargeEntry> result = new EnumMap<>(DEFAULT_MAP);
 
-    final Map<SalesChargeCategory, Set<Holding>> groupedHoldingsBySalesCharge = groupBySalesChargeCategories(
+    final Map<SalesChargeCategory, Set<PortfolioHolding>> groupedHoldingsBySalesCharge = groupBySalesChargeCategories(
         salesCharges);
 
     final BigDecimal categorizedMarketValues = groupedHoldingsBySalesCharge.values().stream()
         .flatMap(Set::stream)
-        .map(Holding::getValue)
+        .map(PortfolioHolding::getValue)
         .reduce(ZERO, BigDecimal::add);
 
     groupedHoldingsBySalesCharge.forEach((salesCharge, holdingSet) -> {
@@ -75,11 +75,12 @@ public class SalesChargeCalculation {
     return new SalesChargeResult().setSalesCharges(result);
   }
 
-  private BigDecimal calculateAllocation(final Set<Holding> holdingSet, final BigDecimal totalMarketValues) {
+  private BigDecimal calculateAllocation(final Set<PortfolioHolding> holdingSet, final BigDecimal totalMarketValues) {
     return toUserScale(divide(getSumOfMarketValues(holdingSet), totalMarketValues));
   }
 
-  private Set<SalesChargeResult.SalesChargeHoldingEntry> getSalesChargeHoldingResDtos(final Set<Holding> holdingSet,
+  private Set<SalesChargeResult.SalesChargeHoldingEntry> getSalesChargeHoldingResDtos(
+      final Set<PortfolioHolding> holdingSet,
       final BigDecimal totalMarketValues) {
     return holdingSet.stream()
         .map(holding -> new SalesChargeResult.SalesChargeHoldingEntry(holding.getIdsString(),
@@ -87,7 +88,7 @@ public class SalesChargeCalculation {
         .collect(Collectors.toSet());
   }
 
-  private BigDecimal getMutualFundAllocation(final Holding holding, final BigDecimal totalMarketValues) {
+  private BigDecimal getMutualFundAllocation(final PortfolioHolding holding, final BigDecimal totalMarketValues) {
     return toUserScale(divide(holding.getValue(), totalMarketValues));
   }
 
@@ -98,8 +99,8 @@ public class SalesChargeCalculation {
    *          map of holdings as key and sales charge type as value.
    * @return grouped holdings.
    */
-  private Map<SalesChargeCategory, Set<Holding>> groupBySalesChargeCategories(
-      final Map<Holding, SalesCharge> salesCharges) {
+  private Map<SalesChargeCategory, Set<PortfolioHolding>> groupBySalesChargeCategories(
+      final Map<PortfolioHolding, SalesCharge> salesCharges) {
     return salesCharges.entrySet().stream()
         .filter(e -> e.getValue().getType() != null)
         .filter(e -> SalesChargeCategory.fromValue(e.getValue().getType()) != null)
@@ -110,7 +111,7 @@ public class SalesChargeCalculation {
   /**
    * calculates sum of market values, uses holding values from provided set of holdings.
    */
-  private BigDecimal getSumOfMarketValues(final Set<Holding> holdings) {
-    return holdings.stream().map(Holding::getValue).reduce(ZERO, BigDecimal::add);
+  private BigDecimal getSumOfMarketValues(final Set<PortfolioHolding> holdings) {
+    return holdings.stream().map(PortfolioHolding::getValue).reduce(ZERO, BigDecimal::add);
   }
 }

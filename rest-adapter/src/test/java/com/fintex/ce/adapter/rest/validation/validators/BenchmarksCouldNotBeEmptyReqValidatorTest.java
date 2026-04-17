@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -40,7 +40,7 @@ class BenchmarksCouldNotBeEmptyReqValidatorTest extends AbstractHoldingsNotEmpty
     PeriodCommand cmd = new PeriodCommand();
     cmd.setCurrency(Currency.CAD);
     cmd.setBenchmarkHoldings(List.of(
-        new Holding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
             new SecurityIdentifier("ID1", FiIdentifierType.TICKER))));
     return cmd;
   }
