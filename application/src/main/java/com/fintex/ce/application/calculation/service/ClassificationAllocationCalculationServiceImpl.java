@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -73,7 +73,7 @@ public class ClassificationAllocationCalculationServiceImpl
   @Override
   public ClassificationAllocationResult calculate(
       ExposureDataHolder<ClassificationAllocationType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
 
@@ -95,7 +95,7 @@ public class ClassificationAllocationCalculationServiceImpl
 
   @Override
   public ExposureDataHolder<ClassificationAllocationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
-    Map<Holding, ClassificationAllocation> rawData = classificationAllocationSecurityDataFetcher.fetch(
+    Map<PortfolioHolding, ClassificationAllocation> rawData = classificationAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         ClassificationAllocation::getSecurityClassificationValues,

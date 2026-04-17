@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.response.YieldResponseMapper;
 import com.fintex.ce.model.domain.calculation.yield.Yield;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
 import com.fintex.ce.model.dto.command.YieldCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -39,19 +39,19 @@ class YieldCalculationServiceImplTest {
     service = new YieldCalculationServiceImpl(yieldFetcher, responseMapper);
   }
 
-  static Map<Holding, Yield> createMockData() {
-    Map<Holding, Yield> mockData = new HashMap<>();
+  static Map<PortfolioHolding, Yield> createMockData() {
+    Map<PortfolioHolding, Yield> mockData = new HashMap<>();
     Yield yield1 = new Yield();
     yield1.setDividendYield(new BigDecimal("0.05"));
-    mockData.put(new Holding(new BigDecimal("100"), FinancialInstrumentType.MUTUAL_FUND_CANADA, null), yield1);
+    mockData.put(new PortfolioHolding(new BigDecimal("100"), FinancialInstrumentType.MUTUAL_FUND_CANADA, null), yield1);
 
     Yield yield2 = new Yield();
     yield2.setDividendYield(new BigDecimal("0.10"));
-    mockData.put(new Holding(new BigDecimal("200"), FinancialInstrumentType.HEDGE_FUND_CANADA, null), yield2);
+    mockData.put(new PortfolioHolding(new BigDecimal("200"), FinancialInstrumentType.HEDGE_FUND_CANADA, null), yield2);
 
     Yield yield3 = new Yield();
     yield3.setDividendYield(new BigDecimal("0.06"));
-    mockData.put(new Holding(new BigDecimal("150"), FinancialInstrumentType.GIC, null), yield3);
+    mockData.put(new PortfolioHolding(new BigDecimal("150"), FinancialInstrumentType.GIC, null), yield3);
     return mockData;
   }
 
@@ -59,7 +59,7 @@ class YieldCalculationServiceImplTest {
   void shouldTestPerform_whenConditionIsMet() {
     // SETUP
     YieldCommand reqDTO = mock(YieldCommand.class);
-    Map<Holding, Yield> mockData = createMockData();
+    Map<PortfolioHolding, Yield> mockData = createMockData();
     YieldResult expectedResponse = new YieldResult();
 
     when(yieldFetcher.fetch(any(), any())).thenReturn(mockData);
@@ -93,7 +93,7 @@ class YieldCalculationServiceImplTest {
   void shouldTestPerform_whenVerifyResponseMapperCalled() {
     // SETUP
     YieldCommand reqDTO = mock(YieldCommand.class);
-    Map<Holding, Yield> mockData = createMockData();
+    Map<PortfolioHolding, Yield> mockData = createMockData();
     when(yieldFetcher.fetch(any(), any())).thenReturn(mockData);
     when(responseMapper.toResponse(any(Map.class), any())).thenReturn(new YieldResult());
 

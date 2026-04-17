@@ -1,7 +1,7 @@
 package com.fintex.ce.util;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.IncomeForecastDto;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -18,12 +18,13 @@ public class PortfolioUtils {
   private PortfolioUtils() {
   }
 
-  public static Map<Holding, BigDecimal> calculateInitialPortfolioWeight(final Collection<Holding> holdings) {
-    final BigDecimal sum = holdings.stream().map(Holding::getValue).reduce(ZERO, BigDecimal::add);
+  public static Map<PortfolioHolding, BigDecimal> calculateInitialPortfolioWeight(
+      final Collection<PortfolioHolding> holdings) {
+    final BigDecimal sum = holdings.stream().map(PortfolioHolding::getValue).reduce(ZERO, BigDecimal::add);
     return holdings.stream().collect(toMap(e -> e, e -> DecimalUtils.divide(e.getValue(), sum)));
   }
 
-  public static void setHoldingResponseDetails(final Holding holding,
+  public static void setHoldingResponseDetails(final PortfolioHolding holding,
       final IncomeForecastDto incomeForecastDTO) {
     SecurityIdentifier secId = holding.getSecurityIdentifier();
     if (secId == null) {
@@ -40,8 +41,8 @@ public class PortfolioUtils {
     }
   }
 
-  public static <T> boolean areAllValuesInMapEmpty(final Map<Holding, Map<T, BigDecimal>> map) {
-    for (final Map.Entry<Holding, Map<T, BigDecimal>> entry : map.entrySet()) {
+  public static <T> boolean areAllValuesInMapEmpty(final Map<PortfolioHolding, Map<T, BigDecimal>> map) {
+    for (final Map.Entry<PortfolioHolding, Map<T, BigDecimal>> entry : map.entrySet()) {
       if (entry.getValue() != null && !entry.getValue().isEmpty()) {
         return false;
       }
@@ -49,11 +50,11 @@ public class PortfolioUtils {
     return true;
   }
 
-  public static <T> boolean areAllValuesZerosInMap(final Map<Holding, Map<T, BigDecimal>> map) {
+  public static <T> boolean areAllValuesZerosInMap(final Map<PortfolioHolding, Map<T, BigDecimal>> map) {
     return map.values().stream().flatMap(e -> e.values().stream()).allMatch(v -> v.compareTo(ZERO) == 0);
   }
 
-  public static String createKey(final Holding holding) {
+  public static String createKey(final PortfolioHolding holding) {
     String result;
     SecurityIdentifier secId = holding.getSecurityIdentifier();
 

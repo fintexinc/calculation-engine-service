@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -20,14 +20,14 @@ class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSector_whenPortfolioContainsOnlyAom() {
-    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
+    final PortfolioHolding aom = new PortfolioHolding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
         new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
 
-    Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
+    Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
     final HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSectorTypes = getFixedIncomeSecuritiesAllocationTypeOfAOM();
     exposures.put(aom, fixedIncomeSectorTypes);
 
-    Map<Holding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876));
+    Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876));
 
     var sut = new FixedIncomeBondSectorCalculation(exposures, List.of(aom), List.of(), fixedIncomePlusCash);
 
@@ -85,17 +85,19 @@ class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSector_whenPortfolioContainsAomAndRbf605() {
-    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
+    final PortfolioHolding aom = new PortfolioHolding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
         new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
-    final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA,
+    final PortfolioHolding rbf605 = new PortfolioHolding(BigDecimal.valueOf(50),
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
 
-    Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
+    Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
     exposures.put(rbf605, getFixedIncomeSecuritiesAllocationTypeOfRBF605());
     exposures.put(aom, getFixedIncomeSecuritiesAllocationTypeOfAOM());
 
-    Map<Holding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876), rbf605, BigDecimal
-        .valueOf(0.3489427));
+    Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876), rbf605,
+        BigDecimal
+            .valueOf(0.3489427));
 
     var sut = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(), fixedIncomePlusCash);
 
@@ -109,17 +111,19 @@ class FixedIncomeBondSectorCalculationTest {
 
   @Test
   void shouldCalculateFixedIncomeSectorFromAomOnly_whenRbf605FixedIncomePlusCashIsZero() {
-    final Holding aom = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
+    final PortfolioHolding aom = new PortfolioHolding(BigDecimal.valueOf(50), FinancialInstrumentType.ETF_US,
         new SecurityIdentifier("AOM", FiIdentifierType.TICKER));
-    final Holding rbf605 = new Holding(BigDecimal.valueOf(50), FinancialInstrumentType.MUTUAL_FUND_CANADA,
+    final PortfolioHolding rbf605 = new PortfolioHolding(BigDecimal.valueOf(50),
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("RBF605", FiIdentifierType.FUNDSERV));
 
-    Map<Holding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
+    Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures = new HashMap<>();
     exposures.put(rbf605, getFixedIncomeSecuritiesAllocationTypeOfRBF605());
     exposures.put(aom, getFixedIncomeSecuritiesAllocationTypeOfAOM());
 
-    Map<Holding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876), rbf605, BigDecimal
-        .valueOf(0.0));
+    Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876), rbf605,
+        BigDecimal
+            .valueOf(0.0));
 
     var sut = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(), fixedIncomePlusCash);
 

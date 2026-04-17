@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.dto.response;
 
 import com.fintex.ce.adapter.rest.dto.response.core.WarningDTO;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,7 +20,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DailyGrowthOf10KDTO extends WarningDTO {
-  private Map<Holding, TreeMap<LocalDate, BigDecimal>> dailyGrowthOf10K = new HashMap<>();
+  private Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> dailyGrowthOf10K = new HashMap<>();
   private LocalDate performanceStartDate;
   private LocalDate performanceEndDate;
 }

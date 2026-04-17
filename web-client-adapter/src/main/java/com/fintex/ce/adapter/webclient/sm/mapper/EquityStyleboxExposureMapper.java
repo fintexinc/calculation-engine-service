@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.rating.StyleBoxType;
 import com.fintex.wm.commons.domain.rating.StyleBoxValue;
 import com.fintex.wm.commons.domain.rating.StyleBoxes;
@@ -24,7 +24,7 @@ public class EquityStyleboxExposureMapper
       SecurityMasterResponseMapper<EquityStyleboxExposure, StyleBoxes> {
 
   @Override
-  public EquityStyleboxExposure map(StyleBoxes smsResponse, Holding holding) {
+  public EquityStyleboxExposure map(StyleBoxes smsResponse, PortfolioHolding holding) {
     Map<StyleBoxType, BigDecimal> boxValues = Optional.ofNullable(smsResponse)
         .map(StyleBoxes::getBoxValues)
         .orElse(List.of())

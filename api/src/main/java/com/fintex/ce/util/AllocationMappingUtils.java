@@ -1,6 +1,6 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.Warning;
 
@@ -47,7 +47,7 @@ public final class AllocationMappingUtils {
    * map to the same enum value and need custom merging logic.
    */
   public static <E extends Enum<E>, D> ExposureDataHolder<E> mapToAllocations(
-      Map<Holding, D> rawData,
+      Map<PortfolioHolding, D> rawData,
       Function<D, Map<String, BigDecimal>> valueExtractor,
       Function<String, E> typeResolver,
       Map<E, BigDecimal> defaultMap,
@@ -55,7 +55,7 @@ public final class AllocationMappingUtils {
       String fdsServiceName,
       BiConsumer<Map<E, BigDecimal>, Map.Entry<E, BigDecimal>> accumulator) {
     List<Warning> warnings = new ArrayList<>();
-    Map<Holding, Map<E, BigDecimal>> allocations = rawData.entrySet().stream()
+    Map<PortfolioHolding, Map<E, BigDecimal>> allocations = rawData.entrySet().stream()
         .collect(toMap(
             Map.Entry::getKey,
             entry -> mapStringKeyedAllocations(
@@ -69,7 +69,7 @@ public final class AllocationMappingUtils {
    * to an enum value with no merging needed.
    */
   public static <E extends Enum<E>, D> ExposureDataHolder<E> mapToAllocations(
-      Map<Holding, D> rawData,
+      Map<PortfolioHolding, D> rawData,
       Function<D, Map<String, BigDecimal>> valueExtractor,
       Function<String, E> typeResolver,
       Map<E, BigDecimal> defaultMap,
@@ -85,12 +85,12 @@ public final class AllocationMappingUtils {
    * contains typed enum keys (e.g., from SM REST fetcher mappers).
    */
   public static <E extends Enum<E>, D> ExposureDataHolder<E> mapTypedAllocations(
-      Map<Holding, D> rawData,
+      Map<PortfolioHolding, D> rawData,
       Function<D, Map<E, BigDecimal>> valueExtractor,
       Map<E, BigDecimal> defaultMap,
       ErrorCode emptyWarningCode) {
     List<Warning> warnings = new ArrayList<>();
-    Map<Holding, Map<E, BigDecimal>> allocations = rawData.entrySet().stream()
+    Map<PortfolioHolding, Map<E, BigDecimal>> allocations = rawData.entrySet().stream()
         .collect(toMap(
             Map.Entry::getKey,
             entry -> {
@@ -107,7 +107,7 @@ public final class AllocationMappingUtils {
   }
 
   private static <E extends Enum<E>> Map<E, BigDecimal> mapStringKeyedAllocations(
-      Holding holding,
+      PortfolioHolding holding,
       Map<String, BigDecimal> rawValues,
       Function<String, E> typeResolver,
       Map<E, BigDecimal> defaultMap,

@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.HoldingsProvider;
 import com.fintex.ce.model.error.ErrorCode;
@@ -31,11 +31,11 @@ public abstract class AbstractGicFieldReqValidator<V> implements RequestValidato
     if (!(command instanceof HoldingsProvider hp)) {
       return;
     }
-    List<Holding> holdings = hp.getHoldings();
+    List<PortfolioHolding> holdings = hp.getHoldings();
     if (holdings == null || holdings.isEmpty()) {
       return;
     }
-    for (Holding holding : holdings) {
+    for (PortfolioHolding holding : holdings) {
       if (holding instanceof GicHolding gic && isNull(fieldAccessor.apply(gic))) {
         throw errorCode.reqValidationError();
       }

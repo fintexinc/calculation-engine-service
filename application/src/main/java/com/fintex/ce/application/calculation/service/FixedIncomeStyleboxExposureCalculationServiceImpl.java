@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.mapping.response.FixedIncomeStyleboxExposureResponseMapper;
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -56,7 +56,7 @@ public class FixedIncomeStyleboxExposureCalculationServiceImpl
 
   @Override
   public FixedIncomeStyleboxExposureResult calculate(ExposureDataHolder<FixedIncomeStyleBoxType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
@@ -69,7 +69,7 @@ public class FixedIncomeStyleboxExposureCalculationServiceImpl
 
   @Override
   public ExposureDataHolder<FixedIncomeStyleBoxType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
-    Map<Holding, FixedIncomeStyleboxExposure> rawData = fixedIncomeStyleboxSecurityDataFetcher.fetch(
+    Map<PortfolioHolding, FixedIncomeStyleboxExposure> rawData = fixedIncomeStyleboxSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         FixedIncomeStyleboxExposure::getBoxValues,

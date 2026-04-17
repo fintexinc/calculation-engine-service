@@ -1,6 +1,6 @@
 package com.fintex.ce.util;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.Warning;
 
 import java.math.BigDecimal;
@@ -16,6 +16,6 @@ import java.util.Map;
  *          the enum type used as allocation keys (e.g., MaturityAllocationType, FixedIncomeStyleBoxType)
  */
 public record ExposureDataHolder<E>(
-    Map<Holding, Map<E, BigDecimal>> allocations,
+    Map<PortfolioHolding, Map<E, BigDecimal>> allocations,
     List<Warning> warnings) {
 }

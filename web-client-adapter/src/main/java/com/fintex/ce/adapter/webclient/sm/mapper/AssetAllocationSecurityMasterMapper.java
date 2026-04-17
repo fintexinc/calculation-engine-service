@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
 import com.fintex.wm.commons.domain.value.NameValue;
 
@@ -23,7 +23,7 @@ public class AssetAllocationSecurityMasterMapper
 
   @Override
   public HoldingAssetAllocation map(AssetAllocation smsResponse,
-      Holding holding) {
+      PortfolioHolding holding) {
     Map<String, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
         .map(AssetAllocation::getAllocation)
         .orElse(List.of())

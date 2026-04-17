@@ -5,7 +5,7 @@ import com.fintex.ce.application.mapping.response.CreditQualityResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
@@ -66,8 +66,8 @@ class CreditQualityServiceImplTest {
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-    final Holding h = mock(Holding.class);
-    final List<Holding> holdings = List.of(h);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
+    final List<PortfolioHolding> holdings = List.of(h);
     final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
 
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
@@ -91,10 +91,10 @@ class CreditQualityServiceImplTest {
           creditQualityFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-      final Holding h = mock(Holding.class);
+      final PortfolioHolding h = mock(PortfolioHolding.class);
       when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
 
-      final List<Holding> holdings = List.of(h);
+      final List<PortfolioHolding> holdings = List.of(h);
       final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
       when(reqDTO.getHoldings()).thenReturn(holdings);
 
@@ -117,10 +117,10 @@ class CreditQualityServiceImplTest {
           creditQualityFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-      final Holding h = mock(Holding.class);
+      final PortfolioHolding h = mock(PortfolioHolding.class);
       when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
 
-      final List<Holding> holdings = List.of(h);
+      final List<PortfolioHolding> holdings = List.of(h);
       final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
       when(reqDTO.getHoldings()).thenReturn(holdings);
 
@@ -143,14 +143,14 @@ class CreditQualityServiceImplTest {
           creditQualityFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-      final Holding h = mock(Holding.class);
-      final List<Holding> holdings = List.of(h);
+      final PortfolioHolding h = mock(PortfolioHolding.class);
+      final List<PortfolioHolding> holdings = List.of(h);
 
       final CreditQuality rawCq = new CreditQuality();
       rawCq.setRatings(Map.of());
       when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(h, rawCq));
 
-      final Map<Holding, BigDecimal> fixed = Map.of(h, TEN);
+      final Map<PortfolioHolding, BigDecimal> fixed = Map.of(h, TEN);
       when(sut.getFixedIncomeCreditQuality(any(), anyList())).thenReturn(fixed);
 
       final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
@@ -174,7 +174,7 @@ class CreditQualityServiceImplTest {
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final CreditQuality rawCq = new CreditQuality();
     rawCq.setRatings(Map.of(AAA, ONE));
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
@@ -199,7 +199,7 @@ class CreditQualityServiceImplTest {
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final CreditQuality rawCq = new CreditQuality();
     rawCq.setRatings(Map.of(AAA, ONE));
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
@@ -227,10 +227,10 @@ class CreditQualityServiceImplTest {
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final List<Warning> warnings = List.of(mock(Warning.class));
     final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
-    final List<Holding> holdings = List.of(h);
+    final List<PortfolioHolding> holdings = List.of(h);
     final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
@@ -285,7 +285,7 @@ class CreditQualityServiceImplTest {
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> asset = Map.of(AssetAllocationRegion.ASIA_PACIFIC_EQUITIES, TEN,
         AssetAllocationRegion.FIXED_INCOME, HUNDRED);
 
@@ -294,14 +294,14 @@ class CreditQualityServiceImplTest {
 
     final List<Warning> warnings = List.of(mock(Warning.class));
     final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
-    final List<Holding> holdings = List.of(h);
+    final List<PortfolioHolding> holdings = List.of(h);
     when(reqDTO.getHoldings()).thenReturn(holdings);
     final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
     when(reqDTO.getDataProviders()).thenReturn(providers);
 
     doCallRealMethod().when(sut).getFixedIncomeValue(any());
     doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-    final Map<Holding, BigDecimal> actual = sut.getFixedIncomeCreditQuality(reqDTO, warnings);
+    final Map<PortfolioHolding, BigDecimal> actual = sut.getFixedIncomeCreditQuality(reqDTO, warnings);
 
     assertEquals(Map.of(h, HUNDRED), actual);
   }
@@ -311,12 +311,13 @@ class CreditQualityServiceImplTest {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> asset = Map.of(AssetAllocationRegion.ASIA_PACIFIC_EQUITIES, TEN,
         AssetAllocationRegion.FIXED_INCOME, HUNDRED);
 
     doCallRealMethod().when(c).getFixedIncomeValue(any());
-    final Map<Holding, BigDecimal> actual = Map.of(h, asset).entrySet().stream().collect(toMap(Map.Entry::getKey,
+    final Map<PortfolioHolding, BigDecimal> actual = Map.of(h, asset).entrySet().stream().collect(toMap(
+        Map.Entry::getKey,
         c::getFixedIncomeValue));
 
     assertEquals(Map.of(h, HUNDRED), actual);
@@ -326,11 +327,12 @@ class CreditQualityServiceImplTest {
   void shouldGetFixedIncomeValue_whenCheckResult2() {
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> asset = Map.of(AssetAllocationRegion.ASIA_PACIFIC_EQUITIES, TEN);
 
     doCallRealMethod().when(c).getFixedIncomeValue(any());
-    Map.Entry<Holding, Map<AssetAllocationRegion, BigDecimal>> entry = Map.of(h, asset).entrySet().iterator().next();
+    Map.Entry<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> entry = Map.of(h, asset).entrySet().iterator()
+        .next();
     assertThrows(NoSuchElementException.class, () -> c.getFixedIncomeValue(entry));
   }
 
@@ -339,18 +341,19 @@ class CreditQualityServiceImplTest {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
-    final Holding h2 = new Holding(null, FinancialInstrumentType.CASH, null);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
+    final PortfolioHolding h2 = new PortfolioHolding(null, FinancialInstrumentType.CASH, null);
 
     final int creditQValue = 2;
     final int fixedIncomeValue = 3;
     final int weightValue = 10;
 
-    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = Map.of(h, Map.of(AAA, BigDecimal
-        .valueOf(
-            creditQValue)));
-    final Map<Holding, BigDecimal> fixedIncomeCreditQuality = Map.of(h, BigDecimal.valueOf(fixedIncomeValue));
-    final Map<Holding, BigDecimal> weights = Map.of(h, BigDecimal.valueOf(weightValue), h2, BigDecimal.ONE);
+    final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = Map.of(h, Map.of(AAA,
+        BigDecimal
+            .valueOf(
+                creditQValue)));
+    final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality = Map.of(h, BigDecimal.valueOf(fixedIncomeValue));
+    final Map<PortfolioHolding, BigDecimal> weights = Map.of(h, BigDecimal.valueOf(weightValue), h2, BigDecimal.ONE);
 
     doCallRealMethod().when(c).calculateSumProductRating(any(), any(), any(), any());
     final BigDecimal actual = c.calculateSumProductRating(creditQuality, fixedIncomeCreditQuality, weights, AAA);
@@ -363,7 +366,7 @@ class CreditQualityServiceImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
-      final List<Holding> holdings = List.of(mock(Holding.class));
+      final List<PortfolioHolding> holdings = List.of(mock(PortfolioHolding.class));
 
       when(sut.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
@@ -379,14 +382,14 @@ class CreditQualityServiceImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
-      final Holding h = mock(Holding.class);
-      Map<Holding, BigDecimal> weights = Map.of(h, TEN);
+      final PortfolioHolding h = mock(PortfolioHolding.class);
+      Map<PortfolioHolding, BigDecimal> weights = Map.of(h, TEN);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(weights);
 
-      final List<Holding> holdings = List.of(h);
-      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
-      final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
+      final List<PortfolioHolding> holdings = List.of(h);
+      final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
+      final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       when(sut.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
@@ -438,10 +441,10 @@ class CreditQualityServiceImplTest {
     // SETUP
     final CreditQualityServiceImpl c = mock(CreditQualityServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
-    final List<Holding> holdings = List.of(h);
-    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
-    final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
+    final List<PortfolioHolding> holdings = List.of(h);
+    final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
+    final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
     doCallRealMethod().when(c).calculate(any(), any(), any());
     final Map<FixedIncomeCreditQuality, BigDecimal> actual = c.calculate(holdings, creditQ, fixedCreditQ);
@@ -454,15 +457,15 @@ class CreditQualityServiceImplTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
-      final Holding h = mock(Holding.class);
+      final PortfolioHolding h = mock(PortfolioHolding.class);
 
       Map<CreditQualityRatingType, BigDecimal> rescaled = Map.of(AAA, TEN);
 
       when(sut.calculateCreditQualityRatingTypes(any(), any(), any())).thenReturn(rescaled);
 
-      final List<Holding> holdings = List.of(h);
-      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
-      final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
+      final List<PortfolioHolding> holdings = List.of(h);
+      final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
+      final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
       final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);
@@ -476,15 +479,15 @@ class CreditQualityServiceImplTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
-      final Holding h = mock(Holding.class);
+      final PortfolioHolding h = mock(PortfolioHolding.class);
 
       Map<CreditQualityRatingType, BigDecimal> rescaled = Map.of(AAA, TEN);
 
       mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(any())).thenReturn(rescaled);
 
-      final List<Holding> holdings = List.of(h);
-      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
-      final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
+      final List<PortfolioHolding> holdings = List.of(h);
+      final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
+      final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
       final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);
@@ -498,7 +501,7 @@ class CreditQualityServiceImplTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
 
-      final Holding h = mock(Holding.class);
+      final PortfolioHolding h = mock(PortfolioHolding.class);
 
       Map<CreditQualityRatingType, BigDecimal> rescaled = Map.of(AAA, TEN);
 
@@ -507,9 +510,9 @@ class CreditQualityServiceImplTest {
       final HashMap<FixedIncomeCreditQuality, BigDecimal> expected = new HashMap<>();
       when(sut.toFixedIncomeCreditQuality(rescaled)).thenReturn(expected);
 
-      final List<Holding> holdings = List.of(h);
-      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
-      final Map<Holding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
+      final List<PortfolioHolding> holdings = List.of(h);
+      final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
+      final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
       doCallRealMethod().when(sut).calculate(any(), any(), any());
       final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);

@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.breakdown;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.util.CalculationUtils;
 import com.fintex.ce.util.ExposureDataHolder;
@@ -91,10 +91,10 @@ class BreakdownAbstractServiceTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       final var service = mock(BreakdownAbstractService.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var exposures = Map.of(
           holding, Map.of(EquityMarketCapitalizationType.SMALL, TEN),
-          mock(Holding.class), Map.of(EquityMarketCapitalizationType.MEDIUM, BigDecimal.ONE));
+          mock(PortfolioHolding.class), Map.of(EquityMarketCapitalizationType.MEDIUM, BigDecimal.ONE));
       final var weights = Map.of(holding, TEN);
       final var typeExposures = Map.of(holding, TEN);
 
@@ -129,7 +129,7 @@ class BreakdownAbstractServiceTest {
   void shouldPerform_whenVerifyFetch() {
     final var service = mock(BreakdownAbstractService.class, withSettings().useConstructor());
 
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var req = mock(PortfolioHoldingsCommand.class);
 
     when(req.getHoldings()).thenReturn(holdings);
@@ -146,7 +146,7 @@ class BreakdownAbstractServiceTest {
   void shouldPerform_whenVerifyCalculate() {
     final var service = mock(BreakdownAbstractService.class, withSettings().useConstructor());
 
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var req = mock(PortfolioHoldingsCommand.class);
     final Map exposures = mock(Map.class);
 

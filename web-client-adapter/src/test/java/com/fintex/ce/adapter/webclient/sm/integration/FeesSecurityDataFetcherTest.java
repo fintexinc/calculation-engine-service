@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.integration;
 import com.fintex.ce.adapter.webclient.sm.integration.fixture.FeesSmsResponseAppender;
 import com.fintex.ce.adapter.webclient.sm.integration.fixture.FeesSmsResponseAppender.FeesValues;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -43,7 +43,7 @@ class FeesSecurityDataFetcherTest extends AbstractSecurityDataFetcherTest<FeeDat
   }
 
   @Override
-  protected List<Holding> holdingsForComplexScenario() {
+  protected List<PortfolioHolding> holdingsForComplexScenario() {
     return List.of(
         createHolding(etf1MorningstarId, FiIdentifierType.MORNINGSTAR_ID, FinancialInstrumentType.ETF_CANADA),
         createHolding("ETF2", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA),
@@ -66,9 +66,9 @@ class FeesSecurityDataFetcherTest extends AbstractSecurityDataFetcherTest<FeeDat
   }
 
   @Override
-  protected void assertComplexScenario(Map<Holding, FeeData> result) {
-    Holding etf1 = holdingsForComplexScenario().get(0);
-    Holding fund1 = holdingsForComplexScenario().get(2);
+  protected void assertComplexScenario(Map<PortfolioHolding, FeeData> result) {
+    PortfolioHolding etf1 = holdingsForComplexScenario().get(0);
+    PortfolioHolding fund1 = holdingsForComplexScenario().get(2);
 
     assertThat(result).containsOnlyKeys(etf1, fund1);
 
@@ -90,7 +90,7 @@ class FeesSecurityDataFetcherTest extends AbstractSecurityDataFetcherTest<FeeDat
   }
 
   @Override
-  protected Holding holdingForEmptyResponseScenario() {
+  protected PortfolioHolding holdingForEmptyResponseScenario() {
     return createHolding("SEC-001", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
   }
 

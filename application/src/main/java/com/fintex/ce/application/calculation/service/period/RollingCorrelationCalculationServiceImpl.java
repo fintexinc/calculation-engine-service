@@ -6,7 +6,7 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
@@ -47,13 +47,13 @@ public class RollingCorrelationCalculationServiceImpl
   @Override
   public RollingCorrelationCalculation defineCalculationMethod(RollingCalculationCommand reqDTO) {
     BenchmarkCalculationDTO inputDTO = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
-    Map<Holding, Map<LocalDate, BigDecimal>> baseTotalReturn = getBaseTotalReturns(reqDTO);
+    Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturn = getBaseTotalReturns(reqDTO);
     var correlationCalculation = new CorrelationCalculation(inputDTO, baseTotalReturn, defaultPeriods);
     return new RollingCorrelationCalculation(inputDTO, defaultPeriods, correlationCalculation, inputDTO
         .getWeightedAverageBenchmarkReturns());
   }
 
-  public Map<Holding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand reqDTO) {
+  public Map<PortfolioHolding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand reqDTO) {
     ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(),
         reqDTO
             .getCurrency(), ReturnFactorScale.SCALE_OF_TWO);

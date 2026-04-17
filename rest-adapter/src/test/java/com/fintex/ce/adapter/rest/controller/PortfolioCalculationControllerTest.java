@@ -10,7 +10,7 @@ import com.fintex.ce.adapter.rest.validation.validators.PeriodReqValidator;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.ErrorResult;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
@@ -251,7 +251,7 @@ class PortfolioCalculationControllerTest {
 
     @Test
     void shouldReturnBadRequest_whenCashHoldingHasNullCurrency() throws Exception {
-      Holding cashHolding = CashHolding.builder()
+      PortfolioHolding cashHolding = CashHolding.builder()
           .value(BigDecimal.valueOf(100))
           .holdingType(FinancialInstrumentType.CASH)
           .build();

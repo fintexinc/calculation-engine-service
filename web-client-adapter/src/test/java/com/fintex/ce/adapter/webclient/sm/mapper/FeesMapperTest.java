@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -104,9 +104,9 @@ class FeesMapperTest {
     assertThat(result.getGrossExpenseRatio()).isNull();
   }
 
-  private Holding createHolding(String securityId) {
+  private PortfolioHolding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, identifier);
+    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, identifier);
   }
 }

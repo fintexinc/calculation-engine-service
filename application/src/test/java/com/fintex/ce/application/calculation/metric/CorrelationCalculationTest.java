@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
@@ -51,7 +51,7 @@ class CorrelationCalculationTest {
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculatePortfolioBaseTotalReturnValuesByPeriodWhenHoldingHasEnoughReturns() {
     final var calculationDTO = mock(CalculationDTO.class);
     final var map = mock(Map.class);
-    final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), map);
+    final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), map);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));
 
@@ -71,7 +71,7 @@ class CorrelationCalculationTest {
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculatePortfolioBaseTotalReturnValuesByPeriodWhenHoldingHasNoTEnoughReturns() {
     final var calculationDTO = mock(CalculationDTO.class);
     final var map = mock(Map.class);
-    final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), map);
+    final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), map);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));
 
@@ -91,7 +91,7 @@ class CorrelationCalculationTest {
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetCorrelationPeriodResultWhenPortfolioReturnHasEnoughReturns() {
     final var calculationDTO = mock(CalculationDTO.class);
     final var monthlyReturns = mock(Map.class);
-    final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), monthlyReturns);
+    final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), monthlyReturns);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));
 
@@ -112,7 +112,7 @@ class CorrelationCalculationTest {
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetCorrelationPeriodResultWhenPortfolioReturnHasNotEnoughReturns() {
     final var calculationDTO = mock(CalculationDTO.class);
     final var monthlyReturns = mock(Map.class);
-    final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), monthlyReturns);
+    final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), monthlyReturns);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));
 
@@ -133,7 +133,7 @@ class CorrelationCalculationTest {
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyHasEnoughReturns() {
     final var calculationDTO = mock(CalculationDTO.class);
     final var map = mock(Map.class);
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var portfolioBaseTotalReturn = Map.of(holding, map);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));
@@ -153,7 +153,7 @@ class CorrelationCalculationTest {
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResult() {
     final var calculationDTO = mock(CalculationDTO.class);
     final var monthlyReturns = mock(Map.class);
-    final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), monthlyReturns);
+    final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), monthlyReturns);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));
 
@@ -177,7 +177,7 @@ class CorrelationCalculationTest {
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenHoldingHasNotEnoughReturns() {
     final var calculationDTO = mock(CalculationDTO.class);
     final var monthlyReturns = mock(Map.class);
-    final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), monthlyReturns);
+    final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), monthlyReturns);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));
     final var treeMap = mock(TreeMap.class);
@@ -253,8 +253,8 @@ class CorrelationCalculationTest {
     final var sut = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, ONE);
-    final var usEtfHolding = new Holding(null, FinancialInstrumentType.ETF_US, null);
-    final var mutualFundsHolding = new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
+    final var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US, null);
+    final var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
     final var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
     when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
@@ -270,8 +270,8 @@ class CorrelationCalculationTest {
     final var sut = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, ONE);
-    final var usEtfHolding = new Holding(null, FinancialInstrumentType.ETF_US, null);
-    final var mutualFundsHolding = new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
+    final var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US, null);
+    final var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
     final var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
     when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
@@ -389,9 +389,9 @@ class CorrelationCalculationTest {
   @Test
   void shouldBuildCorrelationPeriodResult_whenMappingCorrelationValues() {
     final var sut = mock(CorrelationCalculation.class);
-    final var usEtfHolding = new Holding(null, FinancialInstrumentType.ETF_US,
+    final var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV));
-    final var mutualFundsHolding = new Holding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+    final var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV));
     final var map = Map.of(mutualFundsHolding, BigDecimalConstants.TWELVE);
 
@@ -408,9 +408,9 @@ class CorrelationCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var calculationDTO = mock(CalculationDTO.class);
-    final var map = Map.of(new Holding(null, FinancialInstrumentType.ETF_US,
+    final var map = Map.of(new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV)), mock(Map.class));
-    final var portfolioBaseTotalReturn = Map.of(mock(Holding.class), map);
+    final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), map);
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(calculationDTO, portfolioBaseTotalReturn, Set.of()));
 

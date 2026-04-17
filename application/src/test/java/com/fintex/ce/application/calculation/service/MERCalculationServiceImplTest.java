@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.Notification;
@@ -76,7 +76,7 @@ class MERCalculationServiceImplTest {
         DEFAULT_DATA_PROPERTIES));
 
     final var reqDTO = mock(AverageMerCommand.class);
-    final List<Holding> holdings = List.of();
+    final List<PortfolioHolding> holdings = List.of();
     final var resDto = mock(AverageMerResult.class);
     final var providers = List.of(DataProvider.MORNINGSTAR);
 
@@ -173,7 +173,7 @@ class MERCalculationServiceImplTest {
     final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
         DEFAULT_DATA_PROPERTIES));
 
-    final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+    final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     final var reqDTO = mock(AverageMerCommand.class);
     final var parameterTypes = List.of(SCALED, ABSOLUTE);
 
@@ -197,7 +197,7 @@ class MERCalculationServiceImplTest {
       final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
           DEFAULT_DATA_PROPERTIES));
 
-      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
@@ -222,7 +222,7 @@ class MERCalculationServiceImplTest {
       final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
           DEFAULT_DATA_PROPERTIES));
 
-      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var providers = mock(List.class);
 
@@ -247,7 +247,7 @@ class MERCalculationServiceImplTest {
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation a = new AverageManagementExpenseCalculation();
 
     doCallRealMethod().when(merCalculationServiceMock).setInitialFeeAndModifiedFeeValues(anyMap());
@@ -265,7 +265,7 @@ class MERCalculationServiceImplTest {
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation a = new AverageManagementExpenseCalculation();
 
     doCallRealMethod().when(merCalculationServiceMock).setInitialFeeAndModifiedFeeValues(anyMap());
@@ -283,7 +283,7 @@ class MERCalculationServiceImplTest {
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation aDto = new AverageManagementExpenseCalculation();
 
     doCallRealMethod().when(merCalculationServiceMock).setInitialFeeAndModifiedFeeValues(anyMap());
@@ -301,9 +301,9 @@ class MERCalculationServiceImplTest {
     final MERCalculationServiceImpl m = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
 
-    final Holding h1 = mock(Holding.class);
+    final PortfolioHolding h1 = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation aDto1 = mock(AverageManagementExpenseCalculation.class);
-    final Holding h2 = mock(Holding.class);
+    final PortfolioHolding h2 = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation aDto2 = mock(AverageManagementExpenseCalculation.class);
 
     final Warning w1 = new Warning(null, "ANY1");
@@ -318,7 +318,7 @@ class MERCalculationServiceImplTest {
         FinancialInstrumentType.ETF_US, Map.of(h1, aDto1),
         FinancialInstrumentType.ETF_CANADA, Map.of(h2, aDto2),
         FinancialInstrumentType.STOCK_CANADA,
-        Map.of(mock(Holding.class), mock(AverageManagementExpenseCalculation.class))));
+        Map.of(mock(PortfolioHolding.class), mock(AverageManagementExpenseCalculation.class))));
 
     // VERIFY
     Assertions.assertNotNull(actual);
@@ -341,7 +341,7 @@ class MERCalculationServiceImplTest {
     doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(),
         any());
     // ACT
-    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(etfHoldingDto, mock(Holding.class),
+    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(etfHoldingDto, mock(PortfolioHolding.class),
         notification);
 
     // VERIFY
@@ -353,7 +353,7 @@ class MERCalculationServiceImplTest {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
 
     doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(),
         any());
@@ -372,7 +372,7 @@ class MERCalculationServiceImplTest {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
 
     doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any(), any());
     // ACT
@@ -391,7 +391,7 @@ class MERCalculationServiceImplTest {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
     when(a.getManagementExpenseRatio()).thenReturn(ONE);
@@ -412,7 +412,7 @@ class MERCalculationServiceImplTest {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
     when(a.getActualManagementFee()).thenReturn(ONE);
@@ -436,7 +436,7 @@ class MERCalculationServiceImplTest {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
     when(a.getNetExpenseRatio()).thenReturn(ONE);
@@ -455,7 +455,7 @@ class MERCalculationServiceImplTest {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
     when(a.getGrossExpenseRatio()).thenReturn(ONE);
@@ -484,7 +484,7 @@ class MERCalculationServiceImplTest {
     doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(),
         any());
     // ACT
-    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(etfHoldingDto, mock(Holding.class),
+    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(etfHoldingDto, mock(PortfolioHolding.class),
         notification);
 
     // VERIFY
@@ -627,7 +627,7 @@ class MERCalculationServiceImplTest {
     final var sut = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var input = mock(AverageManagementExpenseCalculation.class);
 
     final BigDecimal bigDecimal = mock(BigDecimal.class);
@@ -649,7 +649,7 @@ class MERCalculationServiceImplTest {
     final var sut = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var input = mock(AverageManagementExpenseCalculation.class);
 
     final BigDecimal bigDecimal = mock(BigDecimal.class);
@@ -671,7 +671,7 @@ class MERCalculationServiceImplTest {
     final var sut = mock(MERCalculationServiceImpl.class);
     final Notification notification = new Notification();
 
-    final var holding = new Holding(null, FinancialInstrumentType.HEDGE_FUND_CANADA, null);
+    final var holding = new PortfolioHolding(null, FinancialInstrumentType.HEDGE_FUND_CANADA, null);
     final var input = mock(AverageManagementExpenseCalculation.class);
     final Optional<List<Warning>> expected = Optional.of(List.of(WRN_MER_MER_001.warning(holding), WRN_MER_AMF_001
         .warning(holding)));

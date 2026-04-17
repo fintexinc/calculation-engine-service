@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.wm.commons.domain.classification.SecurityClassificationTypeValue;
 
@@ -25,7 +25,7 @@ public class ClassificationAllocationMapper
       SecurityMasterResponseMapper<ClassificationAllocation, SecurityClassificationAllocation> {
 
   @Override
-  public ClassificationAllocation map(SecurityClassificationAllocation smsResponse, Holding holding) {
+  public ClassificationAllocation map(SecurityClassificationAllocation smsResponse, PortfolioHolding holding) {
     Map<ClassificationAllocationType, BigDecimal> classificationMap = Optional.ofNullable(smsResponse)
         .map(SecurityClassificationAllocation::getValues)
         .orElse(List.of())

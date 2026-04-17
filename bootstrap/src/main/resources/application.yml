@@ -47,6 +47,7 @@ external-services:
         income: /api/v1/wealth/securities/income
         fees: /api/v1/wealth/securities/fees
         sales-charge: /api/v1/wealth/securities/sales-charge
+        top-holdings: /api/v1/wealth/securities/top-holdings
         returns:
           monthly: /api/v1/wealth/securities/returns/monthly
 

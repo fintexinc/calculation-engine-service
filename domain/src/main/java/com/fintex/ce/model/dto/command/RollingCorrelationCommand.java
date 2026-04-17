@@ -1,6 +1,6 @@
 package com.fintex.ce.model.dto.command;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -15,16 +15,16 @@ import lombok.ToString;
 public class RollingCorrelationCommand extends RollingCalculationCommand {
 
   @Override
-  public PortfolioCommand setHoldings(List<Holding> holdings) {
+  public PortfolioCommand setHoldings(List<PortfolioHolding> holdings) {
     return super.setHoldings(holdings.stream()
-        .map(holding -> (Holding) holding.toBuilder().value(BigDecimal.ONE).build())
+        .map(holding -> (PortfolioHolding) holding.toBuilder().value(BigDecimal.ONE).build())
         .toList());
   }
 
   @Override
-  public PortfolioCommand setBenchmarkHoldings(List<Holding> benchmarkHoldings) {
+  public PortfolioCommand setBenchmarkHoldings(List<PortfolioHolding> benchmarkHoldings) {
     return super.setBenchmarkHoldings(benchmarkHoldings.stream()
-        .map(holding -> (Holding) holding.toBuilder().value(BigDecimal.ONE).build())
+        .map(holding -> (PortfolioHolding) holding.toBuilder().value(BigDecimal.ONE).build())
         .toList());
   }
 }

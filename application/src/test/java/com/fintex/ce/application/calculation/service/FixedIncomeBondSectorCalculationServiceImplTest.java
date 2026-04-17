@@ -4,7 +4,7 @@ import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -86,7 +86,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
         .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper,
             DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var rawData = new FixedIncomeBondSecurities();
     rawData.setFixedIncomeBondSectors(Map.of(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS, TEN));
 
@@ -104,7 +104,7 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
       final var fixedIncomeFetcher = mock(SecurityDataFetcher.class);
       final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
       final AssetAllocationDataMapper assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
-      final Holding fundSeriesHolding = mock(Holding.class);
+      final PortfolioHolding fundSeriesHolding = mock(PortfolioHolding.class);
 
       final var service = mock(FixedIncomeBondSectorCalculationServiceImpl.class, withSettings()
           .useConstructor(fixedIncomeFetcher, assetAllocationFetcher, assetAllocationDataMapper,

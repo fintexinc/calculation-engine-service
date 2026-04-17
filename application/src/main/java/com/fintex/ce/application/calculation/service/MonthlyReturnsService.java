@@ -12,7 +12,7 @@ import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.exceptions.FdsDataValidationException;
 import com.fintex.ce.port.webclient.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -68,27 +68,29 @@ public class MonthlyReturnsService {
         .getWeightedAverage();
   }
 
-  public ReturnsAggregate<HoldingMonthlyReturns> getMonthlyReturns(List<Holding> holdings, Currency currency) {
-    Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List
-        .of());
+  public ReturnsAggregate<HoldingMonthlyReturns> getMonthlyReturns(List<PortfolioHolding> holdings, Currency currency) {
+    Map<PortfolioHolding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(
+        holdings, List
+            .of());
     originalMonthlyReturns.putAll(monthlyReturnsGenerator.generateGicMonthlyReturns(holdings));
     return getMonthlyReturns(originalMonthlyReturns);
   }
 
   public ReturnsAggregate<HoldingMonthlyReturns> getMonthlyReturns(
-      Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns) {
+      Map<PortfolioHolding, HoldingMonthlyReturns> originalMonthlyReturns) {
     return new ReturnsAggregate<>(originalMonthlyReturns);
   }
 
   public ReturnsAggregate<HoldingMonthlyReturns> getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(
-      List<Holding> holdings,
+      List<PortfolioHolding> holdings,
       Currency currency) {
-    Map<Holding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(holdings, List
-        .of());
+    Map<PortfolioHolding, HoldingMonthlyReturns> originalMonthlyReturns = monthlyReturnsSecurityDataFetcher.fetch(
+        holdings, List
+            .of());
     return ReturnsAggregate.initOnlyWithReturnsDataValidation(originalMonthlyReturns);
   }
 
-  public ReturnsAggregate<HoldingMonthlyReturns> getPortfolioMonthlyReturns(final List<Holding> holdings,
+  public ReturnsAggregate<HoldingMonthlyReturns> getPortfolioMonthlyReturns(final List<PortfolioHolding> holdings,
       final Currency currency,
       final ReturnFactorScale returnFactorScale) throws FdsDataValidationException {
     ReturnsAggregate<HoldingMonthlyReturns> portfolioMonthlyReturnsAggregate = getMonthlyReturns(holdings, currency);
@@ -105,7 +107,7 @@ public class MonthlyReturnsService {
     return portfolioMonthlyReturnsAggregate;
   }
 
-  public ReturnsAggregate<HoldingMonthlyReturns> getBenchmarkMonthlyReturns(final List<Holding> holdings,
+  public ReturnsAggregate<HoldingMonthlyReturns> getBenchmarkMonthlyReturns(final List<PortfolioHolding> holdings,
       final Currency currency,
       final ReturnFactorScale returnFactorScale) {
     ReturnsAggregate<HoldingMonthlyReturns> benchmarkMonthlyReturnsAggregate = getMonthlyReturns(holdings, currency);
@@ -123,9 +125,9 @@ public class MonthlyReturnsService {
   }
 
   private Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fetchFxRates(
-      Map<Holding, Currency> holdingCurrencies, Currency toCurrency,
+      Map<PortfolioHolding, Currency> holdingCurrencies, Currency toCurrency,
       LocalDate from, LocalDate to) {
-    log.debug("Holding currencies: {}, target: {}", holdingCurrencies.values(), toCurrency);
+    log.debug("PortfolioHolding currencies: {}, target: {}", holdingCurrencies.values(), toCurrency);
     DateRange dateRange = new DateRange(from, to);
     return holdingCurrencies.values().stream()
         .distinct()

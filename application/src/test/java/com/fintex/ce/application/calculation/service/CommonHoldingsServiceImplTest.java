@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.model.domain.calculation.holding.CommonHoldings;
+import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
 import com.fintex.ce.model.domain.calculation.holding.HoldingAggregator;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
@@ -54,7 +54,7 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
+      final var holdings = List.of(mock(PortfolioHolding.class));
 
       when(reqDTO.getHoldings()).thenReturn(holdings);
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
@@ -78,8 +78,8 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
-      final var allocations = Map.of(mock(Holding.class), TEN);
+      final var holdings = List.of(mock(PortfolioHolding.class));
+      final var allocations = Map.of(mock(PortfolioHolding.class), TEN);
 
       when(reqDTO.getHoldings()).thenReturn(holdings);
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
@@ -103,7 +103,7 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
+      final var holdings = List.of(mock(PortfolioHolding.class));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
       when(reqDTO.getHoldings()).thenReturn(holdings);
@@ -128,7 +128,7 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
+      final var holdings = List.of(mock(PortfolioHolding.class));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
       when(reqDTO.getHoldings()).thenReturn(holdings);
@@ -154,12 +154,12 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
+      final var holdings = List.of(mock(PortfolioHolding.class));
 
-      final var rawCommonHoldings = new CommonHoldings();
+      final var rawCommonHoldings = new CommonTopHoldings();
       rawCommonHoldings.setHoldings(List.of());
-      final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
-      final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
+      final var holdingsFromSms = Map.of(mock(PortfolioHolding.class), rawCommonHoldings);
+      final var allocations = Map.of(mock(PortfolioHolding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
       final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
 
@@ -189,12 +189,12 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
+      final var holdings = List.of(mock(PortfolioHolding.class));
 
-      final var rawCommonHoldings = new CommonHoldings();
+      final var rawCommonHoldings = new CommonTopHoldings();
       rawCommonHoldings.setHoldings(List.of());
-      final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
-      final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
+      final var holdingsFromSms = Map.of(mock(PortfolioHolding.class), rawCommonHoldings);
+      final var allocations = Map.of(mock(PortfolioHolding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
       final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
 
@@ -225,12 +225,12 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
+      final var holdings = List.of(mock(PortfolioHolding.class));
 
-      final var rawCommonHoldings = new CommonHoldings();
+      final var rawCommonHoldings = new CommonTopHoldings();
       rawCommonHoldings.setHoldings(List.of());
-      final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
-      final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
+      final var holdingsFromSms = Map.of(mock(PortfolioHolding.class), rawCommonHoldings);
+      final var allocations = Map.of(mock(PortfolioHolding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
       final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
       final var sortedLeaves = Map.of(mock(HoldingAggregator.class), TEN);
@@ -262,12 +262,12 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
+      final var holdings = List.of(mock(PortfolioHolding.class));
 
-      final var rawCommonHoldings = new CommonHoldings();
+      final var rawCommonHoldings = new CommonTopHoldings();
       rawCommonHoldings.setHoldings(List.of());
-      final var holdingsFromSms = Map.of(mock(Holding.class), rawCommonHoldings);
-      final var allocations = Map.of(mock(Holding.class), mock(BigDecimal.class));
+      final var holdingsFromSms = Map.of(mock(PortfolioHolding.class), rawCommonHoldings);
+      final var allocations = Map.of(mock(PortfolioHolding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
       final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHoldingsDTO.class)));
       final var sortedLeaves = Map.of(mock(HoldingAggregator.class), TEN);
@@ -493,8 +493,8 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
-    final var allocations = Map.of(new Holding(null, null, null), TEN);
-    final var parent = new Holding(null, null, null);
+    final var allocations = Map.of(new PortfolioHolding(null, null, null), TEN);
+    final var parent = new PortfolioHolding(null, null, null);
     final var child = mock(CommonHoldingsDTO.class);
     final var expected = new CommonHoldingsDTO();
     expected.setWeight(TEN);
@@ -519,8 +519,8 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
-    final var allocations = Map.of(new Holding(null, null, null), TEN);
-    final var parent = new Holding(null, null, null);
+    final var allocations = Map.of(new PortfolioHolding(null, null, null), TEN);
+    final var parent = new PortfolioHolding(null, null, null);
     final var child = mock(CommonHoldingsDTO.class);
     final var expected = new CommonHoldingsDTO();
     expected.setWeight(BigDecimal.valueOf(100));
@@ -547,7 +547,7 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
-    final var parent = mock(Holding.class);
+    final var parent = mock(PortfolioHolding.class);
     final var allocations = Map.of(parent, TEN);
     final var child = mock(CommonHoldingsDTO.class);
     final var expected = new CommonHoldingsDTO();
@@ -580,7 +580,7 @@ class CommonHoldingsServiceImplTest {
 
       final var holdingsDTO = mock(CommonHoldingsDTO.class);
       final var sameLeaves = List.of(holdingsDTO);
-      final var parentHolding = mock(Holding.class);
+      final var parentHolding = mock(PortfolioHolding.class);
       final var expected = TEN;
 
       when(holdingsDTO.getHolding()).thenReturn(parentHolding);
@@ -606,7 +606,7 @@ class CommonHoldingsServiceImplTest {
 
     final var holdingsDTO = mock(CommonHoldingsDTO.class);
     final var sameLeaves = List.of(holdingsDTO);
-    final var parentHolding = mock(Holding.class);
+    final var parentHolding = mock(PortfolioHolding.class);
     final var expected = TEN;
 
     when(holdingsDTO.getHolding()).thenReturn(parentHolding);
@@ -636,7 +636,7 @@ class CommonHoldingsServiceImplTest {
       final var sortedLeafEntry = new AbstractMap.SimpleEntry<>(holdingAggregator, TEN);
 
       final var holdingsKeyDTO = mock(HoldingsKeyResult.class);
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
 
       when(commonHoldingsDTO.getHolding()).thenReturn(holding);
       when(commonHoldingsDTO.getWeight()).thenReturn(TEN);
@@ -667,7 +667,7 @@ class CommonHoldingsServiceImplTest {
       final var sortedLeafEntry = new AbstractMap.SimpleEntry<>(holdingAggregator, TEN);
 
       final var holdingsKeyDTO = mock(HoldingsKeyResult.class);
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
 
       when(commonHoldingsDTO.getHolding()).thenReturn(holding);
       when(commonHoldingsDTO.getWeight()).thenReturn(TEN);
@@ -697,7 +697,7 @@ class CommonHoldingsServiceImplTest {
       final var sortedLeafEntry = new AbstractMap.SimpleEntry<>(holdingAggregator, TEN);
 
       final var holdingsKeyDTO = mock(HoldingsKeyResult.class);
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var expected = new TopCommonHoldingData("Tesla", null, null, null, toUserScale(TEN), 1, Set.of(
           holdingsKeyDTO));
 
@@ -730,7 +730,7 @@ class CommonHoldingsServiceImplTest {
       final var sortedLeafEntry = new AbstractMap.SimpleEntry<>(holdingAggregator, TEN);
 
       final var holdingsKeyDTO = mock(HoldingsKeyResult.class);
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var expected = new TopCommonHoldingData("Tesla", "H", null, null, toUserScale(TEN), 1, Set.of(
           holdingsKeyDTO));
 
@@ -757,7 +757,7 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulativeTypes));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
     final var holdings = Map.of(holding, List.of(commonHoldingsDTO));
     final var allocations = Map.of(holding, TEN);
@@ -778,7 +778,7 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulativeTypes));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var commonHoldingsDTO = mock(CommonHoldingsDTO.class);
     final var holdings = Map.of(holding, List.of(commonHoldingsDTO));
     final var allocations = Map.of(holding, TEN);
@@ -802,8 +802,8 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
-    final var allocations = Map.of(mock(Holding.class), TEN);
-    final var parent = mock(Holding.class);
+    final var allocations = Map.of(mock(PortfolioHolding.class), TEN);
+    final var parent = mock(PortfolioHolding.class);
     final var child = mock(CommonHoldingsDTO.class);
     final var firstLevelChildren = List.of(child);
 
@@ -828,8 +828,8 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
-    final var allocations = Map.of(mock(Holding.class), TEN);
-    final var parent = mock(Holding.class);
+    final var allocations = Map.of(mock(PortfolioHolding.class), TEN);
+    final var parent = mock(PortfolioHolding.class);
     final var child = mock(CommonHoldingsDTO.class);
     final var firstLevelChildren = List.of(child);
     final var expected = new CommonHoldingsDTO("Apple Inc", null, TEN, null, null);
@@ -883,7 +883,7 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
-    final var parent = mock(Holding.class);
+    final var parent = mock(PortfolioHolding.class);
     final var child = mock(CommonHoldingsDTO.class);
 
     when(parent.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_CANADA);
@@ -906,7 +906,7 @@ class CommonHoldingsServiceImplTest {
     final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
-    final var parent = mock(Holding.class);
+    final var parent = mock(PortfolioHolding.class);
     final var child = mock(CommonHoldingsDTO.class);
 
     when(parent.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_CANADA);
@@ -971,7 +971,7 @@ class CommonHoldingsServiceImplTest {
           .useConstructor(fetcher, defaultPeriods));
 
       final var reqDTO = mock(TopCommonHoldingsCommand.class);
-      final var holdings = List.of(mock(Holding.class));
+      final var holdings = List.of(mock(PortfolioHolding.class));
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
       when(reqDTO.getHoldings()).thenReturn(holdings);

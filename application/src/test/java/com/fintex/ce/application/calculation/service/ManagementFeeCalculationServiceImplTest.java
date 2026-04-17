@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import com.fintex.ce.model.domain.enumeration.ParameterType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.Notification;
@@ -75,7 +75,7 @@ class ManagementFeeCalculationServiceImplTest {
           .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
       final var reqDTO = mock(AverageMerCommand.class);
-      final List<Holding> holdings = List.of();
+      final List<PortfolioHolding> holdings = List.of();
       final var resDto = mock(ManagementFeeResult.class);
       final var defaultProviders = mock(List.class);
 
@@ -128,7 +128,7 @@ class ManagementFeeCalculationServiceImplTest {
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
-      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
@@ -155,7 +155,7 @@ class ManagementFeeCalculationServiceImplTest {
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
-      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var parameterTypes = mock(List.class);
 
@@ -180,7 +180,7 @@ class ManagementFeeCalculationServiceImplTest {
       final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
-      final HashMap<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+      final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
       final var reqDTO = mock(AverageMerCommand.class);
       final var providers = mock(List.class);
 
@@ -289,7 +289,7 @@ class ManagementFeeCalculationServiceImplTest {
     verify(sut).getScaledAverageMer(averageMerCalculationDtoMap);
   }
 
-  private Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> getCalculationDtoMap() {
+  private Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> getCalculationDtoMap() {
     final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO1 = new AverageManagementExpenseCalculation();
     averageManagementExpenseCalculationDTO1.setMarketValue(new BigDecimal("10"));
     final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO2 = new AverageManagementExpenseCalculation();
@@ -303,24 +303,25 @@ class ManagementFeeCalculationServiceImplTest {
     final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO6 = new AverageManagementExpenseCalculation();
     averageManagementExpenseCalculationDTO6.setMarketValue(new BigDecimal("60"));
 
-    return Map.of(MUTUAL_FUND_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO1),
-        ETF_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO2),
-        ETF_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO3),
-        FinancialInstrumentType.STOCK_CANADA, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO4),
-        FinancialInstrumentType.STOCK_US, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO5),
-        FinancialInstrumentType.CASH, Map.of(mock(Holding.class), averageManagementExpenseCalculationDTO6));
+    return Map.of(MUTUAL_FUND_CANADA, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDTO1),
+        ETF_US, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDTO2),
+        ETF_CANADA, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDTO3),
+        FinancialInstrumentType.STOCK_CANADA, Map.of(mock(PortfolioHolding.class),
+            averageManagementExpenseCalculationDTO4),
+        FinancialInstrumentType.STOCK_US, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDTO5),
+        FinancialInstrumentType.CASH, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDTO6));
   }
 
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenExpectExceptionWhenHoldingIsFundAndManagementFeeIsEmpty() {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
-    var holding = new Holding(null, null, null);
+    var holding = new PortfolioHolding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(null);
     var expected = ERR_MF_MF_001.error(holding);
 
-    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+    Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(MUTUAL_FUND_CANADA, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
@@ -338,11 +339,11 @@ class ManagementFeeCalculationServiceImplTest {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var notification = new Notification();
-    var holding = new Holding(null, null, null);
+    var holding = new PortfolioHolding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(null);
 
-    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+    Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(FinancialInstrumentType.STOCK_US, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
@@ -359,11 +360,11 @@ class ManagementFeeCalculationServiceImplTest {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var notification = new Notification();
-    var holding = new Holding(null, null, null);
+    var holding = new PortfolioHolding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(TEN);
 
-    Map<FinancialInstrumentType, Map<Holding, AverageManagementExpenseCalculation>> map = new HashMap<>();
+    Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(ETF_US, Map.of(holding, averageCalculationDto));
 
     doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());

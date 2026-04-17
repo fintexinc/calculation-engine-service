@@ -3,7 +3,7 @@ package com.fintex.ce.application.mapping.response;
 import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.error.Warning;
 
@@ -47,7 +47,8 @@ public class MaturityAllocationResponseMapper implements ResponseMapper<Maturity
   }
 
   @Override
-  public MaturityAllocationResult toResponse(Map<Holding, MaturityAllocation> domainMap, List<Warning> warnings) {
+  public MaturityAllocationResult toResponse(Map<PortfolioHolding, MaturityAllocation> domainMap,
+      List<Warning> warnings) {
     // This method requires complex aggregation with holding weights
     // Delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for MaturityAllocation");

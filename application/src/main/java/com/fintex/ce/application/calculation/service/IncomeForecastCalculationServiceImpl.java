@@ -7,7 +7,7 @@ import com.fintex.ce.model.domain.calculation.yield.IncomeForecast;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.InterestFreq;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
 import com.fintex.ce.model.dto.IncomeForecastDto;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
@@ -67,7 +67,7 @@ public class IncomeForecastCalculationServiceImpl
   @Override
   public IncomeForecastResult perform(final IncomeForecastCommand reqDTO) {
     final ArrayList<Warning> warnings = new ArrayList<>();
-    final Map<Holding, IncomeForecast> incomeForecastDto = incomeForecastSecurityDataFetcher.fetch(
+    final Map<PortfolioHolding, IncomeForecast> incomeForecastDto = incomeForecastSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
 
     final Integer period = Optional.ofNullable(reqDTO.getTimeIntervalPeriods()).orElse(TWELVE_MONTH);
@@ -76,7 +76,7 @@ public class IncomeForecastCalculationServiceImpl
     return incomeForecastResDto;
   }
 
-  private IncomeForecastResult calculate(final Map<Holding, IncomeForecast> holdingIncomeForecastMap,
+  private IncomeForecastResult calculate(final Map<PortfolioHolding, IncomeForecast> holdingIncomeForecastMap,
       final Integer terms) {
 
     final List<IncomeForecastDto> incomeForecasts = holdingIncomeForecastMap.entrySet()
@@ -92,8 +92,8 @@ public class IncomeForecastCalculationServiceImpl
   }
 
   private IncomeForecastDto getIncomeForecastDto(final Integer terms,
-      final Map.Entry<Holding, IncomeForecast> entry) {
-    final Holding holding = entry.getKey();
+      final Map.Entry<PortfolioHolding, IncomeForecast> entry) {
+    final PortfolioHolding holding = entry.getKey();
     return Objects.equals(holding.getHoldingType(), FinancialInstrumentType.GIC)
         ? getGicIncomeForecast(holding)
         : getIncomeForecast(terms, entry.getValue(), holding);
@@ -101,7 +101,7 @@ public class IncomeForecastCalculationServiceImpl
 
   private IncomeForecastDto getIncomeForecast(final Integer terms,
       final IncomeForecast rIncomeForecast,
-      final Holding holding) {
+      final PortfolioHolding holding) {
     final IncomeForecastDto incomeForecastDto = getIncomeForecastDto(holding);
 
     if (isFixedIncomeAtMaturityType(rIncomeForecast, holding)) {
@@ -142,7 +142,7 @@ public class IncomeForecastCalculationServiceImpl
   }
 
   private boolean isFixedIncomeAtMaturityType(final IncomeForecast rIncomeForecast,
-      final Holding holding) {
+      final PortfolioHolding holding) {
     return Objects.equals(holding.getHoldingType(), FinancialInstrumentType.FIXED_INCOME) &&
         Objects.isNull(rIncomeForecast.getSchedule()) &&
         ObjectUtils.allNotNull(rIncomeForecast.getDividendYield(), rIncomeForecast.getPaymentFrequencyType(),
@@ -150,7 +150,7 @@ public class IncomeForecastCalculationServiceImpl
         Objects.equals(AT_MATURITY_PAYMENT_FREQUENCY, rIncomeForecast.getPaymentFrequencyType());
   }
 
-  private static IncomeForecastDto getIncomeForecastDto(final Holding holding) {
+  private static IncomeForecastDto getIncomeForecastDto(final PortfolioHolding holding) {
     final String holdingType = holding.getHoldingType().name();
     final String securityIdentifierType = holding.getSecurityIdentifier().getIdType().name();
 
@@ -163,7 +163,7 @@ public class IncomeForecastCalculationServiceImpl
     return incomeForecastDto;
   }
 
-  private IncomeForecastDto getGicIncomeForecast(final Holding holding) {
+  private IncomeForecastDto getGicIncomeForecast(final PortfolioHolding holding) {
     final GicHolding gicHolding = (GicHolding) holding;
     final LocalDate investmentDate = gicHolding.getInvestmentDate();
     final List<Income> incomeDtos = getGicIncomes(investmentDate, gicHolding);

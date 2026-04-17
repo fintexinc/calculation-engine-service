@@ -4,7 +4,7 @@ import com.fintex.ce.application.mapping.response.YieldResponseMapper;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.calculation.yield.Yield;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
 import com.fintex.ce.model.dto.command.YieldCommand;
 import com.fintex.ce.model.error.Warning;
@@ -36,7 +36,7 @@ public class YieldCalculationServiceImpl implements CalculationService<YieldResu
   @Override
   public YieldResult perform(final YieldCommand reqDTO) {
     final ArrayList<Warning> warnings = new ArrayList<>();
-    final Map<Holding, Yield> yieldData = yieldSecurityDataFetcher.fetch(reqDTO.getHoldings(), List.of());
+    final Map<PortfolioHolding, Yield> yieldData = yieldSecurityDataFetcher.fetch(reqDTO.getHoldings(), List.of());
     return responseMapper.toResponse(yieldData, warnings);
   }
 }

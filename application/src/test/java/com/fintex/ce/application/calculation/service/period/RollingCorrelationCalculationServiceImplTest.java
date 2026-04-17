@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.RollingCorrelationCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -44,7 +44,7 @@ class RollingCorrelationCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(sut.defineCalculationMethod(reqDTO)).thenReturn(mock(RollingCorrelationCalculation.class));
@@ -64,7 +64,7 @@ class RollingCorrelationCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var rollingCorrelationCalculation = mock(RollingCorrelationCalculation.class);
     final var rollingPeriods = Set.of("12");
 
@@ -382,7 +382,7 @@ class RollingCorrelationCalculationServiceImplTest {
 
     doCallRealMethod().when(sut).getBaseTotalReturns(any());
 
-    final Map<Holding, Map<LocalDate, BigDecimal>> actual = sut.getBaseTotalReturns(reqDTO);
+    final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> actual = sut.getBaseTotalReturns(reqDTO);
 
     assertSame(baseTotalReturn, actual);
   }

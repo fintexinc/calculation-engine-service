@@ -2,7 +2,7 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.calculation.metric.formula.SumProduct;
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.ce.util.ReturnFactorScale;
 
@@ -37,7 +37,7 @@ class WeightedAverageComponentTest {
   void shouldCollectMonthlyWeightEntries_whenCheckResult() {
     // SETUP
     final var sut = mock(WeightedAverageComponent.class);
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var date = LocalDate.of(2020, 10, 10);
     final var oldValue = new BigDecimal("2.2");
     final var expectedNewValue = new BigDecimal("1.1");
@@ -47,7 +47,7 @@ class WeightedAverageComponentTest {
     doCallRealMethod().when(sut).collectMonthlyWeightEntries(any());
 
     // ACT
-    final Function<Map.Entry<Holding, TreeMap<LocalDate, BigDecimal>>, TreeMap<LocalDate, BigDecimal>> actualFunction = sut
+    final Function<Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>, TreeMap<LocalDate, BigDecimal>> actualFunction = sut
         .collectMonthlyWeightEntries(map);
 
     final Map<LocalDate, BigDecimal> actual = actualFunction.apply(Map.entry(holding, new TreeMap<>(Map.of(date,
@@ -63,7 +63,7 @@ class WeightedAverageComponentTest {
       // SETUP
       final var sut = mock(WeightedAverageComponent.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var pBaseTotalReturn = Map.of(holding, new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE)));
 
       when(sut.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
@@ -84,7 +84,7 @@ class WeightedAverageComponentTest {
       // SETUP
       final var sut = mock(WeightedAverageComponent.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       var map = mock(TreeMap.class);
       portfolioUtilsMock.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(anyCollection())).thenReturn(map);
       when(sut.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
@@ -110,7 +110,7 @@ class WeightedAverageComponentTest {
       final var sut = mock(WeightedAverageComponent.class,
           withSettings().useConstructor(ReturnFactorScale.AS_IS));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       when(sut.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
 
       doCallRealMethod().when(sut).calculateTotalPortfolioReturnFactor(anyMap(), anyMap());
@@ -139,7 +139,7 @@ class WeightedAverageComponentTest {
       final var sut = mock(WeightedAverageComponent.class,
           withSettings().useConstructor(ReturnFactorScale.SCALE_OF_TWO));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       when(sut.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
 
       doCallRealMethod().when(sut).calculateTotalPortfolioReturnFactor(anyMap(), anyMap());

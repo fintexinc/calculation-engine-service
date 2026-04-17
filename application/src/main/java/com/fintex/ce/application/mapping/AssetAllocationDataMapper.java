@@ -4,7 +4,7 @@ import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -36,8 +36,8 @@ public class AssetAllocationDataMapper {
         Stream.of(AssetAllocationRegion.values()).collect(toMap(e -> e, e -> BigDecimal.ZERO)));
   }
 
-  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForAA(AssetAllocationDataDTO dto) {
-    final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> result = new HashMap<>();
+  public Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> mapForAA(AssetAllocationDataDTO dto) {
+    final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> result = new HashMap<>();
     result.putAll(mapForNoneStock(dto.getEtfUsFdsResponse()));
     result.putAll(mapForNoneStock(dto.getEtfCanadaFdsResponse()));
     result.putAll(mapForNoneStock(dto.getMutualFundFdsResponse()));
@@ -53,22 +53,24 @@ public class AssetAllocationDataMapper {
     return result;
   }
 
-  private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForStock(
-      final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> stockFdsResponse) {
+  private Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> mapForStock(
+      final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> stockFdsResponse) {
     return stockFdsResponse.entrySet().stream().collect(
         toMap(
             Map.Entry::getKey,
             e -> overrideDefaultValues(DEFAULT_MAP, e.getValue())));
   }
 
-  private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForCash(final List<Holding> holdings) {
+  private Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> mapForCash(
+      final List<PortfolioHolding> holdings) {
     return holdings.stream().collect(Collectors.toMap(
         k -> k,
         v -> overrideDefaultValues(DEFAULT_MAP, Map.of(AssetAllocationRegion.CASH, BigDecimal.ONE))));
   }
 
-  private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForGic(final List<Holding> holdings) {
-    final HashMap<Holding, Map<AssetAllocationRegion, BigDecimal>> result = new HashMap<>();
+  private Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> mapForGic(
+      final List<PortfolioHolding> holdings) {
+    final HashMap<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> result = new HashMap<>();
     for (final var holding : holdings) {
       final var gic = (GicHolding) holding;
       result.put(gic, overrideDefaultValues(DEFAULT_MAP, Map.of(gic.getAssetAllocation(), BigDecimal.ONE)));
@@ -76,7 +78,7 @@ public class AssetAllocationDataMapper {
     return result;
   }
 
-  private <H extends Holding> Map<Holding, Map<AssetAllocationRegion, BigDecimal>> mapForNoneStock(
+  private <H extends PortfolioHolding> Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> mapForNoneStock(
       final Map<H, HoldingAssetAllocation> holdings) {
     return holdings.entrySet().stream().collect(
         toMap(
@@ -91,8 +93,8 @@ public class AssetAllocationDataMapper {
    *          map of holdings to their asset allocation data
    * @return map of holdings to their region-based allocation breakdown
    */
-  public Map<Holding, Map<AssetAllocationRegion, BigDecimal>> toRegionExposures(
-      Map<Holding, HoldingAssetAllocation> allocations) {
+  public Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> toRegionExposures(
+      Map<PortfolioHolding, HoldingAssetAllocation> allocations) {
     if (CollectionUtils.isEmpty(allocations)) {
       return Collections.emptyMap();
     }

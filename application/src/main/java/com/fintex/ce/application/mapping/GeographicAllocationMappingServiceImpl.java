@@ -2,7 +2,7 @@ package com.fintex.ce.application.mapping;
 
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.GeographicAllocationDTO;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.HttpCode;
@@ -46,8 +46,8 @@ public class GeographicAllocationMappingServiceImpl implements GeographicAllocat
    * @return holdings that are grouped by regions
    */
   @Override
-  public Map<Holding, Map<GeographicRegionType, BigDecimal>> mapToGeographicRegions(
-      final Map<Holding, Map<String, BigDecimal>> holdingAllocations,
+  public Map<PortfolioHolding, Map<GeographicRegionType, BigDecimal>> mapToGeographicRegions(
+      final Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations,
       final List<Warning> warnings, final ErrorCode errorCode) {
     return holdingAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> mapToRegions(e.getKey(), e
         .getValue(), warnings, errorCode)));
@@ -64,7 +64,7 @@ public class GeographicAllocationMappingServiceImpl implements GeographicAllocat
    *          error code when response is empty
    * @return grouped by regions
    */
-  private Map<GeographicRegionType, BigDecimal> mapToRegions(final Holding holding,
+  private Map<GeographicRegionType, BigDecimal> mapToRegions(final PortfolioHolding holding,
       final Map<String, BigDecimal> allocations,
       final List<Warning> warnings, final ErrorCode errorCode) {
     final Map<GeographicRegionType, BigDecimal> map = new HashMap<>();

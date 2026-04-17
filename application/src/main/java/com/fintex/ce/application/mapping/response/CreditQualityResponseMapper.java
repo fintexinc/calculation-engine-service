@@ -3,7 +3,7 @@ package com.fintex.ce.application.mapping.response;
 import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
 import com.fintex.ce.model.error.Warning;
 
@@ -39,7 +39,7 @@ public class CreditQualityResponseMapper implements ResponseMapper<CreditQuality
   }
 
   @Override
-  public CreditQualityResult toResponse(Map<Holding, CreditQuality> domainMap, List<Warning> warnings) {
+  public CreditQualityResult toResponse(Map<PortfolioHolding, CreditQuality> domainMap, List<Warning> warnings) {
     // This method requires complex aggregation with asset allocation data
     // Delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for CreditQuality");

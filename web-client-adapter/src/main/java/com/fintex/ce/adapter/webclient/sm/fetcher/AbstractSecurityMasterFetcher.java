@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.mapper.HoldingMappingUtils;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
@@ -54,18 +54,18 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
   }
 
   @Override
-  public Map<Holding, D> fetch(List<? extends Holding> holdings, List<DataProvider> providers) {
+  public Map<PortfolioHolding, D> fetch(List<? extends PortfolioHolding> holdings, List<DataProvider> providers) {
     if (CollectionUtils.isEmpty(holdings)) {
       return Collections.emptyMap();
     }
 
-    Map<FinancialInstrumentType, List<Holding>> groupedHoldings = groupHoldingsByType(holdings);
+    Map<FinancialInstrumentType, List<PortfolioHolding>> groupedHoldings = groupHoldingsByType(holdings);
     if (groupedHoldings.isEmpty()) {
       return Collections.emptyMap();
     }
 
     // List because multiple holdings can share the same security (e.g., same stock in different accounts)
-    Map<String, List<Holding>> identifierToHoldings = new HashMap<>();
+    Map<String, List<PortfolioHolding>> identifierToHoldings = new HashMap<>();
     List<TypedIdentifiers> typedIdentifiers = buildTypedIdentifiers(groupedHoldings, identifierToHoldings);
 
     if (CollectionUtils.isEmpty(typedIdentifiers)) {
@@ -83,7 +83,7 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
         request,
         responseType);
 
-    Map<Holding, D> result = mapResponsesToHoldings(
+    Map<PortfolioHolding, D> result = mapResponsesToHoldings(
         responses != null ? responses : List.of(),
         identifierToHoldings);
 
@@ -93,19 +93,20 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
     return result;
   }
 
-  private Map<FinancialInstrumentType, List<Holding>> groupHoldingsByType(List<? extends Holding> holdings) {
+  private Map<FinancialInstrumentType, List<PortfolioHolding>> groupHoldingsByType(
+      List<? extends PortfolioHolding> holdings) {
     return holdings.stream()
         .filter(this::hasValidHoldingType)
-        .collect(groupingBy(Holding::getHoldingType));
+        .collect(groupingBy(PortfolioHolding::getHoldingType));
   }
 
-  private boolean hasValidHoldingType(Holding holding) {
+  private boolean hasValidHoldingType(PortfolioHolding holding) {
     return holding.getHoldingType() != null && !HoldingMappingUtils.isSkipped(holding.getHoldingType());
   }
 
   private List<TypedIdentifiers> buildTypedIdentifiers(
-      Map<FinancialInstrumentType, List<Holding>> groupedHoldings,
-      Map<String, List<Holding>> identifierToHoldings) {
+      Map<FinancialInstrumentType, List<PortfolioHolding>> groupedHoldings,
+      Map<String, List<PortfolioHolding>> identifierToHoldings) {
 
     return groupedHoldings.entrySet().stream()
         .map(entry -> buildTypedIdentifierForType(entry, identifierToHoldings))
@@ -114,8 +115,8 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
   }
 
   private TypedIdentifiers buildTypedIdentifierForType(
-      Map.Entry<FinancialInstrumentType, List<Holding>> entry,
-      Map<String, List<Holding>> identifierToHoldings) {
+      Map.Entry<FinancialInstrumentType, List<PortfolioHolding>> entry,
+      Map<String, List<PortfolioHolding>> identifierToHoldings) {
 
     List<SecurityIdentifier> identifiers = entry.getValue().stream()
         .filter(h -> h.getSecurityIdentifier() != null)
@@ -123,7 +124,7 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
           String key = buildKey(h.getSecurityIdentifier());
           identifierToHoldings.computeIfAbsent(key, k -> new ArrayList<>()).add(h);
         })
-        .map(Holding::getSecurityIdentifier)
+        .map(PortfolioHolding::getSecurityIdentifier)
         .toList();
 
     if (identifiers.isEmpty()) {
@@ -136,9 +137,9 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
         .build();
   }
 
-  private Map<Holding, D> mapResponsesToHoldings(
+  private Map<PortfolioHolding, D> mapResponsesToHoldings(
       List<SecurityAttributeResult<R>> responses,
-      Map<String, List<Holding>> identifierToHoldings) {
+      Map<String, List<PortfolioHolding>> identifierToHoldings) {
 
     if (CollectionUtils.isEmpty(responses)) {
       return Collections.emptyMap();
@@ -153,12 +154,12 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
             (existing, replacement) -> existing));
   }
 
-  private Map<Holding, D> mapResponseToHoldings(
+  private Map<PortfolioHolding, D> mapResponseToHoldings(
       SecurityAttributeResult<R> response,
-      Map<String, List<Holding>> identifierToHoldings) {
+      Map<String, List<PortfolioHolding>> identifierToHoldings) {
 
     String responseKey = buildKey(response.getIdentifier());
-    List<Holding> holdings = identifierToHoldings.get(responseKey);
+    List<PortfolioHolding> holdings = identifierToHoldings.get(responseKey);
 
     if (CollectionUtils.isEmpty(holdings)) {
       log.warn("No matching holdings for identifier: {}", response.getIdentifier());

@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
 import com.fintex.ce.model.domain.enumeration.SalesChargeCategory;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -51,10 +51,10 @@ class SalesChargeTypeCalculationTest {
 
   @Test
   void shouldCalculateWeightsPerType_whenEachTypeContainsOneHolding() {
-    final Map<Holding, SalesCharge> dataFromFds = new HashMap<>();
-    final Holding holding1 = createHolding("RBF605", 10_000);
-    final Holding holding2 = createHolding("RBF606", 20_000);
-    final Holding holding3 = createHolding("RBF607", 70_000);
+    final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
+    final PortfolioHolding holding1 = createHolding("RBF605", 10_000);
+    final PortfolioHolding holding2 = createHolding("RBF606", 20_000);
+    final PortfolioHolding holding3 = createHolding("RBF607", 70_000);
     dataFromFds.put(holding1, SalesCharge.builder().type(DEFERRED_SALES_CHARGE_ON_MARKET_VALUE).build());
     dataFromFds.put(holding2, SalesCharge.builder().type(FRONT_END_CHARGE).build());
     dataFromFds.put(holding3, SalesCharge.builder().type(LOW_SALES_CHARGE).build());
@@ -78,17 +78,17 @@ class SalesChargeTypeCalculationTest {
     assertEquals(expected, actual);
   }
 
-  private Holding createHolding(final String fundServCode, final int value) {
-    return new Holding(BigDecimal.valueOf(value), FinancialInstrumentType.MUTUAL_FUND_CANADA,
+  private PortfolioHolding createHolding(final String fundServCode, final int value) {
+    return new PortfolioHolding(BigDecimal.valueOf(value), FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV));
   }
 
   @Test
   void shouldCalculateWeights_whenTwoTypesContainOneHoldingEach() {
 
-    final Map<Holding, SalesCharge> dataFromFds = new HashMap<>();
-    final Holding holding2 = createHolding("RBF606", 51_000);
-    final Holding holding3 = createHolding("RBF607", 49_000);
+    final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
+    final PortfolioHolding holding2 = createHolding("RBF606", 51_000);
+    final PortfolioHolding holding3 = createHolding("RBF607", 49_000);
     dataFromFds.put(holding2, SalesCharge.builder().type(VOLUME_SALES_CHARGE).build());
     dataFromFds.put(holding3, SalesCharge.builder().type(DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT).build());
 
@@ -111,7 +111,7 @@ class SalesChargeTypeCalculationTest {
 
   @Test
   void shouldAggregateHoldingsByType_whenEachTypeHasMultipleHoldings() {
-    final Map<Holding, SalesCharge> dataFromFds = new HashMap<>();
+    final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 10_000, FRONT_END_CHARGE);
     addHoldingAndRSalesCharge(dataFromFds, "RBF607", 15_000, VOLUME_SALES_CHARGE);
     addHoldingAndRSalesCharge(dataFromFds, "RBF608", 17_000, FORMULA_ONE);
@@ -145,7 +145,7 @@ class SalesChargeTypeCalculationTest {
 
   @Test
   void shouldReturnDefaultMap_whenNoHoldingsProvided() {
-    final Map<Holding, SalesCharge> dataFromFds = new HashMap<>();
+    final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
 
     final var sut = new SalesChargeCalculation(dataFromFds);
 
@@ -158,7 +158,7 @@ class SalesChargeTypeCalculationTest {
 
   @Test
   void shouldCalculateFullWeightForSingleType_whenThreeHoldingsShareSameType() {
-    final Map<Holding, SalesCharge> dataFromFds = new HashMap<>();
+    final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 50_000, FRONT_END_CHARGE);
     addHoldingAndRSalesCharge(dataFromFds, "RBF607", 50_000, VOLUME_SALES_CHARGE);
     addHoldingAndRSalesCharge(dataFromFds, "RBF608", 50_000, FORMULA_ONE);
@@ -186,7 +186,7 @@ class SalesChargeTypeCalculationTest {
 
   @Test
   void shouldCalculateFullWeightForSingleType_whenOneHoldingSharesSameType() {
-    final Map<Holding, SalesCharge> dataFromFds = new HashMap<>();
+    final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 150_000, FRONT_END_CHARGE);
 
     final var sut = new SalesChargeCalculation(dataFromFds);
@@ -205,11 +205,12 @@ class SalesChargeTypeCalculationTest {
     assertEquals(expected, actual);
   }
 
-  private void addHoldingAndRSalesCharge(final Map<Holding, SalesCharge> dataFromFds,
+  private void addHoldingAndRSalesCharge(final Map<PortfolioHolding, SalesCharge> dataFromFds,
       final String fundServCode,
       final int value,
       final SalesChargeType frontEndCharge) {
-    final Holding holding = new Holding(BigDecimal.valueOf(value), FinancialInstrumentType.MUTUAL_FUND_CANADA,
+    final PortfolioHolding holding = new PortfolioHolding(BigDecimal.valueOf(value),
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV));
 
     dataFromFds.put(holding, SalesCharge.builder().type(frontEndCharge).build());

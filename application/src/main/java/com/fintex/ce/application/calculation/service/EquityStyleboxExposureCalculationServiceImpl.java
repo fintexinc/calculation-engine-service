@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.mapping.response.EquityStyleboxExposureResponseMapper;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -56,7 +56,7 @@ public class EquityStyleboxExposureCalculationServiceImpl
 
   @Override
   public EquityStyleboxExposureResult calculate(ExposureDataHolder<StyleBoxType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
@@ -69,7 +69,8 @@ public class EquityStyleboxExposureCalculationServiceImpl
 
   @Override
   public ExposureDataHolder<StyleBoxType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
-    Map<Holding, EquityStyleboxExposure> rawData = equityStyleboxSecurityDataFetcher.fetch(reqDTO.getHoldings(),
+    Map<PortfolioHolding, EquityStyleboxExposure> rawData = equityStyleboxSecurityDataFetcher.fetch(reqDTO
+        .getHoldings(),
         List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         EquityStyleboxExposure::getBoxValues,

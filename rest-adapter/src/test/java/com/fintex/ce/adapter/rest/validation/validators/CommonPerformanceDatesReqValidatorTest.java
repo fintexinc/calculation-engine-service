@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.exceptions.ReqValidationException;
@@ -67,7 +67,7 @@ class CommonPerformanceDatesReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenAllHoldingsAreValid() {
-    Holding holding = new Holding(
+    PortfolioHolding holding = new PortfolioHolding(
         BigDecimal.TEN,
         FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));

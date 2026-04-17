@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -46,7 +46,7 @@ class CreditQualityMapperTest {
     smsResponse.setAverageCreditQualityRating("A");
     smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
 
-    Holding holding = createHolding("AGG.US");
+    PortfolioHolding holding = createHolding("AGG.US");
 
     CreditQuality result = mapper.map(smsResponse, holding);
 
@@ -65,7 +65,7 @@ class CreditQualityMapperTest {
   @ParameterizedTest
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyRatings_whenResponseIsNullOrHasNoRatings(CreditQualityRatings smsResponse) {
-    Holding holding = createHolding("TEST.ID");
+    PortfolioHolding holding = createHolding("TEST.ID");
 
     CreditQuality result = mapper.map(smsResponse, holding);
 
@@ -159,7 +159,7 @@ class CreditQualityMapperTest {
     return new CreditQualityRatingTypeValue(rating.name(), new BigDecimal(value), List.of());
   }
 
-  private Holding createHolding(String securityId) {
-    return new Holding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
+  private PortfolioHolding createHolding(String securityId) {
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
   }
 }

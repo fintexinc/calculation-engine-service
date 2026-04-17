@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -33,7 +33,7 @@ class EquityStyleboxExposureMapperTest {
         new StyleBoxValue(StyleBoxType.MID_GROWTH, new BigDecimal("3.8"))));
     styleBoxes.setDataProvider(DataProvider.MORNINGSTAR);
 
-    Holding holding = createHolding("XIU.TO", FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding holding = createHolding("XIU.TO", FinancialInstrumentType.ETF_CANADA);
 
     EquityStyleboxExposure result = mapper.map(styleBoxes, holding);
 
@@ -49,7 +49,7 @@ class EquityStyleboxExposureMapperTest {
   @ParameterizedTest
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyBoxValues_whenResponseIsNullOrHasNoBoxValues(StyleBoxes smsResponse) {
-    Holding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
+    PortfolioHolding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
 
     EquityStyleboxExposure result = mapper.map(smsResponse, holding);
 
@@ -117,9 +117,9 @@ class EquityStyleboxExposureMapperTest {
     assertThat(result.getBoxValues().get(StyleBoxType.SMALL_GROWTH)).isEqualByComparingTo("1.5");
   }
 
-  private Holding createHolding(String securityId, FinancialInstrumentType holdingType) {
+  private PortfolioHolding createHolding(String securityId, FinancialInstrumentType holdingType) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new Holding(null, holdingType, identifier);
+    return new PortfolioHolding(null, holdingType, identifier);
   }
 }

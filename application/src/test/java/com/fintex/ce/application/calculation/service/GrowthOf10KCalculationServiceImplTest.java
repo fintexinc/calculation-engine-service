@@ -5,7 +5,7 @@ import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.model.domain.calculation.DateRange;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.ReturnCommand;
@@ -41,7 +41,7 @@ class GrowthOf10KCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService));
 
     final var returnReqDTO = mock(ReturnCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var calculationDTO = mock(CalculationDTO.class);
     final var calculation = mock(Growth10KCalculation.class);
 
@@ -63,7 +63,7 @@ class GrowthOf10KCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService));
 
     final var returnReqDTO = mock(ReturnCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     when(returnReqDTO.getHoldings()).thenReturn(holdings);
     when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
     when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
@@ -91,7 +91,7 @@ class GrowthOf10KCalculationServiceImplTest {
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<PortfolioHolding> holdings = List.of(mock(PortfolioHolding.class));
 
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturnsAggregate);
@@ -118,7 +118,7 @@ class GrowthOf10KCalculationServiceImplTest {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
 
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
@@ -147,7 +147,7 @@ class GrowthOf10KCalculationServiceImplTest {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
     final var warnings = List.of(mock(Warning.class));
 
@@ -179,7 +179,7 @@ class GrowthOf10KCalculationServiceImplTest {
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturnsAggregate);
@@ -205,7 +205,7 @@ class GrowthOf10KCalculationServiceImplTest {
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturnsAggregate);

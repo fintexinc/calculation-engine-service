@@ -4,7 +4,7 @@ import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.error.Warning;
 
@@ -51,7 +51,8 @@ public class AssetAllocationResponseMapper implements ResponseMapper<HoldingAsse
   }
 
   @Override
-  public AssetAllocationResult toResponse(Map<Holding, HoldingAssetAllocation> domainMap, List<Warning> warnings) {
+  public AssetAllocationResult toResponse(Map<PortfolioHolding, HoldingAssetAllocation> domainMap,
+      List<Warning> warnings) {
     // This method would need aggregation logic - delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for HoldingAssetAllocation");
   }

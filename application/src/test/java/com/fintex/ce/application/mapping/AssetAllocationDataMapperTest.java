@@ -6,7 +6,7 @@ import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
@@ -32,22 +32,22 @@ class AssetAllocationDataMapperTest {
     // SETUP
     final var sut = mock(AssetAllocationDataMapper.class);
 
-    final Holding etfUs = mock(Holding.class);
-    final Holding canadaPooledFundHolding = mock(Holding.class);
-    final Holding canadaHedgeFundHolding = mock(Holding.class);
-    final Holding usMutualFundHolding = mock(Holding.class);
-    final Holding fixedIncomeHolding = mock(Holding.class);
-    final Holding smaHolding = mock(Holding.class);
-    final Holding etfCanada = mock(Holding.class);
-    final Holding fundSeriesHolding = mock(Holding.class);
-    final Holding benchmarkIndexHolding = mock(Holding.class);
+    final PortfolioHolding etfUs = mock(PortfolioHolding.class);
+    final PortfolioHolding canadaPooledFundHolding = mock(PortfolioHolding.class);
+    final PortfolioHolding canadaHedgeFundHolding = mock(PortfolioHolding.class);
+    final PortfolioHolding usMutualFundHolding = mock(PortfolioHolding.class);
+    final PortfolioHolding fixedIncomeHolding = mock(PortfolioHolding.class);
+    final PortfolioHolding smaHolding = mock(PortfolioHolding.class);
+    final PortfolioHolding etfCanada = mock(PortfolioHolding.class);
+    final PortfolioHolding fundSeriesHolding = mock(PortfolioHolding.class);
+    final PortfolioHolding benchmarkIndexHolding = mock(PortfolioHolding.class);
     final CashHolding cashHolding = CashHolding.builder().value(BigDecimal.valueOf(100_000_000)).holdingType(
         FinancialInstrumentType.CASH).build();
-    final Holding stocksHoldings = mock(Holding.class);
+    final PortfolioHolding stocksHoldings = mock(PortfolioHolding.class);
     final GicHolding gicHolding = GicHolding.builder().value(BigDecimal.valueOf(1)).holdingType(
         FinancialInstrumentType.GIC)
         .term(GREATER_THAN_YEAR).build();
-    final Map<Holding, HoldingAssetAllocation> etfCanadaAssetAllocation = new HashMap<>();
+    final Map<PortfolioHolding, HoldingAssetAllocation> etfCanadaAssetAllocation = new HashMap<>();
     final var rAssetAllocationForEtfCanada = new HoldingAssetAllocation().setHoldingType(
         FinancialInstrumentType.ETF_CANADA)
         .setAllocations(EMPTY_SORTED_MAP);
@@ -66,7 +66,7 @@ class AssetAllocationDataMapperTest {
     req.setFixedIncomeFdsResponse(getFdsResponse(fixedIncomeHolding));
     req.setSeparatelyManagedAccountFdsResponse(getFdsResponse(smaHolding));
 
-    final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> expected = getExpected(etfUs,
+    final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> expected = getExpected(etfUs,
         fundSeriesHolding,
         benchmarkIndexHolding, canadaPooledFundHolding, canadaHedgeFundHolding, usMutualFundHolding, fixedIncomeHolding,
         smaHolding);
@@ -87,14 +87,16 @@ class AssetAllocationDataMapperTest {
     ComparisonUtils.compareMaps(expected, actual);
   }
 
-  private HashMap<Holding, Map<AssetAllocationRegion, BigDecimal>> getExpected(final Holding... holdings) {
+  private HashMap<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> getExpected(
+      final PortfolioHolding... holdings) {
     return getExpectedAllocations(holdings);
   }
 
-  private HashMap<Holding, Map<AssetAllocationRegion, BigDecimal>> getExpectedAllocations(final Holding... holdings) {
-    final var result = new HashMap<Holding, Map<AssetAllocationRegion, BigDecimal>>();
+  private HashMap<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> getExpectedAllocations(
+      final PortfolioHolding... holdings) {
+    final var result = new HashMap<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>>();
 
-    for (final Holding holding : holdings) {
+    for (final PortfolioHolding holding : holdings) {
       final Map<AssetAllocationRegion, BigDecimal> assetAllocation = new HashMap<>();
       for (final AssetAllocationRegion region : AssetAllocationRegion.values()) {
         assetAllocation.put(region, BigDecimal.valueOf(region.ordinal()));
@@ -106,8 +108,8 @@ class AssetAllocationDataMapperTest {
     return result;
   }
 
-  private Map<Holding, HoldingAssetAllocation> getFdsResponse(final Holding holding) {
-    final var result = new HashMap<Holding, HoldingAssetAllocation>();
+  private Map<PortfolioHolding, HoldingAssetAllocation> getFdsResponse(final PortfolioHolding holding) {
+    final var result = new HashMap<PortfolioHolding, HoldingAssetAllocation>();
 
     final var assetAllocations = new HashMap<String, BigDecimal>();
     for (final var region : AssetAllocationRegion.values()) {
@@ -123,8 +125,8 @@ class AssetAllocationDataMapperTest {
     return result;
   }
 
-  private Map<Holding, Map<AssetAllocationRegion, BigDecimal>> getStocks(final Holding holding) {
-    final var result = new HashMap<Holding, Map<AssetAllocationRegion, BigDecimal>>();
+  private Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> getStocks(final PortfolioHolding holding) {
+    final var result = new HashMap<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>>();
 
     final var assetAllocations = new HashMap<AssetAllocationRegion, BigDecimal>();
     for (final var region : AssetAllocationRegion.values()) {

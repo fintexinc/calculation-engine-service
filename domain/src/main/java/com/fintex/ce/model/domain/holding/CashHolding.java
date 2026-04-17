@@ -17,7 +17,7 @@ import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalEquals;
 @ToString(callSuper = true)
 @SuperBuilder(toBuilder = true)
 @Jacksonized
-public class CashHolding extends Holding implements MonthlyReturnGeneratableHolding {
+public class CashHolding extends PortfolioHolding implements MonthlyReturnGeneratableHolding {
 
   private final Currency currency;
   private final LocalDate investmentDate;

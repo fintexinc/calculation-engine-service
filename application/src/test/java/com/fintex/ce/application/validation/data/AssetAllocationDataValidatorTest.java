@@ -2,7 +2,7 @@ package com.fintex.ce.application.validation.data;
 
 import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.Warning;
 
 import org.junit.jupiter.api.Test;
@@ -69,10 +69,10 @@ class AssetAllocationDataValidatorTest {
     final var rAssetAllocation2 = mock(HoldingAssetAllocation.class);
     final var rAssetAllocation2Map = mock(Map.class);
     when(rAssetAllocation2.getAllocations()).thenReturn(rAssetAllocation2Map);
-    final var holding1 = mock(Holding.class);
-    final var holding2 = mock(Holding.class);
+    final var holding1 = mock(PortfolioHolding.class);
+    final var holding2 = mock(PortfolioHolding.class);
 
-    final var holdings = new HashMap<Holding, HoldingAssetAllocation>();
+    final var holdings = new HashMap<PortfolioHolding, HoldingAssetAllocation>();
     holdings.put(holding1, rAssetAllocation1);
     holdings.put(holding2, rAssetAllocation2);
 
@@ -92,7 +92,7 @@ class AssetAllocationDataValidatorTest {
     // SETUP
     final var sut = mock(AssetAllocationDataValidator.class);
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var assetAllocation = new HashMap<String, BigDecimal>();
     final var warnings = mock(List.class);
 
@@ -109,7 +109,7 @@ class AssetAllocationDataValidatorTest {
     // SETUP
     final var sut = mock(AssetAllocationDataValidator.class);
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var assetAllocation = new HashMap<String, BigDecimal>();
     assetAllocation.put("AssetAllocationRegionThatDoesn'tExists", BigDecimal.TEN);
     assetAllocation.put("AssetAllocationRegionThatDoesn'tExists Either", BigDecimal.ONE);
@@ -129,7 +129,7 @@ class AssetAllocationDataValidatorTest {
     // SETUP
     final var sut = mock(AssetAllocationDataValidator.class);
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var warnings = new ArrayList<Warning>();
 
     when(holding.getIdsString()).thenReturn("generateUserIdentifier");

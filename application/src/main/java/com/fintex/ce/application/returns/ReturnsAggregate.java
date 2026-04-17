@@ -7,7 +7,7 @@ import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.returns.HistoricalNavPrices;
 import com.fintex.ce.model.domain.calculation.returns.ReturnsData;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.HttpCode;
@@ -46,8 +46,8 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 public class ReturnsAggregate<T extends ReturnsData> {
   public Notification notification = new Notification();
-  public Map<Holding, Currency> holdingCurrencyMap;
-  public Map<Holding, TreeMap<LocalDate, BigDecimal>> returnsMap;
+  public Map<PortfolioHolding, Currency> holdingCurrencyMap;
+  public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returnsMap;
   @Getter
   public LocalDate ped;
   @Getter
@@ -64,7 +64,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
   public ReturnsAggregate() {
   }
 
-  public ReturnsAggregate(Map<Holding, T> originalMonthlyReturns) {
+  public ReturnsAggregate(Map<PortfolioHolding, T> originalMonthlyReturns) {
     inCaseOfAnyErrorInReturnsThrowAnException(originalMonthlyReturns);
     this.holdingCurrencyMap = retrieveHoldingCurrencies(originalMonthlyReturns);
     this.returnsMap = retrieveReturns(originalMonthlyReturns);
@@ -72,7 +72,8 @@ public class ReturnsAggregate<T extends ReturnsData> {
     validateReturns();
   }
 
-  public static ReturnsAggregate<HistoricalNavPrices> initForNavPrices(Map<Holding, HistoricalNavPrices> returns) {
+  public static ReturnsAggregate<HistoricalNavPrices> initForNavPrices(
+      Map<PortfolioHolding, HistoricalNavPrices> returns) {
     var result = new ReturnsAggregate<HistoricalNavPrices>();
     result.returnsMap = result.retrieveReturns(returns);
     result.findPedAndPsd();
@@ -86,7 +87,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public static <T extends ReturnsData> ReturnsAggregate<T> initOnlyWithReturnsDataValidation(
-      Map<Holding, T> originalMonthlyReturns) {
+      Map<PortfolioHolding, T> originalMonthlyReturns) {
     var result = new ReturnsAggregate<T>();
     inCaseOfMonthlyReturnsErrorsThrowAnException(originalMonthlyReturns);
     result.returnsMap = result.retrieveReturns(originalMonthlyReturns);
@@ -97,7 +98,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   private static <T extends ReturnsData> void inCaseOfMonthlyReturnsErrorsThrowAnException(
-      Map<Holding, T> originalMonthlyReturns) {
+      Map<PortfolioHolding, T> originalMonthlyReturns) {
     var notification = new Notification();
     originalMonthlyReturns.values()
         .stream()
@@ -107,7 +108,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
     notification.ifAnyNonAllowedErrorThrowException(List.of(ERR_RRC_MR_002, ERR_RRC_MMR_001, ERR_FDS_MC_002));
   }
 
-  private void inCaseOfAnyErrorInReturnsThrowAnException(Map<Holding, T> originalMonthlyReturns) {
+  private void inCaseOfAnyErrorInReturnsThrowAnException(Map<PortfolioHolding, T> originalMonthlyReturns) {
     originalMonthlyReturns.values()
         .forEach(returns -> notification.addErrors(convertToDataErrorExceptions(returns.getErrors())));
     ifAnyErrorsThrowException();
@@ -214,13 +215,13 @@ public class ReturnsAggregate<T extends ReturnsData> {
     return this;
   }
 
-  public ReturnsAggregate<T> validateAndUpdateCpsdAndCped(final Map<Holding, HistoricalNavPrices> navData,
+  public ReturnsAggregate<T> validateAndUpdateCpsdAndCped(final Map<PortfolioHolding, HistoricalNavPrices> navData,
       final DailyPerformanceCommand reqDTO) {
     validateEarliestAndLatestAvailableDate(navData, reqDTO);
     return this;
   }
 
-  public void validateEarliestAndLatestAvailableDate(final Map<Holding, HistoricalNavPrices> navData,
+  public void validateEarliestAndLatestAvailableDate(final Map<PortfolioHolding, HistoricalNavPrices> navData,
       final DailyPerformanceCommand reqDTO) {
     final LocalDate startDate = getStartDate(reqDTO);
     final LocalDate endDate = getEndDate(reqDTO);
@@ -294,12 +295,12 @@ public class ReturnsAggregate<T extends ReturnsData> {
     return endDate;
   }
 
-  public Map<Holding, TreeMap<LocalDate, BigDecimal>> getReturnsMap() {
+  public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> getReturnsMap() {
     return returnsMap.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> MapUtils.copyTreeMap(entry
         .getValue(), TreeMap::new)));
   }
 
-  public Map<Holding, TreeMap<LocalDate, BigDecimal>> getOriginalReturns() {
+  public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> getOriginalReturns() {
     return returnsMap;
   }
 
@@ -311,7 +312,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
         .max(LocalDate::compareTo).orElse(null);
   }
 
-  public LocalDate findPed(Map<Holding, TreeMap<LocalDate, BigDecimal>> monthlyReturns) {
+  public LocalDate findPed(Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> monthlyReturns) {
     return monthlyReturns.values()
         .stream()
         .map(e -> e.keySet().stream().max(LocalDate::compareTo))
@@ -323,8 +324,8 @@ public class ReturnsAggregate<T extends ReturnsData> {
     return findPed(this.returnsMap);
   }
 
-  public Map<Holding, Currency> retrieveHoldingCurrencies(Map<Holding, T> originalMReturns) {
-    Map<Boolean, Map<Holding, T>> partitionedHoldings = originalMReturns.entrySet()
+  public Map<PortfolioHolding, Currency> retrieveHoldingCurrencies(Map<PortfolioHolding, T> originalMReturns) {
+    Map<Boolean, Map<PortfolioHolding, T>> partitionedHoldings = originalMReturns.entrySet()
         .stream()
         .collect(Collectors.partitioningBy(e -> Objects.nonNull(getCurrency(e)), Collectors.toMap(
             Map.Entry::getKey,
@@ -335,12 +336,13 @@ public class ReturnsAggregate<T extends ReturnsData> {
         .collect(HashMap::new, (m, entry) -> m.put(entry.getKey(), getCurrency(entry)), HashMap::putAll);
   }
 
-  private Currency getCurrency(Map.Entry<Holding, T> e) {
+  private Currency getCurrency(Map.Entry<PortfolioHolding, T> e) {
     String currency = e.getValue().getCurrency();
     return Currency.fromValueOrNull(currency);
   }
 
-  public Map<Holding, TreeMap<LocalDate, BigDecimal>> retrieveReturns(Map<Holding, T> originalMReturns) {
+  public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> retrieveReturns(
+      Map<PortfolioHolding, T> originalMReturns) {
     return originalMReturns.entrySet()
         .stream()
         .filter(k -> Objects.nonNull(k.getValue().getReturns()))
@@ -354,13 +356,14 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public ReturnsAggregate<T> validateReturns() {
-    Map<LocalDate, List<Map.Entry<Holding, TreeMap<LocalDate, BigDecimal>>>> startDateEntriesMap = returnsMap.entrySet()
+    Map<LocalDate, List<Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>>> startDateEntriesMap = returnsMap
+        .entrySet()
         .stream()
         .collect(groupingBy(e -> e.getValue().firstKey(), toList()));
     if (Objects.nonNull(psd) && Objects.nonNull(ped)) {
       while (psd.isAfter(ped)) {
         var entries = startDateEntriesMap.get(psd);
-        for (Map.Entry<Holding, TreeMap<LocalDate, BigDecimal>> entry : entries) {
+        for (Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> entry : entries) {
           notification.addError(ERR_RRC_MR_002.error(entry.getKey()));
           returnsMap.remove(entry.getKey());
         }
@@ -371,7 +374,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
     return this;
   }
 
-  public ReturnsAggregate<T> validateMonthlyDataMissing(final Map<Holding, HistoricalNavPrices> navData,
+  public ReturnsAggregate<T> validateMonthlyDataMissing(final Map<PortfolioHolding, HistoricalNavPrices> navData,
       final DailyPerformanceCommand reqDTO) {
     final long holdingsWithPacOrWithdrawals = reqDTO.getDailyHoldings().stream()
         .filter(dh -> (!dh.getWithdrawal().equals(BigDecimal.ZERO) && !dh.getPac().equals(BigDecimal.ZERO)))

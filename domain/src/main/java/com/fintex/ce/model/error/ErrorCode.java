@@ -1,6 +1,6 @@
 package com.fintex.ce.model.error;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.exceptions.DataErrorException;
 import com.fintex.ce.model.error.exceptions.ReqValidationException;
 
@@ -98,8 +98,8 @@ public enum ErrorCode {
   ERR_RRC_CNOB_001("Custom number of bins must be greater than 5"),
   ERR_RRC_CNOB_002("Custom number of bins must be less than 30"),
 
-  ERR_RRC_MR_001("Holding does not contain latest monthly return. Missing timeframe: %s to %s"),
-  ERR_RRC_MR_002("Holding performance start date is not within common performance date range."),
+  ERR_RRC_MR_001("PortfolioHolding does not contain latest monthly return. Missing timeframe: %s to %s"),
+  ERR_RRC_MR_002("PortfolioHolding performance start date is not within common performance date range."),
 
   ERR_ALL_GTZ_001("Holdings values must be greater than or equal to 0 and must not be null."),
 
@@ -130,15 +130,15 @@ public enum ErrorCode {
     this.message = message;
   }
 
-  public Warning warning(Holding h) {
+  public Warning warning(PortfolioHolding h) {
     return new Warning(h.getIdsString(), this.message, this.name());
   }
 
-  public Warning warning(Holding h, String param1, String param2) {
+  public Warning warning(PortfolioHolding h, String param1, String param2) {
     return new Warning(h.getIdsString(), String.format(this.message, param1, param2), this.name());
   }
 
-  public DataErrorException error(Holding h) {
+  public DataErrorException error(PortfolioHolding h) {
     return new DataErrorException(this.message, h.getIdsString(), this);
   }
 
@@ -154,11 +154,11 @@ public enum ErrorCode {
     return new DataErrorException(String.format(this.message), id, this);
   }
 
-  public DataErrorException error(Holding h, String param1, String param2) {
+  public DataErrorException error(PortfolioHolding h, String param1, String param2) {
     return new DataErrorException(String.format(this.message, param1, param2), h.getIdsString(), this);
   }
 
-  public DataErrorException error(Holding h, Object param1) {
+  public DataErrorException error(PortfolioHolding h, Object param1) {
     return new DataErrorException(String.format(this.message, param1), h.getIdsString(), this);
   }
 

@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.rest.validation.validators;
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
@@ -51,7 +51,7 @@ public class TopCommonHoldingsReqValidator implements RequestValidator {
     }
   }
 
-  private boolean checkGicHoldingName(List<Holding> holdings) {
+  private boolean checkGicHoldingName(List<PortfolioHolding> holdings) {
     List<GicHolding> gicHoldings = filterHoldings(holdings, GIC_PREDICATE);
     long holdingsWithoutName = gicHoldings.stream()
         .filter(h -> Objects.isNull(h.getName()) || h.getName().isEmpty())

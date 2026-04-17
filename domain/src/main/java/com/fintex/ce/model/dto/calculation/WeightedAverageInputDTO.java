@@ -3,7 +3,7 @@ package com.fintex.ce.model.dto.calculation;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.enumeration.Rebalanced;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import java.math.BigDecimal;
@@ -23,9 +23,9 @@ public class WeightedAverageInputDTO {
   private Rebalanced rebalanced;
   private DateRange dateRange;
 
-  private Map<Holding, Currency> holdings;
+  private Map<PortfolioHolding, Currency> holdings;
 
-  private Map<Holding, Map<LocalDate, BigDecimal>> portfolioReturns;
+  private Map<PortfolioHolding, Map<LocalDate, BigDecimal>> portfolioReturns;
   private Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates;
 
   private Currency currency;

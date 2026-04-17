@@ -5,7 +5,7 @@ import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityGeographicExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
@@ -56,7 +56,7 @@ public class EquityGeographicExposureCalculationServiceImpl
 
   @Override
   public EquityGeographicExposureResult calculate(ExposureDataHolder<GeographicRegionType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (areAllValuesInMapEmpty(exposures)) {
@@ -77,11 +77,11 @@ public class EquityGeographicExposureCalculationServiceImpl
   @Override
   public ExposureDataHolder<GeographicRegionType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
     List<Warning> warnings = new ArrayList<>();
-    Map<Holding, EquityCountryAllocation> rawData = equityCountryAllocationSecurityDataFetcher.fetch(
+    Map<PortfolioHolding, EquityCountryAllocation> rawData = equityCountryAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    Map<Holding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
+    Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
-    Map<Holding, Map<GeographicRegionType, BigDecimal>> allocations = geographicAllocationMappingService
+    Map<PortfolioHolding, Map<GeographicRegionType, BigDecimal>> allocations = geographicAllocationMappingService
         .mapToGeographicRegions(mappedHoldings, warnings, WRN_RRC_EGE_001);
     return new ExposureDataHolder<>(allocations, warnings);
   }

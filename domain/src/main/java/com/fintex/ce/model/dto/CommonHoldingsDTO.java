@@ -1,7 +1,7 @@
 package com.fintex.ce.model.dto;
 
 import com.fintex.ce.model.domain.calculation.holding.HoldingAggregator;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,7 +27,7 @@ public class CommonHoldingsDTO {
   private String ticker;
   private String exchangeCode;
 
-  private Holding holding;
+  private PortfolioHolding holding;
   private BigDecimal weight;
 
   // This field is using only for identifying GIC holdings, as it is possible that all parameters of GIC are equals but

@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatings;
 
@@ -27,7 +27,7 @@ public class CreditQualityMapper
       .collect(Collectors.toMap(e -> e.name().toUpperCase(), e -> e));
 
   @Override
-  public CreditQuality map(CreditQualityRatings smsResponse, Holding holding) {
+  public CreditQuality map(CreditQualityRatings smsResponse, PortfolioHolding holding) {
     Map<CreditQualityRatingType, BigDecimal> ratings = Optional.ofNullable(smsResponse)
         .map(CreditQualityRatings::getRatings)
         .orElse(List.of())

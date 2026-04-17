@@ -5,7 +5,7 @@ import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -67,14 +67,14 @@ class AssetAllocationEMServiceImplTest {
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
-    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(h, cRegions);
+    Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(h, cRegions);
 
     final Map<AssetAllocationRegion, BigDecimal> aRegions = Map.of(
         CANADIAN_EQUITIES, BigDecimal.valueOf(3),
         CASH, BigDecimal.valueOf(3));
-    final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations = Map.of(h, aRegions);
+    final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations = Map.of(h, aRegions);
 
     doCallRealMethod().when(service).calculateEquityDiff(any(), any(), any(), any());
     // ACT
@@ -91,15 +91,15 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
-    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding(null,
+    Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new PortfolioHolding(null,
         FinancialInstrumentType.CASH, null), cRegions);
 
     final Map<AssetAllocationRegion, BigDecimal> aRegions = Map.of(
         CANADIAN_EQUITIES, BigDecimal.valueOf(3),
         CASH, BigDecimal.valueOf(3));
-    final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations = Map.of(h, aRegions);
+    final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations = Map.of(h, aRegions);
 
     doCallRealMethod().when(a).calculateEquityDiff(any(), any(), any(), any());
     // ACT
@@ -114,20 +114,20 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<CountryRegionType, BigDecimal> cRegions = Map.of(CountryRegionType.EMERGING_MARKET, TEN);
-    Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new Holding(null,
+    Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocations = Map.of(new PortfolioHolding(null,
         FinancialInstrumentType.CASH, null), cRegions);
 
     final Map<AssetAllocationRegion, BigDecimal> aRegions = Map.of(
         CANADIAN_EQUITIES, BigDecimal.valueOf(3),
         CASH, BigDecimal.valueOf(3));
-    final Map<Holding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations = Map.of(h, aRegions);
+    final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations = Map.of(h, aRegions);
 
     doCallRealMethod().when(a).calculateEquityDiff(any(), any(), any(), any());
     doCallRealMethod().when(a).calculateEquityDifference(any(), any(), any());
     // ACT
-    final Map<Holding, BigDecimal> actual = a.calculateEquityDifference(List.of(h), countryAllocations,
+    final Map<PortfolioHolding, BigDecimal> actual = a.calculateEquityDifference(List.of(h), countryAllocations,
         assetAllocations);
 
     // VERIFY
@@ -145,10 +145,10 @@ class AssetAllocationEMServiceImplTest {
     final AssetAllocationEMServiceImpl a = new AssetAllocationEMServiceImpl(null, null, null, null,
         DEFAULT_DATA_PROPERTIES);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, BigDecimal.valueOf(40));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     // ACT
     final BigDecimal actual = a.emForInternationalEquity(h, countryAllocations, equityDifference);
@@ -162,7 +162,7 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         CASH, expected,
@@ -170,7 +170,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
         BigDecimal.valueOf(40));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -187,7 +187,7 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         FIXED_INCOME, expected,
@@ -195,7 +195,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
         BigDecimal.valueOf(40));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -212,7 +212,7 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         CANADIAN_EQUITIES, BigDecimal.valueOf(99),
@@ -220,7 +220,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
         CountryRegionType.CANADA, expected);
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -237,7 +237,7 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         US_EQUITIES, BigDecimal.valueOf(99),
@@ -245,7 +245,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
         CountryRegionType.UNITED_STATES, expected);
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -262,7 +262,7 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         US_EQUITIES, expected,
@@ -270,7 +270,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
         BigDecimal.valueOf(40));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -286,14 +286,14 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final var service = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = TEN;
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, BigDecimal.valueOf(11),
         US_EQUITIES, BigDecimal.valueOf(100));
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, BigDecimal.valueOf(40),
         CountryRegionType.CANADA, expected);
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -309,12 +309,12 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final var service = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, BigDecimal.valueOf(6),
         US_EQUITIES, TEN);
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
         BigDecimal.valueOf(40));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -330,14 +330,14 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final var service = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = TEN;
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, BigDecimal.valueOf(11),
         US_EQUITIES, BigDecimal.valueOf(100));
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, BigDecimal.valueOf(40),
         CountryRegionType.UNITED_STATES, expected);
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -353,12 +353,12 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final var service = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(CANADIAN_EQUITIES, TEN,
         US_EQUITIES, BigDecimal.valueOf(6));
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED,
         BigDecimal.valueOf(40));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(service).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -374,7 +374,7 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         EM_EQUITIES, BigDecimal.valueOf(99),
@@ -382,7 +382,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(
         CountryRegionType.EMERGING_MARKET, expected);
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -399,14 +399,14 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         EM_EQUITIES, BigDecimal.valueOf(7),
         ASIA_PACIFIC_EQUITIES, TEN);
 
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.EMERGING_MARKET, expected);
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -423,7 +423,7 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final BigDecimal expected = BigDecimal.valueOf(6);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         OTHER, expected,
@@ -431,7 +431,7 @@ class AssetAllocationEMServiceImplTest {
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.EMERGING_MARKET, BigDecimal
         .valueOf(3));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     doCallRealMethod().when(a).getEmergingMarketValue(any(), any(), any(), any(), any());
     // ACT
@@ -450,7 +450,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocations = Map.<AssetAllocationRegion, BigDecimal>of(UNCLASSIFIED, expected);
 
     // ACT
-    final BigDecimal actual = a.getEmergingMarketValue(mock(Holding.class), assetAllocations, null, null,
+    final BigDecimal actual = a.getEmergingMarketValue(mock(PortfolioHolding.class), assetAllocations, null, null,
         AssetAllocationRegionEmType.UNCLASSIFIED);
 
     // VERIFY
@@ -477,14 +477,14 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         OTHER, BigDecimal.valueOf(6),
         ASIA_PACIFIC_EQUITIES, TEN);
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.EMERGING_MARKET, BigDecimal
         .valueOf(3));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     when(a.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
 
@@ -515,14 +515,14 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final AssetAllocationEMServiceImpl a = mock(AssetAllocationEMServiceImpl.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         OTHER, BigDecimal.valueOf(6),
         ASIA_PACIFIC_EQUITIES, TEN);
 
     final Map<CountryRegionType, BigDecimal> countryAllocations = Map.of(CountryRegionType.EMERGING_MARKET, BigDecimal
         .valueOf(3));
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
 
     when(a.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
 
@@ -559,7 +559,7 @@ class AssetAllocationEMServiceImplTest {
 
     final var providers = mock(List.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         OTHER, BigDecimal.valueOf(6),
         ASIA_PACIFIC_EQUITIES, TEN);
@@ -588,14 +588,14 @@ class AssetAllocationEMServiceImplTest {
 
     final var providers = mock(List.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         OTHER, BigDecimal.valueOf(6),
         ASIA_PACIFIC_EQUITIES, TEN);
 
     when(service.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
 
-    final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = Map.of(h, Map.of(
+    final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = Map.of(h, Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, ONE));
     when(countryAllocationMappingService.mapToCountryRegions(any(), any(), any())).thenReturn(
         countryAllocationsMap);
@@ -622,18 +622,18 @@ class AssetAllocationEMServiceImplTest {
 
     final var providers = mock(List.class);
 
-    final Holding h = mock(Holding.class);
+    final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<AssetAllocationRegion, BigDecimal> assetAllocations = Map.of(
         OTHER, BigDecimal.valueOf(6),
         ASIA_PACIFIC_EQUITIES, TEN);
 
     when(service.getEmergingMarketValue(any(), any(), any(), any(), any())).thenReturn(ONE);
 
-    final Map<Holding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = Map.of(h, Map.of(
+    final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = Map.of(h, Map.of(
         CountryRegionType.INTERNATIONAL_DEVELOPED, ONE));
     when(countryAllocationMappingService.mapToCountryRegions(any(), any(), any())).thenReturn(
         countryAllocationsMap);
-    final Map<Holding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
+    final Map<PortfolioHolding, BigDecimal> equityDifference = Map.of(h, BigDecimal.valueOf(5));
     when(service.calculateEquityDifference(any(), any(), any())).thenReturn(equityDifference);
 
     doCallRealMethod().when(service).calculateAssetAllocationEMarketMap(any(), any(), anyList());
@@ -657,7 +657,7 @@ class AssetAllocationEMServiceImplTest {
         assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final PortfolioHoldingsCommand reqDto = mock(PortfolioHoldingsCommand.class);
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<PortfolioHolding> holdings = List.of(mock(PortfolioHolding.class));
     when(reqDto.getHoldings()).thenReturn(holdings);
     when(service.fetchExposures(any())).thenReturn(new ExposureDataHolder<>(Map.of(), List.of()));
 
@@ -681,7 +681,7 @@ class AssetAllocationEMServiceImplTest {
           countryAllocationFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
       when(service.calculateAssetAllocationEMarketMap(any(), any(), anyList())).thenReturn(new ExposureDataHolder<>(
           exposures, List.of()));
@@ -788,7 +788,7 @@ class AssetAllocationEMServiceImplTest {
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
     final var providers = List.of(DataProvider.MORNINGSTAR);
@@ -818,7 +818,7 @@ class AssetAllocationEMServiceImplTest {
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final Map assetAllocations = mock(Map.class);
     final PortfolioHoldingsCommand portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
@@ -852,7 +852,7 @@ class AssetAllocationEMServiceImplTest {
           countryAllocationFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final Map assetAllocations = mock(Map.class);
       final var providers = mock(List.class);
       final PortfolioHoldingsCommand portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
@@ -878,7 +878,7 @@ class AssetAllocationEMServiceImplTest {
     // SETUP
     final var service = mock(AssetAllocationEMServiceImpl.class);
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
     doCallRealMethod().when(service).calculate(any(), any());
@@ -898,7 +898,7 @@ class AssetAllocationEMServiceImplTest {
       // SETUP
       final var service = mock(AssetAllocationEMServiceImpl.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.FIXED_INCOME, TEN));
       final var netProducts = mock(Map.class);

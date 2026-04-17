@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -68,10 +68,10 @@ class SalesChargeTypeMapperTest {
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
-  private Holding createHolding(String securityId) {
+  private PortfolioHolding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return Holding.builder()
+    return PortfolioHolding.builder()
         .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
         .securityIdentifier(identifier)
         .build();

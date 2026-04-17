@@ -1,6 +1,6 @@
 package com.fintex.ce.model.dto.calculation;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import java.math.BigDecimal;
@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class BenchmarkWeightedAverageDTO extends WeightedAverageInputDTO {
 
-  private Map<Holding, Map<LocalDate, BigDecimal>> benchmarkMonthlyReturns;
-  private Map<Holding, Currency> benchmarks;
+  private Map<PortfolioHolding, Map<LocalDate, BigDecimal>> benchmarkMonthlyReturns;
+  private Map<PortfolioHolding, Currency> benchmarks;
 
 }

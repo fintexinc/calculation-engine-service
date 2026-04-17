@@ -8,7 +8,7 @@ import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
@@ -66,7 +66,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
 
   @Override
   public ExposureDataHolder<FixedIncomeSecuritiesAllocationType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
-    Map<Holding, FixedIncomeBondSecurities> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
+    Map<PortfolioHolding, FixedIncomeBondSecurities> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         FixedIncomeBondSecurities::getFixedIncomeBondSectors,
@@ -83,12 +83,12 @@ public class FixedIncomeBondSectorCalculationServiceImpl
 
   @Override
   public FixedIncomeSectorResult calculate(ExposureDataHolder<FixedIncomeSecuritiesAllocationType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     return calculate(exposureData, holdings, defaultDataProperties.getDataProviders());
   }
 
   private FixedIncomeSectorResult calculate(ExposureDataHolder<FixedIncomeSecuritiesAllocationType> exposureData,
-      List<Holding> holdings, List<DataProvider> dataProviders) {
+      List<PortfolioHolding> holdings, List<DataProvider> dataProviders) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
@@ -98,16 +98,16 @@ public class FixedIncomeBondSectorCalculationServiceImpl
       return defaultResult;
     }
 
-    Map<Holding, BigDecimal> fixedIncomePlusCash = getFixedIncomePlusCash(holdings, warnings, dataProviders);
+    Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash = getFixedIncomePlusCash(holdings, warnings, dataProviders);
 
     FixedIncomeBondSectorCalculation calculation = new FixedIncomeBondSectorCalculation(exposures, holdings, warnings,
         fixedIncomePlusCash);
     return calculation.calculate();
   }
 
-  private Map<Holding, BigDecimal> getFixedIncomePlusCash(final List<Holding> holdings,
+  private Map<PortfolioHolding, BigDecimal> getFixedIncomePlusCash(final List<PortfolioHolding> holdings,
       final List<Warning> warnings, final List<DataProvider> dataProviders) {
-    final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
+    final Map<PortfolioHolding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         holdings, dataProviders);
     var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
     return assetAllocations.entrySet()
@@ -115,7 +115,8 @@ public class FixedIncomeBondSectorCalculationServiceImpl
         .collect(toMap(Map.Entry::getKey, this::getFixedIncomePlusCashValue));
   }
 
-  private BigDecimal getFixedIncomePlusCashValue(Map.Entry<Holding, Map<AssetAllocationRegion, BigDecimal>> entry) {
+  private BigDecimal getFixedIncomePlusCashValue(
+      Map.Entry<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> entry) {
     BigDecimal fixedIncome = entry.getValue().getOrDefault(FIXED_INCOME, ZERO);
     BigDecimal cash = entry.getValue().getOrDefault(CASH, ZERO);
     return fixedIncome.add(cash);

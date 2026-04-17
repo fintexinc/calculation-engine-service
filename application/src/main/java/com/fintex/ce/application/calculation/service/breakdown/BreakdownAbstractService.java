@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.breakdown;
 
 import com.fintex.ce.calculation.BreakdownCalculationService;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.WarningResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.util.ExposureDataHolder;
@@ -28,7 +28,7 @@ public abstract class BreakdownAbstractService<E extends WarningResult, T>
   protected BreakdownAbstractService() {
   }
 
-  public abstract E calculate(ExposureDataHolder<T> exposureData, List<Holding> holdings);
+  public abstract E calculate(ExposureDataHolder<T> exposureData, List<PortfolioHolding> holdings);
 
   /**
    * Fetches exposure data for holdings. Returns an immutable result containing both the mapped allocations and any
@@ -53,11 +53,11 @@ public abstract class BreakdownAbstractService<E extends WarningResult, T>
    *          an array with the types for which net products should be calculated
    * @return calculate net product
    */
-  public Map<T, BigDecimal> calculateNetProducts(final Map<Holding, Map<T, BigDecimal>> values,
-      final List<Holding> holdings,
+  public Map<T, BigDecimal> calculateNetProducts(final Map<PortfolioHolding, Map<T, BigDecimal>> values,
+      final List<PortfolioHolding> holdings,
       final T[] types) {
     final Map<T, BigDecimal> products = new HashMap<>();
-    final Map<Holding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
+    final Map<PortfolioHolding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
     for (T type : types) {
       final BigDecimal product = calculateNetProduct(type, values, weights);
       products.put(type, product);
@@ -77,9 +77,9 @@ public abstract class BreakdownAbstractService<E extends WarningResult, T>
    * @return calculate net product
    */
   public BigDecimal calculateNetProduct(final T type,
-      final Map<Holding, Map<T, BigDecimal>> values,
-      final Map<Holding, BigDecimal> weights) {
-    final Map<Holding, BigDecimal> typeExposures = values.entrySet()
+      final Map<PortfolioHolding, Map<T, BigDecimal>> values,
+      final Map<PortfolioHolding, BigDecimal> weights) {
+    final Map<PortfolioHolding, BigDecimal> typeExposures = values.entrySet()
         .stream()
         .filter(e -> e.getValue().containsKey(type))
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().get(type)));

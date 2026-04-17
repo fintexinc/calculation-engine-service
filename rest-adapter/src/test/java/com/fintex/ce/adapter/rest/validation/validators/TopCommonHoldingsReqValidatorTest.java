@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.model.error.exceptions.ReqValidationException;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -106,8 +106,8 @@ class TopCommonHoldingsReqValidatorTest {
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
 
-  private Holding createHolding(String id) {
-    return new Holding(
+  private PortfolioHolding createHolding(String id) {
+    return new PortfolioHolding(
         BigDecimal.TEN,
         FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier(id, FiIdentifierType.TICKER));

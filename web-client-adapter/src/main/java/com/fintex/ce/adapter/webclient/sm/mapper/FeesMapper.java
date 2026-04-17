@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
 import com.fintex.wm.commons.domain.financial.Fees;
@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 public class FeesMapper implements SecurityMasterResponseMapper<FeeData, Fees> {
 
   @Override
-  public FeeData map(Fees smsResponse, Holding holding) {
+  public FeeData map(Fees smsResponse, PortfolioHolding holding) {
     FeeData result = new FeeData()
         .setHoldingId(holding.getSecurityIdentifier().getId());
 

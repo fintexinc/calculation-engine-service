@@ -6,7 +6,7 @@ import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
@@ -51,7 +51,7 @@ public class CountryExposureCalculationImpl extends BreakdownAbstractService<Cou
 
   @Override
   public CountryExposureResult calculate(ExposureDataHolder<CountryRegionType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (areAllValuesInMapEmpty(exposures)) {
@@ -65,10 +65,11 @@ public class CountryExposureCalculationImpl extends BreakdownAbstractService<Cou
   @Override
   public ExposureDataHolder<CountryRegionType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
     List<Warning> warnings = new ArrayList<>();
-    Map<Holding, CountryExposure> rawData = countryExposureSecurityDataFetcher.fetch(reqDTO.getHoldings(), List.of());
-    Map<Holding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
+    Map<PortfolioHolding, CountryExposure> rawData = countryExposureSecurityDataFetcher.fetch(reqDTO.getHoldings(), List
+        .of());
+    Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
-    Map<Holding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService
+    Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService
         .mapToCountryRegions(mappedHoldings, warnings, WRN_FICQ_BCE_001);
     return new ExposureDataHolder<>(allocations, warnings);
   }

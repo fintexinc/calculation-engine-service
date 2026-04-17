@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.CalculationUtils;
@@ -36,7 +36,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
     final var service = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher, geographicAllocationMappingService));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var rawAllocation = new EquityCountryAllocation();
     rawAllocation.setAllocations(Map.of("CA", TEN));
     final var rawData = Map.of(holding, rawAllocation);
@@ -59,7 +59,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
       final var service = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(fetcher, geographicAllocationMappingService));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(GeographicRegionType.CANADA, TEN));
 
@@ -80,7 +80,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
       final var service = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(fetcher, geographicAllocationMappingService));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(GeographicRegionType.CANADA, TEN));
       final var netProducts = mock(Map.class);
@@ -105,7 +105,7 @@ class EquityGeographicExposureCalculationServiceImplTest {
       final var service = mock(EquityGeographicExposureCalculationServiceImpl.class, withSettings()
           .useConstructor(fetcher, geographicAllocationMappingService));
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(GeographicRegionType.CANADA, TEN));
       final var netProducts = mock(Map.class);

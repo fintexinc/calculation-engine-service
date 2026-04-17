@@ -1,7 +1,7 @@
 package com.fintex.ce.model.dto.command;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -29,9 +29,9 @@ public abstract class PortfolioCommand extends CalculationCommand
       BenchmarkHoldingsProvider {
 
   @Schema(description = "Portfolio holdings to calculate metrics for")
-  private List<Holding> holdings;
+  private List<PortfolioHolding> holdings;
   @Schema(description = "Benchmark holdings for relative performance calculations")
-  private List<Holding> benchmarkHoldings;
+  private List<PortfolioHolding> benchmarkHoldings;
   @NotNull(message = ErrorCode.Names.ERR_VAL_NN_001)
   @Schema(description = "Target currency for the calculation", example = "CAD")
   private Currency currency;

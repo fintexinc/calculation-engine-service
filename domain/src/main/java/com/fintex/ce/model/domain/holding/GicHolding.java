@@ -21,7 +21,7 @@ import static com.fintex.wm.commons.domain.currency.Currency.CAD;
 @ToString(callSuper = true)
 @SuperBuilder(toBuilder = true)
 @Jacksonized
-public class GicHolding extends Holding implements MonthlyReturnGeneratableHolding {
+public class GicHolding extends PortfolioHolding implements MonthlyReturnGeneratableHolding {
 
   public static final LocalDate DEFAULT_START_DATE = LocalDate.of(1954, 1, 31);
 
@@ -68,7 +68,7 @@ public class GicHolding extends Holding implements MonthlyReturnGeneratableHoldi
 
   @Override
   public String getIdsString() {
-    return getHoldingType() + Holding.DELIMITER + getCurrency() + Holding.DELIMITER + getValue();
+    return getHoldingType() + PortfolioHolding.DELIMITER + getCurrency() + PortfolioHolding.DELIMITER + getValue();
   }
 
   @Override

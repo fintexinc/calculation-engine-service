@@ -2,7 +2,7 @@ package com.fintex.ce.model.domain.calculation;
 
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.Warning;
 
 import java.math.BigDecimal;
@@ -16,18 +16,18 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class AssetAllocationDataDTO {
 
-  Map<Holding, HoldingAssetAllocation> etfUsFdsResponse;
-  Map<Holding, HoldingAssetAllocation> canadaPooledFundFdsResponse;
-  Map<Holding, HoldingAssetAllocation> canadaHedgeFundsFdsResponse;
-  Map<Holding, HoldingAssetAllocation> usFundsFdsResponse;
-  Map<Holding, HoldingAssetAllocation> etfCanadaFdsResponse;
-  Map<Holding, HoldingAssetAllocation> mutualFundFdsResponse;
-  Map<Holding, HoldingAssetAllocation> benchmarkIndexFdsResponse;
-  Map<Holding, HoldingAssetAllocation> fixedIncomeFdsResponse;
-  Map<Holding, HoldingAssetAllocation> separatelyManagedAccountFdsResponse;
-  Map<Holding, Map<AssetAllocationRegion, BigDecimal>> stocksFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> etfUsFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> canadaPooledFundFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> canadaHedgeFundsFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> usFundsFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> etfCanadaFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> mutualFundFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> benchmarkIndexFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> fixedIncomeFdsResponse;
+  Map<PortfolioHolding, HoldingAssetAllocation> separatelyManagedAccountFdsResponse;
+  Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> stocksFdsResponse;
 
-  List<? extends Holding> holdings;
+  List<? extends PortfolioHolding> holdings;
 
   List<Warning> warnings = new ArrayList<>();
 }

@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.RollingStandardDeviationCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
@@ -36,7 +36,7 @@ class RollingStandardDeviationCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(reqDTO.getHoldings()).thenReturn(holdings);
     when(sut.defineCalculationMethod(reqDTO)).thenReturn(mock(RollingStandardDeviationCalculation.class));
@@ -55,7 +55,7 @@ class RollingStandardDeviationCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
     final var reqDTO = mock(RollingCalculationCommand.class);
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var rollingCorrelationCalculation = mock(RollingStandardDeviationCalculation.class);
     final var rollingPeriods = Set.of("12");
 

@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.value.CountryValue;
 
@@ -22,7 +22,7 @@ public class CountryExposureMapper
       SecurityMasterResponseMapper<CountryExposure, CountryAllocation> {
 
   @Override
-  public CountryExposure map(CountryAllocation smsResponse, Holding holding) {
+  public CountryExposure map(CountryAllocation smsResponse, PortfolioHolding holding) {
     Map<String, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
         .map(CountryAllocation::getAllocation)
         .orElse(List.of())

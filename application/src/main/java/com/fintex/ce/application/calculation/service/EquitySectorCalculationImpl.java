@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.mapping.response.EquitySectorResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -55,7 +55,7 @@ public class EquitySectorCalculationImpl
 
   @Override
   public EquitySectorResult calculate(ExposureDataHolder<EquitySectorAllocationType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var sectors = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(sectors)) {
@@ -68,12 +68,13 @@ public class EquitySectorCalculationImpl
 
   @Override
   public ExposureDataHolder<EquitySectorAllocationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
-    Map<Holding, EquitySector> rawData = equitySectorSecurityDataFetcher.fetch(reqDTO.getHoldings(), List.of());
+    Map<PortfolioHolding, EquitySector> rawData = equitySectorSecurityDataFetcher.fetch(reqDTO.getHoldings(), List
+        .of());
     return new ExposureDataHolder<>(toSectorExposures(rawData), List.of());
   }
 
-  private Map<Holding, Map<EquitySectorAllocationType, BigDecimal>> toSectorExposures(
-      Map<Holding, EquitySector> allocations) {
+  private Map<PortfolioHolding, Map<EquitySectorAllocationType, BigDecimal>> toSectorExposures(
+      Map<PortfolioHolding, EquitySector> allocations) {
     if (CollectionUtils.isEmpty(allocations)) {
       return Collections.emptyMap();
     }

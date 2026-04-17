@@ -1,6 +1,6 @@
 package com.fintex.ce.model.dto.command;
 
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -31,5 +31,5 @@ public class ReturnCommand extends CalculationCommand
   @Schema(description = "Target currency", example = "CAD")
   private Currency currency;
   @Schema(description = "Portfolio holdings")
-  private List<Holding> holdings;
+  private List<PortfolioHolding> holdings;
 }

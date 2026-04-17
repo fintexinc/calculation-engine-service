@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -34,7 +34,7 @@ class ClassificationAllocationCalculationServiceImplTest {
     final var service = mock(ClassificationAllocationCalculationServiceImpl.class, withSettings()
         .useConstructor(fetcher));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var classificationAllocation = new ClassificationAllocation()
         .setSecurityClassificationValues(Map.of(
             ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL, BigDecimal.TEN));
@@ -58,7 +58,7 @@ class ClassificationAllocationCalculationServiceImplTest {
     // SETUP
     final var service = mock(ClassificationAllocationCalculationServiceImpl.class);
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(ClassificationAllocationType.ALTERNATIVE_INVESTMENTS__INTERNATIONAL,
         BigDecimal.TEN));
@@ -77,7 +77,7 @@ class ClassificationAllocationCalculationServiceImplTest {
     try (final var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       final var service = mock(ClassificationAllocationCalculationServiceImpl.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(ClassificationAllocationType.ALTERNATIVE_INVESTMENTS__INTERNATIONAL,
           BigDecimal.TEN));

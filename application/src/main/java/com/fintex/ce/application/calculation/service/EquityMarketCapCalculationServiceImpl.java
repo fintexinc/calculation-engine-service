@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -72,7 +72,8 @@ public class EquityMarketCapCalculationServiceImpl
 
   @Override
   public ExposureDataHolder<EquityMarketCapitalizationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
-    Map<Holding, HoldingEquityMarketCap> rawData = equityMarketCapSecurityDataFetcher.fetch(reqDTO.getHoldings(),
+    Map<PortfolioHolding, HoldingEquityMarketCap> rawData = equityMarketCapSecurityDataFetcher.fetch(reqDTO
+        .getHoldings(),
         List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         HoldingEquityMarketCap::getRatings,
@@ -81,7 +82,7 @@ public class EquityMarketCapCalculationServiceImpl
 
   @Override
   public EquityMarketCapResult calculate(ExposureDataHolder<EquityMarketCapitalizationType> exposureData,
-      List<Holding> holdings) {
+      List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {

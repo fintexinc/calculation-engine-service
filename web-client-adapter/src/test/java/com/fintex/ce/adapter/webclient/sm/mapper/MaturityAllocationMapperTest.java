@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.Maturities;
 import com.fintex.wm.commons.domain.allocation.MaturityDurationValue;
@@ -117,7 +117,7 @@ class MaturityAllocationMapperTest {
     return mdv;
   }
 
-  private Holding createHolding(String securityId) {
-    return new Holding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
+  private PortfolioHolding createHolding(String securityId) {
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
   }
 }

@@ -4,7 +4,7 @@ import com.fintex.ce.model.domain.calculation.distribution.Income;
 import com.fintex.ce.model.domain.calculation.yield.IncomeForecast;
 import com.fintex.ce.model.domain.enumeration.InterestFreq;
 import com.fintex.ce.model.domain.holding.GicHolding;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -79,7 +79,7 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldPerformFundSeries_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
-    final Holding fundSeriesHolding = Mockito.mock(Holding.class);
+    final PortfolioHolding fundSeriesHolding = Mockito.mock(PortfolioHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final List<String> schedule = List.of("1-30", "3-15", "6-20", "10-12");
@@ -129,7 +129,7 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldPerformFundSeries_whenVerify2() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
-    final Holding fundSeriesHolding = Mockito.mock(Holding.class);
+    final PortfolioHolding fundSeriesHolding = Mockito.mock(PortfolioHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final List<String> schedule = List.of("6-30", "12-30");
@@ -177,7 +177,7 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldPerformFixedIncome_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
-    final Holding fixedIncomeHolding = Mockito.mock(Holding.class);
+    final PortfolioHolding fixedIncomeHolding = Mockito.mock(PortfolioHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final List<String> schedule = List.of("6-30", "12-30");
@@ -225,7 +225,7 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldPerformFixedIncomeAtMaturity_whenVerify() {
     // SETUP
     final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
-    final Holding fixedIncomeHolding = Mockito.mock(Holding.class);
+    final PortfolioHolding fixedIncomeHolding = Mockito.mock(PortfolioHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
     final BigDecimal holdingValue = new BigDecimal(1000);

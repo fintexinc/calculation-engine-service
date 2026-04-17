@@ -4,7 +4,7 @@ import com.fintex.ce.application.validation.CpedDataValidation;
 import com.fintex.ce.application.validation.CpsdDataValidation;
 import com.fintex.ce.model.domain.calculation.returns.HistoricalNavPrices;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.ValidationError;
@@ -34,7 +34,7 @@ class ReturnsTest {
   @Test
   void shouldInitFor_whenNavPrices() {
     // SETUP
-    final Holding holding = mock(Holding.class);
+    final PortfolioHolding holding = mock(PortfolioHolding.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
 
     final ReturnsAggregate sut = new ReturnsAggregate();
@@ -50,7 +50,7 @@ class ReturnsTest {
   @Test
   void shouldInitOnly_whenWithReturnsDataValidation() {
     // SETUP
-    final Holding holding = mock(Holding.class);
+    final PortfolioHolding holding = mock(PortfolioHolding.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
 
     final ReturnsAggregate sut = new ReturnsAggregate();
@@ -66,8 +66,8 @@ class ReturnsTest {
   @Test
   void shouldInitOnlyWithReturnsDataValidation_whenMonthlyReturnsError() {
     // SETUP
-    final Holding holding = mock(Holding.class);
-    final Holding holdingMissingReturns = mock(Holding.class);
+    final PortfolioHolding holding = mock(PortfolioHolding.class);
+    final PortfolioHolding holdingMissingReturns = mock(PortfolioHolding.class);
     final HoldingMonthlyReturns monthlyReturns = mock(HoldingMonthlyReturns.class);
     final HoldingMonthlyReturns monthlyReturnsMissing = mock(HoldingMonthlyReturns.class);
     monthlyReturnsMissing.setErrors(List.of(new ValidationError("id", ErrorCode.ERR_RRC_MR_002.name(), "message")));
@@ -88,8 +88,8 @@ class ReturnsTest {
   @Test
   void shouldInitOnlyWithReturnsDataValidation_whenNonAllowedMonthlyReturnsError() {
     // SETUP
-    final Holding holding = mock(Holding.class);
-    final Holding holdingMissingReturns = mock(Holding.class);
+    final PortfolioHolding holding = mock(PortfolioHolding.class);
+    final PortfolioHolding holdingMissingReturns = mock(PortfolioHolding.class);
     final HoldingMonthlyReturns monthlyReturns = mock(HoldingMonthlyReturns.class);
     final HoldingMonthlyReturns monthlyReturnsMissing = mock(HoldingMonthlyReturns.class);
 
@@ -110,7 +110,7 @@ class ReturnsTest {
   @Test
   void shouldValidateAnd_whenUpdateCpsdAndCped() {
     // SETUP
-    final Holding holding = mock(Holding.class);
+    final PortfolioHolding holding = mock(PortfolioHolding.class);
     final DailyPerformanceCommand dailyPerformanceReqDTO = mock(DailyPerformanceCommand.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
     final CpsdDataValidation cpsdDataValidation = mock(CpsdDataValidation.class);
@@ -139,7 +139,7 @@ class ReturnsTest {
   @Test
   void shouldValidateMonthly_whenDataMissing() {
     // SETUP
-    final Holding holding = mock(Holding.class);
+    final PortfolioHolding holding = mock(PortfolioHolding.class);
     final DailyPerformanceCommand dailyPerformanceReqDTO = mock(DailyPerformanceCommand.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
     final CpsdDataValidation cpsdDataValidation = mock(CpsdDataValidation.class);
@@ -197,8 +197,8 @@ class ReturnsTest {
   @Test
   void shouldValidateReturns_whenRemovesEntriesWithInvalidDates() {
     ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
-    Holding holding1 = mock(Holding.class);
-    Holding holding2 = mock(Holding.class);
+    PortfolioHolding holding1 = mock(PortfolioHolding.class);
+    PortfolioHolding holding2 = mock(PortfolioHolding.class);
     TreeMap<LocalDate, BigDecimal> returns1 = new TreeMap<>(Map.of(
         LocalDate.of(2023, 1, 1), BigDecimal.ONE,
         LocalDate.of(2023, 2, 1), BigDecimal.ONE));
@@ -206,7 +206,7 @@ class ReturnsTest {
         LocalDate.of(2023, 3, 1), BigDecimal.ONE,
         LocalDate.of(2023, 4, 1), BigDecimal.ONE));
 
-    Map<Holding, TreeMap<LocalDate, BigDecimal>> returnsMap = new HashMap<>();
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returnsMap = new HashMap<>();
 
     returnsMap.put(holding1, returns1);
     returnsMap.put(holding2, returns2);

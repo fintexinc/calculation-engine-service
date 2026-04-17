@@ -9,7 +9,7 @@ import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
@@ -54,37 +54,39 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
   @Override
   public CreditQualityResult perform(final PortfolioHoldingsCommand reqDTO) {
     final ArrayList<Warning> warnings = new ArrayList<>();
-    final Map<Holding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
+    final Map<PortfolioHolding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
         reqDTO.getHoldings(), List.of());
-    final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(rawCreditQuality,
+    final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(
+        rawCreditQuality,
         warnings);
     if (areAllValuesInMapEmpty(creditQuality)) {
       return responseMapper.toEmptyResponse(warnings);
     }
-    final Map<Holding, BigDecimal> fixedIncomeCreditQuality = getFixedIncomeCreditQuality(reqDTO, warnings);
+    final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality = getFixedIncomeCreditQuality(reqDTO, warnings);
     final Map<FixedIncomeCreditQuality, BigDecimal> result = calculate(reqDTO.getHoldings(), creditQuality,
         fixedIncomeCreditQuality);
     return responseMapper.fromCalculatedValues(result, warnings);
   }
 
-  public Map<Holding, BigDecimal> getFixedIncomeCreditQuality(final PortfolioHoldingsCommand reqDTO,
+  public Map<PortfolioHolding, BigDecimal> getFixedIncomeCreditQuality(final PortfolioHoldingsCommand reqDTO,
       final List<Warning> warnings) {
-    final Map<Holding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
+    final Map<PortfolioHolding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         reqDTO.getHoldings(),
         getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
     final var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
     return assetAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, this::getFixedIncomeValue));
   }
 
-  public BigDecimal getFixedIncomeValue(final Map.Entry<Holding, Map<AssetAllocationRegion, BigDecimal>> entry) {
+  public BigDecimal getFixedIncomeValue(
+      final Map.Entry<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> entry) {
     return entry.getValue().entrySet().stream()
         .filter(e2 -> AssetAllocationRegion.FIXED_INCOME.equals(e2.getKey()))
         .map(Map.Entry::getValue).findFirst().orElseThrow();
   }
 
-  public Map<FixedIncomeCreditQuality, BigDecimal> calculate(final List<Holding> holdings,
-      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
-      final Map<Holding, BigDecimal> fixedIncomeCreditQuality) {
+  public Map<FixedIncomeCreditQuality, BigDecimal> calculate(final List<PortfolioHolding> holdings,
+      final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
+      final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality) {
     final Map<CreditQualityRatingType, BigDecimal> ratings = calculateCreditQualityRatingTypes(holdings, creditQuality,
         fixedIncomeCreditQuality);
     final Map<CreditQualityRatingType, BigDecimal> reScaled = reScaleAbs(ratings);
@@ -103,10 +105,11 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     return map;
   }
 
-  public Map<CreditQualityRatingType, BigDecimal> calculateCreditQualityRatingTypes(final List<Holding> holdings,
-      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
-      final Map<Holding, BigDecimal> fixedIncomeCreditQuality) {
-    final Map<Holding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
+  public Map<CreditQualityRatingType, BigDecimal> calculateCreditQualityRatingTypes(
+      final List<PortfolioHolding> holdings,
+      final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
+      final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality) {
+    final Map<PortfolioHolding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
     final Map<CreditQualityRatingType, BigDecimal> ratingMap = new EnumMap<>(CreditQualityRatingType.class);
     for (CreditQualityRatingType rating : CreditQualityRatingType.values()) {
       final BigDecimal sumProduct = calculateSumProductRating(creditQuality, fixedIncomeCreditQuality, weights, rating);
@@ -116,11 +119,11 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
   }
 
   public BigDecimal calculateSumProductRating(
-      final Map<Holding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
-      final Map<Holding, BigDecimal> fixedIncomeCreditQuality,
-      final Map<Holding, BigDecimal> weights,
+      final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality,
+      final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality,
+      final Map<PortfolioHolding, BigDecimal> weights,
       final CreditQualityRatingType rating) {
-    final Map<Holding, BigDecimal> collectedRating = creditQuality.entrySet().stream()
+    final Map<PortfolioHolding, BigDecimal> collectedRating = creditQuality.entrySet().stream()
         .filter(e -> e.getValue().containsKey(rating))
         .filter(e -> fixedIncomeCreditQuality.containsKey(e.getKey()))
         .filter(e -> weights.containsKey(e.getKey()))
@@ -128,14 +131,14 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
     return sumProduct(collectedRating, fixedIncomeCreditQuality, weights);
   }
 
-  private Map<Holding, Map<CreditQualityRatingType, BigDecimal>> extractRatings(
-      final Map<Holding, CreditQuality> rawData,
+  private Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> extractRatings(
+      final Map<PortfolioHolding, CreditQuality> rawData,
       final List<Warning> warnings) {
     return rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> extractRatings(e.getKey(), e.getValue(), warnings)));
   }
 
-  private Map<CreditQualityRatingType, BigDecimal> extractRatings(final Holding holding,
+  private Map<CreditQualityRatingType, BigDecimal> extractRatings(final PortfolioHolding holding,
       final CreditQuality creditQuality,
       final List<Warning> warnings) {
     if (CollectionUtils.isEmpty(creditQuality.getRatings())) {

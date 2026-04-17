@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -72,7 +72,7 @@ class EquityMarketCapCalculationServiceImplTest {
     final var service = mock(EquityMarketCapCalculationServiceImpl.class, withSettings()
         .useConstructor(marketCapFetcher));
 
-    final var holdings = List.of(mock(Holding.class));
+    final var holdings = List.of(mock(PortfolioHolding.class));
     final var req = mock(PortfolioHoldingsCommand.class);
 
     when(req.getHoldings()).thenReturn(holdings);
@@ -126,7 +126,7 @@ class EquityMarketCapCalculationServiceImplTest {
 
       final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(EquityMarketCapitalizationType.SMALL, TEN));
 
@@ -145,7 +145,7 @@ class EquityMarketCapCalculationServiceImplTest {
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var service = mock(EquityMarketCapCalculationServiceImpl.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(EquityMarketCapitalizationType.SMALL, TEN));
       final var netProducts = mock(Map.class);

@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.mapping.CountryAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
-import com.fintex.ce.model.domain.holding.Holding;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -45,7 +45,7 @@ class EquityCountryExposureCalculationServiceImplTest {
         withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
 
     final PortfolioHoldingsCommand req = mock(PortfolioHoldingsCommand.class);
-    final List<Holding> holdings = List.of(mock(Holding.class));
+    final List<PortfolioHolding> holdings = List.of(mock(PortfolioHolding.class));
     when(req.getHoldings()).thenReturn(holdings);
     when(service.fetchExposures(any())).thenReturn(new ExposureDataHolder<>(Map.of(), List.of()));
 
@@ -59,10 +59,10 @@ class EquityCountryExposureCalculationServiceImplTest {
 
     final CountryRegionType canada = CountryRegionType.CANADA;
 
-    final Holding h1 = new Holding(BigDecimal.ONE, FinancialInstrumentType.CASH, null);
-    final Holding h2 = new Holding(BigDecimal.TEN, FinancialInstrumentType.ETF_US, null);
+    final PortfolioHolding h1 = new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.CASH, null);
+    final PortfolioHolding h2 = new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.ETF_US, null);
 
-    final Map<Holding, Map<CountryRegionType, BigDecimal>> exposures = Map.of(
+    final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> exposures = Map.of(
         h1, Map.of(canada, BigDecimal.valueOf(2), CountryRegionType.EMERGING_MARKET, BigDecimal.valueOf(21)),
         h2, Map.of(canada, BigDecimal.valueOf(5)));
 
@@ -79,10 +79,10 @@ class EquityCountryExposureCalculationServiceImplTest {
 
     final CountryRegionType type = CountryRegionType.EMERGING_MARKET;
 
-    final Holding h1 = new Holding(BigDecimal.ONE, FinancialInstrumentType.ETF_US, null);
-    final Holding h2 = new Holding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
+    final PortfolioHolding h1 = new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF_US, null);
+    final PortfolioHolding h2 = new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
 
-    final Map<Holding, Map<CountryRegionType, BigDecimal>> exposures = Map.of(
+    final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> exposures = Map.of(
         h1, Map.of(type, BigDecimal.valueOf(2), CountryRegionType.CANADA, BigDecimal.valueOf(21)),
         h2, Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(5)));
 
@@ -133,7 +133,7 @@ class EquityCountryExposureCalculationServiceImplTest {
     final var service = mock(EquityCountryExposureCalculationServiceImpl.class,
         withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
 
-    final var holding = mock(Holding.class);
+    final var holding = mock(PortfolioHolding.class);
     final var command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holding));
     when(command.getDataProviders()).thenReturn(List.of());
@@ -158,7 +158,7 @@ class EquityCountryExposureCalculationServiceImplTest {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var service = mock(EquityCountryExposureCalculationServiceImpl.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
 
@@ -176,7 +176,7 @@ class EquityCountryExposureCalculationServiceImplTest {
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var service = mock(EquityCountryExposureCalculationServiceImpl.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
       final var netProducts = mock(Map.class);
@@ -198,7 +198,7 @@ class EquityCountryExposureCalculationServiceImplTest {
         var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var service = mock(EquityCountryExposureCalculationServiceImpl.class);
 
-      final var holding = mock(Holding.class);
+      final var holding = mock(PortfolioHolding.class);
       final var holdings = List.of(holding);
       final var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
       final var netProducts = mock(Map.class);
