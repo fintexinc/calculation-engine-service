@@ -10,7 +10,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
-import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.PceExceptionCollector;
 import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -68,13 +68,13 @@ public class RollingCorrelationCalculationServiceImpl
   @Override
   public BenchmarkCalculationDTO buildCalculationDto(RollingCalculationCommand reqDTO,
       ReturnFactorScale returnFactorScale) {
-    Notification notification = new Notification();
+    PceExceptionCollector notification = new PceExceptionCollector();
 
     ReturnsAggregate portfolioMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
         .getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale));
     ReturnsAggregate benchmarkMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
         .getBenchmarkMonthlyReturns(reqDTO.getBenchmarkHoldings(), reqDTO.getCurrency(), returnFactorScale));
-    notification.ifAnyErrorThrowException();
+    notification.throwIfAny();
 
     portfolioMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate);
     benchmarkMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate);
@@ -85,7 +85,7 @@ public class RollingCorrelationCalculationServiceImpl
     NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = notification.tryCatch(() -> monthlyReturnsService
         .getWeightedAverageWithCpsdAndCpedValidation(benchmarkMonthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
             .getCustomPed()));
-    notification.ifAnyErrorThrowException();
+    notification.throwIfAny();
 
     var result = new BenchmarkCalculationDTO();
     result.setWeightedAverageBenchmarkReturns(benchmarkTotalReturns);

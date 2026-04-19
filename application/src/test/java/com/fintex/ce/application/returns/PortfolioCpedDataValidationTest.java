@@ -5,8 +5,8 @@ import com.fintex.ce.model.error.ErrorCode;
 
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPED_002;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPED_003;
+import static com.fintex.ce.model.error.ErrorCode.CPED_AFTER_PORTFOLIO_PED;
+import static com.fintex.ce.model.error.ErrorCode.CPED_BEFORE_PORTFOLIO_PSD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PortfolioCpedDataValidationTest {
@@ -20,7 +20,7 @@ class PortfolioCpedDataValidationTest {
     final ErrorCode actual = sut.getCpedIsAfterPedExceptionCode();
 
     // VERIFY
-    assertEquals(ERR_RRC_CPED_003, actual);
+    assertEquals(CPED_AFTER_PORTFOLIO_PED, actual);
   }
 
   @Test
@@ -32,7 +32,7 @@ class PortfolioCpedDataValidationTest {
     final ErrorCode actual = sut.getCpedIsBeforePsdExceptionCode();
 
     // VERIFY
-    assertEquals(ERR_RRC_CPED_002, actual);
+    assertEquals(CPED_BEFORE_PORTFOLIO_PSD, actual);
   }
 
 }

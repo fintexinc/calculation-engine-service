@@ -2,7 +2,7 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.error.exceptions.DataErrorException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_MFR_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_MONTHLY_FX_RATE;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -75,9 +75,9 @@ class FxRatesConversionComponentTest {
     final Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
 
     final LocalDate date = toLastDayOfMonth(LocalDate.now().plusMonths(1));
-    final DataErrorException expected = ERR_RRC_MFR_001.error(date);
+    final CalculationException expected = MISSING_MONTHLY_FX_RATE.toException(date);
 
-    final DataErrorException actual = assertThrows(DataErrorException.class,
+    final CalculationException actual = assertThrows(CalculationException.class,
         () -> component.convert(returns, holdingCurrencies, fxRates, Currency.USD));
 
     assertEquals(expected, actual);

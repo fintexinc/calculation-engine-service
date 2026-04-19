@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
-import com.fintex.ce.adapter.rest.service.RestExceptionHandlingServiceImpl;
+import com.fintex.ce.adapter.rest.dto.WarningDTO;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqValidator;
@@ -11,15 +10,18 @@ import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.domain.result.ErrorResult;
+import com.fintex.ce.model.domain.result.WarningResult;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
@@ -80,7 +82,7 @@ class PortfolioCalculationControllerTest {
         .toList();
 
     var controller = new PortfolioCalculationController(
-        serviceList, new RestExceptionHandlingServiceImpl(),
+        serviceList,
         new com.fintex.ce.adapter.rest.validation.RequestValidationFacade(java.util.List.of()));
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
@@ -94,8 +96,8 @@ class PortfolioCalculationControllerTest {
   void shouldReturnMappedResponse_whenValidMetricRequested(
       CalculationMetric metric,
       CalculationCommand command,
-      ErrorResult serviceResult,
-      Class<? extends ErrorDTO> responseType) throws Exception {
+      Object serviceResult,
+      Class<? extends WarningDTO> responseType) throws Exception {
     lenient().when(mockServices.get(metric).perform(any())).thenReturn(serviceResult);
 
     command.setMetric(metric);
@@ -117,11 +119,11 @@ class PortfolioCalculationControllerTest {
 
     verify(mockServices.get(metric)).perform(any());
 
-    ErrorDTO expectedDto = responseType.getDeclaredConstructor().newInstance();
+    WarningDTO expectedDto = responseType.getDeclaredConstructor().newInstance();
     BeanUtils.copyProperties(serviceResult, expectedDto);
 
     String responseBody = mvcResult.getResponse().getContentAsString();
-    ErrorDTO actualDto = objectMapper.readValue(responseBody, responseType);
+    WarningDTO actualDto = objectMapper.readValue(responseBody, responseType);
 
     assertThat(actualDto)
         .isNotNull()
@@ -134,28 +136,34 @@ class PortfolioCalculationControllerTest {
   @Test
   void shouldThrowException_whenUnknownMetricRequested() {
     String requestBody = """
-        {"metric": "trailing-total-returns", "currency": "CAD"}
+        {"metric": "trailing-total-returns", "currency": "CAD", "holdings": [
+          {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+           "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
+        ]}
         """;
 
     assertThatThrownBy(() -> mockMvc.perform(
         post(BASE_PATH + "/unknown-metric")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody)))
-        .hasCauseInstanceOf(IllegalArgumentException.class)
+        .hasCauseInstanceOf(CalculationException.class)
         .hasMessageContaining("unknown-metric");
   }
 
   @Test
   void shouldThrowException_whenMetricInBodyMismatchesPathParameter() {
     String requestBody = """
-        {"metric": "sharpe-ratio", "holdings": [], "currency": "CAD"}
+        {"metric": "sharpe-ratio", "currency": "CAD", "holdings": [
+          {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+           "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
+        ]}
         """;
 
     assertThatThrownBy(() -> mockMvc.perform(
         post(BASE_PATH + "/trailing-total-returns")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody)))
-        .hasCauseInstanceOf(IllegalArgumentException.class)
+        .hasCauseInstanceOf(CalculationException.class)
         .hasMessageContaining("Metric mismatch");
   }
 
@@ -172,7 +180,7 @@ class PortfolioCalculationControllerTest {
   private CalculationService<?, ?> createMockService(CalculationMetric metric) {
     CalculationService mock = mock(CalculationService.class);
     lenient().when(mock.getMetric()).thenReturn(metric);
-    lenient().when(mock.perform(any())).thenReturn(new ErrorResult() {});
+    lenient().when(mock.perform(any())).thenReturn(new WarningResult() {});
     mockServices.put(metric, mock);
     return mock;
   }
@@ -203,11 +211,11 @@ class PortfolioCalculationControllerTest {
       for (CalculationMetric m : CalculationMetric.values()) {
         CalculationService svc = mock(CalculationService.class);
         lenient().when(svc.getMetric()).thenReturn(m);
-        lenient().when(svc.perform(any())).thenReturn(new ErrorResult() {});
+        lenient().when(svc.perform(any())).thenReturn(new WarningResult() {});
         services.add(svc);
       }
 
-      var controller = new PortfolioCalculationController(services, new RestExceptionHandlingServiceImpl(), facade);
+      var controller = new PortfolioCalculationController(services, facade);
       LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
       validator.afterPropertiesSet();
       validatingMockMvc = MockMvcBuilders.standaloneSetup(controller)
@@ -285,7 +293,7 @@ class PortfolioCalculationControllerTest {
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest())
           .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("ERR_BWP_BWPTIP_002")));
+              org.hamcrest.Matchers.containsString("BWP-002")));
     }
 
     @Test
@@ -303,7 +311,7 @@ class PortfolioCalculationControllerTest {
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest())
           .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("ERR_RRC_CNOB_001")));
+              org.hamcrest.Matchers.containsString("DIS-001")));
     }
 
     @Test
@@ -321,7 +329,7 @@ class PortfolioCalculationControllerTest {
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest())
           .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("ERR_RRC_CNOB_002")));
+              org.hamcrest.Matchers.containsString("DIS-002")));
     }
 
     @Test
@@ -336,7 +344,7 @@ class PortfolioCalculationControllerTest {
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest())
           .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("ERR_RRC_TIP_003")));
+              org.hamcrest.Matchers.containsString("TIP-003")));
     }
 
     @Test
@@ -351,7 +359,7 @@ class PortfolioCalculationControllerTest {
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest())
           .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("ERR_RRC_TIP_003")));
+              org.hamcrest.Matchers.containsString("TIP-003")));
     }
 
     @Test
@@ -370,7 +378,7 @@ class PortfolioCalculationControllerTest {
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest())
           .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("ERR_BWP_BWPTIP_001")));
+              org.hamcrest.Matchers.containsString("BWP-001")));
     }
 
     @Test
@@ -378,7 +386,7 @@ class PortfolioCalculationControllerTest {
       BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
       cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
       cmd.setCurrency(Currency.CAD);
-      cmd.setHoldings(List.of());
+      cmd.setHoldings(List.of(dummyHolding()));
       cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
       cmd.setCustomPed(LocalDate.of(2024, 12, 31));
       cmd.setBestWorstTimeIntervalPeriods(Set.of(1L, 300L));
@@ -395,7 +403,7 @@ class PortfolioCalculationControllerTest {
       DistributionOfReturnsCommand lowerBoundCmd = new DistributionOfReturnsCommand();
       lowerBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       lowerBoundCmd.setCurrency(Currency.CAD);
-      lowerBoundCmd.setHoldings(List.of());
+      lowerBoundCmd.setHoldings(List.of(dummyHolding()));
       lowerBoundCmd.setPeriods(Set.of("12"));
       lowerBoundCmd.setCustomNumberOfBins(5);
 
@@ -408,7 +416,7 @@ class PortfolioCalculationControllerTest {
       DistributionOfReturnsCommand upperBoundCmd = new DistributionOfReturnsCommand();
       upperBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       upperBoundCmd.setCurrency(Currency.CAD);
-      upperBoundCmd.setHoldings(List.of());
+      upperBoundCmd.setHoldings(List.of(dummyHolding()));
       upperBoundCmd.setPeriods(Set.of("12"));
       upperBoundCmd.setCustomNumberOfBins(30);
 
@@ -417,6 +425,12 @@ class PortfolioCalculationControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(om.writeValueAsString(upperBoundCmd)))
           .andExpect(status().isOk());
+    }
+
+    private static PortfolioHolding dummyHolding() {
+      return new PortfolioHolding(
+          BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+          new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
     }
 
     @Test
@@ -464,7 +478,7 @@ class PortfolioCalculationControllerTest {
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest())
           .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("ERR_RRC_CNOB_002")))
+              org.hamcrest.Matchers.containsString("DIS-002")))
           .andExpect(content().string(
               org.hamcrest.Matchers.containsString("must not be null")));
     }

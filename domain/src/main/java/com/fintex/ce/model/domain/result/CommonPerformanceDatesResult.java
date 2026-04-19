@@ -4,15 +4,13 @@ import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class CommonPerformanceDatesResult extends ErrorResult {
+public class CommonPerformanceDatesResult extends WarningResult {
 
   private LocalDate commonPerformanceStartDatePf;
   private LocalDate commonPerformanceEndDatePf;

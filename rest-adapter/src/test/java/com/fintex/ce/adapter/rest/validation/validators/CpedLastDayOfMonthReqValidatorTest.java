@@ -4,7 +4,7 @@ import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.ReturnCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ class CpedLastDayOfMonthReqValidatorTest extends AbstractLastDayOfMonthReqValida
 
   @Override
   String expectedErrorCode() {
-    return "ERR_RRC_CPED_001";
+    return "CPED_NOT_MONTH_END";
   }
 
   @Test
@@ -53,10 +53,10 @@ class CpedLastDayOfMonthReqValidatorTest extends AbstractLastDayOfMonthReqValida
     command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_RRC_CPED_001");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("CPED_NOT_MONTH_END");
         });
   }
 }

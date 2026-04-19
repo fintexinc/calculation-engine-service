@@ -16,7 +16,7 @@ public class BenchmarkHoldingReqValidator
 
   public BenchmarkHoldingReqValidator() {
     super(BenchmarkHoldingsProvider.class, BenchmarkHoldingsProvider::getBenchmarkHoldings,
-        HoldingsValidationHelper::validate);
+        HoldingsValidationHelper::validate, "benchmarkHoldings", true);
   }
 
   @Override

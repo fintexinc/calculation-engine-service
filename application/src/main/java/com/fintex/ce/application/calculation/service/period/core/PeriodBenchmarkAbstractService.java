@@ -5,7 +5,7 @@ import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.PceExceptionCollector;
 import com.fintex.ce.util.ReturnFactorScale;
 
 import java.math.BigDecimal;
@@ -24,22 +24,22 @@ public abstract class PeriodBenchmarkAbstractService<E extends PeriodResult, R e
 
   @Override
   public BenchmarkCalculationDTO buildCalculationDto(R command, ReturnFactorScale returnFactorScale) {
-    var notification = new Notification();
+    var collector = new PceExceptionCollector();
 
-    ReturnsAggregate portfolioMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
+    ReturnsAggregate portfolioMonthlyReturnsAggregate = collector.tryCatch(() -> monthlyReturnsService
         .getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency(), returnFactorScale));
-    ReturnsAggregate benchmarkMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
+    ReturnsAggregate benchmarkMonthlyReturnsAggregate = collector.tryCatch(() -> monthlyReturnsService
         .getBenchmarkMonthlyReturns(command.getBenchmarkHoldings(), command.getCurrency(), returnFactorScale));
-    notification.ifAnyErrorThrowException();
+    collector.throwIfAny();
 
     portfolioMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate);
     benchmarkMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate);
 
-    NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = notification.tryCatch(() -> monthlyReturnsService
+    NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = collector.tryCatch(() -> monthlyReturnsService
         .getWeightedAverageWithCpedValidation(portfolioMonthlyReturnsAggregate, command.getCustomPed()));
-    NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = notification.tryCatch(() -> monthlyReturnsService
+    NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = collector.tryCatch(() -> monthlyReturnsService
         .getWeightedAverageWithCpedValidation(benchmarkMonthlyReturnsAggregate, command.getCustomPed()));
-    notification.ifAnyErrorThrowException();
+    collector.throwIfAny();
 
     var result = new BenchmarkCalculationDTO();
     result.setWeightedAverageBenchmarkReturns(benchmarkTotalReturns);

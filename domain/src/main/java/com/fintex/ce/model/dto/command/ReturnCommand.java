@@ -6,6 +6,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -27,9 +28,10 @@ public class ReturnCommand extends CalculationCommand
   private LocalDate customPsd;
   @Schema(description = "Custom performance end date")
   private LocalDate customPed;
-  @NotNull(message = ErrorCode.Names.ERR_VAL_NN_001)
+  @NotNull(message = ErrorCode.Codes.FIELD_NOT_NULL)
   @Schema(description = "Target currency", example = "CAD")
   private Currency currency;
   @Schema(description = "Portfolio holdings")
+  @NotEmpty(message = ErrorCode.Codes.FIELD_NOT_EMPTY)
   private List<PortfolioHolding> holdings;
 }

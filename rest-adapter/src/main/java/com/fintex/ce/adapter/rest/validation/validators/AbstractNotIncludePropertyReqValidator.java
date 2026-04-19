@@ -32,7 +32,7 @@ public abstract class AbstractNotIncludePropertyReqValidator<T, V> implements Re
       return;
     }
     if (nonNull(accessor.apply(carrierType.cast(command)))) {
-      throw errorCode.reqValidationError();
+      throw errorCode.toValidationException();
     }
   }
 }

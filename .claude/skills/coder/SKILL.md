@@ -5,7 +5,7 @@ description: >
   Use this skill when writing new code, implementing features, fixing bugs, or adding functionality.
   Applies hexagonal architecture patterns, design patterns (Strategy, Template Method, Observer),
   clean code principles, N+1 prevention, null safety, and SonarQube compliance.
-  Trigger when: "implement", "write", "add feature", "create", "fix", "build".
+  Trigger when: "implement", "write", "add feature", "create", "fix", "build", "do", "refactor", "rework".
 ---
 
 # Coding Guidelines
@@ -34,6 +34,8 @@ mvn jib:build                              # Build Docker image
 
 ## Module Structure & Rules
 
+The project implements the Hexagonal Architecture with Spring Boot with the following modules:
+
 | Module               | Purpose                                                   | Spring? |
 |----------------------|-----------------------------------------------------------|---------|
 | `domain`             | Pure domain models, enums, DTOs, calculation types        | No      |
@@ -51,51 +53,10 @@ mvn jib:build                              # Build Docker image
 
 ---
 
-## 1) Think Hierarchy First
+## 1) Always try to use GoF patterns adapted to the Spring ecosystem
 
-Before writing ANY class: "Can this be abstracted?"
-
-### Template Method Pattern
-
-```java
-public abstract class SecurityDataFetcher<T extends Security> {
-    public final T fetch(String id) {
-        var rawData = fetchFromSM(id);
-        validate(rawData);
-        return mapToSecurity(rawData);
-    }
-    protected abstract T mapToSecurity(SMResponse data);
-}
-// Subclasses ONLY implement what's different
-```
-
-### Strategy Pattern
-
-```java
-public interface CalculationStrategy {
-  boolean supports(SecurityType type);
-  BigDecimal calculate(SecurityData data);
-}
-
-@Service
-@RequiredArgsConstructor
-public class CalculationService {
-  private final List<CalculationStrategy> strategies;
-  public BigDecimal calculate(Security security) {
-    return strategies.stream()
-            .filter(s -> s.supports(security.getType()))
-            .findFirst()
-            .orElseThrow(() -> new UnsupportedSecurityTypeException(security.getType()))
-            .calculate(security.getData());
-  }
-}
-```
-
-**Existing abstract classes to extend:**
-- `*CalculationAbstract` — calculations
-- `AbstractSecurityMasterFetcher<DomainModel, SmsResponse>` — SM REST fetchers
-
----
+E.g. Strategy (inject a list of beans of an interface and associate them to map by common method returning an enum), 
+Chain of Responsibility, Template Method, Observer, Factory Method, Adapter, Bridge, etc.
 
 ## 2) Calculation Architecture (Two-Layer Pattern)
 
@@ -106,61 +67,38 @@ Service -> Calculation two-layer design with Template Method:
 - **`PeriodBenchmarkAbstractService<E, R>`** — adds benchmark data with `Notification` error handling
 - **`BreakdownAbstractService<T, E>`** — allocation/exposure. `fetchExposures()` -> `calculate()` -> `calculateNetProducts()`
 
-### Calculation Layer (`application/.../calculation/core/`)
+### Calculation Layer (`application/.../calculation/metric`)
 Pure logic, no data fetching.
 - **`PeriodCalculationAbstract<T, V>`** — period resolution (months, YTD, SINCE_INCEPTION), date filtering
 - **`RollingAbstractCalculation<T>`** — rolling window calculations
 - **`AlphaBetaCalculationAbstract<T>`**, **`RSquaredCalculationAbstract<T>`** — regression
 - **`UpDownSideCalculationAbstract`** — capture ratios
 
-### Adding a New Calculation
-1. Domain result type in `domain/.../result/`
-2. Calculation class extending abstract base in `application/.../calculation/`
-3. Service impl extending abstract service in `application/.../service/calculation/`
-4. Response mapper in `application/.../mapper/response/`
-5. Endpoint + DTOs in `rest-adapter/.../dto/`
-6. Wire via `@Qualifier` in `PortfolioController`
+## 3) Code Style & Conventions
 
----
+- **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `mvn spotless:apply`
+- **BigDecimal:** `BigDecimal.valueOf()` for literals, never `new BigDecimal(double)`. `new BigDecimal(String)` is fine
+- **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
+- **Optional**: Return `Optional<T>` for optional values when it makes sense
+- **Null check**: Validate SM data at adapter boundary with `Objects.requireNonNull`
+- **Not null collections**: Never return null collections — use `List.of()`
+- **Collection null/empty checks:** use `org.springframework.util.CollectionUtils.isEmpty(col)` instead of `col == null || col.isEmpty()`. Never perform the same `null || isEmpty` check twice in a row — collapse to a single `CollectionUtils.isEmpty` call
+- **Object construction:** prefer Lombok builders (`@Builder` / `@SuperBuilder`) over chained accessors (`new Foo().setX(..).setY(..)`). Accessors are fine for incremental mutation inside mappers with conditional branches, but tests and one-shot construction must use the builder
+- **Ternary:** use for simple single-expression returns/assignments instead of if/else
+- **No `final`** on method parameters/variables unless class fields or explicit constants
+- **No fully qualified class names** — always use imports
+- **No magic strings** — extract to constants or enums
+- **Enum factory methods:** always name `fromValue(value)`
+- **Extract strings into constants or enums** - no magic strings in code
+- **Extract repeated code into utility methods** - if you write the same 3+ lines twice, create a util
+- **DI:** `@RequiredArgsConstructor` with final fields, not `@AllArgsConstructor`
+- **Max 5-7 deps** per class; max 3 nesting levels (early returns)
+- **Tests:** JUnit 5 + Mockito, no Spring context for unit tests. Naming: `shouldDoSomething_whenCondition`
 
-## 3) REST Layer Flow
+## 4) External Calls (SM)
 
-```
-PortfolioController -> RequestValidationFacade (Chain of Responsibility)
-    -> RestCommandMapper (DTO -> command) -> CalculationService.perform(command)
-    -> RestResponseMapper (result -> response DTO)
-```
-
-All endpoints: POST `/portfolio/*`. Validation chain: `NotNullReqValidation` -> `HoldingsCouldNotBeEmptyReqValidation` -> `DateGreaterThanDateAbstractReqValidation` -> `LastDayOfMonthAbstractReqValidator`.
-
----
-
-## 4) Module Placement & Ports
-
-```java
-// Output port (api module)
-@FunctionalInterface
-public interface SecurityDataFetcher<T> {
-  Map<Holding, T> fetch(List<? extends Holding> holdings, List<DataProvider> providers);
-}
-
-// Abstract fetcher (web-client-adapter) — Template Method for SM REST calls
-public abstract class AbstractSecurityMasterFetcher<DomainModel, SmsResponse>
-    implements SecurityDataFetcher<DomainModel> {
-  protected abstract String endpointPath();
-  protected abstract ParameterizedTypeReference<List<SecurityAttributeResult<SmsResponse>>> responseType();
-  protected abstract SecurityMasterResponseMapper<DomainModel, SmsResponse> responseMapper();
-}
-```
-
-**Stubs** in `web-client-adapter/.../stub/`: return empty data. When implementing a real fetcher, extend `AbstractSecurityMasterFetcher` and remove the stub.
-
----
-
-## 5) External Calls (SM)
-
-**Never call SM in loops (N+1)** — always batch.
-**Always use Resilience4j:**
+**Never call external web services in loops (N+1)** — always batch.
+**Always use Resilience4j for resilience patterns**
 
 ```java
 @CircuitBreaker(name = "securityMaster", fallbackMethod = "fetchFallback")
@@ -172,63 +110,28 @@ No hardcoded timeouts, URLs, retry counts — configure in `application.yaml`.
 
 ---
 
-## 6) Null Safety & Exceptions
+## 5) Error Handling
 
-- Return `Optional<T>` for optional values
-- Validate SM data at adapter boundary with `Objects.requireNonNull`
-- Never return null collections — use `List.of()`
-- Translate exceptions at adapter boundaries with meaningful context messages
+All exceptions/instances must be linked to ErrorCode and handled in GlobalExceptionHandler. 
+They must be converted to a Notification list.
 
----
+## 6) Test Naming Convention
 
-## 7) Code Style & Conventions
+Test methods must follow the `shouldDoSomething_whenCondition` naming pattern. The name should clearly describe the
+expected behavior and the condition that triggers it.
 
-- **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `mvn spotless:apply`
-- **BigDecimal:** `BigDecimal.valueOf()` for literals, never `new BigDecimal(double)`. `new BigDecimal(String)` is fine
-- **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
-- **Collection null/empty checks:** use `org.springframework.util.CollectionUtils.isEmpty(col)` instead of `col == null || col.isEmpty()`. Never perform the same `null || isEmpty` check twice in a row — collapse to a single `CollectionUtils.isEmpty` call
-- **Object construction:** prefer Lombok builders (`@Builder` / `@SuperBuilder`) over chained accessors (`new Foo().setX(..).setY(..)`). Accessors are fine for incremental mutation inside mappers with conditional branches, but tests and one-shot construction must use the builder
-- **Ternary:** use for simple single-expression returns/assignments instead of if/else
-- **No `final`** on method parameters/variables unless class fields or explicit constants
-- **No fully qualified class names** — always use imports
-- **No magic strings** — extract to constants or enums
-- **Enum factory methods:** always name `fromValue(value)`
-- **DI:** `@RequiredArgsConstructor` with final fields, not `@AllArgsConstructor`
-- **Max 5-7 deps** per class; max 3 nesting levels (early returns)
-- **Tests:** JUnit 5 + Mockito, no Spring context for unit tests. Naming: `shouldDoSomething_whenCondition`
-- **Commits:** Conventional Commits: `<type>(<scope>): <subject>` with `refs: CE-123`
-- **PRs:** 1-2 squashed commits, rebase onto main, fast-forward merge
+**Examples:**
 
----
+```java
+@Test
+void shouldCalculateReturns_whenSecurityDataExists() { ... }
 
-## 8) Key Packages Reference
+@Test
+void shouldThrowException_whenSecurityNotFound() { ... }
 
-- Port interfaces (SM): `api/.../port/sm/`
-- Port interfaces (other): `api/.../port/`
-- Service interfaces: `api/.../service/calculation/`
-- Utilities: `api/.../util/` — `AllocationMappingUtils`, `CalculationUtils`, `DecimalUtils`, `DateTimeUtils`, `PortfolioUtils`, `FilterUtils`
-- Domain commands: `domain/.../dto/command/`
-- Domain results: `domain/.../model/result/` — 40+ result types
-- Allocation enums: `domain/.../model/calculation/`
-- REST DTOs: `rest-adapter/.../adapter/rest/dto/`
-- Validators: `rest-adapter/.../adapter/rest/validation/chainofresponsibility/`
-- SM fetchers: `web-client-adapter/.../sm/fetcher/`
-- SM client: `web-client-adapter/.../sm/client/SecurityMasterWebClient`
-- Bootstrap configs: `bootstrap/.../config/`
-
----
-
-## 9) Dependencies & Gotchas
-
-**sm-domain:** `com.fintex.wm:domain:2.0.0-SNAPSHOT` provides: StyleBoxValue, StyleBoxes, PaymentFrequencyType, SalesChargeType, FxRate, SecurityIdentifier. Version must be explicit in `domain/pom.xml`.
-
-**Gotchas:**
-- Lombok `@Accessors(chain=true)` on parent: setter returns parent type, breaks fluent chains in subclasses
-- Holding class hierarchy cannot be mocked (ByteBuddy can't instrument sm-domain SecurityIdentifier)
-- When removing constructor params from services, update ALL test files using `useConstructor()`
-- Removing transitive dependencies may require adding explicit deps (slf4j-api, spring-web)
-
----
+@Test
+void shouldFetchFromSM_whenSecurityIdIsValid() { ... }
+```
 
 ## Before Writing Code Checklist
 

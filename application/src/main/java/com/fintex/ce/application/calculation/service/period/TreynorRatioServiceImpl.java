@@ -9,7 +9,7 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.beans.factory.annotation.Value;

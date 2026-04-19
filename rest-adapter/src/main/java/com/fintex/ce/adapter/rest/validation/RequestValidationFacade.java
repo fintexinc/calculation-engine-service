@@ -2,13 +2,12 @@ package com.fintex.ce.adapter.rest.validation;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.dto.command.CalculationCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.PceExceptionCollector;
 
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,16 +27,13 @@ public class RequestValidationFacade {
 
   public void validate(CalculationCommand command, CalculationMetric metric) {
     List<RequestValidator> validators = validatorsByMetric.getOrDefault(metric, List.of());
-    LinkedList<ReqValidationException> errors = new LinkedList<>();
+    PceExceptionCollector collector = new PceExceptionCollector();
     for (RequestValidator validator : validators) {
-      try {
+      collector.tryCatch(() -> {
         validator.validate(command);
-      } catch (ReqValidationException e) {
-        errors.add(e);
-      }
+        return null;
+      });
     }
-    if (!errors.isEmpty()) {
-      throw new ReqValidationException(errors);
-    }
+    collector.throwIfAny();
   }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 public class CipsdLastDayOfMonthReqValidator extends AbstractLastDayOfMonthReqValidator<PeriodCommand> {
 
   public CipsdLastDayOfMonthReqValidator() {
-    super(PeriodCommand.class, PeriodCommand::getCustomIntervalPsd, ErrorCode.ERR_RRC_CIPSD_001);
+    super(PeriodCommand.class, PeriodCommand::getCustomIntervalPsd, ErrorCode.CIPSD_NOT_MONTH_END);
   }
 
   @Override

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_FIS_FISE_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_FIXED_INCOME_STYLEBOX_EXPOSURE;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 
@@ -73,6 +73,6 @@ public class FixedIncomeStyleboxExposureCalculationServiceImpl
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         FixedIncomeStyleboxExposure::getBoxValues,
-        DEFAULT_MAP, WRN_FIS_FISE_001);
+        DEFAULT_MAP, MISSING_FIXED_INCOME_STYLEBOX_EXPOSURE);
   }
 }

@@ -20,5 +20,5 @@ import lombok.experimental.Accessors;
 @Schema(description = "Command for best and worst performance periods analysis. Supports metric: best-worst-periods")
 public class BestWorstPeriodsCommand extends ReturnCommand {
   @Schema(description = "Time interval periods in months for best/worst analysis", example = "[12, 36]")
-  private Set<@Min(value = 1, message = ErrorCode.Names.ERR_BWP_BWPTIP_001) @Max(value = 300, message = ErrorCode.Names.ERR_BWP_BWPTIP_002) Long> bestWorstTimeIntervalPeriods;
+  private Set<@Min(value = 1, message = ErrorCode.Codes.BEST_WORST_TIME_INTERVAL_NOT_POSITIVE) @Max(value = 300, message = ErrorCode.Codes.BEST_WORST_TIME_INTERVAL_TOO_LARGE) Long> bestWorstTimeIntervalPeriods;
 }

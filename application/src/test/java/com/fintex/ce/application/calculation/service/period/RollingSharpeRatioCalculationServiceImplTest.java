@@ -7,7 +7,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
-import com.fintex.ce.port.webclient.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;

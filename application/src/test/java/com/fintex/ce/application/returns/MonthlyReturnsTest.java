@@ -4,7 +4,7 @@ import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.model.domain.calculation.returns.ReturnsData;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.PceExceptionCollector;
 import com.fintex.ce.util.MapUtils;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -23,7 +23,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_MR_002;
+import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
@@ -158,7 +158,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     final var holdingCurrency = mock(Map.class);
-    sut.notification = new Notification();
+    sut.notification = new PceExceptionCollector();
 
     sut.returnsMap = monthlyReturns;
     sut.holdingCurrencyMap = holdingCurrency;
@@ -303,7 +303,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.notification = new Notification();
+    sut.notification = new PceExceptionCollector();
 
     doCallRealMethod().when(sut).setWeightedAverageComponent(any());
     final var weightedAverageComponent = mock(WeightedAverageComponent.class);
@@ -322,7 +322,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.notification = new Notification();
+    sut.notification = new PceExceptionCollector();
 
     doCallRealMethod().when(sut).setWeightedAverageComponent(any());
     final var weightedAverageComponent = mock(WeightedAverageComponent.class);
@@ -341,7 +341,7 @@ class MonthlyReturnsTest {
   @Test
   void shouldValidateCped_whenVerifyValidatePortfolioCped() {
     final var sut = mock(ReturnsAggregate.class);
-    Notification notification = mock(Notification.class);
+    PceExceptionCollector notification = mock(PceExceptionCollector.class);
     sut.notification = notification;
 
     final var monthlyReturns = mock(Map.class);
@@ -365,7 +365,7 @@ class MonthlyReturnsTest {
   @Test
   void shouldValidateCpsd_whenVerifyValidatePortfolioCped() {
     final var sut = mock(ReturnsAggregate.class);
-    Notification notification = mock(Notification.class);
+    PceExceptionCollector notification = mock(PceExceptionCollector.class);
     sut.notification = notification;
 
     final var monthlyReturns = mock(Map.class);
@@ -417,9 +417,9 @@ class MonthlyReturnsTest {
     var validatedReturns = sut.validateReturns();
 
     var expectedErrorList = List.of(
-        ERR_RRC_MR_002.error(h2),
-        ERR_RRC_MR_002.error(h1),
-        ERR_RRC_MR_002.error(h3));
+        HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h2),
+        HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h1),
+        HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h3));
     assertTrue(validatedReturns.getErrors().containsAll(expectedErrorList));
     assertEquals(expectedErrorList.size(), validatedReturns.getErrors().size());
   }
@@ -455,9 +455,9 @@ class MonthlyReturnsTest {
     var validatedReturns = sut.validateReturns();
 
     var expectedErrorList = List.of(
-        ERR_RRC_MR_002.error(h1),
-        ERR_RRC_MR_002.error(h2),
-        ERR_RRC_MR_002.error(h3));
+        HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h1),
+        HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h2),
+        HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h3));
 
     assertTrue(validatedReturns.getErrors().containsAll(expectedErrorList));
     assertEquals(expectedErrorList.size(), validatedReturns.getErrors().size());
@@ -495,8 +495,8 @@ class MonthlyReturnsTest {
     var validatedReturns = sut.validateReturns();
 
     var expectedErrorList = List.of(
-        ERR_RRC_MR_002.error(h3),
-        ERR_RRC_MR_002.error(h4));
+        HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h3),
+        HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h4));
     assertTrue(validatedReturns.getErrors().containsAll(expectedErrorList));
     assertEquals(expectedErrorList.size(), validatedReturns.getErrors().size());
   }
@@ -596,7 +596,7 @@ class MonthlyReturnsTest {
   @Test
   void shouldRetrieveHoldingCurrencies_whenCheckResult() {
     final var sut = mock(ReturnsAggregate.class);
-    sut.notification = new Notification();
+    sut.notification = new PceExceptionCollector();
 
     final var holding1 = mock(PortfolioHolding.class);
     final var holding2 = mock(PortfolioHolding.class);
@@ -614,13 +614,13 @@ class MonthlyReturnsTest {
 
     final var expected = Map.of(holding1, Currency.CAD, holding2, Currency.USD);
     assertEquals(expected, actual);
-    assertTrue(sut.notification.getErrors().isEmpty());
+    assertTrue(sut.notification.getExceptions().isEmpty());
   }
 
   @Test
   void shouldRetrieveHoldingCurrencies_whenCurrencyIsNull() {
     final var sut = mock(ReturnsAggregate.class);
-    sut.notification = new Notification();
+    sut.notification = new PceExceptionCollector();
 
     final var holding1 = mock(PortfolioHolding.class);
     final var holding2 = mock(PortfolioHolding.class);
@@ -639,7 +639,7 @@ class MonthlyReturnsTest {
     final var expected = new HashMap<PortfolioHolding, Currency>();
     expected.put(holding2, Currency.USD);
     assertEquals(expected, actual);
-    assertFalse(sut.notification.getErrors().isEmpty());
+    assertFalse(sut.notification.getExceptions().isEmpty());
   }
 
   @Test

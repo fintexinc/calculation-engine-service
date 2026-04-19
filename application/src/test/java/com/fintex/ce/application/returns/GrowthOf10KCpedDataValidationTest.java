@@ -1,7 +1,7 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.validation.GrowthOf10KCpedDataValidation;
-import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.PceExceptionCollector;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class GrowthOf10KCpedDataValidationTest {
   void shouldValidate_whenVerify() {
     // SETUP
     final GrowthOf10KCpedDataValidation sut = mock(GrowthOf10KCpedDataValidation.class);
-    var notification = new Notification();
+    var collector = new PceExceptionCollector();
 
     final var cped = LocalDate.now();
     final var psd = LocalDate.now().minusMonths(1);
@@ -26,10 +26,10 @@ class GrowthOf10KCpedDataValidationTest {
 
     doCallRealMethod().when(sut).validate(any(), any(), any(), any());
     // ACT
-    sut.validate(cped, psd, ped, notification);
+    sut.validate(cped, psd, ped, collector);
 
     // VERIFY
-    verify(sut).validateCpedIsBeforePsd(cped, psd, notification);
+    verify(sut).validateCpedIsBeforePsd(cped, psd, collector);
   }
 
 }

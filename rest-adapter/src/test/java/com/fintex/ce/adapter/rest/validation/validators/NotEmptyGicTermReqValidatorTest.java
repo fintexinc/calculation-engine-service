@@ -33,6 +33,6 @@ class NotEmptyGicTermReqValidatorTest extends AbstractGicFieldReqValidatorTest {
 
   @Override
   String expectedErrorCode() {
-    return "ERR_GIC_MC_002";
+    return "GIC_HOLDING_MISSING_TERM";
   }
 }

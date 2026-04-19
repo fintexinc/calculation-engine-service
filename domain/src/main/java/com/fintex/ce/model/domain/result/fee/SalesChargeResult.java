@@ -1,7 +1,6 @@
 package com.fintex.ce.model.domain.result.fee;
 
 import com.fintex.ce.model.domain.enumeration.SalesChargeCategory;
-import com.fintex.ce.model.domain.result.ErrorResult;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
@@ -20,11 +19,11 @@ import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalHashCode;
 
 @Getter
 @Setter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SalesChargeResult extends ErrorResult {
+@EqualsAndHashCode
+@ToString
+public class SalesChargeResult {
 
   private Map<SalesChargeCategory, SalesChargeEntry> salesCharges = new EnumMap<>(SalesChargeCategory.class);
 

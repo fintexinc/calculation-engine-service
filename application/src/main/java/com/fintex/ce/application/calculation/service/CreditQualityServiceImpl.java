@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_CQ_CQ_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_CREDIT_QUALITY;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CalculationUtils.sumProduct;
@@ -142,7 +142,7 @@ public class CreditQualityServiceImpl implements CalculationService<CreditQualit
       final CreditQuality creditQuality,
       final List<Warning> warnings) {
     if (CollectionUtils.isEmpty(creditQuality.getRatings())) {
-      warnings.add(WRN_CQ_CQ_001.warning(holding));
+      warnings.add(MISSING_CREDIT_QUALITY.warning(holding));
       return Map.of();
     }
     return creditQuality.getRatings();

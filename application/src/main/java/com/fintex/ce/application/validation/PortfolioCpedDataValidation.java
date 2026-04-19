@@ -4,20 +4,20 @@ import com.fintex.ce.model.error.ErrorCode;
 
 import lombok.EqualsAndHashCode;
 
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPED_002;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPED_003;
+import static com.fintex.ce.model.error.ErrorCode.CPED_AFTER_PORTFOLIO_PED;
+import static com.fintex.ce.model.error.ErrorCode.CPED_BEFORE_PORTFOLIO_PSD;
 
 @EqualsAndHashCode
 public class PortfolioCpedDataValidation extends CpedDataValidation {
 
   @Override
   public ErrorCode getCpedIsAfterPedExceptionCode() {
-    return ERR_RRC_CPED_003;
+    return CPED_AFTER_PORTFOLIO_PED;
   }
 
   @Override
   public ErrorCode getCpedIsBeforePsdExceptionCode() {
-    return ERR_RRC_CPED_002;
+    return CPED_BEFORE_PORTFOLIO_PSD;
   }
 
 }

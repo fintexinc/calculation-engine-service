@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

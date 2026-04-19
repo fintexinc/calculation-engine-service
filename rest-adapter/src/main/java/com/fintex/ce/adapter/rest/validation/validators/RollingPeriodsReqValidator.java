@@ -34,10 +34,10 @@ public class RollingPeriodsReqValidator implements RequestValidator {
     }
     for (final var period : periods) {
       if (!isNumeric(period) && !isNegativeNumeric(period)) {
-        throw ErrorCode.ERR_RRC_TIP_004.reqValidationError(period);
+        throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toValidationException(period);
       }
       if (Long.parseLong(period) <= 0) {
-        throw ErrorCode.ERR_RRC_RTIP_003.reqValidationError();
+        throw ErrorCode.ROLLING_TIME_INTERVAL_NOT_POSITIVE.toValidationException();
       }
     }
   }

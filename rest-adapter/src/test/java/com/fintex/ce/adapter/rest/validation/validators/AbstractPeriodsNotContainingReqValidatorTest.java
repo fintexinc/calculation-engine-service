@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.rest.validation.validators;
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
@@ -29,10 +29,10 @@ abstract class AbstractPeriodsNotContainingReqValidatorTest {
     command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> createValidator().validate(command))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo(expectedErrorCode());
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo(expectedErrorCode());
         });
   }
 
@@ -43,10 +43,10 @@ abstract class AbstractPeriodsNotContainingReqValidatorTest {
     command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> createValidator().validate(command))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo(expectedErrorCode());
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo(expectedErrorCode());
         });
   }
 

@@ -18,6 +18,6 @@ import lombok.experimental.Accessors;
 @Schema(description = "Command for income forecast calculation. Supports metric: income-forecast")
 public class IncomeForecastCommand extends PortfolioHoldingsCommand {
   @Schema(description = "Forecast time period in months", example = "12")
-  @Positive(message = ErrorCode.Names.ERR_RRC_TIP_003)
+  @Positive(message = ErrorCode.Codes.TIME_INTERVAL_PERIOD_NOT_POSITIVE)
   private Integer timeIntervalPeriods;
 }

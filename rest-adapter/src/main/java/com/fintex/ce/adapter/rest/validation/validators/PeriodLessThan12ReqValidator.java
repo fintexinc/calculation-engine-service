@@ -14,7 +14,7 @@ import java.util.List;
 public class PeriodLessThan12ReqValidator extends AbstractPeriodsLessThan12ReqValidator<PeriodCommand> {
 
   public PeriodLessThan12ReqValidator() {
-    super(PeriodCommand.class, PeriodCommand::getPeriods, ErrorCode.ERR_RRC_TIP_001);
+    super(PeriodCommand.class, PeriodCommand::getPeriods, ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12);
   }
 
   @Override

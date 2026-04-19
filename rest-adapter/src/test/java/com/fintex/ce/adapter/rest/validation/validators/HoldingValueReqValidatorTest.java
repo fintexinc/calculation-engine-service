@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -31,10 +31,10 @@ class HoldingValueReqValidatorTest {
     cmd.setHoldings(List.of(holding));
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_ALL_GTZ_001");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_VALUE_NEGATIVE_OR_NULL");
         });
   }
 
@@ -49,10 +49,10 @@ class HoldingValueReqValidatorTest {
     cmd.setHoldings(List.of(holding));
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_ALL_GTZ_001");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_VALUE_NEGATIVE_OR_NULL");
         });
   }
 
@@ -67,10 +67,10 @@ class HoldingValueReqValidatorTest {
     cmd.setHoldings(List.of(holding));
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_ALL_GTZ_001");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_VALUE_NEGATIVE_OR_NULL");
           assertThat(rve.getId()).isEqualTo("FUND1");
         });
   }

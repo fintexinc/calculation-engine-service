@@ -1,53 +1,53 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.rest.dto.response.AlphaResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AnnualReturnResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AssetAllocationEMResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AssetAllocationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AverageMerResponse;
-import com.fintex.ce.adapter.rest.dto.response.BestWorstPeriodsResponseDTO;
-import com.fintex.ce.adapter.rest.dto.response.BetaResDTO;
-import com.fintex.ce.adapter.rest.dto.response.ClassificationAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.response.CommonPerformanceDatesResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CreditQualityResDTO;
-import com.fintex.ce.adapter.rest.dto.response.DownsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.DownsideDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityCountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityMarketCapResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquitySectorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.response.ExcessReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.FixedIncomeSectorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.FixedIncomeStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.response.GeographicExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.Growth10KResDTO;
-import com.fintex.ce.adapter.rest.dto.response.IncomeForecastResDto;
-import com.fintex.ce.adapter.rest.dto.response.InformationRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.LeadingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.MARRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.ManagementFeeResponse;
-import com.fintex.ce.adapter.rest.dto.response.MaturityAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.response.MaxDrawdownResDTO;
-import com.fintex.ce.adapter.rest.dto.response.MeanResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RSquaredResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingCorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingSharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingStandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.SalesChargeResDtos;
-import com.fintex.ce.adapter.rest.dto.response.SharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.SortinoRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.StandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TopCommonHoldingsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TrackingErrorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TrailingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TreynorRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.UpsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.YieldResDto;
-import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
-import com.fintex.ce.adapter.rest.dto.response.distributionofreturns.DistributionOfReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.CommonPerformanceDatesResDTO;
+import com.fintex.ce.adapter.rest.dto.WarningDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationEMResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.ClassificationAllocationResDto;
+import com.fintex.ce.adapter.rest.dto.allocation.CreditQualityResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.EquityMarketCapResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.EquitySectorResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.FixedIncomeSectorResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.MaturityAllocationResDto;
+import com.fintex.ce.adapter.rest.dto.correlation.CorrelationResDTO;
+import com.fintex.ce.adapter.rest.dto.distribution.DistributionOfReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.CountryExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.EquityCountryExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.EquityStyleboxExposureResDto;
+import com.fintex.ce.adapter.rest.dto.exposure.FixedIncomeStyleboxExposureResDto;
+import com.fintex.ce.adapter.rest.dto.exposure.GeographicExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.fee.AverageMerResponse;
+import com.fintex.ce.adapter.rest.dto.fee.ManagementFeeResponse;
+import com.fintex.ce.adapter.rest.dto.fee.SalesChargeResDtos;
+import com.fintex.ce.adapter.rest.dto.holding.TopCommonHoldingsResDTO;
+import com.fintex.ce.adapter.rest.dto.income.IncomeForecastResDto;
+import com.fintex.ce.adapter.rest.dto.income.YieldResDto;
+import com.fintex.ce.adapter.rest.dto.period.BestWorstPeriodsResponseDTO;
+import com.fintex.ce.adapter.rest.dto.returns.AnnualReturnResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.ExcessReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.Growth10KResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.LeadingTotalReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.MeanResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.TrailingTotalReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.AlphaResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.BetaResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.DownsideCaptureResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.DownsideDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.InformationRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.MARRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.MaxDrawdownResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.RSquaredResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.SharpeRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.SortinoRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.StandardDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.TrackingErrorResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.TreynorRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.UpsideCaptureResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingCorrelationResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingSharpeRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingStandardDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingTotalReturnsResDTO;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
@@ -57,8 +57,8 @@ import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.ParameterType;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
-import com.fintex.ce.model.domain.result.ErrorResult;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
@@ -126,6 +126,9 @@ import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
 import com.fintex.wm.commons.domain.rating.StyleBoxType;
 
@@ -145,6 +148,10 @@ class CalculationTestDataProvider {
   static final LocalDate PED = LocalDate.of(2024, 12, 31);
   static final LocalDate PSD = LocalDate.of(2024, 1, 1);
   static final LocalDate CUSTOM_IPSD = LocalDate.of(2024, 6, 1);
+
+  static final PortfolioHolding DUMMY_HOLDING = new PortfolioHolding(
+      BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+      new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
 
   static final Set<TimeIntervalResult> TIME_INTERVALS = Set.of(
       new TimeIntervalResult().setTimeIntervalPeriod("12M").setValue(BigDecimal.valueOf(8.56)),
@@ -262,7 +269,7 @@ class CalculationTestDataProvider {
   }
 
   private static Arguments period(CalculationMetric metric, PeriodResult result,
-      Class<? extends ErrorDTO> responseType) {
+      Class<? extends WarningDTO> responseType) {
     result.setPed(PED);
     result.setPsd(PSD);
     result.setCustomIpsd(CUSTOM_IPSD);
@@ -270,30 +277,30 @@ class CalculationTestDataProvider {
   }
 
   private static Arguments rolling(CalculationMetric metric, PeriodResult result,
-      Class<? extends ErrorDTO> responseType) {
+      Class<? extends WarningDTO> responseType) {
     result.setPed(PED);
     result.setPsd(PSD);
     return Arguments.of(metric, rollingCommand(), result, responseType);
   }
 
-  private static Arguments breakdown(CalculationMetric metric, ErrorResult result,
-      Class<? extends ErrorDTO> responseType) {
+  private static Arguments breakdown(CalculationMetric metric, Object result,
+      Class<? extends WarningDTO> responseType) {
     return Arguments.of(metric, portfolioHoldingsCommand(), result, responseType);
   }
 
-  private static Arguments fee(CalculationMetric metric, ErrorResult result,
-      Class<? extends ErrorDTO> responseType) {
+  private static Arguments fee(CalculationMetric metric, Object result,
+      Class<? extends WarningDTO> responseType) {
     return Arguments.of(metric, averageMerCommand(), result, responseType);
   }
 
   private static Arguments entry(CalculationMetric metric, CalculationCommand command,
-      ErrorResult result, Class<? extends ErrorDTO> responseType) {
+      Object result, Class<? extends WarningDTO> responseType) {
     return Arguments.of(metric, command, result, responseType);
   }
 
   static PeriodCommand periodCommand() {
     PeriodCommand cmd = new PeriodCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setCurrency(Currency.CAD);
     cmd.setPeriods(Set.of("12M", "36M"));
     return cmd;
@@ -301,7 +308,7 @@ class CalculationTestDataProvider {
 
   private static RollingCalculationCommand rollingCommand() {
     RollingCalculationCommand cmd = new RollingCalculationCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setCurrency(Currency.CAD);
     cmd.setPeriods(Set.of("12M"));
     cmd.setRollingPeriods(Set.of("12M"));
@@ -310,8 +317,8 @@ class CalculationTestDataProvider {
 
   private static RollingCorrelationCommand rollingCorrelationCommand() {
     RollingCorrelationCommand cmd = new RollingCorrelationCommand();
-    cmd.setHoldings(List.of());
-    cmd.setBenchmarkHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
+    cmd.setBenchmarkHoldings(List.of(DUMMY_HOLDING));
     cmd.setCurrency(Currency.CAD);
     cmd.setPeriods(Set.of("12M"));
     cmd.setRollingPeriods(Set.of("12M"));
@@ -320,20 +327,20 @@ class CalculationTestDataProvider {
 
   private static PortfolioHoldingsCommand portfolioHoldingsCommand() {
     PortfolioHoldingsCommand cmd = new PortfolioHoldingsCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     return cmd;
   }
 
   private static AverageMerCommand averageMerCommand() {
     AverageMerCommand cmd = new AverageMerCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setParameterTypes(List.of(ParameterType.SCALED, ParameterType.ABSOLUTE));
     return cmd;
   }
 
   private static ReturnCommand returnCommand() {
     ReturnCommand cmd = new ReturnCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setCurrency(Currency.CAD);
     cmd.setCustomPsd(PSD);
     cmd.setCustomPed(PED);
@@ -342,7 +349,7 @@ class CalculationTestDataProvider {
 
   private static BestWorstPeriodsCommand bestWorstPeriodsCommand() {
     BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setCurrency(Currency.CAD);
     cmd.setCustomPsd(PSD);
     cmd.setCustomPed(PED);
@@ -352,28 +359,28 @@ class CalculationTestDataProvider {
 
   private static IncomeForecastCommand incomeForecastCommand() {
     IncomeForecastCommand cmd = new IncomeForecastCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setTimeIntervalPeriods(12);
     return cmd;
   }
 
   private static YieldCommand yieldCommand() {
     YieldCommand cmd = new YieldCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setTimeIntervalPeriods(12);
     return cmd;
   }
 
   private static MultiplePortfoliosCommand multiplePortfoliosCommand() {
     MultiplePortfoliosCommand cmd = new MultiplePortfoliosCommand();
-    cmd.setPortfolios(Set.of());
-    cmd.setBenchmarkHoldings(List.of());
+    cmd.setPortfolios(Set.of(new MultiplePortfoliosCommand.Portfolio(List.of(DUMMY_HOLDING))));
+    cmd.setBenchmarkHoldings(List.of(DUMMY_HOLDING));
     return cmd;
   }
 
   private static TopCommonHoldingsCommand topCommonHoldingsCommand() {
     TopCommonHoldingsCommand cmd = new TopCommonHoldingsCommand();
-    cmd.setHoldings(List.of());
+    cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setNumOfFundsMin(2);
     cmd.setNumOfTopCommonHoldings(10);
     return cmd;

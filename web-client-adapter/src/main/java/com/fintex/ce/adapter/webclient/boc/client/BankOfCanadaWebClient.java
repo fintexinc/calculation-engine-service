@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.webclient.boc.client;
 
-import com.fintex.ce.adapter.webclient.boc.exception.BankOfCanadaWebClientException;
+import com.fintex.ce.model.error.exceptions.ExternalServiceBadResponseException;
+import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -12,10 +13,20 @@ import lombok.extern.slf4j.Slf4j;
 
 import reactor.core.publisher.Mono;
 
+/**
+ * WebClient for Bank of Canada API calls. Failures are split by cause:
+ * <ul>
+ * <li>4xx response → {@link ExternalServiceBadResponseException} (HTTP 502 Bad Gateway)</li>
+ * <li>5xx response or transport/connection error → {@link ExternalServiceUnavailableException} (HTTP 503 Service
+ * Unavailable)</li>
+ * </ul>
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BankOfCanadaWebClient {
+
+  private static final String SERVICE_NAME = "Bank of Canada";
 
   private final WebClient bocWebClient;
 
@@ -26,16 +37,27 @@ public class BankOfCanadaWebClient {
         .retrieve()
         .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
         .bodyToMono(responseType)
+        .onErrorMap(BankOfCanadaWebClient::handleError)
         .block();
     log.debug("GET response from Bank of Canada: {} - status OK", path);
     return result;
   }
 
   private Mono<Throwable> handleErrorResponse(String path, ClientResponse response) {
+    HttpStatusCode status = response.statusCode();
     return response.bodyToMono(String.class)
+        .defaultIfEmpty("")
         .flatMap(body -> {
-          log.error("Bank of Canada API error: {} {} - {}", path, response.statusCode(), body);
-          return Mono.error(new BankOfCanadaWebClientException(response.statusCode(), body));
+          log.error("Bank of Canada API error: {} {} - {}", path, status, body);
+          return Mono.error(status.is4xxClientError()
+              ? new ExternalServiceBadResponseException(SERVICE_NAME)
+              : new ExternalServiceUnavailableException(SERVICE_NAME));
         });
+  }
+
+  private static Throwable handleError(Throwable error) {
+    return error instanceof ExternalServiceBadResponseException || error instanceof ExternalServiceUnavailableException
+        ? error
+        : new ExternalServiceUnavailableException(SERVICE_NAME, error);
   }
 }

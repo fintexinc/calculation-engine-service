@@ -92,8 +92,6 @@ management:
           name: http.client.requests
 
 logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-},%X{requestId:-}]"
   level:
     root: INFO
     com.fintex.ce: DEBUG

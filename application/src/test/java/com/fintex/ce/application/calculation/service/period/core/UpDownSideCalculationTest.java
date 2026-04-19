@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service.period.core;
 
 import com.fintex.ce.application.calculation.service.period.UpsideCaptureCalculationServiceImpl;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static com.fintex.ce.model.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_TIP_001;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_TIP_002;
+import static com.fintex.ce.model.error.ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE;
+import static com.fintex.ce.model.error.ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
@@ -31,10 +31,10 @@ class UpDownSideCalculationTest {
 
     doCallRealMethod().when(u).addSpecificChecks(any());
     // ACT
-    final ReqValidationException e = assertThrows(ReqValidationException.class, () -> u.addSpecificChecks(p));
+    final CalculationException e = assertThrows(CalculationException.class, () -> u.addSpecificChecks(p));
 
     // VERIFY
-    assertEquals(ERR_RRC_TIP_001.getMessage(), e.getMessage());
+    assertEquals(TIME_INTERVAL_PERIOD_LESS_THAN_12.getMessage(), e.getMessage());
   }
 
   @Test
@@ -47,10 +47,10 @@ class UpDownSideCalculationTest {
 
     doCallRealMethod().when(u).addSpecificChecks(any());
     // ACT
-    final ReqValidationException e = assertThrows(ReqValidationException.class, () -> u.addSpecificChecks(p));
+    final CalculationException e = assertThrows(CalculationException.class, () -> u.addSpecificChecks(p));
 
     // VERIFY
-    assertEquals(ERR_RRC_TIP_002.getMessage(), e.getMessage());
+    assertEquals(TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.getMessage(), e.getMessage());
   }
 
   @Test

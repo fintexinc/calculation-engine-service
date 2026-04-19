@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.enumeration.calculation;
 
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
-import com.fintex.ce.model.error.exceptions.SystemException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +39,7 @@ class AssetAllocationRegionEmTypeTest {
 
     // ACT
     String region = AssetAllocationRegionEmType.CANADIAN_EQUITY.getRegion() + 1;
-    assertThrows(SystemException.class, () -> AssetAllocationRegionEmType.fromValue(region));
+    assertThrows(CalculationException.class, () -> AssetAllocationRegionEmType.fromValue(region));
   }
 
 }

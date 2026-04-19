@@ -13,8 +13,8 @@ import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.error.exceptions.FdsDataValidationException;
-import com.fintex.ce.port.webclient.FxRatesFetcher;
+import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
+import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -92,7 +92,7 @@ public class MonthlyReturnsService {
 
   public ReturnsAggregate<HoldingMonthlyReturns> getPortfolioMonthlyReturns(final List<PortfolioHolding> holdings,
       final Currency currency,
-      final ReturnFactorScale returnFactorScale) throws FdsDataValidationException {
+      final ReturnFactorScale returnFactorScale) throws CalculationsFailedException {
     ReturnsAggregate<HoldingMonthlyReturns> portfolioMonthlyReturnsAggregate = getMonthlyReturns(holdings, currency);
 
     portfolioMonthlyReturnsAggregate

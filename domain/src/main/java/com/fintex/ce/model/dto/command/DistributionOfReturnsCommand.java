@@ -24,7 +24,7 @@ public class DistributionOfReturnsCommand extends PeriodCommand implements Custo
   private LocalDate customPsd;
   @Schema(description = "Number of histogram bins for the distribution")
   @JsonProperty("numberOfBins")
-  @Min(value = 5, message = ErrorCode.Names.ERR_RRC_CNOB_001)
-  @Max(value = 30, message = ErrorCode.Names.ERR_RRC_CNOB_002)
+  @Min(value = 5, message = ErrorCode.Codes.CUSTOM_NUMBER_OF_BINS_LESS_THAN_MIN)
+  @Max(value = 30, message = ErrorCode.Codes.CUSTOM_NUMBER_OF_BINS_GREATER_THAN_MAX)
   private Integer customNumberOfBins;
 }

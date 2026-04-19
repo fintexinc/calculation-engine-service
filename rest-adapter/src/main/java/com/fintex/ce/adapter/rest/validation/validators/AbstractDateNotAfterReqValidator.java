@@ -27,7 +27,7 @@ public abstract class AbstractDateNotAfterReqValidator implements RequestValidat
     LocalDate first = firstDateAccessor.apply(command);
     LocalDate second = secondDateAccessor.apply(command);
     if (first != null && second != null && first.isAfter(second)) {
-      throw errorCode.reqValidationError();
+      throw errorCode.toValidationException();
     }
   }
 }

@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.enumeration.calculation;
 
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
-import com.fintex.ce.model.error.exceptions.SystemException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class AssetAllocationRegionTypeTest {
     final String region = "Cashh";
 
     // VERIFY
-    Assertions.assertThrows(SystemException.class, () -> {
+    Assertions.assertThrows(CalculationException.class, () -> {
       AssetAllocationRegionType.fromValue(region);
     });
   }

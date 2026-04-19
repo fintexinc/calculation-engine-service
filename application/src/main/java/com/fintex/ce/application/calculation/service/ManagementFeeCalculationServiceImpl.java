@@ -8,7 +8,6 @@ import com.fintex.ce.model.domain.enumeration.ParameterType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
-import com.fintex.ce.model.error.Notification;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -21,13 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.SCALED;
-import static com.fintex.ce.model.error.ErrorCode.ERR_MF_MF_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_MANAGEMENT_FEE;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service
@@ -71,24 +69,20 @@ public class ManagementFeeCalculationServiceImpl
   @Override
   public List<Warning> setInitialFeeAndModifiedFeeValues(
       final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupOfMers) {
-    var notification = new Notification();
-    List<Warning> warnings = groupOfMers.entrySet().stream()
+    return groupOfMers.entrySet().stream()
         .filter(e -> FUNDS.contains(e.getKey()))
         .flatMap(e -> e.getValue().entrySet().stream())
-        .map(e -> validateManagementFee(e.getValue(), e.getKey(), notification))
+        .map(e -> validateManagementFee(e.getValue(), e.getKey()))
         .flatMap(Optional::stream)
         .flatMap(Collection::stream)
-        .collect(Collectors.toList());
-    notification.ifAnyErrorThrowException();
-    return warnings;
+        .toList();
   }
 
   public Optional<List<Warning>> validateManagementFee(
       AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
-      PortfolioHolding holding,
-      Notification notification) {
+      PortfolioHolding holding) {
     if (Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
-      notification.addError(ERR_MF_MF_001.error(holding, org.springframework.http.HttpStatus.BAD_REQUEST));
+      throw MISSING_MANAGEMENT_FEE.toExceptionForHolding(holding);
     }
     setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
         .getActualManagementFee());

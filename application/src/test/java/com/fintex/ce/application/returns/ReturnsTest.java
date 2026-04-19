@@ -7,10 +7,10 @@ import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.ValidationError;
 import com.fintex.ce.model.error.Warning;
-import com.fintex.ce.model.error.exceptions.DataErrorException;
-import com.fintex.ce.model.error.exceptions.FdsDataValidationException;
+import com.fintex.ce.model.error.exceptions.BasePceException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
+import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -70,7 +70,7 @@ class ReturnsTest {
     final PortfolioHolding holdingMissingReturns = mock(PortfolioHolding.class);
     final HoldingMonthlyReturns monthlyReturns = mock(HoldingMonthlyReturns.class);
     final HoldingMonthlyReturns monthlyReturnsMissing = mock(HoldingMonthlyReturns.class);
-    monthlyReturnsMissing.setErrors(List.of(new ValidationError("id", ErrorCode.ERR_RRC_MR_002.name(), "message")));
+    monthlyReturnsMissing.setErrors(List.of(ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toNotification("id", null, null, null)));
 
     final ReturnsAggregate sut = new ReturnsAggregate();
     Mockito.when(monthlyReturns.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
@@ -99,10 +99,10 @@ class ReturnsTest {
     Mockito.when(monthlyReturns.hasMonthlyReturnsErrors()).thenReturn(false);
     Mockito.when(monthlyReturnsMissing.hasMonthlyReturnsErrors()).thenReturn(true);
     Mockito.when(monthlyReturnsMissing.getOnlyMonthlyReturnsErrors()).thenReturn(
-        List.of(new ValidationError("id", ErrorCode.ERR_RRC_CPED_003.name(), "message")));
+        List.of(ErrorCode.CPED_AFTER_PORTFOLIO_PED.toNotification("id", null, null, null)));
 
     // VERIFY
-    assertThrows(FdsDataValidationException.class, () -> sut.initOnlyWithReturnsDataValidation(Map.of(holding,
+    assertThrows(CalculationsFailedException.class, () -> sut.initOnlyWithReturnsDataValidation(Map.of(holding,
         monthlyReturns, holdingMissingReturns, monthlyReturnsMissing)));
 
   }
@@ -174,9 +174,9 @@ class ReturnsTest {
   @Test
   void shouldGetErrors_whenReturnsListOfErrorsWhenErrorsExist() {
     ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
-    DataErrorException error = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
-    sut.notification.addError(error);
-    List<DataErrorException> errors = sut.getErrors();
+    CalculationException error = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id");
+    sut.notification.add(error);
+    List<BasePceException> errors = sut.getErrors();
     assertEquals(1, errors.size());
     assertEquals(error, errors.get(0));
   }
@@ -184,11 +184,11 @@ class ReturnsTest {
   @Test
   void shouldGetErrors_whenReturnsMultipleErrorsWhenMultipleErrorsExist() {
     ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
-    DataErrorException error1 = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
-    DataErrorException error2 = new DataErrorException("message", "id2", ErrorCode.ERR_RRC_MR_002);
-    sut.notification.addError(error1);
-    sut.notification.addError(error2);
-    List<DataErrorException> errors = sut.getErrors();
+    CalculationException error1 = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id");
+    CalculationException error2 = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id2");
+    sut.notification.add(error1);
+    sut.notification.add(error2);
+    List<BasePceException> errors = sut.getErrors();
     assertEquals(2, errors.size());
     assertTrue(errors.contains(error1));
     assertTrue(errors.contains(error2));
@@ -228,13 +228,13 @@ class ReturnsTest {
   @Test
   void shouldGetErrorsAsWarnings_whenReturnsListOfWarningsWhenErrorsExist() {
     ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
-    DataErrorException error = new DataErrorException("message", "id", ErrorCode.ERR_RRC_MR_002);
-    sut.notification.addError(error);
+    CalculationException error = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id");
+    sut.notification.add(error);
     List<Warning> warnings = sut.getErrorsAsWarnings();
     assertEquals(1, warnings.size());
     assertEquals(error.getId(), warnings.get(0).getId());
     assertEquals(error.getMessage(), warnings.get(0).getMessage());
-    assertEquals(error.getCode().name(), warnings.get(0).getCode());
+    assertEquals(error.getErrorCode().getCode(), warnings.get(0).getCode());
   }
 
 }

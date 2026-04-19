@@ -19,7 +19,7 @@ public class RollingPeriodsLessThan12ReqValidator
 
   public RollingPeriodsLessThan12ReqValidator() {
     super(RollingCalculationCommand.class, RollingCalculationCommand::getRollingPeriods,
-        ErrorCode.ERR_RRC_RTIP_001);
+        ErrorCode.ROLLING_INTERVAL_LESS_THAN_12);
   }
 
   @Override

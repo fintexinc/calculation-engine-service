@@ -19,7 +19,7 @@ public class NotIncludeCpedReqValidator
       AbstractNotIncludePropertyReqValidator<PeriodCommand, LocalDate> {
 
   public NotIncludeCpedReqValidator() {
-    super(PeriodCommand.class, PeriodCommand::getCustomPed, ErrorCode.ERR_RRC_TIP_006);
+    super(PeriodCommand.class, PeriodCommand::getCustomPed, ErrorCode.REQUEST_CONTAINS_CUSTOM_PED);
   }
 
   @Override

@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.mapping.GeographicAllocationMappingService;
+import com.fintex.ce.application.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;

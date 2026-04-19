@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.FIXED_INCOME;
-import static com.fintex.ce.model.error.ErrorCode.WRN_BS_BS_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_FIXED_INCOME_BOND_SECTOR;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
@@ -70,7 +70,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         FixedIncomeBondSecurities::getFixedIncomeBondSectors,
-        ALLOCATION_DEFAULT_MAP, WRN_BS_BS_001);
+        ALLOCATION_DEFAULT_MAP, MISSING_FIXED_INCOME_BOND_SECTOR);
   }
 
   @Override

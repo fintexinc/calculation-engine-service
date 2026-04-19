@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_UNKNOWN_001;
+import static com.fintex.ce.model.error.ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 
 /**
@@ -123,7 +123,7 @@ public final class AllocationMappingUtils {
         .map(entry -> {
           E type = typeResolver.apply(entry.getKey());
           if (type == null) {
-            warnings.add(WRN_UNKNOWN_001.warning(holding, entry.getKey(), fdsServiceName));
+            warnings.add(UNKNOWN_TYPE_FROM_DATA_POINT.warning(holding, entry.getKey(), fdsServiceName));
           }
           return type != null ? Map.entry(type, entry.getValue()) : null;
         })

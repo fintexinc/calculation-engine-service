@@ -24,6 +24,6 @@ class CipsdLastDayOfMonthReqValidatorTest extends AbstractLastDayOfMonthReqValid
 
   @Override
   String expectedErrorCode() {
-    return "ERR_RRC_CIPSD_001";
+    return "CIPSD_NOT_MONTH_END";
   }
 }

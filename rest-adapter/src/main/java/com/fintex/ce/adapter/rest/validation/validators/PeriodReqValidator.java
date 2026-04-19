@@ -40,10 +40,10 @@ public class PeriodReqValidator implements RequestValidator {
     final Set<String> allowedSymbols = Stream.of(Period.values()).map(Enum::name).collect(Collectors.toSet());
     for (String period : periods) {
       if (NumberUtils.isNumber(period) && Integer.parseInt(period) <= 0) {
-        throw ErrorCode.ERR_RRC_TIP_003.reqValidationError();
+        throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.toValidationException();
       }
       if (!isNumeric(period) && !allowedSymbols.contains(period)) {
-        throw ErrorCode.ERR_RRC_TIP_004.reqValidationError(period);
+        throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toValidationException(period);
       }
     }
   }

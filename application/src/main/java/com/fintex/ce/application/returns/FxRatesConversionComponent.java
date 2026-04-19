@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_MFR_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_MONTHLY_FX_RATE;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.CollectorUtils.toTreeMap;
@@ -61,7 +61,7 @@ public class FxRatesConversionComponent {
 
   private BigDecimal validateFxRates(final LocalDate date, final BigDecimal fxRateValue) {
     if (fxRateValue == null) {
-      throw ERR_RRC_MFR_001.error(date);
+      throw MISSING_MONTHLY_FX_RATE.toException(date);
     }
     return fxRateValue;
   }

@@ -18,6 +18,6 @@ class PeriodsNotContainingYearToDateReqValidatorTest
 
   @Override
   String expectedErrorCode() {
-    return "ERR_RRC_TIP_002";
+    return "TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE";
   }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_MA_MA_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_MATURITY_ALLOCATION;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 
@@ -72,7 +72,7 @@ public class MaturityAllocationCalculationServiceImpl
         MaturityAllocation::getMaturityDurationValues,
         MaturityAllocationType::fromValue,
         ALLOCATION_DEFAULT_MAP,
-        WRN_MA_MA_001,
+        MISSING_MATURITY_ALLOCATION,
         "FDS Get Maturity Allocation",
         (map, entry) -> map.merge(entry.getKey().getDisplayType(), entry.getValue(), BigDecimal::add));
   }

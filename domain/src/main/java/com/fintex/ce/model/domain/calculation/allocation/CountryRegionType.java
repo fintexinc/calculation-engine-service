@@ -1,7 +1,6 @@
 package com.fintex.ce.model.domain.calculation.allocation;
 
-import com.fintex.ce.model.error.HttpCode;
-import com.fintex.ce.model.error.exceptions.SystemException;
+import com.fintex.ce.model.error.ErrorCode;
 
 import lombok.Getter;
 
@@ -25,8 +24,7 @@ public enum CountryRegionType {
         return value;
       }
     }
-    final String message = String.format("Could not find region for %s", region);
-    throw new SystemException(message, HttpCode.INTERNAL_SERVER_ERROR);
+    throw ErrorCode.INTERNAL_SERVER_ERROR.toException(String.format("Could not find region for %s", region));
   }
 
 }

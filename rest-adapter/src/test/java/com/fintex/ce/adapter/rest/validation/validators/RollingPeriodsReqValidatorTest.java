@@ -2,7 +2,7 @@ package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
@@ -27,10 +27,10 @@ class RollingPeriodsReqValidatorTest {
     cmd.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_RRC_TIP_004");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("TIME_INTERVAL_PERIOD_NOT_ALLOWED");
         });
   }
 
@@ -42,10 +42,10 @@ class RollingPeriodsReqValidatorTest {
     cmd.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_RRC_RTIP_003");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("ROLLING_TIME_INTERVAL_NOT_POSITIVE");
         });
   }
 

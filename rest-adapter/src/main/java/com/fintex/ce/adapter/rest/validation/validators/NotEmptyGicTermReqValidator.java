@@ -17,7 +17,7 @@ import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 public class NotEmptyGicTermReqValidator extends AbstractGicFieldReqValidator<BigDecimal> {
 
   public NotEmptyGicTermReqValidator() {
-    super(GicHolding::getTerm, ErrorCode.ERR_GIC_MC_002);
+    super(GicHolding::getTerm, ErrorCode.GIC_HOLDING_MISSING_TERM);
   }
 
   @Override

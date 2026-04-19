@@ -43,13 +43,13 @@ public class AssetAllocationDataValidator {
     assetAllocations.keySet().forEach(region -> {
       final var assetAllocationRegion = AssetAllocationRegion.fromValue(region);
       if (assetAllocationRegion == null || assetAllocationRegion.getName() == null) {
-        warnings.add(ErrorCode.WRN_UNKNOWN_001.warning(holding, region, "Asset Allocation"));
+        warnings.add(ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT.warning(holding, region, "Asset Allocation"));
       }
     });
   }
 
   public void validateWhenAssetAllocationIsEmpty(final PortfolioHolding holding, final List<Warning> warnings) {
-    warnings.add(ErrorCode.WRN_AA_AA_001.warning(holding));
+    warnings.add(ErrorCode.MISSING_ASSET_ALLOCATION.warning(holding));
   }
 
 }

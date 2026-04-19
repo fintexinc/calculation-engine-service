@@ -8,7 +8,7 @@ import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse;
 import com.fintex.ce.adapter.webclient.boc.mapper.BankOfCanadaFxRateMapper;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
-import com.fintex.ce.port.webclient.FxRatesFetcher;
+import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 
 import org.springframework.stereotype.Component;
 

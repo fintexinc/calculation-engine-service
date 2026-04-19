@@ -32,6 +32,6 @@ class NotIncludeCipsdReqValidatorTest extends AbstractNotIncludePropertyReqValid
 
   @Override
   String expectedErrorCode() {
-    return "ERR_RRC_TIP_005";
+    return "REQUEST_CONTAINS_CUSTOM_INTERVAL_PSD";
   }
 }

@@ -1,6 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
-import com.fintex.ce.port.webclient.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.springframework.stereotype.Component;
