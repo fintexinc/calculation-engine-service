@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
-import com.fintex.ce.mapping.GeographicAllocationMappingService;
+import com.fintex.ce.application.mapping.GeographicAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_RRC_EGE_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_GEOGRAPHIC_EXPOSURE;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
@@ -82,7 +82,7 @@ public class EquityGeographicExposureCalculationServiceImpl
     Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
     Map<PortfolioHolding, Map<GeographicRegionType, BigDecimal>> allocations = geographicAllocationMappingService
-        .mapToGeographicRegions(mappedHoldings, warnings, WRN_RRC_EGE_001);
+        .mapToGeographicRegions(mappedHoldings, warnings, MISSING_EQUITY_GEOGRAPHIC_EXPOSURE);
     return new ExposureDataHolder<>(allocations, warnings);
   }
 

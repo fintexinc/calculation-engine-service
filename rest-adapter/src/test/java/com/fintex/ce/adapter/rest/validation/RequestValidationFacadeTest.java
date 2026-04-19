@@ -3,7 +3,9 @@ package com.fintex.ce.adapter.rest.validation;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 
 import org.junit.jupiter.api.Test;
 
@@ -52,8 +54,8 @@ class RequestValidationFacadeTest {
     when(validator1.supportedMetrics()).thenReturn(List.of(CalculationMetric.TRAILING_TOTAL_RETURNS));
     when(validator2.supportedMetrics()).thenReturn(List.of(CalculationMetric.TRAILING_TOTAL_RETURNS));
 
-    ReqValidationException error1 = new ReqValidationException("Error 1");
-    ReqValidationException error2 = new ReqValidationException("Error 2");
+    ValidationException error1 = ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12.toValidationException();
+    ValidationException error2 = ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.toValidationException();
     doThrow(error1).when(validator1).validate(any());
     doThrow(error2).when(validator2).validate(any());
 
@@ -61,11 +63,11 @@ class RequestValidationFacadeTest {
     PeriodCommand command = new PeriodCommand();
 
     assertThatThrownBy(() -> facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(CalculationsFailedException.class)
         .satisfies(ex -> {
-          ReqValidationException composite = (ReqValidationException) ex;
-          assertThat(composite.getReqValidationExceptions()).hasSize(2);
-          assertThat(composite.getReqValidationExceptions()).containsExactly(error1, error2);
+          CalculationsFailedException composite = (CalculationsFailedException) ex;
+          assertThat(composite.getExceptions()).hasSize(2);
+          assertThat(composite.getExceptions()).containsExactly(error1, error2);
         });
   }
 

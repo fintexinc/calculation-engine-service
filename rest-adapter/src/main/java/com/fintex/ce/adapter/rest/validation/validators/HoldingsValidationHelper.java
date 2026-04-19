@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.MonthlyReturnGeneratableHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.ce.util.DateTimeUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -45,7 +45,7 @@ public class HoldingsValidationHelper {
         throw buildValueMissingException(holding);
       }
       if (value.compareTo(BigDecimal.ZERO) < 0) {
-        throw ErrorCode.ERR_ALL_GTZ_001.reqValidationError();
+        throw ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationException();
       }
     }
   }
@@ -55,7 +55,7 @@ public class HoldingsValidationHelper {
         .filter(h -> !(h instanceof GicHolding))
         .toList();
     if (new HashSet<>(nonGicHoldings).size() != nonGicHoldings.size()) {
-      throw ErrorCode.ERR_DH_001.reqValidationError();
+      throw ErrorCode.DUPLICATE_HOLDING.toValidationException();
     }
   }
 
@@ -79,22 +79,20 @@ public class HoldingsValidationHelper {
         .filter(cashHolding -> Objects.isNull(cashHolding.getCurrency()))
         .findFirst()
         .ifPresent(ignored -> {
-          throw ErrorCode.ERR_RRC_MC_002.reqValidationError();
+          throw ErrorCode.HOLDING_MISSING_CURRENCY.toValidationException();
         });
   }
 
-  private static ReqValidationException buildInvestmentDateException(PortfolioHolding holding) {
-    String code = Optional.ofNullable(holding).map(PortfolioHolding::getIdsString).orElse("");
-    String message = String.format("Investment date could not be before %s years ago",
-        DateTimeUtils.QUINCENTENARY);
-    return new ReqValidationException(code, message);
+  private static ValidationException buildInvestmentDateException(PortfolioHolding holding) {
+    String id = Optional.ofNullable(holding).map(PortfolioHolding::getIdsString).orElse("");
+    return ErrorCode.GIC_INVESTMENT_DATE_TOO_OLD.toValidationExceptionForId(id, id, DateTimeUtils.QUINCENTENARY);
   }
 
-  private static ReqValidationException buildValueMissingException(PortfolioHolding holding) {
+  private static ValidationException buildValueMissingException(PortfolioHolding holding) {
     SecurityIdentifier secId = holding.getSecurityIdentifier();
     if (secId != null && secId.getId() != null) {
-      return ErrorCode.ERR_ALL_GTZ_001.reqValidationErrorWithId(secId.getId());
+      return ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationExceptionForId(secId.getId());
     }
-    return ErrorCode.ERR_ALL_GTZ_001.reqValidationError();
+    return ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationException();
   }
 }

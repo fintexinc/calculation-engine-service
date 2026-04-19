@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.rest.validation.validators;
 import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -31,10 +31,10 @@ class TopCommonHoldingsReqValidatorTest {
     command.setNumOfFundsMin(0);
 
     assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_TCH_NFM_001");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("NUM_OF_FUNDS_MIN_NOT_POSITIVE");
         });
   }
 
@@ -45,10 +45,10 @@ class TopCommonHoldingsReqValidatorTest {
     command.setNumOfFundsMin(5);
 
     assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_TCH_NFM_002");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("NUM_OF_FUNDS_EXCEEDS_PORTFOLIO");
         });
   }
 
@@ -64,10 +64,10 @@ class TopCommonHoldingsReqValidatorTest {
     command.setAccumulateHoldingTypes(thirteenTypes);
 
     assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_TCH_AHT_001");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("ACCUMULATE_HOLDING_TYPES_EXCEED_MAX");
         });
   }
 
@@ -83,10 +83,10 @@ class TopCommonHoldingsReqValidatorTest {
     command.setNumOfFundsMin(1);
 
     assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_TCH_GNM_003");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("GIC_HOLDING_NAME_EMPTY");
         });
   }
 

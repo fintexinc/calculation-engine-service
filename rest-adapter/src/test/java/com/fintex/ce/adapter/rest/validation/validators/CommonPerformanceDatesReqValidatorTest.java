@@ -4,7 +4,7 @@ import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -38,10 +38,10 @@ class CommonPerformanceDatesReqValidatorTest {
     cmd.setPortfolios(Collections.emptySet());
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_RRC_MC_002");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_MISSING_CURRENCY");
         });
   }
 
@@ -58,10 +58,10 @@ class CommonPerformanceDatesReqValidatorTest {
     cmd.setPortfolios(Set.of(new MultiplePortfoliosCommand.Portfolio(List.of(cashHolding))));
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_RRC_MC_002");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_MISSING_CURRENCY");
         });
   }
 

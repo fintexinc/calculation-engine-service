@@ -10,14 +10,13 @@ import com.fintex.ce.model.domain.calculation.returns.ReturnsData;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.HttpCode;
-import com.fintex.ce.model.error.Notification;
-import com.fintex.ce.model.error.ValidationError;
+import com.fintex.ce.model.error.PceExceptionCollector;
 import com.fintex.ce.model.error.Warning;
-import com.fintex.ce.model.error.exceptions.DataErrorException;
-import com.fintex.ce.model.error.exceptions.SystemException;
+import com.fintex.ce.model.error.exceptions.BasePceException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.util.MapUtils;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,10 +31,11 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import static com.fintex.ce.model.error.ErrorCode.ERR_FDS_MC_002;
-import static com.fintex.ce.model.error.ErrorCode.ERR_NAV_PRICES_002;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_MMR_001;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_MR_002;
+import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
+import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_HISTORICAL_NAV_PRICES_FOR_MONTH;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_MONTHLY_RETURNS;
+import static com.fintex.ce.model.error.ErrorCode.NAV_PARAM_MISSING;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.PATTERN_1;
@@ -45,7 +45,7 @@ import static java.util.stream.Collectors.toList;
 
 @EqualsAndHashCode
 public class ReturnsAggregate<T extends ReturnsData> {
-  public Notification notification = new Notification();
+  public PceExceptionCollector notification = new PceExceptionCollector();
   public Map<PortfolioHolding, Currency> holdingCurrencyMap;
   public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returnsMap;
   @Getter
@@ -99,28 +99,28 @@ public class ReturnsAggregate<T extends ReturnsData> {
 
   private static <T extends ReturnsData> void inCaseOfMonthlyReturnsErrorsThrowAnException(
       Map<PortfolioHolding, T> originalMonthlyReturns) {
-    var notification = new Notification();
+    var notification = new PceExceptionCollector();
     originalMonthlyReturns.values()
         .stream()
         .filter(ReturnsData::hasMonthlyReturnsErrors)
-        .forEach(returns -> notification.addErrors(convertToDataErrorExceptions(returns
+        .forEach(returns -> notification.addAll(convertToCalculationExceptions(returns
             .getOnlyMonthlyReturnsErrors())));
-    notification.ifAnyNonAllowedErrorThrowException(List.of(ERR_RRC_MR_002, ERR_RRC_MMR_001, ERR_FDS_MC_002));
+    notification.throwIfAnyNonAllowed(List.of(HOLDING_PSD_OUT_OF_RANGE, MISSING_MONTHLY_RETURNS,
+        HOLDING_MISSING_CURRENCY_FROM_FDS));
   }
 
   private void inCaseOfAnyErrorInReturnsThrowAnException(Map<PortfolioHolding, T> originalMonthlyReturns) {
     originalMonthlyReturns.values()
-        .forEach(returns -> notification.addErrors(convertToDataErrorExceptions(returns.getErrors())));
+        .forEach(returns -> notification.addAll(convertToCalculationExceptions(returns.getErrors())));
     ifAnyErrorsThrowException();
   }
 
-  private static List<DataErrorException> convertToDataErrorExceptions(List<ValidationError> errors) {
+  private static List<CalculationException> convertToCalculationExceptions(List<Notification> errors) {
     if (errors == null) {
       return List.of();
     }
     return errors.stream()
-        .map(e -> new DataErrorException(e.getId(), e.getMessage(),
-            ErrorCode.valueOf(e.getCode())))
+        .map(n -> ErrorCode.fromCode(n.getCode()).toExceptionForId(n.getUuid()))
         .toList();
   }
 
@@ -264,10 +264,9 @@ public class ReturnsAggregate<T extends ReturnsData> {
   private LocalDate getEarliestAvailableDate(final LocalDate startDate, final HistoricalNavPrices navPrices,
       final TreeMap<LocalDate, BigDecimal> value) {
     if (Objects.isNull(startDate) || Objects.isNull(value)) {
-      throw new SystemException(
-          "Can't obtain Earliest Available Date. Missed one of the parameters. Start Date: %s. Value: %s".formatted(
-              startDate, value),
-          HttpCode.INTERNAL_SERVER_ERROR);
+      throw NAV_PARAM_MISSING.toException(
+          Objects.isNull(startDate) ? "startDate" : "value",
+          Objects.isNull(startDate) ? startDate : value);
     }
 
     for (LocalDate date = startDate; date.isBefore(value.lastKey()); date = date.plusDays(1)) {
@@ -281,10 +280,9 @@ public class ReturnsAggregate<T extends ReturnsData> {
   private LocalDate getLatestAvailableDate(final LocalDate endDate, final HistoricalNavPrices navPrices,
       final TreeMap<LocalDate, BigDecimal> value) {
     if (Objects.isNull(endDate) || Objects.isNull(value)) {
-      throw new SystemException(
-          "Can't obtain Latest Available Date. Missed one of the parameters. End Date: %s. Value: %s".formatted(endDate,
-              value),
-          HttpCode.INTERNAL_SERVER_ERROR);
+      throw NAV_PARAM_MISSING.toException(
+          Objects.isNull(endDate) ? "endDate" : "value",
+          Objects.isNull(endDate) ? endDate : value);
     }
 
     for (LocalDate date = endDate; date.isAfter(value.firstKey()); date = date.minusDays(1)) {
@@ -330,7 +328,8 @@ public class ReturnsAggregate<T extends ReturnsData> {
         .collect(Collectors.partitioningBy(e -> Objects.nonNull(getCurrency(e)), Collectors.toMap(
             Map.Entry::getKey,
             Map.Entry::getValue)));
-    partitionedHoldings.get(false).forEach((key, value) -> notification.addError(ERR_FDS_MC_002.error(key)));
+    partitionedHoldings.get(false).forEach((key, value) -> notification.add(HOLDING_MISSING_CURRENCY_FROM_FDS
+        .toExceptionForHolding(key)));
     return partitionedHoldings.get(true).entrySet()
         .stream()
         .collect(HashMap::new, (m, entry) -> m.put(entry.getKey(), getCurrency(entry)), HashMap::putAll);
@@ -351,7 +350,8 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public ReturnsAggregate<T> ifAnyErrorsThrowException() {
-    notification.ifAnyNonAllowedErrorThrowException(List.of(ERR_RRC_MR_002, ERR_RRC_MMR_001, ERR_FDS_MC_002));
+    notification.throwIfAnyNonAllowed(List.of(HOLDING_PSD_OUT_OF_RANGE, MISSING_MONTHLY_RETURNS,
+        HOLDING_MISSING_CURRENCY_FROM_FDS));
     return this;
   }
 
@@ -364,7 +364,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
       while (psd.isAfter(ped)) {
         var entries = startDateEntriesMap.get(psd);
         for (Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> entry : entries) {
-          notification.addError(ERR_RRC_MR_002.error(entry.getKey()));
+          notification.add(HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(entry.getKey()));
           returnsMap.remove(entry.getKey());
         }
         findPedAndPsd();
@@ -382,17 +382,19 @@ public class ReturnsAggregate<T extends ReturnsData> {
     if (holdingsWithPacOrWithdrawals != 0) {
       navData.forEach((key, value) -> value.getMissedMonthData().stream()
           .filter(m -> m.isAfter(reqDTO.getStartDate()) && m.isBefore(reqDTO.getEndDate()))
-          .forEach(m -> notification.addError(ERR_NAV_PRICES_002.error(key, m.format(PATTERN_1)))));
+          .forEach(m -> notification.add(MISSING_HISTORICAL_NAV_PRICES_FOR_MONTH.toExceptionForHolding(key, m.format(
+              PATTERN_1)))));
     }
     return this;
   }
 
-  public List<DataErrorException> getErrors() {
-    return notification.getErrors();
+  public List<BasePceException> getErrors() {
+    return notification.getExceptions();
   }
 
   public List<Warning> getErrorsAsWarnings() {
-    return notification.getErrors().stream().map(error -> new Warning(error.getId(), error.getMessage(), error.getCode()
-        .name())).toList();
+    return notification.getExceptions().stream()
+        .map(error -> new Warning(error.getId(), error.getMessage(), error.getErrorCode().getCode()))
+        .toList();
   }
 }

@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import static com.fintex.ce.model.error.ErrorCode.Names.ERR_VAL_NN_001;
+import static com.fintex.ce.model.error.ErrorCode.Codes.FIELD_NOT_NULL;
 import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalEquals;
 import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalHashCode;
 
@@ -36,10 +36,10 @@ public class PortfolioHolding {
 
   private final BigDecimal value;
 
-  @NotNull(message = ERR_VAL_NN_001)
+  @NotNull(message = FIELD_NOT_NULL)
   private final FinancialInstrumentType holdingType;
 
-  @NotNull(message = ERR_VAL_NN_001)
+  @NotNull(message = FIELD_NOT_NULL)
   @Valid
   private final SecurityIdentifier securityIdentifier;
 

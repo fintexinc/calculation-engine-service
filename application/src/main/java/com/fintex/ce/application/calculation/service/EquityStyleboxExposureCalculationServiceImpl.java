@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_ES_ESE_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_STYLEBOX_EXPOSURE;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 
@@ -74,6 +74,6 @@ public class EquityStyleboxExposureCalculationServiceImpl
         List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         EquityStyleboxExposure::getBoxValues,
-        DEFAULT_MAP, WRN_ES_ESE_001);
+        DEFAULT_MAP, MISSING_EQUITY_STYLEBOX_EXPOSURE);
   }
 }

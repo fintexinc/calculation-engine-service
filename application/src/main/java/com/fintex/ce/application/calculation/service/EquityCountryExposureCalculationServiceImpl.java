@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
-import com.fintex.ce.mapping.CountryAllocationMappingService;
+import com.fintex.ce.application.mapping.CountryAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_RRC_ECE_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_COUNTRY_EXPOSURE;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
@@ -82,7 +82,7 @@ public class EquityCountryExposureCalculationServiceImpl
     Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
     Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService
-        .mapToCountryRegions(holdingAllocations, warnings, WRN_RRC_ECE_001);
+        .mapToCountryRegions(holdingAllocations, warnings, MISSING_EQUITY_COUNTRY_EXPOSURE);
     return new ExposureDataHolder<>(allocations, warnings);
   }
 

@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_AA_AA_001;
-import static com.fintex.ce.model.error.ErrorCode.WRN_UNKNOWN_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_ASSET_ALLOCATION;
+import static com.fintex.ce.model.error.ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
@@ -121,7 +121,7 @@ class AssetAllocationDataValidatorTest {
 
     // VERIFY
     assertEquals(2, warnings.size());
-    warnings.forEach(warning -> assertEquals(WRN_UNKNOWN_001.name(), warning.getCode()));
+    warnings.forEach(warning -> assertEquals(UNKNOWN_TYPE_FROM_DATA_POINT.getCode(), warning.getCode()));
   }
 
   @Test
@@ -140,7 +140,7 @@ class AssetAllocationDataValidatorTest {
 
     // VERIFY
     assertEquals(1, warnings.size());
-    assertEquals(WRN_AA_AA_001.name(), warnings.get(0).getCode());
+    assertEquals(MISSING_ASSET_ALLOCATION.getCode(), warnings.get(0).getCode());
   }
 
 }

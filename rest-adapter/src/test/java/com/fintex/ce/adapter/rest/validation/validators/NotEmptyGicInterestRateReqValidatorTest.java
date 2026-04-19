@@ -33,6 +33,6 @@ class NotEmptyGicInterestRateReqValidatorTest extends AbstractGicFieldReqValidat
 
   @Override
   String expectedErrorCode() {
-    return "ERR_GIC_MC_001";
+    return "GIC_HOLDING_MISSING_INTEREST_RATE";
   }
 }

@@ -1,53 +1,53 @@
 package com.fintex.ce.adapter.rest.util;
 
-import com.fintex.ce.adapter.rest.dto.response.AlphaResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AnnualReturnResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AssetAllocationEMResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AssetAllocationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AverageMerResponse;
-import com.fintex.ce.adapter.rest.dto.response.BestWorstPeriodsResponseDTO;
-import com.fintex.ce.adapter.rest.dto.response.BetaResDTO;
-import com.fintex.ce.adapter.rest.dto.response.ClassificationAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.response.CommonPerformanceDatesResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CreditQualityResDTO;
-import com.fintex.ce.adapter.rest.dto.response.DownsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.DownsideDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityCountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityMarketCapResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquitySectorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.response.ExcessReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.FixedIncomeSectorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.FixedIncomeStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.response.GeographicExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.Growth10KResDTO;
-import com.fintex.ce.adapter.rest.dto.response.IncomeForecastResDto;
-import com.fintex.ce.adapter.rest.dto.response.InformationRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.LeadingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.MARRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.ManagementFeeResponse;
-import com.fintex.ce.adapter.rest.dto.response.MaturityAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.response.MaxDrawdownResDTO;
-import com.fintex.ce.adapter.rest.dto.response.MeanResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RSquaredResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingCorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingSharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingStandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.SalesChargeResDtos;
-import com.fintex.ce.adapter.rest.dto.response.SharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.SortinoRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.StandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TopCommonHoldingsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TrackingErrorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TrailingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TreynorRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.UpsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.YieldResDto;
-import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
-import com.fintex.ce.adapter.rest.dto.response.distributionofreturns.DistributionOfReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.CommonPerformanceDatesResDTO;
+import com.fintex.ce.adapter.rest.dto.WarningDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationEMResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.ClassificationAllocationResDto;
+import com.fintex.ce.adapter.rest.dto.allocation.CreditQualityResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.EquityMarketCapResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.EquitySectorResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.FixedIncomeSectorResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.MaturityAllocationResDto;
+import com.fintex.ce.adapter.rest.dto.correlation.CorrelationResDTO;
+import com.fintex.ce.adapter.rest.dto.distribution.DistributionOfReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.CountryExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.EquityCountryExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.EquityStyleboxExposureResDto;
+import com.fintex.ce.adapter.rest.dto.exposure.FixedIncomeStyleboxExposureResDto;
+import com.fintex.ce.adapter.rest.dto.exposure.GeographicExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.fee.AverageMerResponse;
+import com.fintex.ce.adapter.rest.dto.fee.ManagementFeeResponse;
+import com.fintex.ce.adapter.rest.dto.fee.SalesChargeResDtos;
+import com.fintex.ce.adapter.rest.dto.holding.TopCommonHoldingsResDTO;
+import com.fintex.ce.adapter.rest.dto.income.IncomeForecastResDto;
+import com.fintex.ce.adapter.rest.dto.income.YieldResDto;
+import com.fintex.ce.adapter.rest.dto.period.BestWorstPeriodsResponseDTO;
+import com.fintex.ce.adapter.rest.dto.returns.AnnualReturnResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.ExcessReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.Growth10KResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.LeadingTotalReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.MeanResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.TrailingTotalReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.AlphaResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.BetaResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.DownsideCaptureResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.DownsideDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.InformationRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.MARRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.MaxDrawdownResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.RSquaredResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.SharpeRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.SortinoRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.StandardDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.TrackingErrorResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.TreynorRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.UpsideCaptureResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingCorrelationResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingSharpeRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingStandardDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingTotalReturnsResDTO;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 
 import java.util.Map;
@@ -57,7 +57,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class ResponseMappingUtils {
 
-  private static final Map<CalculationMetric, Supplier<? extends ErrorDTO>> RESPONSE_FACTORIES = Map.ofEntries(
+  private static final Map<CalculationMetric, Supplier<? extends WarningDTO>> RESPONSE_FACTORIES = Map.ofEntries(
       Map.entry(CalculationMetric.TRAILING_TOTAL_RETURNS, TrailingTotalReturnsResDTO::new),
       Map.entry(CalculationMetric.LEADING_TOTAL_RETURNS, LeadingTotalReturnsResDTO::new),
       Map.entry(CalculationMetric.ROLLING_TOTAL_RETURNS, RollingTotalReturnsResDTO::new),
@@ -107,8 +107,8 @@ public final class ResponseMappingUtils {
       Map.entry(CalculationMetric.TOP_COMMON_HOLDINGS, TopCommonHoldingsResDTO::new),
       Map.entry(CalculationMetric.FIXED_INCOME_CREDIT_QUALITY, CreditQualityResDTO::new));
 
-  public static Supplier<? extends ErrorDTO> getResponseFactory(CalculationMetric metric) {
-    Supplier<? extends ErrorDTO> factory = RESPONSE_FACTORIES.get(metric);
+  public static Supplier<? extends WarningDTO> getResponseFactory(CalculationMetric metric) {
+    Supplier<? extends WarningDTO> factory = RESPONSE_FACTORIES.get(metric);
     if (factory == null) {
       throw new IllegalArgumentException("No response mapping for metric: " + metric);
     }

@@ -32,6 +32,6 @@ class NotIncludeCpedReqValidatorTest extends AbstractNotIncludePropertyReqValida
 
   @Override
   String expectedErrorCode() {
-    return "ERR_RRC_TIP_006";
+    return "REQUEST_CONTAINS_CUSTOM_PED";
   }
 }

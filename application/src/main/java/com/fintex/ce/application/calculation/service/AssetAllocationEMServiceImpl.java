@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
-import com.fintex.ce.mapping.CountryAllocationMappingService;
+import com.fintex.ce.application.mapping.CountryAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
@@ -42,7 +42,7 @@ import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationR
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.US_EQUITIES;
 import static com.fintex.ce.model.domain.calculation.allocation.CountryRegionType.UNITED_STATES;
-import static com.fintex.ce.model.error.ErrorCode.WRN_RRC_ECE_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_COUNTRY_EXPOSURE;
 import static com.fintex.ce.util.CalculationUtils.sum;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
@@ -101,7 +101,7 @@ public class AssetAllocationEMServiceImpl
     Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = rawCountryAllocations.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
     final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> countryAllocationsMap = countryAllocationMappingService
-        .mapToCountryRegions(holdingAllocations, warnings, WRN_RRC_ECE_001);
+        .mapToCountryRegions(holdingAllocations, warnings, MISSING_EQUITY_COUNTRY_EXPOSURE);
     final Map<PortfolioHolding, BigDecimal> equityDifference = calculateEquityDifference(
         holdings, countryAllocationsMap, assetAllocations);
     Map<PortfolioHolding, Map<AssetAllocationRegionEmType, BigDecimal>> allocations = holdings.stream().collect(

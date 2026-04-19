@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.client;
 
-import com.fintex.ce.adapter.webclient.sm.exception.SecurityMasterWebClientException;
+import com.fintex.ce.model.error.exceptions.ExternalServiceBadResponseException;
+import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,6 +17,12 @@ import reactor.core.publisher.Mono;
 
 /**
  * Generic WebClient for Security Master API calls. Provides generic HTTP methods that can be used by specific fetchers.
+ * Failures are split by cause:
+ * <ul>
+ * <li>4xx response → {@link ExternalServiceBadResponseException} (HTTP 502 Bad Gateway)</li>
+ * <li>5xx response or transport/connection error → {@link ExternalServiceUnavailableException} (HTTP 503 Service
+ * Unavailable)</li>
+ * </ul>
  */
 @Slf4j
 @Component
@@ -23,22 +30,12 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class SecurityMasterWebClient {
 
+  private static final String SERVICE_NAME = "Security Master";
+
   private final WebClient smWebClient;
 
   /**
    * Performs a POST request and returns the response body.
-   *
-   * @param path
-   *          endpoint path
-   * @param request
-   *          request body
-   * @param responseType
-   *          parameterized type reference for response
-   * @param <T>
-   *          request type
-   * @param <R>
-   *          response type
-   * @return response body or null if empty
    */
   public <T, R> R post(String path, T request, ParameterizedTypeReference<R> responseType) {
     log.debug("POST request to: {}", path);
@@ -48,6 +45,7 @@ public class SecurityMasterWebClient {
         .retrieve()
         .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
         .bodyToMono(responseType)
+        .onErrorMap(SecurityMasterWebClient::handleError)
         .block();
     log.debug("POST response from: {} - status OK", path);
     return result;
@@ -55,14 +53,6 @@ public class SecurityMasterWebClient {
 
   /**
    * Performs a GET request and returns the response body.
-   *
-   * @param path
-   *          endpoint path
-   * @param responseType
-   *          response class type
-   * @param <R>
-   *          response type
-   * @return response body or null if empty
    */
   public <R> R get(String path, Class<R> responseType) {
     log.debug("GET request to: {}", path);
@@ -71,6 +61,7 @@ public class SecurityMasterWebClient {
         .retrieve()
         .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
         .bodyToMono(responseType)
+        .onErrorMap(SecurityMasterWebClient::handleError)
         .block();
     log.debug("GET response from: {} - status OK", path);
     return result;
@@ -78,14 +69,6 @@ public class SecurityMasterWebClient {
 
   /**
    * Performs a GET request and returns the response body with parameterized type.
-   *
-   * @param path
-   *          endpoint path
-   * @param responseType
-   *          parameterized type reference for response
-   * @param <R>
-   *          response type
-   * @return response body or null if empty
    */
   public <R> R get(String path, ParameterizedTypeReference<R> responseType) {
     log.debug("GET request to: {}", path);
@@ -94,16 +77,27 @@ public class SecurityMasterWebClient {
         .retrieve()
         .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
         .bodyToMono(responseType)
+        .onErrorMap(SecurityMasterWebClient::handleError)
         .block();
     log.debug("GET response from: {} - status OK", path);
     return result;
   }
 
   private Mono<Throwable> handleErrorResponse(String path, ClientResponse response) {
+    HttpStatusCode status = response.statusCode();
     return response.bodyToMono(String.class)
+        .defaultIfEmpty("")
         .flatMap(body -> {
-          log.error("Security Master API error: {} {} - {}", path, response.statusCode(), body);
-          return Mono.error(new SecurityMasterWebClientException(response.statusCode(), body));
+          log.error("Security Master API error: {} {} - {}", path, status, body);
+          return Mono.error(status.is4xxClientError()
+              ? new ExternalServiceBadResponseException(SERVICE_NAME)
+              : new ExternalServiceUnavailableException(SERVICE_NAME));
         });
+  }
+
+  private static Throwable handleError(Throwable error) {
+    return error instanceof ExternalServiceBadResponseException || error instanceof ExternalServiceUnavailableException
+        ? error
+        : new ExternalServiceUnavailableException(SERVICE_NAME, error);
   }
 }

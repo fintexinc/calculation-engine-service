@@ -43,7 +43,7 @@ public abstract class AbstractPeriodsNotContainingReqValidator implements Reques
     }
     for (String period : periods) {
       if (!isNumeric(period) && period.equals(disallowedPeriod.name())) {
-        throw errorCode.reqValidationError();
+        throw errorCode.toValidationException();
       }
     }
   }

@@ -1,6 +1,6 @@
 package com.fintex.ce.model.domain.calculation.returns;
 
-import com.fintex.ce.model.error.ValidationError;
+import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,11 +16,11 @@ public interface ReturnsData {
 
   TreeMap<LocalDate, BigDecimal> getReturns();
 
-  List<ValidationError> getErrors();
+  List<Notification> getErrors();
 
   boolean hasErrors();
 
-  void addError(ValidationError error);
+  void addError(Notification error);
 
   /**
    * Check if there are monthly returns specific errors. Default implementation checks if any errors exist.
@@ -32,7 +32,7 @@ public interface ReturnsData {
   /**
    * Get only monthly returns specific errors. Default implementation returns all errors.
    */
-  default List<ValidationError> getOnlyMonthlyReturnsErrors() {
+  default List<Notification> getOnlyMonthlyReturnsErrors() {
     return getErrors();
   }
 

@@ -16,7 +16,7 @@ import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 public class PeriodsNotContainingYearToDateReqValidator extends AbstractPeriodsNotContainingReqValidator {
 
   public PeriodsNotContainingYearToDateReqValidator() {
-    super(Period.YEAR_TO_DATE, ErrorCode.ERR_RRC_TIP_002);
+    super(Period.YEAR_TO_DATE, ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE);
   }
 
   @Override

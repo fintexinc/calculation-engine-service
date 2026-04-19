@@ -12,142 +12,45 @@ practices for contributing to this project.
 
 ## Code Style Guidelines
 
-### Use Optional or the ternary operator for Null Safety
+### Always try to use GoF patterns adapted to the Spring ecosystem
 
-Prefer using `Optional` instead of null checks to handle nullable variables and transform types.
-The exception is the ternary operator as it's short and concise.
+E.g. Strategy (inject a list of beans of an interface and associate them to map by common method returning an enum),
+Chain of Responsibility, Template Method, Observer, Factory Method, Adapter, Bridge, etc.
 
-**❌ Bad:**
+### Calculation Architecture (Two-Layer Pattern)
 
-```java
-public String getSecurityName(Security security) {
-    if (security == null) {
-        return "Unknown";
-    }
-    if (security.getName() == null) {
-        return "Unknown";
-    }
-    return security.getName();
-}
-```
+Service -> Calculation two-layer design with Template Method:
 
-**✅ Good:**
+### Service Layer (`application/.../service/calculation/`)
+- **`PeriodAbstractService<E, R>`** — period-based calculations (returns, ratios). `perform(command)` -> `defineCalculationMethod()` -> `calculate(periods)`
+- **`PeriodBenchmarkAbstractService<E, R>`** — adds benchmark data with `Notification` error handling
+- **`BreakdownAbstractService<T, E>`** — allocation/exposure. `fetchExposures()` -> `calculate()` -> `calculateNetProducts()`
 
-```java
-public String getSecurityName(Security security) {
-    return Optional.ofNullable(security)
-        .map(Security::getName)
-        .orElse("Unknown");
-}
-```
+### Calculation Layer (`application/.../calculation/metric`)
+Pure logic, no data fetching.
+- **`PeriodCalculationAbstract<T, V>`** — period resolution (months, YTD, SINCE_INCEPTION), date filtering
+- **`RollingAbstractCalculation<T>`** — rolling window calculations
+- **`AlphaBetaCalculationAbstract<T>`**, **`RSquaredCalculationAbstract<T>`** — regression
+- **`UpDownSideCalculationAbstract`** — capture ratios
 
-**✅ Good:**
-
-```java
-Optional.ofNullable(user)
-    .
-
-map(User::getEmail)
-    .
-
-filter(email ->email.
-
-contains("@"))
-        .
-
-orElseThrow(() ->new
-
-InvalidEmailException());
-```
-
-**✅ Good:**
-
-```java
-return entity ==null?new
-
-Entity() :entity;
-```
-
-### Think Hierarchy First
-
-Before writing any class, ask: "Can this be abstracted?"
-
-This codebase uses deep hierarchies. When you see similar classes (e.g., EtfEndpoint, FundEndpoint, StockEndpoint), use
-the Template Method pattern:
-
-**❌ Bad:** 20 classes with identical method bodies
-
-```java
-public class EtfEndpoint extends AbstractEndpoint<EtfResponse> {
-    public EtfResponse fetch(String id) {
-        return client.query(id, EtfResponse.class);  // Same in ALL classes!
-    }
-}
-```
-
-**✅ Good:** Common logic in abstract class, subclasses only provide type-specific details
-
-```java
-public abstract class AbstractEndpoint<T> {
-    protected abstract Class<T> getResponseType();
-
-    public T fetch(String id) {  // Single implementation
-        return client.query(id, getResponseType());
-    }
-}
-```
-
-### External Service Calls (Security Master)
-
-This service fetches data from Security Master (SM) via REST. All external calls must:
-
-1. **Never call SM in loops (N+1 problem)**
-   ```java
-   // ❌ Bad
-   items.forEach(i -> smClient.fetch(i.getId()));
-
-   // ✅ Good
-   smClient.fetchBatch(ids);
-   ```
-
-2. **Use Resilience4j annotations**
-   ```java
-   @CircuitBreaker(name = "securityMaster", fallbackMethod = "fallback")
-   @Retry(name = "securityMaster")
-   @Bulkhead(name = "securityMaster")
-   public Data fetch(String id) { }
-   ```
-
-3. **Configuration in application.yaml** - no hardcoded timeouts, URLs, or retry counts in code
-
-### Use `@Accessors(chain = true)` on Result/Command Classes
-
-All Result and Command DTOs must use `@Accessors(chain = true)` for fluent setters. This enables method chaining for
-cleaner object construction.
-
-```java
-// ✅ Good
-@Data
-@Accessors(chain = true)
-public class CalculationResult {
-    private BigDecimal value;
-    private String currency;
-}
-
-// Usage:
-new CalculationResult()
-    .setValue(BigDecimal.TEN)
-    .setCurrency("USD");
-```
-
-**Gotcha:** Lombok `@Accessors(chain = true)` on a parent class generates setters that return the parent type. This
-breaks fluent chains in subclasses. If you have a class hierarchy, apply `@Accessors(chain = true)` on each class
-individually.
-
-### Extract Constants and Utilities
-
+### Code convention rules
+- **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `mvn spotless:apply`
+- **BigDecimal:** `BigDecimal.valueOf()` for literals, never `new BigDecimal(double)`. `new BigDecimal(String)` is fine
+- **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
+- **Optional**: Return `Optional<T>` for optional values when it makes sense
+- **Null check**: Validate SM data at adapter boundary with `Objects.requireNonNull`
+- **Not null collections**: Never return null collections — use `List.of()`
+- **Collection null/empty checks:** use `org.springframework.util.CollectionUtils.isEmpty(col)` instead of `col == null || col.isEmpty()`. Never perform the same `null || isEmpty` check twice in a row — collapse to a single `CollectionUtils.isEmpty` call
+- **Object construction:** prefer Lombok builders (`@Builder` / `@SuperBuilder`) over chained accessors (`new Foo().setX(..).setY(..)`). Accessors are fine for incremental mutation inside mappers with conditional branches, but tests and one-shot construction must use the builder
+- **Ternary:** use for simple single-expression returns/assignments instead of if/else
+- **No `final`** on method parameters/variables unless class fields or explicit constants
+- **No fully qualified class names** — always use imports
+- **No magic strings** — extract to constants or enums
+- **Enum factory methods:** always name `fromValue(value)`
+- **DI:** `@RequiredArgsConstructor` with final fields, not `@AllArgsConstructor`
 - **Extract strings into constants or enums** - no magic strings in code
 - **Extract repeated code into utility methods** - if you write the same 3+ lines twice, create a util
+
 
 ### Code Formatting
 

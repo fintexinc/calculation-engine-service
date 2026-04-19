@@ -5,8 +5,8 @@ import com.fintex.ce.model.domain.enumeration.ParameterType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
-import com.fintex.ce.model.error.Notification;
-import com.fintex.ce.model.error.exceptions.FdsDataValidationException;
+import com.fintex.ce.model.error.Warning;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
@@ -23,7 +23,7 @@ import java.util.Map;
 import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.SCALED;
-import static com.fintex.ce.model.error.ErrorCode.ERR_MF_MF_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_MANAGEMENT_FEE;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType.ETF_CANADA;
 import static com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType.ETF_US;
@@ -31,7 +31,6 @@ import static com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType.M
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -211,7 +210,7 @@ class ManagementFeeCalculationServiceImplTest {
 
     doCallRealMethod().when(sut).setFeeValues(any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
-    doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
+    doCallRealMethod().when(sut).validateManagementFee(any(), any());
     // ACT
     sut.setInitialFeeAndModifiedFeeValues(calculationDtoMap);
 
@@ -319,26 +318,24 @@ class ManagementFeeCalculationServiceImplTest {
     var holding = new PortfolioHolding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(null);
-    var expected = ERR_MF_MF_001.error(holding);
+    var expected = MISSING_MANAGEMENT_FEE.toExceptionForHolding(holding);
 
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(MUTUAL_FUND_CANADA, Map.of(holding, averageCalculationDto));
 
-    doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
+    doCallRealMethod().when(sut).validateManagementFee(any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    var actualException = assertThrows(FdsDataValidationException.class, () -> sut.setInitialFeeAndModifiedFeeValues(
-        map));
+    var actualException = assertThrows(CalculationException.class, () -> sut.setInitialFeeAndModifiedFeeValues(map));
 
     // VERIFY
-    assertTrue(actualException.getExceptionList().stream().anyMatch(e -> e.getCode().equals(expected.getCode())));
+    assertEquals(expected.getErrorCode(), actualException.getErrorCode());
   }
 
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenNothingHappensIfHoldingsIsOnlyCashAndStocks() {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
-    var notification = new Notification();
     var holding = new PortfolioHolding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(null);
@@ -346,20 +343,19 @@ class ManagementFeeCalculationServiceImplTest {
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(FinancialInstrumentType.STOCK_US, Map.of(holding, averageCalculationDto));
 
-    doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
+    doCallRealMethod().when(sut).validateManagementFee(any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    sut.setInitialFeeAndModifiedFeeValues(map);
+    List<Warning> warnings = sut.setInitialFeeAndModifiedFeeValues(map);
 
     // VERIFY
-    assertFalse(notification.hasErrors());
+    assertTrue(warnings.isEmpty());
   }
 
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenNothingHappensIfHoldingsIsFundAndContainsManagementFee() {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
-    var notification = new Notification();
     var holding = new PortfolioHolding(null, null, null);
     var averageCalculationDto = new AverageManagementExpenseCalculation();
     averageCalculationDto.setActualManagementFee(TEN);
@@ -367,13 +363,13 @@ class ManagementFeeCalculationServiceImplTest {
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(ETF_US, Map.of(holding, averageCalculationDto));
 
-    doCallRealMethod().when(sut).validateManagementFee(any(), any(), any());
+    doCallRealMethod().when(sut).validateManagementFee(any(), any());
     doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    sut.setInitialFeeAndModifiedFeeValues(map);
+    List<Warning> warnings = sut.setInitialFeeAndModifiedFeeValues(map);
 
     // VERIFY
-    assertFalse(notification.hasErrors());
+    assertTrue(warnings.isEmpty());
   }
 
 }

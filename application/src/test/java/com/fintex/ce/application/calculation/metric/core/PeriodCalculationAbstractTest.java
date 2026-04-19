@@ -9,7 +9,7 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.calculation.WeightedAverageInputDTO;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -205,7 +205,7 @@ class PeriodCalculationAbstractTest {
     final String period = "TEST";
 
     doCallRealMethod().when(p).getNumberOfMonthsFor(any(), any());
-    final ReqValidationException e = assertThrows(ReqValidationException.class, () -> p.getNumberOfMonthsFor(returns,
+    final CalculationException e = assertThrows(CalculationException.class, () -> p.getNumberOfMonthsFor(returns,
         period));
 
     assertTrue(e.getMessage().contains(period));

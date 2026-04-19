@@ -35,7 +35,7 @@ public abstract class AbstractLastDayOfMonthReqValidator<T> implements RequestVa
     }
     LocalDate date = dateAccessor.apply(carrierType.cast(command));
     if (date != null && !date.equals(toLastDayOfMonth(date))) {
-      throw errorCode.reqValidationError();
+      throw errorCode.toValidationException();
     }
   }
 }

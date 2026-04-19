@@ -16,7 +16,7 @@ public class PeriodsNotContainingSinceCustomIntervalPerformanceStartDateReqValid
       AbstractPeriodsNotContainingReqValidator {
 
   public PeriodsNotContainingSinceCustomIntervalPerformanceStartDateReqValidator() {
-    super(Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE, ErrorCode.ERR_RRC_TIP_008);
+    super(Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE, ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_SINCE_CIPSD);
   }
 
   @Override

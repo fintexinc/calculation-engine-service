@@ -1,7 +1,7 @@
 package com.fintex.ce.application.validation;
 
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.PceExceptionCollector;
 
 import java.time.LocalDate;
 
@@ -9,12 +9,12 @@ import static java.util.Objects.nonNull;
 
 public abstract class CpsdDataValidation {
 
-  public void validate(LocalDate cpsd, LocalDate psd, LocalDate ped, Notification notification) {
+  public void validate(LocalDate cpsd, LocalDate psd, LocalDate ped, PceExceptionCollector notification) {
     if (nonNull(cpsd) && cpsd.isAfter(ped)) {
-      notification.addError(getCpsdIsAfterPedExceptionCode().error());
+      notification.add(getCpsdIsAfterPedExceptionCode().toException());
     }
     if (nonNull(cpsd) && cpsd.isBefore(psd)) {
-      notification.addError(getCpsdIsBeforePsdExceptionCode().error());
+      notification.add(getCpsdIsBeforePsdExceptionCode().toException());
     }
   }
 

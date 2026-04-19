@@ -18,6 +18,6 @@ class PeriodsNotContainingSincePerformanceStartDateReqValidatorTest
 
   @Override
   String expectedErrorCode() {
-    return "ERR_RRC_TIP_007";
+    return "TIME_INTERVAL_PERIOD_CONTAINS_SINCE_PSD";
   }
 }

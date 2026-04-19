@@ -38,16 +38,16 @@ public class TopCommonHoldingsReqValidator implements RequestValidator {
         ? 0
         : tch.getAccumulateHoldingTypes().size();
     if (Optional.ofNullable(tch.getNumOfFundsMin()).orElse(1) < 1) {
-      throw ErrorCode.ERR_TCH_NFM_001.reqValidationError();
+      throw ErrorCode.NUM_OF_FUNDS_MIN_NOT_POSITIVE.toValidationException();
     }
     if (Objects.nonNull(tch.getNumOfFundsMin()) && tch.getNumOfFundsMin() > tch.getHoldings().size()) {
-      throw ErrorCode.ERR_TCH_NFM_002.reqValidationError();
+      throw ErrorCode.NUM_OF_FUNDS_EXCEEDS_PORTFOLIO.toValidationException();
     }
     if (sizeOfAccumulateHoldingTypes > 12) {
-      throw ErrorCode.ERR_TCH_AHT_001.reqValidationError();
+      throw ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX.toValidationException();
     }
     if (checkGicHoldingName(tch.getHoldings())) {
-      throw ErrorCode.ERR_TCH_GNM_003.reqValidationError();
+      throw ErrorCode.GIC_HOLDING_NAME_EMPTY.toValidationException();
     }
   }
 

@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.metric.core;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.util.DecimalUtils;
 
 import org.springframework.util.CollectionUtils;
@@ -165,7 +165,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
     } else if (SINCE_PERFORMANCE_START_DATE.name().equalsIgnoreCase(period)) {
       return getNumberOfMonthsForSinceInception(returns);
     }
-    throw new ReqValidationException(String.format("Period is not supported %s", period));
+    throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toException(period);
   }
 
   /**

@@ -37,7 +37,7 @@ public abstract class AbstractPeriodsLessThan12ReqValidator<T> implements Reques
     }
     for (String period : periods) {
       if (isNumeric(period) && Long.parseLong(period) < 12) {
-        throw errorCode.reqValidationError();
+        throw errorCode.toValidationException();
       }
     }
   }

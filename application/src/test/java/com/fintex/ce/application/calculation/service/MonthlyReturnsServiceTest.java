@@ -8,7 +8,7 @@ import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
 import com.fintex.ce.application.validation.BenchmarkCpsdDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
-import com.fintex.ce.port.webclient.FxRatesFetcher;
+import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.wm.commons.domain.currency.Currency;

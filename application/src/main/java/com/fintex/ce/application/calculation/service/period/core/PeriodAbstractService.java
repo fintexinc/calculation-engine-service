@@ -62,10 +62,10 @@ public abstract class PeriodAbstractService<E extends PeriodResult, R extends Pe
     }
     for (String period : command.getPeriods()) {
       if (StringUtils.isNumeric(period) && Integer.parseInt(period) < 12) {
-        throw ErrorCode.ERR_RRC_TIP_001.reqValidationError();
+        throw ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12.toException();
       }
       if (Period.YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
-        throw ErrorCode.ERR_RRC_TIP_002.reqValidationError();
+        throw ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.toException();
       }
     }
   }

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_EMC_EMC_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_MARKET_CAPITALIZATION;
 import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
@@ -77,7 +77,7 @@ public class EquityMarketCapCalculationServiceImpl
         List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         HoldingEquityMarketCap::getRatings,
-        ALLOCATION_DEFAULT_MAP, WRN_EMC_EMC_001);
+        ALLOCATION_DEFAULT_MAP, MISSING_EQUITY_MARKET_CAPITALIZATION);
   }
 
   @Override

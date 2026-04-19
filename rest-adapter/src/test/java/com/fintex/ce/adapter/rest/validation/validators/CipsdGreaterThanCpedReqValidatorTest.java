@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
@@ -24,10 +24,10 @@ class CipsdGreaterThanCpedReqValidatorTest {
     command.setCurrency(Currency.CAD);
 
     assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_RRC_CIPSD_002");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("CIPSD_AFTER_CPED");
         });
   }
 

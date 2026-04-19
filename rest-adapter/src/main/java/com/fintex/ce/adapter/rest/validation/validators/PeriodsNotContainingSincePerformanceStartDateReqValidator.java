@@ -16,7 +16,7 @@ public class PeriodsNotContainingSincePerformanceStartDateReqValidator
       AbstractPeriodsNotContainingReqValidator {
 
   public PeriodsNotContainingSincePerformanceStartDateReqValidator() {
-    super(Period.SINCE_PERFORMANCE_START_DATE, ErrorCode.ERR_RRC_TIP_007);
+    super(Period.SINCE_PERFORMANCE_START_DATE, ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_SINCE_PSD);
   }
 
   @Override

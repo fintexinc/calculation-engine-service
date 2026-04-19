@@ -1,55 +1,55 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.rest.dto.response.AlphaResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AnnualReturnResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AssetAllocationEMResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AssetAllocationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.AverageMerResponse;
-import com.fintex.ce.adapter.rest.dto.response.BestWorstPeriodsResponseDTO;
-import com.fintex.ce.adapter.rest.dto.response.BetaResDTO;
-import com.fintex.ce.adapter.rest.dto.response.ClassificationAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.response.CommonPerformanceDatesResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.CreditQualityResDTO;
-import com.fintex.ce.adapter.rest.dto.response.DownsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.DownsideDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityCountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityMarketCapResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquitySectorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.EquityStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.response.ExcessReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.FixedIncomeSectorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.FixedIncomeStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.response.GeographicExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.Growth10KResDTO;
-import com.fintex.ce.adapter.rest.dto.response.IncomeForecastResDto;
-import com.fintex.ce.adapter.rest.dto.response.InformationRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.LeadingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.MARRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.ManagementFeeResponse;
-import com.fintex.ce.adapter.rest.dto.response.MaturityAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.response.MaxDrawdownResDTO;
-import com.fintex.ce.adapter.rest.dto.response.MeanResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RSquaredResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingCorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingSharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingStandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.RollingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.SalesChargeResDtos;
-import com.fintex.ce.adapter.rest.dto.response.SharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.SortinoRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.StandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TopCommonHoldingsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TrackingErrorResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TrailingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.response.TreynorRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.response.UpsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.response.YieldResDto;
-import com.fintex.ce.adapter.rest.dto.response.core.ErrorDTO;
-import com.fintex.ce.adapter.rest.dto.response.distributionofreturns.DistributionOfReturnsResDTO;
-import com.fintex.ce.adapter.rest.service.RestExceptionHandlingServiceImpl;
+import com.fintex.ce.adapter.rest.dto.CommonPerformanceDatesResDTO;
+import com.fintex.ce.adapter.rest.dto.WarningDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationEMResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.ClassificationAllocationResDto;
+import com.fintex.ce.adapter.rest.dto.allocation.CreditQualityResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.EquityMarketCapResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.EquitySectorResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.FixedIncomeSectorResDTO;
+import com.fintex.ce.adapter.rest.dto.allocation.MaturityAllocationResDto;
+import com.fintex.ce.adapter.rest.dto.correlation.CorrelationResDTO;
+import com.fintex.ce.adapter.rest.dto.distribution.DistributionOfReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.CountryExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.EquityCountryExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.exposure.EquityStyleboxExposureResDto;
+import com.fintex.ce.adapter.rest.dto.exposure.FixedIncomeStyleboxExposureResDto;
+import com.fintex.ce.adapter.rest.dto.exposure.GeographicExposureResDTO;
+import com.fintex.ce.adapter.rest.dto.fee.AverageMerResponse;
+import com.fintex.ce.adapter.rest.dto.fee.ManagementFeeResponse;
+import com.fintex.ce.adapter.rest.dto.fee.SalesChargeResDtos;
+import com.fintex.ce.adapter.rest.dto.holding.TopCommonHoldingsResDTO;
+import com.fintex.ce.adapter.rest.dto.income.IncomeForecastResDto;
+import com.fintex.ce.adapter.rest.dto.income.YieldResDto;
+import com.fintex.ce.adapter.rest.dto.period.BestWorstPeriodsResponseDTO;
+import com.fintex.ce.adapter.rest.dto.returns.AnnualReturnResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.ExcessReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.Growth10KResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.LeadingTotalReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.MeanResDTO;
+import com.fintex.ce.adapter.rest.dto.returns.TrailingTotalReturnsResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.AlphaResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.BetaResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.DownsideCaptureResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.DownsideDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.InformationRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.MARRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.MaxDrawdownResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.RSquaredResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.SharpeRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.SortinoRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.StandardDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.TrackingErrorResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.TreynorRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.risk.UpsideCaptureResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingCorrelationResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingSharpeRatioResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingStandardDeviationResDTO;
+import com.fintex.ce.adapter.rest.dto.rolling.RollingTotalReturnsResDTO;
 import com.fintex.ce.adapter.rest.util.ResponseMappingUtils;
+import com.fintex.ce.adapter.rest.util.ResultCopyUtils;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -71,7 +71,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -88,20 +87,16 @@ public class PortfolioCalculationController {
   public static final String BASE_PATH = "/api/v1/portfolio/calculations";
 
   private final Map<CalculationMetric, CalculationService<?, ?>> serviceMap;
-  private final RestExceptionHandlingServiceImpl restExceptionHandler;
   private final RequestValidationFacade validationFacade;
 
   public PortfolioCalculationController(
       List<CalculationService<?, ?>> calculationServices,
-      RestExceptionHandlingServiceImpl restExceptionHandler,
       RequestValidationFacade validationFacade) {
     this.serviceMap = calculationServices.stream()
         .collect(Collectors.toMap(CalculationService::getMetric, Function.identity(),
             (existing, duplicate) -> {
-              throw new IllegalStateException(
-                  "Duplicate CalculationService registered for metric: " + existing.getMetric());
+              throw ErrorCode.INTERNAL_SERVER_ERROR.toException();
             }));
-    this.restExceptionHandler = restExceptionHandler;
     this.validationFacade = validationFacade;
   }
 
@@ -137,25 +132,24 @@ public class PortfolioCalculationController {
   })))
   @PostMapping("/{metricName}")
   @SuppressWarnings("unchecked")
-  public ErrorDTO calculate(
+  public WarningDTO calculate(
       @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable String metricName,
-      @RequestBody @NotNull(message = ErrorCode.Names.ERR_VAL_NN_001) @Valid CalculationCommand command) {
+      @RequestBody @Valid CalculationCommand command) {
     CalculationMetric metric = CalculationMetric.from(metricName);
     if (!serviceMap.containsKey(metric)) {
-      throw new IllegalArgumentException("Metric " + metricName + " is not supported");
+      throw ErrorCode.UNSUPPORTED_METRIC.toException(metricName);
     }
 
     if (command.getMetric() != null && command.getMetric() != metric) {
-      throw new IllegalArgumentException(
-          "Metric mismatch: path parameter is '" + metricName + "' but request body contains '" +
-              command.getMetric().getValue() + "'");
+      throw ErrorCode.METRIC_MISMATCH.toException(metricName, command.getMetric().getValue());
     }
 
     validationFacade.validate(command, metric);
 
     CalculationService<?, ?> service = serviceMap.get(metric);
-    return restExceptionHandler.handleWithResultMapping(
-        () -> ((CalculationService<?, CalculationCommand>) service).perform(command),
-        ResponseMappingUtils.getResponseFactory(metric));
+    Object result = ((CalculationService<?, CalculationCommand>) service).perform(command);
+    WarningDTO response = ResponseMappingUtils.getResponseFactory(metric).get();
+    ResultCopyUtils.copyProperties(result, response);
+    return response;
   }
 }

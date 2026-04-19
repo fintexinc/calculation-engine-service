@@ -4,7 +4,7 @@ import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -34,10 +34,10 @@ abstract class AbstractGicFieldReqValidatorTest {
     cmd.setHoldings(List.of(createInvalidGicHolding()));
 
     assertThatThrownBy(() -> createValidator().validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo(expectedErrorCode());
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo(expectedErrorCode());
         });
   }
 

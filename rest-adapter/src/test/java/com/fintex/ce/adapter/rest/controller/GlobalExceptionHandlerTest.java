@@ -1,142 +1,119 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.rest.dto.exception.ErrorRes2DTO;
-import com.fintex.ce.adapter.rest.dto.exception.RuntimeExceptionDTO;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.HttpCode;
-import com.fintex.ce.model.error.exceptions.DataErrorException;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
-import com.fintex.ce.model.error.exceptions.SystemException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
+import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
+import com.fintex.wm.commons.error.ErrorResponse;
+import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.error.Severity;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import org.junit.jupiter.api.Test;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class GlobalExceptionHandlerTest {
 
+  private final GlobalExceptionHandler sut = new GlobalExceptionHandler();
+
   @Test
-  void globalExceptionHandler1_checkResult() {
-    final var sut = mock(GlobalExceptionHandler.class);
-    final var exception = mock(Exception.class);
-    final var expectedMessage = "message";
+  void unexpectedException_returns500WithGenericNotificationAndNoLeakedMessage() {
+    Exception exception = new RuntimeException("internal stack trace that must not leak");
 
-    when(exception.getMessage()).thenReturn(expectedMessage);
-    doCallRealMethod().when(sut).globalExceptionHandler1(any(), any());
+    ResponseEntity<ErrorResponse> response = sut.handleUnexpected(exception);
 
-    final RuntimeExceptionDTO exceptionDTO = sut.globalExceptionHandler1(exception, mock(HttpServletRequest.class));
-
-    assertEquals(1, exceptionDTO.getErrors().size());
-    assertTrue(exceptionDTO.getErrors().contains(
-        new ErrorRes2DTO(HttpStatus.INTERNAL_SERVER_ERROR.name(), expectedMessage)));
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getNotifications()).hasSize(1);
+    Notification notification = response.getBody().getNotifications().get(0);
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.INTERNAL_SERVER_ERROR.getCode());
+    assertThat(notification.getMessage()).isEqualTo(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
+    assertThat(notification.getMessage()).doesNotContain("internal stack trace");
+    assertThat(notification.getSeverity()).isEqualTo(Severity.ERROR);
   }
 
   @Test
-  void globalExceptionHandler12_checkResult() {
-    final var sut = mock(GlobalExceptionHandler.class);
-    final var exception = mock(NullPointerException.class);
-    final var expectedMessage = "message";
+  void calculationException_returnsMatchingHttpStatus() {
+    CalculationException exception = ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX.toException();
 
-    when(exception.getMessage()).thenReturn(expectedMessage);
-    doCallRealMethod().when(sut).globalExceptionHandler12(any(NullPointerException.class), any());
+    ResponseEntity<ErrorResponse> response = sut.handlePceException(exception);
 
-    final RuntimeExceptionDTO exceptionDTO = sut.globalExceptionHandler12(exception, mock(HttpServletRequest.class));
-
-    assertEquals(1, exceptionDTO.getErrors().size());
-    assertTrue(exceptionDTO.getErrors().contains(
-        new ErrorRes2DTO(HttpStatus.INTERNAL_SERVER_ERROR.name(), expectedMessage)));
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getNotifications()).hasSize(1);
+    Notification notification = response.getBody().getNotifications().get(0);
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX.getCode());
+    assertThat(notification.getSeverity()).isEqualTo(Severity.ERROR);
   }
 
   @Test
-  void globalExceptionHandler12_checkResultForDataErrorException() {
-    final var sut = mock(GlobalExceptionHandler.class);
-    final var exception = mock(DataErrorException.class);
-    final var expectedMessage = "message";
+  void calculationsFailedException_aggregatesAllNotifications() {
+    CalculationException error1 = ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12.toException();
+    CalculationException error2 = ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.toException();
+    CalculationsFailedException composite = new CalculationsFailedException(List.of(error1, error2));
 
-    when(exception.getCode()).thenReturn(ErrorCode.ERR_TCH_AHT_001);
-    when(exception.getMessage()).thenReturn(expectedMessage);
-    when(exception.getHttpStatusCode()).thenReturn(HttpStatus.BAD_REQUEST.value());
-    doCallRealMethod().when(sut).globalExceptionHandler12(any(DataErrorException.class), any());
+    ResponseEntity<ErrorResponse> response = sut.handleCalculationsFailed(composite);
 
-    final RuntimeExceptionDTO exceptionDTO = sut.globalExceptionHandler12(exception, mock(HttpServletRequest.class))
-        .getBody();
-
-    assertEquals(1, exceptionDTO.getErrors().size());
-    assertTrue(exceptionDTO.getErrors().contains(new ErrorRes2DTO(exception)));
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getNotifications()).hasSize(2);
+    assertThat(response.getBody().getNotifications())
+        .extracting(Notification::getCode)
+        .containsExactly(ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12.getCode(),
+            ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.getCode());
   }
 
   @Test
-  void generalExceptionHandler14_checkResult() {
-    final var sut = mock(GlobalExceptionHandler.class);
-    final var exception = mock(SystemException.class);
-    final var expectedMessage = "message";
-    final var expectedError = HttpCode.BAD_REQUEST;
-
-    when(exception.getErrorCode()).thenReturn(expectedError);
-    when(exception.getMessage()).thenReturn(expectedMessage);
-    doCallRealMethod().when(sut).generalExceptionHandler14(any(), any());
-
-    final RuntimeExceptionDTO response = sut.generalExceptionHandler14(exception, mock(HttpServletRequest.class));
-
-    assertEquals(1, response.getErrors().size());
-    assertTrue(response.getErrors().contains(new ErrorRes2DTO(expectedError.name(), expectedMessage)));
-  }
-
-  @Test
-  void methodArgumentNotValidExceptionHandler_mapsKnownExceptionCode() {
-    var sut = new GlobalExceptionHandler();
+  void methodArgumentNotValid_mapsKnownErrorCode() {
     var bindingResult = new BeanPropertyBindingResult(new Object(), "command");
     bindingResult.addError(new FieldError("command", "bestWorstTimeIntervalPeriods",
-        null, false, null, null, ErrorCode.ERR_BWP_BWPTIP_002.name()));
+        null, false, null, null, ErrorCode.BEST_WORST_TIME_INTERVAL_TOO_LARGE.name()));
     var exception = mock(MethodArgumentNotValidException.class);
     when(exception.getMessage()).thenReturn("validation failed");
     when(exception.getBindingResult()).thenReturn(bindingResult);
 
-    RuntimeExceptionDTO response = sut.methodArgumentNotValidExceptionHandler(exception, mock(
-        HttpServletRequest.class));
+    ResponseEntity<ErrorResponse> response = sut.handleMethodArgumentNotValid(exception);
 
-    assertEquals(1, response.getErrors().size());
-    assertTrue(response.getErrors().contains(new ErrorRes2DTO(
-        null, ErrorCode.ERR_BWP_BWPTIP_002.name(), ErrorCode.ERR_BWP_BWPTIP_002.getMessage())));
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getNotifications()).hasSize(1);
+    assertThat(response.getBody().getNotifications().get(0).getCode())
+        .isEqualTo(ErrorCode.BEST_WORST_TIME_INTERVAL_TOO_LARGE.getCode());
   }
 
   @Test
-  void methodArgumentNotValidExceptionHandler_includesFieldNameInMessage() {
-    var sut = new GlobalExceptionHandler();
+  void methodArgumentNotValid_includesFieldNameWhenTemplateHasPlaceholder() {
     var bindingResult = new BeanPropertyBindingResult(new Object(), "command");
     bindingResult.addError(new FieldError("command", "currency",
-        null, false, null, null, ErrorCode.ERR_VAL_NN_001.name()));
+        null, false, null, null, ErrorCode.FIELD_NOT_NULL.getCode()));
     var exception = mock(MethodArgumentNotValidException.class);
     when(exception.getMessage()).thenReturn("validation failed");
     when(exception.getBindingResult()).thenReturn(bindingResult);
 
-    RuntimeExceptionDTO response = sut.methodArgumentNotValidExceptionHandler(exception, mock(
-        HttpServletRequest.class));
+    ResponseEntity<ErrorResponse> response = sut.handleMethodArgumentNotValid(exception);
 
-    assertEquals(1, response.getErrors().size());
-    assertTrue(response.getErrors().contains(new ErrorRes2DTO(
-        null, ErrorCode.ERR_VAL_NN_001.name(), "currency must not be null")));
+    assertThat(response.getBody()).isNotNull();
+    Notification notification = response.getBody().getNotifications().get(0);
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.FIELD_NOT_NULL.getCode());
+    assertThat(notification.getMessage()).isEqualTo("currency must not be null");
+    assertThat(notification.getFieldName()).isEqualTo("currency");
   }
 
   @Test
-  void methodArgumentNotValidExceptionHandler_passesThroughUnknownMessage() {
-    var sut = new GlobalExceptionHandler();
+  void methodArgumentNotValid_passesThroughUnknownMessage() {
     var bindingResult = new BeanPropertyBindingResult(new Object(), "command");
     bindingResult.addError(new FieldError("command", "field",
         null, false, new String[] {"NotNull"}, null, "free-text message"));
@@ -144,45 +121,26 @@ class GlobalExceptionHandlerTest {
     when(exception.getMessage()).thenReturn("validation failed");
     when(exception.getBindingResult()).thenReturn(bindingResult);
 
-    RuntimeExceptionDTO response = sut.methodArgumentNotValidExceptionHandler(exception, mock(
-        HttpServletRequest.class));
+    ResponseEntity<ErrorResponse> response = sut.handleMethodArgumentNotValid(exception);
 
-    assertEquals(1, response.getErrors().size());
-    assertTrue(response.getErrors().contains(new ErrorRes2DTO(null, "NotNull", "free-text message")));
+    assertThat(response.getBody()).isNotNull();
+    Notification notification = response.getBody().getNotifications().get(0);
+    assertThat(notification.getMessage()).isEqualTo("free-text message");
+    assertThat(notification.getFieldName()).isEqualTo("field");
   }
 
   @Test
-  void constraintViolationExceptionHandler_mapsKnownExceptionCode() {
-    var sut = new GlobalExceptionHandler();
+  void constraintViolation_mapsKnownErrorCode() {
     ConstraintViolation<?> violation = mock(ConstraintViolation.class);
-    when(violation.getMessage()).thenReturn(ErrorCode.ERR_RRC_TIP_003.name());
+    when(violation.getMessage()).thenReturn(ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.name());
     var exception = new ConstraintViolationException("violation", Set.of(violation));
 
-    RuntimeExceptionDTO response = sut.constraintViolationExceptionHandler(exception, mock(HttpServletRequest.class));
+    ResponseEntity<ErrorResponse> response = sut.handleConstraintViolation(exception);
 
-    assertEquals(1, response.getErrors().size());
-    assertTrue(response.getErrors().contains(new ErrorRes2DTO(
-        null, ErrorCode.ERR_RRC_TIP_003.name(), ErrorCode.ERR_RRC_TIP_003.getMessage())));
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getNotifications()).hasSize(1);
+    assertThat(response.getBody().getNotifications().get(0).getCode())
+        .isEqualTo(ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.getCode());
   }
-
-  @Test
-  void requestValidationExceptionHandler_checkResult() {
-    final var sut = mock(GlobalExceptionHandler.class);
-    final var exception = mock(ReqValidationException.class);
-    final var exceptionId = "id";
-    final var exceptionCode = "code";
-    final var expectedMessage = "message";
-
-    when(exception.getId()).thenReturn(exceptionId);
-    when(exception.getCode()).thenReturn(exceptionCode);
-    when(exception.getMessage()).thenReturn(expectedMessage);
-    when(exception.getReqValidationExceptions()).thenReturn(List.of(exception));
-    doCallRealMethod().when(sut).requestValidationExceptionHandler(any(), any());
-
-    final var response = sut.requestValidationExceptionHandler(exception, mock(HttpServletRequest.class));
-
-    assertEquals(1, response.getErrors().size());
-    assertTrue(response.getErrors().contains(new ErrorRes2DTO(exceptionId, exceptionCode, expectedMessage)));
-  }
-
 }

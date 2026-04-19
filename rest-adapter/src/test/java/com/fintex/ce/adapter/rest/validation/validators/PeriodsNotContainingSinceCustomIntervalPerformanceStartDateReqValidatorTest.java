@@ -18,6 +18,6 @@ class PeriodsNotContainingSinceCustomIntervalPerformanceStartDateReqValidatorTes
 
   @Override
   String expectedErrorCode() {
-    return "ERR_RRC_TIP_008";
+    return "TIME_INTERVAL_PERIOD_CONTAINS_SINCE_CIPSD";
   }
 }

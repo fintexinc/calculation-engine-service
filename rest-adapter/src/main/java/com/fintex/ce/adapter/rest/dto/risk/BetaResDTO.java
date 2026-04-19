@@ -1,0 +1,22 @@
+package com.fintex.ce.adapter.rest.dto.risk;
+
+import com.fintex.ce.adapter.rest.dto.PeriodResDTO;
+import com.fintex.ce.adapter.rest.dto.TimeIntervalResDTO;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Set;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@Data
+@Schema(description = "Response for beta metric. Contains beta (sensitivity to benchmark) per time interval period.")
+public class BetaResDTO extends PeriodResDTO {
+
+  @Schema(description = "Beta coefficient per time interval period")
+  private Set<TimeIntervalResDTO> beta;
+
+}

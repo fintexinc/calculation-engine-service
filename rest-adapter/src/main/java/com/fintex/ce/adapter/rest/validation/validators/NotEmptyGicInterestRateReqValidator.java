@@ -17,7 +17,7 @@ import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 public class NotEmptyGicInterestRateReqValidator extends AbstractGicFieldReqValidator<BigDecimal> {
 
   public NotEmptyGicInterestRateReqValidator() {
-    super(GicHolding::getClientIntRate, ErrorCode.ERR_GIC_MC_001);
+    super(GicHolding::getClientIntRate, ErrorCode.GIC_HOLDING_MISSING_INTEREST_RATE);
   }
 
   @Override

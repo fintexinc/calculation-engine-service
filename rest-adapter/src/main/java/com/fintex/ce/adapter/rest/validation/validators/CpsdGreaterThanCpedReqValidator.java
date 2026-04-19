@@ -20,7 +20,7 @@ public class CpsdGreaterThanCpedReqValidator extends AbstractDateNotAfterReqVali
     super(
         cmd -> cmd instanceof CustomPsdProvider p ? p.getCustomPsd() : null,
         cmd -> cmd instanceof CustomPedProvider p ? p.getCustomPed() : null,
-        ErrorCode.ERR_RRC_CPSD_004);
+        ErrorCode.CPSD_AFTER_CPED);
   }
 
   @Override

@@ -4,19 +4,19 @@ import com.fintex.ce.model.error.ErrorCode;
 
 import lombok.EqualsAndHashCode;
 
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_BMPSD_002;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_BMPSD_003;
+import static com.fintex.ce.model.error.ErrorCode.CPSD_AFTER_BENCHMARK_PED;
+import static com.fintex.ce.model.error.ErrorCode.CPSD_BEFORE_BENCHMARK_PSD;
 
 @EqualsAndHashCode
 public class BenchmarkCpsdDataValidation extends CpsdDataValidation {
 
   @Override
   public ErrorCode getCpsdIsBeforePsdExceptionCode() {
-    return ERR_RRC_BMPSD_002;
+    return CPSD_BEFORE_BENCHMARK_PSD;
   }
 
   @Override
   public ErrorCode getCpsdIsAfterPedExceptionCode() {
-    return ERR_RRC_BMPSD_003;
+    return CPSD_AFTER_BENCHMARK_PED;
   }
 }

@@ -32,7 +32,7 @@ public class PeriodContainYearToDateReqValidator implements RequestValidator {
     }
     for (final String period : periods) {
       if (Period.YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
-        throw ErrorCode.ERR_RRC_TIP_002.reqValidationError();
+        throw ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.toValidationException();
       }
     }
   }

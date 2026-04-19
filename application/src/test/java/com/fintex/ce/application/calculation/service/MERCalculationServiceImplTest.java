@@ -5,8 +5,9 @@ import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalcul
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
-import com.fintex.ce.model.error.Notification;
+import com.fintex.ce.model.error.PceExceptionCollector;
 import com.fintex.ce.model.error.Warning;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
@@ -26,14 +27,16 @@ import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTI
 import static com.fintex.ce.model.domain.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.FORCE_REPORT_FEE;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.SCALED;
-import static com.fintex.ce.model.error.ErrorCode.WRN_MER_AMF_001;
-import static com.fintex.ce.model.error.ErrorCode.WRN_MER_MER_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_ACTUAL_MANAGEMENT_FEE;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_MANAGEMENT_EXPENSE_RATIO;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_NET_EXPENSE_RATIO;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyMap;
@@ -245,7 +248,7 @@ class MERCalculationServiceImplTest {
   void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForCanadaEtfAndCanadaMutualFundsWithCanadaEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation a = new AverageManagementExpenseCalculation();
@@ -256,14 +259,14 @@ class MERCalculationServiceImplTest {
         Map.of(FinancialInstrumentType.ETF_CANADA, Map.of(h, a)));
 
     // VERIFY
-    verify(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(a, h, notification);
+    verify(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(a, h);
   }
 
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForCanadaEtfAndCanadaMutualFundsWithUsEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation a = new AverageManagementExpenseCalculation();
@@ -274,14 +277,14 @@ class MERCalculationServiceImplTest {
         Map.of(FinancialInstrumentType.MUTUAL_FUND_CANADA, Map.of(h, a)));
 
     // VERIFY
-    verify(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(a, h, notification);
+    verify(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(a, h);
   }
 
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForUsEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation aDto = new AverageManagementExpenseCalculation();
@@ -292,14 +295,14 @@ class MERCalculationServiceImplTest {
         Map.of(FinancialInstrumentType.ETF_US, Map.of(h, aDto)));
 
     // VERIFY
-    verify(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(aDto, h, notification);
+    verify(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(aDto, h);
   }
 
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenCheckResult() {
     // SETUP
     final MERCalculationServiceImpl m = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation aDto1 = mock(AverageManagementExpenseCalculation.class);
@@ -309,8 +312,8 @@ class MERCalculationServiceImplTest {
     final Warning w1 = new Warning(null, "ANY1");
     final Warning w2 = new Warning(null, "ANY2");
 
-    when(m.handleFeeDataForUsEtfAndMutualFund(aDto1, h1, notification)).thenReturn(Optional.of(w1));
-    when(m.handleFeeDataForCanadaMutualHedgeFundsAndEtf(aDto2, h2, notification)).thenReturn(Optional.of(List.of(w2)));
+    when(m.handleFeeDataForUsEtfAndMutualFund(aDto1, h1)).thenReturn(Optional.of(w1));
+    when(m.handleFeeDataForCanadaMutualHedgeFundsAndEtf(aDto2, h2)).thenReturn(Optional.of(List.of(w2)));
 
     doCallRealMethod().when(m).setInitialFeeAndModifiedFeeValues(anyMap());
     // ACT
@@ -329,7 +332,7 @@ class MERCalculationServiceImplTest {
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenCallsFillFeeValuesWithManagementExpenseRation() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final AverageManagementExpenseCalculation etfHoldingDto = new AverageManagementExpenseCalculation();
     etfHoldingDto.setHoldingType(FinancialInstrumentType.ETF_CANADA);
@@ -338,11 +341,9 @@ class MERCalculationServiceImplTest {
     etfHoldingDto.setManagementExpenseRatio(mockManagementExpenseRatio);
     etfHoldingDto.setActualManagementFee(mock(BigDecimal.class));
 
-    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(),
-        any());
+    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
     // ACT
-    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(etfHoldingDto, mock(PortfolioHolding.class),
-        notification);
+    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(etfHoldingDto, mock(PortfolioHolding.class));
 
     // VERIFY
     verify(merCalculationServiceMock).setFeeValues(etfHoldingDto, mockManagementExpenseRatio);
@@ -352,18 +353,14 @@ class MERCalculationServiceImplTest {
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenThrowsException() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
     final PortfolioHolding h = mock(PortfolioHolding.class);
+    final AverageManagementExpenseCalculation dto = mock(AverageManagementExpenseCalculation.class);
 
-    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(),
-        any());
-    // ACT
-    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(mock(
-        AverageManagementExpenseCalculation.class), h, notification);
-
-    // VERIFY
-    assertEquals(1, notification.getErrors().stream().filter(e -> e.getMessage().equals(
-        "The holding is missing both MER and Management Fee")).count());
+    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
+    // ACT + VERIFY
+    CalculationException thrown = assertThrows(CalculationException.class,
+        () -> merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(dto, h));
+    assertEquals("The holding is missing both MER and Management Fee", thrown.getMessage());
     verify(h).getIdsString();
   }
 
@@ -371,36 +368,31 @@ class MERCalculationServiceImplTest {
   void shouldSetForUsEtfType_whenThrowsException() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
     final PortfolioHolding h = mock(PortfolioHolding.class);
+    final AverageManagementExpenseCalculation dto = mock(AverageManagementExpenseCalculation.class);
 
-    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any(), any());
-    // ACT
-    merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(mock(AverageManagementExpenseCalculation.class), h,
-        notification);
-
-    // VERIFY
-    assertEquals(1, notification.getErrors().stream().filter(e -> e.getMessage().equals(
-        "The holding is missing both Net Expense Ratio and Gross Expense Ratio")).count());
+    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any());
+    // ACT + VERIFY
+    CalculationException thrown = assertThrows(CalculationException.class,
+        () -> merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(dto, h));
+    assertEquals("The holding is missing both Net Expense Ratio and Gross Expense Ratio", thrown.getMessage());
     verify(h).getIdsString();
-    // assertEquals("The holding is missing both Net Expense Ratio and Gross Expense Ratio", e.getMessage());
   }
 
   @Test
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenMerIsPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
     final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
     when(a.getManagementExpenseRatio()).thenReturn(ONE);
 
-    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(),
-        any());
+    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
     // ACT
-    final Optional<List<Warning>> warning = merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(a, h,
-        notification);
+    final Optional<List<Warning>> warning = merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(a,
+        h);
 
     // VERIFY
     verify(a, times(3)).getManagementExpenseRatio();
@@ -411,39 +403,38 @@ class MERCalculationServiceImplTest {
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenMerIsNotPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
     final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
     when(a.getActualManagementFee()).thenReturn(ONE);
 
-    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(),
-        any());
+    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
     // ACT
-    final Optional<List<Warning>> warning = merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(a, h,
-        notification);
+    final Optional<List<Warning>> warning = merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(a,
+        h);
 
     // VERIFY
     verify(h).getIdsString();
     verify(a, times(2)).getActualManagementFee();
     assertTrue(warning.isPresent());
-    assertEquals(List.of(new Warning(null, "The holding is missing Management Expense Ratio", "WRN_MER_MER_001")),
-        warning.get());
+    assertEquals(List.of(new Warning(null, "The holding is missing Management Expense Ratio",
+        MISSING_MANAGEMENT_EXPENSE_RATIO.getCode())), warning.get());
   }
 
   @Test
   void shouldSetForUsEtfType_whenNetIsPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
     final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
     when(a.getNetExpenseRatio()).thenReturn(ONE);
 
-    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any(), any());
+    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any());
     // ACT
-    final Optional<Warning> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h, notification);
+    final Optional<Warning> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h);
 
     // VERIFY
     verify(a, times(3)).getNetExpenseRatio();
@@ -454,38 +445,37 @@ class MERCalculationServiceImplTest {
   void shouldSetForUsEtfType_whenNetIsNotPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
     final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
     when(a.getGrossExpenseRatio()).thenReturn(ONE);
 
-    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any(), any());
+    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any());
     // ACT
-    final Optional<Warning> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h, notification);
+    final Optional<Warning> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h);
 
     // VERIFY
     verify(h).getIdsString();
     verify(a, times(2)).getGrossExpenseRatio();
     assertTrue(warning.isPresent());
-    assertEquals(new Warning(null, "The holding is missing Net Expense Ratio", "WRN_MER_NER_001"), warning.get());
+    assertEquals(new Warning(null, "The holding is missing Net Expense Ratio",
+        MISSING_NET_EXPENSE_RATIO.getCode()), warning.get());
   }
 
   @Test
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenCallsFillFeeValuesWithActualManagementFee() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
     final AverageManagementExpenseCalculation etfHoldingDto = new AverageManagementExpenseCalculation();
     etfHoldingDto.setHoldingType(FinancialInstrumentType.ETF_CANADA);
     final BigDecimal mockActualManagementFee = mock(BigDecimal.class);
     etfHoldingDto.setActualManagementFee(mockActualManagementFee);
 
-    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(),
-        any());
+    doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
     // ACT
-    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(etfHoldingDto, mock(PortfolioHolding.class),
-        notification);
+    merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(etfHoldingDto, mock(PortfolioHolding.class));
 
     // VERIFY
     verify(merCalculationServiceMock).setFeeValues(etfHoldingDto, mockActualManagementFee);
@@ -495,7 +485,7 @@ class MERCalculationServiceImplTest {
   void shouldCalculateAverageMER_whenVerifyGetScaledAverageMer() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var parameterTypes = mock(List.class);
     final var averageMerCalculationDtos = mock(Map.class);
@@ -625,7 +615,7 @@ class MERCalculationServiceImplTest {
   void shouldHandleFeesForUsEtf_whenVerifySetFeeValues() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var holding = mock(PortfolioHolding.class);
     final var input = mock(AverageManagementExpenseCalculation.class);
@@ -634,10 +624,10 @@ class MERCalculationServiceImplTest {
     when(input.getNetExpenseRatio()).thenReturn(bigDecimal);
     when(input.getGrossExpenseRatio()).thenReturn(mock(BigDecimal.class));
 
-    doCallRealMethod().when(sut).handleFeeDataForUsEtfAndMutualFund(any(), any(), any());
+    doCallRealMethod().when(sut).handleFeeDataForUsEtfAndMutualFund(any(), any());
 
     // ACT
-    sut.handleFeeDataForUsEtfAndMutualFund(input, holding, notification);
+    sut.handleFeeDataForUsEtfAndMutualFund(input, holding);
 
     // VERIFY
     verify(sut).setFeeValues(eq(input), same(bigDecimal));
@@ -647,7 +637,7 @@ class MERCalculationServiceImplTest {
   void shouldHandleFeesForUsEtf_whenCheckResult() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var holding = mock(PortfolioHolding.class);
     final var input = mock(AverageManagementExpenseCalculation.class);
@@ -656,10 +646,10 @@ class MERCalculationServiceImplTest {
     when(input.getNetExpenseRatio()).thenReturn(bigDecimal);
     when(input.getGrossExpenseRatio()).thenReturn(mock(BigDecimal.class));
 
-    doCallRealMethod().when(sut).handleFeeDataForUsEtfAndMutualFund(any(), any(), any());
+    doCallRealMethod().when(sut).handleFeeDataForUsEtfAndMutualFund(any(), any());
 
     // ACT
-    final Optional<Warning> actual = sut.handleFeeDataForUsEtfAndMutualFund(input, holding, notification);
+    final Optional<Warning> actual = sut.handleFeeDataForUsEtfAndMutualFund(input, holding);
 
     // VERIFY
     assertEquals(Optional.empty(), actual);
@@ -669,18 +659,18 @@ class MERCalculationServiceImplTest {
   void shouldHandleFeesForCanadaMutualHedgeFundsAndEtf_whenReturnsTwoWarningsInCaseOfAbsentDataForCanadaHedgeFund() {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var holding = new PortfolioHolding(null, FinancialInstrumentType.HEDGE_FUND_CANADA, null);
     final var input = mock(AverageManagementExpenseCalculation.class);
-    final Optional<List<Warning>> expected = Optional.of(List.of(WRN_MER_MER_001.warning(holding), WRN_MER_AMF_001
-        .warning(holding)));
+    final Optional<List<Warning>> expected = Optional.of(List.of(MISSING_MANAGEMENT_EXPENSE_RATIO.warning(holding),
+        MISSING_ACTUAL_MANAGEMENT_FEE
+            .warning(holding)));
 
-    doCallRealMethod().when(sut).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any(), any());
+    doCallRealMethod().when(sut).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
 
     // ACT
-    final Optional<List<Warning>> actual = sut.handleFeeDataForCanadaMutualHedgeFundsAndEtf(input, holding,
-        notification);
+    final Optional<List<Warning>> actual = sut.handleFeeDataForCanadaMutualHedgeFundsAndEtf(input, holding);
 
     // VERIFY
     assertEquals(expected, actual);

@@ -5,8 +5,8 @@ import com.fintex.ce.model.error.ErrorCode;
 
 import org.junit.jupiter.api.Test;
 
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_BMPSD_002;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_BMPSD_003;
+import static com.fintex.ce.model.error.ErrorCode.CPSD_AFTER_BENCHMARK_PED;
+import static com.fintex.ce.model.error.ErrorCode.CPSD_BEFORE_BENCHMARK_PSD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BenchmarkCpsdDataValidationTest {
@@ -20,7 +20,7 @@ class BenchmarkCpsdDataValidationTest {
     final ErrorCode actual = sut.getCpsdIsBeforePsdExceptionCode();
 
     // VERIFY
-    assertEquals(ERR_RRC_BMPSD_002, actual);
+    assertEquals(CPSD_BEFORE_BENCHMARK_PSD, actual);
   }
 
   @Test
@@ -32,7 +32,7 @@ class BenchmarkCpsdDataValidationTest {
     final ErrorCode actual = sut.getCpsdIsAfterPedExceptionCode();
 
     // VERIFY
-    assertEquals(ERR_RRC_BMPSD_003, actual);
+    assertEquals(CPSD_AFTER_BENCHMARK_PED, actual);
   }
 
 }

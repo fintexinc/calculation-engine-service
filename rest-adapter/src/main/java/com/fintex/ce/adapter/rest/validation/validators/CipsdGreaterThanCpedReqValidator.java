@@ -17,7 +17,7 @@ public class CipsdGreaterThanCpedReqValidator extends AbstractDateNotAfterReqVal
     super(
         cmd -> cmd instanceof PeriodCommand pc ? pc.getCustomIntervalPsd() : null,
         cmd -> cmd instanceof PeriodCommand pc ? pc.getCustomPed() : null,
-        ErrorCode.ERR_RRC_CIPSD_002);
+        ErrorCode.CIPSD_AFTER_CPED);
   }
 
   @Override

@@ -17,7 +17,7 @@ public class NotIncludeCipsdReqValidator
       AbstractNotIncludePropertyReqValidator<PeriodCommand, LocalDate> {
 
   public NotIncludeCipsdReqValidator() {
-    super(PeriodCommand.class, PeriodCommand::getCustomIntervalPsd, ErrorCode.ERR_RRC_TIP_005);
+    super(PeriodCommand.class, PeriodCommand::getCustomIntervalPsd, ErrorCode.REQUEST_CONTAINS_CUSTOM_INTERVAL_PSD);
   }
 
   @Override

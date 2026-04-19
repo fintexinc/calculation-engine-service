@@ -1,16 +1,14 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.validation.CpedDataValidation;
-import com.fintex.ce.model.error.Notification;
-
-import org.springframework.http.HttpStatus;
+import com.fintex.ce.model.error.PceExceptionCollector;
 
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPED_002;
-import static com.fintex.ce.model.error.ErrorCode.ERR_RRC_CPED_003;
+import static com.fintex.ce.model.error.ErrorCode.CPED_AFTER_PORTFOLIO_PED;
+import static com.fintex.ce.model.error.ErrorCode.CPED_BEFORE_PORTFOLIO_PSD;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -25,7 +23,7 @@ class CpedDataValidationTest {
   void shouldValidate_whenVerifyValidateCpedIsAfterPed() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
-    var notification = new Notification();
+    var notification = new PceExceptionCollector();
 
     final var cped = LocalDate.now();
     final var psd = LocalDate.now().minusMonths(1);
@@ -43,7 +41,7 @@ class CpedDataValidationTest {
   void shouldValidate_whenVerifyValidateCpedIsBeforePsd() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
-    var notification = new Notification();
+    var notification = new PceExceptionCollector();
 
     final var cped = LocalDate.now();
     final var psd = LocalDate.now().minusMonths(1);
@@ -61,7 +59,7 @@ class CpedDataValidationTest {
   void shouldValidateCpedIsBeforePsd_whenCpedIsNulLThenNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
-    var notification = new Notification();
+    var notification = new PceExceptionCollector();
 
     final LocalDate cped = null;
     final var psd = LocalDate.now().minusMonths(1);
@@ -79,13 +77,13 @@ class CpedDataValidationTest {
   void shouldValidateCpedIsBeforePsd_whenCpedIsAfterPsdNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
-    var notification = new Notification();
+    var notification = new PceExceptionCollector();
 
     final var cped = LocalDate.now();
     final var psd = LocalDate.now().minusMonths(1);
     final var ped = LocalDate.now().minusMonths(2);
 
-    when(sut.getCpedIsBeforePsdExceptionCode()).thenReturn(ERR_RRC_CPED_002);
+    when(sut.getCpedIsBeforePsdExceptionCode()).thenReturn(CPED_BEFORE_PORTFOLIO_PSD);
 
     doCallRealMethod().when(sut).validateCpedIsBeforePsd(any(), any(), any());
     // ACT
@@ -99,27 +97,27 @@ class CpedDataValidationTest {
   void shouldValidateCpedIsBeforePsd_whenCpedIsBeforePsdErrorShouldBeThrown() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
-    var notification = new Notification();
+    var notification = new PceExceptionCollector();
 
     final var cped = LocalDate.now();
     final var psd = LocalDate.now().plusMonths(1);
     final var ped = LocalDate.now().minusMonths(2);
 
-    when(sut.getCpedIsBeforePsdExceptionCode()).thenReturn(ERR_RRC_CPED_002);
+    when(sut.getCpedIsBeforePsdExceptionCode()).thenReturn(CPED_BEFORE_PORTFOLIO_PSD);
 
     doCallRealMethod().when(sut).validateCpedIsBeforePsd(any(), any(), any());
     // ACT
     sut.validateCpedIsBeforePsd(cped, psd, notification);
 
     // VERIFY
-    assertTrue(notification.getErrors().contains(ERR_RRC_CPED_002.error(HttpStatus.BAD_REQUEST)));
+    assertTrue(notification.getExceptions().contains(CPED_BEFORE_PORTFOLIO_PSD.toException()));
   }
 
   @Test
   void shouldValidateCpedIsAfterPed_whenCpedIsNulLThenNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final LocalDate cped = null;
     final var psd = LocalDate.now().minusMonths(1);
@@ -137,13 +135,13 @@ class CpedDataValidationTest {
   void shouldValidateCpedIsAfterPed_whenCpedIsBeforePedNothingShouldHappen() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var cped = LocalDate.now();
     final var psd = LocalDate.now().minusMonths(1);
     final var ped = LocalDate.now().plusMonths(2);
 
-    when(sut.getCpedIsBeforePsdExceptionCode()).thenReturn(ERR_RRC_CPED_003);
+    when(sut.getCpedIsBeforePsdExceptionCode()).thenReturn(CPED_AFTER_PORTFOLIO_PED);
 
     doCallRealMethod().when(sut).validateCpedIsAfterPed(any(), any(), any());
     // ACT
@@ -157,20 +155,20 @@ class CpedDataValidationTest {
   void shouldValidateCpedIsAfterPed_whenCpedIsAfterPedErrorShouldBeThrown() {
     // SETUP
     final var sut = mock(CpedDataValidation.class);
-    final Notification notification = new Notification();
+    final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var cped = LocalDate.now();
     final var psd = LocalDate.now().plusMonths(1);
     final var ped = LocalDate.now().minusMonths(2);
 
-    when(sut.getCpedIsAfterPedExceptionCode()).thenReturn(ERR_RRC_CPED_003);
+    when(sut.getCpedIsAfterPedExceptionCode()).thenReturn(CPED_AFTER_PORTFOLIO_PED);
 
     doCallRealMethod().when(sut).validateCpedIsAfterPed(any(), any(), any());
     // ACT
     sut.validateCpedIsAfterPed(cped, ped, notification);
 
     // VERIFY
-    assertTrue(notification.getErrors().contains(ERR_RRC_CPED_003.error(HttpStatus.BAD_REQUEST)));
+    assertTrue(notification.getExceptions().contains(CPED_AFTER_PORTFOLIO_PED.toException()));
   }
 
 }

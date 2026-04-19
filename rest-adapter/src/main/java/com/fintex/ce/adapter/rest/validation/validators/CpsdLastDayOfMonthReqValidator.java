@@ -16,7 +16,7 @@ import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 public class CpsdLastDayOfMonthReqValidator extends AbstractLastDayOfMonthReqValidator<CustomPsdProvider> {
 
   public CpsdLastDayOfMonthReqValidator() {
-    super(CustomPsdProvider.class, CustomPsdProvider::getCustomPsd, ErrorCode.ERR_RRC_CPSD_001);
+    super(CustomPsdProvider.class, CustomPsdProvider::getCustomPsd, ErrorCode.CPSD_NOT_MONTH_END);
   }
 
   @Override

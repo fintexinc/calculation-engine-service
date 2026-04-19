@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.model.error.ErrorCode.WRN_CA_CA_001;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_CLASSIFICATION_ALLOCATION;
 import static com.fintex.ce.util.CalculationUtils.reScale;
 import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ZERO;
@@ -99,7 +99,7 @@ public class ClassificationAllocationCalculationServiceImpl
         reqDTO.getHoldings(), List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         ClassificationAllocation::getSecurityClassificationValues,
-        ALLOCATION_DEFAULT_MAP, WRN_CA_CA_001);
+        ALLOCATION_DEFAULT_MAP, MISSING_CLASSIFICATION_ALLOCATION);
   }
 
 }

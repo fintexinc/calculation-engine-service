@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.rest.validation.validators;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.error.exceptions.ReqValidationException;
+import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -37,10 +37,10 @@ class BenchmarkHoldingReqValidatorTest {
     cmd.setBenchmarkHoldings(List.of(h1, h2));
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_DH_001");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("DUPLICATE_HOLDING");
         });
   }
 
@@ -57,10 +57,10 @@ class BenchmarkHoldingReqValidatorTest {
     cmd.setBenchmarkHoldings(List.of(cashHolding));
 
     assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ReqValidationException.class)
+        .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
-          ReqValidationException rve = (ReqValidationException) ex;
-          assertThat(rve.getCode()).isEqualTo("ERR_RRC_MC_002");
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_MISSING_CURRENCY");
         });
   }
 
@@ -81,11 +81,32 @@ class BenchmarkHoldingReqValidatorTest {
   }
 
   @Test
-  void shouldNotThrow_whenBenchmarkHoldingsAreEmpty() {
+  void shouldThrow_whenBenchmarkHoldingsAreEmpty() {
     PeriodCommand cmd = new PeriodCommand();
     cmd.setCurrency(Currency.CAD);
     cmd.setBenchmarkHoldings(Collections.emptyList());
 
-    assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
+    assertThatThrownBy(() -> validator.validate(cmd))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_EMPTY");
+          assertThat(rve.getFieldName()).isEqualTo("benchmarkHoldings");
+        });
+  }
+
+  @Test
+  void shouldThrow_whenBenchmarkHoldingsAreNull() {
+    PeriodCommand cmd = new PeriodCommand();
+    cmd.setCurrency(Currency.CAD);
+    cmd.setBenchmarkHoldings(null);
+
+    assertThatThrownBy(() -> validator.validate(cmd))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_EMPTY");
+          assertThat(rve.getFieldName()).isEqualTo("benchmarkHoldings");
+        });
   }
 }

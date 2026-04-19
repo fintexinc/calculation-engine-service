@@ -8,8 +8,8 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
-import com.fintex.ce.model.error.Notification;
-import com.fintex.ce.model.error.ValidationError;
+import com.fintex.ce.model.error.PceExceptionCollector;
+import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.springframework.stereotype.Service;
@@ -17,7 +17,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Service
 public class CommonPerformanceDateServiceImpl
@@ -39,32 +41,29 @@ public class CommonPerformanceDateServiceImpl
   public CommonPerformanceDatesResult perform(MultiplePortfoliosCommand mReqDTO) {
     List<PortfolioHolding> portfolioHoldings = collectAllPortfolioHoldings(mReqDTO.getPortfolios());
 
-    var notification = new Notification();
-    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForPortfolios = notification.tryCatch(
-        () -> getPortfolioMonthlyReturns(
-            portfolioHoldings));
-    DateRange commonPerformanceDateForPortfolios = notification.tryCatch(() -> commonPerformanceDateFor(
-        monthlyReturnsAggregateForPortfolios));
-    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForBenchmark = notification.tryCatch(
-        () -> getPortfolioMonthlyReturns(
-            mReqDTO
-                .getBenchmarkHoldings()));
-    DateRange commonPerformanceDatesForBenchmarks = notification.tryCatch(() -> commonPerformanceDateFor(
-        monthlyReturnsAggregateForBenchmark));
-    notification.ifAnyErrorThrowException();
+    var collector = new PceExceptionCollector();
+    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForPortfolios = collector.tryCatch(
+        () -> getPortfolioMonthlyReturns(portfolioHoldings));
+    DateRange commonPerformanceDateForPortfolios = collector.tryCatch(
+        () -> commonPerformanceDateFor(monthlyReturnsAggregateForPortfolios));
+    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForBenchmark = collector.tryCatch(
+        () -> getPortfolioMonthlyReturns(mReqDTO.getBenchmarkHoldings()));
+    DateRange commonPerformanceDatesForBenchmarks = collector.tryCatch(
+        () -> commonPerformanceDateFor(monthlyReturnsAggregateForBenchmark));
+    collector.throwIfAny();
 
-    CommonPerformanceDatesResult res = new CommonPerformanceDatesResult()
+    List<Warning> warnings = Stream.of(monthlyReturnsAggregateForPortfolios, monthlyReturnsAggregateForBenchmark)
+        .filter(Objects::nonNull)
+        .flatMap(a -> a.getErrorsAsWarnings().stream())
+        .toList();
+
+    CommonPerformanceDatesResult result = new CommonPerformanceDatesResult()
         .setCommonPerformanceStartDatePf(commonPerformanceDateForPortfolios.start())
         .setCommonPerformanceEndDatePf(commonPerformanceDateForPortfolios.end())
         .setCommonPerformanceStartDateBm(commonPerformanceDatesForBenchmarks.start())
         .setCommonPerformanceEndDateBm(commonPerformanceDatesForBenchmarks.end());
-
-    if (!ObjectUtils.isEmpty(monthlyReturnsAggregateForPortfolios)) {
-      res.setErrors(notification.tryCatch(monthlyReturnsAggregateForPortfolios.getErrors().stream().map(
-          err -> new ValidationError(err.getId(), err.getCode().name(), err.getMessage()))::toList));
-    }
-
-    return res;
+    result.setWarnings(warnings);
+    return result;
   }
 
   List<PortfolioHolding> collectAllPortfolioHoldings(Set<MultiplePortfoliosCommand.Portfolio> portfolios) {

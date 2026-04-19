@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
-import com.fintex.ce.mapping.CountryAllocationMappingService;
+import com.fintex.ce.application.mapping.CountryAllocationMappingService;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;

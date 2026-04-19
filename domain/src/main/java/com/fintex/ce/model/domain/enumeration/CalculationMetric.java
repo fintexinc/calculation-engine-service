@@ -15,6 +15,7 @@ import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.model.dto.command.RollingCorrelationCommand;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.model.dto.command.YieldCommand;
+import com.fintex.ce.model.error.ErrorCode;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -218,7 +219,7 @@ public enum CalculationMetric {
   public static CalculationMetric from(String value) {
     CalculationMetric metric = VALUE_MAP.get(value);
     if (metric == null) {
-      throw new IllegalArgumentException("Unknown calculation metric: " + value);
+      throw ErrorCode.UNSUPPORTED_METRIC.toException(value);
     }
     return metric;
   }
