@@ -251,6 +251,22 @@ public enum ErrorCode {
       HttpStatus.OK,
       Severity.WARNING),
 
+  MISSING_HOLDING_IDENTIFIERS(
+      Codes.MISSING_HOLDING_IDENTIFIERS,
+      "%d portfolio securities are missing underlying holding identifiers of the configured comparison type",
+      "Some portfolio securities had no underlying holding identifiers of the configured comparison type returned by the data provider",
+      "Populate underlying holding identifiers for the affected securities in the source data",
+      HttpStatus.OK,
+      Severity.WARNING),
+
+  MISSING_UNDERLYING_HOLDING_ID_VALUE(
+      Codes.MISSING_UNDERLYING_HOLDING_ID_VALUE,
+      "%d underlying holdings have a null identifier value for the configured comparison type",
+      "The data provider returned underlying holdings whose identifier value is null for the configured comparison type",
+      "Populate identifier values for the affected underlying holdings in the source data",
+      HttpStatus.OK,
+      Severity.WARNING),
+
   // ============================================
   // FX-xxx — FX rate errors
   // ============================================
@@ -976,6 +992,8 @@ public enum ErrorCode {
     public static final String MISSING_BUSINESS_COUNTRY_CODE = "FDS-026";
     public static final String MISSING_COMPANY_NAME = "FDS-027";
     public static final String UNDERLYING_FUND_MISSING_UNDERLYING_HOLDINGS = "FDS-028";
+    public static final String MISSING_HOLDING_IDENTIFIERS = "FDS-029";
+    public static final String MISSING_UNDERLYING_HOLDING_ID_VALUE = "FDS-030";
 
     // FX
     public static final String MISSING_MONTHLY_FX_RATE = "FX-001";
