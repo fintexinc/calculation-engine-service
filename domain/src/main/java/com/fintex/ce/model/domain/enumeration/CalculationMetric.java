@@ -177,7 +177,10 @@ public enum CalculationMetric {
   TOP_COMMON_HOLDINGS("top-common-holdings", TopCommonHoldingsCommand.class),
 
   @Schema(description = "Fixed income credit quality breakdown")
-  FIXED_INCOME_CREDIT_QUALITY("fixed-income-credit-quality", PortfolioHoldingsCommand.class);
+  FIXED_INCOME_CREDIT_QUALITY("fixed-income-credit-quality", PortfolioHoldingsCommand.class),
+
+  @Schema(description = "Count of unique underlying holdings across all portfolio securities")
+  NUMBER_OF_UNIQUE_HOLDINGS("number-of-unique-holdings", PortfolioHoldingsCommand.class);
 
   @JsonValue
   private final String value;

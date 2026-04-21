@@ -23,6 +23,7 @@ import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
+import com.fintex.ce.model.domain.result.holding.NumberOfUniqueHoldingsResult;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
 import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
 import com.fintex.ce.model.domain.result.income.YieldResult;
@@ -126,7 +127,7 @@ public class PortfolioCalculationController {
       SalesChargeResult.class,
       IncomeForecastResult.class, YieldResult.class,
       CommonPerformanceDatesResult.class, TopCommonHoldingsResult.class,
-      CreditQualityResult.class
+      CreditQualityResult.class, NumberOfUniqueHoldingsResult.class
   })))
   @PostMapping("/{metricName}")
   @SuppressWarnings("unchecked")

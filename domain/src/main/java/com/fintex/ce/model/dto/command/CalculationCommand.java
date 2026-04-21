@@ -30,7 +30,8 @@ import lombok.experimental.Accessors;
         "equity-market-capitalization", "fixed-income-country-exposure",
         "fixed-income-geographic-exposure", "fixed-income-bond-sector",
         "fixed-income-stylebox-exposure", "maturity-allocation",
-        "classification-allocation", "sales-charge", "fixed-income-credit-quality"
+        "classification-allocation", "sales-charge", "fixed-income-credit-quality",
+        "number-of-unique-holdings"
     }),
     @Type(value = ReturnCommand.class, names = {"annual-returns", "growth-of-10k"}),
     @Type(value = AverageMerCommand.class, names = {"mer", "management-fee"}),
