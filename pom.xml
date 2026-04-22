@@ -45,6 +45,7 @@
 
         <!-- Test dependencies -->
         <mockito.version>5.18.0</mockito.version>
+        <assertj.version>3.27.3</assertj.version>
 
         <!-- Plugin versions -->
         <git-commit-id-plugin.version>2.2.4</git-commit-id-plugin.version>
@@ -172,6 +173,12 @@
                 <version>4.12.0</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -202,6 +209,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
