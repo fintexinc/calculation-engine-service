@@ -7,7 +7,7 @@ import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.holding.Holding;
 import com.fintex.wm.commons.domain.holding.SecurityHolding;
 import com.fintex.wm.commons.domain.holding.TopHoldings;
-import com.fintex.wm.commons.domain.id.ExternalIdentifiers;
+import com.fintex.wm.commons.domain.id.IdentifiersDatapoint;
 import com.fintex.wm.commons.domain.value.MultilingualString;
 
 import org.springframework.stereotype.Component;
@@ -50,8 +50,8 @@ public class TopHoldingsMapper implements SecurityMasterResponseMapper<CommonTop
     th.setType(sh.getType());
     th.setValue(sh.getMarketValue());
     th.setWeight(sh.getWeighting());
-    th.setIdentifiers(Optional.ofNullable(sh.getExternalIdentifiers())
-        .map(ExternalIdentifiers::getCodes)
+    th.setIdentifiers(Optional.ofNullable(sh.getIdentifiers())
+        .map(IdentifiersDatapoint::getIdentifiers)
         .orElse(List.of()));
     th.setUnderlyingHoldings(mapUnderlyingHoldings(sh.getUnderlyingHoldings()));
     return th;

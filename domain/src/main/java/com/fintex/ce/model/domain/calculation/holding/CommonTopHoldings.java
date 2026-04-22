@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.calculation.holding;
 
 import com.fintex.ce.model.domain.calculation.BaseCalculationData;
-import com.fintex.wm.commons.domain.id.IdentifierTypeValue;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,7 +37,7 @@ public class CommonTopHoldings extends BaseCalculationData<CommonTopHoldings> {
     private String type;
     private BigDecimal value;
     private List<CommonTopHolding> underlyingHoldings;
-    private List<IdentifierTypeValue> identifiers;
+    private List<SecurityIdentifier> identifiers;
     private BigDecimal weight;
   }
 
