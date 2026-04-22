@@ -44,19 +44,19 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
   @Override
   public MaxDrawdownEntry calculatePeriodForNumberOfMonths(final int numberOfMonths) {
     if (numberOfMonths > getPortfolioTotalReturns().size()) {
-      return new MaxDrawdownEntry().setTimeIntervalPeriod(String.valueOf(numberOfMonths));
+      return new MaxDrawdownEntry().setPeriod(String.valueOf(numberOfMonths));
     }
     final NavigableMap<LocalDate, BigDecimal> growth10KByPeriod = new TreeMap<>(
         getSubMapByPeriodStartDate(getPeriodStartDateWithOneMonthOffset(numberOfMonths), growth10K));
     final NavigableMap<LocalDate, BigDecimal> maximumDrawdownMap = calculateMaxDrawdownValues(growth10KByPeriod);
     final Map.Entry<LocalDate, BigDecimal> maxDrawdownEntry = getMaxDrawdownValue(maximumDrawdownMap);
     if (maxDrawdownEntry.getValue().compareTo(BigDecimal.ZERO) == 0) {
-      return new MaxDrawdownEntry().setValue(BigDecimal.ZERO).setTimeIntervalPeriod(String.valueOf(numberOfMonths));
+      return new MaxDrawdownEntry().setValue(BigDecimal.ZERO).setPeriod(String.valueOf(numberOfMonths));
     }
     final Map.Entry<LocalDate, BigDecimal> peak = getPeakValue(maximumDrawdownMap, maxDrawdownEntry);
     final Integer recoveryTime = getRecoveryTimeValue(maximumDrawdownMap, maxDrawdownEntry, peak);
     return new MaxDrawdownEntry()
-        .setTimeIntervalPeriod(String.valueOf(numberOfMonths))
+        .setPeriod(String.valueOf(numberOfMonths))
         .setValue(scaleFunction.apply(maxDrawdownEntry.getValue()))
         .setDrawdownStartDate(getDrawDownStartDateWithOneMonthOffset(peak))
         .setDrawdownTroughDate(maxDrawdownEntry.getKey()).setRecoveryTime(recoveryTime);
@@ -74,7 +74,7 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
   public MaxDrawdownResult defineResponseType(final Set<Pair<String, MaxDrawdownEntry>> result) {
     final MaxDrawdownResult maxDrawdownResDTO = new MaxDrawdownResult();
     final List<MaxDrawdownEntry> maxDrawdownDTOS = result.stream()
-        .map(v -> ofNullable(v.getValue()).orElse(new MaxDrawdownEntry()).setTimeIntervalPeriod(v.getKey()))
+        .map(v -> ofNullable(v.getValue()).orElse(new MaxDrawdownEntry()).setPeriod(v.getKey()))
         .collect(Collectors.toList());
     maxDrawdownResDTO.setMaxDrawdown(maxDrawdownDTOS);
     return maxDrawdownResDTO;

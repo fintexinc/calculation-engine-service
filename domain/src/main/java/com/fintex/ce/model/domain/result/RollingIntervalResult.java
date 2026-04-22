@@ -12,6 +12,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class RollingIntervalResult {
 
-  private String timeIntervalPeriod;
+  private String period;
   private Set<IntervalResult> values;
 }

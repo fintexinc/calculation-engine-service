@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalcul
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.ParameterType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -35,9 +35,9 @@ import static java.math.BigDecimal.ZERO;
  * @param <R>
  *          result type. Return type of 'perform' method.
  */
-public abstract class AverageManagementExpenseCalculationService<R extends WarningResult>
+public abstract class AverageManagementExpenseCalculationService<R extends BaseCalculationResult>
     implements
-      CalculationService<R, AverageMerCommand> {
+      CalculationService<AverageMerCommand, R> {
 
   protected AverageManagementExpenseCalculationService() {
   }

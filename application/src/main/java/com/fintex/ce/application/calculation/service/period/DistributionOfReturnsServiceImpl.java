@@ -22,7 +22,7 @@ import java.util.Set;
 @Service
 public class DistributionOfReturnsServiceImpl
     implements
-      CalculationService<DistributionOfReturnsResult, DistributionOfReturnsCommand> {
+      CalculationService<DistributionOfReturnsCommand, DistributionOfReturnsResult> {
 
   private final MonthlyReturnsService monthlyReturnsService;
 

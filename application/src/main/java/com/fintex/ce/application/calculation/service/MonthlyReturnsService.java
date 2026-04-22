@@ -98,7 +98,8 @@ public class MonthlyReturnsService {
     portfolioMonthlyReturnsAggregate
         .setFxRatesConversionComponent(new FxRatesConversionComponent())
         .setFxRates(fetchFxRates(portfolioMonthlyReturnsAggregate.holdingCurrencyMap, currency,
-            portfolioMonthlyReturnsAggregate.getPsd(), portfolioMonthlyReturnsAggregate.getPed()), currency)
+            portfolioMonthlyReturnsAggregate.getPerformanceStartDate(), portfolioMonthlyReturnsAggregate
+                .getPerformanceEndDate()), currency)
         .setMonthlyReturnsCutComponent(new ReturnsCutComponent())
         .setWeightedAverageComponent(new WeightedAverageComponent(returnFactorScale))
         .setCpsdDataValidation(new PortfolioCpsdDataValidation())
@@ -115,7 +116,8 @@ public class MonthlyReturnsService {
     benchmarkMonthlyReturnsAggregate
         .setFxRatesConversionComponent(new FxRatesConversionComponent())
         .setFxRates(fetchFxRates(benchmarkMonthlyReturnsAggregate.holdingCurrencyMap, currency,
-            benchmarkMonthlyReturnsAggregate.getPsd(), benchmarkMonthlyReturnsAggregate.getPed()), currency)
+            benchmarkMonthlyReturnsAggregate.getPerformanceStartDate(), benchmarkMonthlyReturnsAggregate
+                .getPerformanceEndDate()), currency)
         .setMonthlyReturnsCutComponent(new ReturnsCutComponent())
         .setWeightedAverageComponent(new WeightedAverageComponent(returnFactorScale))
         .setCpsdDataValidation(new BenchmarkCpsdDataValidation())

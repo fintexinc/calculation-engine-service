@@ -22,7 +22,7 @@ import java.util.NavigableMap;
 import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
 
 @Service
-public class GrowthOf10KCalculationServiceImpl implements CalculationService<Growth10KResult, ReturnCommand> {
+public class GrowthOf10KCalculationServiceImpl implements CalculationService<ReturnCommand, Growth10KResult> {
 
   private final MonthlyReturnsService monthlyReturnsService;
 

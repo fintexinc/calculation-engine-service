@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public abstract class PeriodAbstractService<E extends PeriodResult, R extends PeriodCommand>
     implements
-      PeriodCalculationService<E, R> {
+      PeriodCalculationService<R, E> {
   protected final Set<String> defaultPeriods;
   public MonthlyReturnsService monthlyReturnsService;
 

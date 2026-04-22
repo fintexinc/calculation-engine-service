@@ -121,8 +121,8 @@ class ReturnsTest {
 
     sut.setCpsdDataValidation(cpsdDataValidation);
     sut.setCpedDataValidation(cpedDataValidation);
-    sut.psd = LocalDate.now().minusMonths(7);
-    sut.ped = LocalDate.now().plusMonths(7);
+    sut.performanceStartDate = LocalDate.now().minusMonths(7);
+    sut.performanceEndDate = LocalDate.now().plusMonths(7);
     sut.returnsMap = Map.of(holding, returns);
     Mockito.when(dailyPerformanceReqDTO.getStartDate()).thenReturn(LocalDate.now().minusMonths(7));
     Mockito.when(dailyPerformanceReqDTO.getEndDate()).thenReturn(LocalDate.now().plusMonths(7));
@@ -150,8 +150,8 @@ class ReturnsTest {
 
     sut.setCpsdDataValidation(cpsdDataValidation);
     sut.setCpedDataValidation(cpedDataValidation);
-    sut.ped = LocalDate.now().minusMonths(7);
-    sut.psd = LocalDate.now().plusMonths(7);
+    sut.performanceEndDate = LocalDate.now().minusMonths(7);
+    sut.performanceStartDate = LocalDate.now().plusMonths(7);
     sut.returnsMap = Map.of(holding, returns);
     Mockito.when(dailyPerformanceReqDTO.getStartDate()).thenReturn(LocalDate.now().minusMonths(7));
     Mockito.when(dailyPerformanceReqDTO.getEndDate()).thenReturn(LocalDate.now().plusMonths(7));

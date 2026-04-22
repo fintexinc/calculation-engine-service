@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class YieldCalculationServiceImpl implements CalculationService<YieldResult, YieldCommand> {
+public class YieldCalculationServiceImpl implements CalculationService<YieldCommand, YieldResult> {
 
   private final SecurityDataFetcher<Yield> yieldSecurityDataFetcher;
   private final YieldResponseMapper responseMapper;

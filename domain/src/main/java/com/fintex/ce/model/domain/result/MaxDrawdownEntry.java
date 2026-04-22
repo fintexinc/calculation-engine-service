@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class MaxDrawdownEntry {
 
-  private String timeIntervalPeriod;
+  private String period;
   private BigDecimal value;
   private LocalDate drawdownStartDate;
   private LocalDate drawdownTroughDate;

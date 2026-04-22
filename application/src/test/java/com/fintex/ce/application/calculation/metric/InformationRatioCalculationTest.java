@@ -131,11 +131,11 @@ class InformationRatioCalculationTest {
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     final Set<Pair<String, BigDecimal>> periodAndInformationRatio = mock(Set.class);
-    Set<TimeIntervalResult> timeIntervalResultS = mock(Set.class);
+    Set<TimeIntervalResult> informationRatio = mock(Set.class);
     final var expected = new InformationRatioResult();
-    expected.setTimeIntervalResultS(timeIntervalResultS);
+    expected.setInformationRatio(informationRatio);
 
-    when(sut.formTimeIntervalResult(periodAndInformationRatio)).thenReturn(timeIntervalResultS);
+    when(sut.formTimeIntervalResult(periodAndInformationRatio)).thenReturn(informationRatio);
 
     doCallRealMethod().when(sut).defineResponseType(any());
     final var actual = sut.defineResponseType(periodAndInformationRatio);

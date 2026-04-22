@@ -1,7 +1,9 @@
 package com.fintex.ce.model.domain.result.exposure;
 
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
-import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -16,7 +18,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Accessors(chain = true)
-public class EquityCountryExposureResult extends WarningResult {
+@Schema(description = "Response for equity-country-exposure metric. Contains equity country exposure breakdown.")
+public class EquityCountryExposureResult extends BaseCalculationResult {
 
+  @Schema(description = "Equity exposure percentages by country")
   private Map<CountryRegionType, BigDecimal> equityCountryExposure;
 }

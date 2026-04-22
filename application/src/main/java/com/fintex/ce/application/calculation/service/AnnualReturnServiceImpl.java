@@ -19,7 +19,7 @@ import java.util.NavigableMap;
 import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
 
 @Service
-public class AnnualReturnServiceImpl implements CalculationService<AnnualReturnResult<Integer>, ReturnCommand> {
+public class AnnualReturnServiceImpl implements CalculationService<ReturnCommand, AnnualReturnResult<Integer>> {
 
   private final MonthlyReturnsService monthlyReturnsService;
 

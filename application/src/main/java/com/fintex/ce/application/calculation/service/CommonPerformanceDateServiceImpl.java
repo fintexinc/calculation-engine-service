@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 @Service
 public class CommonPerformanceDateServiceImpl
     implements
-      CalculationService<CommonPerformanceDatesResult, MultiplePortfoliosCommand> {
+      CalculationService<MultiplePortfoliosCommand, CommonPerformanceDatesResult> {
 
   private final MonthlyReturnsService monthlyReturnsService;
 
@@ -77,7 +77,8 @@ public class CommonPerformanceDateServiceImpl
     if (ObjectUtils.isEmpty(monthlyReturnsAggregate)) {
       return DateRange.UNBOUNDED;
     }
-    return new DateRange(monthlyReturnsAggregate.getPsd(), monthlyReturnsAggregate.getPed());
+    return new DateRange(monthlyReturnsAggregate.getPerformanceStartDate(), monthlyReturnsAggregate
+        .getPerformanceEndDate());
   }
 
   ReturnsAggregate<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<PortfolioHolding> holdings) {

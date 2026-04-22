@@ -463,9 +463,9 @@ class PeriodCalculationAbstractTest {
     final TrailingTotalReturnsResult actual = new TrailingTotalReturnsResult();
     p.populateBasicDetails(actual);
 
-    assertEquals(LOCAL_DATE_NOW, actual.getCustomIpsd());
-    assertEquals(LOCAL_DATE_NOW.minusMonths(1), actual.getPsd());
-    assertEquals(LOCAL_DATE_NOW.plusMonths(1), actual.getPed());
+    assertEquals(LOCAL_DATE_NOW, actual.getCustomIntervalPerformanceStartDate());
+    assertEquals(LOCAL_DATE_NOW.minusMonths(1), actual.getPerformanceStartDate());
+    assertEquals(LOCAL_DATE_NOW.plusMonths(1), actual.getPerformanceEndDate());
   }
 
   @ParameterizedTest

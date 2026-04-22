@@ -1,58 +1,56 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.rest.dto.CommonPerformanceDatesResDTO;
-import com.fintex.ce.adapter.rest.dto.WarningDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationEMResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.ClassificationAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.allocation.CreditQualityResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.EquityMarketCapResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.EquitySectorResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.FixedIncomeSectorResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.MaturityAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.correlation.CorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.distribution.DistributionOfReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.exposure.CountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.exposure.EquityCountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.exposure.EquityStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.exposure.FixedIncomeStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.exposure.GeographicExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.fee.AverageMerResponse;
-import com.fintex.ce.adapter.rest.dto.fee.ManagementFeeResponse;
-import com.fintex.ce.adapter.rest.dto.fee.SalesChargeResDtos;
-import com.fintex.ce.adapter.rest.dto.holding.TopCommonHoldingsResDTO;
-import com.fintex.ce.adapter.rest.dto.income.IncomeForecastResDto;
-import com.fintex.ce.adapter.rest.dto.income.YieldResDto;
-import com.fintex.ce.adapter.rest.dto.period.BestWorstPeriodsResponseDTO;
-import com.fintex.ce.adapter.rest.dto.returns.AnnualReturnResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.ExcessReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.Growth10KResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.LeadingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.MeanResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.TrailingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.AlphaResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.BetaResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.DownsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.DownsideDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.InformationRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.MARRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.MaxDrawdownResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.RSquaredResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.SharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.SortinoRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.StandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.TrackingErrorResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.TreynorRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.UpsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.rolling.RollingCorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.rolling.RollingSharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.rolling.RollingStandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.rolling.RollingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.util.ResponseMappingUtils;
-import com.fintex.ce.adapter.rest.util.ResultCopyUtils;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
+import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
+import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
+import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
+import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
+import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
+import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
+import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
+import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
+import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
+import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
+import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
+import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
+import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
+import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
+import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
+import com.fintex.ce.model.domain.result.fee.AverageMerResult;
+import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
+import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
+import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
+import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
+import com.fintex.ce.model.domain.result.income.YieldResult;
+import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
+import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
+import com.fintex.ce.model.domain.result.returns.ExcessReturnsResult;
+import com.fintex.ce.model.domain.result.returns.Growth10KResult;
+import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
+import com.fintex.ce.model.domain.result.returns.MeanResult;
+import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
+import com.fintex.ce.model.domain.result.risk.AlphaResult;
+import com.fintex.ce.model.domain.result.risk.BetaResult;
+import com.fintex.ce.model.domain.result.risk.DownsideCaptureResult;
+import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
+import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
+import com.fintex.ce.model.domain.result.risk.MarRatioResult;
+import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
+import com.fintex.ce.model.domain.result.risk.RSquaredResult;
+import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
+import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
+import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
+import com.fintex.ce.model.domain.result.risk.TrackingErrorResult;
+import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
+import com.fintex.ce.model.domain.result.risk.UpsideCaptureResult;
+import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
+import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
+import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
+import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.error.ErrorCode;
 
@@ -104,35 +102,35 @@ public class PortfolioCalculationController {
       + "The request body schema depends on the metric — period-based metrics require time intervals, "
       + "breakdown metrics require holdings, and fee metrics require parameter types.")
   @ApiResponse(responseCode = "200", description = "Calculation result", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(oneOf = {
-      TrailingTotalReturnsResDTO.class, LeadingTotalReturnsResDTO.class,
-      RollingTotalReturnsResDTO.class, ExcessReturnsResDTO.class,
-      AnnualReturnResDTO.class, Growth10KResDTO.class,
-      BestWorstPeriodsResponseDTO.class, DistributionOfReturnsResDTO.class,
-      StandardDeviationResDTO.class, RollingStandardDeviationResDTO.class,
-      MeanResDTO.class, SharpeRatioResDTO.class,
-      RollingSharpeRatioResDTO.class, SortinoRatioResDTO.class,
-      MaxDrawdownResDTO.class, DownsideDeviationResDTO.class,
-      MARRatioResDTO.class, TreynorRatioResDTO.class,
-      InformationRatioResDTO.class, TrackingErrorResDTO.class,
-      AlphaResDTO.class, BetaResDTO.class,
-      RSquaredResDTO.class, CorrelationResDTO.class,
-      RollingCorrelationResDTO.class, UpsideCaptureResDTO.class,
-      DownsideCaptureResDTO.class,
-      AssetAllocationResDTO.class, AssetAllocationEMResDTO.class,
-      EquitySectorResDTO.class, EquityCountryExposureResDTO.class,
-      EquityStyleboxExposureResDto.class, GeographicExposureResDTO.class,
-      EquityMarketCapResDTO.class, CountryExposureResDTO.class,
-      FixedIncomeSectorResDTO.class, FixedIncomeStyleboxExposureResDto.class,
-      MaturityAllocationResDto.class, ClassificationAllocationResDto.class,
-      AverageMerResponse.class, ManagementFeeResponse.class,
-      SalesChargeResDtos.class,
-      IncomeForecastResDto.class, YieldResDto.class,
-      CommonPerformanceDatesResDTO.class, TopCommonHoldingsResDTO.class,
-      CreditQualityResDTO.class
+      TrailingTotalReturnsResult.class, LeadingTotalReturnsResult.class,
+      RollingTotalReturnsResult.class, ExcessReturnsResult.class,
+      AnnualReturnResult.class, Growth10KResult.class,
+      BestWorstPeriodsResult.class, DistributionOfReturnsResult.class,
+      StandardDeviationResult.class, RollingStandardDeviationResult.class,
+      MeanResult.class, SharpeRatioResult.class,
+      RollingSharpeRatioResult.class, SortinoRatioResult.class,
+      MaxDrawdownResult.class, DownsideDeviationResult.class,
+      MarRatioResult.class, TreynorRatioResult.class,
+      InformationRatioResult.class, TrackingErrorResult.class,
+      AlphaResult.class, BetaResult.class,
+      RSquaredResult.class, CorrelationResult.class,
+      RollingCorrelationResult.class, UpsideCaptureResult.class,
+      DownsideCaptureResult.class,
+      AssetAllocationResult.class, AssetAllocationEMResult.class,
+      EquitySectorResult.class, EquityCountryExposureResult.class,
+      EquityStyleboxExposureResult.class, GeographicExposureResult.class,
+      EquityMarketCapResult.class, CountryExposureResult.class,
+      FixedIncomeSectorResult.class, FixedIncomeStyleboxExposureResult.class,
+      MaturityAllocationResult.class, ClassificationAllocationResult.class,
+      AverageMerResult.class, ManagementFeeResult.class,
+      SalesChargeResult.class,
+      IncomeForecastResult.class, YieldResult.class,
+      CommonPerformanceDatesResult.class, TopCommonHoldingsResult.class,
+      CreditQualityResult.class
   })))
   @PostMapping("/{metricName}")
   @SuppressWarnings("unchecked")
-  public WarningDTO calculate(
+  public BaseCalculationResult calculate(
       @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable String metricName,
       @RequestBody @Valid CalculationCommand command) {
     CalculationMetric metric = CalculationMetric.from(metricName);
@@ -147,9 +145,6 @@ public class PortfolioCalculationController {
     validationFacade.validate(command, metric);
 
     CalculationService<?, ?> service = serviceMap.get(metric);
-    Object result = ((CalculationService<?, CalculationCommand>) service).perform(command);
-    WarningDTO response = ResponseMappingUtils.getResponseFactory(metric).get();
-    ResultCopyUtils.copyProperties(result, response);
-    return response;
+    return ((CalculationService<CalculationCommand, ?>) service).perform(command);
   }
 }

@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
-import com.fintex.ce.model.domain.result.risk.MARRatioResult;
+import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.util.DecimalUtils;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.DecimalUtils.abs;
 
-public class MarRatioCalculation extends PeriodCalculationAbstract<MARRatioResult, BigDecimal> {
+public class MarRatioCalculation extends PeriodCalculationAbstract<MarRatioResult, BigDecimal> {
 
   private final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation;
   private final MaxDrawdownCalculation maxDrawdownCalculation;
@@ -44,8 +44,8 @@ public class MarRatioCalculation extends PeriodCalculationAbstract<MARRatioResul
   }
 
   @Override
-  public MARRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final var marRatioResDTO = new MARRatioResult();
+  public MarRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
+    final var marRatioResDTO = new MarRatioResult();
     final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
     marRatioResDTO.setMarRatio(timeIntervals);
     return marRatioResDTO;

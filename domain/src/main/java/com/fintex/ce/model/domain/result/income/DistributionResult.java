@@ -2,7 +2,7 @@ package com.fintex.ce.model.domain.result.income;
 
 import com.fintex.ce.model.domain.calculation.distribution.DistributionData;
 import com.fintex.ce.model.domain.enumeration.DailyResultType;
-import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -19,6 +19,6 @@ import lombok.experimental.Accessors;
 @ToString
 @NoArgsConstructor
 @Accessors(chain = true)
-public class DistributionResult extends WarningResult {
+public class DistributionResult extends BaseCalculationResult {
   private Map<DailyResultType, TreeMap<LocalDate, DistributionData>> distribution = new HashMap<>();
 }

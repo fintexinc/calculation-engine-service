@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service.breakdown;
 
 import com.fintex.ce.calculation.BreakdownCalculationService;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.util.ExposureDataHolder;
 
@@ -21,7 +21,7 @@ import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
  * @param <T>
  *          result enum type
  */
-public abstract class BreakdownAbstractService<E extends WarningResult, T>
+public abstract class BreakdownAbstractService<E extends BaseCalculationResult, T>
     implements
       BreakdownCalculationService<E, T> {
 

@@ -12,6 +12,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TimeIntervalResult {
 
-  private String timeIntervalPeriod;
+  private String period;
   private BigDecimal value;
 }

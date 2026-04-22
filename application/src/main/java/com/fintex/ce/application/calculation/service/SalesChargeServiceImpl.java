@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
-public class SalesChargeServiceImpl implements CalculationService<SalesChargeResult, PortfolioHoldingsCommand> {
+public class SalesChargeServiceImpl implements CalculationService<PortfolioHoldingsCommand, SalesChargeResult> {
 
   private final SecurityDataFetcher<SalesCharge> salesChargeSecurityDataFetcher;
 

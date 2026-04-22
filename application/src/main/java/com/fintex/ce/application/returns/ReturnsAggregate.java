@@ -49,9 +49,9 @@ public class ReturnsAggregate<T extends ReturnsData> {
   public Map<PortfolioHolding, Currency> holdingCurrencyMap;
   public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returnsMap;
   @Getter
-  public LocalDate ped;
+  public LocalDate performanceEndDate;
   @Getter
-  public LocalDate psd;
+  public LocalDate performanceStartDate;
 
   private ReturnsCutComponent monthlyReturnsCutComponent = new ReturnsCutComponent();
   private FxRatesConversionComponent fxRatesConversionComponent;
@@ -125,14 +125,14 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public ReturnsAggregate<T> findPedAndPsd() {
-    this.ped = findPedAmongMonthlyReturns();
-    this.psd = findPsdAmongMonthlyReturns();
+    this.performanceEndDate = findPedAmongMonthlyReturns();
+    this.performanceStartDate = findPsdAmongMonthlyReturns();
     return this;
   }
 
   public ReturnsAggregate<T> cutArgumentToTheSameEndDate(ReturnsAggregate<T> arg) {
-    if (this.ped.isBefore(arg.getPed())) {
-      arg.returnsMap = monthlyReturnsCutComponent.cutReturnsByEndDate(arg.returnsMap, this.ped);
+    if (this.performanceEndDate.isBefore(arg.getPerformanceEndDate())) {
+      arg.returnsMap = monthlyReturnsCutComponent.cutReturnsByEndDate(arg.returnsMap, this.performanceEndDate);
       return arg.findPedAndPsd();
     }
     return arg;
@@ -177,7 +177,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public ReturnsAggregate<T> cutByCpedIfCpedEmptyCutByPed(LocalDate cped) {
-    returnsMap = monthlyReturnsCutComponent.cutReturnsByEndDate(returnsMap, ped);
+    returnsMap = monthlyReturnsCutComponent.cutReturnsByEndDate(returnsMap, performanceEndDate);
     if (Objects.nonNull(cped)) {
       returnsMap = monthlyReturnsCutComponent.cutReturnsByEndDate(returnsMap, cped);
     }
@@ -185,17 +185,17 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public ReturnsAggregate<T> cutByPed() {
-    returnsMap = monthlyReturnsCutComponent.cutReturnsByEndDate(returnsMap, ped);
+    returnsMap = monthlyReturnsCutComponent.cutReturnsByEndDate(returnsMap, performanceEndDate);
     return this;
   }
 
   public ReturnsAggregate<T> cutByPsd() {
-    returnsMap = monthlyReturnsCutComponent.cutReturnsByStartDate(returnsMap, psd);
+    returnsMap = monthlyReturnsCutComponent.cutReturnsByStartDate(returnsMap, performanceStartDate);
     return this;
   }
 
   public ReturnsAggregate<T> cutByCpsdIfCpsdEmptyCutByPsd(LocalDate cpsd) {
-    LocalDate startDate = Objects.isNull(cpsd) ? psd : cpsd;
+    LocalDate startDate = Objects.isNull(cpsd) ? performanceStartDate : cpsd;
     returnsMap = monthlyReturnsCutComponent.cutReturnsByStartDate(returnsMap, startDate);
     return this;
   }
@@ -206,12 +206,12 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public ReturnsAggregate<T> validateCped(LocalDate cped) {
-    cpedDataValidation.validate(cped, psd, ped, notification);
+    cpedDataValidation.validate(cped, performanceStartDate, performanceEndDate, notification);
     return this;
   }
 
   public ReturnsAggregate<T> validateCpsd(LocalDate cpsd) {
-    cpsdDataValidation.validate(cpsd, psd, ped, notification);
+    cpsdDataValidation.validate(cpsd, performanceStartDate, performanceEndDate, notification);
     return this;
   }
 
@@ -241,9 +241,9 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   private LocalDate getStartDate(final DailyPerformanceCommand reqDTO) {
-    final LocalDate startDate = Optional.ofNullable(reqDTO.getStartDate()).orElse(psd);
+    final LocalDate startDate = Optional.ofNullable(reqDTO.getStartDate()).orElse(performanceStartDate);
     LocalDate newStartDate = LocalDate.of(startDate.getYear(), startDate.getMonth(), 1);
-    if (newStartDate.isBefore(psd)) {
+    if (newStartDate.isBefore(performanceStartDate)) {
       newStartDate = newStartDate.plusMonths(1);
     }
     validateCpsd(newStartDate);
@@ -252,8 +252,8 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   private LocalDate getEndDate(final DailyPerformanceCommand reqDTO) {
-    LocalDate newEndDate = toLastDayOfMonth(Optional.ofNullable(reqDTO.getEndDate()).orElse(ped));
-    if (newEndDate.isAfter(ped)) {
+    LocalDate newEndDate = toLastDayOfMonth(Optional.ofNullable(reqDTO.getEndDate()).orElse(performanceEndDate));
+    if (newEndDate.isAfter(performanceEndDate)) {
       newEndDate = toLastDayOfMonth(newEndDate.minusMonths(1));
     }
     validateCped(newEndDate);
@@ -360,9 +360,9 @@ public class ReturnsAggregate<T extends ReturnsData> {
         .entrySet()
         .stream()
         .collect(groupingBy(e -> e.getValue().firstKey(), toList()));
-    if (Objects.nonNull(psd) && Objects.nonNull(ped)) {
-      while (psd.isAfter(ped)) {
-        var entries = startDateEntriesMap.get(psd);
+    if (Objects.nonNull(performanceStartDate) && Objects.nonNull(performanceEndDate)) {
+      while (performanceStartDate.isAfter(performanceEndDate)) {
+        var entries = startDateEntriesMap.get(performanceStartDate);
         for (Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> entry : entries) {
           notification.add(HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(entry.getKey()));
           returnsMap.remove(entry.getKey());

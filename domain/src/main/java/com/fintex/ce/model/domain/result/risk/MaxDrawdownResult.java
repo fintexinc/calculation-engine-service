@@ -3,6 +3,8 @@ package com.fintex.ce.model.domain.result.risk;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.PeriodResult;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +17,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Accessors(chain = true)
+@Schema(description = "Response for max-drawdown metric. Contains maximum peak-to-trough drawdown per time interval period.")
 public class MaxDrawdownResult extends PeriodResult {
 
+  @Schema(description = "Maximum drawdown entries per time interval period")
   private List<MaxDrawdownEntry> maxDrawdown;
 }

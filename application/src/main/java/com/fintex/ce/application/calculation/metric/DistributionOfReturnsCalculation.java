@@ -206,8 +206,8 @@ public class DistributionOfReturnsCalculation {
     return (DistributionOfReturnsResult) new DistributionOfReturnsResult()
         .setMonthlyReturns(calculatedMonthlyReturns)
         .setYearlyReturns(calculatedAnnualReturns)
-        .setPsd(returns.firstKey())
-        .setPed(returns.lastKey());
+        .setPerformanceStartDate(returns.firstKey())
+        .setPerformanceEndDate(returns.lastKey());
   }
 
   /**
