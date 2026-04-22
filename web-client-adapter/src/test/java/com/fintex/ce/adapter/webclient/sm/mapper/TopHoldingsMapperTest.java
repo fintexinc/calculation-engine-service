@@ -8,9 +8,8 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.holding.TopHolding;
 import com.fintex.wm.commons.domain.holding.TopHoldings;
-import com.fintex.wm.commons.domain.id.ExternalIdentifiers;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.IdentifierTypeValue;
+import com.fintex.wm.commons.domain.id.IdentifiersDatapoint;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.value.MultilingualString;
 
@@ -53,20 +52,20 @@ class TopHoldingsMapperTest {
   }
 
   @Test
-  void shouldExtractTickerFromExternalIdentifiers() {
-    var ticker = new IdentifierTypeValue();
-    ticker.setType(FiIdentifierType.TICKER);
-    ticker.setValue("RY.TO");
-    var exchangeId = new IdentifierTypeValue();
-    exchangeId.setType(FiIdentifierType.EXCHANGE_ID);
-    exchangeId.setValue("TSX");
+  void shouldExtractTickerFromIdentifiers() {
+    var ticker = new SecurityIdentifier();
+    ticker.setIdType(FiIdentifierType.TICKER);
+    ticker.setId("RY.TO");
+    var exchangeId = new SecurityIdentifier();
+    exchangeId.setIdType(FiIdentifierType.EXCHANGE_ID);
+    exchangeId.setId("TSX");
 
-    var externalIds = new ExternalIdentifiers();
-    externalIds.setCodes(List.of(ticker, exchangeId));
+    var identifiers = new IdentifiersDatapoint();
+    identifiers.setIdentifiers(List.of(ticker, exchangeId));
 
     var sh = new TopHolding();
     sh.setName(List.of(new MultilingualString(LanguageCode.EN, "Royal Bank")));
-    sh.setExternalIdentifiers(externalIds);
+    sh.setIdentifiers(identifiers);
 
     var smsResponse = new TopHoldings();
     smsResponse.setAllocation(List.of(sh));

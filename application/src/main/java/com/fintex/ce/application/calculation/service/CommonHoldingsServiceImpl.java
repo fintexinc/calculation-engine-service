@@ -14,7 +14,7 @@ import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.IdentifierTypeValue;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -381,8 +381,8 @@ public class CommonHoldingsServiceImpl
     return Optional.ofNullable(holding.getIdentifiers())
         .orElse(List.of())
         .stream()
-        .filter(id -> type.equals(id.getType()))
-        .map(IdentifierTypeValue::getValue)
+        .filter(id -> type.equals(id.getIdType()))
+        .map(SecurityIdentifier::getId)
         .findFirst()
         .orElse(null);
   }
