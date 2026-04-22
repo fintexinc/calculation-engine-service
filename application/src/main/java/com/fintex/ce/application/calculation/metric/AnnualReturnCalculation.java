@@ -82,8 +82,8 @@ public class AnnualReturnCalculation {
    */
   public void populateBasicDetails(final AnnualReturnResult<Integer> responseDTO,
       final TreeMap<LocalDate, BigDecimal> portfolioReturns) {
-    responseDTO.setPsd(portfolioReturns.firstKey());
-    responseDTO.setPed(portfolioReturns.lastKey());
+    responseDTO.setPerformanceStartDate(portfolioReturns.firstKey());
+    responseDTO.setPerformanceEndDate(portfolioReturns.lastKey());
   }
 
 }

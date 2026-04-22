@@ -1,7 +1,9 @@
 package com.fintex.ce.model.domain.result.exposure;
 
-import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -16,7 +18,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Accessors(chain = true)
-public class FixedIncomeStyleboxExposureResult extends WarningResult {
+@Schema(description = "Response for fixed-income-stylebox-exposure metric. Contains fixed income style box exposure breakdown.")
+public class FixedIncomeStyleboxExposureResult extends BaseCalculationResult {
 
+  @Schema(description = "Fixed income exposure percentages by style box")
   private Map<FixedIncomeStyleBoxType, BigDecimal> fixedIncomeStyleboxExposure;
 }

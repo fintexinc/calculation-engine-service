@@ -262,9 +262,9 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          user defined period based response object
    */
   public void populateBasicDetails(final T responseDTO) {
-    responseDTO.setCustomIpsd(cipsd);
-    responseDTO.setPed(portfolioTotalReturns.lastKey());
-    responseDTO.setPsd(portfolioTotalReturns.firstKey());
+    responseDTO.setCustomIntervalPerformanceStartDate(cipsd);
+    responseDTO.setPerformanceEndDate(portfolioTotalReturns.lastKey());
+    responseDTO.setPerformanceStartDate(portfolioTotalReturns.firstKey());
   }
 
   /**

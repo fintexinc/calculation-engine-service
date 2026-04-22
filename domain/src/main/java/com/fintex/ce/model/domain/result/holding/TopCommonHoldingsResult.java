@@ -1,6 +1,10 @@
 package com.fintex.ce.model.domain.result.holding;
 
-import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 import lombok.Data;
@@ -14,7 +18,10 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Accessors(chain = true)
-public class TopCommonHoldingsResult extends WarningResult {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Schema(description = "Response for top-common-holdings metric. Contains top common holdings shared across portfolio funds.")
+public class TopCommonHoldingsResult extends BaseCalculationResult {
 
+  @Schema(description = "Top common holdings shared across portfolio funds")
   private List<TopCommonHoldingData> commonHoldings;
 }

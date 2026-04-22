@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @NoArgsConstructor
-public class InflationResult extends WarningResult {
+public class InflationResult extends BaseCalculationResult {
 
   private Map<String, InflationDTO> inflationData;
 }

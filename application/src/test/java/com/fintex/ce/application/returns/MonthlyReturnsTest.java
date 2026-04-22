@@ -51,16 +51,16 @@ class MonthlyReturnsTest {
     final var sut = mock(ReturnsAggregate.class);
     final var other = mock(ReturnsAggregate.class);
 
-    sut.ped = LOCAL_DATE_NOW;
-    other.ped = LOCAL_DATE_NOW.minusMonths(1);
+    sut.performanceEndDate = LOCAL_DATE_NOW;
+    other.performanceEndDate = LOCAL_DATE_NOW.minusMonths(1);
 
-    doCallRealMethod().when(other).getPed();
+    doCallRealMethod().when(other).getPerformanceEndDate();
     doCallRealMethod().when(sut).cutArgumentToTheSameEndDate(any());
 
     sut.cutArgumentToTheSameEndDate(other);
 
     verify(sut).cutArgumentToTheSameEndDate(other);
-    verify(other).getPed();
+    verify(other).getPerformanceEndDate();
     verifyNoMoreInteractions(sut, other);
   }
 
@@ -69,10 +69,10 @@ class MonthlyReturnsTest {
     final var sut = mock(ReturnsAggregate.class);
     final var other = mock(ReturnsAggregate.class);
 
-    sut.ped = LOCAL_DATE_NOW;
-    other.ped = LOCAL_DATE_NOW.minusMonths(1);
+    sut.performanceEndDate = LOCAL_DATE_NOW;
+    other.performanceEndDate = LOCAL_DATE_NOW.minusMonths(1);
 
-    doCallRealMethod().when(other).getPed();
+    doCallRealMethod().when(other).getPerformanceEndDate();
     doCallRealMethod().when(sut).cutArgumentToTheSameEndDate(any());
 
     final var actual = sut.cutArgumentToTheSameEndDate(other);
@@ -88,9 +88,9 @@ class MonthlyReturnsTest {
     final var otherMonthlyReturns = mock(Map.class);
     other.returnsMap = otherMonthlyReturns;
 
-    sut.ped = LOCAL_DATE_NOW;
-    other.ped = LOCAL_DATE_NOW.plusMonths(1);
-    doCallRealMethod().when(other).getPed();
+    sut.performanceEndDate = LOCAL_DATE_NOW;
+    other.performanceEndDate = LOCAL_DATE_NOW.plusMonths(1);
+    doCallRealMethod().when(other).getPerformanceEndDate();
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -110,9 +110,9 @@ class MonthlyReturnsTest {
 
     other.returnsMap = mock(Map.class);
 
-    sut.ped = LOCAL_DATE_NOW;
-    other.ped = LOCAL_DATE_NOW.plusMonths(1);
-    doCallRealMethod().when(other).getPed();
+    sut.performanceEndDate = LOCAL_DATE_NOW;
+    other.performanceEndDate = LOCAL_DATE_NOW.plusMonths(1);
+    doCallRealMethod().when(other).getPerformanceEndDate();
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -132,9 +132,9 @@ class MonthlyReturnsTest {
 
     other.returnsMap = mock(Map.class);
 
-    sut.ped = LOCAL_DATE_NOW;
-    other.ped = LOCAL_DATE_NOW.plusMonths(1);
-    doCallRealMethod().when(other).getPed();
+    sut.performanceEndDate = LOCAL_DATE_NOW;
+    other.performanceEndDate = LOCAL_DATE_NOW.plusMonths(1);
+    doCallRealMethod().when(other).getPerformanceEndDate();
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -183,7 +183,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.ped = LOCAL_DATE_NOW.plusMonths(3);
+    sut.performanceEndDate = LOCAL_DATE_NOW.plusMonths(3);
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -203,7 +203,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.ped = LOCAL_DATE_NOW;
+    sut.performanceEndDate = LOCAL_DATE_NOW;
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -223,7 +223,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.ped = LOCAL_DATE_NOW;
+    sut.performanceEndDate = LOCAL_DATE_NOW;
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -243,7 +243,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.psd = LOCAL_DATE_NOW;
+    sut.performanceStartDate = LOCAL_DATE_NOW;
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -263,7 +263,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.psd = LOCAL_DATE_NOW.plusMonths(3);
+    sut.performanceStartDate = LOCAL_DATE_NOW.plusMonths(3);
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -283,7 +283,7 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.psd = LOCAL_DATE_NOW.plusMonths(3);
+    sut.performanceStartDate = LOCAL_DATE_NOW.plusMonths(3);
 
     doCallRealMethod().when(sut).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
@@ -346,8 +346,8 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.ped = LOCAL_DATE_NOW.plusMonths(2);
-    sut.psd = LOCAL_DATE_NOW.plusMonths(1);
+    sut.performanceEndDate = LOCAL_DATE_NOW.plusMonths(2);
+    sut.performanceStartDate = LOCAL_DATE_NOW.plusMonths(1);
 
     doCallRealMethod().when(sut).setCpedDataValidation(any());
     final var cpedDataValidation = mock(PortfolioCpedDataValidation.class);
@@ -370,8 +370,8 @@ class MonthlyReturnsTest {
 
     final var monthlyReturns = mock(Map.class);
     sut.returnsMap = monthlyReturns;
-    sut.ped = LOCAL_DATE_NOW.plusMonths(2);
-    sut.psd = LOCAL_DATE_NOW.plusMonths(1);
+    sut.performanceEndDate = LOCAL_DATE_NOW.plusMonths(2);
+    sut.performanceStartDate = LOCAL_DATE_NOW.plusMonths(1);
 
     doCallRealMethod().when(sut).setCpsdDataValidation(any());
     final var portfolioCpsdDataValidation = mock(PortfolioCpsdDataValidation.class);

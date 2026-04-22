@@ -85,8 +85,8 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).calculate();
     final BestWorstPeriodsResult responseDTO = sut.calculate();
 
-    assertEquals(responseDTO.getPed(), LocalDate.of(2020, 12, 31));
-    assertEquals(responseDTO.getPsd(), LocalDate.of(2019, 12, 31));
+    assertEquals(responseDTO.getPerformanceEndDate(), LocalDate.of(2020, 12, 31));
+    assertEquals(responseDTO.getPerformanceStartDate(), LocalDate.of(2019, 12, 31));
     Assertions.assertTrue(responseDTO.getBestWorstPeriods().getNumberOfPeriods().isEmpty());
     Assertions.assertTrue(responseDTO.getBestWorstPeriods().getAverage().isEmpty());
     Assertions.assertTrue(responseDTO.getBestWorstPeriods().getBestPeriodDate().isEmpty());

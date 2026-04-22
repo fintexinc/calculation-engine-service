@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
-import com.fintex.ce.model.domain.result.risk.MARRatioResult;
+import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.util.DecimalUtils;
 
@@ -156,7 +156,7 @@ class MarRatioCalculationTest {
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    final MARRatioResult actual = sut.defineResponseType(result);
+    final MarRatioResult actual = sut.defineResponseType(result);
 
     assertEquals(expected, actual.getMarRatio());
   }

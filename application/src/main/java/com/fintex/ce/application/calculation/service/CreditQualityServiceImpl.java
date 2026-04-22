@@ -38,7 +38,7 @@ import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
 
 @Service
 @RequiredArgsConstructor
-public class CreditQualityServiceImpl implements CalculationService<CreditQualityResult, PortfolioHoldingsCommand> {
+public class CreditQualityServiceImpl implements CalculationService<PortfolioHoldingsCommand, CreditQualityResult> {
 
   private final SecurityDataFetcher<CreditQuality> creditQualitySecurityDataFetcher;
   private final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher;

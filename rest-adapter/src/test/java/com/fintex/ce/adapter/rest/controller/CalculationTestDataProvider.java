@@ -1,53 +1,5 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.rest.dto.CommonPerformanceDatesResDTO;
-import com.fintex.ce.adapter.rest.dto.WarningDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationEMResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.AssetAllocationResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.ClassificationAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.allocation.CreditQualityResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.EquityMarketCapResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.EquitySectorResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.FixedIncomeSectorResDTO;
-import com.fintex.ce.adapter.rest.dto.allocation.MaturityAllocationResDto;
-import com.fintex.ce.adapter.rest.dto.correlation.CorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.distribution.DistributionOfReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.exposure.CountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.exposure.EquityCountryExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.exposure.EquityStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.exposure.FixedIncomeStyleboxExposureResDto;
-import com.fintex.ce.adapter.rest.dto.exposure.GeographicExposureResDTO;
-import com.fintex.ce.adapter.rest.dto.fee.AverageMerResponse;
-import com.fintex.ce.adapter.rest.dto.fee.ManagementFeeResponse;
-import com.fintex.ce.adapter.rest.dto.fee.SalesChargeResDtos;
-import com.fintex.ce.adapter.rest.dto.holding.TopCommonHoldingsResDTO;
-import com.fintex.ce.adapter.rest.dto.income.IncomeForecastResDto;
-import com.fintex.ce.adapter.rest.dto.income.YieldResDto;
-import com.fintex.ce.adapter.rest.dto.period.BestWorstPeriodsResponseDTO;
-import com.fintex.ce.adapter.rest.dto.returns.AnnualReturnResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.ExcessReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.Growth10KResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.LeadingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.MeanResDTO;
-import com.fintex.ce.adapter.rest.dto.returns.TrailingTotalReturnsResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.AlphaResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.BetaResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.DownsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.DownsideDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.InformationRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.MARRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.MaxDrawdownResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.RSquaredResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.SharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.SortinoRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.StandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.TrackingErrorResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.TreynorRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.risk.UpsideCaptureResDTO;
-import com.fintex.ce.adapter.rest.dto.rolling.RollingCorrelationResDTO;
-import com.fintex.ce.adapter.rest.dto.rolling.RollingSharpeRatioResDTO;
-import com.fintex.ce.adapter.rest.dto.rolling.RollingStandardDeviationResDTO;
-import com.fintex.ce.adapter.rest.dto.rolling.RollingTotalReturnsResDTO;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
@@ -58,6 +10,7 @@ import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.ParameterType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.PeriodResult;
@@ -79,6 +32,7 @@ import com.fintex.ce.model.domain.result.exposure.EquityGeographicExposureResult
 import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeGeographicExposureResult;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
+import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
@@ -97,7 +51,7 @@ import com.fintex.ce.model.domain.result.risk.BetaResult;
 import com.fintex.ce.model.domain.result.risk.DownsideCaptureResult;
 import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
-import com.fintex.ce.model.domain.result.risk.MARRatioResult;
+import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
 import com.fintex.ce.model.domain.result.risk.RSquaredResult;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
@@ -154,12 +108,12 @@ class CalculationTestDataProvider {
       new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
 
   static final Set<TimeIntervalResult> TIME_INTERVALS = Set.of(
-      new TimeIntervalResult().setTimeIntervalPeriod("12M").setValue(BigDecimal.valueOf(8.56)),
-      new TimeIntervalResult().setTimeIntervalPeriod("36M").setValue(BigDecimal.valueOf(6.23)));
+      new TimeIntervalResult().setPeriod("12M").setValue(BigDecimal.valueOf(8.56)),
+      new TimeIntervalResult().setPeriod("36M").setValue(BigDecimal.valueOf(6.23)));
 
   static final Set<RollingIntervalResult> ROLLING_INTERVALS = Set.of(
       new RollingIntervalResult()
-          .setTimeIntervalPeriod("12M")
+          .setPeriod("12M")
           .setValues(Set.of(
               new IntervalResult().setKey(LocalDate.of(2024, 6, 30)).setValue(BigDecimal.valueOf(5.12)),
               new IntervalResult().setKey(LocalDate.of(2024, 12, 31)).setValue(BigDecimal.valueOf(7.89)))));
@@ -167,134 +121,135 @@ class CalculationTestDataProvider {
   static Stream<Arguments> calculationMetricArguments() {
     return Stream.of(
         period(CalculationMetric.TRAILING_TOTAL_RETURNS, new TrailingTotalReturnsResult().setTrailingTotalReturn(
-            TIME_INTERVALS), TrailingTotalReturnsResDTO.class),
+            TIME_INTERVALS), TrailingTotalReturnsResult.class),
         period(CalculationMetric.LEADING_TOTAL_RETURNS, new LeadingTotalReturnsResult().setLeadingTotalReturn(
-            TIME_INTERVALS), LeadingTotalReturnsResDTO.class),
+            TIME_INTERVALS), LeadingTotalReturnsResult.class),
         period(CalculationMetric.EXCESS_RETURNS, new ExcessReturnsResult().setExcessReturns(TIME_INTERVALS),
-            ExcessReturnsResDTO.class),
+            ExcessReturnsResult.class),
         period(CalculationMetric.STANDARD_DEVIATION, new StandardDeviationResult().setStandardDeviation(TIME_INTERVALS),
-            StandardDeviationResDTO.class),
-        period(CalculationMetric.MEAN, new MeanResult().setMean(TIME_INTERVALS), MeanResDTO.class),
+            StandardDeviationResult.class),
+        period(CalculationMetric.MEAN, new MeanResult().setMean(TIME_INTERVALS), MeanResult.class),
         period(CalculationMetric.SHARPE_RATIO, new SharpeRatioResult().setSharpeRatio(TIME_INTERVALS),
-            SharpeRatioResDTO.class),
+            SharpeRatioResult.class),
         period(CalculationMetric.SORTINO_RATIO, new SortinoRatioResult().setSortinoRatio(TIME_INTERVALS),
-            SortinoRatioResDTO.class),
+            SortinoRatioResult.class),
         period(CalculationMetric.DOWNSIDE_DEVIATION, new DownsideDeviationResult().setDownsideDeviation(TIME_INTERVALS),
-            DownsideDeviationResDTO.class),
-        period(CalculationMetric.MAR_RATIO, new MARRatioResult().setMarRatio(TIME_INTERVALS), MARRatioResDTO.class),
+            DownsideDeviationResult.class),
+        period(CalculationMetric.MAR_RATIO, new MarRatioResult().setMarRatio(TIME_INTERVALS), MarRatioResult.class),
         period(CalculationMetric.TREYNOR_RATIO, new TreynorRatioResult().setTreynorRatio(TIME_INTERVALS),
-            TreynorRatioResDTO.class),
-        period(CalculationMetric.INFORMATION_RATIO, new InformationRatioResult().setTimeIntervalResultS(TIME_INTERVALS),
-            InformationRatioResDTO.class),
+            TreynorRatioResult.class),
+        period(CalculationMetric.INFORMATION_RATIO, new InformationRatioResult().setInformationRatio(TIME_INTERVALS),
+            InformationRatioResult.class),
         period(CalculationMetric.TRACKING_ERROR, new TrackingErrorResult().setTrackingError(TIME_INTERVALS),
-            TrackingErrorResDTO.class),
-        period(CalculationMetric.ALPHA, new AlphaResult().setAlpha(TIME_INTERVALS), AlphaResDTO.class),
-        period(CalculationMetric.BETA, new BetaResult().setBeta(TIME_INTERVALS), BetaResDTO.class),
-        period(CalculationMetric.R_SQUARED, new RSquaredResult().setRSquared(TIME_INTERVALS), RSquaredResDTO.class),
+            TrackingErrorResult.class),
+        period(CalculationMetric.ALPHA, new AlphaResult().setAlpha(TIME_INTERVALS), AlphaResult.class),
+        period(CalculationMetric.BETA, new BetaResult().setBeta(TIME_INTERVALS), BetaResult.class),
+        period(CalculationMetric.R_SQUARED, new RSquaredResult().setRSquared(TIME_INTERVALS), RSquaredResult.class),
         period(CalculationMetric.UPSIDE_CAPTURE, new UpsideCaptureResult().setUpsideCapture(TIME_INTERVALS),
-            UpsideCaptureResDTO.class),
+            UpsideCaptureResult.class),
         period(CalculationMetric.DOWNSIDE_CAPTURE, new DownsideCaptureResult().setDownsideCapture(TIME_INTERVALS),
-            DownsideCaptureResDTO.class),
+            DownsideCaptureResult.class),
         period(CalculationMetric.MAX_DRAWDOWN, new MaxDrawdownResult().setMaxDrawdown(List.of()),
-            MaxDrawdownResDTO.class),
+            MaxDrawdownResult.class),
         period(CalculationMetric.CORRELATION, new CorrelationResult().setHoldingsKey(List.of()).setCorrelationPeriods(
-            List.of()), CorrelationResDTO.class),
+            List.of()), CorrelationResult.class),
         period(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS, new DistributionOfReturnsResult(),
-            DistributionOfReturnsResDTO.class),
+            DistributionOfReturnsResult.class),
 
         rolling(CalculationMetric.ROLLING_TOTAL_RETURNS, new RollingTotalReturnsResult().setRollingTotalReturns(
-            ROLLING_INTERVALS), RollingTotalReturnsResDTO.class),
+            ROLLING_INTERVALS), RollingTotalReturnsResult.class),
         rolling(CalculationMetric.ROLLING_STANDARD_DEVIATION, new RollingStandardDeviationResult()
-            .setRollingStandardDeviation(ROLLING_INTERVALS), RollingStandardDeviationResDTO.class),
+            .setRollingStandardDeviation(ROLLING_INTERVALS), RollingStandardDeviationResult.class),
         rolling(CalculationMetric.ROLLING_SHARPE_RATIO, new RollingSharpeRatioResult().setRollingSharpeRatio(
-            ROLLING_INTERVALS), RollingSharpeRatioResDTO.class),
+            ROLLING_INTERVALS), RollingSharpeRatioResult.class),
         entry(CalculationMetric.ROLLING_CORRELATION, rollingCorrelationCommand(), new RollingCorrelationResult()
-            .setRollingCorrelation(ROLLING_INTERVALS).setPed(PED).setPsd(PSD), RollingCorrelationResDTO.class),
+            .setRollingCorrelation(ROLLING_INTERVALS).setPerformanceEndDate(PED).setPerformanceStartDate(PSD),
+            RollingCorrelationResult.class),
 
         breakdown(CalculationMetric.ASSET_ALLOCATIONS, new AssetAllocationResult().setAssetAllocation(Map.of(
-            AssetAllocationRegionType.CASH, BigDecimal.valueOf(45.5))), AssetAllocationResDTO.class),
+            AssetAllocationRegionType.CASH, BigDecimal.valueOf(45.5))), AssetAllocationResult.class),
         breakdown(CalculationMetric.ASSET_ALLOCATIONS_EM, new AssetAllocationEMResult()
             .setAssetAllocationEmergingMarkets(Map.of(AssetAllocationRegionEmType.CASH, BigDecimal.valueOf(12.3))),
-            AssetAllocationEMResDTO.class),
+            AssetAllocationEMResult.class),
         breakdown(CalculationMetric.EQUITY_SECTOR, new EquitySectorResult().setEquitySector(Map.of(
-            EquitySectorAllocationType.TECHNOLOGY, BigDecimal.valueOf(30.0))), EquitySectorResDTO.class),
+            EquitySectorAllocationType.TECHNOLOGY, BigDecimal.valueOf(30.0))), EquitySectorResult.class),
         breakdown(CalculationMetric.EQUITY_COUNTRY_EXPOSURE, new EquityCountryExposureResult().setEquityCountryExposure(
-            Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(60.0))), EquityCountryExposureResDTO.class),
+            Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(60.0))), EquityCountryExposureResult.class),
         breakdown(CalculationMetric.EQUITY_STYLEBOX_EXPOSURE, new EquityStyleboxExposureResult()
             .setEquityStyleboxExposure(Map.of(StyleBoxType.LARGE_CORE, BigDecimal.valueOf(40.0))),
-            EquityStyleboxExposureResDto.class),
+            EquityStyleboxExposureResult.class),
         breakdown(CalculationMetric.EQUITY_GEOGRAPHIC_EXPOSURE, new EquityGeographicExposureResult()
             .setEquityGeographicExposure(Map.of(GeographicRegionType.OTHER, BigDecimal.valueOf(70.0))),
-            GeographicExposureResDTO.class),
+            GeographicExposureResult.class),
         breakdown(CalculationMetric.EQUITY_MARKET_CAPITALIZATION, new EquityMarketCapResult()
             .setEquityMarketCapitalization(Map.of(EquityMarketCapitalizationType.GIANT, BigDecimal.valueOf(55.0))),
-            EquityMarketCapResDTO.class),
+            EquityMarketCapResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_COUNTRY_EXPOSURE, new CountryExposureResult().setCountryExposure(Map
-            .of(CountryRegionType.CANADA, BigDecimal.valueOf(80.0))), CountryExposureResDTO.class),
+            .of(CountryRegionType.CANADA, BigDecimal.valueOf(80.0))), CountryExposureResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_GEOGRAPHIC_EXPOSURE, new FixedIncomeGeographicExposureResult()
             .setEquityGeographicExposure(Map.of(GeographicRegionType.OTHER, BigDecimal.valueOf(25.0))),
-            GeographicExposureResDTO.class),
+            GeographicExposureResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_BOND_SECTOR, new FixedIncomeSectorResult().setFixedIncomeSector(Map.of(
             FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(35.0))),
-            FixedIncomeSectorResDTO.class),
+            FixedIncomeSectorResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_STYLEBOX_EXPOSURE, new FixedIncomeStyleboxExposureResult()
             .setFixedIncomeStyleboxExposure(Map.of(FixedIncomeStyleBoxType.HIGH_LIMITED, BigDecimal.valueOf(20.0))),
-            FixedIncomeStyleboxExposureResDto.class),
+            FixedIncomeStyleboxExposureResult.class),
         breakdown(CalculationMetric.MATURITY_ALLOCATION, new MaturityAllocationResult().setMaturityAllocation(Map.of(
-            MaturityAllocationType.MORE_THAN_TWENTY_YEARS, BigDecimal.valueOf(15.0))), MaturityAllocationResDto.class),
+            MaturityAllocationType.MORE_THAN_TWENTY_YEARS, BigDecimal.valueOf(15.0))), MaturityAllocationResult.class),
         breakdown(CalculationMetric.CLASSIFICATION_ALLOCATION, new ClassificationAllocationResult()
             .setClassificationAllocation(Map.of(ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED, BigDecimal
-                .valueOf(30.0))), ClassificationAllocationResDto.class),
-        breakdown(CalculationMetric.SALES_CHARGE, new SalesChargeResult(), SalesChargeResDtos.class),
+                .valueOf(30.0))), ClassificationAllocationResult.class),
+        breakdown(CalculationMetric.SALES_CHARGE, new SalesChargeResult(), SalesChargeResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_CREDIT_QUALITY, new CreditQualityResult().setCreditQuality(Map.of(
-            FixedIncomeCreditQuality.AAA, BigDecimal.valueOf(25.0))), CreditQualityResDTO.class),
+            FixedIncomeCreditQuality.AAA, BigDecimal.valueOf(25.0))), CreditQualityResult.class),
 
         fee(CalculationMetric.MER, new AverageMerResult().setManagementExpenseRatio(Map.of(ParameterType.SCALED,
-            BigDecimal.valueOf(1.25))), AverageMerResponse.class),
+            BigDecimal.valueOf(1.25))), AverageMerResult.class),
         fee(CalculationMetric.MANAGEMENT_FEE, new ManagementFeeResult().setManagementFee(Map.of(ParameterType.ABSOLUTE,
-            BigDecimal.valueOf(0.85))), ManagementFeeResponse.class),
+            BigDecimal.valueOf(0.85))), ManagementFeeResult.class),
 
-        entry(CalculationMetric.ANNUAL_RETURNS, returnCommand(), annualReturnResult(), AnnualReturnResDTO.class),
-        entry(CalculationMetric.GROWTH_OF_10K, returnCommand(), growth10kResult(), Growth10KResDTO.class),
+        entry(CalculationMetric.ANNUAL_RETURNS, returnCommand(), annualReturnResult(), AnnualReturnResult.class),
+        entry(CalculationMetric.GROWTH_OF_10K, returnCommand(), growth10kResult(), Growth10KResult.class),
         entry(CalculationMetric.BEST_WORST_PERIODS, bestWorstPeriodsCommand(), bestWorstPeriodsResult(),
-            BestWorstPeriodsResponseDTO.class),
+            BestWorstPeriodsResult.class),
         entry(CalculationMetric.INCOME_FORECAST, incomeForecastCommand(), new IncomeForecastResult().setIncomeForecast(
-            List.of()), IncomeForecastResDto.class),
+            List.of()), IncomeForecastResult.class),
         entry(CalculationMetric.YIELD, yieldCommand(), new YieldResult().setYield(BigDecimal.valueOf(3.45)),
-            YieldResDto.class),
+            YieldResult.class),
         entry(CalculationMetric.COMMON_PERFORMANCE_DATES, multiplePortfoliosCommand(), commonPerformanceDatesResult(),
-            CommonPerformanceDatesResDTO.class),
+            CommonPerformanceDatesResult.class),
         entry(CalculationMetric.TOP_COMMON_HOLDINGS, topCommonHoldingsCommand(), new TopCommonHoldingsResult()
-            .setCommonHoldings(List.of()), TopCommonHoldingsResDTO.class));
+            .setCommonHoldings(List.of()), TopCommonHoldingsResult.class));
   }
 
   private static Arguments period(CalculationMetric metric, PeriodResult result,
-      Class<? extends WarningDTO> responseType) {
-    result.setPed(PED);
-    result.setPsd(PSD);
-    result.setCustomIpsd(CUSTOM_IPSD);
+      Class<? extends BaseCalculationResult> responseType) {
+    result.setPerformanceEndDate(PED);
+    result.setPerformanceStartDate(PSD);
+    result.setCustomIntervalPerformanceStartDate(CUSTOM_IPSD);
     return Arguments.of(metric, periodCommand(), result, responseType);
   }
 
   private static Arguments rolling(CalculationMetric metric, PeriodResult result,
-      Class<? extends WarningDTO> responseType) {
-    result.setPed(PED);
-    result.setPsd(PSD);
+      Class<? extends BaseCalculationResult> responseType) {
+    result.setPerformanceEndDate(PED);
+    result.setPerformanceStartDate(PSD);
     return Arguments.of(metric, rollingCommand(), result, responseType);
   }
 
   private static Arguments breakdown(CalculationMetric metric, Object result,
-      Class<? extends WarningDTO> responseType) {
+      Class<? extends BaseCalculationResult> responseType) {
     return Arguments.of(metric, portfolioHoldingsCommand(), result, responseType);
   }
 
   private static Arguments fee(CalculationMetric metric, Object result,
-      Class<? extends WarningDTO> responseType) {
+      Class<? extends BaseCalculationResult> responseType) {
     return Arguments.of(metric, averageMerCommand(), result, responseType);
   }
 
   private static Arguments entry(CalculationMetric metric, CalculationCommand command,
-      Object result, Class<? extends WarningDTO> responseType) {
+      Object result, Class<? extends BaseCalculationResult> responseType) {
     return Arguments.of(metric, command, result, responseType);
   }
 
@@ -388,22 +343,22 @@ class CalculationTestDataProvider {
 
   private static AnnualReturnResult<Integer> annualReturnResult() {
     AnnualReturnResult<Integer> result = new AnnualReturnResult<>();
-    result.setPed(PED);
-    result.setPsd(PSD);
+    result.setPerformanceEndDate(PED);
+    result.setPerformanceStartDate(PSD);
     return result;
   }
 
   private static Growth10KResult growth10kResult() {
     Growth10KResult result = new Growth10KResult();
-    result.setPed(PED);
-    result.setPsd(PSD);
+    result.setPerformanceEndDate(PED);
+    result.setPerformanceStartDate(PSD);
     return result;
   }
 
   private static BestWorstPeriodsResult bestWorstPeriodsResult() {
     BestWorstPeriodsResult result = new BestWorstPeriodsResult();
-    result.setPed(PED);
-    result.setPsd(PSD);
+    result.setPerformanceEndDate(PED);
+    result.setPerformanceStartDate(PSD);
     return result;
   }
 

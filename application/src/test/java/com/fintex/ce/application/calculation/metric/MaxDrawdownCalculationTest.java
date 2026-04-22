@@ -270,7 +270,7 @@ class MaxDrawdownCalculationTest {
 
     final MaxDrawdownEntry maxDrawDownDTO = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    assertEquals(String.valueOf(TWELVE), maxDrawDownDTO.getTimeIntervalPeriod());
+    assertEquals(String.valueOf(TWELVE), maxDrawDownDTO.getPeriod());
     assertNull(maxDrawDownDTO.getDrawdownTroughDate());
     assertNull(maxDrawDownDTO.getDrawdownStartDate());
     assertNull(maxDrawDownDTO.getRecoveryTime());
@@ -300,7 +300,7 @@ class MaxDrawdownCalculationTest {
 
     final MaxDrawdownEntry maxDrawDownDTO = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    assertEquals(String.valueOf(TWELVE), maxDrawDownDTO.getTimeIntervalPeriod());
+    assertEquals(String.valueOf(TWELVE), maxDrawDownDTO.getPeriod());
     assertNull(maxDrawDownDTO.getDrawdownTroughDate());
     assertNull(maxDrawDownDTO.getDrawdownStartDate());
     assertNull(maxDrawDownDTO.getRecoveryTime());

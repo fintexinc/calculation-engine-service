@@ -48,8 +48,8 @@ public class BestWorstPeriodCalculation {
       calculateBestWorstPeriodValues(period, rollingCumulativeReturns);
     }
     BestWorstPeriodsResult bwpResult = new BestWorstPeriodsResult();
-    bwpResult.setPed(portfolioReturns.lastKey());
-    bwpResult.setPsd(portfolioReturns.firstKey());
+    bwpResult.setPerformanceEndDate(portfolioReturns.lastKey());
+    bwpResult.setPerformanceStartDate(portfolioReturns.firstKey());
     bwpResult.setBestWorstPeriods(bestWorstPeriodDTO);
     return bwpResult;
   }

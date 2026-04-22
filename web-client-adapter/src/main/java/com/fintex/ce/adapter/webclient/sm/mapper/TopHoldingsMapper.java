@@ -65,7 +65,7 @@ public class TopHoldingsMapper implements SecurityMasterResponseMapper<CommonTop
         .filter(SecurityHolding.class::isInstance)
         .map(SecurityHolding.class::cast)
         .map(this::toCommonTopHolding)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private String extractEnglishName(List<MultilingualString> names) {

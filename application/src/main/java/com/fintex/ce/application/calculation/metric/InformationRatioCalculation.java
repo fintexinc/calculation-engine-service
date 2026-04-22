@@ -49,7 +49,7 @@ public class InformationRatioCalculation
   public InformationRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodAndInformationRatio) {
     final var result = new InformationRatioResult();
     final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodAndInformationRatio);
-    result.setTimeIntervalResultS(timeIntervals);
+    result.setInformationRatio(timeIntervals);
     return result;
   }
 }

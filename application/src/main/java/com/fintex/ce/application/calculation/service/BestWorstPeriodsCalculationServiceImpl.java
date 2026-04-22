@@ -23,7 +23,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class BestWorstPeriodsCalculationServiceImpl
     implements
-      CalculationService<BestWorstPeriodsResult, BestWorstPeriodsCommand> {
+      CalculationService<BestWorstPeriodsCommand, BestWorstPeriodsResult> {
 
   private final MonthlyReturnsService monthlyReturnsService;
 

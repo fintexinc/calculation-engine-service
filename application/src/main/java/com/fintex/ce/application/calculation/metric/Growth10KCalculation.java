@@ -50,8 +50,8 @@ public class Growth10KCalculation {
   public Growth10KResult calculate() {
     final List<KeyValueResult> growth10KMap = calculateGrowth10K(portfolioReturns);
     Growth10KResult growth10KResult = new Growth10KResult();
-    growth10KResult.setPed(getPortfolioEndDate(portfolioReturns));
-    growth10KResult.setPsd(getPortfolioStartDate(portfolioReturns));
+    growth10KResult.setPerformanceEndDate(getPortfolioEndDate(portfolioReturns));
+    growth10KResult.setPerformanceStartDate(getPortfolioStartDate(portfolioReturns));
     growth10KResult.setGrowth10k(growth10KMap);
     growth10KResult.setWarnings(warnings);
     return growth10KResult;

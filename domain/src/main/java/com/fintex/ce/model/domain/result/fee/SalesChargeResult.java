@@ -1,6 +1,9 @@
 package com.fintex.ce.model.domain.result.fee;
 
 import com.fintex.ce.model.domain.enumeration.SalesChargeCategory;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
@@ -21,10 +24,12 @@ import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalHashCode;
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
-@EqualsAndHashCode
-@ToString
-public class SalesChargeResult {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Schema(description = "Response for sales-charge metric. Contains sales charge breakdown by category.")
+public class SalesChargeResult extends BaseCalculationResult {
 
+  @Schema(description = "Sales charge breakdown by category")
   private Map<SalesChargeCategory, SalesChargeEntry> salesCharges = new EnumMap<>(SalesChargeCategory.class);
 
   public record SalesChargeEntry(BigDecimal allocation, BigDecimal value, Set<SalesChargeHoldingEntry> holdings) {

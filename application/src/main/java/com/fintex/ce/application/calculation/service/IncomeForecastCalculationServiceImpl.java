@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
 @Service
 public class IncomeForecastCalculationServiceImpl
     implements
-      CalculationService<IncomeForecastResult, IncomeForecastCommand> {
+      CalculationService<IncomeForecastCommand, IncomeForecastResult> {
 
   private static final int ONE_MONTH = 1;
   private static final int TWO_SYMBOLS = 2;

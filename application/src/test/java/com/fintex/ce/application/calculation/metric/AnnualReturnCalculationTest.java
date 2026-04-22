@@ -43,11 +43,12 @@ class AnnualReturnCalculationTest {
         end, BigDecimal.TEN));
 
     doCallRealMethod().when(sut).populateBasicDetails(any(), any());
-    final AnnualReturnResult resDTO = new AnnualReturnResult().setAnnualReturns(List.of()).setWarnings(List.of());
+    final AnnualReturnResult resDTO = new AnnualReturnResult().setAnnualReturns(List.of());
+    resDTO.setWarnings(List.of());
     sut.populateBasicDetails(resDTO, portfolioReturns);
 
-    assertEquals(end, resDTO.getPed());
-    assertEquals(start, resDTO.getPsd());
+    assertEquals(end, resDTO.getPerformanceEndDate());
+    assertEquals(start, resDTO.getPerformanceStartDate());
     assertEquals(List.of(), resDTO.getAnnualReturns());
   }
 

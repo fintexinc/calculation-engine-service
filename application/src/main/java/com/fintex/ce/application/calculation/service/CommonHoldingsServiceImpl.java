@@ -45,7 +45,7 @@ import static java.util.stream.Collectors.toSet;
 @Service
 public class CommonHoldingsServiceImpl
     implements
-      CalculationService<TopCommonHoldingsResult, TopCommonHoldingsCommand> {
+      CalculationService<TopCommonHoldingsCommand, TopCommonHoldingsResult> {
 
   private static final int DEFAULT_NUMBER_OF_FUNDS_MIN = 1;
   private static final int DEFAULT_NUMBER_OF_TOP_COMMON_HOLDINGS = 10;

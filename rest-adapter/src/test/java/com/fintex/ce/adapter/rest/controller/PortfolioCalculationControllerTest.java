@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.rest.dto.WarningDTO;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqValidator;
@@ -10,7 +9,7 @@ import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.domain.result.WarningResult;
+import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
@@ -23,7 +22,6 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
@@ -97,8 +95,8 @@ class PortfolioCalculationControllerTest {
       CalculationMetric metric,
       CalculationCommand command,
       Object serviceResult,
-      Class<? extends WarningDTO> responseType) throws Exception {
-    lenient().when(mockServices.get(metric).perform(any())).thenReturn(serviceResult);
+      Class<? extends BaseCalculationResult> responseType) throws Exception {
+    lenient().when(mockServices.get(metric).perform(any())).thenReturn((BaseCalculationResult) serviceResult);
 
     command.setMetric(metric);
     String requestBody = objectMapper.writeValueAsString(command);
@@ -119,18 +117,15 @@ class PortfolioCalculationControllerTest {
 
     verify(mockServices.get(metric)).perform(any());
 
-    WarningDTO expectedDto = responseType.getDeclaredConstructor().newInstance();
-    BeanUtils.copyProperties(serviceResult, expectedDto);
-
     String responseBody = mvcResult.getResponse().getContentAsString();
-    WarningDTO actualDto = objectMapper.readValue(responseBody, responseType);
+    BaseCalculationResult actualDto = objectMapper.readValue(responseBody, responseType);
 
     assertThat(actualDto)
         .isNotNull()
         .isInstanceOf(responseType)
         .usingRecursiveComparison()
         .ignoringCollectionOrder()
-        .isEqualTo(expectedDto);
+        .isEqualTo(serviceResult);
   }
 
   @Test
@@ -180,7 +175,7 @@ class PortfolioCalculationControllerTest {
   private CalculationService<?, ?> createMockService(CalculationMetric metric) {
     CalculationService mock = mock(CalculationService.class);
     lenient().when(mock.getMetric()).thenReturn(metric);
-    lenient().when(mock.perform(any())).thenReturn(new WarningResult() {});
+    lenient().when(mock.perform(any())).thenReturn(new BaseCalculationResult() {});
     mockServices.put(metric, mock);
     return mock;
   }
@@ -211,7 +206,13 @@ class PortfolioCalculationControllerTest {
       for (CalculationMetric m : CalculationMetric.values()) {
         CalculationService svc = mock(CalculationService.class);
         lenient().when(svc.getMetric()).thenReturn(m);
-        lenient().when(svc.perform(any())).thenReturn(new WarningResult() {});
+        Object result = switch (m) {
+          case BEST_WORST_PERIODS -> new com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult();
+          case DISTRIBUTION_OF_MONTHLY_RETURNS ->
+            new com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult();
+          default -> new BaseCalculationResult() {};
+        };
+        lenient().when(svc.perform(any())).thenReturn((BaseCalculationResult) result);
         services.add(svc);
       }
 

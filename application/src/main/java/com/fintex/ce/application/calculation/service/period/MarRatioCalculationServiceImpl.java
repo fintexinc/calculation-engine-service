@@ -7,7 +7,7 @@ import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculat
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.result.risk.MARRatioResult;
+import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.util.ReturnFactorScale;
@@ -23,7 +23,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 
 @Service
-public class MarRatioCalculationServiceImpl extends PeriodAbstractService<MARRatioResult, PeriodCommand> {
+public class MarRatioCalculationServiceImpl extends PeriodAbstractService<MarRatioResult, PeriodCommand> {
 
   public static final Function<BigDecimal, BigDecimal> SCALE_FUNCTION = e -> e;
 
@@ -39,7 +39,7 @@ public class MarRatioCalculationServiceImpl extends PeriodAbstractService<MARRat
   }
 
   @Override
-  public MARRatioResult perform(final PeriodCommand reqDTO) {
+  public MarRatioResult perform(final PeriodCommand reqDTO) {
     final MarRatioCalculation calculationMethod = defineCalculationMethod(reqDTO);
     return calculationMethod.calculate(reqDTO.getPeriods());
   }
