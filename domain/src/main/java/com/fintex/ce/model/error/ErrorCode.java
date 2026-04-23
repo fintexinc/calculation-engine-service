@@ -692,6 +692,14 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  HOLDING_VALUES_SUM_NOT_POSITIVE(
+      Codes.HOLDING_VALUES_SUM_NOT_POSITIVE,
+      "Sum of holding values must be greater than 0.",
+      "All supplied holdings have zero values, so portfolio weights cannot be calculated",
+      "Provide at least one holding with a positive value",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
   DUPLICATE_HOLDING(
       Codes.DUPLICATE_HOLDING,
       "Duplicate holding found in request",
@@ -1042,6 +1050,7 @@ public enum ErrorCode {
     // Holdings validation
     public static final String HOLDING_VALUE_NEGATIVE_OR_NULL = "HLD-001";
     public static final String DUPLICATE_HOLDING = "HLD-002";
+    public static final String HOLDING_VALUES_SUM_NOT_POSITIVE = "HLD-003";
 
     // Mutual Fund classification
     public static final String INVALID_SHARE_CLASS = "MF-001";
