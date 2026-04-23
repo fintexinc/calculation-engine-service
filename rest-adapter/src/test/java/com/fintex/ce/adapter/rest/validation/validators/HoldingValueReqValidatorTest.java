@@ -89,6 +89,40 @@ class HoldingValueReqValidatorTest {
   }
 
   @Test
+  void shouldThrow_whenAllHoldingValuesAreZero() {
+    PortfolioHolding zeroHolding = new PortfolioHolding(
+        BigDecimal.ZERO, FinancialInstrumentType.ETF_CANADA,
+        new SecurityIdentifier("HEWJ", FiIdentifierType.TICKER));
+
+    PeriodCommand cmd = new PeriodCommand();
+    cmd.setCurrency(Currency.CAD);
+    cmd.setHoldings(List.of(zeroHolding));
+
+    assertThatThrownBy(() -> validator.validate(cmd))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_VALUES_SUM_NOT_POSITIVE");
+        });
+  }
+
+  @Test
+  void shouldNotThrow_whenAnyHoldingValueIsZero_butSumIsPositive() {
+    PortfolioHolding zero = new PortfolioHolding(
+        BigDecimal.ZERO, FinancialInstrumentType.ETF_CANADA,
+        new SecurityIdentifier("HEWJ", FiIdentifierType.TICKER));
+    PortfolioHolding positive = new PortfolioHolding(
+        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("FUND1", FiIdentifierType.TICKER));
+
+    PeriodCommand cmd = new PeriodCommand();
+    cmd.setCurrency(Currency.CAD);
+    cmd.setHoldings(List.of(zero, positive));
+
+    assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
+  }
+
+  @Test
   void shouldNotThrow_whenHoldingsAreEmpty() {
     PeriodCommand cmd = new PeriodCommand();
     cmd.setCurrency(Currency.CAD);

@@ -39,6 +39,7 @@ public class HoldingsValidationHelper {
     if (CollectionUtils.isEmpty(holdings)) {
       return;
     }
+    BigDecimal sum = BigDecimal.ZERO;
     for (PortfolioHolding holding : holdings) {
       BigDecimal value = holding.getValue();
       if (value == null) {
@@ -47,6 +48,10 @@ public class HoldingsValidationHelper {
       if (value.compareTo(BigDecimal.ZERO) < 0) {
         throw ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationException();
       }
+      sum = sum.add(value);
+    }
+    if (sum.compareTo(BigDecimal.ZERO) <= 0) {
+      throw ErrorCode.HOLDING_VALUES_SUM_NOT_POSITIVE.toValidationException();
     }
   }
 
