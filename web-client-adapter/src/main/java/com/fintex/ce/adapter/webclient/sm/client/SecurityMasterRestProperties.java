@@ -14,4 +14,5 @@ public class SecurityMasterRestProperties {
   private int timeout = 90000;
   private boolean logBody = false;
   private boolean logRequests = false;
+  private String healthCheckPath;
 }

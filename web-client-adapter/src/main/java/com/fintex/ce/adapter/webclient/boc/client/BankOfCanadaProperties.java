@@ -18,6 +18,7 @@ public class BankOfCanadaProperties {
   private int timeout = 30000;
   private boolean logBody = false;
   private boolean logRequests = false;
+  private String healthCheckPath;
   private Map<String, CurrencyPairConfig> currencyPairs = new HashMap<>();
 
   @Data

@@ -13,6 +13,7 @@ external-services:
   bank-of-canada:
     base-url: https://www.bankofcanada.ca/valet
     timeout: 30000
+    health-check-path: /lists/series/json
     currency-pairs:
       USD_CAD:
         rate-sources:
@@ -31,6 +32,7 @@ external-services:
     rest:
       base-url: ${SM_REST_BASE_URL}
       timeout: 60000
+      health-check-path: /actuator/health
       endpoints:
         allocations:
           asset: /api/v1/wealth/securities/allocations/asset
@@ -90,6 +92,23 @@ management:
       client:
         requests:
           name: http.client.requests
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState, sms
+        liveness:
+          include: livenessState
+  health:
+    diskspace:
+      enabled: false
 
 logging:
   level:

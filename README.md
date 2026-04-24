@@ -36,6 +36,31 @@ You can read the description for all metrics, requests and responses on Swagger 
 | Swagger UI | `https://portfolio-calculation-engine.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui/index.html` |
 | OpenAPI YAML | `https://portfolio-calculation-engine.ashybay-bfa8feae.canadacentral.azurecontainerapps.io/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/api-docs.yaml`         |
 
+### Health Checks
+
+Spring Boot Actuator exposes liveness and readiness probes — no custom controller. Suitable for Kubernetes / load-balancer health checks.
+
+| Endpoint | Returns | Meaning |
+|----------|---------|---------|
+| `GET /actuator/health` | `200 {"status":"UP"}` / `503 {"status":"DOWN"}` | Composite of all registered indicators (SMS + Bank of Canada + built-ins) |
+| `GET /actuator/health/liveness` | `200` / `503` | Process is alive (JVM up). Independent of downstream availability — never fails because of SMS/BoC outages. |
+| `GET /actuator/health/readiness` | `200` / `503` | Service is ready to serve calculations. Gated on **SMS reachability** — every metric depends on it. Bank of Canada is *not* gated (only affects FX-conversion paths). |
+
+Probe mechanics:
+
+- A short fail-fast 3-second connect/read timeout is applied to the indicator HTTP calls (see `HealthCheckRestClientFactory`), so a hung downstream fails the probe quickly rather than holding up the K8s probe window.
+- Endpoint paths called by the indicators are configurable: `external-services.security-master.rest.health-check-path` (default `/actuator/health`) and `external-services.bank-of-canada.health-check-path` (default `/lists/series/json`).
+- `management.endpoint.health.show-details: never` — bodies don't leak SMS/BoC URLs or exception stacks (the actuator endpoint isn't behind auth).
+
+Sample Kubernetes probe block:
+
+```yaml
+livenessProbe:
+  httpGet: { path: /actuator/health/liveness, port: 8181 }
+readinessProbe:
+  httpGet: { path: /actuator/health/readiness, port: 8181 }
+```
+
 ### Dependencies
 
 | Dependency | Purpose |
