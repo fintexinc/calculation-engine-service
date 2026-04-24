@@ -120,6 +120,36 @@ class MonthlyReturnsMapperTest {
     assertThat(result.getReturns().lastKey()).isEqualTo(LocalDate.of(2025, 3, 31));
   }
 
+  @Test
+  void shouldNormalizeFirstOfMonthDatesToLastOfMonth() {
+    var smsResponse = new MonthlyReturns();
+    smsResponse.setReturns(List.of(
+        createDateValue("2024-12-01", "-5.28348"),
+        createDateValue("2025-01-01", "3.60137"),
+        createDateValue("2025-02-01", "-2.02298")));
+
+    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-008"));
+
+    assertThat(result.getReturns()).containsOnlyKeys(
+        LocalDate.of(2024, 12, 31),
+        LocalDate.of(2025, 1, 31),
+        LocalDate.of(2025, 2, 28));
+  }
+
+  @Test
+  void shouldKeepFirstValue_whenMidMonthEntriesCollideAfterNormalization() {
+    var smsResponse = new MonthlyReturns();
+    smsResponse.setReturns(List.of(
+        createDateValue("2025-01-01", "0.0100"),
+        createDateValue("2025-01-15", "0.0200")));
+
+    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-009"));
+
+    assertThat(result.getReturns()).hasSize(1);
+    assertThat(result.getReturns().get(LocalDate.of(2025, 1, 31)))
+        .isEqualByComparingTo("0.0100");
+  }
+
   private DateBigDecimalValue createDateValue(String date, String value) {
     var dv = new DateBigDecimalValue();
     dv.setDate(date);

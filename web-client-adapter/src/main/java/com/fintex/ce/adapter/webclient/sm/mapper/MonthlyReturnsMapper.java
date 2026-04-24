@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
+
 @Component
 public class MonthlyReturnsMapper
     implements
@@ -34,7 +36,7 @@ public class MonthlyReturnsMapper
         .stream()
         .filter(entry -> entry.getDate() != null && entry.getValue() != null)
         .collect(Collectors.toMap(
-            entry -> LocalDate.parse(entry.getDate()),
+            entry -> toLastDayOfMonth(LocalDate.parse(entry.getDate())),
             DateBigDecimalValue::getValue,
             (existing, replacement) -> existing,
             TreeMap::new));
