@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.Growth10KCalculation;
 import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.model.domain.calculation.DateRange;
@@ -10,7 +11,6 @@ import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.error.Warning;
-import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;

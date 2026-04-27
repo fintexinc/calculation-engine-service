@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 
 public abstract class RollingAbstractCalculation<T extends PeriodResult>
     extends

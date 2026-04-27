@@ -1,4 +1,4 @@
-package com.fintex.ce.util;
+package com.fintex.ce.application.util;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -6,7 +6,7 @@ import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.fintex.ce.util.CollectorUtils.toMap;
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 

@@ -12,9 +12,9 @@ import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
 
+import static com.fintex.ce.application.util.DecimalUtils.divide;
+import static com.fintex.ce.application.util.DecimalUtils.pow;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.util.DecimalUtils.divide;
-import static com.fintex.ce.util.DecimalUtils.pow;
 import static java.math.BigDecimal.ONE;
 
 public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<TrailingTotalReturnsResult, BigDecimal> {

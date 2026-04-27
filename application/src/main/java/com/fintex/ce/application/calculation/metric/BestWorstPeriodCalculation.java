@@ -1,11 +1,11 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodData;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
 import com.fintex.ce.model.domain.result.period.IntervalResult;
 import com.fintex.ce.model.domain.result.period.PeriodDateResult;
 import com.fintex.ce.model.domain.result.period.PeriodValueResult;
-import com.fintex.ce.util.DecimalUtils;
 
 import org.springframework.util.CollectionUtils;
 

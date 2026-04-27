@@ -1,5 +1,6 @@
 package com.fintex.ce.application.returns;
 
+import com.fintex.ce.application.util.MapUtils;
 import com.fintex.ce.application.validation.CpedDataValidation;
 import com.fintex.ce.application.validation.CpsdDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
@@ -14,7 +15,6 @@ import com.fintex.ce.model.error.PceExceptionCollector;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationException;
-import com.fintex.ce.util.MapUtils;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.error.Notification;
 
@@ -31,13 +31,13 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_HISTORICAL_NAV_PRICES_FOR_MONTH;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_MONTHLY_RETURNS;
 import static com.fintex.ce.model.error.ErrorCode.NAV_PARAM_MISSING;
-import static com.fintex.ce.util.CollectorUtils.toMap;
-import static com.fintex.ce.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.PATTERN_1;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.util.stream.Collectors.groupingBy;

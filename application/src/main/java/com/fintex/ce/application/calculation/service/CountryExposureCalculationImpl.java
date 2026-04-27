@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.application.mapping.CountryAllocationMappingService;
 import com.fintex.ce.application.mapping.response.CountryExposureResponseMapper;
+import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -11,7 +12,6 @@ import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.ExposureDataHolder;
 
 import org.springframework.stereotype.Service;
 
@@ -21,8 +21,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.application.util.PortfolioUtils.areAllValuesInMapEmpty;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_BOND_COUNTRY_EXPOSURE;
-import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
 import static java.util.stream.Collectors.toMap;
 
 @Service

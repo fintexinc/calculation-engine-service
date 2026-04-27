@@ -1,4 +1,4 @@
-package com.fintex.ce.util;
+package com.fintex.ce.application.util;
 
 import org.junit.jupiter.api.Test;
 

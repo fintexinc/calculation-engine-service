@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
 import com.fintex.ce.model.error.Warning;
-import com.fintex.ce.util.DecimalUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.fintex.ce.util.CalculationUtils.product;
+import static com.fintex.ce.application.util.CalculationUtils.product;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
 

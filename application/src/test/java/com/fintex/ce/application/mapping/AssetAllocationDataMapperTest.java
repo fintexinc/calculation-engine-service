@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.application.util.MapUtils.overrideDefaultValues;
 import static com.fintex.ce.application.util.TestConstants.GREATER_THAN_YEAR;
-import static com.fintex.ce.util.MapUtils.overrideDefaultValues;
 import static org.apache.commons.collections4.MapUtils.EMPTY_SORTED_MAP;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;

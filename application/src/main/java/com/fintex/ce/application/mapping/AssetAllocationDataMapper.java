@@ -18,11 +18,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.application.util.MapUtils.overrideDefaultValues;
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.UNCLASSIFIED;
 import static com.fintex.ce.util.FilterUtils.CASH_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.filterHoldings;
-import static com.fintex.ce.util.MapUtils.overrideDefaultValues;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toMap;
 

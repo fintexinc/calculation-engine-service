@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapping.response.AssetAllocationResponseMapper;
+import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
@@ -12,7 +13,6 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.wm.commons.domain.DataProvider;
 
 import org.springframework.stereotype.Service;

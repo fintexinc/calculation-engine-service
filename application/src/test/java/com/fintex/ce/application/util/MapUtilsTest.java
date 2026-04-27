@@ -1,4 +1,4 @@
-package com.fintex.ce.util;
+package com.fintex.ce.application.util;
 
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static com.fintex.ce.util.TestConstants.LOCAL_DATE_NOW;
+import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static java.math.BigDecimal.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;

@@ -2,9 +2,9 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.calculation.metric.formula.SumProduct;
 import com.fintex.ce.application.util.ComparisonUtils;
+import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.ce.util.ReturnFactorScale;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

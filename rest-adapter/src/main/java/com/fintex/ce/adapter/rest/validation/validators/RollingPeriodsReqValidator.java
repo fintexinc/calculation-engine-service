@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
+import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
@@ -13,7 +14,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Set;
 
-import static com.fintex.ce.util.CalculationUtils.isNegativeNumeric;
 import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 @Component
@@ -33,7 +33,7 @@ public class RollingPeriodsReqValidator implements RequestValidator {
       return;
     }
     for (final var period : periods) {
-      if (!isNumeric(period) && !isNegativeNumeric(period)) {
+      if (!isNumeric(period) && !CalculationUtils.isNegativeNumeric(period)) {
         throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toValidationException(period);
       }
       if (Long.parseLong(period) <= 0) {

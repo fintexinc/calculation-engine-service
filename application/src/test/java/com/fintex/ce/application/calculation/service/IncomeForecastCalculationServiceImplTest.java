@@ -1,5 +1,6 @@
 package com.fintex.ce.application.calculation.service;
 
+import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.calculation.distribution.Income;
 import com.fintex.ce.model.domain.calculation.yield.IncomeForecast;
 import com.fintex.ce.model.domain.enumeration.InterestFreq;
@@ -8,7 +9,6 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.DecimalUtils;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;

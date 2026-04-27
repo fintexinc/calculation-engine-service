@@ -1,5 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
+import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
 import com.fintex.ce.model.domain.calculation.holding.HoldingAggregator;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -9,8 +11,6 @@ import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
 import com.fintex.ce.model.dto.CommonHoldingsDTO;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.DecimalUtils;
-import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.Test;
@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

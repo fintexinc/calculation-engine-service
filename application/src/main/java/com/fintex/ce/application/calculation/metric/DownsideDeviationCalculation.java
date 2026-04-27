@@ -16,13 +16,13 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static com.fintex.ce.application.util.CalculationUtils.sum;
+import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
+import static com.fintex.ce.application.util.DecimalUtils.divide;
+import static com.fintex.ce.application.util.DecimalUtils.pow;
+import static com.fintex.ce.application.util.DecimalUtils.squareRoot;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
-import static com.fintex.ce.util.CalculationUtils.sum;
-import static com.fintex.ce.util.CollectorUtils.toTreeMap;
-import static com.fintex.ce.util.DecimalUtils.divide;
-import static com.fintex.ce.util.DecimalUtils.pow;
-import static com.fintex.ce.util.DecimalUtils.squareRoot;
 
 public class DownsideDeviationCalculation<T extends PeriodResult> extends PeriodCalculationAbstract<T, BigDecimal> {
 

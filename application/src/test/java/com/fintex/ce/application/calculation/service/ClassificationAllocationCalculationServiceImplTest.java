@@ -1,14 +1,14 @@
 package com.fintex.ce.application.calculation.service;
 
+import com.fintex.ce.application.util.CalculationUtils;
+import com.fintex.ce.application.util.ExposureDataHolder;
+import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.CalculationUtils;
-import com.fintex.ce.util.ExposureDataHolder;
-import com.fintex.ce.util.PortfolioUtils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

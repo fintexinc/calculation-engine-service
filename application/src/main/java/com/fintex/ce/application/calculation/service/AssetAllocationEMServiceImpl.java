@@ -4,6 +4,8 @@ import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstract
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
 import com.fintex.ce.application.mapping.CountryAllocationMappingService;
+import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
@@ -15,8 +17,6 @@ import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.DecimalUtils;
-import com.fintex.ce.util.ExposureDataHolder;
 import com.fintex.wm.commons.domain.DataProvider;
 
 import org.springframework.stereotype.Service;
@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 
+import static com.fintex.ce.application.util.CalculationUtils.sum;
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.ASIA_PACIFIC_EQUITIES;
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.CANADIAN_EQUITIES;
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.CASH;
@@ -43,8 +45,6 @@ import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationR
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.US_EQUITIES;
 import static com.fintex.ce.model.domain.calculation.allocation.CountryRegionType.UNITED_STATES;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_COUNTRY_EXPOSURE;
-import static com.fintex.ce.util.CalculationUtils.sum;
-import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
 

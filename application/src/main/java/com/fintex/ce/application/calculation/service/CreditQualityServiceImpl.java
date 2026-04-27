@@ -26,15 +26,15 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
+import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
+import static com.fintex.ce.application.util.CalculationUtils.sumProduct;
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.application.util.DecimalUtils.divide;
+import static com.fintex.ce.application.util.PortfolioUtils.areAllValuesInMapEmpty;
+import static com.fintex.ce.application.util.PortfolioUtils.calculateInitialPortfolioWeight;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_CREDIT_QUALITY;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
-import static com.fintex.ce.util.CalculationUtils.sumProduct;
-import static com.fintex.ce.util.CollectorUtils.toMap;
-import static com.fintex.ce.util.DecimalUtils.divide;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
-import static com.fintex.ce.util.PortfolioUtils.areAllValuesInMapEmpty;
-import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
 
 @Service
 @RequiredArgsConstructor

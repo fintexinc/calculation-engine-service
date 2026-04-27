@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
-import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
+import static com.fintex.ce.application.constant.HoldingTypeGroup.FUNDS;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.SCALED;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_MANAGEMENT_FEE;

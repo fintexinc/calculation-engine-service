@@ -1,4 +1,4 @@
-package com.fintex.ce.util;
+package com.fintex.ce.application.util;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
@@ -13,8 +13,8 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.model.error.ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT;
-import static com.fintex.ce.util.CollectorUtils.toMap;
 
 /**
  * Pure utility methods for mapping raw security data into typed allocation maps.

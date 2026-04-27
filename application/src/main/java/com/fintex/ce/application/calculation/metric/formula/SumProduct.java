@@ -7,7 +7,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
-import static com.fintex.ce.util.CollectorUtils.toTreeMap;
+import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
 
 /**
  * Calculating the sumproduct for two maps

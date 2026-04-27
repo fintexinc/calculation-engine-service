@@ -1,19 +1,19 @@
 package com.fintex.ce.application.calculation.service.breakdown;
 
+import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.calculation.BreakdownCalculationService;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.util.ExposureDataHolder;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.util.CalculationUtils.sumProduct;
-import static com.fintex.ce.util.CollectorUtils.toMap;
-import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
+import static com.fintex.ce.application.util.CalculationUtils.sumProduct;
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.application.util.PortfolioUtils.calculateInitialPortfolioWeight;
 
 /**
  * @param <E>

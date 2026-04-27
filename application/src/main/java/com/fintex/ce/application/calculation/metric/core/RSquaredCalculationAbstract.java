@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric.core;
 
+import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.util.BigDecimalConstants;
-import com.fintex.ce.util.DecimalUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,7 +11,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ZERO;
 
 /**

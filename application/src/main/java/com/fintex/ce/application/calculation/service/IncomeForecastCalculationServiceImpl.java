@@ -1,5 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
+import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.constant.GeneralConstants;
 import com.fintex.ce.model.domain.calculation.distribution.Income;
@@ -13,8 +15,6 @@ import com.fintex.ce.model.dto.IncomeForecastDto;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.DecimalUtils;
-import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.stereotype.Service;

@@ -1,6 +1,8 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.mapping.response.MaturityAllocationResponseMapper;
+import com.fintex.ce.application.util.ExposureDataHolder;
+import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -8,8 +10,6 @@ import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.ExposureDataHolder;
-import com.fintex.ce.util.PortfolioUtils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,15 +1,15 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
+import com.fintex.ce.application.util.AllocationMappingUtils;
+import com.fintex.ce.application.util.ExposureDataHolder;
+import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.AllocationMappingUtils;
-import com.fintex.ce.util.ExposureDataHolder;
-import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 
 import org.springframework.stereotype.Service;
@@ -23,10 +23,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_MARKET_CAPITALIZATION;
-import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
-import static com.fintex.ce.util.CollectorUtils.toMap;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.GIANT;
 import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.LARGE;
 import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.MEDIUM;

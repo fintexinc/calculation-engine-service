@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
 
-import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
+import static com.fintex.ce.application.util.ReturnFactorScale.SCALE_OF_TWO;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service

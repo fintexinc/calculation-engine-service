@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 
 /**
  * Response mapper for EquityStyleboxExposure domain model to EquityStyleboxExposureResult. Handles conversion of

@@ -1,4 +1,4 @@
-package com.fintex.ce.util;
+package com.fintex.ce.application.util;
 
 import com.fintex.ce.model.util.BigDecimalConstants;
 
@@ -10,11 +10,11 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static com.fintex.ce.util.DecimalUtils.INTERNAL_SCALE;
-import static com.fintex.ce.util.DecimalUtils.ROUNDING_MODE;
-import static com.fintex.ce.util.DecimalUtils.pow;
-import static com.fintex.ce.util.DecimalUtils.toScale;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.application.util.DecimalUtils.INTERNAL_SCALE;
+import static com.fintex.ce.application.util.DecimalUtils.ROUNDING_MODE;
+import static com.fintex.ce.application.util.DecimalUtils.pow;
+import static com.fintex.ce.application.util.DecimalUtils.toScale;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 

@@ -4,6 +4,9 @@ import com.fintex.ce.application.calculation.metric.FixedIncomeBondSectorCalcula
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.AssetAllocationDataMapper;
+import com.fintex.ce.application.util.AllocationMappingUtils;
+import com.fintex.ce.application.util.ExposureDataHolder;
+import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
@@ -13,9 +16,6 @@ import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.AllocationMappingUtils;
-import com.fintex.ce.util.ExposureDataHolder;
-import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 
@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.CASH;
 import static com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion.FIXED_INCOME;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_FIXED_INCOME_BOND_SECTOR;
-import static com.fintex.ce.util.CollectorUtils.toMap;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
 
