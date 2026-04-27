@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
+import static com.fintex.ce.application.util.DecimalUtils.OUTPUT_SCALE;
 import static com.fintex.ce.model.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
 import static com.fintex.ce.model.error.ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE;
 import static com.fintex.ce.model.error.ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12;
-import static com.fintex.ce.util.DecimalUtils.OUTPUT_SCALE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

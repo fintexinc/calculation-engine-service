@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import lombok.Getter;
 
-import static com.fintex.ce.util.CalculationUtils.average;
+import static com.fintex.ce.application.util.CalculationUtils.average;
 
 @Getter
 abstract class PortfolioBenchmarkCalculationAbstract<T extends PeriodResult>

@@ -1,4 +1,4 @@
-package com.fintex.ce.util;
+package com.fintex.ce.application.util;
 
 import com.fintex.ce.model.util.BigDecimalConstants;
 
@@ -9,7 +9,7 @@ import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import static com.fintex.ce.util.DecimalUtils.divide;
+import static com.fintex.ce.application.util.DecimalUtils.divide;
 
 @Getter
 @AllArgsConstructor

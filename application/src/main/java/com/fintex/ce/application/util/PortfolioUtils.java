@@ -1,8 +1,9 @@
-package com.fintex.ce.util;
+package com.fintex.ce.application.util;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.IncomeForecastDto;
+import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 

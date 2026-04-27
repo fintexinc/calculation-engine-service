@@ -14,8 +14,8 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
+import static com.fintex.ce.application.util.DecimalUtils.divide;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.util.DecimalUtils.divide;
 
 @Slf4j
 public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRatioResult, BigDecimal> {

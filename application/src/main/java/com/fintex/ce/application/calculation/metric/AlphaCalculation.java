@@ -13,8 +13,8 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 
+import static com.fintex.ce.application.util.CalculationUtils.average;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.util.CalculationUtils.average;
 
 public class AlphaCalculation extends AlphaBetaCalculationAbstract<AlphaResult> {
 

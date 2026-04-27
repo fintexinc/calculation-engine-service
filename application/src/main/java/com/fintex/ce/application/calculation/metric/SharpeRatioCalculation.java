@@ -14,8 +14,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import lombok.extern.slf4j.Slf4j;
 
+import static com.fintex.ce.application.util.DecimalUtils.divide;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.util.DecimalUtils.divide;
 import static java.math.BigDecimal.ZERO;
 
 @Slf4j

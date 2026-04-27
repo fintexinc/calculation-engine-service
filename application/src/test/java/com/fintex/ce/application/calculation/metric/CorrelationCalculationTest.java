@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;

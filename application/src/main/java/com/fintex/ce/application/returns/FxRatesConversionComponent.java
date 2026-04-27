@@ -10,12 +10,12 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
+import static com.fintex.ce.application.util.DecimalUtils.divide;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_MONTHLY_FX_RATE;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.util.CollectorUtils.toMap;
-import static com.fintex.ce.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
-import static com.fintex.ce.util.DecimalUtils.divide;
 import static java.math.BigDecimal.ONE;
 
 public class FxRatesConversionComponent {

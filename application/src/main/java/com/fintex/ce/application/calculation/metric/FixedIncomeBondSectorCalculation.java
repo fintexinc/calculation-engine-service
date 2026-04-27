@@ -10,13 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
+import static com.fintex.ce.application.util.CalculationUtils.sumProduct;
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.application.util.DecimalUtils.divide;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.application.util.PortfolioUtils.calculateInitialPortfolioWeight;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.util.CalculationUtils.reScaleAbs;
-import static com.fintex.ce.util.CalculationUtils.sumProduct;
-import static com.fintex.ce.util.CollectorUtils.toMap;
-import static com.fintex.ce.util.DecimalUtils.divide;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
-import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
 
 public class FixedIncomeBondSectorCalculation {
 

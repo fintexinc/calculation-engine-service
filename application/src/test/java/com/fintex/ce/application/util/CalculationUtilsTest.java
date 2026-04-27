@@ -1,13 +1,13 @@
-package com.fintex.ce.util;
+package com.fintex.ce.application.util;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-import static com.fintex.ce.util.DecimalUtils.abs;
-import static com.fintex.ce.util.DecimalUtils.divide;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.application.util.DecimalUtils.abs;
+import static com.fintex.ce.application.util.DecimalUtils.divide;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -1,11 +1,11 @@
 package com.fintex.ce.application.mapping;
 
+import com.fintex.ce.application.util.JacksonUtil;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.GeographicAllocationDTO;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.Warning;
-import com.fintex.ce.util.JacksonUtil;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.model.error.ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT;
-import static com.fintex.ce.util.CollectorUtils.toMap;
 
 @Service
 public class GeographicAllocationMappingService {

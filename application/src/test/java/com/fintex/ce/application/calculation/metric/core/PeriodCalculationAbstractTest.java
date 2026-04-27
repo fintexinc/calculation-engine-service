@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.model.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
 import static com.fintex.ce.model.domain.enumeration.Period.SINCE_PERFORMANCE_START_DATE;
@@ -34,7 +35,6 @@ import static com.fintex.ce.model.domain.enumeration.Period.YEAR_TO_DATE;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;

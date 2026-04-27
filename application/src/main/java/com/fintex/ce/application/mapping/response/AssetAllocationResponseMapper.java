@@ -15,7 +15,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 
 @Component
 public class AssetAllocationResponseMapper implements ResponseMapper<HoldingAssetAllocation, AssetAllocationResult> {

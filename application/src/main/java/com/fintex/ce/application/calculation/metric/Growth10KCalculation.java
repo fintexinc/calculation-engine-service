@@ -15,11 +15,11 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
 
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.TEN_THOUSAND;
 import static com.fintex.ce.util.DateTimeUtils.addOneMonth;
 import static com.fintex.ce.util.DateTimeUtils.minusOneMonth;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
 
 public class Growth10KCalculation {
 

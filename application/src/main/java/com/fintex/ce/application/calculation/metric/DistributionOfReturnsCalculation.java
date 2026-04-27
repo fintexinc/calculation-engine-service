@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.Objects;
 
+import static com.fintex.ce.application.util.DecimalUtils.divide;
+import static com.fintex.ce.application.util.DecimalUtils.getMaxValue;
+import static com.fintex.ce.application.util.DecimalUtils.getMinValue;
+import static com.fintex.ce.application.util.DecimalUtils.setInternalScale;
+import static com.fintex.ce.application.util.DecimalUtils.squareRoot;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.util.DecimalUtils.divide;
-import static com.fintex.ce.util.DecimalUtils.getMaxValue;
-import static com.fintex.ce.util.DecimalUtils.getMinValue;
-import static com.fintex.ce.util.DecimalUtils.setInternalScale;
-import static com.fintex.ce.util.DecimalUtils.squareRoot;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.isNull;
 

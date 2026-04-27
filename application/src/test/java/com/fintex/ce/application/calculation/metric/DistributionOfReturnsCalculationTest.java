@@ -1,11 +1,11 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsIntervalResult;
 import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
 import com.fintex.ce.model.domain.result.distribution.DistributionRangeResult;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.model.util.BigDecimalConstants;
-import com.fintex.ce.util.DecimalUtils;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

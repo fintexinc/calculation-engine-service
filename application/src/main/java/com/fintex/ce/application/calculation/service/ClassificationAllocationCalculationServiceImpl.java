@@ -1,6 +1,9 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.breakdown.BreakdownAbstractService;
+import com.fintex.ce.application.util.AllocationMappingUtils;
+import com.fintex.ce.application.util.ExposureDataHolder;
+import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -8,9 +11,6 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.AllocationMappingUtils;
-import com.fintex.ce.util.ExposureDataHolder;
-import com.fintex.ce.util.PortfolioUtils;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.stereotype.Service;
@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.application.util.CalculationUtils.reScale;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_CLASSIFICATION_ALLOCATION;
-import static com.fintex.ce.util.CalculationUtils.reScale;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 

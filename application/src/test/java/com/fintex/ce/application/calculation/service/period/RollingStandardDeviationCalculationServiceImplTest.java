@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static com.fintex.ce.application.util.ReturnFactorScale.SCALE_OF_TWO;
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyList;

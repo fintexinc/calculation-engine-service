@@ -2,10 +2,10 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.model.util.BigDecimalConstants;
-import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;

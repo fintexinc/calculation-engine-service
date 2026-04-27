@@ -3,18 +3,18 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.MeanCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
+import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.MeanResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static com.fintex.ce.util.DecimalUtils.OUTPUT_SCALE;
+import static com.fintex.ce.application.util.DecimalUtils.OUTPUT_SCALE;
 
 @Service
 public class MeanCalculationServiceImpl extends PeriodAbstractService<MeanResult, PeriodCommand> {

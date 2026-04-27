@@ -5,12 +5,12 @@ import com.fintex.ce.application.calculation.metric.RollingTotalReturnsCalculati
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
-import com.fintex.ce.util.ReturnFactorScale;
 
 import org.springframework.stereotype.Service;
 

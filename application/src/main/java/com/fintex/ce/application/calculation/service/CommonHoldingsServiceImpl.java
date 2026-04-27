@@ -34,9 +34,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.util.CollectorUtils.toLinkedHashMap;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
-import static com.fintex.ce.util.PortfolioUtils.calculateInitialPortfolioWeight;
+import static com.fintex.ce.application.util.CollectorUtils.toLinkedHashMap;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.application.util.PortfolioUtils.calculateInitialPortfolioWeight;
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toMap;

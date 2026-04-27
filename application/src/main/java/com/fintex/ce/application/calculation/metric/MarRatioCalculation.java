@@ -1,11 +1,11 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 import com.fintex.ce.model.dto.calculation.CalculationDTO;
-import com.fintex.ce.util.DecimalUtils;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.fintex.ce.application.util.DecimalUtils.abs;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.util.DecimalUtils.abs;
 
 public class MarRatioCalculation extends PeriodCalculationAbstract<MarRatioResult, BigDecimal> {
 

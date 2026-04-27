@@ -22,12 +22,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.constant.HoldingTypeGroup.FUNDS;
+import static com.fintex.ce.application.constant.HoldingTypeGroup.FUNDS;
+import static com.fintex.ce.application.util.DecimalUtils.divide;
+import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.ABSOLUTE;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.FORCE_REPORT_FEE;
 import static com.fintex.ce.model.domain.enumeration.ParameterType.SCALED;
-import static com.fintex.ce.util.DecimalUtils.divide;
-import static com.fintex.ce.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
 

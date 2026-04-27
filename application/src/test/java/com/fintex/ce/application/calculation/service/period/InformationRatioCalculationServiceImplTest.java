@@ -2,10 +2,10 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
+import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
 import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.util.ReturnFactorScale;
 
 import org.junit.jupiter.api.Test;
 

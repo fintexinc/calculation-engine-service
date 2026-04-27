@@ -12,8 +12,8 @@ import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
 
+import static com.fintex.ce.application.util.DecimalUtils.divide;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
-import static com.fintex.ce.util.DecimalUtils.divide;
 import static java.math.BigDecimal.ZERO;
 
 public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRatioResult, BigDecimal> {

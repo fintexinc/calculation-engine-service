@@ -1,9 +1,9 @@
 package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.calculation.metric.formula.SumProduct;
+import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.util.PortfolioUtils;
-import com.fintex.ce.util.ReturnFactorScale;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,8 +14,8 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import lombok.EqualsAndHashCode;
 
-import static com.fintex.ce.util.CollectorUtils.toMap;
-import static com.fintex.ce.util.CollectorUtils.toTreeMap;
+import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ZERO;
 

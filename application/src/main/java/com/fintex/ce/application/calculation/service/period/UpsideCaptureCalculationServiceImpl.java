@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static com.fintex.ce.util.ReturnFactorScale.AS_IS;
+import static com.fintex.ce.application.util.ReturnFactorScale.AS_IS;
 
 @Service
 public class UpsideCaptureCalculationServiceImpl

@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 
-import static com.fintex.ce.util.ReturnFactorScale.SCALE_OF_TWO;
+import static com.fintex.ce.application.util.ReturnFactorScale.SCALE_OF_TWO;
 
 @Service
 public class GrowthOf10KCalculationServiceImpl implements CalculationService<ReturnCommand, Growth10KResult> {

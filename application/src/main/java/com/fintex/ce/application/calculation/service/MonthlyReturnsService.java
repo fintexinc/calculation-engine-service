@@ -5,6 +5,7 @@ import com.fintex.ce.application.returns.MonthlyReturnsGenerator;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.returns.ReturnsCutComponent;
 import com.fintex.ce.application.returns.WeightedAverageComponent;
+import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
 import com.fintex.ce.application.validation.BenchmarkCpsdDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
@@ -16,7 +17,6 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.ReturnFactorScale;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.springframework.stereotype.Service;
