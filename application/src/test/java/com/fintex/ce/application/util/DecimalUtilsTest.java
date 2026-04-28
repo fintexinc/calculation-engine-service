@@ -10,11 +10,11 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static com.fintex.ce.application.util.DecimalUtils.INTERNAL_SCALE;
-import static com.fintex.ce.application.util.DecimalUtils.ROUNDING_MODE;
 import static com.fintex.ce.application.util.DecimalUtils.pow;
 import static com.fintex.ce.application.util.DecimalUtils.toScale;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
+import static com.fintex.ce.model.util.BigDecimalConstants.INTERNAL_SCALE;
+import static com.fintex.ce.model.util.BigDecimalConstants.ROUNDING_MODE;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 

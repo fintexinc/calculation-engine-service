@@ -16,6 +16,10 @@ public record DateRange(LocalDate start, LocalDate end) {
     return start == null && end == null;
   }
 
+  public boolean isBounded() {
+    return start != null && end != null;
+  }
+
   public boolean contains(LocalDate date) {
     return (start == null || !date.isBefore(start))
         && (end == null || !date.isAfter(end));

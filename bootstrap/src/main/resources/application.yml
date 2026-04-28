@@ -9,6 +9,13 @@ spring:
         composite-indicator:
           enabled: false
 
+cache:
+  data:
+    fx-rates:
+      enabled: true
+      max-entries: 4096
+      recency-cutoff-days: 1
+
 external-services:
   bank-of-canada:
     base-url: https://www.bankofcanada.ca/valet

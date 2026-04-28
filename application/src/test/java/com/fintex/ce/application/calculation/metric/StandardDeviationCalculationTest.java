@@ -17,9 +17,9 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.fintex.ce.application.util.DecimalUtils.OUTPUT_SCALE;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
+import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;

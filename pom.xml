@@ -22,6 +22,7 @@
         <module>api</module>
         <module>application</module>
         <module>web-client-adapter</module>
+        <module>cache-adapter</module>
         <module>rest-adapter</module>
         <module>bootstrap</module>
     </modules>
@@ -97,6 +98,11 @@
             <dependency>
                 <groupId>com.fintex</groupId>
                 <artifactId>web-client-adapter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fintex</groupId>
+                <artifactId>cache-adapter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

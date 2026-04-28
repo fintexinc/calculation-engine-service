@@ -32,6 +32,11 @@
         </dependency>
         <dependency>
             <groupId>com.fintex</groupId>
+            <artifactId>cache-adapter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fintex</groupId>
             <artifactId>rest-adapter</artifactId>
             <version>${project.version}</version>
         </dependency>

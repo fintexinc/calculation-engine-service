@@ -18,8 +18,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import static com.fintex.ce.application.util.DecimalUtils.INTERNAL_SCALE;
 import static com.fintex.ce.application.util.DecimalUtils.toScale;
+import static com.fintex.ce.model.util.BigDecimalConstants.INTERNAL_SCALE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 
 @Accessors(chain = true)
