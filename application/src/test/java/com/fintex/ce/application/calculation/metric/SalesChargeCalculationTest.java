@@ -12,7 +12,6 @@ import com.fintex.wm.commons.domain.sales.SalesChargeType;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +20,8 @@ import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.calculation.metric.SalesChargeCalculation.DEFAULT_MAP;
 import static com.fintex.ce.application.calculation.metric.SalesChargeCalculation.DEFAULT_SALES_CHARGE_DTO;
+import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
+import static com.fintex.ce.model.util.BigDecimalConstants.ROUNDING_MODE;
 import static com.fintex.wm.commons.domain.sales.SalesChargeType.DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT;
 import static com.fintex.wm.commons.domain.sales.SalesChargeType.DEFERRED_SALES_CHARGE_ON_MARKET_VALUE;
 import static com.fintex.wm.commons.domain.sales.SalesChargeType.FORMULA_ONE;
@@ -32,10 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SalesChargeTypeCalculationTest {
 
-  private static final int OUTPUT_SCALE = 10;
-
   private static BigDecimal scaled(double val) {
-    return BigDecimal.valueOf(val).setScale(OUTPUT_SCALE, RoundingMode.HALF_UP);
+    return BigDecimal.valueOf(val).setScale(OUTPUT_SCALE, ROUNDING_MODE);
   }
 
   @Test

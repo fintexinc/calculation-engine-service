@@ -30,7 +30,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FxRatesFetcherImplTest {
+class BocFxRatesFetcherTest {
 
   private static final CurrencyExchangePair USD_CAD = new CurrencyExchangePair(Currency.USD, Currency.CAD);
   private static final CurrencyExchangePair CAD_USD = new CurrencyExchangePair(Currency.CAD, Currency.USD);
@@ -46,11 +46,11 @@ class FxRatesFetcherImplTest {
 
   private final BankOfCanadaProperties properties = new BankOfCanadaProperties();
 
-  private FxRatesFetcherImpl fetcher;
+  private BocFxRatesFetcher fetcher;
 
   @BeforeEach
   void setUp() {
-    fetcher = new FxRatesFetcherImpl(client, mapper, properties);
+    fetcher = new BocFxRatesFetcher(client, mapper, properties);
   }
 
   @Test
@@ -166,6 +166,27 @@ class FxRatesFetcherImplTest {
     var result = fetcher.fetch(USD_CAD, DATE_RANGE);
 
     assertThat(result.get(overlapDate)).isEqualByComparingTo("1.3450");
+  }
+
+  @Test
+  void shouldReportPairAsCanonical_whenDirectPairConfigured() {
+    configureCurrencyPair("USD_CAD",
+        source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), null, null));
+
+    assertThat(fetcher.canonicalDirection(USD_CAD)).isEqualTo(USD_CAD);
+  }
+
+  @Test
+  void shouldReportInverseAsCanonical_whenOnlyInversePairConfigured() {
+    configureCurrencyPair("USD_CAD",
+        source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), null, null));
+
+    assertThat(fetcher.canonicalDirection(CAD_USD)).isEqualTo(USD_CAD);
+  }
+
+  @Test
+  void shouldReportPairAsCanonical_whenNeitherDirectionConfigured() {
+    assertThat(fetcher.canonicalDirection(EUR_CAD)).isEqualTo(EUR_CAD);
   }
 
   @Test

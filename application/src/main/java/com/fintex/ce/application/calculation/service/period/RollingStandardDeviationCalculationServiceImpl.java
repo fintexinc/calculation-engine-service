@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.Set;
 
-import static com.fintex.ce.application.util.DecimalUtils.OUTPUT_SCALE;
+import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 
 @Service
 public class RollingStandardDeviationCalculationServiceImpl

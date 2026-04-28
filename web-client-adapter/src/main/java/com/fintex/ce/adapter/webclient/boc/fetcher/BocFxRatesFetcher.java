@@ -13,7 +13,6 @@ import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,9 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import static com.fintex.ce.model.util.BigDecimalConstants.INVERSE_SCALE;
+import static com.fintex.ce.model.util.BigDecimalConstants.ROUNDING_MODE;
 
 /**
  * Fetches historical FX rates from the Bank of Canada Valet API. Implements the {@link FxRatesFetcher} port — the
@@ -36,9 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FxRatesFetcherImpl implements FxRatesFetcher {
+public class BocFxRatesFetcher implements FxRatesFetcher {
 
-  private static final int INVERSE_SCALE = 10;
   private static final String PAIR_SEPARATOR = "_";
 
   private final BankOfCanadaWebClient client;
@@ -75,6 +76,19 @@ public class FxRatesFetcherImpl implements FxRatesFetcher {
     return new TreeMap<>();
   }
 
+  @Override
+  public CurrencyExchangePair canonicalDirection(CurrencyExchangePair pair) {
+    String directKey = pair.from().name() + PAIR_SEPARATOR + pair.to().name();
+    if (properties.getCurrencyPairs().containsKey(directKey)) {
+      return pair;
+    }
+    String inverseKey = pair.to().name() + PAIR_SEPARATOR + pair.from().name();
+    if (properties.getCurrencyPairs().containsKey(inverseKey)) {
+      return pair.inverse();
+    }
+    return pair;
+  }
+
   private NavigableMap<LocalDate, BigDecimal> fetchFromSources(List<FxRateSource> allSources,
       LocalDate startDate, LocalDate endDate) {
     boolean hasDateRange = startDate != null && endDate != null;
@@ -104,7 +118,7 @@ public class FxRatesFetcherImpl implements FxRatesFetcher {
     return rates.entrySet().stream()
         .collect(Collectors.toMap(
             Map.Entry::getKey,
-            e -> BigDecimal.ONE.divide(e.getValue(), INVERSE_SCALE, RoundingMode.HALF_UP),
+            e -> BigDecimal.ONE.divide(e.getValue(), INVERSE_SCALE, ROUNDING_MODE),
             (a, b) -> a,
             TreeMap::new));
   }

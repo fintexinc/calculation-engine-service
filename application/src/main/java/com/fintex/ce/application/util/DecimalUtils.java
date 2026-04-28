@@ -1,20 +1,19 @@
 package com.fintex.ce.application.util;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.model.util.BigDecimalConstants.INTERNAL_SCALE;
+import static com.fintex.ce.model.util.BigDecimalConstants.MATH_CONTEXT;
+import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
+import static com.fintex.ce.model.util.BigDecimalConstants.ROUNDING_MODE;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 
 public class DecimalUtils {
-  public static final int INTERNAL_SCALE = 15;
-  static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
-  public static final int OUTPUT_SCALE = 10;
-  static final MathContext MATH_CONTEXT = new MathContext(INTERNAL_SCALE);
 
   private DecimalUtils() {
   }
