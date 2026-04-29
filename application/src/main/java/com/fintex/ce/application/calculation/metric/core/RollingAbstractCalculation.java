@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric.core;
 
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -23,7 +23,7 @@ public abstract class RollingAbstractCalculation<T extends PeriodResult>
     extends
       PeriodCalculationAbstract<T, NavigableMap<LocalDate, BigDecimal>> {
 
-  protected RollingAbstractCalculation(final CalculationDTO input,
+  protected RollingAbstractCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods) {
     super(input, defaultPeriods);
   }

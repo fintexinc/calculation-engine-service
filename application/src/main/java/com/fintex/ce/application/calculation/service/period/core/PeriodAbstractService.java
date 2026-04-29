@@ -5,10 +5,10 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.calculation.PeriodCalculationService;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.Period;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
 
@@ -45,7 +45,8 @@ public abstract class PeriodAbstractService<E extends PeriodResult, R extends Pe
     return calculationMethod.calculate(command.getPeriods());
   }
 
-  public CalculationDTO buildCalculationDto(final R command, final ReturnFactorScale returnFactorScale) {
+  public PeriodCalculationInput buildPeriodCalculationInput(final R command,
+      final ReturnFactorScale returnFactorScale) {
     final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = monthlyReturnsService
         .getPortfolioMonthlyReturns(
             command.getHoldings(), command.getCurrency(), returnFactorScale);
@@ -53,7 +54,7 @@ public abstract class PeriodAbstractService<E extends PeriodResult, R extends Pe
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
         .getWeightedAverageWithCpedValidation(monthlyReturnsAggregate, command.getCustomPed());
 
-    return new CalculationDTO(command.getCustomIntervalPsd(), portfolioTotalReturns);
+    return new PeriodCalculationInput(command.getCustomIntervalPsd(), portfolioTotalReturns);
   }
 
   public void addSpecificChecks(final PeriodCommand command) {

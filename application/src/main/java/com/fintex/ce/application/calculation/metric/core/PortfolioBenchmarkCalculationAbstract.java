@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric.core;
 
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
 import java.math.BigDecimal;
@@ -20,7 +20,7 @@ abstract class PortfolioBenchmarkCalculationAbstract<T extends PeriodResult>
   public NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn;
   public NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn;
 
-  protected PortfolioBenchmarkCalculationAbstract(final BenchmarkCalculationDTO input,
+  protected PortfolioBenchmarkCalculationAbstract(final BenchmarkPeriodCalculationInput input,
       final Set<String> periods,
       final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn,
       final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn) {

@@ -2,9 +2,9 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.BestWorstPeriodCalculation;
 import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -36,7 +36,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
 
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var portfolioTotalReturns = mock(TreeMap.class);
@@ -45,8 +45,8 @@ class BestWorstPeriodsCalculationServiceImplTest {
 
     final BestWorstPeriodsResult expected = mock(BestWorstPeriodsResult.class);
     when(bestWorstPeriodCalculation.calculate()).thenReturn(expected);
-    when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
     when(sut.buildBestWorstPeriodCalculation(any(), any())).thenReturn(bestWorstPeriodCalculation);
 
@@ -58,26 +58,26 @@ class BestWorstPeriodsCalculationServiceImplTest {
   }
 
   @Test
-  void shouldPerform_whenVerifyBuildWeightedAverageInputDto() {
+  void shouldPerform_whenVerifyBuildWeightedAverageInput() {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
 
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
     final BestWorstPeriodCalculation bestWorstPeriodCalculation = mock(BestWorstPeriodCalculation.class, withSettings()
         .useConstructor(portfolioTotalReturns, Set.of()));
 
-    when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
     when(sut.buildBestWorstPeriodCalculation(any(), any())).thenReturn(bestWorstPeriodCalculation);
 
     doCallRealMethod().when(sut).perform(bestWorstPeriodCommand);
     sut.perform(bestWorstPeriodCommand);
 
-    verify(sut).buildWeightedAverageInputDto(bestWorstPeriodCommand);
+    verify(sut).buildWeightedAverageInput(bestWorstPeriodCommand);
 
   }
 
@@ -86,7 +86,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
 
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
@@ -94,31 +94,31 @@ class BestWorstPeriodsCalculationServiceImplTest {
         .useConstructor(portfolioTotalReturns, Set.of()));
 
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
-    when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
     when(sut.buildBestWorstPeriodCalculation(any(), any())).thenReturn(bestWorstPeriodCalculation);
 
     doCallRealMethod().when(sut).perform(bestWorstPeriodCommand);
     sut.perform(bestWorstPeriodCommand);
 
-    verify(sut).buildBestWorstPeriodCalculation(bestWorstPeriodCommand, calculationDTO);
+    verify(sut).buildBestWorstPeriodCalculation(bestWorstPeriodCommand, context);
   }
 
   @Test
   void shouldBuildBestWorstPeriodCalculation_whenVerifyGetPeriods() {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class);
 
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
 
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
-    when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(sut).buildBestWorstPeriodCalculation(any(), any());
-    sut.buildBestWorstPeriodCalculation(bestWorstPeriodCommand, calculationDTO);
+    sut.buildBestWorstPeriodCalculation(bestWorstPeriodCommand, context);
 
     verify(sut).getPeriods(bestWorstPeriodCommand);
   }
@@ -127,21 +127,21 @@ class BestWorstPeriodsCalculationServiceImplTest {
   void shouldBuildBestWorstPeriodCalculation_whenCheckResult() {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class);
 
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
 
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
-    when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>(Map.of(LocalDate.now(),
+    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>(Map.of(LocalDate.now(),
         BigDecimal.ONE)));
-    final BestWorstPeriodCalculation expected = new BestWorstPeriodCalculation(calculationDTO
+    final BestWorstPeriodCalculation expected = new BestWorstPeriodCalculation(context
         .getWeightedAveragePortfolioReturns(),
         sut.getPeriods(bestWorstPeriodCommand));
 
     doCallRealMethod().when(sut).buildBestWorstPeriodCalculation(any(), any());
     final BestWorstPeriodCalculation actual = sut.buildBestWorstPeriodCalculation(bestWorstPeriodCommand,
-        calculationDTO);
+        context);
 
     assertEquals(expected, actual);
   }
@@ -184,26 +184,26 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var sut = mock(BestWorstPeriodsCalculationServiceImpl.class, withSettings()
         .useConstructor((MonthlyReturnsService) null));
 
-    final var calculationDTO = mock(CalculationDTO.class);
-    when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    final var context = mock(PeriodCalculationInput.class);
+    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
 
     final var bestWorstPeriodCommand = mock(BestWorstPeriodsCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var bestWorstPeriodCalculation = mock(BestWorstPeriodCalculation.class);
-    final var resDTO = mock(BestWorstPeriodsResult.class);
+    final var expected = mock(BestWorstPeriodsResult.class);
 
     when(bestWorstPeriodCommand.getHoldings()).thenReturn(holdings);
     when(bestWorstPeriodCommand.getCurrency()).thenReturn(Currency.CAD);
     when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(1));
     when(sut.buildBestWorstPeriodCalculation(any(), any())).thenReturn(bestWorstPeriodCalculation);
-    when(bestWorstPeriodCalculation.calculate()).thenReturn(resDTO);
+    when(bestWorstPeriodCalculation.calculate()).thenReturn(expected);
 
     doCallRealMethod().when(sut).perform(any());
-    final BestWorstPeriodsResult bestWorstPeriodsResponseDTO = sut.perform(bestWorstPeriodCommand);
+    final BestWorstPeriodsResult result = sut.perform(bestWorstPeriodCommand);
 
-    assertSame(resDTO, bestWorstPeriodsResponseDTO);
+    assertSame(expected, result);
 
   }
 
@@ -221,8 +221,8 @@ class BestWorstPeriodsCalculationServiceImplTest {
     when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
-    sut.buildWeightedAverageInputDto(bestWorstPeriodCommand);
+    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
+    sut.buildWeightedAverageInput(bestWorstPeriodCommand);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
@@ -246,8 +246,8 @@ class BestWorstPeriodsCalculationServiceImplTest {
     when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
-    sut.buildWeightedAverageInputDto(bestWorstPeriodCommand);
+    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
+    sut.buildWeightedAverageInput(bestWorstPeriodCommand);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns,
         LOCAL_DATE_NOW.minusMonths(2), LOCAL_DATE_NOW);
@@ -262,7 +262,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var holdings = List.of(mock(PortfolioHolding.class));
 
     final var portfolioTotalReturns = mock(NavigableMap.class);
-    final var expected = new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
         portfolioTotalReturns);
 
@@ -272,8 +272,8 @@ class BestWorstPeriodsCalculationServiceImplTest {
     when(bestWorstPeriodCommand.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(bestWorstPeriodCommand.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
-    final CalculationDTO actual = sut.buildWeightedAverageInputDto(bestWorstPeriodCommand);
+    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
+    final PeriodCalculationInput actual = sut.buildWeightedAverageInput(bestWorstPeriodCommand);
 
     assertEquals(expected, actual);
   }

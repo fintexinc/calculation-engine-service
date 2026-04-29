@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -19,7 +19,7 @@ import static java.math.BigDecimal.ONE;
 
 public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<TrailingTotalReturnsResult, BigDecimal> {
 
-  public TrailingTotalReturnsCalculation(final CalculationDTO input,
+  public TrailingTotalReturnsCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods) {
     super(input, defaultPeriods);
   }
@@ -43,11 +43,11 @@ public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<T
   }
 
   @Override
-  public TrailingTotalReturnsResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final TrailingTotalReturnsResult trailingTotalReturnsResDTO = new TrailingTotalReturnsResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    trailingTotalReturnsResDTO.setTrailingTotalReturn(timeIntervals);
-    return trailingTotalReturnsResDTO;
+  public TrailingTotalReturnsResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setTrailingTotalReturn(timeIntervals);
+    return result;
   }
 
 }

@@ -63,10 +63,11 @@ public class CountryExposureCalculationImpl extends BreakdownAbstractService<Cou
   }
 
   @Override
-  public ExposureDataHolder<CountryRegionType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
+  public ExposureDataHolder<CountryRegionType> fetchExposures(PortfolioHoldingsCommand command) {
     List<Warning> warnings = new ArrayList<>();
-    Map<PortfolioHolding, CountryExposure> rawData = countryExposureSecurityDataFetcher.fetch(reqDTO.getHoldings(), List
-        .of());
+    Map<PortfolioHolding, CountryExposure> rawData = countryExposureSecurityDataFetcher.fetch(command.getHoldings(),
+        List
+            .of());
     Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
     Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService

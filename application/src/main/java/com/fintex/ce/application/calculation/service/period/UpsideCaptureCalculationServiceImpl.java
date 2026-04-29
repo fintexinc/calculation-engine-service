@@ -4,9 +4,9 @@ import com.fintex.ce.application.calculation.metric.UpsideCaptureCalculation;
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.UpsideCaptureResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -33,9 +33,9 @@ public class UpsideCaptureCalculationServiceImpl
   }
 
   @Override
-  public PeriodCalculationAbstract<UpsideCaptureResult, ?> defineCalculationMethod(final PeriodCommand reqDTO) {
-    final BenchmarkCalculationDTO inDTO = buildCalculationDto(reqDTO, AS_IS);
-    return new UpsideCaptureCalculation(inDTO, defaultPeriods);
+  public PeriodCalculationAbstract<UpsideCaptureResult, ?> defineCalculationMethod(final PeriodCommand command) {
+    final BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command, AS_IS);
+    return new UpsideCaptureCalculation(context, defaultPeriods);
   }
 
 }

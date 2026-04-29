@@ -50,9 +50,9 @@ class IncomeForecastCalculationServiceImplTest {
 
   @Test
   void shouldTestPerform_whenConditionIsMet() {
-    IncomeForecastCommand reqDTO = new IncomeForecastCommand(); // Initialize with some mock data if needed
+    IncomeForecastCommand command = new IncomeForecastCommand(); // Initialize with some mock data if needed
     when(incomeForecastFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
-    IncomeForecastResult response = sut.perform(reqDTO);
+    IncomeForecastResult response = sut.perform(command);
     assertNotNull(response);
   }
   @Test
@@ -78,7 +78,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformFundSeries_whenVerify() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final PortfolioHolding fundSeriesHolding = Mockito.mock(PortfolioHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
@@ -89,14 +89,14 @@ class IncomeForecastCalculationServiceImplTest {
         .thenReturn(Map.of(fundSeriesHolding, incomeForecast));
     Mockito.when(fundSeriesHolding.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     Mockito.when(fundSeriesHolding.getValue()).thenReturn(holdingValue);
-    Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
+    Mockito.when(command.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(fundSeriesHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("FUNDSERV_CODE",
         FiIdentifierType.FUNDSERV));
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -128,7 +128,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformFundSeries_whenVerify2() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final PortfolioHolding fundSeriesHolding = Mockito.mock(PortfolioHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
@@ -139,14 +139,14 @@ class IncomeForecastCalculationServiceImplTest {
         .thenReturn(Map.of(fundSeriesHolding, incomeForecast));
     Mockito.when(fundSeriesHolding.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     Mockito.when(fundSeriesHolding.getValue()).thenReturn(holdingValue);
-    Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
+    Mockito.when(command.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(fundSeriesHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("FUNDSERV_CODE",
         FiIdentifierType.FUNDSERV));
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -176,7 +176,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformFixedIncome_whenVerify() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final PortfolioHolding fixedIncomeHolding = Mockito.mock(PortfolioHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
@@ -187,14 +187,14 @@ class IncomeForecastCalculationServiceImplTest {
         .thenReturn(Map.of(fixedIncomeHolding, incomeForecast));
     Mockito.when(fixedIncomeHolding.getHoldingType()).thenReturn(FinancialInstrumentType.FIXED_INCOME);
     Mockito.when(fixedIncomeHolding.getValue()).thenReturn(holdingValue);
-    Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
+    Mockito.when(command.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(fixedIncomeHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("CUSIP_ID",
         FiIdentifierType.CUSIP));
     Mockito.when(incomeForecast.getDividendYield()).thenReturn(dividendYield);
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -224,7 +224,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformFixedIncomeAtMaturity_whenVerify() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final PortfolioHolding fixedIncomeHolding = Mockito.mock(PortfolioHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal dividendYield = new BigDecimal("0.5");
@@ -234,7 +234,7 @@ class IncomeForecastCalculationServiceImplTest {
         .thenReturn(Map.of(fixedIncomeHolding, incomeForecast));
     Mockito.when(fixedIncomeHolding.getHoldingType()).thenReturn(FinancialInstrumentType.FIXED_INCOME);
     Mockito.when(fixedIncomeHolding.getValue()).thenReturn(holdingValue);
-    Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
+    Mockito.when(command.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(fixedIncomeHolding.getSecurityIdentifier()).thenReturn(new SecurityIdentifier("CUSIP_ID",
         FiIdentifierType.CUSIP));
     Mockito.when(incomeForecast.getSchedule()).thenReturn(null);
@@ -244,7 +244,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(incomeForecast.getPaymentFrequencyType()).thenReturn("AT_MATURITY");
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -261,7 +261,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformGic_whenVerify() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal holdingValue = new BigDecimal(1000);
@@ -271,14 +271,14 @@ class IncomeForecastCalculationServiceImplTest {
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
-    Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
+    Mockito.when(command.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(currentDate);
     Mockito.when(gicHolding.getTerm()).thenReturn(new BigDecimal(36));
     Mockito.when(gicHolding.getInterestFreq()).thenReturn(InterestFreq.ANNUAL);
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -301,7 +301,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformGic_whenVerify2() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal holdingValue = new BigDecimal(1000);
@@ -311,14 +311,14 @@ class IncomeForecastCalculationServiceImplTest {
         .thenReturn(Map.of(gicHolding, incomeForecast));
     Mockito.when(gicHolding.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
     Mockito.when(gicHolding.getValue()).thenReturn(holdingValue);
-    Mockito.when(incomeForecastReqDTO.getTimeIntervalPeriods()).thenReturn(12);
+    Mockito.when(command.getTimeIntervalPeriods()).thenReturn(12);
     Mockito.when(gicHolding.getInvestmentDate()).thenReturn(investmentDate);
     Mockito.when(gicHolding.getTerm()).thenReturn(new BigDecimal(12));
     Mockito.when(gicHolding.getInterestFreq()).thenReturn(InterestFreq.SEMI_ANNUAL);
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -335,7 +335,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformGic_whenVerify3() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal holdingValue = new BigDecimal(1000);
@@ -351,7 +351,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -372,7 +372,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformGic_whenVerify4() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal holdingValue = new BigDecimal(1000);
@@ -388,7 +388,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -409,7 +409,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformGic_whenVerify5() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal holdingValue = new BigDecimal(1000);
@@ -425,7 +425,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -446,7 +446,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformGic_whenVerify6() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal holdingValue = new BigDecimal(1000);
@@ -462,7 +462,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -483,7 +483,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformGic_whenVerify7() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal holdingValue = new BigDecimal(1000);
@@ -499,7 +499,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -516,7 +516,7 @@ class IncomeForecastCalculationServiceImplTest {
   @Test
   void shouldPerformGic_whenVerify8() {
     // SETUP
-    final IncomeForecastCommand incomeForecastReqDTO = Mockito.mock(IncomeForecastCommand.class);
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
     final GicHolding gicHolding = Mockito.mock(GicHolding.class);
     final IncomeForecast incomeForecast = Mockito.mock(IncomeForecast.class);
     final BigDecimal holdingValue = new BigDecimal(1000);
@@ -532,7 +532,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(incomeForecastReqDTO);
+    final IncomeForecastResult result = sut.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);

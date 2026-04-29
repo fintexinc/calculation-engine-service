@@ -44,21 +44,21 @@ public class ManagementFeeCalculationServiceImpl
 
   @Override
   protected void setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(final ManagementFeeResult response,
-      final AverageMerCommand reqDTO) {
-    setNullForScaledIfHoldingContainsNoFunds(response.getManagementFee(), reqDTO);
+      final AverageMerCommand command) {
+    setNullForScaledIfHoldingContainsNoFunds(response.getManagementFee(), command);
   }
 
   @Override
   public Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> fetchData(
-      final AverageMerCommand reqDTO) {
+      final AverageMerCommand command) {
     Map<PortfolioHolding, FeeData> rawData = feesSecurityDataFetcher.fetch(
-        reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
-    return groupAndMap(rawData, reqDTO.getHoldings());
+        command.getHoldings(),
+        getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
+    return groupAndMap(rawData, command.getHoldings());
   }
 
   @Override
-  protected AverageManagementExpenseCalculation mapFeeDataToDto(PortfolioHolding holding, FeeData fees) {
+  protected AverageManagementExpenseCalculation mapFeeDataToCalculation(PortfolioHolding holding, FeeData fees) {
     return AverageManagementExpenseCalculation.builder()
         .marketValue(holding.getValue())
         .holdingType(holding.getHoldingType())
@@ -79,12 +79,12 @@ public class ManagementFeeCalculationServiceImpl
   }
 
   public Optional<List<Warning>> validateManagementFee(
-      AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
+      AverageManagementExpenseCalculation averageManagementExpenseCalculation,
       PortfolioHolding holding) {
-    if (Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
+    if (Objects.isNull(averageManagementExpenseCalculation.getActualManagementFee())) {
       throw MISSING_MANAGEMENT_FEE.toExceptionForHolding(holding);
     }
-    setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+    setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
         .getActualManagementFee());
     return Optional.empty();
   }
@@ -92,15 +92,15 @@ public class ManagementFeeCalculationServiceImpl
   @Override
   public ManagementFeeResult calculateAverageValue(List<ParameterType> parameterTypes,
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
-    final var resDTO = new ManagementFeeResult();
+    final var result = new ManagementFeeResult();
     if (parameterTypes.contains(SCALED)) {
       final BigDecimal scaledAverageMer = getScaledAverageMer(averageMerCalculationDtos);
-      resDTO.getManagementFee().put(SCALED, scaledAverageMer);
+      result.getManagementFee().put(SCALED, scaledAverageMer);
     }
     if (parameterTypes.contains(ABSOLUTE)) {
       final BigDecimal absoluteAverageMer = getAbsoluteAverageMer(averageMerCalculationDtos);
-      resDTO.getManagementFee().put(ABSOLUTE, absoluteAverageMer);
+      result.getManagementFee().put(ABSOLUTE, absoluteAverageMer);
     }
-    return resDTO;
+    return result;
   }
 }

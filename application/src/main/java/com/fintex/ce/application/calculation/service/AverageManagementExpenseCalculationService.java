@@ -46,24 +46,25 @@ public abstract class AverageManagementExpenseCalculationService<R extends BaseC
    * Maps FeeData to AverageManagementExpenseCalculation. Subclasses implement this to define which fee fields to
    * extract.
    */
-  protected abstract AverageManagementExpenseCalculation mapFeeDataToDto(PortfolioHolding holding, FeeData fees);
+  protected abstract AverageManagementExpenseCalculation mapFeeDataToCalculation(PortfolioHolding holding,
+      FeeData fees);
 
   protected abstract Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> fetchData(
       final AverageMerCommand command);
 
   /**
-   * Groups raw fee data by holding type and maps to calculation DTOs. Holdings without fee data get a default DTO with
-   * zero fees.
+   * Groups raw fee data by holding type and maps to calculation entries. Holdings without fee data get a default entry
+   * with zero fees.
    */
   protected Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupAndMap(
       Map<PortfolioHolding, FeeData> rawData, List<? extends PortfolioHolding> holdings) {
 
     final Stream<Map.Entry<PortfolioHolding, AverageManagementExpenseCalculation>> fetched = rawData.entrySet().stream()
-        .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), mapFeeDataToDto(e.getKey(), e.getValue())));
+        .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), mapFeeDataToCalculation(e.getKey(), e.getValue())));
 
     final Stream<Map.Entry<PortfolioHolding, AverageManagementExpenseCalculation>> defaults = holdings.stream()
         .filter(holding -> !rawData.containsKey(holding))
-        .map(holding -> new AbstractMap.SimpleEntry<>(holding, createDefaultDto(holding)));
+        .map(holding -> new AbstractMap.SimpleEntry<>(holding, createDefaultCalculation(holding)));
 
     return Stream.concat(fetched, defaults)
         .collect(Collectors.groupingBy(
@@ -72,7 +73,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends BaseC
             Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
-  private AverageManagementExpenseCalculation createDefaultDto(PortfolioHolding holding) {
+  private AverageManagementExpenseCalculation createDefaultCalculation(PortfolioHolding holding) {
     return AverageManagementExpenseCalculation.builder()
         .marketValue(holding.getValue())
         .holdingType(holding.getHoldingType())
@@ -92,16 +93,16 @@ public abstract class AverageManagementExpenseCalculationService<R extends BaseC
 
   @Override
   public R perform(final AverageMerCommand command) {
-    final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> averageMerCalculationDTOs = fetchData(
+    final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> averageMerCalculationDtos = fetchData(
         command);
 
-    final List<Warning> warnings = setInitialFeeAndModifiedFeeValues(averageMerCalculationDTOs);
-    final var resultDTO = calculateAverageValue(getSpecifiedIfEmpty(command.getParameterTypes(), SCALED, ABSOLUTE),
-        averageMerCalculationDTOs);
+    final List<Warning> warnings = setInitialFeeAndModifiedFeeValues(averageMerCalculationDtos);
+    final var result = calculateAverageValue(getSpecifiedIfEmpty(command.getParameterTypes(), SCALED, ABSOLUTE),
+        averageMerCalculationDtos);
 
-    resultDTO.setWarnings(warnings);
-    setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(resultDTO, command);
-    return resultDTO;
+    result.setWarnings(warnings);
+    setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(result, command);
+    return result;
   }
 
   public void setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(
@@ -127,10 +128,10 @@ public abstract class AverageManagementExpenseCalculationService<R extends BaseC
     }
   }
 
-  public void setFeeValues(final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
+  public void setFeeValues(final AverageManagementExpenseCalculation averageManagementExpenseCalculation,
       final BigDecimal managementExpenseRatio) {
-    averageManagementExpenseCalculationDTO.setInitialFee(managementExpenseRatio);
-    averageManagementExpenseCalculationDTO.setModifiedFee(managementExpenseRatio);
+    averageManagementExpenseCalculation.setInitialFee(managementExpenseRatio);
+    averageManagementExpenseCalculation.setModifiedFee(managementExpenseRatio);
   }
 
   public BigDecimal getScaledAverageMer(
@@ -177,49 +178,49 @@ public abstract class AverageManagementExpenseCalculationService<R extends BaseC
   }
 
   public BigDecimal getAverageMerByParameterType(
-      final List<AverageManagementExpenseCalculation> merCalculationDTOList) {
-    final BigDecimal amountOfMarketValues = getAmountOfMarketValues(merCalculationDTOList);
+      final List<AverageManagementExpenseCalculation> merCalculationDtoList) {
+    final BigDecimal amountOfMarketValues = getAmountOfMarketValues(merCalculationDtoList);
     final BigDecimal[] averageManagementExpenseRatio = {BigDecimal.ZERO};
-    merCalculationDTOList.forEach(merCalculationDTO -> {
-      calculateMarketValueQualified(merCalculationDTO);
-      calculatePercentageQualified(merCalculationDTO, amountOfMarketValues);
+    merCalculationDtoList.forEach(merCalculation -> {
+      calculateMarketValueQualified(merCalculation);
+      calculatePercentageQualified(merCalculation, amountOfMarketValues);
       averageManagementExpenseRatio[0] = calculateAverageManagementExpenseRatio(averageManagementExpenseRatio[0],
-          merCalculationDTO);
+          merCalculation);
     });
     return toUserScale(averageManagementExpenseRatio[0]);
   }
 
   public BigDecimal getAmountOfMarketValues(
-      final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDTOList) {
-    return averageManagementExpenseCalculationDTOList.stream().map(
+      final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList) {
+    return averageManagementExpenseCalculationDtoList.stream().map(
         AverageManagementExpenseCalculation::getMarketValue).reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
   public void calculateMarketValueQualified(
-      final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO) {
-    if (Objects.isNull(averageManagementExpenseCalculationDTO.getModifiedFee())) {
-      averageManagementExpenseCalculationDTO.setMarketValueQualified(ZERO);
+      final AverageManagementExpenseCalculation averageManagementExpenseCalculation) {
+    if (Objects.isNull(averageManagementExpenseCalculation.getModifiedFee())) {
+      averageManagementExpenseCalculation.setMarketValueQualified(ZERO);
     } else {
-      averageManagementExpenseCalculationDTO.setMarketValueQualified(averageManagementExpenseCalculationDTO
+      averageManagementExpenseCalculation.setMarketValueQualified(averageManagementExpenseCalculation
           .getMarketValue());
     }
   }
 
   public void calculatePercentageQualified(
-      final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
+      final AverageManagementExpenseCalculation averageManagementExpenseCalculation,
       final BigDecimal amountOfMarketValues) {
-    if (Objects.nonNull(averageManagementExpenseCalculationDTO.getMarketValueQualified())
-        && !averageManagementExpenseCalculationDTO.getMarketValueQualified().equals(BigDecimal.ZERO)) {
-      averageManagementExpenseCalculationDTO.setPercentageQualified(divide(averageManagementExpenseCalculationDTO
+    if (Objects.nonNull(averageManagementExpenseCalculation.getMarketValueQualified())
+        && !averageManagementExpenseCalculation.getMarketValueQualified().equals(BigDecimal.ZERO)) {
+      averageManagementExpenseCalculation.setPercentageQualified(divide(averageManagementExpenseCalculation
           .getMarketValueQualified(), amountOfMarketValues));
     }
   }
 
   public BigDecimal calculateAverageManagementExpenseRatio(final BigDecimal currentAverageManagementExpenseRatio,
-      final AverageManagementExpenseCalculation merCalculationDTO) {
-    if (Objects.nonNull(merCalculationDTO.getModifiedFee()) && Objects.nonNull(merCalculationDTO
+      final AverageManagementExpenseCalculation merCalculation) {
+    if (Objects.nonNull(merCalculation.getModifiedFee()) && Objects.nonNull(merCalculation
         .getPercentageQualified())) {
-      return currentAverageManagementExpenseRatio.add(merCalculationDTO.getModifiedFee().multiply(merCalculationDTO
+      return currentAverageManagementExpenseRatio.add(merCalculation.getModifiedFee().multiply(merCalculation
           .getPercentageQualified()));
     }
     return currentAverageManagementExpenseRatio;

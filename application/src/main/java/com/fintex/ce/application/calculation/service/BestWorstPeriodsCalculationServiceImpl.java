@@ -3,9 +3,9 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.metric.BestWorstPeriodCalculation;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,31 +41,31 @@ public class BestWorstPeriodsCalculationServiceImpl
   }
 
   @Override
-  public BestWorstPeriodsResult perform(final BestWorstPeriodsCommand reqDTO) {
-    final CalculationDTO inputDTO = buildWeightedAverageInputDto(reqDTO);
-    return buildBestWorstPeriodCalculation(reqDTO, inputDTO).calculate();
+  public BestWorstPeriodsResult perform(final BestWorstPeriodsCommand command) {
+    final PeriodCalculationInput context = buildWeightedAverageInput(command);
+    return buildBestWorstPeriodCalculation(command, context).calculate();
   }
 
-  public BestWorstPeriodCalculation buildBestWorstPeriodCalculation(BestWorstPeriodsCommand reqDTO,
-      CalculationDTO inputDTO) {
-    return new BestWorstPeriodCalculation(inputDTO.getWeightedAveragePortfolioReturns(), getPeriods(reqDTO));
+  public BestWorstPeriodCalculation buildBestWorstPeriodCalculation(BestWorstPeriodsCommand command,
+      PeriodCalculationInput context) {
+    return new BestWorstPeriodCalculation(context.getWeightedAveragePortfolioReturns(), getPeriods(command));
   }
 
-  public CalculationDTO buildWeightedAverageInputDto(final BestWorstPeriodsCommand reqDTO) {
-    final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO
-        .getHoldings(), reqDTO
+  public PeriodCalculationInput buildWeightedAverageInput(final BestWorstPeriodsCommand command) {
+    final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(command
+        .getHoldings(), command
             .getCurrency(), SCALE_OF_TWO);
 
     final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new CalculationDTO().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns);
+    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns);
   }
 
-  public Set<Long> getPeriods(final BestWorstPeriodsCommand reqDTO) {
-    return !isEmpty(reqDTO.getBestWorstTimeIntervalPeriods())
-        ? reqDTO.getBestWorstTimeIntervalPeriods()
+  public Set<Long> getPeriods(final BestWorstPeriodsCommand command) {
+    return !isEmpty(command.getBestWorstTimeIntervalPeriods())
+        ? command.getBestWorstTimeIntervalPeriods()
         : defaultPeriods;
   }
 

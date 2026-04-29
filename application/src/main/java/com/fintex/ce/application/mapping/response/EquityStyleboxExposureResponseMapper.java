@@ -61,7 +61,7 @@ public class EquityStyleboxExposureResponseMapper
    *          the calculated net product values per stylebox type
    * @param warnings
    *          list of warnings to include in response
-   * @return the response DTO with scaled values
+   * @return the result with scaled values
    */
   public EquityStyleboxExposureResult fromNetProducts(Map<StyleBoxType, BigDecimal> netProducts,
       List<Warning> warnings) {

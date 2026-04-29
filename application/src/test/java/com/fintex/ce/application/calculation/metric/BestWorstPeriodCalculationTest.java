@@ -38,9 +38,9 @@ class BestWorstPeriodCalculationTest {
     final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     doCallRealMethod().when(sut).calculate();
-    final BestWorstPeriodsResult responseDTO = sut.calculate();
+    final BestWorstPeriodsResult result = sut.calculate();
 
-    assertNull(responseDTO);
+    assertNull(result);
   }
 
   @Test
@@ -83,17 +83,17 @@ class BestWorstPeriodCalculationTest {
     doNothing().when(sut).calculateBestWorstPeriodValues(any(), any());
 
     doCallRealMethod().when(sut).calculate();
-    final BestWorstPeriodsResult responseDTO = sut.calculate();
+    final BestWorstPeriodsResult result = sut.calculate();
 
-    assertEquals(responseDTO.getPerformanceEndDate(), LocalDate.of(2020, 12, 31));
-    assertEquals(responseDTO.getPerformanceStartDate(), LocalDate.of(2019, 12, 31));
-    Assertions.assertTrue(responseDTO.getBestWorstPeriods().getNumberOfPeriods().isEmpty());
-    Assertions.assertTrue(responseDTO.getBestWorstPeriods().getAverage().isEmpty());
-    Assertions.assertTrue(responseDTO.getBestWorstPeriods().getBestPeriodDate().isEmpty());
-    Assertions.assertTrue(responseDTO.getBestWorstPeriods().getBestPeriodPct().isEmpty());
-    Assertions.assertTrue(responseDTO.getBestWorstPeriods().getPctPositive().isEmpty());
-    Assertions.assertTrue(responseDTO.getBestWorstPeriods().getWorstPeriodDate().isEmpty());
-    Assertions.assertTrue(responseDTO.getBestWorstPeriods().getWorstPeriodPct().isEmpty());
+    assertEquals(result.getPerformanceEndDate(), LocalDate.of(2020, 12, 31));
+    assertEquals(result.getPerformanceStartDate(), LocalDate.of(2019, 12, 31));
+    Assertions.assertTrue(result.getBestWorstPeriods().getNumberOfPeriods().isEmpty());
+    Assertions.assertTrue(result.getBestWorstPeriods().getAverage().isEmpty());
+    Assertions.assertTrue(result.getBestWorstPeriods().getBestPeriodDate().isEmpty());
+    Assertions.assertTrue(result.getBestWorstPeriods().getBestPeriodPct().isEmpty());
+    Assertions.assertTrue(result.getBestWorstPeriods().getPctPositive().isEmpty());
+    Assertions.assertTrue(result.getBestWorstPeriods().getWorstPeriodDate().isEmpty());
+    Assertions.assertTrue(result.getBestWorstPeriods().getWorstPeriodPct().isEmpty());
   }
 
   @Test
@@ -272,9 +272,9 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).calculateNumberOfPeriods(any(), any());
     sut.calculateNumberOfPeriods(12L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getNumberOfPeriods().isEmpty());
-    assertEquals(12L, sut.bestWorstPeriodDTO.getNumberOfPeriods().get(0).getPeriod());
-    assertEquals(BigDecimal.valueOf(13), sut.bestWorstPeriodDTO.getNumberOfPeriods().get(0).getValue());
+    assertFalse(sut.bestWorstPeriodData.getNumberOfPeriods().isEmpty());
+    assertEquals(12L, sut.bestWorstPeriodData.getNumberOfPeriods().get(0).getPeriod());
+    assertEquals(BigDecimal.valueOf(13), sut.bestWorstPeriodData.getNumberOfPeriods().get(0).getValue());
   }
 
   @Test
@@ -290,10 +290,10 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).annualize(any(), any());
     sut.calculateAverage(3L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getAverage().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getAverage().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("1.011499443237")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getAverage().get(0).getValue()));
-    assertEquals(3L, sut.bestWorstPeriodDTO.getAverage().get(0).getPeriod());
+        sut.bestWorstPeriodData.getAverage().get(0).getValue()));
+    assertEquals(3L, sut.bestWorstPeriodData.getAverage().get(0).getPeriod());
   }
 
   @Test
@@ -319,10 +319,10 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).annualize(any(), any());
     sut.calculateAverage(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getAverage().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getAverage().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.418273402146778")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getAverage().get(0).getValue()));
-    assertEquals(24L, sut.bestWorstPeriodDTO.getAverage().get(0).getPeriod());
+        sut.bestWorstPeriodData.getAverage().get(0).getValue()));
+    assertEquals(24L, sut.bestWorstPeriodData.getAverage().get(0).getPeriod());
   }
 
   @Test
@@ -347,15 +347,15 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).annualize(any(), any());
     sut.calculateBestPeriodValue(6L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getBestPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getBestPeriodDate().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getBestPeriodPct().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getBestPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("1.03431353421321")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getBestPeriodPct().get(0).getValue()));
-    assertEquals(6L, sut.bestWorstPeriodDTO.getBestPeriodPct().get(0).getPeriod());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getPeriod());
-    assertEquals(LocalDate.of(2020, 03, 31), sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getInterval()
+        sut.bestWorstPeriodData.getBestPeriodPct().get(0).getValue()));
+    assertEquals(6L, sut.bestWorstPeriodData.getBestPeriodPct().get(0).getPeriod());
+    assertEquals(6L, sut.bestWorstPeriodData.getBestPeriodDate().get(0).getPeriod());
+    assertEquals(LocalDate.of(2020, 03, 31), sut.bestWorstPeriodData.getBestPeriodDate().get(0).getInterval()
         .getEndDate());
-    assertEquals(LocalDate.of(2019, 10, 1), sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getInterval()
+    assertEquals(LocalDate.of(2019, 10, 1), sut.bestWorstPeriodData.getBestPeriodDate().get(0).getInterval()
         .getStartDate());
   }
 
@@ -369,15 +369,15 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).annualize(any(), any());
     sut.calculateBestPeriodValue(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getBestPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getBestPeriodDate().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getBestPeriodPct().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getBestPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.426293635340637")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getBestPeriodPct().get(0).getValue()));
-    assertEquals(24L, sut.bestWorstPeriodDTO.getBestPeriodPct().get(0).getPeriod());
-    assertEquals(24L, sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getPeriod());
-    assertEquals(LocalDate.of(2020, 03, 31), sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getInterval()
+        sut.bestWorstPeriodData.getBestPeriodPct().get(0).getValue()));
+    assertEquals(24L, sut.bestWorstPeriodData.getBestPeriodPct().get(0).getPeriod());
+    assertEquals(24L, sut.bestWorstPeriodData.getBestPeriodDate().get(0).getPeriod());
+    assertEquals(LocalDate.of(2020, 03, 31), sut.bestWorstPeriodData.getBestPeriodDate().get(0).getInterval()
         .getEndDate());
-    assertEquals(LocalDate.of(2018, 04, 1), sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getInterval()
+    assertEquals(LocalDate.of(2018, 04, 1), sut.bestWorstPeriodData.getBestPeriodDate().get(0).getInterval()
         .getStartDate());
   }
 
@@ -393,15 +393,15 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).annualize(any(), any());
     sut.calculateBestPeriodValue(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getBestPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getBestPeriodDate().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getBestPeriodPct().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getBestPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.426293635340637")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getBestPeriodPct().get(0).getValue()));
-    assertEquals(24L, sut.bestWorstPeriodDTO.getBestPeriodPct().get(0).getPeriod());
-    assertEquals(24L, sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getPeriod());
-    assertEquals(LocalDate.of(2020, 12, 31), sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getInterval()
+        sut.bestWorstPeriodData.getBestPeriodPct().get(0).getValue()));
+    assertEquals(24L, sut.bestWorstPeriodData.getBestPeriodPct().get(0).getPeriod());
+    assertEquals(24L, sut.bestWorstPeriodData.getBestPeriodDate().get(0).getPeriod());
+    assertEquals(LocalDate.of(2020, 12, 31), sut.bestWorstPeriodData.getBestPeriodDate().get(0).getInterval()
         .getEndDate());
-    assertEquals(LocalDate.of(2019, 1, 1), sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getInterval()
+    assertEquals(LocalDate.of(2019, 1, 1), sut.bestWorstPeriodData.getBestPeriodDate().get(0).getInterval()
         .getStartDate());
   }
 
@@ -417,15 +417,15 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).annualize(any(), any());
     sut.calculateWorstPeriodValue(6L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getWorstPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getWorstPeriodDate().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.994895485347306")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getWorstPeriodPct().get(0).getValue()));
-    assertEquals(6L, sut.bestWorstPeriodDTO.getWorstPeriodPct().get(0).getPeriod());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getPeriod());
-    assertEquals(LocalDate.of(2020, 1, 31), sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getInterval()
+        sut.bestWorstPeriodData.getWorstPeriodPct().get(0).getValue()));
+    assertEquals(6L, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).getPeriod());
+    assertEquals(6L, sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getPeriod());
+    assertEquals(LocalDate.of(2020, 1, 31), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getInterval()
         .getEndDate());
-    assertEquals(LocalDate.of(2019, 8, 1), sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getInterval()
+    assertEquals(LocalDate.of(2019, 8, 1), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getInterval()
         .getStartDate());
   }
 
@@ -440,15 +440,15 @@ class BestWorstPeriodCalculationTest {
 
     sut.calculateWorstPeriodValue(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getWorstPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getWorstPeriodDate().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.412407690911978")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getWorstPeriodPct().get(0).getValue()));
-    assertEquals(24L, sut.bestWorstPeriodDTO.getWorstPeriodPct().get(0).getPeriod());
-    assertEquals(24L, sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getPeriod());
-    assertEquals(LocalDate.of(2020, 1, 31), sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getInterval()
+        sut.bestWorstPeriodData.getWorstPeriodPct().get(0).getValue()));
+    assertEquals(24L, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).getPeriod());
+    assertEquals(24L, sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getPeriod());
+    assertEquals(LocalDate.of(2020, 1, 31), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getInterval()
         .getEndDate());
-    assertEquals(LocalDate.of(2018, 2, 1), sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getInterval()
+    assertEquals(LocalDate.of(2018, 2, 1), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getInterval()
         .getStartDate());
   }
 
@@ -464,15 +464,15 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).annualize(any(), any());
     sut.calculateWorstPeriodValue(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getWorstPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getWorstPeriodDate().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.412407690911978")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getWorstPeriodPct().get(0).getValue()));
-    assertEquals(24L, sut.bestWorstPeriodDTO.getWorstPeriodPct().get(0).getPeriod());
-    assertEquals(24L, sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getPeriod());
-    assertEquals(LocalDate.of(2020, 12, 31), sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getInterval()
+        sut.bestWorstPeriodData.getWorstPeriodPct().get(0).getValue()));
+    assertEquals(24L, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).getPeriod());
+    assertEquals(24L, sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getPeriod());
+    assertEquals(LocalDate.of(2020, 12, 31), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getInterval()
         .getEndDate());
-    assertEquals(LocalDate.of(2019, 1, 1), sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getInterval()
+    assertEquals(LocalDate.of(2019, 1, 1), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getInterval()
         .getStartDate());
   }
 
@@ -501,9 +501,9 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).calculatePositive(any(), any());
     sut.calculatePositive(6L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getPctPositive().isEmpty());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getPctPositive().get(0).getPeriod());
-    assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(1)), DecimalUtils.toUserScale(sut.bestWorstPeriodDTO
+    assertFalse(sut.bestWorstPeriodData.getPctPositive().isEmpty());
+    assertEquals(6L, sut.bestWorstPeriodData.getPctPositive().get(0).getPeriod());
+    assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(1)), DecimalUtils.toUserScale(sut.bestWorstPeriodData
         .getPctPositive().get(0).getValue()));
   }
 
@@ -520,10 +520,10 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).calculatePositive(any(), any());
     sut.calculatePositive(6L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodDTO.getPctPositive().isEmpty());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getPctPositive().get(0).getPeriod());
+    assertFalse(sut.bestWorstPeriodData.getPctPositive().isEmpty());
+    assertEquals(6L, sut.bestWorstPeriodData.getPctPositive().get(0).getPeriod());
     assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(0.846153846153846)), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodDTO.getPctPositive().get(0).getValue()));
+        sut.bestWorstPeriodData.getPctPositive().get(0).getValue()));
   }
 
   @Test
@@ -531,7 +531,7 @@ class BestWorstPeriodCalculationTest {
     final var portfolioReturns = getPortfolioReturns();
     final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
-    sut.bestWorstPeriodDTO.getNumberOfPeriods().add(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
+    sut.bestWorstPeriodData.getNumberOfPeriods().add(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
 
     doCallRealMethod().when(sut).getNumberOfPeriodsByPeriod(any());
     final PeriodValueResult numberOfPeriodsByPeriod = sut.getNumberOfPeriodsByPeriod(6L);
@@ -559,27 +559,27 @@ class BestWorstPeriodCalculationTest {
     doCallRealMethod().when(sut).addDefaultValues(any());
     sut.addDefaultValues(6L);
 
-    assertFalse(sut.bestWorstPeriodDTO.getPctPositive().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getWorstPeriodDate().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getWorstPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getBestPeriodDate().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getBestPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getNumberOfPeriods().isEmpty());
-    assertFalse(sut.bestWorstPeriodDTO.getAverage().isEmpty());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getPctPositive().get(0).getPeriod());
-    assertEquals(null, sut.bestWorstPeriodDTO.getPctPositive().get(0).getValue());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getPeriod());
-    assertNull(sut.bestWorstPeriodDTO.getWorstPeriodDate().get(0).getInterval());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getWorstPeriodPct().get(0).getPeriod());
-    assertEquals(null, sut.bestWorstPeriodDTO.getWorstPeriodPct().get(0).getValue());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getPeriod());
-    assertNull(sut.bestWorstPeriodDTO.getBestPeriodDate().get(0).getInterval());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getBestPeriodPct().get(0).getPeriod());
-    assertEquals(null, sut.bestWorstPeriodDTO.getBestPeriodPct().get(0).getValue());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getNumberOfPeriods().get(0).getPeriod());
-    assertEquals(ZERO, sut.bestWorstPeriodDTO.getNumberOfPeriods().get(0).getValue());
-    assertEquals(6L, sut.bestWorstPeriodDTO.getAverage().get(0).getPeriod());
-    assertEquals(null, sut.bestWorstPeriodDTO.getAverage().get(0).getValue());
+    assertFalse(sut.bestWorstPeriodData.getPctPositive().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getBestPeriodDate().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getBestPeriodPct().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getNumberOfPeriods().isEmpty());
+    assertFalse(sut.bestWorstPeriodData.getAverage().isEmpty());
+    assertEquals(6L, sut.bestWorstPeriodData.getPctPositive().get(0).getPeriod());
+    assertEquals(null, sut.bestWorstPeriodData.getPctPositive().get(0).getValue());
+    assertEquals(6L, sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getPeriod());
+    assertNull(sut.bestWorstPeriodData.getWorstPeriodDate().get(0).getInterval());
+    assertEquals(6L, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).getPeriod());
+    assertEquals(null, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).getValue());
+    assertEquals(6L, sut.bestWorstPeriodData.getBestPeriodDate().get(0).getPeriod());
+    assertNull(sut.bestWorstPeriodData.getBestPeriodDate().get(0).getInterval());
+    assertEquals(6L, sut.bestWorstPeriodData.getBestPeriodPct().get(0).getPeriod());
+    assertEquals(null, sut.bestWorstPeriodData.getBestPeriodPct().get(0).getValue());
+    assertEquals(6L, sut.bestWorstPeriodData.getNumberOfPeriods().get(0).getPeriod());
+    assertEquals(ZERO, sut.bestWorstPeriodData.getNumberOfPeriods().get(0).getValue());
+    assertEquals(6L, sut.bestWorstPeriodData.getAverage().get(0).getPeriod());
+    assertEquals(null, sut.bestWorstPeriodData.getAverage().get(0).getValue());
   }
 
   private TreeMap<LocalDate, BigDecimal> getPortfolioReturns() {

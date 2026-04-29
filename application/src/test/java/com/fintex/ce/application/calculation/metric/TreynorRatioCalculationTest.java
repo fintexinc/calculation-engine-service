@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ class TreynorRatioCalculationTest {
     final var beta = mock(BetaCalculation.class);
     final var tBills = mock(TreeMap.class);
     final var sut = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(CalculationDTO.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
 
     when(sut.getPortfolioTotalReturns()).thenReturn(tBills);
     when(tBills.size()).thenReturn(TWELVE);
@@ -55,7 +55,7 @@ class TreynorRatioCalculationTest {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
     final var sut = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(CalculationDTO.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
@@ -74,7 +74,7 @@ class TreynorRatioCalculationTest {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
     final var sut = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(CalculationDTO.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
@@ -93,7 +93,7 @@ class TreynorRatioCalculationTest {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
     final var sut = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(CalculationDTO.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
@@ -113,7 +113,7 @@ class TreynorRatioCalculationTest {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
     final var sut = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(CalculationDTO.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
@@ -146,18 +146,18 @@ class TreynorRatioCalculationTest {
   @Test
   void shouldMapIntervalResults_whenDefiningResponseType() {
     final var sut = mock(TreynorRatioCalculation.class);
-    final var result = Set.of(Pair.of("2015-01-01", ZERO), Pair.of("2018-02-02", ONE));
+    final var pairs = Set.of(Pair.of("2015-01-01", ZERO), Pair.of("2018-02-02", ONE));
 
-    final var intervalResDto = new TimeIntervalResult("2015-01-01", ZERO);
-    final var intervalResDto1 = new TimeIntervalResult("2018-02-02", ONE);
-    final var expected = Set.of(intervalResDto, intervalResDto1);
+    final var interval1 = new TimeIntervalResult("2015-01-01", ZERO);
+    final var interval2 = new TimeIntervalResult("2018-02-02", ONE);
+    final var expected = Set.of(interval1, interval2);
 
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
     doCallRealMethod().when(sut).defineResponseType(anySet());
 
-    final TreynorRatioResult sortinoRatioResDTO = sut.defineResponseType(result);
+    final TreynorRatioResult result = sut.defineResponseType(pairs);
 
-    assertEquals(expected, sortinoRatioResDTO.getTreynorRatio());
+    assertEquals(expected, result.getTreynorRatio());
   }
 
   @Test

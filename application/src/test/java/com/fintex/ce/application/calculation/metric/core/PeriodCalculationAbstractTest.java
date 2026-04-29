@@ -4,11 +4,11 @@ import com.fintex.ce.application.calculation.metric.BetaCalculation;
 import com.fintex.ce.application.calculation.metric.ExcessReturnsCalculation;
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.util.ComparisonUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.input.WeightedAverageInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
-import com.fintex.ce.model.dto.calculation.WeightedAverageInputDTO;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -61,7 +61,7 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldAddSinceCustomIntervalPeriod_whenSinceCustomIntervalStartDateIsValid() {
-    final CalculationDTO w = mock(CalculationDTO.class);
+    final PeriodCalculationInput w = mock(PeriodCalculationInput.class);
     when(w.getCipsd()).thenReturn(null);
     final PeriodCalculationAbstract p = new TrailingTotalReturnsCalculation(w, Set.of());
 
@@ -89,7 +89,7 @@ class PeriodCalculationAbstractTest {
   void shouldCalculateFromCustomIntervalStartDate_whenSinceCustomIntervalPeriodRequested() {
     final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final WeightedAverageInputDTO w = mock(WeightedAverageInputDTO.class);
+    final WeightedAverageInput w = mock(WeightedAverageInput.class);
     when(w.getCipsd()).thenReturn(LocalDate.now());
 
     when(p.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(false);
@@ -137,10 +137,10 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldDelegateToCalculatePeriodForNumberOfMonths_whenCalculatingSinceCustomInterval() {
-    final var inputDTO = mock(CalculationDTO.class);
-    when(inputDTO.getCipsd()).thenReturn(LOCAL_DATE_NOW);
+    final var context = mock(PeriodCalculationInput.class);
+    when(context.getCipsd()).thenReturn(LOCAL_DATE_NOW);
     final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
-        withSettings().useConstructor(inputDTO, null));
+        withSettings().useConstructor(context, null));
 
     p.portfolioTotalReturns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE, LOCAL_DATE_NOW.plusMonths(2), ONE));
 
@@ -257,7 +257,7 @@ class PeriodCalculationAbstractTest {
   void shouldReturnDefaultPeriods_whenInputPeriodsEmpty() {
     final Set<String> periods = Set.of("3");
     final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
-        withSettings().useConstructor(mock(CalculationDTO.class), periods));
+        withSettings().useConstructor(mock(PeriodCalculationInput.class), periods));
 
     doCallRealMethod().when(p).getInitialPeriods(any());
     final Set actual = p.getInitialPeriods(Set.of());
@@ -269,7 +269,7 @@ class PeriodCalculationAbstractTest {
   void shouldReturnInputPeriods_whenInputPeriodsProvided() {
     final Set<String> periods = Set.of("3");
     final PeriodCalculationAbstract sut = mock(PeriodCalculationAbstract.class,
-        withSettings().useConstructor(mock(CalculationDTO.class), periods));
+        withSettings().useConstructor(mock(PeriodCalculationInput.class), periods));
 
     doCallRealMethod().when(sut).getInitialPeriods(any());
     final Set<String> userP = Set.of("5");
@@ -336,14 +336,14 @@ class PeriodCalculationAbstractTest {
     final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     final Set<String> periods = Set.of("1");
-    final PeriodResult resDTO = mock(PeriodResult.class);
-    when(p.defineResponseType(any())).thenReturn(resDTO);
+    final PeriodResult result = mock(PeriodResult.class);
+    when(p.defineResponseType(any())).thenReturn(result);
 
     doCallRealMethod().when(p).calculate(any());
     final PeriodResult actual = p.calculate(periods);
 
-    verify(p).populateBasicDetails(resDTO);
-    assertEquals(resDTO, actual);
+    verify(p).populateBasicDetails(result);
+    assertEquals(result, actual);
   }
 
   @Test
@@ -449,11 +449,11 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldPopulateDateDetails_whenSettingPeriodDates() {
-    final var inputDTO = mock(CalculationDTO.class);
-    when(inputDTO.getCipsd()).thenReturn(LOCAL_DATE_NOW);
+    final var context = mock(PeriodCalculationInput.class);
+    when(context.getCipsd()).thenReturn(LOCAL_DATE_NOW);
 
     final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
-        withSettings().useConstructor(inputDTO, Set.of()));
+        withSettings().useConstructor(context, Set.of()));
 
     final TreeMap kvTreeMap = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE, LOCAL_DATE_NOW.plusMonths(1),
         ONE));
@@ -513,7 +513,7 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldAddSinceCustomIntervalPeriod_whenCustomStartDateAfterPortfolioStart() {
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     when(input.getCipsd()).thenReturn(LOCAL_DATE_NOW);
     final Map<LocalDate, BigDecimal> returns = Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE);
     final var portfolioTotalReturns = new TreeMap<>(returns);
@@ -530,7 +530,7 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldAddSinceCustomIntervalPeriod_whenCustomStartDateBeforePortfolioStart() {
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     when(input.getCipsd()).thenReturn(LOCAL_DATE_NOW);
     final Map<LocalDate, BigDecimal> returns = Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE);
     final var portfolioTotalReturns = new TreeMap<>(returns);
@@ -546,7 +546,7 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldAddSinceCustomIntervalPeriod_whenCustomStartDateEqualsPortfolioStart() {
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final var sut = mock(PeriodCalculationAbstract.class, withSettings().useConstructor(input, null));
     final Map<LocalDate, BigDecimal> returns = Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE, LOCAL_DATE_NOW.plusMonths(1),
         TWO);

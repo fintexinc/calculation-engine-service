@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric.core;
 
 import com.fintex.ce.application.util.ComparisonUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -103,8 +103,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldCalculateRollingValueForEachEntry_whenAllEntriesAreInRange() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
     final var numberOfMonths = 12;
     final var portfolioReturns = totalPortfolioReturns;
 
@@ -118,8 +120,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldRoundValuesToUserScale_whenFormattingRollingReturns() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
 
     final var totalPortfolioReturns = new TreeMap<LocalDate, BigDecimal>();
     totalPortfolioReturns.put(NOW.plusMonths(1), BigDecimal.valueOf(1.123456789123456));
@@ -137,8 +141,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldReturnNull_whenFormattingNullRollingReturns() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
 
     doCallRealMethod().when(sut).toUserFormat(any());
     final NavigableMap<LocalDate, BigDecimal> actual = sut.toUserFormat(null);
@@ -148,8 +154,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldReturnTrue_whenEntryDateIsWithinRange() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
 
     final var returnEntry = new AbstractMap.SimpleEntry<>(NOW.plusMonths(1), TEN);
     final var startDateOfRollingReturn = NOW;
@@ -163,8 +171,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldReturnFalse_whenEntryDateIsOutsideRange() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
 
     final var returnEntry = new AbstractMap.SimpleEntry<>(NOW.minusMonths(1), TEN);
     final var startDateOfRollingReturn = NOW;
@@ -178,8 +188,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldDelegateToOverloadedMethod_whenCalculatingByMonthsOnly() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
     final var numberOfMonths = 12;
 
     when(sut.getPortfolioTotalReturns()).thenReturn(new TreeMap());
@@ -191,8 +203,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldMapRollingIntervals_whenBuildingRollingIntervalResults() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
     final var result = Set.of(Pair.of("12", totalPortfolioReturns));
     final LinkedHashSet<IntervalResult> intervalRestDtos = new LinkedHashSet<>();
     intervalRestDtos.add(new IntervalResult(NOW, TWO));
@@ -208,8 +222,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldReturnNull_whenMappingRollingReturnWithNullValues() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
     final var result = Pair.of("12", null);
 
     doCallRealMethod().when(sut).mapRollingReturn(any());
@@ -220,8 +236,10 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldMapEntriesToIntervalResults_whenRollingReturnContainsValues() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class), Set
-        .of()));
+    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
+        Set
+            .of()));
     final Pair<String, NavigableMap<LocalDate, BigDecimal>> result = Pair.of("12", totalPortfolioReturns);
 
     doCallRealMethod().when(sut).mapRollingReturn(any());

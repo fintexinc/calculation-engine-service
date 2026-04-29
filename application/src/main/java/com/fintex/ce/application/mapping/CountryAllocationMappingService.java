@@ -70,11 +70,11 @@ public class CountryAllocationMappingService {
       return map;
     }
     allocations.forEach((countryId, value) -> {
-      final CountryAllocation allocationDTO = countryAllocationMap.get(countryId);
-      if (allocationDTO == null || allocationDTO.getRegion() == null) {
+      final CountryAllocation allocation = countryAllocationMap.get(countryId);
+      if (allocation == null || allocation.getRegion() == null) {
         warnings.add(UNKNOWN_TYPE_FROM_DATA_POINT.warning(holding, countryId, "Country Allocation Mapping Table"));
       } else {
-        sumAllocations(map, value, allocationDTO.getRegion());
+        sumAllocations(map, value, allocation.getRegion());
       }
     });
     return map;

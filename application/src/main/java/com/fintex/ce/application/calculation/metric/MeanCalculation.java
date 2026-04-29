@@ -2,10 +2,10 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.util.CalculationUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.MeanResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -29,7 +29,7 @@ public class MeanCalculation<T extends PeriodResult> extends PeriodCalculationAb
   @Setter
   private int scale = INTERNAL_SCALE;
 
-  public MeanCalculation(final CalculationDTO input,
+  public MeanCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods) {
     super(input, defaultPeriods);
   }
@@ -64,11 +64,11 @@ public class MeanCalculation<T extends PeriodResult> extends PeriodCalculationAb
   }
 
   @Override
-  public T defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final MeanResult meanResDTO = new MeanResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    meanResDTO.setMean(timeIntervals);
-    return (T) meanResDTO;
+  public T defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final MeanResult result = new MeanResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setMean(timeIntervals);
+    return (T) result;
   }
 
 }

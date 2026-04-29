@@ -61,7 +61,7 @@ public class MaturityAllocationResponseMapper implements ResponseMapper<Maturity
    *          the calculated net product values per maturity type
    * @param warnings
    *          list of warnings to include in response
-   * @return the response DTO with scaled values
+   * @return the result with scaled values
    */
   public MaturityAllocationResult fromNetProducts(Map<MaturityAllocationType, BigDecimal> netProducts,
       List<Warning> warnings) {

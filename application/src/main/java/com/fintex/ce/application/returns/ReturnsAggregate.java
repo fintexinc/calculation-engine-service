@@ -216,48 +216,48 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public ReturnsAggregate<T> validateAndUpdateCpsdAndCped(final Map<PortfolioHolding, HistoricalNavPrices> navData,
-      final DailyPerformanceCommand reqDTO) {
-    validateEarliestAndLatestAvailableDate(navData, reqDTO);
+      final DailyPerformanceCommand command) {
+    validateEarliestAndLatestAvailableDate(navData, command);
     return this;
   }
 
   public void validateEarliestAndLatestAvailableDate(final Map<PortfolioHolding, HistoricalNavPrices> navData,
-      final DailyPerformanceCommand reqDTO) {
-    final LocalDate startDate = getStartDate(reqDTO);
-    final LocalDate endDate = getEndDate(reqDTO);
+      final DailyPerformanceCommand command) {
+    final LocalDate startDate = getStartDate(command);
+    final LocalDate endDate = getEndDate(command);
     ifAnyErrorsThrowException();
 
     returnsMap.forEach((key, value) -> {
       final HistoricalNavPrices navPrices = navData.get(key);
       final LocalDate earliestAvailableDate = getEarliestAvailableDate(startDate, navPrices, value);
-      if (earliestAvailableDate.isAfter(reqDTO.getStartDate())) {
-        reqDTO.setStartDate(earliestAvailableDate);
+      if (earliestAvailableDate.isAfter(command.getStartDate())) {
+        command.setStartDate(earliestAvailableDate);
       }
       final LocalDate latestAvailableDate = getLatestAvailableDate(endDate, navPrices, value);
-      if (latestAvailableDate.isBefore(reqDTO.getEndDate())) {
-        reqDTO.setEndDate(latestAvailableDate);
+      if (latestAvailableDate.isBefore(command.getEndDate())) {
+        command.setEndDate(latestAvailableDate);
       }
     });
   }
 
-  private LocalDate getStartDate(final DailyPerformanceCommand reqDTO) {
-    final LocalDate startDate = Optional.ofNullable(reqDTO.getStartDate()).orElse(performanceStartDate);
+  private LocalDate getStartDate(final DailyPerformanceCommand command) {
+    final LocalDate startDate = Optional.ofNullable(command.getStartDate()).orElse(performanceStartDate);
     LocalDate newStartDate = LocalDate.of(startDate.getYear(), startDate.getMonth(), 1);
     if (newStartDate.isBefore(performanceStartDate)) {
       newStartDate = newStartDate.plusMonths(1);
     }
     validateCpsd(newStartDate);
-    reqDTO.setStartDate(newStartDate);
+    command.setStartDate(newStartDate);
     return newStartDate;
   }
 
-  private LocalDate getEndDate(final DailyPerformanceCommand reqDTO) {
-    LocalDate newEndDate = toLastDayOfMonth(Optional.ofNullable(reqDTO.getEndDate()).orElse(performanceEndDate));
+  private LocalDate getEndDate(final DailyPerformanceCommand command) {
+    LocalDate newEndDate = toLastDayOfMonth(Optional.ofNullable(command.getEndDate()).orElse(performanceEndDate));
     if (newEndDate.isAfter(performanceEndDate)) {
       newEndDate = toLastDayOfMonth(newEndDate.minusMonths(1));
     }
     validateCped(newEndDate);
-    reqDTO.setEndDate(newEndDate);
+    command.setEndDate(newEndDate);
     return newEndDate;
   }
 
@@ -375,13 +375,13 @@ public class ReturnsAggregate<T extends ReturnsData> {
   }
 
   public ReturnsAggregate<T> validateMonthlyDataMissing(final Map<PortfolioHolding, HistoricalNavPrices> navData,
-      final DailyPerformanceCommand reqDTO) {
-    final long holdingsWithPacOrWithdrawals = reqDTO.getDailyHoldings().stream()
+      final DailyPerformanceCommand command) {
+    final long holdingsWithPacOrWithdrawals = command.getDailyHoldings().stream()
         .filter(dh -> (!dh.getWithdrawal().equals(BigDecimal.ZERO) && !dh.getPac().equals(BigDecimal.ZERO)))
         .count();
     if (holdingsWithPacOrWithdrawals != 0) {
       navData.forEach((key, value) -> value.getMissedMonthData().stream()
-          .filter(m -> m.isAfter(reqDTO.getStartDate()) && m.isBefore(reqDTO.getEndDate()))
+          .filter(m -> m.isAfter(command.getStartDate()) && m.isBefore(command.getEndDate()))
           .forEach(m -> notification.add(MISSING_HISTORICAL_NAV_PRICES_FOR_MONTH.toExceptionForHolding(key, m.format(
               PATTERN_1)))));
     }

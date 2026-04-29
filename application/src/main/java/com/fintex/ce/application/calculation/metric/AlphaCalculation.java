@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.AlphaBetaCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.AlphaResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -18,7 +18,7 @@ import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 
 public class AlphaCalculation extends AlphaBetaCalculationAbstract<AlphaResult> {
 
-  public AlphaCalculation(final BenchmarkCalculationDTO input,
+  public AlphaCalculation(final BenchmarkPeriodCalculationInput input,
       final Set<String> periods,
       final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn,
       final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn) {
@@ -26,11 +26,11 @@ public class AlphaCalculation extends AlphaBetaCalculationAbstract<AlphaResult> 
   }
 
   @Override
-  public AlphaResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final AlphaResult resDTO = new AlphaResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    resDTO.setAlpha(timeIntervals);
-    return resDTO;
+  public AlphaResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final AlphaResult result = new AlphaResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setAlpha(timeIntervals);
+    return result;
   }
 
   @Override

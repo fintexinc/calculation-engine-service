@@ -7,9 +7,9 @@ import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculat
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.MarRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,23 +39,23 @@ public class MarRatioCalculationServiceImpl extends PeriodAbstractService<MarRat
   }
 
   @Override
-  public MarRatioResult perform(final PeriodCommand reqDTO) {
-    final MarRatioCalculation calculationMethod = defineCalculationMethod(reqDTO);
-    return calculationMethod.calculate(reqDTO.getPeriods());
+  public MarRatioResult perform(final PeriodCommand command) {
+    final MarRatioCalculation calculationMethod = defineCalculationMethod(command);
+    return calculationMethod.calculate(command.getPeriods());
   }
 
-  public MarRatioCalculation defineCalculationMethod(final PeriodCommand reqDTO) {
-    final CalculationDTO inputDTO = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
-    final var trailingTotalReturnsCalculation = new TrailingTotalReturnsCalculation(inputDTO, defaultPeriods);
+  public MarRatioCalculation defineCalculationMethod(final PeriodCommand command) {
+    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    final var trailingTotalReturnsCalculation = new TrailingTotalReturnsCalculation(context, defaultPeriods);
 
-    final var growth10KCalculation = new Growth10KCalculation(inputDTO.getWeightedAveragePortfolioReturns(), null,
+    final var growth10KCalculation = new Growth10KCalculation(context.getWeightedAveragePortfolioReturns(), null,
         false);
     final TreeMap<LocalDate, BigDecimal> growth10K = new TreeMap<>();
-    growth10KCalculation.setFirstGrowth10KValue(inputDTO.getWeightedAveragePortfolioReturns(), growth10K);
-    growth10KCalculation.calculateGrowth10K(inputDTO.getWeightedAveragePortfolioReturns(), growth10K);
+    growth10KCalculation.setFirstGrowth10KValue(context.getWeightedAveragePortfolioReturns(), growth10K);
+    growth10KCalculation.calculateGrowth10K(context.getWeightedAveragePortfolioReturns(), growth10K);
 
-    final var maxDrawdownCalculation = new MaxDrawdownCalculation(inputDTO, defaultPeriods, growth10K, SCALE_FUNCTION);
-    return new MarRatioCalculation(inputDTO, defaultPeriods, trailingTotalReturnsCalculation, maxDrawdownCalculation);
+    final var maxDrawdownCalculation = new MaxDrawdownCalculation(context, defaultPeriods, growth10K, SCALE_FUNCTION);
+    return new MarRatioCalculation(context, defaultPeriods, trailingTotalReturnsCalculation, maxDrawdownCalculation);
   }
 
 }

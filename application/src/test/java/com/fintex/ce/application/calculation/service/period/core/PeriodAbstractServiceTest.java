@@ -4,8 +4,8 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -104,12 +104,12 @@ class PeriodAbstractServiceTest {
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
 
-    final CalculationDTO expected = new CalculationDTO();
+    final PeriodCalculationInput expected = new PeriodCalculationInput();
     expected.setCipsd(req.getCustomIntervalPsd());
     expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    final CalculationDTO actual = sut.buildCalculationDto(req, returnFactorScale);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(req, returnFactorScale);
 
     assertEquals(expected, actual);
   }
@@ -135,12 +135,12 @@ class PeriodAbstractServiceTest {
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
 
-    final CalculationDTO expected = new CalculationDTO();
+    final PeriodCalculationInput expected = new PeriodCalculationInput();
     expected.setCipsd(req.getCustomIntervalPsd());
     expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(req, returnFactorScale);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
@@ -167,12 +167,12 @@ class PeriodAbstractServiceTest {
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
 
-    final CalculationDTO expected = new CalculationDTO();
+    final PeriodCalculationInput expected = new PeriodCalculationInput();
     expected.setCipsd(req.getCustomIntervalPsd());
     expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(req, returnFactorScale);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed());
   }

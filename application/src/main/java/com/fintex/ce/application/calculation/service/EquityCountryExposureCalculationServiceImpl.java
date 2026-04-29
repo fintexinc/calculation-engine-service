@@ -75,10 +75,10 @@ public class EquityCountryExposureCalculationServiceImpl
   }
 
   @Override
-  public ExposureDataHolder<CountryRegionType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
+  public ExposureDataHolder<CountryRegionType> fetchExposures(final PortfolioHoldingsCommand command) {
     List<Warning> warnings = new ArrayList<>();
     Map<PortfolioHolding, EquityCountryAllocation> rawData = equityCountryAllocationSecurityDataFetcher.fetch(
-        reqDTO.getHoldings(), List.of());
+        command.getHoldings(), List.of());
     Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
     Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService

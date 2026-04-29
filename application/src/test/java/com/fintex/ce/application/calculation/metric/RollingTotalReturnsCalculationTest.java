@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -56,8 +56,8 @@ class RollingTotalReturnsCalculationTest {
   @Test
   void shouldCalculateRollingValue_whenCheckResult() {
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
-    final var calculationDTO = mock(CalculationDTO.class);
-    final var sut = mock(RollingTotalReturnsCalculation.class, withSettings().useConstructor(calculationDTO, Set.of(),
+    final var context = mock(PeriodCalculationInput.class);
+    final var sut = mock(RollingTotalReturnsCalculation.class, withSettings().useConstructor(context, Set.of(),
         trailingTotalReturnsCalculation));
     final int numberOfMonths = 12;
 
@@ -83,17 +83,17 @@ class RollingTotalReturnsCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(RollingTotalReturnsCalculation.class);
-    final var result = Set.of(Pair.of("12", portfolioReturns));
+    final var periodValues = Set.of(Pair.of("12", portfolioReturns));
 
     final LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
     res.add(new IntervalResult(LocalDate.now().minusMonths(3), TEN));
-    final var resDTO = new RollingIntervalResult("12", res);
-    final var expected = new RollingTotalReturnsResult().setRollingTotalReturns(Set.of(resDTO));
+    final var intervalResult = new RollingIntervalResult("12", res);
+    final var expected = new RollingTotalReturnsResult().setRollingTotalReturns(Set.of(intervalResult));
 
-    when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(resDTO));
+    when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
 
-    doCallRealMethod().when(sut).defineResponseType(result);
-    final RollingTotalReturnsResult actual = sut.defineResponseType(result);
+    doCallRealMethod().when(sut).defineResponseType(periodValues);
+    final RollingTotalReturnsResult actual = sut.defineResponseType(periodValues);
 
     Assertions.assertEquals(expected.getRollingTotalReturns(), actual.getRollingTotalReturns());
   }

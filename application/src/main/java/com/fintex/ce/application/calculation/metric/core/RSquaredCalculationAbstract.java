@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric.core;
 
 import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ public abstract class RSquaredCalculationAbstract<T extends PeriodResult>
     extends
       PortfolioBenchmarkCalculationAbstract<T> {
 
-  protected RSquaredCalculationAbstract(final BenchmarkCalculationDTO input,
+  protected RSquaredCalculationAbstract(final BenchmarkPeriodCalculationInput input,
       final Set<String> periods,
       final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn,
       final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn) {

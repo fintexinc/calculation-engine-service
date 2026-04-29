@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.util.ReturnFactorScale;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -25,24 +25,24 @@ import static org.mockito.Mockito.withSettings;
 class SortinoRatioCalculationServiceImplTest {
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(SortinoRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
-    final var reqDTO = mock(PeriodCommand.class);
-    final var input = mock(BenchmarkCalculationDTO.class);
+    final var command = mock(PeriodCommand.class);
+    final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var treeMap = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.TEN));
 
     when(input.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
-    when(sut.buildCalculationDto(any(), any())).thenReturn(input);
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(input);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(reqDTO);
+    sut.defineCalculationMethod(command);
 
-    verify(sut).buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_ONE);
+    verify(sut).buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
   }
 }

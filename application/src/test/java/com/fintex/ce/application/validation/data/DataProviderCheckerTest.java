@@ -2,7 +2,7 @@ package com.fintex.ce.application.validation.data;
 
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.validation.DataProviderRequestHandlingValidator;
-import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.wm.commons.domain.DataProvider;
 
@@ -34,7 +34,7 @@ class DataProviderCheckerTest {
       final var list = mock(List.class);
       when(map.values()).thenReturn(list);
 
-      final var assetAllocationData = mock(AssetAllocationDataDTO.class);
+      final var assetAllocationData = mock(AssetAllocationData.class);
       when(assetAllocationData.getBenchmarkIndexFdsResponse()).thenReturn(map);
       when(assetAllocationData.getEtfCanadaFdsResponse()).thenReturn(map);
       when(assetAllocationData.getEtfUsFdsResponse()).thenReturn(map);

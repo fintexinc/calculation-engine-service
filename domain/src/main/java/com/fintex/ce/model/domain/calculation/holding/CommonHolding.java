@@ -1,6 +1,5 @@
-package com.fintex.ce.model.dto;
+package com.fintex.ce.model.domain.calculation.holding;
 
-import com.fintex.ce.model.domain.calculation.holding.HoldingAggregator;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import java.math.BigDecimal;
@@ -15,7 +14,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class CommonHoldingsDTO {
+public class CommonHolding {
 
   private static final String EQUITY_TYPE = "E";
 
@@ -23,7 +22,7 @@ public class CommonHoldingsDTO {
   private String companyName;
   private String type;
   private BigDecimal value;
-  private List<CommonHoldingsDTO> underlyingHoldings;
+  private List<CommonHolding> underlyingHoldings;
   private String ticker;
   private String exchangeCode;
 
@@ -34,7 +33,7 @@ public class CommonHoldingsDTO {
   // them aren't same
   private UUID uuid = null;
 
-  public CommonHoldingsDTO(final String companyName, final String type, final BigDecimal value,
+  public CommonHolding(final String companyName, final String type, final BigDecimal value,
       final String ticker, final String exchangeCode) {
     this.companyName = companyName;
     this.type = type;

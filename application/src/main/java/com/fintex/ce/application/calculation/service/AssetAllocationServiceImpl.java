@@ -51,10 +51,11 @@ public class AssetAllocationServiceImpl extends BreakdownAbstractService<AssetAl
   }
 
   @Override
-  public ExposureDataHolder<AssetAllocationRegion> fetchExposures(PortfolioHoldingsCommand reqDTO) {
-    List<DataProvider> providers = getSpecifiedIfEmpty(reqDTO.getDataProviders(),
+  public ExposureDataHolder<AssetAllocationRegion> fetchExposures(PortfolioHoldingsCommand command) {
+    List<DataProvider> providers = getSpecifiedIfEmpty(command.getDataProviders(),
         defaultDataProperties.getDataProviders());
-    Map<PortfolioHolding, HoldingAssetAllocation> allocations = securityDataPort.fetch(reqDTO.getHoldings(), providers);
+    Map<PortfolioHolding, HoldingAssetAllocation> allocations = securityDataPort.fetch(command.getHoldings(),
+        providers);
     return new ExposureDataHolder<>(assetAllocationDataMapper.toRegionExposures(allocations), List.of());
   }
 

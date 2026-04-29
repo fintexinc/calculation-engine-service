@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -21,7 +21,7 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
   public DownsideDeviationCalculation<SortinoRatioResult> downsideDeviationCalculation;
   public NavigableMap<LocalDate, BigDecimal> tBills;
 
-  public SortinoRatioCalculation(final CalculationDTO input,
+  public SortinoRatioCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final NavigableMap<LocalDate, BigDecimal> tBills,
       final DownsideDeviationCalculation<SortinoRatioResult> downsideDeviationCalculation) {
@@ -47,11 +47,11 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
   }
 
   @Override
-  public SortinoRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final SortinoRatioResult sortinoRatioResDTO = new SortinoRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    sortinoRatioResDTO.setSortinoRatio(timeIntervals);
-    return sortinoRatioResDTO;
+  public SortinoRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final SortinoRatioResult result = new SortinoRatioResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setSortinoRatio(timeIntervals);
+    return result;
   }
 
   /**

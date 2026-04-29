@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.RSquaredCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.RSquaredResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,7 +16,7 @@ import lombok.Getter;
 @Getter
 public class RSquaredCalculation extends RSquaredCalculationAbstract<RSquaredResult> {
 
-  public RSquaredCalculation(final BenchmarkCalculationDTO input,
+  public RSquaredCalculation(final BenchmarkPeriodCalculationInput input,
       final Set<String> periods,
       final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn,
       final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn) {
@@ -24,11 +24,11 @@ public class RSquaredCalculation extends RSquaredCalculationAbstract<RSquaredRes
   }
 
   @Override
-  public RSquaredResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final RSquaredResult resDTO = new RSquaredResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    resDTO.setRSquared(timeIntervals);
-    return resDTO;
+  public RSquaredResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final RSquaredResult result = new RSquaredResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setRSquared(timeIntervals);
+    return result;
   }
 
 }

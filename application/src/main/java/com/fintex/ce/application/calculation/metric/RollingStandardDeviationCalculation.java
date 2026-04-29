@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.RollingAbstractCalculation;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,7 +16,7 @@ public class RollingStandardDeviationCalculation extends RollingAbstractCalculat
 
   private final StandardDeviationCalculation<PeriodResult> standardDeviationCalculation;
 
-  public RollingStandardDeviationCalculation(final CalculationDTO input,
+  public RollingStandardDeviationCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final StandardDeviationCalculation<PeriodResult> standardDeviationCalculation) {
     super(input, defaultPeriods);

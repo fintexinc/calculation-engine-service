@@ -656,14 +656,14 @@ class AssetAllocationEMServiceImplTest {
         countryAllocationFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
-    final PortfolioHoldingsCommand reqDto = mock(PortfolioHoldingsCommand.class);
+    final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
     final List<PortfolioHolding> holdings = List.of(mock(PortfolioHolding.class));
-    when(reqDto.getHoldings()).thenReturn(holdings);
+    when(command.getHoldings()).thenReturn(holdings);
     when(service.fetchExposures(any())).thenReturn(new ExposureDataHolder<>(Map.of(), List.of()));
 
     doCallRealMethod().when(service).perform(any());
     // ACT
-    service.perform(reqDto);
+    service.perform(command);
 
     // VERIFY
   }
@@ -789,18 +789,18 @@ class AssetAllocationEMServiceImplTest {
         assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
     final var holding = mock(PortfolioHolding.class);
-    final var portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
     final var providers = List.of(DataProvider.MORNINGSTAR);
 
-    when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
-    when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(providers);
     when(service.calculateAssetAllocationEMarketMap(any(), any(), anyList())).thenReturn(new ExposureDataHolder<>(
         exposures, List.of()));
     doCallRealMethod().when(service).fetchExposures(any());
 
     // ACT
-    service.fetchExposures(portfolioHoldingsReqDTO);
+    service.fetchExposures(command);
 
     // VERIFY
     verify(assetAllocationFetcher).fetch(eq(List.of(holding)), any());
@@ -820,20 +820,20 @@ class AssetAllocationEMServiceImplTest {
 
     final var holding = mock(PortfolioHolding.class);
     final Map assetAllocations = mock(Map.class);
-    final PortfolioHoldingsCommand portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
+    final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
     final var providers = List.of(DataProvider.MORNINGSTAR);
     final var mappedResult = mock(Map.class);
 
-    when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
-    when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(providers);
     when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(assetAllocations);
     when(service.calculateAssetAllocationEMarketMap(any(), any(), anyList())).thenReturn(new ExposureDataHolder<>(
         exposures, List.of()));
     when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(mappedResult);
     doCallRealMethod().when(service).fetchExposures(any());
     // ACT
-    service.fetchExposures(portfolioHoldingsReqDTO);
+    service.fetchExposures(command);
 
     // VERIFY
     verify(service).calculateAssetAllocationEMarketMap(eq(List.of(holding)), eq(mappedResult), eq(providers));
@@ -855,17 +855,17 @@ class AssetAllocationEMServiceImplTest {
       final var holding = mock(PortfolioHolding.class);
       final Map assetAllocations = mock(Map.class);
       final var providers = mock(List.class);
-      final PortfolioHoldingsCommand portfolioHoldingsReqDTO = mock(PortfolioHoldingsCommand.class);
+      final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
       final var exposures = Map.of(holding, Map.of(AssetAllocationRegionEmType.OTHER, TEN));
 
-      when(portfolioHoldingsReqDTO.getDataProviders()).thenReturn(providers);
-      when(portfolioHoldingsReqDTO.getHoldings()).thenReturn(List.of(holding));
+      when(command.getDataProviders()).thenReturn(providers);
+      when(command.getHoldings()).thenReturn(List.of(holding));
       when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(assetAllocations);
       when(service.calculateAssetAllocationEMarketMap(any(), any(), anyList())).thenReturn(new ExposureDataHolder<>(
           exposures, List.of()));
       doCallRealMethod().when(service).fetchExposures(any());
       // ACT
-      service.fetchExposures(portfolioHoldingsReqDTO);
+      service.fetchExposures(command);
 
       // VERIFY
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, List.of(MORNINGSTAR)), Mockito.times(

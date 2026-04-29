@@ -67,8 +67,8 @@ public class EquitySectorCalculationImpl
   }
 
   @Override
-  public ExposureDataHolder<EquitySectorAllocationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
-    Map<PortfolioHolding, EquitySector> rawData = equitySectorSecurityDataFetcher.fetch(reqDTO.getHoldings(), List
+  public ExposureDataHolder<EquitySectorAllocationType> fetchExposures(final PortfolioHoldingsCommand command) {
+    Map<PortfolioHolding, EquitySector> rawData = equitySectorSecurityDataFetcher.fetch(command.getHoldings(), List
         .of());
     return new ExposureDataHolder<>(toSectorExposures(rawData), List.of());
   }

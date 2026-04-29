@@ -1,7 +1,5 @@
-package com.fintex.ce.model.domain.calculation;
+package com.fintex.ce.model.domain.calculation.allocation;
 
-import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
-import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.Warning;
 
@@ -14,7 +12,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class AssetAllocationDataDTO {
+public class AssetAllocationData {
 
   Map<PortfolioHolding, HoldingAssetAllocation> etfUsFdsResponse;
   Map<PortfolioHolding, HoldingAssetAllocation> canadaPooledFundFdsResponse;

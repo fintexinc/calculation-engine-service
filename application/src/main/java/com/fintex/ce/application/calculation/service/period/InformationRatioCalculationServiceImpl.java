@@ -7,9 +7,9 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +35,9 @@ public class InformationRatioCalculationServiceImpl
   }
 
   @Override
-  public PeriodCalculationAbstract<InformationRatioResult, ?> defineCalculationMethod(PeriodCommand reqDTO) {
-    final BenchmarkCalculationDTO input = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
+  public PeriodCalculationAbstract<InformationRatioResult, ?> defineCalculationMethod(PeriodCommand command) {
+    final BenchmarkPeriodCalculationInput input = buildPeriodCalculationInput(command,
+        ReturnFactorScale.SCALE_OF_TWO);
     final var trailingTotalReturnsCalculation = new TrailingTotalReturnsCalculation(input, Set.of());
     final var trackingErrorCalculation = new TrackingErrorCalculation(input, Set.of());
     return new InformationRatioCalculation(input, defaultPeriods, trailingTotalReturnsCalculation,

@@ -2,9 +2,9 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.BenchmarkWeightedAverageCalculation;
 import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TrackingErrorResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -32,20 +32,20 @@ public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculatio
 
   public NavigableMap<LocalDate, BigDecimal> portfolioReturnOverBenchmark;
 
-  public TrackingErrorCalculation(final BenchmarkCalculationDTO input,
+  public TrackingErrorCalculation(final BenchmarkPeriodCalculationInput input,
       final Set<String> periods) {
     super(input, periods);
     portfolioReturnOverBenchmark = calculateExcessPortfolioReturnOverBenchmark();
   }
 
   @Override
-  public TrackingErrorResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final TrackingErrorResult resDto = new TrackingErrorResult();
-    final Set<TimeIntervalResult> timeIntervals = result.stream().map(e -> new TimeIntervalResult(e.getKey(), e
+  public TrackingErrorResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final TrackingErrorResult result = new TrackingErrorResult();
+    final Set<TimeIntervalResult> timeIntervals = periodValues.stream().map(e -> new TimeIntervalResult(e.getKey(), e
         .getValue()))
         .collect(Collectors.toSet());
-    resDto.setTrackingError(timeIntervals);
-    return resDto;
+    result.setTrackingError(timeIntervals);
+    return result;
   }
 
   @Override

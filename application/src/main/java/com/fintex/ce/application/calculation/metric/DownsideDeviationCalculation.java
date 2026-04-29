@@ -1,10 +1,10 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -29,7 +29,7 @@ public class DownsideDeviationCalculation<T extends PeriodResult> extends Period
   public NavigableMap<LocalDate, BigDecimal> tBills;
   public NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn;
 
-  public DownsideDeviationCalculation(final CalculationDTO input,
+  public DownsideDeviationCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final NavigableMap<LocalDate, BigDecimal> tBills) {
     super(input, defaultPeriods);
@@ -53,11 +53,11 @@ public class DownsideDeviationCalculation<T extends PeriodResult> extends Period
   }
 
   @Override
-  public T defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final DownsideDeviationResult downsideDeviationResDTO = new DownsideDeviationResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    downsideDeviationResDTO.setDownsideDeviation(timeIntervals);
-    return (T) downsideDeviationResDTO;
+  public T defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final DownsideDeviationResult result = new DownsideDeviationResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setDownsideDeviation(timeIntervals);
+    return (T) result;
   }
 
   /**

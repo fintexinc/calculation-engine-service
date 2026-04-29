@@ -68,8 +68,8 @@ public class EquityStyleboxExposureCalculationServiceImpl
   }
 
   @Override
-  public ExposureDataHolder<StyleBoxType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
-    Map<PortfolioHolding, EquityStyleboxExposure> rawData = equityStyleboxSecurityDataFetcher.fetch(reqDTO
+  public ExposureDataHolder<StyleBoxType> fetchExposures(PortfolioHoldingsCommand command) {
+    Map<PortfolioHolding, EquityStyleboxExposure> rawData = equityStyleboxSecurityDataFetcher.fetch(command
         .getHoldings(),
         List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,

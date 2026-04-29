@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.util.ReturnFactorScale;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -26,18 +26,18 @@ class DownsideCaptureCalculationServiceImplTest {
     final var sut = mock(DownsideCaptureCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of()));
 
-    final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
+    final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
-    when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
-    when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
+    when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
+    when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
     sut.defineCalculationMethod(req);
 
-    verify(sut).buildCalculationDto(req, ReturnFactorScale.AS_IS);
+    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.AS_IS);
   }
 }

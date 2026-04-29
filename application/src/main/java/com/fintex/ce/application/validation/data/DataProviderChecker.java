@@ -1,7 +1,7 @@
 package com.fintex.ce.application.validation.data;
 
 import com.fintex.ce.application.config.DefaultDataProperties;
-import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.wm.commons.domain.DataProvider;
 
@@ -20,21 +20,21 @@ public class DataProviderChecker {
 
   private final DefaultDataProperties defaultDataProperties;
 
-  public void check(final List<DataProvider> dataProviders, final AssetAllocationDataDTO assetAllocationDataDto) {
+  public void check(final List<DataProvider> dataProviders, final AssetAllocationData assetAllocationData) {
     final List<DataProvider> defaults = defaultDataProperties.getDataProviders();
-    dataProviderCheckValidation(dataProviders, assetAllocationDataDto.getEtfUsFdsResponse().values(),
+    dataProviderCheckValidation(dataProviders, assetAllocationData.getEtfUsFdsResponse().values(),
         HoldingAssetAllocation::getProviders, defaults, clearAssetAllocation());
-    dataProviderCheckValidation(dataProviders, assetAllocationDataDto.getEtfCanadaFdsResponse().values(),
+    dataProviderCheckValidation(dataProviders, assetAllocationData.getEtfCanadaFdsResponse().values(),
         HoldingAssetAllocation::getProviders, defaults, clearAssetAllocation());
-    dataProviderCheckValidation(dataProviders, assetAllocationDataDto.getMutualFundFdsResponse().values(),
+    dataProviderCheckValidation(dataProviders, assetAllocationData.getMutualFundFdsResponse().values(),
         HoldingAssetAllocation::getProviders, defaults, clearAssetAllocation());
-    dataProviderCheckValidation(dataProviders, assetAllocationDataDto.getBenchmarkIndexFdsResponse().values(),
+    dataProviderCheckValidation(dataProviders, assetAllocationData.getBenchmarkIndexFdsResponse().values(),
         HoldingAssetAllocation::getProviders, defaults, clearAssetAllocation());
-    dataProviderCheckValidation(dataProviders, assetAllocationDataDto.getCanadaPooledFundFdsResponse().values(),
+    dataProviderCheckValidation(dataProviders, assetAllocationData.getCanadaPooledFundFdsResponse().values(),
         HoldingAssetAllocation::getProviders, defaults, clearAssetAllocation());
-    dataProviderCheckValidation(dataProviders, assetAllocationDataDto.getCanadaHedgeFundsFdsResponse().values(),
+    dataProviderCheckValidation(dataProviders, assetAllocationData.getCanadaHedgeFundsFdsResponse().values(),
         HoldingAssetAllocation::getProviders, defaults, clearAssetAllocation());
-    dataProviderCheckValidation(dataProviders, assetAllocationDataDto.getUsFundsFdsResponse().values(),
+    dataProviderCheckValidation(dataProviders, assetAllocationData.getUsFundsFdsResponse().values(),
         HoldingAssetAllocation::getProviders, defaults, clearAssetAllocation());
   }
 

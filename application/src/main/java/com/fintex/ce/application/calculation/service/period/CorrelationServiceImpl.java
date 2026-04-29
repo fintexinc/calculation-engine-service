@@ -6,10 +6,10 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -36,19 +36,19 @@ public class CorrelationServiceImpl extends PeriodAbstractService<CorrelationRes
   }
 
   @Override
-  public CorrelationResult perform(final PeriodCommand reqDTO) {
-    final PeriodCalculationAbstract<CorrelationResult, ?> calculationMethod = defineCalculationMethod(reqDTO);
-    return calculationMethod.calculate(reqDTO.getPeriods());
+  public CorrelationResult perform(final PeriodCommand command) {
+    final PeriodCalculationAbstract<CorrelationResult, ?> calculationMethod = defineCalculationMethod(command);
+    return calculationMethod.calculate(command.getPeriods());
   }
 
-  public CorrelationCalculation defineCalculationMethod(final PeriodCommand reqDTO) {
-    reqDTO.setReqCurrencyToCashHolding();
+  public CorrelationCalculation defineCalculationMethod(final PeriodCommand command) {
+    command.setReqCurrencyToCashHolding();
     final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
-        reqDTO.getHoldings(), reqDTO.getCurrency(), ReturnFactorScale.SCALE_OF_TWO);
+        command.getHoldings(), command.getCurrency(), ReturnFactorScale.SCALE_OF_TWO);
 
     final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturns = monthlyReturnsAggregate
-        .validateCped(reqDTO.getCustomPed())
-        .cutByCpedIfCpedEmptyCutByPed(reqDTO.getCustomPed())
+        .validateCped(command.getCustomPed())
+        .cutByCpedIfCpedEmptyCutByPed(command.getCustomPed())
         .fxRatesApplied()
         .getReturnsMap();
 
@@ -56,8 +56,9 @@ public class CorrelationServiceImpl extends PeriodAbstractService<CorrelationRes
         .cutByPsd()
         .getWeightedAverage();
 
-    final var calculationDTO = new CalculationDTO(reqDTO.getCustomIntervalPsd(), weightedAveragePortfolioReturns);
-    return new CorrelationCalculation(calculationDTO, baseTotalReturns, defaultPeriods);
+    final var context = new PeriodCalculationInput(command.getCustomIntervalPsd(),
+        weightedAveragePortfolioReturns);
+    return new CorrelationCalculation(context, baseTotalReturns, defaultPeriods);
   }
 
 }

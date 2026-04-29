@@ -1,4 +1,4 @@
-package com.fintex.ce.model.dto.calculation;
+package com.fintex.ce.model.domain.calculation.input;
 
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class WeightedAverageInputDTO {
+public class WeightedAverageInput {
 
   protected LocalDate cipsd;
 
@@ -30,12 +30,12 @@ public class WeightedAverageInputDTO {
 
   private Currency currency;
 
-  public WeightedAverageInputDTO() {
+  public WeightedAverageInput() {
     this.rebalanced = Rebalanced.MONTHLY;
   }
 
-  public WeightedAverageInputDTO makeCopy() {
-    return new WeightedAverageInputDTO()
+  public WeightedAverageInput makeCopy() {
+    return new WeightedAverageInput()
         .setCipsd(this.cipsd)
         .setRebalanced(this.rebalanced)
         .setDateRange(this.dateRange)

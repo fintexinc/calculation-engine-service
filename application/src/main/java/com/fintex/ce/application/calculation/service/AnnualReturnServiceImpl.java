@@ -3,10 +3,10 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.metric.AnnualReturnCalculation;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,26 +34,27 @@ public class AnnualReturnServiceImpl implements CalculationService<ReturnCommand
   }
 
   @Override
-  public AnnualReturnResult<Integer> perform(final ReturnCommand reqDTO) {
-    final CalculationDTO inputDTO = buildWeightedAverageInputDto(reqDTO);
-    return buildAnnualReturnCalculation(inputDTO).calculate();
+  public AnnualReturnResult<Integer> perform(final ReturnCommand command) {
+    final PeriodCalculationInput context = buildWeightedAverageInput(command);
+    return buildAnnualReturnCalculation(context).calculate();
   }
 
-  public AnnualReturnCalculation buildAnnualReturnCalculation(final CalculationDTO inputDTO) {
-    return new AnnualReturnCalculation(inputDTO.getWeightedAveragePortfolioReturns(), inputDTO.getWarnings());
+  public AnnualReturnCalculation buildAnnualReturnCalculation(final PeriodCalculationInput context) {
+    return new AnnualReturnCalculation(context.getWeightedAveragePortfolioReturns(), context.getWarnings());
   }
 
-  public CalculationDTO buildWeightedAverageInputDto(final ReturnCommand reqDTO) {
+  public PeriodCalculationInput buildWeightedAverageInput(final ReturnCommand command) {
     final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = monthlyReturnsService
-        .getPortfolioMonthlyReturns(reqDTO
-            .getHoldings(), reqDTO.getCurrency(), SCALE_OF_TWO);
+        .getPortfolioMonthlyReturns(command
+            .getHoldings(), command.getCurrency(), SCALE_OF_TWO);
 
     final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new CalculationDTO().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns).setWarnings(
-        monthlyReturnsAggregate.getErrorsAsWarnings());
+    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns)
+        .setWarnings(
+            monthlyReturnsAggregate.getErrorsAsWarnings());
   }
 
 }

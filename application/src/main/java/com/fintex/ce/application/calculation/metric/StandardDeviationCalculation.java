@@ -2,10 +2,10 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.util.CalculationUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -34,7 +34,7 @@ public class StandardDeviationCalculation<T extends PeriodResult> extends Period
   @Setter
   private int scale = INTERNAL_SCALE;
 
-  public StandardDeviationCalculation(final CalculationDTO input,
+  public StandardDeviationCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods) {
     super(input, defaultPeriods);
   }
@@ -90,11 +90,11 @@ public class StandardDeviationCalculation<T extends PeriodResult> extends Period
   }
 
   @Override
-  public T defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final StandardDeviationResult standardDeviationResDTO = new StandardDeviationResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    standardDeviationResDTO.setStandardDeviation(timeIntervals);
-    return (T) standardDeviationResDTO;
+  public T defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final StandardDeviationResult result = new StandardDeviationResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setStandardDeviation(timeIntervals);
+    return (T) result;
   }
 
 }

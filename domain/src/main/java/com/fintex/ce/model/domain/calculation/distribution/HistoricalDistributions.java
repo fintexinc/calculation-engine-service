@@ -23,13 +23,13 @@ public class HistoricalDistributions extends BaseCalculationData<HistoricalDistr
 
   private String currency;
   private FinancialInstrumentType holdingType;
-  private TreeMap<LocalDate, CapitalGainsDto> capitalGains;
-  private TreeMap<LocalDate, DistributionsDto> distributions;
+  private TreeMap<LocalDate, CapitalGains> capitalGains;
+  private TreeMap<LocalDate, Distributions> distributions;
 
   @Data
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class DistributionsDto {
+  public static class Distributions {
     private BigDecimal domesticDividend;
     private BigDecimal foreignDividend;
     private BigDecimal interestIncome;
@@ -52,7 +52,7 @@ public class HistoricalDistributions extends BaseCalculationData<HistoricalDistr
   @Data
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class CapitalGainsDto {
+  public static class CapitalGains {
     private BigDecimal capitalGains;
     private BigDecimal returnOfCapital;
 

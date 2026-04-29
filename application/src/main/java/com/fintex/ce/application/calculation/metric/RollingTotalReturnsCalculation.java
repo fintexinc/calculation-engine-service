@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.RollingAbstractCalculation;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -15,7 +15,7 @@ public class RollingTotalReturnsCalculation extends RollingAbstractCalculation<R
 
   private final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation;
 
-  public RollingTotalReturnsCalculation(final CalculationDTO input,
+  public RollingTotalReturnsCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation) {
     super(input, defaultPeriods);
@@ -29,11 +29,11 @@ public class RollingTotalReturnsCalculation extends RollingAbstractCalculation<R
 
   @Override
   public RollingTotalReturnsResult defineResponseType(
-      final Set<Pair<String, NavigableMap<LocalDate, BigDecimal>>> result) {
-    final var rollingTotalReturnsResDTO = new RollingTotalReturnsResult();
-    final var rollingIntervalResultS = getRollingIntervalResults(result);
-    rollingTotalReturnsResDTO.setRollingTotalReturns(rollingIntervalResultS);
-    return rollingTotalReturnsResDTO;
+      final Set<Pair<String, NavigableMap<LocalDate, BigDecimal>>> periodValues) {
+    final var result = new RollingTotalReturnsResult();
+    final var rollingIntervalResultS = getRollingIntervalResults(periodValues);
+    result.setRollingTotalReturns(rollingIntervalResultS);
+    return result;
   }
 
 }

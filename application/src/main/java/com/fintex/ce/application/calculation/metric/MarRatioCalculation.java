@@ -2,10 +2,10 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.MarRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -21,7 +21,7 @@ public class MarRatioCalculation extends PeriodCalculationAbstract<MarRatioResul
   private final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation;
   private final MaxDrawdownCalculation maxDrawdownCalculation;
 
-  public MarRatioCalculation(final CalculationDTO input,
+  public MarRatioCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation,
       final MaxDrawdownCalculation maxDrawdownCalculation) {
@@ -36,19 +36,19 @@ public class MarRatioCalculation extends PeriodCalculationAbstract<MarRatioResul
       return null;
     }
     final BigDecimal trailingTRValue = trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
-    final MaxDrawdownEntry maxDrawdownDTO = maxDrawdownCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
-    if (Objects.isNull(maxDrawdownDTO.getValue()) || maxDrawdownDTO.getValue().compareTo(BigDecimal.ZERO) == 0) {
+    final MaxDrawdownEntry maxDrawdown = maxDrawdownCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
+    if (Objects.isNull(maxDrawdown.getValue()) || maxDrawdown.getValue().compareTo(BigDecimal.ZERO) == 0) {
       return null;
     }
-    return DecimalUtils.divide(trailingTRValue, abs(maxDrawdownDTO.getValue()));
+    return DecimalUtils.divide(trailingTRValue, abs(maxDrawdown.getValue()));
   }
 
   @Override
-  public MarRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final var marRatioResDTO = new MarRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    marRatioResDTO.setMarRatio(timeIntervals);
-    return marRatioResDTO;
+  public MarRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final var result = new MarRatioResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setMarRatio(timeIntervals);
+    return result;
   }
 
 }

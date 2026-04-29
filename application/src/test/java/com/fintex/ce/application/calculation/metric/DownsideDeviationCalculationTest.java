@@ -153,9 +153,9 @@ class DownsideDeviationCalculationTest {
   void shouldMapIntervalResults_whenDefiningResponseType() {
     final var sut = mock(DownsideDeviationCalculation.class);
     final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", BigDecimal.ONE));
-    final var intervalResDto = new TimeIntervalResult("2000-01-12", ZERO);
-    final var intervalResDto1 = new TimeIntervalResult("2020-01-05", BigDecimal.ONE);
-    final var expected = Set.of(intervalResDto, intervalResDto1);
+    final var interval1 = new TimeIntervalResult("2000-01-12", ZERO);
+    final var interval2 = new TimeIntervalResult("2020-01-05", BigDecimal.ONE);
+    final var expected = Set.of(interval1, interval2);
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());

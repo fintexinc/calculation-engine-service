@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -154,16 +154,16 @@ class SortinoRatioCalculationTest {
     final var sut = mock(SortinoRatioCalculation.class);
     final var pairs = Set.of(Pair.of("2015-01-01", ZERO), Pair.of("2018-02-02", ONE));
 
-    final var intervalResDto = new TimeIntervalResult("2015-01-01", ZERO);
-    final var intervalResDto1 = new TimeIntervalResult("2018-02-02", ONE);
-    final var expected = Set.of(intervalResDto, intervalResDto1);
+    final var interval1 = new TimeIntervalResult("2015-01-01", ZERO);
+    final var interval2 = new TimeIntervalResult("2018-02-02", ONE);
+    final var expected = Set.of(interval1, interval2);
 
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    final SortinoRatioResult sortinoRatioResDTO = sut.defineResponseType(pairs);
+    final SortinoRatioResult result = sut.defineResponseType(pairs);
 
-    assertEquals(expected, sortinoRatioResDTO.getSortinoRatio());
+    assertEquals(expected, result.getSortinoRatio());
   }
 
   @Test
@@ -199,10 +199,11 @@ class SortinoRatioCalculationTest {
   @Test
   void shouldGetDownsideDeviation_whenCheckResult() {
     final var downsideDeviationCalculation = mock(DownsideDeviationCalculation.class);
-    final var calculationDTO = new CalculationDTO().setWeightedAveragePortfolioReturns(new TreeMap<>(Map.of(LocalDate
-        .now(), TEN)));
+    final var context = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(new TreeMap<>(Map.of(
+        LocalDate
+            .now(), TEN)));
     final var sut = mock(SortinoRatioCalculation.class, withSettings()
-        .useConstructor(calculationDTO, Set.of(), new TreeMap<>(Map.of(LocalDate.now(), TEN)),
+        .useConstructor(context, Set.of(), new TreeMap<>(Map.of(LocalDate.now(), TEN)),
             downsideDeviationCalculation));
 
     when(downsideDeviationCalculation.calculatePeriodForNumberOfMonths(TEN.intValue())).thenReturn(BigDecimal.ONE);

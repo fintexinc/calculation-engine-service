@@ -5,9 +5,9 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.RSquaredResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 
@@ -41,14 +41,15 @@ public class RSquaredCalculationServiceImpl extends PeriodBenchmarkAbstractServi
   }
 
   @Override
-  public PeriodCalculationAbstract<RSquaredResult, ?> defineCalculationMethod(final PeriodCommand reqDTO) {
-    final BenchmarkCalculationDTO inDTO = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
-    final var tBills = tBillsProvider.fetch(reqDTO.getCurrency());
-    final NavigableMap<LocalDate, BigDecimal> portfolioExccessReturn = calculateExcessReturn(inDTO
+  public PeriodCalculationAbstract<RSquaredResult, ?> defineCalculationMethod(final PeriodCommand command) {
+    final BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command,
+        ReturnFactorScale.SCALE_OF_TWO);
+    final var tBills = tBillsProvider.fetch(command.getCurrency());
+    final NavigableMap<LocalDate, BigDecimal> portfolioExccessReturn = calculateExcessReturn(context
         .getWeightedAveragePortfolioReturns(), tBills);
-    final NavigableMap<LocalDate, BigDecimal> benchmarkExccessReturn = calculateExcessReturn(inDTO
+    final NavigableMap<LocalDate, BigDecimal> benchmarkExccessReturn = calculateExcessReturn(context
         .getWeightedAverageBenchmarkReturns(), tBills);
-    return new RSquaredCalculation(inDTO, defaultPeriods, portfolioExccessReturn, benchmarkExccessReturn);
+    return new RSquaredCalculation(context, defaultPeriods, portfolioExccessReturn, benchmarkExccessReturn);
   }
 
 }

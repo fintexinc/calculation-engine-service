@@ -6,9 +6,9 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 
@@ -41,10 +41,12 @@ public class TreynorRatioServiceImpl extends PeriodBenchmarkAbstractService<Trey
   }
 
   @Override
-  public PeriodCalculationAbstract<TreynorRatioResult, ?> defineCalculationMethod(PeriodCommand reqDTO) {
-    BenchmarkCalculationDTO betaInput = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
-    BenchmarkCalculationDTO treynorRatioInput = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_ONE);
-    var tBills = tBillsProvider.fetch(reqDTO.getCurrency());
+  public PeriodCalculationAbstract<TreynorRatioResult, ?> defineCalculationMethod(PeriodCommand command) {
+    BenchmarkPeriodCalculationInput betaInput = buildPeriodCalculationInput(command,
+        ReturnFactorScale.SCALE_OF_TWO);
+    BenchmarkPeriodCalculationInput treynorRatioInput = buildPeriodCalculationInput(command,
+        ReturnFactorScale.SCALE_OF_ONE);
+    var tBills = tBillsProvider.fetch(command.getCurrency());
     NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = calculateExcessReturn(betaInput
         .getWeightedAveragePortfolioReturns(), tBills);
     NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn = calculateExcessReturn(betaInput

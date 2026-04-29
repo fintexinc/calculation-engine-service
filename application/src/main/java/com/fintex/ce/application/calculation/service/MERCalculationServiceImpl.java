@@ -49,15 +49,15 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
 
   @Override
   public Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> fetchData(
-      final AverageMerCommand reqDTO) {
+      final AverageMerCommand command) {
     Map<PortfolioHolding, FeeData> rawData = feesSecurityDataFetcher.fetch(
-        reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
-    return groupAndMap(rawData, reqDTO.getHoldings());
+        command.getHoldings(),
+        getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
+    return groupAndMap(rawData, command.getHoldings());
   }
 
   @Override
-  protected AverageManagementExpenseCalculation mapFeeDataToDto(PortfolioHolding holding, FeeData fees) {
+  protected AverageManagementExpenseCalculation mapFeeDataToCalculation(PortfolioHolding holding, FeeData fees) {
     FinancialInstrumentType type = holding.getHoldingType();
     var builder = AverageManagementExpenseCalculation.builder()
         .marketValue(holding.getValue())
@@ -110,71 +110,71 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
   }
 
   public Optional<List<Warning>> handleFeeDataForCanadaMutualHedgeFundsAndEtf(
-      AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
+      AverageManagementExpenseCalculation averageManagementExpenseCalculation,
       PortfolioHolding holding) {
-    if (Objects.isNull(averageManagementExpenseCalculationDTO.getManagementExpenseRatio()) &&
-        Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
+    if (Objects.isNull(averageManagementExpenseCalculation.getManagementExpenseRatio()) &&
+        Objects.isNull(averageManagementExpenseCalculation.getActualManagementFee())) {
       if (FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holding.getHoldingType())) {
-        setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+        setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
             .getManagementExpenseRatio());
         return Optional.of(List.of(MISSING_MANAGEMENT_EXPENSE_RATIO.warning(holding),
             MISSING_ACTUAL_MANAGEMENT_FEE.warning(holding)));
       }
       throw MISSING_MER_AND_MANAGEMENT_FEE.toExceptionForHolding(holding);
-    } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getManagementExpenseRatio())) {
-      setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+    } else if (Objects.isNull(averageManagementExpenseCalculation.getManagementExpenseRatio())) {
+      setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
           .getActualManagementFee());
       return Optional.of(List.of(MISSING_MANAGEMENT_EXPENSE_RATIO.warning(holding)));
-    } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getActualManagementFee())) {
-      setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+    } else if (Objects.isNull(averageManagementExpenseCalculation.getActualManagementFee())) {
+      setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
           .getManagementExpenseRatio());
       return Optional.of(List.of(MISSING_ACTUAL_MANAGEMENT_FEE.warning(holding)));
     }
-    setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+    setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
         .getManagementExpenseRatio());
     return Optional.empty();
   }
 
   public Optional<Warning> handleFeeDataForUsEtfAndMutualFund(
-      AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO,
+      AverageManagementExpenseCalculation averageManagementExpenseCalculation,
       PortfolioHolding holding) {
-    if (Objects.isNull(averageManagementExpenseCalculationDTO.getNetExpenseRatio()) &&
-        Objects.isNull(averageManagementExpenseCalculationDTO.getGrossExpenseRatio())) {
+    if (Objects.isNull(averageManagementExpenseCalculation.getNetExpenseRatio()) &&
+        Objects.isNull(averageManagementExpenseCalculation.getGrossExpenseRatio())) {
       throw MISSING_NER_AND_GER.toExceptionForHolding(holding);
-    } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getNetExpenseRatio())) {
-      setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO
+    } else if (Objects.isNull(averageManagementExpenseCalculation.getNetExpenseRatio())) {
+      setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
           .getGrossExpenseRatio());
       return Optional.of(MISSING_NET_EXPENSE_RATIO.warning(holding));
-    } else if (Objects.isNull(averageManagementExpenseCalculationDTO.getGrossExpenseRatio())) {
-      setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO.getNetExpenseRatio());
+    } else if (Objects.isNull(averageManagementExpenseCalculation.getGrossExpenseRatio())) {
+      setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation.getNetExpenseRatio());
       return Optional.of(MISSING_GROSS_EXPENSE_RATIO.warning(holding));
     }
-    setFeeValues(averageManagementExpenseCalculationDTO, averageManagementExpenseCalculationDTO.getNetExpenseRatio());
+    setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation.getNetExpenseRatio());
     return Optional.empty();
   }
 
   @Override
   public AverageMerResult calculateAverageValue(final List<ParameterType> parameterTypes,
       final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> averageMerCalculationDtos) {
-    final var resDTO = new AverageMerResult();
+    final var result = new AverageMerResult();
     if (parameterTypes.contains(SCALED)) {
       final BigDecimal scaledAverageMer = getScaledAverageMer(averageMerCalculationDtos);
-      resDTO.getManagementExpenseRatio().put(SCALED, scaledAverageMer);
+      result.getManagementExpenseRatio().put(SCALED, scaledAverageMer);
     }
     if (parameterTypes.contains(ABSOLUTE)) {
       final BigDecimal absoluteAverageMer = getAbsoluteAverageMer(averageMerCalculationDtos);
-      resDTO.getManagementExpenseRatio().put(ABSOLUTE, absoluteAverageMer);
+      result.getManagementExpenseRatio().put(ABSOLUTE, absoluteAverageMer);
     }
     if (parameterTypes.contains(FORCE_REPORT_FEE)) {
       final BigDecimal forceReportFeeAverageMer = getForceReportFeeAverageMer(averageMerCalculationDtos);
-      resDTO.getManagementExpenseRatio().put(FORCE_REPORT_FEE, forceReportFeeAverageMer);
+      result.getManagementExpenseRatio().put(FORCE_REPORT_FEE, forceReportFeeAverageMer);
     }
-    return resDTO;
+    return result;
   }
 
   @Override
   public void setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(final AverageMerResult response,
-      final AverageMerCommand reqDTO) {
-    setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(response.getManagementExpenseRatio(), reqDTO);
+      final AverageMerCommand command) {
+    setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(response.getManagementExpenseRatio(), command);
   }
 }

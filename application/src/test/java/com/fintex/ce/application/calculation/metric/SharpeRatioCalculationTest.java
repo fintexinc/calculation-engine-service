@@ -203,15 +203,15 @@ class SharpeRatioCalculationTest {
     final var sut = mock(SharpeRatioCalculation.class);
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
-    final TimeIntervalResult intervalResDto = new TimeIntervalResult("2000-01-12", ZERO);
-    final TimeIntervalResult intervalResDto1 = new TimeIntervalResult("2020-01-05", BigDecimal.ONE);
-    final Set<TimeIntervalResult> expected = Set.of(intervalResDto, intervalResDto1);
+    final TimeIntervalResult interval1 = new TimeIntervalResult("2000-01-12", ZERO);
+    final TimeIntervalResult interval2 = new TimeIntervalResult("2020-01-05", BigDecimal.ONE);
+    final Set<TimeIntervalResult> expected = Set.of(interval1, interval2);
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
-    final SharpeRatioResult sharpeRatioResDTO = sut.defineResponseType(pairs);
+    final SharpeRatioResult result = sut.defineResponseType(pairs);
 
-    assertEquals(expected, sharpeRatioResDTO.getSharpeRatio());
+    assertEquals(expected, result.getSharpeRatio());
   }
 
   @Test

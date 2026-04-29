@@ -1,9 +1,9 @@
 package com.fintex.ce.application.mapping;
 
 import com.fintex.ce.application.util.JacksonUtil;
+import com.fintex.ce.model.domain.calculation.allocation.GeographicAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.dto.GeographicAllocationDTO;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.Warning;
 
@@ -25,7 +25,7 @@ import static com.fintex.ce.model.error.ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT;
 public class GeographicAllocationMappingService {
   private static final String GEOGRAPHIC_ALLOCATION_MAPPING_PATH = "/jsons/geography-allocation-mapping.json";
 
-  private final Map<String, GeographicAllocationDTO> geographicAllocationMap;
+  private final Map<String, GeographicAllocation> geographicAllocationMap;
 
   public GeographicAllocationMappingService() {
     this.geographicAllocationMap = initGeographicAllocationMapping();
@@ -69,11 +69,11 @@ public class GeographicAllocationMappingService {
       return map;
     }
     allocations.forEach((countryId, value) -> {
-      final GeographicAllocationDTO allocationDTO = geographicAllocationMap.get(countryId);
-      if (allocationDTO == null || allocationDTO.getRegion() == null) {
+      final GeographicAllocation allocation = geographicAllocationMap.get(countryId);
+      if (allocation == null || allocation.getRegion() == null) {
         warnings.add(UNKNOWN_TYPE_FROM_DATA_POINT.warning(holding, countryId, "Geographic Allocation Mapping Table"));
       } else {
-        sumAllocations(map, value, allocationDTO.getRegion());
+        sumAllocations(map, value, allocation.getRegion());
       }
     });
     return map;
@@ -85,14 +85,14 @@ public class GeographicAllocationMappingService {
     map.computeIfPresent(region, (type, sum) -> sum.add(value));
   }
 
-  private Map<String, GeographicAllocationDTO> initGeographicAllocationMapping() {
+  private Map<String, GeographicAllocation> initGeographicAllocationMapping() {
     final InputStream in = getGeographicAllocationInputStream();
     if (in == null) {
       throw ErrorCode.INTERNAL_SERVER_ERROR.toException(
           String.format("Geographic Allocation Mapping is missing from path %s", GEOGRAPHIC_ALLOCATION_MAPPING_PATH));
     }
-    final List<GeographicAllocationDTO> list = JacksonUtil.deserialize(in, new TypeReference<>() {});
-    return list.stream().filter(e -> e.getRegion() != null).collect(toMap(GeographicAllocationDTO::getCountryId,
+    final List<GeographicAllocation> list = JacksonUtil.deserialize(in, new TypeReference<>() {});
+    return list.stream().filter(e -> e.getRegion() != null).collect(toMap(GeographicAllocation::getCountryId,
         e -> e));
   }
 

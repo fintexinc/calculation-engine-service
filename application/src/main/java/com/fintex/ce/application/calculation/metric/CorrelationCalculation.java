@@ -2,12 +2,12 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.util.CalculationUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
 import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.springframework.util.CollectionUtils;
 
@@ -39,10 +39,10 @@ public class CorrelationCalculation
 
   private final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> portfolioBaseTotalReturn;
 
-  public CorrelationCalculation(final CalculationDTO calculationDTO,
+  public CorrelationCalculation(final PeriodCalculationInput context,
       final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> portfolioBaseTotalReturn,
       final Set<String> defaultPeriods) {
-    super(calculationDTO, defaultPeriods);
+    super(context, defaultPeriods);
     this.portfolioBaseTotalReturn = portfolioBaseTotalReturn;
   }
 
@@ -66,22 +66,22 @@ public class CorrelationCalculation
   }
 
   @Override
-  public List<CorrelationPeriodResult> toUserFormat(final List<CorrelationPeriodResult> correlationPeriodDTOS) {
-    if (correlationPeriodDTOS == null) {
+  public List<CorrelationPeriodResult> toUserFormat(final List<CorrelationPeriodResult> correlationPeriodDtoS) {
+    if (correlationPeriodDtoS == null) {
       return null;
     }
 
-    for (final var dto : correlationPeriodDTOS) {
+    for (final var dto : correlationPeriodDtoS) {
       if (!CollectionUtils.isEmpty(dto.getCorrelations())) {
         dto.getCorrelations().forEach(e -> e.setValue(toUserScale(e.getValue())));
       }
     }
-    return correlationPeriodDTOS;
+    return correlationPeriodDtoS;
   }
 
   @Override
-  public CorrelationResult defineResponseType(final Set<Pair<String, List<CorrelationPeriodResult>>> result) {
-    final List<CorrelationPeriodResult> correlationPeriods = result.stream()
+  public CorrelationResult defineResponseType(final Set<Pair<String, List<CorrelationPeriodResult>>> periodValues) {
+    final List<CorrelationPeriodResult> correlationPeriods = periodValues.stream()
         .filter(v -> Objects.nonNull(v.getValue()))
         .flatMap(l -> setPeriod(l.getKey(), l.getValue()).stream())
         .collect(Collectors.toList());

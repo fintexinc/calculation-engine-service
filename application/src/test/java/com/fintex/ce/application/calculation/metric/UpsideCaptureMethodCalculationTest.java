@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.UpsideCaptureResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -33,10 +33,10 @@ class UpsideCaptureMethodCalculationTest {
 
   @Test
   void shouldDefineResponseType_whenVerifyFormTimeIntervalResult() {
-    final BenchmarkCalculationDTO calculationDTO = mock(BenchmarkCalculationDTO.class);
-    when(calculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
+    final BenchmarkPeriodCalculationInput context = mock(BenchmarkPeriodCalculationInput.class);
+    when(context.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
-    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(calculationDTO, null));
+    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
@@ -66,10 +66,10 @@ class UpsideCaptureMethodCalculationTest {
 
   @Test
   void shouldFilterCaptureExpression_whenCheckResult() {
-    final BenchmarkCalculationDTO calculationDTO = mock(BenchmarkCalculationDTO.class);
-    when(calculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
+    final BenchmarkPeriodCalculationInput context = mock(BenchmarkPeriodCalculationInput.class);
+    when(context.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
-    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(calculationDTO, null));
+    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
 
     final var entry = new AbstractMap.SimpleEntry<>(LocalDate.now(), new BigDecimal(String.valueOf(BigDecimal.ONE)));
 
@@ -81,10 +81,10 @@ class UpsideCaptureMethodCalculationTest {
 
   @Test
   void shouldFilterCaptureExpression_whenCheckResult1() {
-    final BenchmarkCalculationDTO calculationDTO = mock(BenchmarkCalculationDTO.class);
-    when(calculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
+    final BenchmarkPeriodCalculationInput context = mock(BenchmarkPeriodCalculationInput.class);
+    when(context.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
-    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(calculationDTO, null));
+    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
 
     final Map.Entry<LocalDate, BigDecimal> entry = new AbstractMap.SimpleEntry<>(
         LocalDate.now(), new BigDecimal(String.valueOf(BigDecimal.ONE.subtract(HUNDRED))));

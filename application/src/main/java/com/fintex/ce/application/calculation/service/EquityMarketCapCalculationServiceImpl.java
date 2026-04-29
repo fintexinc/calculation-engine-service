@@ -71,8 +71,8 @@ public class EquityMarketCapCalculationServiceImpl
   }
 
   @Override
-  public ExposureDataHolder<EquityMarketCapitalizationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
-    Map<PortfolioHolding, HoldingEquityMarketCap> rawData = equityMarketCapSecurityDataFetcher.fetch(reqDTO
+  public ExposureDataHolder<EquityMarketCapitalizationType> fetchExposures(final PortfolioHoldingsCommand command) {
+    Map<PortfolioHolding, HoldingEquityMarketCap> rawData = equityMarketCapSecurityDataFetcher.fetch(command
         .getHoldings(),
         List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
