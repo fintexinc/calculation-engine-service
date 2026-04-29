@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.application.util.MapUtils.overrideDefaultValues;
 import static com.fintex.ce.application.util.TestConstants.GREATER_THAN_YEAR;
-import static org.apache.commons.collections4.MapUtils.EMPTY_SORTED_MAP;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -50,7 +50,7 @@ class AssetAllocationDataMapperTest {
     final Map<PortfolioHolding, HoldingAssetAllocation> etfCanadaAssetAllocation = new HashMap<>();
     final var rAssetAllocationForEtfCanada = new HoldingAssetAllocation().setHoldingType(
         FinancialInstrumentType.ETF_CANADA)
-        .setAllocations(EMPTY_SORTED_MAP);
+        .setAllocations(Collections.emptySortedMap());
     etfCanadaAssetAllocation.put(etfCanada, rAssetAllocationForEtfCanada);
 
     final var req = new AssetAllocationDataDTO();
