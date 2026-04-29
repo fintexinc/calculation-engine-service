@@ -75,9 +75,9 @@ public class FixedIncomeGeographicExposureCalculationImpl
   }
 
   @Override
-  public ExposureDataHolder<GeographicRegionType> fetchExposures(PortfolioHoldingsCommand reqDTO) {
+  public ExposureDataHolder<GeographicRegionType> fetchExposures(PortfolioHoldingsCommand command) {
     List<Warning> warnings = new ArrayList<>();
-    Map<PortfolioHolding, CountryExposure> rawData = fiCountryExposureSecurityDataFetcher.fetch(reqDTO.getHoldings(),
+    Map<PortfolioHolding, CountryExposure> rawData = fiCountryExposureSecurityDataFetcher.fetch(command.getHoldings(),
         List.of());
     Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));

@@ -3,8 +3,8 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.MarRatioCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -32,16 +32,16 @@ class MarRatioCalculationServiceImplTest {
     final var defaultPeriods = Set.of();
     final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
-    final var reqDTO = mock(PeriodCommand.class);
+    final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
-    when(reqDTO.getHoldings()).thenReturn(holdings);
+    when(command.getHoldings()).thenReturn(holdings);
     when(sut.defineCalculationMethod(any())).thenReturn(mock(MarRatioCalculation.class));
 
     doCallRealMethod().when(sut).perform(any());
-    sut.perform(reqDTO);
+    sut.perform(command);
 
-    verify(sut).defineCalculationMethod(reqDTO);
+    verify(sut).defineCalculationMethod(command);
   }
 
   @Test
@@ -50,16 +50,16 @@ class MarRatioCalculationServiceImplTest {
     final var defaultPeriods = Set.of();
     final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
-    final var reqDTO = mock(PeriodCommand.class);
+    final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
-    when(reqDTO.getHoldings()).thenReturn(holdings);
+    when(command.getHoldings()).thenReturn(holdings);
     when(sut.defineCalculationMethod(any())).thenReturn(mock(MarRatioCalculation.class));
 
     doCallRealMethod().when(sut).perform(any());
-    sut.perform(reqDTO);
+    sut.perform(command);
 
-    verify(sut).defineCalculationMethod(reqDTO);
+    verify(sut).defineCalculationMethod(command);
   }
 
   @Test
@@ -68,38 +68,38 @@ class MarRatioCalculationServiceImplTest {
     final var defaultPeriods = Set.of();
     final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
-    final var reqDTO = mock(PeriodCommand.class);
+    final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
-    when(reqDTO.getHoldings()).thenReturn(holdings);
+    when(command.getHoldings()).thenReturn(holdings);
     final var calculationMethod = mock(MarRatioCalculation.class);
     when(sut.defineCalculationMethod(any())).thenReturn(calculationMethod);
-    when(reqDTO.getPeriods()).thenReturn(Set.of("12"));
+    when(command.getPeriods()).thenReturn(Set.of("12"));
 
     doCallRealMethod().when(sut).perform(any());
-    sut.perform(reqDTO);
+    sut.perform(command);
 
     verify(calculationMethod).calculate(Set.of("12"));
   }
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
-    final var benchmarkCalculationDTO = mock(CalculationDTO.class);
+    final var benchmarkContext = mock(PeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
         BigDecimal.TEN));
 
     final var req = mock(PeriodCommand.class);
-    when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
+    when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
     sut.defineCalculationMethod(req);
 
-    verify(sut).buildCalculationDto(req, ReturnFactorScale.SCALE_OF_TWO);
+    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 }

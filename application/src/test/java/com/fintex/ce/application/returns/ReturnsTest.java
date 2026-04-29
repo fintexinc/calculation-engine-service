@@ -111,7 +111,7 @@ class ReturnsTest {
   void shouldValidateAnd_whenUpdateCpsdAndCped() {
     // SETUP
     final PortfolioHolding holding = mock(PortfolioHolding.class);
-    final DailyPerformanceCommand dailyPerformanceReqDTO = mock(DailyPerformanceCommand.class);
+    final DailyPerformanceCommand command = mock(DailyPerformanceCommand.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
     final CpsdDataValidation cpsdDataValidation = mock(CpsdDataValidation.class);
     final CpedDataValidation cpedDataValidation = mock(CpedDataValidation.class);
@@ -124,13 +124,13 @@ class ReturnsTest {
     sut.performanceStartDate = LocalDate.now().minusMonths(7);
     sut.performanceEndDate = LocalDate.now().plusMonths(7);
     sut.returnsMap = Map.of(holding, returns);
-    Mockito.when(dailyPerformanceReqDTO.getStartDate()).thenReturn(LocalDate.now().minusMonths(7));
-    Mockito.when(dailyPerformanceReqDTO.getEndDate()).thenReturn(LocalDate.now().plusMonths(7));
+    Mockito.when(command.getStartDate()).thenReturn(LocalDate.now().minusMonths(7));
+    Mockito.when(command.getEndDate()).thenReturn(LocalDate.now().plusMonths(7));
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(returns);
 
     // ACT
     final ReturnsAggregate actual = sut.validateAndUpdateCpsdAndCped(Map.of(holding, historicalNavPrices),
-        dailyPerformanceReqDTO);
+        command);
 
     // VERIFY
     assertNotNull(actual);
@@ -140,7 +140,7 @@ class ReturnsTest {
   void shouldValidateMonthly_whenDataMissing() {
     // SETUP
     final PortfolioHolding holding = mock(PortfolioHolding.class);
-    final DailyPerformanceCommand dailyPerformanceReqDTO = mock(DailyPerformanceCommand.class);
+    final DailyPerformanceCommand command = mock(DailyPerformanceCommand.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
     final CpsdDataValidation cpsdDataValidation = mock(CpsdDataValidation.class);
     final CpedDataValidation cpedDataValidation = mock(CpedDataValidation.class);
@@ -153,13 +153,13 @@ class ReturnsTest {
     sut.performanceEndDate = LocalDate.now().minusMonths(7);
     sut.performanceStartDate = LocalDate.now().plusMonths(7);
     sut.returnsMap = Map.of(holding, returns);
-    Mockito.when(dailyPerformanceReqDTO.getStartDate()).thenReturn(LocalDate.now().minusMonths(7));
-    Mockito.when(dailyPerformanceReqDTO.getEndDate()).thenReturn(LocalDate.now().plusMonths(7));
+    Mockito.when(command.getStartDate()).thenReturn(LocalDate.now().minusMonths(7));
+    Mockito.when(command.getEndDate()).thenReturn(LocalDate.now().plusMonths(7));
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(returns);
 
     // ACT
     final ReturnsAggregate actual = sut.validateMonthlyDataMissing(Map.of(holding, historicalNavPrices),
-        dailyPerformanceReqDTO);
+        command);
 
     // VERIFY
     assertNotNull(actual);

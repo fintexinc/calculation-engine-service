@@ -1,4 +1,4 @@
-package com.fintex.ce.model.dto;
+package com.fintex.ce.model.domain.calculation.yield;
 
 import com.fintex.ce.model.domain.calculation.distribution.Income;
 
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IncomeForecastDto {
+public class HoldingIncomeForecast {
 
   private String type;
   private String holdingIdentifier;

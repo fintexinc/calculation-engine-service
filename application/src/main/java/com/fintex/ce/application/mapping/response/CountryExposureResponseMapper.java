@@ -60,7 +60,7 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
    *          the calculated net product values per country region type
    * @param warnings
    *          list of warnings to include in response
-   * @return the response DTO with scaled values
+   * @return the result with scaled values
    */
   public CountryExposureResult fromNetProducts(Map<CountryRegionType, BigDecimal> netProducts, List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {

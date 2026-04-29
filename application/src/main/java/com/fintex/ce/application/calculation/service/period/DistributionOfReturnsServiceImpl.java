@@ -7,9 +7,9 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 
 import org.springframework.stereotype.Service;
@@ -36,25 +36,27 @@ public class DistributionOfReturnsServiceImpl
   }
 
   @Override
-  public DistributionOfReturnsResult perform(final DistributionOfReturnsCommand reqDTO) {
-    final CalculationDTO inputWithScaleOfOne = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_ONE);
-    final CalculationDTO inputWithScaleOfTwo = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
+  public DistributionOfReturnsResult perform(final DistributionOfReturnsCommand command) {
+    final PeriodCalculationInput inputWithScaleOfOne = buildPeriodCalculationInput(command,
+        ReturnFactorScale.SCALE_OF_ONE);
+    final PeriodCalculationInput inputWithScaleOfTwo = buildPeriodCalculationInput(command,
+        ReturnFactorScale.SCALE_OF_TWO);
     final var trailingTotalReturnsCalculation = new TrailingTotalReturnsCalculation(inputWithScaleOfTwo, Set.of());
     final var rollingTotalReturnsCalculation = new RollingTotalReturnsCalculation(inputWithScaleOfTwo, Set.of(),
         trailingTotalReturnsCalculation);
     return new DistributionOfReturnsCalculation(rollingTotalReturnsCalculation, inputWithScaleOfOne
-        .getWeightedAveragePortfolioReturns()).calculate(reqDTO);
+        .getWeightedAveragePortfolioReturns()).calculate(command);
   }
 
-  public CalculationDTO buildCalculationDto(final DistributionOfReturnsCommand reqDTO,
+  public PeriodCalculationInput buildPeriodCalculationInput(final DistributionOfReturnsCommand command,
       final ReturnFactorScale returnFactorScale) {
     final ReturnsAggregate portfolioMonthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
-        reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale);
+        command.getHoldings(), command.getCurrency(), returnFactorScale);
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
   }
 }

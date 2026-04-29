@@ -68,13 +68,13 @@ class CreditQualityServiceImplTest {
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final List<PortfolioHolding> holdings = List.of(h);
-    final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
+    final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
 
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
-    when(reqDTO.getHoldings()).thenReturn(holdings);
+    when(command.getHoldings()).thenReturn(holdings);
 
     doCallRealMethod().when(sut).perform(any());
-    sut.perform(reqDTO);
+    sut.perform(command);
 
     verify(creditQualityFetcher).fetch(eq(holdings), any());
   }
@@ -95,11 +95,11 @@ class CreditQualityServiceImplTest {
       when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
 
       final List<PortfolioHolding> holdings = List.of(h);
-      final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
-      when(reqDTO.getHoldings()).thenReturn(holdings);
+      final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
+      when(command.getHoldings()).thenReturn(holdings);
 
       doCallRealMethod().when(sut).perform(any());
-      sut.perform(reqDTO);
+      sut.perform(command);
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(any()));
     }
@@ -121,13 +121,13 @@ class CreditQualityServiceImplTest {
       when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
 
       final List<PortfolioHolding> holdings = List.of(h);
-      final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
-      when(reqDTO.getHoldings()).thenReturn(holdings);
+      final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
+      when(command.getHoldings()).thenReturn(holdings);
 
       doCallRealMethod().when(sut).perform(any());
-      sut.perform(reqDTO);
+      sut.perform(command);
 
-      verify(sut).getFixedIncomeCreditQuality(eq(reqDTO), anyList());
+      verify(sut).getFixedIncomeCreditQuality(eq(command), anyList());
     }
   }
 
@@ -153,11 +153,11 @@ class CreditQualityServiceImplTest {
       final Map<PortfolioHolding, BigDecimal> fixed = Map.of(h, TEN);
       when(sut.getFixedIncomeCreditQuality(any(), anyList())).thenReturn(fixed);
 
-      final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
-      when(reqDTO.getHoldings()).thenReturn(holdings);
+      final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
+      when(command.getHoldings()).thenReturn(holdings);
 
       doCallRealMethod().when(sut).perform(any());
-      sut.perform(reqDTO);
+      sut.perform(command);
 
       verify(sut).calculate(eq(holdings), any(), eq(fixed));
     }
@@ -229,17 +229,17 @@ class CreditQualityServiceImplTest {
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final List<Warning> warnings = List.of(mock(Warning.class));
-    final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
+    final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
     final List<PortfolioHolding> holdings = List.of(h);
     final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
 
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getDataProviders()).thenReturn(providers);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getDataProviders()).thenReturn(providers);
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of());
 
     doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-    sut.getFixedIncomeCreditQuality(reqDTO, warnings);
+    sut.getFixedIncomeCreditQuality(command, warnings);
 
     verify(assetAllocationFetcher).fetch(eq(holdings), any());
   }
@@ -257,18 +257,18 @@ class CreditQualityServiceImplTest {
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
       final var warnings = List.of(mock(Warning.class));
-      final var reqDTO = mock(PortfolioHoldingsCommand.class);
+      final var command = mock(PortfolioHoldingsCommand.class);
       final var providers = List.of(DataProvider.MORNINGSTAR);
       final List<DataProvider> defaultProviders = List.of(DataProvider.MORNINGSTAR);
 
-      when(reqDTO.getDataProviders()).thenReturn(providers);
+      when(command.getDataProviders()).thenReturn(providers);
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of());
       mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(providers, defaultProviders)).thenReturn(
           providers);
 
       doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-      sut.getFixedIncomeCreditQuality(reqDTO, warnings);
+      sut.getFixedIncomeCreditQuality(command, warnings);
 
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, defaultProviders));
     }
@@ -293,15 +293,15 @@ class CreditQualityServiceImplTest {
     when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of(h, asset));
 
     final List<Warning> warnings = List.of(mock(Warning.class));
-    final PortfolioHoldingsCommand reqDTO = mock(PortfolioHoldingsCommand.class);
+    final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
     final List<PortfolioHolding> holdings = List.of(h);
-    when(reqDTO.getHoldings()).thenReturn(holdings);
+    when(command.getHoldings()).thenReturn(holdings);
     final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
-    when(reqDTO.getDataProviders()).thenReturn(providers);
+    when(command.getDataProviders()).thenReturn(providers);
 
     doCallRealMethod().when(sut).getFixedIncomeValue(any());
     doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-    final Map<PortfolioHolding, BigDecimal> actual = sut.getFixedIncomeCreditQuality(reqDTO, warnings);
+    final Map<PortfolioHolding, BigDecimal> actual = sut.getFixedIncomeCreditQuality(command, warnings);
 
     assertEquals(Map.of(h, HUNDRED), actual);
   }

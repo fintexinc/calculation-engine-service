@@ -34,9 +34,9 @@ public class YieldCalculationServiceImpl implements CalculationService<YieldComm
   }
 
   @Override
-  public YieldResult perform(final YieldCommand reqDTO) {
+  public YieldResult perform(final YieldCommand command) {
     final ArrayList<Warning> warnings = new ArrayList<>();
-    final Map<PortfolioHolding, Yield> yieldData = yieldSecurityDataFetcher.fetch(reqDTO.getHoldings(), List.of());
+    final Map<PortfolioHolding, Yield> yieldData = yieldSecurityDataFetcher.fetch(command.getHoldings(), List.of());
     return responseMapper.toResponse(yieldData, warnings);
   }
 }

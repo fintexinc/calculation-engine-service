@@ -1,4 +1,4 @@
-package com.fintex.ce.model.dto.calculation;
+package com.fintex.ce.model.domain.calculation.input;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class HoldingForDailyCalculationDTO extends InvestmentDataDTO {
+public class HoldingForDailyCalculation extends InvestmentData {
 
   private PortfolioHolding holding;
 
-  public HoldingForDailyCalculationDTO(final PortfolioHolding holding, final BigDecimal purchaseAmount) {
+  public HoldingForDailyCalculation(final PortfolioHolding holding, final BigDecimal purchaseAmount) {
     this.holding = holding;
     this.setPurchaseAmount(purchaseAmount);
   }

@@ -1,8 +1,8 @@
 package com.fintex.ce.application.util;
 
+import com.fintex.ce.model.domain.calculation.yield.HoldingIncomeForecast;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.dto.IncomeForecastDto;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -26,19 +26,19 @@ public class PortfolioUtils {
   }
 
   public static void setHoldingResponseDetails(final PortfolioHolding holding,
-      final IncomeForecastDto incomeForecastDTO) {
+      final HoldingIncomeForecast holdingIncomeForecast) {
     SecurityIdentifier secId = holding.getSecurityIdentifier();
     if (secId == null) {
       return;
     }
 
     if (secId instanceof EquitySecurityIdentifier eqId) {
-      incomeForecastDTO.setTicker(secId.getId());
-      incomeForecastDTO.setExchangeCode(eqId.getExchangeId());
+      holdingIncomeForecast.setTicker(secId.getId());
+      holdingIncomeForecast.setExchangeCode(eqId.getExchangeId());
     } else if (FilterUtils.CANADA_MUTUAL_PREDICATE.test(holding)) {
-      incomeForecastDTO.setFundServeCode(secId.getId());
+      holdingIncomeForecast.setFundServeCode(secId.getId());
     } else {
-      incomeForecastDTO.setIdentifier(secId.getId());
+      holdingIncomeForecast.setIdentifier(secId.getId());
     }
   }
 

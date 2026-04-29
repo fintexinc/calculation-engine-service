@@ -61,7 +61,7 @@ public class FixedIncomeStyleboxExposureResponseMapper
    *          the calculated net product values per stylebox type
    * @param warnings
    *          list of warnings to include in response
-   * @return the response DTO with scaled values
+   * @return the result with scaled values
    */
   public FixedIncomeStyleboxExposureResult fromNetProducts(Map<FixedIncomeStyleBoxType, BigDecimal> netProducts,
       List<Warning> warnings) {

@@ -79,16 +79,16 @@ public class AssetAllocationEMServiceImpl
   }
 
   @Override
-  public ExposureDataHolder<AssetAllocationRegionEmType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
+  public ExposureDataHolder<AssetAllocationRegionEmType> fetchExposures(final PortfolioHoldingsCommand command) {
     final Map<PortfolioHolding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
-        reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
+        command.getHoldings(),
+        getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
     final var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
 
     return calculateAssetAllocationEMarketMap(
-        reqDTO.getHoldings(),
+        command.getHoldings(),
         assetAllocations,
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
+        getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
   }
 
   public ExposureDataHolder<AssetAllocationRegionEmType> calculateAssetAllocationEMarketMap(

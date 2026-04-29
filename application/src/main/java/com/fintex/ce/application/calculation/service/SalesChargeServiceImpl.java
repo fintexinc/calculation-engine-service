@@ -28,9 +28,9 @@ public class SalesChargeServiceImpl implements CalculationService<PortfolioHoldi
   }
 
   @Override
-  public SalesChargeResult perform(PortfolioHoldingsCommand reqDTO) {
-    Map<PortfolioHolding, SalesCharge> salesCharges = salesChargeSecurityDataFetcher.fetch(reqDTO.getHoldings(),
-        reqDTO.getDataProviders());
+  public SalesChargeResult perform(PortfolioHoldingsCommand command) {
+    Map<PortfolioHolding, SalesCharge> salesCharges = salesChargeSecurityDataFetcher.fetch(command.getHoldings(),
+        command.getDataProviders());
 
     SalesChargeCalculation salesChargeCalculation = getSalesChargeCalculation(salesCharges);
     return salesChargeCalculation.calculate();

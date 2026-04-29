@@ -94,9 +94,9 @@ public class ClassificationAllocationCalculationServiceImpl
   }
 
   @Override
-  public ExposureDataHolder<ClassificationAllocationType> fetchExposures(final PortfolioHoldingsCommand reqDTO) {
+  public ExposureDataHolder<ClassificationAllocationType> fetchExposures(final PortfolioHoldingsCommand command) {
     Map<PortfolioHolding, ClassificationAllocation> rawData = classificationAllocationSecurityDataFetcher.fetch(
-        reqDTO.getHoldings(), List.of());
+        command.getHoldings(), List.of());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         ClassificationAllocation::getSecurityClassificationValues,
         ALLOCATION_DEFAULT_MAP, MISSING_CLASSIFICATION_ALLOCATION);

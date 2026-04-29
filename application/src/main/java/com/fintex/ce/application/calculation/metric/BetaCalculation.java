@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.AlphaBetaCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.BetaResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,7 +16,7 @@ import lombok.Getter;
 @Getter
 public class BetaCalculation extends AlphaBetaCalculationAbstract<BetaResult> {
 
-  public BetaCalculation(final BenchmarkCalculationDTO input,
+  public BetaCalculation(final BenchmarkPeriodCalculationInput input,
       final Set<String> periods,
       final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn,
       final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn) {
@@ -24,11 +24,11 @@ public class BetaCalculation extends AlphaBetaCalculationAbstract<BetaResult> {
   }
 
   @Override
-  public BetaResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final BetaResult resDTO = new BetaResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    resDTO.setBeta(timeIntervals);
-    return resDTO;
+  public BetaResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final BetaResult result = new BetaResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setBeta(timeIntervals);
+    return result;
   }
 
 }

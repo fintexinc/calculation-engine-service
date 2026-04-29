@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.RollingAbstractCalculation;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -15,7 +15,7 @@ public class RollingSharpeRatioCalculation extends RollingAbstractCalculation<Ro
 
   private final SharpeRatioCalculation sharpeRatioCalculation;
 
-  public RollingSharpeRatioCalculation(final CalculationDTO input,
+  public RollingSharpeRatioCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final SharpeRatioCalculation sharpeRatioCalculation) {
     super(input, defaultPeriods);

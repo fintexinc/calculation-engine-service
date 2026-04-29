@@ -51,8 +51,8 @@ class PeriodBenchmarkAbstractServiceTest {
     when(benchmarkMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate)).thenReturn(
         benchmark1);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(req, returnFactorScale);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(portfolioMonthlyReturnsAggregate).cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate);
     verify(benchmarkMonthlyReturnsAggregate).cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate);
@@ -80,8 +80,8 @@ class PeriodBenchmarkAbstractServiceTest {
     when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(
         ReturnsAggregate.class));
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(req, returnFactorScale);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(portfolioHoldings, Currency.CAD, returnFactorScale);
   }
@@ -108,8 +108,8 @@ class PeriodBenchmarkAbstractServiceTest {
     when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(
         ReturnsAggregate.class));
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(req, returnFactorScale);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getBenchmarkMonthlyReturns(benchmarkHoldings, Currency.CAD, returnFactorScale);
   }

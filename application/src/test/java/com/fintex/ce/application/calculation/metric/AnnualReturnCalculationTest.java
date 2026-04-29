@@ -43,13 +43,13 @@ class AnnualReturnCalculationTest {
         end, BigDecimal.TEN));
 
     doCallRealMethod().when(sut).populateBasicDetails(any(), any());
-    final AnnualReturnResult resDTO = new AnnualReturnResult().setAnnualReturns(List.of());
-    resDTO.setWarnings(List.of());
-    sut.populateBasicDetails(resDTO, portfolioReturns);
+    final AnnualReturnResult result = new AnnualReturnResult().setAnnualReturns(List.of());
+    result.setWarnings(List.of());
+    sut.populateBasicDetails(result, portfolioReturns);
 
-    assertEquals(end, resDTO.getPerformanceEndDate());
-    assertEquals(start, resDTO.getPerformanceStartDate());
-    assertEquals(List.of(), resDTO.getAnnualReturns());
+    assertEquals(end, result.getPerformanceEndDate());
+    assertEquals(start, result.getPerformanceStartDate());
+    assertEquals(List.of(), result.getAnnualReturns());
   }
 
   @Test
@@ -187,7 +187,7 @@ class AnnualReturnCalculationTest {
     final TreeMap<Integer, BigDecimal> years = new TreeMap<>();
     when(sut.calculateAnnualReturns(any(), any())).thenReturn(years);
 
-    final List<KeyValueResult> keyValueDTOS = years.entrySet().stream().map(e -> new KeyValueResult(e.getKey(), e
+    final List<KeyValueResult> keyValueDtoS = years.entrySet().stream().map(e -> new KeyValueResult(e.getKey(), e
         .getValue()))
         .collect(Collectors.toList());
 
@@ -195,7 +195,7 @@ class AnnualReturnCalculationTest {
     sut.calculate();
 
     verify(sut).populateBasicDetails(
-        argThat(arg -> (arg).getAnnualReturns().equals(keyValueDTOS)),
+        argThat(arg -> (arg).getAnnualReturns().equals(keyValueDtoS)),
         eq(returns));
   }
 

@@ -34,13 +34,13 @@ public class AnnualReturnCalculation {
   public AnnualReturnResult<Integer> calculate() {
     final var portfolioReturns = new TreeMap<>(portfolioTotalReturns);
     final Set<Integer> years = portfolioReturns.keySet().stream().map(LocalDate::getYear).collect(Collectors.toSet());
-    final NavigableMap<Integer, BigDecimal> result = calculateAnnualReturns(portfolioReturns, years);
-    final AnnualReturnResult<Integer> responseDTO = new AnnualReturnResult<>();
-    responseDTO.setAnnualReturns(result.entrySet().stream().map(e -> new KeyValueResult<>(e.getKey(), e.getValue()))
+    final NavigableMap<Integer, BigDecimal> annualReturns = calculateAnnualReturns(portfolioReturns, years);
+    final AnnualReturnResult<Integer> result = new AnnualReturnResult<>();
+    result.setAnnualReturns(annualReturns.entrySet().stream().map(e -> new KeyValueResult<>(e.getKey(), e.getValue()))
         .toList());
-    populateBasicDetails(responseDTO, portfolioReturns);
-    responseDTO.setWarnings(warnings);
-    return responseDTO;
+    populateBasicDetails(result, portfolioReturns);
+    result.setWarnings(warnings);
+    return result;
   }
 
   /**
@@ -75,15 +75,15 @@ public class AnnualReturnCalculation {
   /**
    * Populates PSD and PED for the response
    *
-   * @param responseDTO
-   *          response DTO
+   * @param result
+   *          annual-return result to populate
    * @param portfolioReturns
    *          portfolio returns
    */
-  public void populateBasicDetails(final AnnualReturnResult<Integer> responseDTO,
+  public void populateBasicDetails(final AnnualReturnResult<Integer> result,
       final TreeMap<LocalDate, BigDecimal> portfolioReturns) {
-    responseDTO.setPerformanceStartDate(portfolioReturns.firstKey());
-    responseDTO.setPerformanceEndDate(portfolioReturns.lastKey());
+    result.setPerformanceStartDate(portfolioReturns.firstKey());
+    result.setPerformanceEndDate(portfolioReturns.lastKey());
   }
 
 }

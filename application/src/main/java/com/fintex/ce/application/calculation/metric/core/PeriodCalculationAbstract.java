@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric.core;
 
 import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.error.ErrorCode;
 
 import org.springframework.util.CollectionUtils;
@@ -49,7 +49,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
   public NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns;
   public LocalDate cipsd;
 
-  protected PeriodCalculationAbstract(final CalculationDTO input,
+  protected PeriodCalculationAbstract(final PeriodCalculationInput input,
       final Set<String> defaultPeriods) {
     this.cipsd = input.getCipsd();
     this.portfolioTotalReturns = input.getWeightedAveragePortfolioReturns();
@@ -250,31 +250,31 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    */
   public T calculate(final Set<String> periods) {
     final Set<Pair<String, V>> periodsResult = calculatePeriods(periods);
-    final T responseDTO = defineResponseType(periodsResult);
-    populateBasicDetails(responseDTO);
-    return responseDTO;
+    final T result = defineResponseType(periodsResult);
+    populateBasicDetails(result);
+    return result;
   }
 
   /**
-   * Populates basic DTO fields that are common for all of the period based calculations
-   *
-   * @param responseDTO
-   *          user defined period based response object
-   */
-  public void populateBasicDetails(final T responseDTO) {
-    responseDTO.setCustomIntervalPerformanceStartDate(cipsd);
-    responseDTO.setPerformanceEndDate(portfolioTotalReturns.lastKey());
-    responseDTO.setPerformanceStartDate(portfolioTotalReturns.firstKey());
-  }
-
-  /**
-   * Defines desired period based object with pre-init result
+   * Populates basic fields that are common for all of the period based calculations
    *
    * @param result
-   *          calculated periods (final result)
-   * @return user created period based response object
+   *          period-based result object to populate
    */
-  public abstract T defineResponseType(final Set<Pair<String, V>> result);
+  public void populateBasicDetails(final T result) {
+    result.setCustomIntervalPerformanceStartDate(cipsd);
+    result.setPerformanceEndDate(portfolioTotalReturns.lastKey());
+    result.setPerformanceStartDate(portfolioTotalReturns.firstKey());
+  }
+
+  /**
+   * Builds the metric-specific result from the per-period calculated values.
+   *
+   * @param periodValues
+   *          calculated value per requested period
+   * @return populated period-based result object
+   */
+  public abstract T defineResponseType(final Set<Pair<String, V>> periodValues);
 
   /**
    * returns period start date by number of months. Last date in returns map minus (numberOfMonths - 1)

@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.StandardDeviationCalculation;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 
@@ -83,11 +83,11 @@ class StandardDeviationCalculationServiceImplTest {
     final var sut = mock(StandardDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of("12", "36", "60", "120")));
     final var req = mock(PeriodCommand.class);
-    final var calculationDTO = mock(CalculationDTO.class);
-    final var expected = new StandardDeviationCalculation(calculationDTO, Set.of("12", "36", "60", "120")).setScale(
+    final var context = mock(PeriodCalculationInput.class);
+    final var expected = new StandardDeviationCalculation(context, Set.of("12", "36", "60", "120")).setScale(
         OUTPUT_SCALE);
 
-    when(sut.buildCalculationDto(any(), any())).thenReturn(calculationDTO);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(context);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     // ACT

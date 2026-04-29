@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.util.ReturnFactorScale;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -23,23 +23,23 @@ import static org.mockito.Mockito.withSettings;
 class TrackingErrorCalculationServiceImplTest {
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(TrackingErrorCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
-    final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
+    final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
-    when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
-    when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
+    when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
     sut.defineCalculationMethod(req);
 
-    verify(sut).buildCalculationDto(req, ReturnFactorScale.SCALE_OF_TWO);
+    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 
 }

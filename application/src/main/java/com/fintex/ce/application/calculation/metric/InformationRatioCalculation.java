@@ -2,9 +2,9 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.BenchmarkWeightedAverageCalculation;
 import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -19,7 +19,7 @@ public class InformationRatioCalculation
   private final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation;
   private final TrackingErrorCalculation trackingErrorCalculation;
 
-  public InformationRatioCalculation(final BenchmarkCalculationDTO input,
+  public InformationRatioCalculation(final BenchmarkPeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation,
       final TrackingErrorCalculation trackingErrorCalculation) {

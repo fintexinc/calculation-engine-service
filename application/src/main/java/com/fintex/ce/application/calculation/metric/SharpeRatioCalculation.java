@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -25,7 +25,7 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
 
   public StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation;
 
-  public SharpeRatioCalculation(final CalculationDTO input,
+  public SharpeRatioCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final NavigableMap<LocalDate, BigDecimal> tBills,
       final StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation) {
@@ -90,11 +90,11 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
   }
 
   @Override
-  public SharpeRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final SharpeRatioResult sharpeRatioResDTO = new SharpeRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    sharpeRatioResDTO.setSharpeRatio(timeIntervals);
-    return sharpeRatioResDTO;
+  public SharpeRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final SharpeRatioResult result = new SharpeRatioResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setSharpeRatio(timeIntervals);
+    return result;
   }
 
 }

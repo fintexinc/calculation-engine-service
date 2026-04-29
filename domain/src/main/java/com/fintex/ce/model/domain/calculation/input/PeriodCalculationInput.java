@@ -1,4 +1,4 @@
-package com.fintex.ce.model.dto.calculation;
+package com.fintex.ce.model.domain.calculation.input;
 
 import com.fintex.ce.model.error.Warning;
 
@@ -11,16 +11,16 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class CalculationDTO {
+public class PeriodCalculationInput {
 
-  public CalculationDTO(
+  public PeriodCalculationInput(
       final LocalDate cipsd,
       final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns) {
     this.cipsd = cipsd;
     this.weightedAveragePortfolioReturns = weightedAveragePortfolioReturns;
   }
 
-  public CalculationDTO(
+  public PeriodCalculationInput(
       final LocalDate cipsd,
       final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns,
       final List<Warning> warnings) {
@@ -29,7 +29,7 @@ public class CalculationDTO {
     this.warnings = warnings;
   }
 
-  public CalculationDTO() {
+  public PeriodCalculationInput() {
   }
 
   // custom interval portfolio start date

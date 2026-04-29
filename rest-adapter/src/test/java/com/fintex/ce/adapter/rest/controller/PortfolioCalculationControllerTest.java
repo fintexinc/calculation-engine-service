@@ -118,9 +118,9 @@ class PortfolioCalculationControllerTest {
     verify(mockServices.get(metric)).perform(any());
 
     String responseBody = mvcResult.getResponse().getContentAsString();
-    BaseCalculationResult actualDto = objectMapper.readValue(responseBody, responseType);
+    BaseCalculationResult actual = objectMapper.readValue(responseBody, responseType);
 
-    assertThat(actualDto)
+    assertThat(actual)
         .isNotNull()
         .isInstanceOf(responseType)
         .usingRecursiveComparison()

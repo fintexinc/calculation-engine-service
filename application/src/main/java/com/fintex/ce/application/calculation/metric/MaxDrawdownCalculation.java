@@ -2,9 +2,9 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -32,7 +32,7 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
   private final NavigableMap<LocalDate, BigDecimal> growth10K;
   private final Function<BigDecimal, BigDecimal> scaleFunction;
 
-  public MaxDrawdownCalculation(final CalculationDTO input,
+  public MaxDrawdownCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final NavigableMap<LocalDate, BigDecimal> growth10K,
       final Function<BigDecimal, BigDecimal> scaleFunction) {
@@ -71,13 +71,13 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
   }
 
   @Override
-  public MaxDrawdownResult defineResponseType(final Set<Pair<String, MaxDrawdownEntry>> result) {
-    final MaxDrawdownResult maxDrawdownResDTO = new MaxDrawdownResult();
-    final List<MaxDrawdownEntry> maxDrawdownDTOS = result.stream()
+  public MaxDrawdownResult defineResponseType(final Set<Pair<String, MaxDrawdownEntry>> periodValues) {
+    final MaxDrawdownResult result = new MaxDrawdownResult();
+    final List<MaxDrawdownEntry> maxDrawdownDtoS = periodValues.stream()
         .map(v -> ofNullable(v.getValue()).orElse(new MaxDrawdownEntry()).setPeriod(v.getKey()))
         .collect(Collectors.toList());
-    maxDrawdownResDTO.setMaxDrawdown(maxDrawdownDTOS);
-    return maxDrawdownResDTO;
+    result.setMaxDrawdown(maxDrawdownDtoS);
+    return result;
   }
 
   /**

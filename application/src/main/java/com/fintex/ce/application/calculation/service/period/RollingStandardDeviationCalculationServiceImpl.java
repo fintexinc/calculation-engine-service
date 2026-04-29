@@ -6,9 +6,9 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,30 +38,30 @@ public class RollingStandardDeviationCalculationServiceImpl
   }
 
   @Override
-  public RollingStandardDeviationResult perform(final RollingCalculationCommand reqDTO) {
-    final var rollingStandardDeviationCalculation = defineCalculationMethod(reqDTO);
-    return rollingStandardDeviationCalculation.calculate(reqDTO.getRollingPeriods());
+  public RollingStandardDeviationResult perform(final RollingCalculationCommand command) {
+    final var rollingStandardDeviationCalculation = defineCalculationMethod(command);
+    return rollingStandardDeviationCalculation.calculate(command.getRollingPeriods());
   }
 
   @Override
-  public RollingStandardDeviationCalculation defineCalculationMethod(final RollingCalculationCommand reqDTO) {
-    final CalculationDTO input = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
+  public RollingStandardDeviationCalculation defineCalculationMethod(final RollingCalculationCommand command) {
+    final PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
     final var standardDeviationCalculation = new StandardDeviationCalculation<>(input, defaultPeriods).setScale(
         OUTPUT_SCALE);
     return new RollingStandardDeviationCalculation(input, defaultPeriods, standardDeviationCalculation);
   }
 
   @Override
-  public CalculationDTO buildCalculationDto(final RollingCalculationCommand reqDTO,
+  public PeriodCalculationInput buildPeriodCalculationInput(final RollingCalculationCommand command,
       final ReturnFactorScale returnFactorScale) {
     final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
-        reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale);
+        command.getHoldings(), command.getCurrency(), returnFactorScale);
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
   }
 
 }

@@ -38,8 +38,8 @@ public class CommonPerformanceDateServiceImpl
   }
 
   @Override
-  public CommonPerformanceDatesResult perform(MultiplePortfoliosCommand mReqDTO) {
-    List<PortfolioHolding> portfolioHoldings = collectAllPortfolioHoldings(mReqDTO.getPortfolios());
+  public CommonPerformanceDatesResult perform(MultiplePortfoliosCommand command) {
+    List<PortfolioHolding> portfolioHoldings = collectAllPortfolioHoldings(command.getPortfolios());
 
     var collector = new PceExceptionCollector();
     ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForPortfolios = collector.tryCatch(
@@ -47,7 +47,7 @@ public class CommonPerformanceDateServiceImpl
     DateRange commonPerformanceDateForPortfolios = collector.tryCatch(
         () -> commonPerformanceDateFor(monthlyReturnsAggregateForPortfolios));
     ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForBenchmark = collector.tryCatch(
-        () -> getPortfolioMonthlyReturns(mReqDTO.getBenchmarkHoldings()));
+        () -> getPortfolioMonthlyReturns(command.getBenchmarkHoldings()));
     DateRange commonPerformanceDatesForBenchmarks = collector.tryCatch(
         () -> commonPerformanceDateFor(monthlyReturnsAggregateForBenchmark));
     collector.throwIfAny();

@@ -6,9 +6,9 @@ import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -35,25 +35,25 @@ import static org.mockito.Mockito.withSettings;
 class GrowthOf10KCalculationServiceImplTest {
 
   @Test
-  void shouldPerform_whenVerifyBuildWeightedAverageInputDto() {
+  void shouldPerform_whenVerifyBuildWeightedAverageInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
-    final var returnReqDTO = mock(ReturnCommand.class);
+    final var command = mock(ReturnCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final var calculation = mock(Growth10KCalculation.class);
 
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(sut.buildCalculationDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    when(command.getHoldings()).thenReturn(holdings);
+    when(sut.buildPeriodCalculationInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
     when(sut.buildGrowth10kCalculation(any(), any())).thenReturn(calculation);
 
-    doCallRealMethod().when(sut).perform(returnReqDTO);
-    sut.perform(returnReqDTO);
+    doCallRealMethod().when(sut).perform(command);
+    sut.perform(command);
 
-    verify(sut).buildCalculationDto(returnReqDTO);
+    verify(sut).buildPeriodCalculationInput(command);
   }
 
   @Test
@@ -62,27 +62,27 @@ class GrowthOf10KCalculationServiceImplTest {
     final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
-    final var returnReqDTO = mock(ReturnCommand.class);
+    final var command = mock(ReturnCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
 
     final var growth10KCalculation = mock(Growth10KCalculation.class, withSettings()
         .useConstructor(new TreeMap<>(), DateRange.UNBOUNDED, false, List.of()));
-    final var resDTO = mock(Growth10KResult.class);
+    final var result = mock(Growth10KResult.class);
 
-    final var calculationDTO = mock(CalculationDTO.class);
-    when(sut.buildCalculationDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    final var context = mock(PeriodCalculationInput.class);
+    when(sut.buildPeriodCalculationInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
 
-    when(sut.buildGrowth10kCalculation(returnReqDTO, calculationDTO)).thenReturn(growth10KCalculation);
-    when(growth10KCalculation.calculate()).thenReturn(resDTO);
+    when(sut.buildGrowth10kCalculation(command, context)).thenReturn(growth10KCalculation);
+    when(growth10KCalculation.calculate()).thenReturn(result);
 
     doCallRealMethod().when(sut).perform(any());
-    final Growth10KResult actual = sut.perform(returnReqDTO);
+    final Growth10KResult actual = sut.perform(command);
 
-    assertSame(resDTO, actual);
+    assertSame(result, actual);
   }
 
   @Test
@@ -98,14 +98,14 @@ class GrowthOf10KCalculationServiceImplTest {
     when(monthlyReturnsAggregate.setCpedDataValidation(any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsAggregate.setCpsdDataValidation(any())).thenReturn(monthlyReturnsAggregate);
 
-    final ReturnCommand returnReqDTO = mock(ReturnCommand.class);
-    when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    final ReturnCommand command = mock(ReturnCommand.class);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildCalculationDto(any());
-    sut.buildCalculationDto(returnReqDTO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
+    sut.buildPeriodCalculationInput(command);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(
         holdings,
@@ -122,22 +122,24 @@ class GrowthOf10KCalculationServiceImplTest {
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
 
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
-    final var expected = new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns).setWarnings(List
-        .of());
+    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns)
+        .setWarnings(
+            List
+                .of());
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
         portfolioTotalReturns);
     when(monthlyReturnsAggregate.setCpedDataValidation(any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsAggregate.setCpsdDataValidation(any())).thenReturn(monthlyReturnsAggregate);
 
-    final var returnReqDTO = mock(ReturnCommand.class);
-    when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    final var command = mock(ReturnCommand.class);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildCalculationDto(any());
-    final CalculationDTO actual = sut.buildCalculationDto(returnReqDTO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
+    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command);
 
     assertEquals(expected, actual);
   }
@@ -152,8 +154,9 @@ class GrowthOf10KCalculationServiceImplTest {
     final var warnings = List.of(mock(Warning.class));
 
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
-    final var expected = new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns).setWarnings(
-        warnings);
+    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns)
+        .setWarnings(
+            warnings);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
         portfolioTotalReturns);
@@ -161,14 +164,14 @@ class GrowthOf10KCalculationServiceImplTest {
     when(monthlyReturnsAggregate.setCpsdDataValidation(any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsAggregate.getErrorsAsWarnings()).thenReturn(warnings);
 
-    final var returnReqDTO = mock(ReturnCommand.class);
-    when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    final var command = mock(ReturnCommand.class);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildCalculationDto(any());
-    final CalculationDTO actual = sut.buildCalculationDto(returnReqDTO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
+    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command);
 
     assertEquals(expected, actual);
   }
@@ -186,14 +189,14 @@ class GrowthOf10KCalculationServiceImplTest {
     when(monthlyReturnsAggregate.setCpedDataValidation(any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsAggregate.setCpsdDataValidation(any())).thenReturn(monthlyReturnsAggregate);
 
-    final var returnReqDTO = mock(ReturnCommand.class);
-    when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    final var command = mock(ReturnCommand.class);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildCalculationDto(any());
-    sut.buildCalculationDto(returnReqDTO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
+    sut.buildPeriodCalculationInput(command);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate,
         LOCAL_DATE_NOW.minusMonths(2), LOCAL_DATE_NOW);
@@ -212,14 +215,14 @@ class GrowthOf10KCalculationServiceImplTest {
     when(monthlyReturnsAggregate.setCpedDataValidation(any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsAggregate.setCpsdDataValidation(any())).thenReturn(monthlyReturnsAggregate);
 
-    final var returnReqDTO = mock(ReturnCommand.class);
-    when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
-    when(returnReqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
+    final var command = mock(ReturnCommand.class);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildCalculationDto(any());
-    sut.buildCalculationDto(returnReqDTO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
+    sut.buildPeriodCalculationInput(command);
 
     verify(monthlyReturnsAggregate).setCpedDataValidation(new PortfolioCpedDataValidation());
     verify(monthlyReturnsAggregate).setCpsdDataValidation(new PortfolioCpsdDataValidation());
@@ -229,14 +232,14 @@ class GrowthOf10KCalculationServiceImplTest {
   void shouldBuildGrowth10kCalculation_whenVerifyConstructionGrowth10KCalculation() {
     try (var mockedGrowth10KCalculation = Mockito.mockConstruction(Growth10KCalculation.class)) {
       final var sut = mock(GrowthOf10KCalculationServiceImpl.class);
-      final var returnReqDTO = mock(ReturnCommand.class);
-      final var calculationDTO = mock(CalculationDTO.class);
+      final var command = mock(ReturnCommand.class);
+      final var context = mock(PeriodCalculationInput.class);
 
       doCallRealMethod().when(sut).buildGrowth10kCalculation(any(), any());
 
-      final Growth10KCalculation actual = sut.buildGrowth10kCalculation(returnReqDTO, calculationDTO);
+      final Growth10KCalculation actual = sut.buildGrowth10kCalculation(command, context);
 
-      verify(calculationDTO).getWeightedAveragePortfolioReturns();
+      verify(context).getWeightedAveragePortfolioReturns();
 
       final List<Growth10KCalculation> constructed = mockedGrowth10KCalculation.constructed();
 
@@ -249,15 +252,15 @@ class GrowthOf10KCalculationServiceImplTest {
   void shouldBuildGrowth10kCalculation_whenVerifyCustomDatesUsed() {
     try (var mockedGrowth10KCalculation = Mockito.mockConstruction(Growth10KCalculation.class)) {
       final var sut = mock(GrowthOf10KCalculationServiceImpl.class);
-      final var returnReqDTO = mock(ReturnCommand.class);
-      final var calculationDTO = mock(CalculationDTO.class);
+      final var command = mock(ReturnCommand.class);
+      final var context = mock(PeriodCalculationInput.class);
 
       doCallRealMethod().when(sut).buildGrowth10kCalculation(any(), any());
 
-      sut.buildGrowth10kCalculation(returnReqDTO, calculationDTO);
+      sut.buildGrowth10kCalculation(command, context);
 
-      verify(returnReqDTO).getCustomPsd();
-      verify(returnReqDTO).getCustomPed();
+      verify(command).getCustomPsd();
+      verify(command).getCustomPed();
     }
   }
 

@@ -24,7 +24,7 @@ class SalesChargeTypeServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
-    final var reqDTO = mock(PortfolioHoldingsCommand.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
 
     final var salesCharge = mock(Map.class);
     when(fetcher.fetch(any(), any())).thenReturn(salesCharge);
@@ -32,7 +32,7 @@ class SalesChargeTypeServiceImplTest {
 
     doCallRealMethod().when(sut).perform(any());
     // ACT
-    sut.perform(reqDTO);
+    sut.perform(command);
 
     // VERIFY
     verify(fetcher).fetch(any(), any());
@@ -43,7 +43,7 @@ class SalesChargeTypeServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
-    final var reqDTO = mock(PortfolioHoldingsCommand.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
 
     final var salesCharge = mock(Map.class);
     when(fetcher.fetch(any(), any())).thenReturn(salesCharge);
@@ -51,7 +51,7 @@ class SalesChargeTypeServiceImplTest {
 
     doCallRealMethod().when(sut).perform(any());
     // ACT
-    sut.perform(reqDTO);
+    sut.perform(command);
 
     // VERIFY
     verify(sut).getSalesChargeCalculation(salesCharge);
@@ -62,7 +62,7 @@ class SalesChargeTypeServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
-    final var reqDTO = mock(PortfolioHoldingsCommand.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
     final SalesChargeCalculation calculation = mock(SalesChargeCalculation.class);
     final SalesChargeResult expected = mock(SalesChargeResult.class);
 
@@ -73,7 +73,7 @@ class SalesChargeTypeServiceImplTest {
 
     doCallRealMethod().when(sut).perform(any());
     // ACT
-    final SalesChargeResult actual = sut.perform(reqDTO);
+    final SalesChargeResult actual = sut.perform(command);
 
     // VERIFY
     assertSame(expected, actual);

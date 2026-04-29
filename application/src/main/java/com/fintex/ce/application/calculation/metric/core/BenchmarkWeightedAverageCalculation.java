@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.metric.core;
 
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ public abstract class BenchmarkWeightedAverageCalculation<T extends PeriodResult
   @Setter
   protected NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns;
 
-  protected BenchmarkWeightedAverageCalculation(final BenchmarkCalculationDTO input,
+  protected BenchmarkWeightedAverageCalculation(final BenchmarkPeriodCalculationInput input,
       final Set<String> periods) {
     super(input, periods);
     this.benchmarkTotalReturns = input.getWeightedAverageBenchmarkReturns();

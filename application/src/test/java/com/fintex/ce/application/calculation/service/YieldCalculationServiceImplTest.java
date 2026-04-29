@@ -58,7 +58,7 @@ class YieldCalculationServiceImplTest {
   @Test
   void shouldTestPerform_whenConditionIsMet() {
     // SETUP
-    YieldCommand reqDTO = mock(YieldCommand.class);
+    YieldCommand command = mock(YieldCommand.class);
     Map<PortfolioHolding, Yield> mockData = createMockData();
     YieldResult expectedResponse = new YieldResult();
 
@@ -66,7 +66,7 @@ class YieldCalculationServiceImplTest {
     when(responseMapper.toResponse(any(Map.class), any())).thenReturn(expectedResponse);
 
     // ACT
-    YieldResult result = service.perform(reqDTO);
+    YieldResult result = service.perform(command);
 
     // VERIFY
     verify(yieldFetcher).fetch(any(), any());
@@ -78,12 +78,12 @@ class YieldCalculationServiceImplTest {
   @Test
   void shouldTestPerform_whenVerifyFetcherLoad() {
     // SETUP
-    YieldCommand reqDTO = mock(YieldCommand.class);
+    YieldCommand command = mock(YieldCommand.class);
     when(yieldFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
     when(responseMapper.toResponse(any(Map.class), any())).thenReturn(new YieldResult());
 
     // ACT
-    service.perform(reqDTO);
+    service.perform(command);
 
     // VERIFY
     verify(yieldFetcher).fetch(any(), any());
@@ -92,13 +92,13 @@ class YieldCalculationServiceImplTest {
   @Test
   void shouldTestPerform_whenVerifyResponseMapperCalled() {
     // SETUP
-    YieldCommand reqDTO = mock(YieldCommand.class);
+    YieldCommand command = mock(YieldCommand.class);
     Map<PortfolioHolding, Yield> mockData = createMockData();
     when(yieldFetcher.fetch(any(), any())).thenReturn(mockData);
     when(responseMapper.toResponse(any(Map.class), any())).thenReturn(new YieldResult());
 
     // ACT
-    service.perform(reqDTO);
+    service.perform(command);
 
     // VERIFY
     verify(responseMapper).toResponse(any(Map.class), any());

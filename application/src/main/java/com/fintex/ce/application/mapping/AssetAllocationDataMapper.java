@@ -1,6 +1,6 @@
 package com.fintex.ce.application.mapping;
 
-import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.GicHolding;
@@ -36,20 +36,20 @@ public class AssetAllocationDataMapper {
         Stream.of(AssetAllocationRegion.values()).collect(toMap(e -> e, e -> BigDecimal.ZERO)));
   }
 
-  public Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> mapForAA(AssetAllocationDataDTO dto) {
+  public Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> mapForAA(AssetAllocationData data) {
     final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> result = new HashMap<>();
-    result.putAll(mapForNoneStock(dto.getEtfUsFdsResponse()));
-    result.putAll(mapForNoneStock(dto.getEtfCanadaFdsResponse()));
-    result.putAll(mapForNoneStock(dto.getMutualFundFdsResponse()));
-    result.putAll(mapForNoneStock(dto.getBenchmarkIndexFdsResponse()));
-    result.putAll(mapForNoneStock(dto.getCanadaPooledFundFdsResponse()));
-    result.putAll(mapForNoneStock(dto.getCanadaHedgeFundsFdsResponse()));
-    result.putAll(mapForNoneStock(dto.getUsFundsFdsResponse()));
-    result.putAll(mapForNoneStock(dto.getFixedIncomeFdsResponse()));
-    result.putAll(mapForNoneStock(dto.getSeparatelyManagedAccountFdsResponse()));
-    result.putAll(mapForCash(filterHoldings(dto.getHoldings(), CASH_PREDICATE)));
-    result.putAll(mapForGic(filterHoldings(dto.getHoldings(), GIC_PREDICATE)));
-    result.putAll(mapForStock(dto.getStocksFdsResponse()));
+    result.putAll(mapForNoneStock(data.getEtfUsFdsResponse()));
+    result.putAll(mapForNoneStock(data.getEtfCanadaFdsResponse()));
+    result.putAll(mapForNoneStock(data.getMutualFundFdsResponse()));
+    result.putAll(mapForNoneStock(data.getBenchmarkIndexFdsResponse()));
+    result.putAll(mapForNoneStock(data.getCanadaPooledFundFdsResponse()));
+    result.putAll(mapForNoneStock(data.getCanadaHedgeFundsFdsResponse()));
+    result.putAll(mapForNoneStock(data.getUsFundsFdsResponse()));
+    result.putAll(mapForNoneStock(data.getFixedIncomeFdsResponse()));
+    result.putAll(mapForNoneStock(data.getSeparatelyManagedAccountFdsResponse()));
+    result.putAll(mapForCash(filterHoldings(data.getHoldings(), CASH_PREDICATE)));
+    result.putAll(mapForGic(filterHoldings(data.getHoldings(), GIC_PREDICATE)));
+    result.putAll(mapForStock(data.getStocksFdsResponse()));
     return result;
   }
 

@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -56,8 +56,8 @@ class RollingStandardDeviationCalculationTest {
   @Test
   void shouldCalculateRollingValue_whenCheckResult() {
     final var standardDeviationCalculation = mock(StandardDeviationCalculation.class);
-    final var calculationDTO = mock(CalculationDTO.class);
-    final var sut = mock(RollingStandardDeviationCalculation.class, withSettings().useConstructor(calculationDTO, Set
+    final var context = mock(PeriodCalculationInput.class);
+    final var sut = mock(RollingStandardDeviationCalculation.class, withSettings().useConstructor(context, Set
         .of(), standardDeviationCalculation));
     final int numberOfMonths = 12;
 
@@ -83,17 +83,17 @@ class RollingStandardDeviationCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(RollingStandardDeviationCalculation.class);
-    final var result = Set.of(Pair.of("12", portfolioReturns));
+    final var periodValues = Set.of(Pair.of("12", portfolioReturns));
 
     final LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
     res.add(new IntervalResult(LocalDate.now().minusMonths(3), TEN));
-    final var resDTO = new RollingIntervalResult("12", res);
-    final var expected = new RollingStandardDeviationResult().setRollingStandardDeviation(Set.of(resDTO));
+    final var intervalResult = new RollingIntervalResult("12", res);
+    final var expected = new RollingStandardDeviationResult().setRollingStandardDeviation(Set.of(intervalResult));
 
-    when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(resDTO));
+    when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
 
-    doCallRealMethod().when(sut).defineResponseType(result);
-    final RollingStandardDeviationResult actual = sut.defineResponseType(result);
+    doCallRealMethod().when(sut).defineResponseType(periodValues);
+    final RollingStandardDeviationResult actual = sut.defineResponseType(periodValues);
 
     Assertions.assertEquals(expected.getRollingStandardDeviation(), actual.getRollingStandardDeviation());
   }

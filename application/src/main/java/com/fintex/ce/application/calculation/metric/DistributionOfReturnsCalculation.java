@@ -34,19 +34,19 @@ public class DistributionOfReturnsCalculation {
     this.portfolioTotalReturns = portfolioTotalReturns;
   }
 
-  public DistributionOfReturnsResult calculate(final DistributionOfReturnsCommand reqDTO) {
+  public DistributionOfReturnsResult calculate(final DistributionOfReturnsCommand command) {
     final NavigableMap<LocalDate, BigDecimal> annualReturns = rollingTotalReturnsCalculation
         .calculatePeriodForNumberOfMonths(TWELVE.intValue());
     final DistributionOfReturnsIntervalResult calculatedMonthlyReturns = calculateDistributionOfReturnsFor(
-        portfolioTotalReturns, reqDTO);
+        portfolioTotalReturns, command);
 
     if (annualReturns == null) {
-      return initializeResponseDTO(calculatedMonthlyReturns, null, portfolioTotalReturns);
+      return initializeResult(calculatedMonthlyReturns, null, portfolioTotalReturns);
     }
 
     final DistributionOfReturnsIntervalResult calculatedAnnualReturns = calculateDistributionOfReturnsFor(annualReturns,
-        reqDTO);
-    return initializeResponseDTO(calculatedMonthlyReturns, calculatedAnnualReturns, portfolioTotalReturns);
+        command);
+    return initializeResult(calculatedMonthlyReturns, calculatedAnnualReturns, portfolioTotalReturns);
   }
 
   /**
@@ -54,17 +54,17 @@ public class DistributionOfReturnsCalculation {
    *
    * @param returns
    *          monthly/annual returns.
-   * @param reqDTO
+   * @param command
    *          request dto.
    * @return DistributionOfReturnsIntervalResult for monthly/annual returns.
    */
   public DistributionOfReturnsIntervalResult calculateDistributionOfReturnsFor(
       final NavigableMap<LocalDate, BigDecimal> returns,
-      final DistributionOfReturnsCommand reqDTO) {
+      final DistributionOfReturnsCommand command) {
     final BigDecimal returnsMin = getMinValue(returns);
     final BigDecimal returnsMax = getMaxValue(returns);
 
-    final Integer numberOfBins = calculateNumberOfBins(returns, reqDTO.getCustomNumberOfBins());
+    final Integer numberOfBins = calculateNumberOfBins(returns, command.getCustomNumberOfBins());
     final BigDecimal binWidthIncrements = calculateBinWidthIncrements(returnsMin, returnsMax, numberOfBins);
 
     final List<DistributionRangeResult> distributionRange = calculateDistributionOfReturns(returns, returnsMin,
@@ -142,7 +142,7 @@ public class DistributionOfReturnsCalculation {
       for (int binIndex = 1; binIndex <= numberOfBins; binIndex++) {
         final BigDecimal binInterval = calculateBinInterval(returnsMin, binIndex, binWidthIncrements);
         final long frequencyOfReturns = calculateFrequencyOfReturns(returns, returnsMin, binInterval, result);
-        result.add(initializeDistributionRangeDTO(binIndex, binInterval, frequencyOfReturns));
+        result.add(initializeDistributionRange(binIndex, binInterval, frequencyOfReturns));
       }
     }
     return result;
@@ -178,20 +178,20 @@ public class DistributionOfReturnsCalculation {
    *          MIN value of returns.
    * @param binInterval
    *          calculated bin Interval.
-   * @param rangeResDTOS
+   * @param rangeResDtoS
    *          result.
    * @return calculated frequency of returns.
    */
   public long calculateFrequencyOfReturns(final NavigableMap<LocalDate, BigDecimal> returns,
       final BigDecimal returnsMin,
       final BigDecimal binInterval,
-      final List<DistributionRangeResult> rangeResDTOS) {
+      final List<DistributionRangeResult> rangeResDtoS) {
     return binInterval.compareTo(toUserScale(returnsMin)) == ZERO.intValue()
         ? calculateFrequencyIfBinIntervalEqualsMin(returns, returnsMin)
-        : calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeResDTOS);
+        : calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeResDtoS);
   }
 
-  public DistributionRangeResult initializeDistributionRangeDTO(final int binIndex, final BigDecimal binInterval,
+  public DistributionRangeResult initializeDistributionRange(final int binIndex, final BigDecimal binInterval,
       final long frequencyOfReturns) {
     return new DistributionRangeResult()
         .setBin(binIndex)
@@ -199,7 +199,7 @@ public class DistributionOfReturnsCalculation {
         .setValue(frequencyOfReturns);
   }
 
-  public DistributionOfReturnsResult initializeResponseDTO(
+  public DistributionOfReturnsResult initializeResult(
       final DistributionOfReturnsIntervalResult calculatedMonthlyReturns,
       final DistributionOfReturnsIntervalResult calculatedAnnualReturns,
       final NavigableMap<LocalDate, BigDecimal> returns) {
@@ -233,17 +233,17 @@ public class DistributionOfReturnsCalculation {
    *          monthly/annual returns.
    * @param binInterval
    *          calculated bin Interval.
-   * @param rangeResDTOS
+   * @param rangeResDtoS
    *          list of DistributionRangeResults.
    * @return calculated value.
    */
   public long calculateFrequencyIfBinIntervalNotEqualsMin(final NavigableMap<LocalDate, BigDecimal> returns,
       final BigDecimal binInterval,
-      final List<DistributionRangeResult> rangeResDTOS) {
-    if (rangeResDTOS.isEmpty()) {
+      final List<DistributionRangeResult> rangeResDtoS) {
+    if (rangeResDtoS.isEmpty()) {
       return calculateFrequencyIfBinIntervalEqualsMin(returns, binInterval);
     } else {
-      final BigDecimal rangeOfPreviousBin = rangeResDTOS.get(rangeResDTOS.size() - 1).getRange();
+      final BigDecimal rangeOfPreviousBin = rangeResDtoS.get(rangeResDtoS.size() - 1).getRange();
       return calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeOfPreviousBin);
     }
   }

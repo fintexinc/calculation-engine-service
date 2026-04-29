@@ -6,10 +6,10 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.model.error.PceExceptionCollector;
 
@@ -39,58 +39,58 @@ public class RollingCorrelationCalculationServiceImpl
   }
 
   @Override
-  public RollingCorrelationResult perform(RollingCalculationCommand reqDTO) {
-    RollingCorrelationCalculation rollingCorrelationCalculation = defineCalculationMethod(reqDTO);
-    return rollingCorrelationCalculation.calculate(reqDTO.getRollingPeriods());
+  public RollingCorrelationResult perform(RollingCalculationCommand command) {
+    RollingCorrelationCalculation rollingCorrelationCalculation = defineCalculationMethod(command);
+    return rollingCorrelationCalculation.calculate(command.getRollingPeriods());
   }
 
   @Override
-  public RollingCorrelationCalculation defineCalculationMethod(RollingCalculationCommand reqDTO) {
-    BenchmarkCalculationDTO inputDTO = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
-    Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturn = getBaseTotalReturns(reqDTO);
-    var correlationCalculation = new CorrelationCalculation(inputDTO, baseTotalReturn, defaultPeriods);
-    return new RollingCorrelationCalculation(inputDTO, defaultPeriods, correlationCalculation, inputDTO
+  public RollingCorrelationCalculation defineCalculationMethod(RollingCalculationCommand command) {
+    BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturn = getBaseTotalReturns(command);
+    var correlationCalculation = new CorrelationCalculation(context, baseTotalReturn, defaultPeriods);
+    return new RollingCorrelationCalculation(context, defaultPeriods, correlationCalculation, context
         .getWeightedAverageBenchmarkReturns());
   }
 
-  public Map<PortfolioHolding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand reqDTO) {
-    ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(),
-        reqDTO
+  public Map<PortfolioHolding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand command) {
+    ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(command.getHoldings(),
+        command
             .getCurrency(), ReturnFactorScale.SCALE_OF_TWO);
 
     return monthlyReturnsAggregate
-        .validateCped(reqDTO.getCustomPed())
-        .cutByCpedIfCpedEmptyCutByPed(reqDTO.getCustomPed())
+        .validateCped(command.getCustomPed())
+        .cutByCpedIfCpedEmptyCutByPed(command.getCustomPed())
         .fxRatesApplied()
         .getReturnsMap();
   }
 
   @Override
-  public BenchmarkCalculationDTO buildCalculationDto(RollingCalculationCommand reqDTO,
+  public BenchmarkPeriodCalculationInput buildPeriodCalculationInput(RollingCalculationCommand command,
       ReturnFactorScale returnFactorScale) {
     PceExceptionCollector notification = new PceExceptionCollector();
 
     ReturnsAggregate portfolioMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
-        .getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale));
+        .getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency(), returnFactorScale));
     ReturnsAggregate benchmarkMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
-        .getBenchmarkMonthlyReturns(reqDTO.getBenchmarkHoldings(), reqDTO.getCurrency(), returnFactorScale));
+        .getBenchmarkMonthlyReturns(command.getBenchmarkHoldings(), command.getCurrency(), returnFactorScale));
     notification.throwIfAny();
 
     portfolioMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate);
     benchmarkMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate);
 
     NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = notification.tryCatch(() -> monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed()));
     NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = notification.tryCatch(() -> monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(benchmarkMonthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(benchmarkMonthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed()));
     notification.throwIfAny();
 
-    var result = new BenchmarkCalculationDTO();
+    var result = new BenchmarkPeriodCalculationInput();
     result.setWeightedAverageBenchmarkReturns(benchmarkTotalReturns);
     result.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
-    result.setCipsd(reqDTO.getCustomIntervalPsd());
+    result.setCipsd(command.getCustomIntervalPsd());
     return result;
   }
 

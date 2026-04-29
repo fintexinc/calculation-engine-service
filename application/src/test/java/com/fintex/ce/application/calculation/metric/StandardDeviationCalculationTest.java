@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.util.CalculationUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -52,7 +52,8 @@ class StandardDeviationCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeriodStartDate() {
-    final var sut = mock(StandardDeviationCalculation.class, withSettings().useConstructor(mock(CalculationDTO.class),
+    final var sut = mock(StandardDeviationCalculation.class, withSettings().useConstructor(mock(
+        PeriodCalculationInput.class),
         Set.of()));
     final var treeMap = mock(TreeMap.class);
 
@@ -213,9 +214,9 @@ class StandardDeviationCalculationTest {
   void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(StandardDeviationCalculation.class);
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
-    final var intervalResDto = new TimeIntervalResult("2000-01-12", ZERO);
-    final var intervalResDto1 = new TimeIntervalResult("2020-01-05", ONE);
-    final var expected = Set.of(intervalResDto, intervalResDto1);
+    final var interval1 = new TimeIntervalResult("2000-01-12", ZERO);
+    final var interval2 = new TimeIntervalResult("2020-01-05", ONE);
+    final var expected = Set.of(interval1, interval2);
 
     when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
 

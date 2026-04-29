@@ -124,12 +124,12 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldGetAverageMerByParameterType_whenCallsCalculateAverageManagementExpenseRatio() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDTOList = List.of(
+    final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList = List.of(
         new AverageManagementExpenseCalculation(), new AverageManagementExpenseCalculation());
-    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDTOList);
+    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // ACT
-    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDTOList);
+    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // VERIFY
     verify(sut, times(2)).calculateAverageManagementExpenseRatio(any(), any());
@@ -139,12 +139,12 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldGetAverageMerByParameterType_whenCallsCalculateMarketValueQualified() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDTOList = List.of(
+    final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList = List.of(
         new AverageManagementExpenseCalculation(), new AverageManagementExpenseCalculation());
-    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDTOList);
+    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // ACT
-    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDTOList);
+    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // VERIFY
     verify(sut, times(2)).calculateMarketValueQualified(any());
@@ -154,12 +154,12 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldGetAverageMerByParameterType_whenCallsCalculatePercentageQualified() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDTOList = List.of(
+    final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList = List.of(
         new AverageManagementExpenseCalculation(), new AverageManagementExpenseCalculation());
-    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDTOList);
+    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // ACT
-    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDTOList);
+    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // VERIFY
     verify(sut, times(2)).calculatePercentageQualified(any(), any());
@@ -289,11 +289,11 @@ class AverageManagementExpenseCalculationServiceTest {
     // SETUP
     final var sut = mock(MERCalculationServiceImpl.class);
 
-    final AverageManagementExpenseCalculation mockAverageManagementExpenseCalculationDto = mock(
+    final AverageManagementExpenseCalculation mockAverageManagementExpenseCalculation = mock(
         AverageManagementExpenseCalculation.class);
-    when(mockAverageManagementExpenseCalculationDto.getManagementExpenseRatio()).thenReturn(BigDecimal.ZERO);
+    when(mockAverageManagementExpenseCalculation.getManagementExpenseRatio()).thenReturn(BigDecimal.ZERO);
     final Map<PortfolioHolding, AverageManagementExpenseCalculation> mockAverageMerCalculationDtoList = Map.of(mock(
-        PortfolioHolding.class), mockAverageManagementExpenseCalculationDto);
+        PortfolioHolding.class), mockAverageManagementExpenseCalculation);
 
     doCallRealMethod().when(sut).isMerPresentForHolding(any(), any());
     // ACT
@@ -308,14 +308,14 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperly() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO.setModifiedFee(new BigDecimal("0.97"));
-    averageManagementExpenseCalculationDTO.setPercentageQualified(new BigDecimal("34"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculation.setModifiedFee(new BigDecimal("0.97"));
+    averageManagementExpenseCalculation.setPercentageQualified(new BigDecimal("34"));
     doCallRealMethod().when(sut).calculateAverageManagementExpenseRatio(any(), any());
 
     // ACT
     final BigDecimal result = sut.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
-        averageManagementExpenseCalculationDTO);
+        averageManagementExpenseCalculation);
 
     // VERIFY
     assertEquals(new BigDecimal("62.98"), result);
@@ -325,13 +325,13 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperlyWhenModifiedFeeIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO.setPercentageQualified(new BigDecimal("34"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculation.setPercentageQualified(new BigDecimal("34"));
     doCallRealMethod().when(sut).calculateAverageManagementExpenseRatio(any(), any());
 
     // ACT
     final BigDecimal result = sut.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
-        averageManagementExpenseCalculationDTO);
+        averageManagementExpenseCalculation);
 
     // VERIFY
     assertEquals(new BigDecimal("30"), result);
@@ -341,74 +341,74 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperlyWhenPercentageQualifiedIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO.setModifiedFee(new BigDecimal("0.97"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculation.setModifiedFee(new BigDecimal("0.97"));
     doCallRealMethod().when(sut).calculateAverageManagementExpenseRatio(any(), any());
 
     // ACT
     final BigDecimal result = sut.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
-        averageManagementExpenseCalculationDTO);
+        averageManagementExpenseCalculation);
 
     // VERIFY
     assertEquals(new BigDecimal("30"), result);
   }
 
   @Test
-  void shouldCalculatePercentageQualified_whenAverageMerCalculationDTOisMappedProperly() {
+  void shouldCalculatePercentageQualified_whenAverageMerCalculationDtoisMappedProperly() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO.setMarketValueQualified(new BigDecimal("50000"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculation.setMarketValueQualified(new BigDecimal("50000"));
     doCallRealMethod().when(sut).calculatePercentageQualified(any(), any());
 
     // ACT
-    sut.calculatePercentageQualified(averageManagementExpenseCalculationDTO, new BigDecimal("70000"));
+    sut.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
 
     // VERIFY
-    assertEquals(new BigDecimal("0.714285714285714"), averageManagementExpenseCalculationDTO.getPercentageQualified());
+    assertEquals(new BigDecimal("0.714285714285714"), averageManagementExpenseCalculation.getPercentageQualified());
   }
 
   @Test
-  void shouldCalculatePercentageQualified_whenAverageMerCalculationDTOisMappedProperlyWhenMarketValueQualifiedIsNull() {
+  void shouldCalculatePercentageQualified_whenAverageMerCalculationDtoisMappedProperlyWhenMarketValueQualifiedIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculation();
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
 
     // ACT
-    sut.calculatePercentageQualified(averageManagementExpenseCalculationDTO, new BigDecimal("70000"));
+    sut.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
 
     // VERIFY
-    assertNull(averageManagementExpenseCalculationDTO.getPercentageQualified());
+    assertNull(averageManagementExpenseCalculation.getPercentageQualified());
   }
 
   @Test
-  void shouldCalculatePercentageQualified_whenAverageMerCalculationDTOisMappedProperlyWhenMarketValueQualifiedIsZero() {
+  void shouldCalculatePercentageQualified_whenAverageMerCalculationDtoisMappedProperlyWhenMarketValueQualifiedIsZero() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO.setMarketValueQualified(BigDecimal.ZERO);
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculation.setMarketValueQualified(BigDecimal.ZERO);
 
     // ACT
-    sut.calculatePercentageQualified(averageManagementExpenseCalculationDTO, new BigDecimal("70000"));
+    sut.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
 
     // VERIFY
-    assertNull(averageManagementExpenseCalculationDTO.getPercentageQualified());
+    assertNull(averageManagementExpenseCalculation.getPercentageQualified());
   }
 
   @Test
   void shouldCalculateMarketValueQualified_whenIsMappedProperlyWhenModifiedFeeValueExists() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO.setModifiedFee(new BigDecimal("100"));
-    averageManagementExpenseCalculationDTO.setMarketValue(new BigDecimal("10000"));
-    doCallRealMethod().when(sut).calculateMarketValueQualified(averageManagementExpenseCalculationDTO);
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculation.setModifiedFee(new BigDecimal("100"));
+    averageManagementExpenseCalculation.setMarketValue(new BigDecimal("10000"));
+    doCallRealMethod().when(sut).calculateMarketValueQualified(averageManagementExpenseCalculation);
 
     // ACT
-    sut.calculateMarketValueQualified(averageManagementExpenseCalculationDTO);
+    sut.calculateMarketValueQualified(averageManagementExpenseCalculation);
 
     // VERIFY
-    assertEquals(averageManagementExpenseCalculationDTO.getMarketValue(), averageManagementExpenseCalculationDTO
+    assertEquals(averageManagementExpenseCalculation.getMarketValue(), averageManagementExpenseCalculation
         .getMarketValueQualified());
   }
 
@@ -416,34 +416,34 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldCalculateMarketValueQualified_whenIsMappedProperlyWhenModifiedFeeValueIsNull() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO = new AverageManagementExpenseCalculation();
-    doCallRealMethod().when(sut).calculateMarketValueQualified(averageManagementExpenseCalculationDTO);
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
+    doCallRealMethod().when(sut).calculateMarketValueQualified(averageManagementExpenseCalculation);
 
     // ACT
-    sut.calculateMarketValueQualified(averageManagementExpenseCalculationDTO);
+    sut.calculateMarketValueQualified(averageManagementExpenseCalculation);
 
     // VERIFY
-    assertEquals(new BigDecimal(BigInteger.ZERO), averageManagementExpenseCalculationDTO.getMarketValueQualified());
+    assertEquals(new BigDecimal(BigInteger.ZERO), averageManagementExpenseCalculation.getMarketValueQualified());
   }
 
   @Test
   void shouldGetAmountOfMarketValueQualified_whenReturnsCorrectValue() {
     // SETUP
     final var sut = mock(AverageManagementExpenseCalculationService.class);
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO1 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO1.setMarketValue(new BigDecimal("10"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO2 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO2.setMarketValue(new BigDecimal("20"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO3 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO3.setMarketValue(new BigDecimal("30"));
-    final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDTOList = List.of(
-        averageManagementExpenseCalculationDTO1, averageManagementExpenseCalculationDTO2,
-        averageManagementExpenseCalculationDTO3);
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto1 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto1.setMarketValue(new BigDecimal("10"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto2 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto2.setMarketValue(new BigDecimal("20"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto3 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto3.setMarketValue(new BigDecimal("30"));
+    final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList = List.of(
+        averageManagementExpenseCalculationDto1, averageManagementExpenseCalculationDto2,
+        averageManagementExpenseCalculationDto3);
     doCallRealMethod().when(sut).getAmountOfMarketValues(any());
 
     // ACT
     final BigDecimal amountOfMarketValueQualified = sut.getAmountOfMarketValues(
-        averageManagementExpenseCalculationDTOList);
+        averageManagementExpenseCalculationDtoList);
 
     // VERIFY
     assertEquals(new BigDecimal("60"), amountOfMarketValueQualified);
@@ -456,11 +456,11 @@ class AverageManagementExpenseCalculationServiceTest {
 
       final var sut = mock(AverageManagementExpenseCalculationService.class);
 
-      final var reqDTO = mock(AverageMerCommand.class);
-      final var resDTO = new AverageMerResult();
-      resDTO.getManagementExpenseRatio().put(ABSOLUTE, ONE);
-      resDTO.getManagementExpenseRatio().put(SCALED, TEN);
-      resDTO.getManagementExpenseRatio().put(FORCE_REPORT_FEE, ZERO);
+      final var command = mock(AverageMerCommand.class);
+      final var result = new AverageMerResult();
+      result.getManagementExpenseRatio().put(ABSOLUTE, ONE);
+      result.getManagementExpenseRatio().put(SCALED, TEN);
+      result.getManagementExpenseRatio().put(FORCE_REPORT_FEE, ZERO);
       final var holding1 = new PortfolioHolding(null, FinancialInstrumentType.STOCK_US, null);
       final var holding2 = new PortfolioHolding(null, FinancialInstrumentType.CASH, null);
       final var holdings = List.of(holding1, holding2);
@@ -469,47 +469,47 @@ class AverageManagementExpenseCalculationServiceTest {
       expected.put(SCALED, null);
       expected.put(FORCE_REPORT_FEE, null);
 
-      when(reqDTO.getHoldings()).thenReturn(holdings);
+      when(command.getHoldings()).thenReturn(holdings);
 
       doCallRealMethod().when(sut).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(anyMap(), any());
       doCallRealMethod().when(sut).setNullForScaledIfHoldingContainsNoFunds(any(), any());
       doCallRealMethod().when(sut).setNullForForcedReportFeeIfHoldingContainsNoFunds(any(), any());
       // ACT
-      sut.setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(resDTO.getManagementExpenseRatio(), reqDTO);
+      sut.setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(result.getManagementExpenseRatio(), command);
 
       // VERIFY
-      Assertions.assertNotNull(resDTO);
-      ComparisonUtils.compareMaps(expected, resDTO.getManagementExpenseRatio());
+      Assertions.assertNotNull(result);
+      ComparisonUtils.compareMaps(expected, result.getManagementExpenseRatio());
     }
   }
 
   private Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> getAverageMerCalculationDtoMap() {
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO1 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO1.setMarketValue(new BigDecimal("10"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO2 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO2.setMarketValue(new BigDecimal("20"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO3 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO3.setMarketValue(new BigDecimal("30"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO4 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO4.setMarketValue(new BigDecimal("40"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO5 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO5.setMarketValue(new BigDecimal("50"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO6 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO6.setMarketValue(new BigDecimal("60"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDTO7 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDTO7.setMarketValue(new BigDecimal("70"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto1 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto1.setMarketValue(new BigDecimal("10"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto2 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto2.setMarketValue(new BigDecimal("20"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto3 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto3.setMarketValue(new BigDecimal("30"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto4 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto4.setMarketValue(new BigDecimal("40"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto5 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto5.setMarketValue(new BigDecimal("50"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto6 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto6.setMarketValue(new BigDecimal("60"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto7 = new AverageManagementExpenseCalculation();
+    averageManagementExpenseCalculationDto7.setMarketValue(new BigDecimal("70"));
 
     return Map.of(FinancialInstrumentType.MUTUAL_FUND_CANADA, Map.of(mock(PortfolioHolding.class),
-        averageManagementExpenseCalculationDTO1),
-        FinancialInstrumentType.ETF_US, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDTO2),
+        averageManagementExpenseCalculationDto1),
+        FinancialInstrumentType.ETF_US, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDto2),
         FinancialInstrumentType.ETF_CANADA, Map.of(mock(PortfolioHolding.class),
-            averageManagementExpenseCalculationDTO3),
+            averageManagementExpenseCalculationDto3),
         FinancialInstrumentType.STOCK_CANADA, Map.of(mock(PortfolioHolding.class),
-            averageManagementExpenseCalculationDTO4),
-        FinancialInstrumentType.STOCK_US, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDTO5),
-        FinancialInstrumentType.CASH, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDTO6),
+            averageManagementExpenseCalculationDto4),
+        FinancialInstrumentType.STOCK_US, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDto5),
+        FinancialInstrumentType.CASH, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDto6),
         FinancialInstrumentType.SEGREGATED_FUND_CANADA, Map.of(mock(PortfolioHolding.class),
-            averageManagementExpenseCalculationDTO7));
+            averageManagementExpenseCalculationDto7));
   }
 
 }

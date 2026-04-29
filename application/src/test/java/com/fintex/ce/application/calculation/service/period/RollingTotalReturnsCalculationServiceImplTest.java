@@ -5,9 +5,9 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -112,17 +112,17 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var req = new RollingCalculationCommand();
     req.setRollingPeriods(Set.of("100"));
-    final var inputDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final var portfolioTotalReturns = mock(TreeMap.class);
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
 
-    when(sut.buildCalculationDto(req, returnFactorScale)).thenReturn(inputDTO);
-    when(inputDTO.getWeightedAveragePortfolioReturns()).thenReturn(portfolioTotalReturns);
+    when(sut.buildPeriodCalculationInput(req, returnFactorScale)).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(portfolioTotalReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     final var actual = sut.defineCalculationMethod(req);
 
-    assertEquals(inputDTO.getWeightedAveragePortfolioReturns(), actual.getPortfolioTotalReturns());
+    assertEquals(context.getWeightedAveragePortfolioReturns(), actual.getPortfolioTotalReturns());
     ComparisonUtils.compareCollections(Set.of("10", "20"), actual.getDefaultPeriods());
   }
 
@@ -134,14 +134,14 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var req = new RollingCalculationCommand();
     req.setRollingPeriods(Set.of("100"));
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
 
-    when(sut.buildCalculationDto(req, returnFactorScale)).thenReturn(input);
+    when(sut.buildPeriodCalculationInput(req, returnFactorScale)).thenReturn(input);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     sut.defineCalculationMethod(req);
 
-    verify(sut).buildCalculationDto(req, returnFactorScale);
+    verify(sut).buildPeriodCalculationInput(req, returnFactorScale);
   }
 
   @Test
@@ -159,11 +159,12 @@ class RollingTotalReturnsCalculationServiceImplTest {
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any()))
         .thenReturn(portfolioBaseTotalReturns);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
 
-    final var actual = sut.buildCalculationDto(req, returnFactorScale);
+    final var actual = sut.buildPeriodCalculationInput(req, returnFactorScale);
 
-    final CalculationDTO expected = new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioBaseTotalReturns);
+    final PeriodCalculationInput expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(
+        portfolioBaseTotalReturns);
     Assertions.assertEquals(expected, actual);
   }
 
@@ -182,8 +183,8 @@ class RollingTotalReturnsCalculationServiceImplTest {
     req.setCustomPed(LocalDate.now().plusMonths(10));
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(req, returnFactorScale);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), req.getCurrency(), returnFactorScale);
   }
@@ -205,8 +206,8 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var monthlyReturns = mock(ReturnsAggregate.class);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(req, returnFactorScale);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, req.getCustomPsd(), req
         .getCustomPed());

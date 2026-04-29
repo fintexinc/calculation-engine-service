@@ -1,7 +1,7 @@
 package com.fintex.ce.application.mapping;
 
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.CashHolding;
@@ -53,7 +53,7 @@ class AssetAllocationDataMapperTest {
         .setAllocations(EMPTY_SORTED_MAP);
     etfCanadaAssetAllocation.put(etfCanada, rAssetAllocationForEtfCanada);
 
-    final var req = new AssetAllocationDataDTO();
+    final var req = new AssetAllocationData();
     req.setEtfUsFdsResponse(getFdsResponse(etfUs));
     req.setCanadaPooledFundFdsResponse(getFdsResponse(canadaPooledFundHolding));
     req.setEtfCanadaFdsResponse(etfCanadaAssetAllocation);

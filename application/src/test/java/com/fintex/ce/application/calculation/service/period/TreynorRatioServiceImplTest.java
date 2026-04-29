@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 
@@ -30,26 +30,26 @@ class TreynorRatioServiceImplTest {
   }
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
-    final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
+    final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(CAD);
-    when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
-    when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
-    when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
+    when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
     when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
     sut.defineCalculationMethod(req);
 
-    verify(sut, times(2)).buildCalculationDto(eq(req), any());
+    verify(sut, times(2)).buildPeriodCalculationInput(eq(req), any());
   }
 
   @Test
@@ -59,14 +59,14 @@ class TreynorRatioServiceImplTest {
     final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
-    final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
+    final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(CAD);
-    when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
-    when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
-    when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
+    when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
     when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(sut).defineCalculationMethod(req);
@@ -83,15 +83,15 @@ class TreynorRatioServiceImplTest {
       final var sut = mock(TreynorRatioServiceImpl.class, withSettings()
           .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
-      final var benchmarkCalculationDTO = mock(BenchmarkCalculationDTO.class);
+      final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
       final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>();
       final var req = mock(PeriodCommand.class);
 
       when(req.getCurrency()).thenReturn(CAD);
       when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
-      when(sut.buildCalculationDto(any(), any())).thenReturn(benchmarkCalculationDTO);
-      when(benchmarkCalculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
-      when(benchmarkCalculationDTO.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);
+      when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+      when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
+      when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);
 
       doCallRealMethod().when(sut).defineCalculationMethod(req);
       sut.defineCalculationMethod(req);

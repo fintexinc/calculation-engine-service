@@ -5,9 +5,9 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.LeadingTotalReturnCommand;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,31 +36,31 @@ public class LeadingTotalReturnsCalculationServiceImpl
   }
 
   @Override
-  public LeadingTotalReturnsResult perform(final LeadingTotalReturnCommand reqDTO) {
-    final LeadingTotalReturnsCalculation leadingTotalReturnsCalculation = defineCalculationMethod(reqDTO);
-    return leadingTotalReturnsCalculation.calculate(reqDTO.getPeriods());
+  public LeadingTotalReturnsResult perform(final LeadingTotalReturnCommand command) {
+    final LeadingTotalReturnsCalculation leadingTotalReturnsCalculation = defineCalculationMethod(command);
+    return leadingTotalReturnsCalculation.calculate(command.getPeriods());
   }
 
   @Override
-  public LeadingTotalReturnsCalculation defineCalculationMethod(final LeadingTotalReturnCommand reqDTO) {
-    final CalculationDTO input = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
+  public LeadingTotalReturnsCalculation defineCalculationMethod(final LeadingTotalReturnCommand command) {
+    final PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
     return new LeadingTotalReturnsCalculation(input, defaultPeriods);
   }
 
   @Override
-  public CalculationDTO buildCalculationDto(final LeadingTotalReturnCommand reqDTO,
+  public PeriodCalculationInput buildPeriodCalculationInput(final LeadingTotalReturnCommand command,
       final ReturnFactorScale returnFactorScale) {
     final ReturnsAggregate portfolioMonthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(
-        reqDTO.getHoldings(), reqDTO.getCurrency(), returnFactorScale);
+        command.getHoldings(), command.getCurrency(), returnFactorScale);
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = portfolioMonthlyReturnsAggregate
-        .validateCpsd(reqDTO.getCustomPsd())
+        .validateCpsd(command.getCustomPsd())
         .cutByPed()
-        .cutByCpsdIfCpsdEmptyCutByPsd(reqDTO.getCustomPsd())
+        .cutByCpsdIfCpsdEmptyCutByPsd(command.getCustomPsd())
         .fxRatesApplied()
         .getWeightedAverage();
 
-    return new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
   }
 

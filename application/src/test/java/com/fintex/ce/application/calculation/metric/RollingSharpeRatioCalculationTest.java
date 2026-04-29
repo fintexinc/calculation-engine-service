@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -55,9 +55,9 @@ class RollingSharpeRatioCalculationTest {
 
   @Test
   void shouldReturnSharpeRatioValue_whenCalculatingRollingValue() {
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final var sharpeRatioCalculation = mock(SharpeRatioCalculation.class);
-    final var sut = mock(RollingSharpeRatioCalculation.class, withSettings().useConstructor(calculationDTO, Set.of(),
+    final var sut = mock(RollingSharpeRatioCalculation.class, withSettings().useConstructor(context, Set.of(),
         sharpeRatioCalculation));
     final int numberOfMonths = 12;
 
@@ -83,17 +83,17 @@ class RollingSharpeRatioCalculationTest {
   @Test
   void shouldMapRollingSharpeRatioResult_whenDefiningResponseType() {
     final var sut = mock(RollingSharpeRatioCalculation.class);
-    final var result = Set.of(Pair.of("12", portfolioReturns));
+    final var periodValues = Set.of(Pair.of("12", portfolioReturns));
 
     final LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
     res.add(new IntervalResult(LocalDate.now().minusMonths(3), TEN));
-    final var resDTO = new RollingIntervalResult("12", res);
-    final var expected = new RollingSharpeRatioResult().setRollingSharpeRatio(Set.of(resDTO));
+    final var intervalResult = new RollingIntervalResult("12", res);
+    final var expected = new RollingSharpeRatioResult().setRollingSharpeRatio(Set.of(intervalResult));
 
-    when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(resDTO));
+    when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
 
-    doCallRealMethod().when(sut).defineResponseType(result);
-    final RollingSharpeRatioResult actual = sut.defineResponseType(result);
+    doCallRealMethod().when(sut).defineResponseType(periodValues);
+    final RollingSharpeRatioResult actual = sut.defineResponseType(periodValues);
 
     Assertions.assertEquals(expected.getRollingSharpeRatio(), actual.getRollingSharpeRatio());
   }

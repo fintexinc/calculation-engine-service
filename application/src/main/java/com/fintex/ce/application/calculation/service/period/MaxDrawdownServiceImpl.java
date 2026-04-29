@@ -6,9 +6,9 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -35,26 +35,26 @@ public class MaxDrawdownServiceImpl extends PeriodAbstractService<MaxDrawdownRes
     return CalculationMetric.MAX_DRAWDOWN;
   }
 
-  public MaxDrawdownCalculation defineCalculationMethod(final PeriodCommand reqDTO) {
-    final CalculationDTO inputDTO = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
-    final var growth10KCalculation = new Growth10KCalculation(inputDTO.getWeightedAveragePortfolioReturns(), null,
+  public MaxDrawdownCalculation defineCalculationMethod(final PeriodCommand command) {
+    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    final var growth10KCalculation = new Growth10KCalculation(context.getWeightedAveragePortfolioReturns(), null,
         false);
-    final NavigableMap<LocalDate, BigDecimal> growth10K = initializeGrowthOf10KMap(inputDTO, growth10KCalculation);
-    return new MaxDrawdownCalculation(inputDTO, defaultPeriods, growth10K, DecimalUtils::toUserScale);
+    final NavigableMap<LocalDate, BigDecimal> growth10K = initializeGrowthOf10KMap(context, growth10KCalculation);
+    return new MaxDrawdownCalculation(context, defaultPeriods, growth10K, DecimalUtils::toUserScale);
   }
 
-  public NavigableMap<LocalDate, BigDecimal> initializeGrowthOf10KMap(final CalculationDTO inputDTO,
+  public NavigableMap<LocalDate, BigDecimal> initializeGrowthOf10KMap(final PeriodCalculationInput context,
       final Growth10KCalculation growth10KCalculation) {
     final NavigableMap<LocalDate, BigDecimal> growth10K = new TreeMap<>();
-    if (!CollectionUtils.isEmpty(inputDTO.getWeightedAveragePortfolioReturns())) {
-      growth10KCalculation.setFirstGrowth10KValue(inputDTO.getWeightedAveragePortfolioReturns(), growth10K);
-      growth10KCalculation.calculateGrowth10K(inputDTO.getWeightedAveragePortfolioReturns(), growth10K);
+    if (!CollectionUtils.isEmpty(context.getWeightedAveragePortfolioReturns())) {
+      growth10KCalculation.setFirstGrowth10KValue(context.getWeightedAveragePortfolioReturns(), growth10K);
+      growth10KCalculation.calculateGrowth10K(context.getWeightedAveragePortfolioReturns(), growth10K);
     }
     return growth10K;
   }
 
   @Override
-  public void addSpecificChecks(PeriodCommand reqDTO) {
+  public void addSpecificChecks(PeriodCommand command) {
     // There are no specific checks for MaxDrawdownCalculation
   }
 }

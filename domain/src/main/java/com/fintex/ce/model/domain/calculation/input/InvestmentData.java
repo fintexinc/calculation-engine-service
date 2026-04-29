@@ -1,4 +1,4 @@
-package com.fintex.ce.model.dto.calculation;
+package com.fintex.ce.model.domain.calculation.input;
 
 import com.fintex.ce.model.domain.enumeration.Frequency;
 
@@ -15,7 +15,7 @@ import static com.fintex.ce.model.util.BigDecimalConstants.TEN_THOUSAND;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InvestmentDataDTO {
+public class InvestmentData {
 
   public static BigDecimal DEFAULT_PURCHASE_AMOUNT = TEN_THOUSAND;
   public static Frequency DEFAULT_PAC_FREQUENCY = Frequency.ANNUAL;
@@ -44,21 +44,21 @@ public class InvestmentDataDTO {
   @JsonProperty("withdrawalFrequency")
   private Frequency withdrawalFrequency = DEFAULT_WITHDRAWAL_FREQUENCY;
 
-  public static void validateAndUpdateInvestmentDataDTO(InvestmentDataDTO reqDTO) {
-    if (Objects.isNull(reqDTO.getPurchaseAmount())) {
-      reqDTO.setPurchaseAmount(InvestmentDataDTO.DEFAULT_PURCHASE_AMOUNT);
+  public static void validateAndUpdateInvestmentData(InvestmentData investmentData) {
+    if (Objects.isNull(investmentData.getPurchaseAmount())) {
+      investmentData.setPurchaseAmount(InvestmentData.DEFAULT_PURCHASE_AMOUNT);
     }
-    if (Objects.isNull(reqDTO.getPac())) {
-      reqDTO.setPac(InvestmentDataDTO.DEFAULT_PAC);
+    if (Objects.isNull(investmentData.getPac())) {
+      investmentData.setPac(InvestmentData.DEFAULT_PAC);
     }
-    if (Objects.isNull(reqDTO.getPacFrequency())) {
-      reqDTO.setPacFrequency(InvestmentDataDTO.DEFAULT_PAC_FREQUENCY);
+    if (Objects.isNull(investmentData.getPacFrequency())) {
+      investmentData.setPacFrequency(InvestmentData.DEFAULT_PAC_FREQUENCY);
     }
-    if (Objects.isNull(reqDTO.getWithdrawal())) {
-      reqDTO.setWithdrawal(InvestmentDataDTO.DEFAULT_WITHDRAWAL);
+    if (Objects.isNull(investmentData.getWithdrawal())) {
+      investmentData.setWithdrawal(InvestmentData.DEFAULT_WITHDRAWAL);
     }
-    if (Objects.isNull(reqDTO.getWithdrawalFrequency())) {
-      reqDTO.setWithdrawalFrequency(InvestmentDataDTO.DEFAULT_WITHDRAWAL_FREQUENCY);
+    if (Objects.isNull(investmentData.getWithdrawalFrequency())) {
+      investmentData.setWithdrawalFrequency(InvestmentData.DEFAULT_WITHDRAWAL_FREQUENCY);
     }
   }
 }

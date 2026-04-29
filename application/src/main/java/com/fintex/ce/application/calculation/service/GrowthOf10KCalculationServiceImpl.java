@@ -6,10 +6,10 @@ import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,38 +37,38 @@ public class GrowthOf10KCalculationServiceImpl implements CalculationService<Ret
   }
 
   @Override
-  public Growth10KResult perform(final ReturnCommand reqDTO) {
-    return calculateDefaultGrowthOf10K(reqDTO);
+  public Growth10KResult perform(final ReturnCommand command) {
+    return calculateDefaultGrowthOf10K(command);
   }
 
-  private Growth10KResult calculateDefaultGrowthOf10K(final ReturnCommand reqDTO) {
-    final CalculationDTO inputDTO = buildCalculationDto(reqDTO);
-    Growth10KCalculation growth10KCalculation = buildGrowth10kCalculation(reqDTO, inputDTO);
+  private Growth10KResult calculateDefaultGrowthOf10K(final ReturnCommand command) {
+    final PeriodCalculationInput context = buildPeriodCalculationInput(command);
+    Growth10KCalculation growth10KCalculation = buildGrowth10kCalculation(command, context);
     return growth10KCalculation.calculate();
   }
 
-  public Growth10KCalculation buildGrowth10kCalculation(ReturnCommand reqDTO, CalculationDTO inputDTO) {
+  public Growth10KCalculation buildGrowth10kCalculation(ReturnCommand command, PeriodCalculationInput context) {
     return new Growth10KCalculation(
-        inputDTO.getWeightedAveragePortfolioReturns(),
-        new DateRange(reqDTO.getCustomPsd(), reqDTO.getCustomPed()),
+        context.getWeightedAveragePortfolioReturns(),
+        new DateRange(command.getCustomPsd(), command.getCustomPed()),
         false,
-        inputDTO.getWarnings());
+        context.getWarnings());
   }
 
-  public CalculationDTO buildCalculationDto(final ReturnCommand reqDTO) {
+  public PeriodCalculationInput buildPeriodCalculationInput(final ReturnCommand command) {
     final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = monthlyReturnsService
-        .getPortfolioMonthlyReturns(reqDTO
-            .getHoldings(), reqDTO.getCurrency(), SCALE_OF_TWO);
+        .getPortfolioMonthlyReturns(command
+            .getHoldings(), command.getCurrency(), SCALE_OF_TWO);
 
     monthlyReturnsAggregate
         .setCpedDataValidation(new PortfolioCpedDataValidation())
         .setCpsdDataValidation(new PortfolioCpsdDataValidation());
 
     final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO.getCustomPsd(), reqDTO
+        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new CalculationDTO().setWeightedAveragePortfolioReturns(portfolioTotalReturns).setWarnings(
+    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns).setWarnings(
         monthlyReturnsAggregate
             .getErrorsAsWarnings());
   }

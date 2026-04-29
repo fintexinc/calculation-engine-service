@@ -38,9 +38,9 @@ class TrackingErrorCalculationTest {
         Pair.of("2010-01-01", ONE),
         Pair.of("2020-01-01", TEN));
 
-    final var intervalResDto = new TimeIntervalResult("2010-01-01", ONE);
-    final var intervalResDto1 = new TimeIntervalResult("2020-01-01", TEN);
-    final var expected = Set.of(intervalResDto1, intervalResDto);
+    final var interval1 = new TimeIntervalResult("2010-01-01", ONE);
+    final var interval2 = new TimeIntervalResult("2020-01-01", TEN);
+    final var expected = Set.of(interval2, interval1);
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
     final TrackingErrorResult actual = sut.defineResponseType(pairs);

@@ -52,27 +52,27 @@ public class CreditQualityServiceImpl implements CalculationService<PortfolioHol
   }
 
   @Override
-  public CreditQualityResult perform(final PortfolioHoldingsCommand reqDTO) {
+  public CreditQualityResult perform(final PortfolioHoldingsCommand command) {
     final ArrayList<Warning> warnings = new ArrayList<>();
     final Map<PortfolioHolding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
-        reqDTO.getHoldings(), List.of());
+        command.getHoldings(), List.of());
     final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(
         rawCreditQuality,
         warnings);
     if (areAllValuesInMapEmpty(creditQuality)) {
       return responseMapper.toEmptyResponse(warnings);
     }
-    final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality = getFixedIncomeCreditQuality(reqDTO, warnings);
-    final Map<FixedIncomeCreditQuality, BigDecimal> result = calculate(reqDTO.getHoldings(), creditQuality,
+    final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality = getFixedIncomeCreditQuality(command, warnings);
+    final Map<FixedIncomeCreditQuality, BigDecimal> result = calculate(command.getHoldings(), creditQuality,
         fixedIncomeCreditQuality);
     return responseMapper.fromCalculatedValues(result, warnings);
   }
 
-  public Map<PortfolioHolding, BigDecimal> getFixedIncomeCreditQuality(final PortfolioHoldingsCommand reqDTO,
+  public Map<PortfolioHolding, BigDecimal> getFixedIncomeCreditQuality(final PortfolioHoldingsCommand command,
       final List<Warning> warnings) {
     final Map<PortfolioHolding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
-        reqDTO.getHoldings(),
-        getSpecifiedIfEmpty(reqDTO.getDataProviders(), defaultDataProperties.getDataProviders()));
+        command.getHoldings(),
+        getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
     final var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);
     return assetAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, this::getFixedIncomeValue));
   }

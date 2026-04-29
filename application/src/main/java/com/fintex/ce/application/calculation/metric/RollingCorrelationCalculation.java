@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.RollingAbstractCalculation;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -19,7 +19,7 @@ public class RollingCorrelationCalculation extends RollingAbstractCalculation<Ro
   private final CorrelationCalculation correlationCalculation;
   private final NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns;
 
-  public RollingCorrelationCalculation(final CalculationDTO input,
+  public RollingCorrelationCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final CorrelationCalculation correlationCalculation,
       final NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns) {

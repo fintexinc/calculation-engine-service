@@ -3,9 +3,9 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.RollingStandardDeviationCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -35,16 +35,16 @@ class RollingStandardDeviationCalculationServiceImplTest {
     final var sut = mock(RollingStandardDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
-    final var reqDTO = mock(RollingCalculationCommand.class);
+    final var command = mock(RollingCalculationCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(sut.defineCalculationMethod(reqDTO)).thenReturn(mock(RollingStandardDeviationCalculation.class));
+    when(command.getHoldings()).thenReturn(holdings);
+    when(sut.defineCalculationMethod(command)).thenReturn(mock(RollingStandardDeviationCalculation.class));
 
     doCallRealMethod().when(sut).perform(any());
-    sut.perform(reqDTO);
+    sut.perform(command);
 
-    verify(sut).defineCalculationMethod(reqDTO);
+    verify(sut).defineCalculationMethod(command);
   }
 
   @Test
@@ -54,37 +54,37 @@ class RollingStandardDeviationCalculationServiceImplTest {
     final var sut = mock(RollingStandardDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
-    final var reqDTO = mock(RollingCalculationCommand.class);
+    final var command = mock(RollingCalculationCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var rollingCorrelationCalculation = mock(RollingStandardDeviationCalculation.class);
     final var rollingPeriods = Set.of("12");
 
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(sut.defineCalculationMethod(reqDTO)).thenReturn(rollingCorrelationCalculation);
-    when(reqDTO.getRollingPeriods()).thenReturn(rollingPeriods);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(sut.defineCalculationMethod(command)).thenReturn(rollingCorrelationCalculation);
+    when(command.getRollingPeriods()).thenReturn(rollingPeriods);
 
     doCallRealMethod().when(sut).perform(any());
-    sut.perform(reqDTO);
+    sut.perform(command);
 
     verify(rollingCorrelationCalculation).calculate(rollingPeriods);
   }
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
     final var sut = mock(RollingStandardDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
-    final var reqDTO = mock(RollingCalculationCommand.class);
-    final var input = mock(BenchmarkCalculationDTO.class);
+    final var command = mock(RollingCalculationCommand.class);
+    final var input = mock(BenchmarkPeriodCalculationInput.class);
 
-    when(sut.buildCalculationDto(any(), any())).thenReturn(input);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(input);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(reqDTO);
+    sut.defineCalculationMethod(command);
 
-    verify(sut).buildCalculationDto(reqDTO, SCALE_OF_TWO);
+    verify(sut).buildPeriodCalculationInput(command, SCALE_OF_TWO);
   }
 
   @Test
@@ -94,15 +94,15 @@ class RollingStandardDeviationCalculationServiceImplTest {
     final var sut = mock(RollingStandardDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
-    final var reqDTO = mock(RollingCalculationCommand.class);
+    final var command = mock(RollingCalculationCommand.class);
     final var map = mock(TreeMap.class);
 
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(map);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    final CalculationDTO actual = sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
-    final var expected = new CalculationDTO().setWeightedAveragePortfolioReturns(map);
+    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(map);
     assertEquals(expected, actual);
   }
 
@@ -114,13 +114,13 @@ class RollingStandardDeviationCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
     final var holdings = mock(List.class);
-    final var reqDTO = mock(RollingCalculationCommand.class);
+    final var command = mock(RollingCalculationCommand.class);
 
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    final CalculationDTO actual = sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
@@ -133,16 +133,16 @@ class RollingStandardDeviationCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService, defaultPeriods));
 
     final var holdings = mock(List.class);
-    final var reqDTO = mock(RollingCalculationCommand.class);
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCustomPsd()).thenReturn(LOCAL_DATE_NOW);
-    when(reqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW.plusMonths(1));
+    final var command = mock(RollingCalculationCommand.class);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW);
+    when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW.plusMonths(1));
 
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturnsAggregate);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    final CalculationDTO actual = sut.buildCalculationDto(reqDTO, SCALE_OF_TWO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, LOCAL_DATE_NOW,
         LOCAL_DATE_NOW.plusMonths(1));

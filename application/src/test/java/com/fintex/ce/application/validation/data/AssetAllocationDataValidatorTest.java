@@ -1,6 +1,6 @@
 package com.fintex.ce.application.validation.data;
 
-import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.Warning;
@@ -32,7 +32,7 @@ class AssetAllocationDataValidatorTest {
     // SETUP
     final var sut = mock(AssetAllocationDataValidator.class);
 
-    final var req = mock(AssetAllocationDataDTO.class);
+    final var req = mock(AssetAllocationData.class);
     final var warnings = mock(List.class);
 
     final var etfUs = mock(Map.class);

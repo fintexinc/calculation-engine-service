@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -43,7 +43,7 @@ class MaxDrawdownCalculationTest {
   @Test
   void shouldGetPeriodStartDateWithOneMonthOffset_whenVerifyGetPeriodStartDate() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K, null));
 
     final var numberOfMonths = 12;
@@ -89,7 +89,7 @@ class MaxDrawdownCalculationTest {
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeriodStartDateWithOneMonthOffset() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final Function<BigDecimal, BigDecimal> scaleFunction = DecimalUtils::toUserScale;
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
         scaleFunction));
@@ -113,7 +113,7 @@ class MaxDrawdownCalculationTest {
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetSubMapByPeriodStartDate() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final Function<BigDecimal, BigDecimal> scaleFunction = DecimalUtils::toUserScale;
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
         scaleFunction));
@@ -139,7 +139,7 @@ class MaxDrawdownCalculationTest {
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateMaxDrawdownValues() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final Function<BigDecimal, BigDecimal> scaleFunction = DecimalUtils::toUserScale;
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
         scaleFunction));
@@ -166,7 +166,7 @@ class MaxDrawdownCalculationTest {
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetMaxDrawdownValue() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final Function<BigDecimal, BigDecimal> scaleFunction = DecimalUtils::toUserScale;
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
         scaleFunction));
@@ -194,7 +194,7 @@ class MaxDrawdownCalculationTest {
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeakValue() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final Function<BigDecimal, BigDecimal> scaleFunction = DecimalUtils::toUserScale;
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
         scaleFunction));
@@ -222,7 +222,7 @@ class MaxDrawdownCalculationTest {
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetRecoveryTimeValue() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final Function<BigDecimal, BigDecimal> scaleFunction = DecimalUtils::toUserScale;
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
         scaleFunction));
@@ -250,7 +250,7 @@ class MaxDrawdownCalculationTest {
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenPortfolioTotalReturnsSizeLessThanPeriod() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K, null));
 
     final var treeMap = mock(TreeMap.class);
@@ -268,19 +268,19 @@ class MaxDrawdownCalculationTest {
     when(entry.getValue()).thenReturn(ONE);
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
 
-    final MaxDrawdownEntry maxDrawDownDTO = sut.calculatePeriodForNumberOfMonths(TWELVE);
+    final MaxDrawdownEntry maxDrawDown = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    assertEquals(String.valueOf(TWELVE), maxDrawDownDTO.getPeriod());
-    assertNull(maxDrawDownDTO.getDrawdownTroughDate());
-    assertNull(maxDrawDownDTO.getDrawdownStartDate());
-    assertNull(maxDrawDownDTO.getRecoveryTime());
-    assertNull(maxDrawDownDTO.getValue());
+    assertEquals(String.valueOf(TWELVE), maxDrawDown.getPeriod());
+    assertNull(maxDrawDown.getDrawdownTroughDate());
+    assertNull(maxDrawDown.getDrawdownStartDate());
+    assertNull(maxDrawDown.getRecoveryTime());
+    assertNull(maxDrawDown.getValue());
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhengetMaxDrawdownValueReturnsZero() {
     final var growth10K = mock(TreeMap.class);
-    final var input = mock(CalculationDTO.class);
+    final var input = mock(PeriodCalculationInput.class);
     final var sut = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K, null));
 
     final var treeMap = mock(TreeMap.class);
@@ -298,13 +298,13 @@ class MaxDrawdownCalculationTest {
     when(treeMap.size()).thenReturn(ONE.intValue());
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
 
-    final MaxDrawdownEntry maxDrawDownDTO = sut.calculatePeriodForNumberOfMonths(TWELVE);
+    final MaxDrawdownEntry maxDrawDown = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    assertEquals(String.valueOf(TWELVE), maxDrawDownDTO.getPeriod());
-    assertNull(maxDrawDownDTO.getDrawdownTroughDate());
-    assertNull(maxDrawDownDTO.getDrawdownStartDate());
-    assertNull(maxDrawDownDTO.getRecoveryTime());
-    assertNull(maxDrawDownDTO.getValue());
+    assertEquals(String.valueOf(TWELVE), maxDrawDown.getPeriod());
+    assertNull(maxDrawDown.getDrawdownTroughDate());
+    assertNull(maxDrawDown.getDrawdownStartDate());
+    assertNull(maxDrawDown.getRecoveryTime());
+    assertNull(maxDrawDown.getValue());
   }
 
   @Test

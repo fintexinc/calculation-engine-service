@@ -1,9 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -23,7 +23,7 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
   private final NavigableMap<LocalDate, BigDecimal> tBills;
   private final BetaCalculation betaCalculation;
 
-  public TreynorRatioCalculation(final CalculationDTO input,
+  public TreynorRatioCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods,
       final NavigableMap<LocalDate, BigDecimal> tBills,
       final BetaCalculation betaCalculation) {
@@ -50,11 +50,11 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
   }
 
   @Override
-  public TreynorRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> result) {
-    final var treynorRatioResDTO = new TreynorRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(result);
-    treynorRatioResDTO.setTreynorRatio(timeIntervals);
-    return treynorRatioResDTO;
+  public TreynorRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+    final var result = new TreynorRatioResult();
+    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    result.setTreynorRatio(timeIntervals);
+    return result;
   }
 
   public BigDecimal calculateTreynorRatio(final BigDecimal annualizedPortfolioReturn,

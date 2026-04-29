@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.metric.core;// package com.fintex.ce.domain.calculation.core;
 //
-// import com.fintex.ce.dto.calculation.WeightedAverageInputDTO;
+// import com.fintex.ce.dto.calculation.WeightedAverageInput;
 // import com.fintex.ce.dto.holding.Holding;
 // import com.fintex.ce.util.DateTimeUtils;
 // import org.junit.jupiter.api.Assertions;
@@ -27,7 +27,7 @@ package com.fintex.ce.application.calculation.metric.core;// package com.fintex.
 // //SETUP
 // final Map<LocalDate, BigDecimal> map = Map.of(LOCAL_DATE_NOW, ONE);
 //
-// final WeightedAverageInputDTO input = mock(WeightedAverageInputDTO.class);
+// final WeightedAverageInput input = mock(WeightedAverageInput.class);
 // when(input.getFxRates()).thenReturn(Map.of());
 // when(input.getPortfolioReturns()).thenReturn(Map.of(mock(Holding.class), map));
 //
@@ -83,7 +83,7 @@ package com.fintex.ce.application.calculation.metric.core;// package com.fintex.
 // void calculateWeightedAveragePortfolioMReturns_verifyCalculatePortfolioBaseTotalReturn() {
 // //SETUP
 // final WeightedAveragePortfolioMReturnsCalculation cWeighted = mock(WeightedAveragePortfolioMReturnsCalculation.class,
-// withSettings().useConstructor(mock(WeightedAverageInputDTO.class)));
+// withSettings().useConstructor(mock(WeightedAverageInput.class)));
 // doCallRealMethod().when(cWeighted).calculateWeightedAveragePortfolioMReturns();
 //
 // //ACT
@@ -97,7 +97,7 @@ package com.fintex.ce.application.calculation.metric.core;// package com.fintex.
 // void calculateWeightedAveragePortfolioMReturns_verifyCalculateEndingPortfolioWeight() {
 // //SETUP
 // final WeightedAveragePortfolioMReturnsCalculation cWeighted = mock(WeightedAveragePortfolioMReturnsCalculation.class,
-// withSettings().useConstructor(mock(WeightedAverageInputDTO.class)));
+// withSettings().useConstructor(mock(WeightedAverageInput.class)));
 //
 // final Map<Holding, Map<LocalDate, BigDecimal>> map = Map.of();
 // when(cWeighted.calculatePortfolioBaseTotalReturn()).thenReturn(map);
@@ -115,7 +115,7 @@ package com.fintex.ce.application.calculation.metric.core;// package com.fintex.
 // void calculateWeightedAveragePortfolioMReturns_verifyCalculateTotalPortfolioReturnFactor() {
 // //SETUP
 // final WeightedAveragePortfolioMReturnsCalculation cWeighted = mock(WeightedAveragePortfolioMReturnsCalculation.class,
-// withSettings().useConstructor(mock(WeightedAverageInputDTO.class)));
+// withSettings().useConstructor(mock(WeightedAverageInput.class)));
 //
 // final Map<Holding, Map<LocalDate, BigDecimal>> map = Map.of();
 // final Map<Holding, Map<LocalDate, BigDecimal>> endingPortfolioWeight = Map.of();
@@ -134,7 +134,7 @@ package com.fintex.ce.application.calculation.metric.core;// package com.fintex.
 // @Test
 // void calculateEndingPortfolioWeight_verifyGetInitialHoldingWeights() {
 // //SETUP
-// final WeightedAverageInputDTO in = mock(WeightedAverageInputDTO.class);
+// final WeightedAverageInput in = mock(WeightedAverageInput.class);
 // when(in.getRebalanced()).thenReturn(MONTHLY);
 //
 // final WeightedAveragePortfolioMReturnsCalculation cWeighted = mock(WeightedAveragePortfolioMReturnsCalculation.class,
@@ -152,7 +152,7 @@ package com.fintex.ce.application.calculation.metric.core;// package com.fintex.
 // @Test
 // void calculateEndingPortfolioWeight_verifyFormattedCorrectlyForMonthlyRebalancing() {
 // //SETUP
-// final WeightedAverageInputDTO in = mock(WeightedAverageInputDTO.class);
+// final WeightedAverageInput in = mock(WeightedAverageInput.class);
 // when(in.getRebalanced()).thenReturn(MONTHLY);
 //
 // final WeightedAveragePortfolioMReturnsCalculation cWeighted = mock(WeightedAveragePortfolioMReturnsCalculation.class,

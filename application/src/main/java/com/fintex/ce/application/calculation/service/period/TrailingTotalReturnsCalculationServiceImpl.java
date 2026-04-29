@@ -4,9 +4,9 @@ import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculat
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,13 +30,13 @@ public class TrailingTotalReturnsCalculationServiceImpl
     return CalculationMetric.TRAILING_TOTAL_RETURNS;
   }
 
-  public TrailingTotalReturnsCalculation defineCalculationMethod(final PeriodCommand reqDTO) {
-    final CalculationDTO inputDTO = buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
-    return new TrailingTotalReturnsCalculation(inputDTO, defaultPeriods);
+  public TrailingTotalReturnsCalculation defineCalculationMethod(final PeriodCommand command) {
+    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    return new TrailingTotalReturnsCalculation(context, defaultPeriods);
   }
 
   @Override
-  public void addSpecificChecks(final PeriodCommand reqDTO) {
+  public void addSpecificChecks(final PeriodCommand command) {
     // Empty as there are no specific checks for the current calculation
   }
 

@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.util.ReturnFactorScale;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -20,21 +20,21 @@ import static org.mockito.Mockito.withSettings;
 class SharpeRatioCalculationServiceImplTest {
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyBuildCalculationDto() {
+  void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
 
-    final var weightedAverageInputDTO = mock(CalculationDTO.class);
+    final var weightedAverageInput = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
-    when(sut.buildCalculationDto(any(), any())).thenReturn(weightedAverageInputDTO);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(weightedAverageInput);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     sut.defineCalculationMethod(req);
 
-    verify(sut).buildCalculationDto(req, ReturnFactorScale.SCALE_OF_ONE);
+    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_ONE);
   }
 
   @Test
@@ -43,11 +43,11 @@ class SharpeRatioCalculationServiceImplTest {
     final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
 
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(sut.buildCalculationDto(any(), any())).thenReturn(calculationDTO);
+    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(context);
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());
     sut.defineCalculationMethod(req);

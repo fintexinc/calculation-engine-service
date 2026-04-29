@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
-import com.fintex.ce.model.dto.calculation.BenchmarkCalculationDTO;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class InformationRatioCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResult() {
-    final var input = mock(BenchmarkCalculationDTO.class);
+    final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
     final var sut = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
@@ -53,7 +53,7 @@ class InformationRatioCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGettingPortfolioReturnBenchmarkReturnTrackingError() {
-    final var input = mock(BenchmarkCalculationDTO.class);
+    final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
     final var sut = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
@@ -80,7 +80,7 @@ class InformationRatioCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyNumberOfMonthsGreaterThanBenchmarkTotalReturns() {
-    final var input = mock(BenchmarkCalculationDTO.class);
+    final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
     final var sut = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
@@ -102,7 +102,7 @@ class InformationRatioCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyNumberOfMonthsGreaterThanPortfolioTotalReturns() {
-    final var input = mock(BenchmarkCalculationDTO.class);
+    final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
     final var sut = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
@@ -124,7 +124,7 @@ class InformationRatioCalculationTest {
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
-    final var input = mock(BenchmarkCalculationDTO.class);
+    final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
     final var sut = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),

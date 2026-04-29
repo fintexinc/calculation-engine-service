@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.model.util.BigDecimalConstants;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -33,14 +33,14 @@ class DistributionOfReturnsServiceImplTest {
         .useConstructor(monthlyReturnsService));
     final List holdings = mock(List.class);
 
-    final var reqDTO = mock(DistributionOfReturnsCommand.class);
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
+    final var command = mock(DistributionOfReturnsCommand.class);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
 
-    verify(monthlyReturnsService).getPortfolioMonthlyReturns(reqDTO.getHoldings(), Currency.CAD,
+    verify(monthlyReturnsService).getPortfolioMonthlyReturns(command.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
   }
 
@@ -52,21 +52,21 @@ class DistributionOfReturnsServiceImplTest {
     final List holdings = mock(List.class);
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
 
-    final var reqDTO = mock(DistributionOfReturnsCommand.class);
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(reqDTO.getCustomPsd()).thenReturn(LocalDate.now());
-    when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
+    final var command = mock(DistributionOfReturnsCommand.class);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getCustomPsd()).thenReturn(LocalDate.now());
+    when(command.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO.getCurrency(),
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency(),
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturnsAggregate);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    sut.buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    sut.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
 
-    verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO
+    verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command
         .getCustomPsd(),
-        reqDTO.getCustomPed());
+        command.getCustomPed());
   }
 
   @Test
@@ -78,25 +78,25 @@ class DistributionOfReturnsServiceImplTest {
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
 
-    final var reqDTO = mock(DistributionOfReturnsCommand.class);
-    when(reqDTO.getHoldings()).thenReturn(holdings);
-    when(reqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(reqDTO.getCustomPsd()).thenReturn(LocalDate.now());
-    when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
-    when(reqDTO.getCustomPed()).thenReturn(LocalDate.now().minusMonths(2));
+    final var command = mock(DistributionOfReturnsCommand.class);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getCustomPsd()).thenReturn(LocalDate.now());
+    when(command.getCustomPed()).thenReturn(LocalDate.now().minusMonths(1));
+    when(command.getCustomPed()).thenReturn(LocalDate.now().minusMonths(2));
 
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(reqDTO.getHoldings(), reqDTO.getCurrency(),
+    when(monthlyReturnsService.getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency(),
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturnsAggregate);
-    when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, reqDTO
-        .getCustomPsd(), reqDTO
+    when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command
+        .getCustomPsd(), command
             .getCustomPed())).thenReturn(portfolioTotalReturns);
 
-    final CalculationDTO expected = new CalculationDTO();
-    expected.setCipsd(reqDTO.getCustomIntervalPsd());
+    final PeriodCalculationInput expected = new PeriodCalculationInput();
+    expected.setCipsd(command.getCustomIntervalPsd());
     expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
 
-    doCallRealMethod().when(sut).buildCalculationDto(any(), any());
-    final CalculationDTO actual = sut.buildCalculationDto(reqDTO, ReturnFactorScale.SCALE_OF_TWO);
+    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
 
     assertEquals(expected, actual);
   }

@@ -2,9 +2,9 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.AnnualReturnCalculation;
 import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
-import com.fintex.ce.model.dto.calculation.CalculationDTO;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -37,50 +37,50 @@ class AnnualReturnServiceImplTest {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
-    final var returnReqDTO = mock(ReturnCommand.class);
+    final var command = mock(ReturnCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
-    final var calculationDTO = mock(CalculationDTO.class);
+    final var context = mock(PeriodCalculationInput.class);
 
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    when(command.getHoldings()).thenReturn(holdings);
+    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
     when(sut.buildAnnualReturnCalculation(any())).thenReturn(mock(AnnualReturnCalculation.class));
 
-    doCallRealMethod().when(sut).perform(returnReqDTO);
-    sut.perform(returnReqDTO);
+    doCallRealMethod().when(sut).perform(command);
+    sut.perform(command);
 
-    verify(sut).buildAnnualReturnCalculation(calculationDTO);
+    verify(sut).buildAnnualReturnCalculation(context);
   }
 
   @Test
-  void shouldCalculate_whenVerifyBuildWeightedAverageInputDto() {
+  void shouldCalculate_whenVerifyBuildWeightedAverageInput() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
-    final var returnReqDTO = mock(ReturnCommand.class);
+    final var command = mock(ReturnCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
-    when(returnReqDTO.getHoldings()).thenReturn(holdings);
-    when(returnReqDTO.getCurrency()).thenReturn(Currency.CAD);
-    when(returnReqDTO.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getCurrency()).thenReturn(Currency.CAD);
+    when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
 
-    final var calculationDTO = mock(CalculationDTO.class);
-    when(sut.buildWeightedAverageInputDto(any())).thenReturn(calculationDTO);
-    when(calculationDTO.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
+    final var context = mock(PeriodCalculationInput.class);
+    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
 
     final var annual = mock(AnnualReturnCalculation.class);
-    final var resDTO = mock(AnnualReturnResult.class);
-    when(annual.calculate()).thenReturn(resDTO);
+    final var result = mock(AnnualReturnResult.class);
+    when(annual.calculate()).thenReturn(result);
     when(sut.buildAnnualReturnCalculation(any())).thenReturn(annual);
 
-    doCallRealMethod().when(sut).perform(returnReqDTO);
-    final AnnualReturnResult actual = sut.perform(returnReqDTO);
+    doCallRealMethod().when(sut).perform(command);
+    final AnnualReturnResult actual = sut.perform(command);
 
-    assertSame(actual, resDTO);
+    assertSame(actual, result);
 
   }
 
   @Test
-  void shouldBuildWeightedAverageInputDto_whenVerifyBuildCalculationDto() {
+  void shouldBuildWeightedAverageInput_whenVerifyBuildPeriodCalculationInput() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
     final var holdings = List.of(mock(PortfolioHolding.class));
@@ -92,8 +92,8 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturns);
 
-    doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
-    sut.buildWeightedAverageInputDto(annual);
+    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
+    sut.buildWeightedAverageInput(annual);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
@@ -116,10 +116,10 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
-    final CalculationDTO actual = sut.buildWeightedAverageInputDto(annual);
+    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
+    final PeriodCalculationInput actual = sut.buildWeightedAverageInput(annual);
 
-    final var expected = new CalculationDTO().setWeightedAveragePortfolioReturns(map).setWarnings(List.of());
+    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(map).setWarnings(List.of());
     assertEquals(expected, actual);
   }
 
@@ -141,8 +141,8 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
-    sut.buildWeightedAverageInputDto(annual);
+    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
+    sut.buildWeightedAverageInput(annual);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, LOCAL_DATE_NOW
         .minusMonths(2), LOCAL_DATE_NOW);
@@ -164,8 +164,8 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
-    sut.buildWeightedAverageInputDto(annual);
+    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
+    sut.buildWeightedAverageInput(annual);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
@@ -174,7 +174,7 @@ class AnnualReturnServiceImplTest {
   void shouldBuildAnnualReturnCalculation_whenVerify() {
     try (var mockedAnnualReturnCalculation = mockConstruction(AnnualReturnCalculation.class)) {
       final var sut = mock(AnnualReturnServiceImpl.class);
-      final var input = mock(CalculationDTO.class);
+      final var input = mock(PeriodCalculationInput.class);
       final var map = mock(NavigableMap.class);
 
       when(input.getWeightedAveragePortfolioReturns()).thenReturn(map);
@@ -210,10 +210,10 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInputDto(any());
-    final CalculationDTO actual = sut.buildWeightedAverageInputDto(annual);
+    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
+    final PeriodCalculationInput actual = sut.buildWeightedAverageInput(annual);
 
-    final var expected = new CalculationDTO().setWeightedAveragePortfolioReturns(map).setWarnings(warnings);
+    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(map).setWarnings(warnings);
     assertEquals(expected, actual);
   }
 

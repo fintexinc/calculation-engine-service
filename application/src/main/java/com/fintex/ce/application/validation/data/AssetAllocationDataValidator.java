@@ -1,6 +1,6 @@
 package com.fintex.ce.application.validation.data;
 
-import com.fintex.ce.model.domain.calculation.AssetAllocationDataDTO;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -16,16 +16,16 @@ import java.util.Map;
 @Component
 public class AssetAllocationDataValidator {
 
-  public void validate(final AssetAllocationDataDTO assetAllocationDataDto, final List<Warning> warnings) {
-    validateNonStock(assetAllocationDataDto.getEtfUsFdsResponse(), warnings);
-    validateNonStock(assetAllocationDataDto.getEtfCanadaFdsResponse(), warnings);
-    validateNonStock(assetAllocationDataDto.getMutualFundFdsResponse(), warnings);
-    validateNonStock(assetAllocationDataDto.getBenchmarkIndexFdsResponse(), warnings);
-    validateNonStock(assetAllocationDataDto.getCanadaPooledFundFdsResponse(), warnings);
-    validateNonStock(assetAllocationDataDto.getCanadaHedgeFundsFdsResponse(), warnings);
-    validateNonStock(assetAllocationDataDto.getUsFundsFdsResponse(), warnings);
-    validateNonStock(assetAllocationDataDto.getFixedIncomeFdsResponse(), warnings);
-    validateNonStock(assetAllocationDataDto.getSeparatelyManagedAccountFdsResponse(), warnings);
+  public void validate(final AssetAllocationData assetAllocationData, final List<Warning> warnings) {
+    validateNonStock(assetAllocationData.getEtfUsFdsResponse(), warnings);
+    validateNonStock(assetAllocationData.getEtfCanadaFdsResponse(), warnings);
+    validateNonStock(assetAllocationData.getMutualFundFdsResponse(), warnings);
+    validateNonStock(assetAllocationData.getBenchmarkIndexFdsResponse(), warnings);
+    validateNonStock(assetAllocationData.getCanadaPooledFundFdsResponse(), warnings);
+    validateNonStock(assetAllocationData.getCanadaHedgeFundsFdsResponse(), warnings);
+    validateNonStock(assetAllocationData.getUsFundsFdsResponse(), warnings);
+    validateNonStock(assetAllocationData.getFixedIncomeFdsResponse(), warnings);
+    validateNonStock(assetAllocationData.getSeparatelyManagedAccountFdsResponse(), warnings);
   }
 
   <H extends PortfolioHolding> void validateNonStock(final Map<H, HoldingAssetAllocation> holdings,
