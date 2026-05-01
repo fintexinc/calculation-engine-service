@@ -42,7 +42,6 @@ class FixedIncomeStyleboxExposureMapperTest {
     assertThat(result.getBoxValues().get(FixedIncomeStyleBoxType.HIGH_LIMITED)).isEqualByComparingTo("15.50");
     assertThat(result.getBoxValues().get(FixedIncomeStyleBoxType.HIGH_MODERATE)).isEqualByComparingTo("22.30");
     assertThat(result.getBoxValues().get(FixedIncomeStyleBoxType.MEDIUM_EXTENSIVE)).isEqualByComparingTo("18.75");
-    assertThat(result.getHoldingId()).isEqualTo("AGG");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
@@ -56,7 +55,6 @@ class FixedIncomeStyleboxExposureMapperTest {
     FixedIncomeStyleboxExposure result = mapper.map(smsResponse, holding);
 
     assertThat(result.getBoxValues()).isEmpty();
-    assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.FUND);
     assertThat(result.getProviders()).isEmpty();
   }

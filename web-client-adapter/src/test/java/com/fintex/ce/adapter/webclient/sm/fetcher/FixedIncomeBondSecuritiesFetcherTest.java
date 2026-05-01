@@ -65,13 +65,12 @@ class FixedIncomeBondSecuritiesFetcherTest
   }
 
   @Override
-  protected FixedIncomeBondSecurities createExpectedDomainModel(String holdingId) {
+  protected FixedIncomeBondSecurities createExpectedDomainModel() {
     final FixedIncomeBondSecurities tmpFixedIncomeBondSecurities = new FixedIncomeBondSecurities();
     tmpFixedIncomeBondSecurities.setFixedIncomeBondSectors(Map.of(
         FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(45.2),
         FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS, BigDecimal.valueOf(35.5)));
     tmpFixedIncomeBondSecurities.setHoldingType(FinancialInstrumentType.ETF_CANADA);
-    tmpFixedIncomeBondSecurities.setHoldingId(holdingId);
     return tmpFixedIncomeBondSecurities;
   }
 

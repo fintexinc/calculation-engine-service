@@ -63,7 +63,6 @@ public class FixedIncomeSectorAllocationMapper
     return FixedIncomeBondSecurities.builder()
         .fixedIncomeBondSectors(allocationMap)
         .holdingType(holding.getHoldingType())
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

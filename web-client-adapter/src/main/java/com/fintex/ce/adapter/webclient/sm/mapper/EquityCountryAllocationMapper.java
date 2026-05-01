@@ -37,7 +37,6 @@ public class EquityCountryAllocationMapper
 
     return EquityCountryAllocation.builder()
         .allocations(allocationMap)
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

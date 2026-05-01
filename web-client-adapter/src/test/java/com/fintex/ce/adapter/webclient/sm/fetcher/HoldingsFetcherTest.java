@@ -58,7 +58,7 @@ class HoldingsFetcherTest extends AbstractSecurityMasterFetcherTest<CommonTopHol
   }
 
   @Override
-  protected CommonTopHoldings createExpectedDomainModel(String holdingId) {
+  protected CommonTopHoldings createExpectedDomainModel() {
     var ch = new CommonTopHolding();
     ch.setCompanyName("NVIDIA Corp");
     ch.setType("E");
@@ -67,7 +67,6 @@ class HoldingsFetcherTest extends AbstractSecurityMasterFetcherTest<CommonTopHol
 
     return CommonTopHoldings.builder()
         .holdings(List.of(ch))
-        .holdingId(holdingId)
         .build();
   }
 

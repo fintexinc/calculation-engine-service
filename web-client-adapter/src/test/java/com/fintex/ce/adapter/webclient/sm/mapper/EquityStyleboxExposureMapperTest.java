@@ -41,7 +41,6 @@ class EquityStyleboxExposureMapperTest {
     assertThat(result.getBoxValues().get(StyleBoxType.LARGE_VALUE)).isEqualByComparingTo("18.5");
     assertThat(result.getBoxValues().get(StyleBoxType.LARGE_CORE)).isEqualByComparingTo("42.3");
     assertThat(result.getBoxValues().get(StyleBoxType.MID_GROWTH)).isEqualByComparingTo("3.8");
-    assertThat(result.getHoldingId()).isEqualTo("XIU.TO");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
@@ -54,7 +53,6 @@ class EquityStyleboxExposureMapperTest {
     EquityStyleboxExposure result = mapper.map(smsResponse, holding);
 
     assertThat(result.getBoxValues()).isEmpty();
-    assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.FUND);
     assertThat(result.getProviders()).isEmpty();
   }

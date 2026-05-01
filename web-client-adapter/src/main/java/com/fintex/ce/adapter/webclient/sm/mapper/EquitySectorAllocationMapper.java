@@ -41,7 +41,6 @@ public class EquitySectorAllocationMapper
 
     return EquitySector.builder()
         .allocations(allocationMap)
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

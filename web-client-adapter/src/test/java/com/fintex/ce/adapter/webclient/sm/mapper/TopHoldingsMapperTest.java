@@ -39,7 +39,6 @@ class TopHoldingsMapperTest {
 
     CommonTopHoldings result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getHoldings()).hasSize(1);
 
@@ -79,7 +78,6 @@ class TopHoldingsMapperTest {
   void shouldReturnEmptyHoldings_whenResponseIsNull() {
     CommonTopHoldings result = mapper.map(null, createHolding("SEC-003"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-003");
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getHoldings()).isEmpty();
   }

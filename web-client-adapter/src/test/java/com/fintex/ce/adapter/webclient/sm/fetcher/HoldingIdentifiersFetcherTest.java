@@ -55,7 +55,7 @@ class HoldingIdentifiersFetcherTest
   }
 
   @Override
-  protected HoldingIdentifiers createExpectedDomainModel(String holdingId) {
+  protected HoldingIdentifiers createExpectedDomainModel() {
     return createSmsResponse();
   }
 

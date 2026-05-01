@@ -32,7 +32,6 @@ class AssetAllocationSecurityMasterMapperTest {
 
     HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
     assertThat(result.getAllocations()).hasSize(3);
     assertThat(result.getAllocations()).containsEntry("EQUITY", new BigDecimal("60.5"));
@@ -45,7 +44,6 @@ class AssetAllocationSecurityMasterMapperTest {
   void shouldReturnEmptyAllocationsAndProviders_whenResponseIsNull() {
     HoldingAssetAllocation result = mapper.map(null, createHolding("SEC-002"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
   }

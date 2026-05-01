@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class SalesCharge extends BaseCalculationData<SalesCharge> {
+public class SalesCharge extends BaseCalculationData {
 
   private SalesChargeType type;
 

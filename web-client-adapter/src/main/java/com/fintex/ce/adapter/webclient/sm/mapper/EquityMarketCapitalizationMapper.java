@@ -41,7 +41,6 @@ public class EquityMarketCapitalizationMapper
 
     return HoldingEquityMarketCap.builder()
         .ratings(ratingsMap)
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

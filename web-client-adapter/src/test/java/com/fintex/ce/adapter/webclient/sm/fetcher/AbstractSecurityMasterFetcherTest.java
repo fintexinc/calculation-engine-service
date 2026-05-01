@@ -45,7 +45,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
   protected abstract R createSmsResponse();
 
-  protected abstract D createExpectedDomainModel(String holdingId);
+  protected abstract D createExpectedDomainModel();
 
   protected abstract SecurityMasterResponseMapper<D, R> mapper();
 
@@ -53,7 +53,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
   void shouldReturnMappedResults_whenSmReturnsData() {
     PortfolioHolding holding = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
     R smsResponse = createSmsResponse();
-    D expected = createExpectedDomainModel("XIU.TO");
+    D expected = createExpectedDomainModel();
 
     var identifier = new SecurityIdentifier();
     identifier.setId("XIU.TO");
@@ -124,7 +124,7 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     PortfolioHolding nullTypeHolding = createHolding("SKIP.ID", FiIdentifierType.TICKER, null);
 
     R smsResponse = createSmsResponse();
-    D expected = createExpectedDomainModel("XIU.TO");
+    D expected = createExpectedDomainModel();
 
     var identifier = new SecurityIdentifier();
     identifier.setId("XIU.TO");
@@ -149,8 +149,8 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
 
     R smsResponse1 = createSmsResponse();
     R smsResponse2 = createSmsResponse();
-    D expected1 = createExpectedDomainModel("XIU.TO");
-    D expected2 = createExpectedDomainModel("VFV.TO");
+    D expected1 = createExpectedDomainModel();
+    D expected2 = createExpectedDomainModel();
 
     var id1 = new SecurityIdentifier();
     id1.setId("XIU.TO");
@@ -170,8 +170,8 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
         List.of(holding1, holding2), List.of(DataProvider.MORNINGSTAR));
 
     assertThat(result).hasSize(2);
-    assertThat(result.get(holding1)).isEqualTo(expected1);
-    assertThat(result.get(holding2)).isEqualTo(expected2);
+    assertThat(result.get(holding1)).isSameAs(expected1);
+    assertThat(result.get(holding2)).isSameAs(expected2);
   }
 
   protected PortfolioHolding createHolding(String id, FiIdentifierType idType, FinancialInstrumentType holdingType) {

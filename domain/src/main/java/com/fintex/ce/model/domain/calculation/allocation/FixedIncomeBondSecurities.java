@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FixedIncomeBondSecurities extends BaseCalculationData<FixedIncomeBondSecurities> {
+public class FixedIncomeBondSecurities extends BaseCalculationData {
 
   private FinancialInstrumentType holdingType;
   private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeBondSectors;

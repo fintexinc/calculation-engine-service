@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class HoldingEquityMarketCap extends BaseCalculationData<HoldingEquityMarketCap> {
+public class HoldingEquityMarketCap extends BaseCalculationData {
 
   private FinancialInstrumentType holdingType;
   private Map<EquityMarketCapitalizationType, BigDecimal> ratings;

@@ -8,7 +8,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class BusinessCountry extends BaseCalculationData<BusinessCountry> {
+public class BusinessCountry extends BaseCalculationData {
 
   private String value;
 

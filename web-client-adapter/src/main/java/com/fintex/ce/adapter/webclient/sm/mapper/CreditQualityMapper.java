@@ -52,7 +52,6 @@ public class CreditQualityMapper
 
     return CreditQuality.builder()
         .ratings(ratings)
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

@@ -29,7 +29,6 @@ class YieldMapperTest {
 
     Yield result = sut.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getDividendYield()).isEqualByComparingTo("0.035");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
@@ -38,19 +37,17 @@ class YieldMapperTest {
   void shouldReturnEmptyYield_whenResponseIsNull() {
     Yield result = sut.map(null, createHolding("SEC-002"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getDividendYield()).isNull();
     assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
-  void shouldMapOnlyHoldingId_whenDividendYieldIsNull() {
+  void shouldReturnEmptyYield_whenDividendYieldIsNull() {
     var smsResponse = new Income();
     smsResponse.setDividendYield(null);
 
     Yield result = sut.map(smsResponse, createHolding("SEC-003"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-003");
     assertThat(result.getDividendYield()).isNull();
     assertThat(result.getProviders()).isEmpty();
   }

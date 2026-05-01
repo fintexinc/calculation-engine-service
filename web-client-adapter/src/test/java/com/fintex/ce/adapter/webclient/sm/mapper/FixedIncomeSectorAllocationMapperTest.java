@@ -46,7 +46,6 @@ class FixedIncomeSectorAllocationMapperTest {
         .isEqualByComparingTo("35.50");
     assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSecuritiesAllocationType.MORTGAGE_BACKED_SECURITIES))
         .isEqualByComparingTo("19.30");
-    assertThat(result.getHoldingId()).isEqualTo("AGG");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
@@ -60,7 +59,6 @@ class FixedIncomeSectorAllocationMapperTest {
     FixedIncomeBondSecurities result = mapper.map(smsResponse, holding);
 
     assertThat(result.getFixedIncomeBondSectors()).isEmpty();
-    assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.FUND);
     assertThat(result.getProviders()).isEmpty();
   }

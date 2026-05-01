@@ -27,7 +27,6 @@ public class SalesChargeMapper
         .orElseGet(List::of);
 
     return SalesCharge.builder()
-        .holdingId(holding.getSecurityIdentifier().getId())
         .type(datapoint.map(d -> d.getValue()).orElse(null))
         .providers(providers)
         .build();

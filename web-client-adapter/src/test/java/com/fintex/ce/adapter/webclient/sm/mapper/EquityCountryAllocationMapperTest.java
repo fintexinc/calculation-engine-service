@@ -35,7 +35,6 @@ class EquityCountryAllocationMapperTest {
 
     EquityCountryAllocation result = sut.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getAllocations()).hasSize(2);
     assertThat(result.getAllocations()).containsEntry("CAN", BigDecimal.valueOf(0.65));
@@ -46,7 +45,6 @@ class EquityCountryAllocationMapperTest {
   void shouldReturnEmptyAllocations_whenResponseIsNull() {
     EquityCountryAllocation result = sut.map(null, createHolding("SEC-002"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getAllocations()).isEmpty();
   }

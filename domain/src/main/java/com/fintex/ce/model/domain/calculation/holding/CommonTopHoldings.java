@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class CommonTopHoldings extends BaseCalculationData<CommonTopHoldings> {
+public class CommonTopHoldings extends BaseCalculationData {
 
   private List<CommonTopHolding> holdings;
 

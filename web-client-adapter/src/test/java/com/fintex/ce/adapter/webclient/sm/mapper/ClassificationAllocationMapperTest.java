@@ -41,7 +41,6 @@ class ClassificationAllocationMapperTest {
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.MUTUAL_FUND_CANADA);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getSecurityClassificationValues()).hasSize(2);
@@ -55,7 +54,6 @@ class ClassificationAllocationMapperTest {
   void shouldReturnEmptyMap_whenResponseIsNull() {
     ClassificationAllocation result = mapper.map(null, createHolding("SEC-002"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getSecurityClassificationValues()).isEmpty();
   }

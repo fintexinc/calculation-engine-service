@@ -25,7 +25,6 @@ public class YieldMapper implements SecurityMasterResponseMapper<Yield, Income> 
         .orElseGet(List::of);
 
     return Yield.builder()
-        .holdingId(holding.getSecurityIdentifier().getId())
         .dividendYield(dividendYieldDp.map(d -> d.getValue()).orElse(null))
         .providers(providers)
         .build();

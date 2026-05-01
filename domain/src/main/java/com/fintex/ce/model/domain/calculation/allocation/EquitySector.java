@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class EquitySector extends BaseCalculationData<EquitySector> {
+public class EquitySector extends BaseCalculationData {
 
   private Map<EquitySectorAllocationType, BigDecimal> allocations;
 

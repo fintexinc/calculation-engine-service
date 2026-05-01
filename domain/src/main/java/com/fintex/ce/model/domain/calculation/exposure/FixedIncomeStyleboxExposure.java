@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FixedIncomeStyleboxExposure extends BaseCalculationData<FixedIncomeStyleboxExposure> {
+public class FixedIncomeStyleboxExposure extends BaseCalculationData {
 
   private FinancialInstrumentType holdingType;
   private Map<FixedIncomeStyleBoxType, BigDecimal> boxValues;
