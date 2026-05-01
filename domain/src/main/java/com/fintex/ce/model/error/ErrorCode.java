@@ -270,13 +270,13 @@ public enum ErrorCode {
   // ============================================
   // FX-xxx — FX rate errors
   // ============================================
-  MISSING_MONTHLY_FX_RATE(
-      Codes.MISSING_MONTHLY_FX_RATE,
-      "Monthly FX rates is missing value for a date %s",
-      "No FX rate is available for the requested date",
-      "Ensure FX rates are available for the requested date range",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
+  FX_RATES_UNAVAILABLE(
+      Codes.FX_RATES_UNAVAILABLE,
+      "FX rates unavailable for %s -> %s; values returned in the original currency",
+      "FX rates could not be obtained — the upstream provider was unreachable, returned no data, or the cache held no entries for the requested range — so the affected holding's amounts are not converted to the target currency",
+      "Verify Bank of Canada availability and that the currency pair is configured; ensure rates exist for the requested date range",
+      HttpStatus.OK,
+      Severity.WARNING),
 
   // ============================================
   // RET-xxx — Returns / NAV data errors
@@ -996,7 +996,7 @@ public enum ErrorCode {
     public static final String MISSING_UNDERLYING_HOLDING_ID_VALUE = "FDS-030";
 
     // FX
-    public static final String MISSING_MONTHLY_FX_RATE = "FX-001";
+    public static final String FX_RATES_UNAVAILABLE = "FX-001";
 
     // Returns / NAV
     public static final String MISSING_MONTHLY_RETURNS = "RET-001";

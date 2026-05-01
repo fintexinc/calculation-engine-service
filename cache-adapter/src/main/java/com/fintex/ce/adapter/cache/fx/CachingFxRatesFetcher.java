@@ -11,13 +11,16 @@ import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.fintex.ce.model.util.BigDecimalConstants.INVERSE_SCALE;
-import static com.fintex.ce.model.util.BigDecimalConstants.ROUNDING_MODE;
+import static com.fintex.ce.model.util.BigDecimalUtils.invert;
 
 /**
  * Caching decorator over {@link FxRatesFetcher}. On each call the cache determines which sub-ranges are already loaded
  * and delegates only the gaps to the wrapped fetcher. Unbounded queries bypass the cache and go straight to the
  * delegate — partial-range reasoning requires both endpoints.
+ * <p>
+ * Transport-failure handling is intentionally not done here: if the delegate throws, the exception propagates to the
+ * application layer (where {@code FxRateService} owns the fail-soft translation). The cache only writes for non-empty
+ * loader responses, so a propagating exception leaves the cache untouched for the failed gap.
  * <p>
  * For pairs whose canonical direction differs from the requested direction (as reported by
  * {@link FxRatesFetcher#canonicalDirection(CurrencyExchangePair)}), the cache is keyed on the canonical direction and
@@ -40,7 +43,7 @@ public class CachingFxRatesFetcher implements FxRatesFetcher {
   @Override
   public NavigableMap<LocalDate, BigDecimal> fetch(CurrencyExchangePair currencyPair, DateRange dateRange) {
     if (dateRange == null || !dateRange.isBounded()) {
-      log.debug("Cache bypass for {} — unbounded range", currencyPair);
+      log.debug("Cache bypass for {} - unbounded range", currencyPair);
       return delegate.fetch(currencyPair, dateRange);
     }
     if (dateRange.start().isAfter(dateRange.end())) {
@@ -56,12 +59,12 @@ public class CachingFxRatesFetcher implements FxRatesFetcher {
   }
 
   /**
-   * Inverts every rate in {@code rates} using the precision adapters apply to their inverse-pair fallback, so the
-   * non-canonical-direction output of this caching wrapper matches what the un-cached delegate would have produced.
+   * Inverts every rate in {@code rates} using {@link com.fintex.ce.model.util.BigDecimalUtils#invert(BigDecimal)} so
+   * the non-canonical-direction output of this caching wrapper matches what the un-cached delegate would have produced.
    */
   private static NavigableMap<LocalDate, BigDecimal> invertAll(NavigableMap<LocalDate, BigDecimal> rates) {
     NavigableMap<LocalDate, BigDecimal> inverted = new TreeMap<>();
-    rates.forEach((date, rate) -> inverted.put(date, BigDecimal.ONE.divide(rate, INVERSE_SCALE, ROUNDING_MODE)));
+    rates.forEach((date, rate) -> inverted.put(date, invert(rate)));
     return inverted;
   }
 }

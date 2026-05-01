@@ -44,7 +44,7 @@ Pure logic, no data fetching.
 - **Collection null/empty checks:** use `org.springframework.util.CollectionUtils.isEmpty(col)` instead of `col == null || col.isEmpty()`. Never perform the same `null || isEmpty` check twice in a row — collapse to a single `CollectionUtils.isEmpty` call
 - **Object construction:** prefer immutable data classes. Construct via the canonical/all-args constructor, a single-field constructor (or named static factory `ofX(...)` when types would collide) for the dominant case, or a Lombok `@Builder` / `@SuperBuilder` for multi-field cases; avoid setter-based construction and never mix builder calls with post-build setters. For pure value carriers, use `record`s.
 - **Ternary:** use for simple single-expression returns/assignments instead of if/else
-- **No `final`** on method parameters/variables unless class fields or explicit constants
+- **No `final`** on method parameters/variables
 - **No fully qualified class names** — always use imports
 - **No magic strings** — extract to constants or enums
 - **Enum factory methods:** always name `fromValue(value)`

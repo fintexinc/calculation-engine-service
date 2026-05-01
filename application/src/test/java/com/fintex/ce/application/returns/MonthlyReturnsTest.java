@@ -1,5 +1,6 @@
 package com.fintex.ce.application.returns;
 
+import com.fintex.ce.application.calculation.service.FxRateService;
 import com.fintex.ce.application.util.MapUtils;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
@@ -163,10 +164,10 @@ class MonthlyReturnsTest {
     sut.returnsMap = monthlyReturns;
     sut.holdingCurrencyMap = holdingCurrency;
 
-    doCallRealMethod().when(sut).setFxRatesConversionComponent(any());
+    doCallRealMethod().when(sut).setFxRateService(any());
     doCallRealMethod().when(sut).setFxRates(any(), any());
-    final var fxRatesConversionComponent = mock(FxRatesConversionComponent.class);
-    sut.setFxRatesConversionComponent(fxRatesConversionComponent);
+    var fxRateService = mock(FxRateService.class);
+    sut.setFxRateService(fxRateService);
     sut.setFxRates(Map.of(), Currency.CAD);
 
     doCallRealMethod().when(sut).fxRatesApplied();
@@ -174,7 +175,7 @@ class MonthlyReturnsTest {
     sut.fxRatesApplied();
 
     Assertions.assertNotNull(monthlyReturns);
-    verify(fxRatesConversionComponent).convert(eq(monthlyReturns), eq(holdingCurrency), any(), any());
+    verify(fxRateService).convertReturns(eq(monthlyReturns), eq(holdingCurrency), any(), any(), any());
   }
 
   @Test

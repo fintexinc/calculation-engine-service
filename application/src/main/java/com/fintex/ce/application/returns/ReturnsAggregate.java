@@ -1,5 +1,6 @@
 package com.fintex.ce.application.returns;
 
+import com.fintex.ce.application.calculation.service.FxRateService;
 import com.fintex.ce.application.util.MapUtils;
 import com.fintex.ce.application.validation.CpedDataValidation;
 import com.fintex.ce.application.validation.CpsdDataValidation;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
@@ -33,6 +35,7 @@ import lombok.Getter;
 
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
+import static com.fintex.ce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_HISTORICAL_NAV_PRICES_FOR_MONTH;
@@ -54,7 +57,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
   public LocalDate performanceStartDate;
 
   private ReturnsCutComponent monthlyReturnsCutComponent = new ReturnsCutComponent();
-  private FxRatesConversionComponent fxRatesConversionComponent;
+  private FxRateService fxRateService;
   private Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates;
   private Currency fxTargetCurrency;
   private WeightedAverageComponent weightedAverageComponent;
@@ -138,8 +141,8 @@ public class ReturnsAggregate<T extends ReturnsData> {
     return arg;
   }
 
-  public ReturnsAggregate<T> setFxRatesConversionComponent(FxRatesConversionComponent fxRatesConversionComponent) {
-    this.fxRatesConversionComponent = fxRatesConversionComponent;
+  public ReturnsAggregate<T> setFxRateService(FxRateService fxRateService) {
+    this.fxRateService = fxRateService;
     return this;
   }
 
@@ -172,8 +175,25 @@ public class ReturnsAggregate<T extends ReturnsData> {
 
   public ReturnsAggregate<T> fxRatesApplied() {
     ifAnyErrorsThrowException();
-    returnsMap = fxRatesConversionComponent.convert(returnsMap, holdingCurrencyMap, fxRates, fxTargetCurrency);
+    returnsMap = fxRateService.convertReturns(returnsMap, holdingCurrencyMap, fxRates, fxTargetCurrency, notification);
+    updateCurrenciesAfterConversion();
     return this;
+  }
+
+  private void updateCurrenciesAfterConversion() {
+    if (fxTargetCurrency == null) {
+      return;
+    }
+    Set<String> failedHoldingIds = notification.getExceptions().stream()
+        .filter(e -> e.getErrorCode() == ErrorCode.FX_RATES_UNAVAILABLE)
+        .map(BasePceException::getId)
+        .collect(Collectors.toSet());
+    holdingCurrencyMap.replaceAll((holding, current) -> {
+      if (current == null || current.equals(fxTargetCurrency)) {
+        return current;
+      }
+      return failedHoldingIds.contains(holding.getIdsString()) ? current : fxTargetCurrency;
+    });
   }
 
   public ReturnsAggregate<T> cutByCpedIfCpedEmptyCutByPed(LocalDate cped) {
@@ -351,7 +371,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
 
   public ReturnsAggregate<T> ifAnyErrorsThrowException() {
     notification.throwIfAnyNonAllowed(List.of(HOLDING_PSD_OUT_OF_RANGE, MISSING_MONTHLY_RETURNS,
-        HOLDING_MISSING_CURRENCY_FROM_FDS));
+        HOLDING_MISSING_CURRENCY_FROM_FDS, FX_RATES_UNAVAILABLE));
     return this;
   }
 
