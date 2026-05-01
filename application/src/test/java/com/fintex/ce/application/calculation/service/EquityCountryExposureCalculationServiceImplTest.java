@@ -115,10 +115,10 @@ class EquityCountryExposureCalculationServiceImplTest {
           withSettings().useConstructor(securityDataPort, countryAllocationMappingService));
 
       final var exposures = mock(Map.class);
-      final var expected = new EquityCountryExposureResult();
-      expected.setEquityCountryExposure(EquityCountryExposureCalculationServiceImpl.DEFAULT_MAP);
-      expected.setWarnings(List.of());
-
+      final var expected = EquityCountryExposureResult.builder()
+          .equityCountryExposure(EquityCountryExposureCalculationServiceImpl.DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(true);
 
       doCallRealMethod().when(service).calculate(any(), any());
@@ -138,8 +138,8 @@ class EquityCountryExposureCalculationServiceImplTest {
     when(command.getHoldings()).thenReturn(List.of(holding));
     when(command.getDataProviders()).thenReturn(List.of());
 
-    final var allocation = new EquityCountryAllocation()
-        .setAllocations(Map.of("CAN", BigDecimal.valueOf(0.65)));
+    final var allocation = new EquityCountryAllocation();
+    allocation.setAllocations(Map.of("CAN", BigDecimal.valueOf(0.65)));
     when(securityDataPort.fetch(any(), any())).thenReturn(Map.of(holding, allocation));
 
     final var expected = Map.of(holding, Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(0.65)));

@@ -3,15 +3,16 @@ package com.fintex.ce.model.domain.result;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
+import lombok.experimental.SuperBuilder;
+@SuperBuilder
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @Schema(description = "Response for common-performance-dates metric. Contains common performance start and end dates across portfolios.")
 public class CommonPerformanceDatesResult extends BaseCalculationResult {
 

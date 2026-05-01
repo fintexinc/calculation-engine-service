@@ -4,20 +4,21 @@ import com.fintex.ce.model.domain.calculation.BaseCalculationData;
 import com.fintex.wm.commons.domain.DataProvider;
 
 import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.Accessors;
-
+import lombok.experimental.SuperBuilder;
 /**
  * Combined fee data including management expense ratio, expense ratios, and management fee. Maps from /fees response.
  */
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@NoArgsConstructor
-@Accessors(chain = true)
 public class FeeData extends BaseCalculationData<FeeData> {
 
   private BigDecimal managementFee;

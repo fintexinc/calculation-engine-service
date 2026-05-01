@@ -21,11 +21,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.fintex.ce.util.DateTimeUtils.getMonthsBetweenDates;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
-import static java.util.Optional.ofNullable;
 
 public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdownResult, MaxDrawdownEntry> {
 
@@ -44,22 +42,23 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
   @Override
   public MaxDrawdownEntry calculatePeriodForNumberOfMonths(final int numberOfMonths) {
     if (numberOfMonths > getPortfolioTotalReturns().size()) {
-      return new MaxDrawdownEntry().setPeriod(String.valueOf(numberOfMonths));
+      return new MaxDrawdownEntry(String.valueOf(numberOfMonths), null, null, null, null);
     }
     final NavigableMap<LocalDate, BigDecimal> growth10KByPeriod = new TreeMap<>(
         getSubMapByPeriodStartDate(getPeriodStartDateWithOneMonthOffset(numberOfMonths), growth10K));
     final NavigableMap<LocalDate, BigDecimal> maximumDrawdownMap = calculateMaxDrawdownValues(growth10KByPeriod);
     final Map.Entry<LocalDate, BigDecimal> maxDrawdownEntry = getMaxDrawdownValue(maximumDrawdownMap);
     if (maxDrawdownEntry.getValue().compareTo(BigDecimal.ZERO) == 0) {
-      return new MaxDrawdownEntry().setValue(BigDecimal.ZERO).setPeriod(String.valueOf(numberOfMonths));
+      return new MaxDrawdownEntry(String.valueOf(numberOfMonths), BigDecimal.ZERO, null, null, null);
     }
     final Map.Entry<LocalDate, BigDecimal> peak = getPeakValue(maximumDrawdownMap, maxDrawdownEntry);
     final Integer recoveryTime = getRecoveryTimeValue(maximumDrawdownMap, maxDrawdownEntry, peak);
-    return new MaxDrawdownEntry()
-        .setPeriod(String.valueOf(numberOfMonths))
-        .setValue(scaleFunction.apply(maxDrawdownEntry.getValue()))
-        .setDrawdownStartDate(getDrawDownStartDateWithOneMonthOffset(peak))
-        .setDrawdownTroughDate(maxDrawdownEntry.getKey()).setRecoveryTime(recoveryTime);
+    return new MaxDrawdownEntry(
+        String.valueOf(numberOfMonths),
+        scaleFunction.apply(maxDrawdownEntry.getValue()),
+        getDrawDownStartDateWithOneMonthOffset(peak),
+        maxDrawdownEntry.getKey(),
+        recoveryTime);
   }
 
   public LocalDate getDrawDownStartDateWithOneMonthOffset(final Map.Entry<LocalDate, BigDecimal> peak) {
@@ -74,8 +73,15 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
   public MaxDrawdownResult defineResponseType(final Set<Pair<String, MaxDrawdownEntry>> periodValues) {
     final MaxDrawdownResult result = new MaxDrawdownResult();
     final List<MaxDrawdownEntry> maxDrawdownDtoS = periodValues.stream()
-        .map(v -> ofNullable(v.getValue()).orElse(new MaxDrawdownEntry()).setPeriod(v.getKey()))
-        .collect(Collectors.toList());
+        .map(v -> {
+          final MaxDrawdownEntry entry = v.getValue();
+          if (entry == null) {
+            return new MaxDrawdownEntry(v.getKey(), null, null, null, null);
+          }
+          return new MaxDrawdownEntry(
+              v.getKey(), entry.value(), entry.drawdownStartDate(), entry.drawdownTroughDate(), entry.recoveryTime());
+        })
+        .toList();
     result.setMaxDrawdown(maxDrawdownDtoS);
     return result;
   }

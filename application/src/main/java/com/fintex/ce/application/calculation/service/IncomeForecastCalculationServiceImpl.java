@@ -85,9 +85,7 @@ public class IncomeForecastCalculationServiceImpl
         .filter(dto -> !CollectionUtils.isEmpty(dto.getIncome()))
         .toList();
 
-    final IncomeForecastResult result = new IncomeForecastResult();
-    result.setIncomeForecast(incomeForecasts);
-    return result;
+    return new IncomeForecastResult(incomeForecasts);
 
   }
 

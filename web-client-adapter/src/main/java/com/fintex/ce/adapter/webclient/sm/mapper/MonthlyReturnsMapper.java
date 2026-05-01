@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
@@ -41,17 +42,18 @@ public class MonthlyReturnsMapper
             (existing, replacement) -> existing,
             TreeMap::new));
 
-    HoldingMonthlyReturns result = new HoldingMonthlyReturns()
-        .setReturns(returnsMap)
-        .setCurrency(resolveCurrency(holding))
-        .setHoldingType(holding.getHoldingType())
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(MonthlyReturns::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return HoldingMonthlyReturns.builder()
+        .returns(returnsMap)
+        .currency(resolveCurrency(holding))
+        .holdingType(holding.getHoldingType())
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 
   private String resolveCurrency(PortfolioHolding holding) {

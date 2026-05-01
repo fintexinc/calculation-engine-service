@@ -6,17 +6,18 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.Accessors;
-
+import lombok.experimental.SuperBuilder;
+@SuperBuilder
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
 @Schema(description = "Response for rsquared metric. Contains R-squared (variance explained by benchmark) per time interval period.")
 public class RSquaredResult extends PeriodResult {
 

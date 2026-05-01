@@ -35,9 +35,9 @@ class ClassificationAllocationCalculationServiceImplTest {
         .useConstructor(fetcher));
 
     final var holding = mock(PortfolioHolding.class);
-    final var classificationAllocation = new ClassificationAllocation()
-        .setSecurityClassificationValues(Map.of(
-            ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL, BigDecimal.TEN));
+    final var classificationAllocation = new ClassificationAllocation();
+    classificationAllocation.setSecurityClassificationValues(Map.of(
+        ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL, BigDecimal.TEN));
     final var rawData = Map.of(holding, classificationAllocation);
 
     when(fetcher.fetch(any(), any())).thenReturn(rawData);
@@ -119,10 +119,10 @@ class ClassificationAllocationCalculationServiceImplTest {
           .useConstructor(fetcher));
 
       final var exposures = mock(Map.class);
-      final var expected = new ClassificationAllocationResult();
-      expected.setClassificationAllocation(ClassificationAllocationCalculationServiceImpl.DEFAULT_MAP);
-      expected.setWarnings(List.of());
-
+      final var expected = ClassificationAllocationResult.builder()
+          .classificationAllocation(ClassificationAllocationCalculationServiceImpl.DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
 
       doCallRealMethod().when(service).calculate(any(), any());

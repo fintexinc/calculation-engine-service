@@ -88,7 +88,7 @@ class RollingTotalReturnsCalculationTest {
     final LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
     res.add(new IntervalResult(LocalDate.now().minusMonths(3), TEN));
     final var intervalResult = new RollingIntervalResult("12", res);
-    final var expected = new RollingTotalReturnsResult().setRollingTotalReturns(Set.of(intervalResult));
+    final var expected = new RollingTotalReturnsResult(Set.of(intervalResult));
 
     when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
 

@@ -33,17 +33,17 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
   @Override
   public CountryExposureResult toResponse(CountryExposure domain) {
     if (domain == null || domain.getAllocations() == null) {
-      CountryExposureResult defaultResult = new CountryExposureResult();
-      defaultResult.setCountryExposure(DEFAULT_MAP);
-      defaultResult.setWarnings(List.of());
-      return defaultResult;
+      return CountryExposureResult.builder()
+          .countryExposure(DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
     }
     // Domain model uses String keys - convert to enum
     Map<CountryRegionType, BigDecimal> enumMap = convertToEnumMap(domain.getAllocations());
-    CountryExposureResult result = new CountryExposureResult();
-    result.setCountryExposure(toUserScale(enumMap));
-    result.setWarnings(List.of());
-    return result;
+    return CountryExposureResult.builder()
+        .countryExposure(toUserScale(enumMap))
+        .warnings(List.of())
+        .build();
   }
 
   @Override
@@ -64,15 +64,15 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
    */
   public CountryExposureResult fromNetProducts(Map<CountryRegionType, BigDecimal> netProducts, List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
-      CountryExposureResult defaultResult = new CountryExposureResult();
-      defaultResult.setCountryExposure(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return CountryExposureResult.builder()
+          .countryExposure(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
-    CountryExposureResult result = new CountryExposureResult();
-    result.setCountryExposure(toUserScale(netProducts));
-    result.setWarnings(warnings);
-    return result;
+    return CountryExposureResult.builder()
+        .countryExposure(toUserScale(netProducts))
+        .warnings(warnings)
+        .build();
   }
 
   /**
@@ -83,10 +83,10 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
    * @return response with default (null) values for all country region types
    */
   public CountryExposureResult toEmptyResponse(List<Warning> warnings) {
-    CountryExposureResult result = new CountryExposureResult();
-    result.setCountryExposure(DEFAULT_MAP);
-    result.setWarnings(warnings);
-    return result;
+    return CountryExposureResult.builder()
+        .countryExposure(DEFAULT_MAP)
+        .warnings(warnings)
+        .build();
   }
 
   /**

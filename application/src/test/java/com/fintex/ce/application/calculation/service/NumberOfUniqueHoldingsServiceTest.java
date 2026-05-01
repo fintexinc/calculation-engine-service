@@ -57,8 +57,10 @@ class NumberOfUniqueHoldingsServiceTest {
     var sut = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
     var holdings = List.of(mock(PortfolioHolding.class));
     var providers = List.of(DataProvider.MORNINGSTAR);
-    var command = new PortfolioHoldingsCommand().setHoldings(holdings);
-    command.setDataProviders(providers);
+    var command = PortfolioHoldingsCommand.builder()
+        .holdings(holdings)
+        .dataProviders(providers)
+        .build();
     when(fetcher.fetch(any(), any())).thenReturn(Map.of());
 
     sut.perform(command);
@@ -303,9 +305,10 @@ class NumberOfUniqueHoldingsServiceTest {
   }
 
   private static PortfolioHoldingsCommand commandWithoutData() {
-    var command = new PortfolioHoldingsCommand().setHoldings(List.of());
-    command.setDataProviders(List.of());
-    return command;
+    return PortfolioHoldingsCommand.builder()
+        .holdings(List.of())
+        .dataProviders(List.of())
+        .build();
   }
 
   private static HoldingIdentifiers holdingIdentifiers(SecurityIdentifier... ids) {

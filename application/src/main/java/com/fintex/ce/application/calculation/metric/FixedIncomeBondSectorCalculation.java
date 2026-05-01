@@ -41,10 +41,10 @@ public class FixedIncomeBondSectorCalculation {
         holdings, exposures,
         fixedIncomePlusCash);
     final Map<FixedIncomeSecuritiesAllocationType, BigDecimal> reScaledValues = toUserScale(reScaleAbs(netProducts));
-    FixedIncomeSectorResult result = new FixedIncomeSectorResult();
-    result.setFixedIncomeSector(reScaledValues);
-    result.setWarnings(warnings);
-    return result;
+    return FixedIncomeSectorResult.builder()
+        .fixedIncomeSector(reScaledValues)
+        .warnings(warnings)
+        .build();
   }
 
   private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> calculateFixedIncomeSectorAllocation(

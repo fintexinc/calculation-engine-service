@@ -5,13 +5,14 @@ import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
 import java.math.BigDecimal;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@lombok.experimental.Accessors(chain = true)
 public class TopCommonHoldingData {
 
   private String name;

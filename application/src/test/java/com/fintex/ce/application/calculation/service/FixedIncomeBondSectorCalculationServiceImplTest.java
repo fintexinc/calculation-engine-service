@@ -63,10 +63,10 @@ class FixedIncomeBondSectorCalculationServiceImplTest {
               DEFAULT_DATA_PROPERTIES));
 
       final var exposures = mock(Map.class);
-      final var expected = new FixedIncomeSectorResult();
-      expected.setFixedIncomeSector(FixedIncomeBondSectorCalculationServiceImpl.DEFAULT_MAP);
-      expected.setWarnings(List.of());
-
+      final var expected = FixedIncomeSectorResult.builder()
+          .fixedIncomeSector(FixedIncomeBondSectorCalculationServiceImpl.DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
 
       doCallRealMethod().when(service).calculate(any(), any());

@@ -119,7 +119,10 @@ class AnnualReturnServiceImplTest {
     doCallRealMethod().when(sut).buildWeightedAverageInput(any());
     final PeriodCalculationInput actual = sut.buildWeightedAverageInput(annual);
 
-    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(map).setWarnings(List.of());
+    final var expected = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(map)
+        .warnings(List.of())
+        .build();
     assertEquals(expected, actual);
   }
 
@@ -213,7 +216,10 @@ class AnnualReturnServiceImplTest {
     doCallRealMethod().when(sut).buildWeightedAverageInput(any());
     final PeriodCalculationInput actual = sut.buildWeightedAverageInput(annual);
 
-    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(map).setWarnings(warnings);
+    final var expected = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(map)
+        .warnings(warnings)
+        .build();
     assertEquals(expected, actual);
   }
 

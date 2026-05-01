@@ -69,12 +69,12 @@ public class DistributionOfReturnsCalculation {
 
     final List<DistributionRangeResult> distributionRange = calculateDistributionOfReturns(returns, returnsMin,
         numberOfBins, binWidthIncrements);
-    return new DistributionOfReturnsIntervalResult()
-        .setDistributionMin(toUserScale(returnsMin))
-        .setDistributionMax(toUserScale(returnsMax))
-        .setDistributionBin(numberOfBins)
-        .setDistributionIncrement(toUserScale(binWidthIncrements))
-        .setDistributionRange(distributionRange);
+    return new DistributionOfReturnsIntervalResult(
+        toUserScale(returnsMin),
+        toUserScale(returnsMax),
+        numberOfBins,
+        toUserScale(binWidthIncrements),
+        distributionRange);
   }
 
   /**
@@ -193,21 +193,19 @@ public class DistributionOfReturnsCalculation {
 
   public DistributionRangeResult initializeDistributionRange(final int binIndex, final BigDecimal binInterval,
       final long frequencyOfReturns) {
-    return new DistributionRangeResult()
-        .setBin(binIndex)
-        .setRange(binInterval)
-        .setValue(frequencyOfReturns);
+    return new DistributionRangeResult(binIndex, binInterval, frequencyOfReturns);
   }
 
   public DistributionOfReturnsResult initializeResult(
       final DistributionOfReturnsIntervalResult calculatedMonthlyReturns,
       final DistributionOfReturnsIntervalResult calculatedAnnualReturns,
       final NavigableMap<LocalDate, BigDecimal> returns) {
-    return (DistributionOfReturnsResult) new DistributionOfReturnsResult()
-        .setMonthlyReturns(calculatedMonthlyReturns)
-        .setYearlyReturns(calculatedAnnualReturns)
-        .setPerformanceStartDate(returns.firstKey())
-        .setPerformanceEndDate(returns.lastKey());
+    return DistributionOfReturnsResult.builder()
+        .monthlyReturns(calculatedMonthlyReturns)
+        .yearlyReturns(calculatedAnnualReturns)
+        .performanceStartDate(returns.firstKey())
+        .performanceEndDate(returns.lastKey())
+        .build();
   }
 
   /**
@@ -243,7 +241,7 @@ public class DistributionOfReturnsCalculation {
     if (rangeResDtoS.isEmpty()) {
       return calculateFrequencyIfBinIntervalEqualsMin(returns, binInterval);
     } else {
-      final BigDecimal rangeOfPreviousBin = rangeResDtoS.get(rangeResDtoS.size() - 1).getRange();
+      final BigDecimal rangeOfPreviousBin = rangeResDtoS.get(rangeResDtoS.size() - 1).range();
       return calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeOfPreviousBin);
     }
   }

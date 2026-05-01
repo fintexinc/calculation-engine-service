@@ -31,14 +31,14 @@ class AssetAllocationResponseMapperTest {
 
   @Test
   void shouldAggregateByRegionTypeAndIgnoreUnknownKeys_whenMappingFromDomain() {
-    HoldingAssetAllocation domain = new HoldingAssetAllocation();
-    domain.setAllocations(Map.of(
-        "CANADIAN_EQUITIES", new BigDecimal("0.12345678901"),
-        "US_EQUITIES", new BigDecimal("0.2"),
-        "EUROPEAN_EQUITIES", new BigDecimal("0.3"),
-        "ASIA_PACIFIC_EQUITIES", new BigDecimal("0.4"),
-        "UNKNOWN_KEY", new BigDecimal("0.9999")));
-
+    HoldingAssetAllocation domain = HoldingAssetAllocation.builder()
+        .allocations(Map.of(
+            "CANADIAN_EQUITIES", new BigDecimal("0.12345678901"),
+            "US_EQUITIES", new BigDecimal("0.2"),
+            "EUROPEAN_EQUITIES", new BigDecimal("0.3"),
+            "ASIA_PACIFIC_EQUITIES", new BigDecimal("0.4"),
+            "UNKNOWN_KEY", new BigDecimal("0.9999")))
+        .build();
     AssetAllocationResult result = mapper.toResponse(domain);
     Map<AssetAllocationRegionType, BigDecimal> actual = result.getAssetAllocation();
 

@@ -33,17 +33,17 @@ public class MaturityAllocationResponseMapper implements ResponseMapper<Maturity
   @Override
   public MaturityAllocationResult toResponse(MaturityAllocation domain) {
     if (domain == null || domain.getMaturityDurationValues() == null) {
-      MaturityAllocationResult defaultResult = new MaturityAllocationResult();
-      defaultResult.setMaturityAllocation(DEFAULT_MAP);
-      defaultResult.setWarnings(List.of());
-      return defaultResult;
+      return MaturityAllocationResult.builder()
+          .maturityAllocation(DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
     }
     // Domain model uses String keys - convert to enum
     Map<MaturityAllocationType, BigDecimal> enumMap = convertToEnumMap(domain.getMaturityDurationValues());
-    MaturityAllocationResult result = new MaturityAllocationResult();
-    result.setMaturityAllocation(toUserScale(enumMap));
-    result.setWarnings(List.of());
-    return result;
+    return MaturityAllocationResult.builder()
+        .maturityAllocation(toUserScale(enumMap))
+        .warnings(List.of())
+        .build();
   }
 
   @Override
@@ -66,15 +66,15 @@ public class MaturityAllocationResponseMapper implements ResponseMapper<Maturity
   public MaturityAllocationResult fromNetProducts(Map<MaturityAllocationType, BigDecimal> netProducts,
       List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
-      MaturityAllocationResult defaultResult = new MaturityAllocationResult();
-      defaultResult.setMaturityAllocation(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return MaturityAllocationResult.builder()
+          .maturityAllocation(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
-    MaturityAllocationResult result = new MaturityAllocationResult();
-    result.setMaturityAllocation(toUserScale(netProducts));
-    result.setWarnings(warnings);
-    return result;
+    return MaturityAllocationResult.builder()
+        .maturityAllocation(toUserScale(netProducts))
+        .warnings(warnings)
+        .build();
   }
 
   /**
@@ -85,10 +85,10 @@ public class MaturityAllocationResponseMapper implements ResponseMapper<Maturity
    * @return response with default (null) values for all maturity types
    */
   public MaturityAllocationResult toEmptyResponse(List<Warning> warnings) {
-    MaturityAllocationResult result = new MaturityAllocationResult();
-    result.setMaturityAllocation(DEFAULT_MAP);
-    result.setWarnings(warnings);
-    return result;
+    return MaturityAllocationResult.builder()
+        .maturityAllocation(DEFAULT_MAP)
+        .warnings(warnings)
+        .build();
   }
 
   /**

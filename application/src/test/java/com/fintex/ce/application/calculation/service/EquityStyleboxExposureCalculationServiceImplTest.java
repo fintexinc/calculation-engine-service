@@ -111,10 +111,10 @@ class EquityStyleboxExposureCalculationServiceImplTest {
           .useConstructor(fetcher, responseMapper));
 
       final var exposures = mock(Map.class);
-      final var expected = new EquityStyleboxExposureResult();
-      expected.setEquityStyleboxExposure(Map.of());
-      expected.setWarnings(List.of());
-
+      final var expected = EquityStyleboxExposureResult.builder()
+          .equityStyleboxExposure(Map.of())
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
       when(responseMapper.toEmptyResponse(any())).thenReturn(expected);
 

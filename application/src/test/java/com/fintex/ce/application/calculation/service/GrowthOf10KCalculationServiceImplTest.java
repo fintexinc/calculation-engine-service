@@ -122,10 +122,11 @@ class GrowthOf10KCalculationServiceImplTest {
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
 
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
-    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns)
-        .setWarnings(
-            List
-                .of());
+    final var expected = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(portfolioTotalReturns)
+        .warnings(List
+            .of())
+        .build();
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
         portfolioTotalReturns);
@@ -154,9 +155,10 @@ class GrowthOf10KCalculationServiceImplTest {
     final var warnings = List.of(mock(Warning.class));
 
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
-    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns)
-        .setWarnings(
-            warnings);
+    final var expected = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(portfolioTotalReturns)
+        .warnings(warnings)
+        .build();
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturnsAggregate);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
         portfolioTotalReturns);

@@ -37,11 +37,12 @@ Pure logic, no data fetching.
 - **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `mvn spotless:apply`
 - **BigDecimal:** `BigDecimal.valueOf()` for literals, never `new BigDecimal(double)`. `new BigDecimal(String)` is fine
 - **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
+- **Stream to list:** prefer `.toList()` (returns an unmodifiable list) over `.collect(Collectors.toList())`. Only use `Collectors.toList()` when the result must be mutable
 - **Optional**: Return `Optional<T>` for optional values when it makes sense
 - **Null check**: Validate SM data at adapter boundary with `Objects.requireNonNull`
 - **Not null collections**: Never return null collections — use `List.of()`
 - **Collection null/empty checks:** use `org.springframework.util.CollectionUtils.isEmpty(col)` instead of `col == null || col.isEmpty()`. Never perform the same `null || isEmpty` check twice in a row — collapse to a single `CollectionUtils.isEmpty` call
-- **Object construction:** prefer Lombok builders (`@Builder` / `@SuperBuilder`) over chained accessors (`new Foo().setX(..).setY(..)`). Accessors are fine for incremental mutation inside mappers with conditional branches, but tests and one-shot construction must use the builder
+- **Object construction:** prefer immutable data classes. Construct via the canonical/all-args constructor, a single-field constructor (or named static factory `ofX(...)` when types would collide) for the dominant case, or a Lombok `@Builder` / `@SuperBuilder` for multi-field cases; avoid setter-based construction and never mix builder calls with post-build setters. For pure value carriers, use `record`s.
 - **Ternary:** use for simple single-expression returns/assignments instead of if/else
 - **No `final`** on method parameters/variables unless class fields or explicit constants
 - **No fully qualified class names** — always use imports

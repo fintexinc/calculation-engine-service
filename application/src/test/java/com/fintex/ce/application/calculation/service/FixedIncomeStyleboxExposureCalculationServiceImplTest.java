@@ -111,10 +111,10 @@ class FixedIncomeStyleboxExposureCalculationServiceImplTest {
           .useConstructor(fetcher, responseMapper));
 
       final var exposures = mock(Map.class);
-      final var expected = new FixedIncomeStyleboxExposureResult();
-      expected.setFixedIncomeStyleboxExposure(Map.of());
-      expected.setWarnings(List.of());
-
+      final var expected = FixedIncomeStyleboxExposureResult.builder()
+          .fixedIncomeStyleboxExposure(Map.of())
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
       when(responseMapper.toEmptyResponse(any())).thenReturn(expected);
 

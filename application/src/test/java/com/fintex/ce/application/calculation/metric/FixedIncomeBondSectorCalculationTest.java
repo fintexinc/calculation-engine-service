@@ -50,10 +50,10 @@ class FixedIncomeBondSectorCalculationTest {
     expectedResult.put(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.4367644262));
     expectedResult.put(FixedIncomeSecuritiesAllocationType.SECURITIZED_DEBT, BigDecimal.valueOf(0.0000000000));
     expectedResult.put(FixedIncomeSecuritiesAllocationType.DIRECT_MORTGAGES, BigDecimal.valueOf(0.0000000000));
-    var expected = new FixedIncomeSectorResult();
-    expected.setFixedIncomeSector(expectedResult);
-    expected.setWarnings(List.of());
-    return expected;
+    return FixedIncomeSectorResult.builder()
+        .fixedIncomeSector(expectedResult)
+        .warnings(List.of())
+        .build();
   }
 
   private HashMap<FixedIncomeSecuritiesAllocationType, BigDecimal> getFixedIncomeSecuritiesAllocationTypeOfAOM() {
@@ -146,9 +146,9 @@ class FixedIncomeBondSectorCalculationTest {
     expectedResult.put(FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.535620987));
     expectedResult.put(FixedIncomeSecuritiesAllocationType.SECURITIZED_DEBT, BigDecimal.valueOf(0.0000000000));
     expectedResult.put(FixedIncomeSecuritiesAllocationType.DIRECT_MORTGAGES, BigDecimal.valueOf(0.0000000000));
-    var result = new FixedIncomeSectorResult();
-    result.setFixedIncomeSector(expectedResult);
-    result.setWarnings(List.of());
-    return result;
+    return FixedIncomeSectorResult.builder()
+        .fixedIncomeSector(expectedResult)
+        .warnings(List.of())
+        .build();
   }
 }

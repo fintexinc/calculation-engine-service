@@ -9,12 +9,9 @@ import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.experimental.Accessors;
-
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @Schema(description = "Command for rolling window calculations. Supports metrics: rolling-total-returns, rolling-standard-deviation, rolling-sharpe-ratio")
 public class RollingCalculationCommand extends PeriodCommand implements CustomPsdProvider {
   @Schema(description = "Custom performance start date for rolling window")

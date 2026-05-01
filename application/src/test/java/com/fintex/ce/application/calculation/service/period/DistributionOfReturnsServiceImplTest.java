@@ -91,10 +91,10 @@ class DistributionOfReturnsServiceImplTest {
         .getCustomPsd(), command
             .getCustomPed())).thenReturn(portfolioTotalReturns);
 
-    final PeriodCalculationInput expected = new PeriodCalculationInput();
-    expected.setCipsd(command.getCustomIntervalPsd());
-    expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
-
+    final PeriodCalculationInput expected = PeriodCalculationInput.builder()
+        .cipsd(command.getCustomIntervalPsd())
+        .weightedAveragePortfolioReturns(portfolioTotalReturns)
+        .build();
     doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
     final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
 

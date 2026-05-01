@@ -32,7 +32,11 @@ public class MeanCalculationServiceImpl extends PeriodAbstractService<MeanResult
 
   public MeanCalculation defineCalculationMethod(final PeriodCommand command) {
     final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    return new MeanCalculation(context, defaultPeriods).setScale(OUTPUT_SCALE);
+    return MeanCalculation.builder()
+        .input(context)
+        .defaultPeriods(defaultPeriods)
+        .scale(OUTPUT_SCALE)
+        .build();
   }
 
 }

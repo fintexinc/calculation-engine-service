@@ -28,10 +28,10 @@ public class AssetAllocationResponseMapper implements ResponseMapper<HoldingAsse
     // Domain model uses String keys - convert to enum first
     Map<AssetAllocationRegion, BigDecimal> enumMap = convertToEnumMap(domain.getAllocations());
     Map<AssetAllocationRegionType, BigDecimal> result = calculateAssetAllocationResponse(enumMap);
-    AssetAllocationResult assetAllocationResult = new AssetAllocationResult();
-    assetAllocationResult.setAssetAllocation(toUserScale(result));
-    assetAllocationResult.setWarnings(List.of());
-    return assetAllocationResult;
+    return AssetAllocationResult.builder()
+        .assetAllocation(toUserScale(result))
+        .warnings(List.of())
+        .build();
   }
 
   /**
@@ -77,9 +77,9 @@ public class AssetAllocationResponseMapper implements ResponseMapper<HoldingAsse
   public AssetAllocationResult fromNetProducts(Map<AssetAllocationRegion, BigDecimal> netProducts,
       List<Warning> warnings) {
     Map<AssetAllocationRegionType, BigDecimal> result = calculateAssetAllocationResponse(netProducts);
-    AssetAllocationResult assetAllocationResult = new AssetAllocationResult();
-    assetAllocationResult.setAssetAllocation(toUserScale(result));
-    assetAllocationResult.setWarnings(warnings);
-    return assetAllocationResult;
+    return AssetAllocationResult.builder()
+        .assetAllocation(toUserScale(result))
+        .warnings(warnings)
+        .build();
   }
 }

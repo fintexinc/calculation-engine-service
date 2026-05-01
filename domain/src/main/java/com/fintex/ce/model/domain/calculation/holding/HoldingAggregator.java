@@ -2,9 +2,13 @@ package com.fintex.ce.model.domain.calculation.holding;
 
 import java.util.Objects;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
+@AllArgsConstructor
 public class HoldingAggregator {
 
   private final String name;
@@ -13,12 +17,6 @@ public class HoldingAggregator {
   // This field is using only for identifying GIC holdings, as it is possible that all parameters of GIC are equals but
   // them aren't same
   private UUID uuid;
-
-  public HoldingAggregator(final String name, final String companyName, final UUID uuid) {
-    this.name = name;
-    this.companyName = companyName;
-    this.uuid = uuid;
-  }
 
   public String getNameOrCompanyName() {
     return (name == null || name.isEmpty()) ? companyName : name;

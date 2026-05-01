@@ -13,11 +13,8 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Accessors(chain = true)
 @Schema(description = "Command for return-based calculations with custom date range. Supports metrics: annual-return, growth-of-10k")
 public class ReturnCommand extends CalculationCommand
     implements

@@ -57,13 +57,13 @@ public class CommonPerformanceDateServiceImpl
         .flatMap(a -> a.getErrorsAsWarnings().stream())
         .toList();
 
-    CommonPerformanceDatesResult result = new CommonPerformanceDatesResult()
-        .setCommonPerformanceStartDatePf(commonPerformanceDateForPortfolios.start())
-        .setCommonPerformanceEndDatePf(commonPerformanceDateForPortfolios.end())
-        .setCommonPerformanceStartDateBm(commonPerformanceDatesForBenchmarks.start())
-        .setCommonPerformanceEndDateBm(commonPerformanceDatesForBenchmarks.end());
-    result.setWarnings(warnings);
-    return result;
+    return CommonPerformanceDatesResult.builder()
+        .commonPerformanceStartDatePf(commonPerformanceDateForPortfolios.start())
+        .commonPerformanceEndDatePf(commonPerformanceDateForPortfolios.end())
+        .commonPerformanceStartDateBm(commonPerformanceDatesForBenchmarks.start())
+        .commonPerformanceEndDateBm(commonPerformanceDatesForBenchmarks.end())
+        .warnings(warnings)
+        .build();
   }
 
   List<PortfolioHolding> collectAllPortfolioHoldings(Set<MultiplePortfoliosCommand.Portfolio> portfolios) {

@@ -30,11 +30,11 @@ class EquitySectorResponseMapperTest {
 
   @Test
   void shouldMapAndScaleAllocations_whenMappingFromDomain() {
-    EquitySector domain = new EquitySector();
-    domain.setAllocations(Map.of(
-        EquitySectorAllocationType.ENERGY, new BigDecimal("0.12345678901"),
-        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2")));
-
+    EquitySector domain = EquitySector.builder()
+        .allocations(Map.of(
+            EquitySectorAllocationType.ENERGY, new BigDecimal("0.12345678901"),
+            EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2")))
+        .build();
     EquitySectorResult result = mapper.toResponse(domain);
 
     assertEquals(2, result.getEquitySector().size());

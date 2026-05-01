@@ -67,9 +67,10 @@ class EquityMarketCapitalizationFetcherTest
     EnumMap<EquityMarketCapitalizationType, BigDecimal> ratings = new EnumMap<>(EquityMarketCapitalizationType.class);
     ratings.put(EquityMarketCapitalizationType.GIANT, BigDecimal.valueOf(45.67));
     ratings.put(EquityMarketCapitalizationType.LARGE, BigDecimal.valueOf(30.0));
-    return new HoldingEquityMarketCap()
-        .setRatings(ratings)
-        .setHoldingId(holdingId);
+    return HoldingEquityMarketCap.builder()
+        .ratings(ratings)
+        .holdingId(holdingId)
+        .build();
   }
 
   @Override

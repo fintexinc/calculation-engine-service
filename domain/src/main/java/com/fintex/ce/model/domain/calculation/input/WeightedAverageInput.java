@@ -11,16 +11,21 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.Accessors;
-
+import lombok.NoArgsConstructor;
 @Data
-@Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class WeightedAverageInput {
 
   protected LocalDate cipsd;
 
-  private Rebalanced rebalanced;
+  @Builder.Default
+  private Rebalanced rebalanced = Rebalanced.MONTHLY;
+
   private DateRange dateRange;
 
   private Map<PortfolioHolding, Currency> holdings;
@@ -30,19 +35,16 @@ public class WeightedAverageInput {
 
   private Currency currency;
 
-  public WeightedAverageInput() {
-    this.rebalanced = Rebalanced.MONTHLY;
-  }
-
   public WeightedAverageInput makeCopy() {
-    return new WeightedAverageInput()
-        .setCipsd(this.cipsd)
-        .setRebalanced(this.rebalanced)
-        .setDateRange(this.dateRange)
-        .setHoldings(new HashMap<>(this.holdings))
-        .setPortfolioReturns(new HashMap<>(this.portfolioReturns))
-        .setFxRates(new HashMap<>(this.fxRates))
-        .setCurrency(this.currency);
+    return WeightedAverageInput.builder()
+        .cipsd(this.cipsd)
+        .rebalanced(this.rebalanced)
+        .dateRange(this.dateRange)
+        .holdings(new HashMap<>(this.holdings))
+        .portfolioReturns(new HashMap<>(this.portfolioReturns))
+        .fxRates(new HashMap<>(this.fxRates))
+        .currency(this.currency)
+        .build();
   }
 
 }

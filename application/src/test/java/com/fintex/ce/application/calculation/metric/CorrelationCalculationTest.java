@@ -398,11 +398,11 @@ class CorrelationCalculationTest {
     doCallRealMethod().when(sut).mapToCorrelationPeriodResult(any(), anyInt(), any());
     final CorrelationPeriodResult correlationPeriod = sut.mapToCorrelationPeriodResult(usEtfHolding, TWELVE, map);
 
-    assertEquals(String.valueOf(TWELVE), correlationPeriod.getPeriod());
-    assertEquals("ETF_US_TEST", correlationPeriod.getKey());
-    assertEquals(1, correlationPeriod.getCorrelations().size());
-    assertEquals("MUTUAL_FUND_CANADA_TEST", correlationPeriod.getCorrelations().get(0).getCorrelationKey());
-    assertEquals(BigDecimal.valueOf(TWELVE), correlationPeriod.getCorrelations().get(0).getValue());
+    assertEquals(String.valueOf(TWELVE), correlationPeriod.period());
+    assertEquals("ETF_US_TEST", correlationPeriod.key());
+    assertEquals(1, correlationPeriod.correlations().size());
+    assertEquals("MUTUAL_FUND_CANADA_TEST", correlationPeriod.correlations().get(0).correlationKey());
+    assertEquals(BigDecimal.valueOf(TWELVE), correlationPeriod.correlations().get(0).value());
   }
 
   @Test
@@ -414,7 +414,7 @@ class CorrelationCalculationTest {
     final var sut = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
-    final var listMock = List.of(new CorrelationPeriodResult());
+    final var listMock = List.of(new CorrelationPeriodResult(null, null, null));
     final var pairs = Set.of(Pair.of("2000-01-12", listMock), Pair.of("2020-01-05", listMock));
     when(sut.setPeriod(anyString(), anyList())).thenReturn(listMock);
 
@@ -453,12 +453,10 @@ class CorrelationCalculationTest {
   void shouldKeepValuesUnchanged_whenFormattingAlreadyScaledCorrelationPeriods() {
     final var sut = mock(CorrelationCalculation.class);
 
-    final var correlationPeriod = new CorrelationPeriodResult();
-    correlationPeriod.setCorrelations(List.of());
+    final var correlationPeriod = new CorrelationPeriodResult(null, null, List.of());
     final var argument = List.of(correlationPeriod);
 
-    final var correlationPeriodDtoExpected = new CorrelationPeriodResult();
-    correlationPeriodDtoExpected.setCorrelations(List.of());
+    final var correlationPeriodDtoExpected = new CorrelationPeriodResult(null, null, List.of());
     final var expected = List.of(correlationPeriodDtoExpected);
 
     doCallRealMethod().when(sut).toUserFormat(any());
@@ -471,15 +469,13 @@ class CorrelationCalculationTest {
   void shouldRoundCorrelationValues_whenFormattingCorrelationPeriods() {
     final var sut = mock(CorrelationCalculation.class);
 
-    final var correlationPeriod = new CorrelationPeriodResult();
-    final var correlationKeyValueResult = new CorrelationKeyValueResult().setValue(new BigDecimal("0.123456789112345"));
-    correlationPeriod.setCorrelations(List.of(correlationKeyValueResult));
+    final var correlationKeyValueResult = new CorrelationKeyValueResult(null, new BigDecimal("0.123456789112345"));
+    final var correlationPeriod = new CorrelationPeriodResult(null, null, List.of(correlationKeyValueResult));
     final var argument = List.of(correlationPeriod);
 
-    final var correlationPeriodDtoExpected = new CorrelationPeriodResult();
-    final var correlationKeyValueResultExpected = new CorrelationKeyValueResult().setValue(new BigDecimal(
-        "0.1234567891"));
-    correlationPeriodDtoExpected.setCorrelations(List.of(correlationKeyValueResultExpected));
+    final var correlationKeyValueResultExpected = new CorrelationKeyValueResult(null, new BigDecimal("0.1234567891"));
+    final var correlationPeriodDtoExpected = new CorrelationPeriodResult(null, null,
+        List.of(correlationKeyValueResultExpected));
     final var expected = List.of(correlationPeriodDtoExpected);
 
     doCallRealMethod().when(sut).toUserFormat(any());
@@ -499,7 +495,7 @@ class CorrelationCalculationTest {
     doCallRealMethod().when(sut).setPeriod(anyString(), anyList());
     final var actual = sut.setPeriod(period, periods);
 
-    assertEquals(period, actual.get(0).getPeriod());
+    assertEquals(period, actual.get(0).period());
   }
 
 }

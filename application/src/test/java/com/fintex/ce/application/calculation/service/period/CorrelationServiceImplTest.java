@@ -91,9 +91,10 @@ class CorrelationServiceImplTest {
 
     when(monthlyReturnsAggregate.cutByPsd().getWeightedAverage()).thenReturn(portfolioTotalReturns);
 
-    final PeriodCalculationInput context = new PeriodCalculationInput()
-        .setCipsd(command.getCustomIntervalPsd())
-        .setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    final PeriodCalculationInput context = PeriodCalculationInput.builder()
+        .cipsd(command.getCustomIntervalPsd())
+        .weightedAveragePortfolioReturns(portfolioTotalReturns)
+        .build();
     final var expected = new CorrelationCalculation(context, baseTotalReturns, Set.of());
 
     doCallRealMethod().when(sut).defineCalculationMethod(any());

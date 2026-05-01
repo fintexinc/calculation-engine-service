@@ -102,7 +102,7 @@ class RollingStandardDeviationCalculationServiceImplTest {
     doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
     final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
-    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(map);
+    final var expected = new PeriodCalculationInput(map);
     assertEquals(expected, actual);
   }
 

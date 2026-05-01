@@ -40,7 +40,7 @@ public class SalesChargeCalculation {
 
   public SalesChargeResult calculate() {
     if (CollectionUtils.isEmpty(salesCharges)) {
-      return new SalesChargeResult().setSalesCharges(DEFAULT_MAP);
+      return new SalesChargeResult(DEFAULT_MAP);
     }
     return calculateSalesCharge();
   }
@@ -72,7 +72,7 @@ public class SalesChargeCalculation {
       result.put(salesCharge, new SalesChargeResult.SalesChargeEntry(allocation, value, salesChargeHoldingResDtos));
     });
 
-    return new SalesChargeResult().setSalesCharges(result);
+    return new SalesChargeResult(result);
   }
 
   private BigDecimal calculateAllocation(final Set<PortfolioHolding> holdingSet, final BigDecimal totalMarketValues) {

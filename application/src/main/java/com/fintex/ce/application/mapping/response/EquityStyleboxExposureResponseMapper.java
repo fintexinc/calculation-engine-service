@@ -35,15 +35,15 @@ public class EquityStyleboxExposureResponseMapper
   @Override
   public EquityStyleboxExposureResult toResponse(EquityStyleboxExposure domain) {
     if (domain == null || domain.getBoxValues() == null) {
-      EquityStyleboxExposureResult defaultResult = new EquityStyleboxExposureResult();
-      defaultResult.setEquityStyleboxExposure(DEFAULT_MAP);
-      defaultResult.setWarnings(List.of());
-      return defaultResult;
+      return EquityStyleboxExposureResult.builder()
+          .equityStyleboxExposure(DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
     }
-    EquityStyleboxExposureResult result = new EquityStyleboxExposureResult();
-    result.setEquityStyleboxExposure(toUserScale(domain.getBoxValues()));
-    result.setWarnings(List.of());
-    return result;
+    return EquityStyleboxExposureResult.builder()
+        .equityStyleboxExposure(toUserScale(domain.getBoxValues()))
+        .warnings(List.of())
+        .build();
   }
 
   @Override
@@ -66,15 +66,15 @@ public class EquityStyleboxExposureResponseMapper
   public EquityStyleboxExposureResult fromNetProducts(Map<StyleBoxType, BigDecimal> netProducts,
       List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
-      EquityStyleboxExposureResult defaultResult = new EquityStyleboxExposureResult();
-      defaultResult.setEquityStyleboxExposure(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return EquityStyleboxExposureResult.builder()
+          .equityStyleboxExposure(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
-    EquityStyleboxExposureResult result = new EquityStyleboxExposureResult();
-    result.setEquityStyleboxExposure(toUserScale(netProducts));
-    result.setWarnings(warnings);
-    return result;
+    return EquityStyleboxExposureResult.builder()
+        .equityStyleboxExposure(toUserScale(netProducts))
+        .warnings(warnings)
+        .build();
   }
 
   /**
@@ -85,10 +85,10 @@ public class EquityStyleboxExposureResponseMapper
    * @return response with default (null) values for all stylebox types
    */
   public EquityStyleboxExposureResult toEmptyResponse(List<Warning> warnings) {
-    EquityStyleboxExposureResult result = new EquityStyleboxExposureResult();
-    result.setEquityStyleboxExposure(DEFAULT_MAP);
-    result.setWarnings(warnings);
-    return result;
+    return EquityStyleboxExposureResult.builder()
+        .equityStyleboxExposure(DEFAULT_MAP)
+        .warnings(warnings)
+        .build();
   }
 
 }

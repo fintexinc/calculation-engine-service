@@ -13,11 +13,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import static com.fintex.ce.application.util.DecimalUtils.divide;
 import static com.fintex.ce.application.util.DecimalUtils.pow;
@@ -27,7 +28,6 @@ import static com.fintex.ce.model.util.BigDecimalConstants.INTERNAL_SCALE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static java.math.BigDecimal.ZERO;
 
-@Accessors(chain = true)
 @EqualsAndHashCode
 public class StandardDeviationCalculation<T extends PeriodResult> extends PeriodCalculationAbstract<T, BigDecimal> {
 
@@ -37,6 +37,14 @@ public class StandardDeviationCalculation<T extends PeriodResult> extends Period
   public StandardDeviationCalculation(final PeriodCalculationInput input,
       final Set<String> defaultPeriods) {
     super(input, defaultPeriods);
+  }
+
+  @Builder
+  public StandardDeviationCalculation(final PeriodCalculationInput input,
+      final Set<String> defaultPeriods,
+      final Integer scale) {
+    super(input, defaultPeriods);
+    this.scale = Optional.ofNullable(scale).orElse(INTERNAL_SCALE);
   }
 
   @Override

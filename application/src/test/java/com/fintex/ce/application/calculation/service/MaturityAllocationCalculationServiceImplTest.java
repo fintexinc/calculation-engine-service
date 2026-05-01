@@ -112,10 +112,10 @@ class MaturityAllocationCalculationServiceImplTest {
           .useConstructor(fetcher, responseMapper));
 
       final var exposures = mock(Map.class);
-      final var expected = new MaturityAllocationResult();
-      expected.setMaturityAllocation(MaturityAllocationCalculationServiceImpl.ALLOCATION_DEFAULT_MAP);
-      expected.setWarnings(List.of());
-
+      final var expected = MaturityAllocationResult.builder()
+          .maturityAllocation(MaturityAllocationCalculationServiceImpl.ALLOCATION_DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
       when(responseMapper.toEmptyResponse(any())).thenReturn(expected);
 

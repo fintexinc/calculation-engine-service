@@ -25,4 +25,16 @@ public class AverageManagementExpenseCalculation {
   private BigDecimal marketValueQualified;
   private BigDecimal percentageQualified;
   private FinancialInstrumentType holdingType;
+
+  public static AverageManagementExpenseCalculation ofMarketValue(final BigDecimal marketValue) {
+    final var result = new AverageManagementExpenseCalculation();
+    result.marketValue = marketValue;
+    return result;
+  }
+
+  public static AverageManagementExpenseCalculation ofActualManagementFee(final BigDecimal actualManagementFee) {
+    final var result = new AverageManagementExpenseCalculation();
+    result.actualManagementFee = actualManagementFee;
+    return result;
+  }
 }

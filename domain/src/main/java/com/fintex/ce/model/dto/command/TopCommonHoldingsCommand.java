@@ -6,12 +6,9 @@ import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.experimental.Accessors;
-
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @Schema(description = "Command for finding top common holdings across portfolio funds. Supports metric: top-common-holdings")
 public class TopCommonHoldingsCommand extends PortfolioHoldingsCommand {
   @Schema(description = "Minimum number of funds a holding must appear in")

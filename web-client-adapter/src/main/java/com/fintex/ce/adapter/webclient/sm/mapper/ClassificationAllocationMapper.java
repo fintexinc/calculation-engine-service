@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.wm.commons.domain.classification.SecurityClassificationTypeValue;
 
@@ -38,16 +39,17 @@ public class ClassificationAllocationMapper
             BigDecimal::add,
             () -> new EnumMap<>(ClassificationAllocationType.class)));
 
-    ClassificationAllocation result = new ClassificationAllocation()
-        .setSecurityClassificationValues(classificationMap)
-        .setHoldingType(holding.getHoldingType())
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(SecurityClassificationAllocation::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return ClassificationAllocation.builder()
+        .securityClassificationValues(classificationMap)
+        .holdingType(holding.getHoldingType())
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 
   private ClassificationAllocationType toClassificationType(SecurityClassificationTypeValue entry) {

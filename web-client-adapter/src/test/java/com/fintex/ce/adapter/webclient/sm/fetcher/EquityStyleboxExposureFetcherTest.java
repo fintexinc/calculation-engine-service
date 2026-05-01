@@ -58,11 +58,12 @@ class EquityStyleboxExposureFetcherTest
 
   @Override
   protected EquityStyleboxExposure createExpectedDomainModel(String holdingId) {
-    return new EquityStyleboxExposure()
-        .setBoxValues(Map.of(
-            StyleBoxType.LARGE_CORE, new BigDecimal("42.3"),
-            StyleBoxType.MID_VALUE, new BigDecimal("5.5")))
-        .setHoldingId(holdingId);
+    final EquityStyleboxExposure tmpEquityStyleboxExposure = new EquityStyleboxExposure();
+    tmpEquityStyleboxExposure.setBoxValues(Map.of(
+        StyleBoxType.LARGE_CORE, new BigDecimal("42.3"),
+        StyleBoxType.MID_VALUE, new BigDecimal("5.5")));
+    tmpEquityStyleboxExposure.setHoldingId(holdingId);
+    return tmpEquityStyleboxExposure;
   }
 
   @Override

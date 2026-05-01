@@ -121,11 +121,12 @@ class CommonPerformanceDateServiceImplTest {
 
   private CommonPerformanceDatesResult getExpected(DateRange dateRangeForBenchmarkHoldings,
       DateRange dateRangeForPortfolioHoldings) {
-    return new CommonPerformanceDatesResult()
-        .setCommonPerformanceEndDatePf(dateRangeForPortfolioHoldings.end())
-        .setCommonPerformanceStartDatePf(dateRangeForPortfolioHoldings.start())
-        .setCommonPerformanceEndDateBm(dateRangeForBenchmarkHoldings.end())
-        .setCommonPerformanceStartDateBm(dateRangeForBenchmarkHoldings.start());
+    return CommonPerformanceDatesResult.builder()
+        .commonPerformanceEndDatePf(dateRangeForPortfolioHoldings.end())
+        .commonPerformanceStartDatePf(dateRangeForPortfolioHoldings.start())
+        .commonPerformanceEndDateBm(dateRangeForBenchmarkHoldings.end())
+        .commonPerformanceStartDateBm(dateRangeForBenchmarkHoldings.start())
+        .build();
   }
 
 }

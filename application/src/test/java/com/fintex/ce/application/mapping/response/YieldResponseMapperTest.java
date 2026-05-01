@@ -45,9 +45,9 @@ class YieldResponseMapperTest {
     PortfolioHolding skipped = new PortfolioHolding(new BigDecimal("5"), FinancialInstrumentType.STOCK_CANADA, null);
 
     Map<PortfolioHolding, Yield> domainMap = Map.of(
-        stock, new Yield().setDividendYield(new BigDecimal("0.1")),
-        gic, new Yield().setDividendYield(new BigDecimal("5")),
-        skipped, new Yield().setDividendYield(null));
+        stock, yieldOf(new BigDecimal("0.1")),
+        gic, yieldOf(new BigDecimal("5")),
+        skipped, yieldOf(null));
     List<Warning> warnings = List.of(new Warning("w1", "warning"));
 
     YieldResult result = mapper.toResponse(domainMap, warnings);
@@ -60,11 +60,17 @@ class YieldResponseMapperTest {
   @Test
   void shouldReturnZeroYield_whenNoValidEntriesProvided() {
     PortfolioHolding invalid = new PortfolioHolding(null, FinancialInstrumentType.STOCK_US, null);
-    Map<PortfolioHolding, Yield> domainMap = Map.of(invalid, new Yield().setDividendYield(new BigDecimal("0.1")));
+    Map<PortfolioHolding, Yield> domainMap = Map.of(invalid, yieldOf(new BigDecimal("0.1")));
 
     YieldResult result = mapper.toResponse(domainMap, List.of());
 
     assertEquals(0, result.getYield().compareTo(BigDecimal.ZERO));
     assertEquals(0, result.getWarnings().size());
+  }
+
+  private static Yield yieldOf(final BigDecimal dividendYield) {
+    final Yield yield = new Yield();
+    yield.setDividendYield(dividendYield);
+    return yield;
   }
 }

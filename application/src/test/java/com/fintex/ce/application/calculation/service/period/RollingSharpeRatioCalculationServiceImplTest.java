@@ -111,8 +111,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(mock(RollingCalculationCommand.class),
         SCALE_OF_TWO);
 
-    final PeriodCalculationInput expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(
-        portfolioBaseTotalReturn);
+    final PeriodCalculationInput expected = new PeriodCalculationInput(portfolioBaseTotalReturn);
     assertEquals(expected, actual);
   }
 

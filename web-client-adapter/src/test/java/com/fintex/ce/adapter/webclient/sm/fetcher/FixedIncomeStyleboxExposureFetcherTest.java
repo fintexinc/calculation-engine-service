@@ -65,12 +65,13 @@ class FixedIncomeStyleboxExposureFetcherTest
 
   @Override
   protected FixedIncomeStyleboxExposure createExpectedDomainModel(String holdingId) {
-    return new FixedIncomeStyleboxExposure()
-        .setBoxValues(Map.of(
-            FixedIncomeStyleBoxType.HIGH_LIMITED, BigDecimal.valueOf(15.5),
-            FixedIncomeStyleBoxType.MEDIUM_MODERATE, BigDecimal.valueOf(22.3)))
-        .setHoldingType(FinancialInstrumentType.ETF_CANADA)
-        .setHoldingId(holdingId);
+    final FixedIncomeStyleboxExposure tmpFixedIncomeStyleboxExposure = new FixedIncomeStyleboxExposure();
+    tmpFixedIncomeStyleboxExposure.setBoxValues(Map.of(
+        FixedIncomeStyleBoxType.HIGH_LIMITED, BigDecimal.valueOf(15.5),
+        FixedIncomeStyleBoxType.MEDIUM_MODERATE, BigDecimal.valueOf(22.3)));
+    tmpFixedIncomeStyleboxExposure.setHoldingType(FinancialInstrumentType.ETF_CANADA);
+    tmpFixedIncomeStyleboxExposure.setHoldingId(holdingId);
+    return tmpFixedIncomeStyleboxExposure;
   }
 
   @Override

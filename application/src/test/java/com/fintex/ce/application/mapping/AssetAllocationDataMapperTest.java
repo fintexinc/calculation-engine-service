@@ -48,9 +48,10 @@ class AssetAllocationDataMapperTest {
         FinancialInstrumentType.GIC)
         .term(GREATER_THAN_YEAR).build();
     final Map<PortfolioHolding, HoldingAssetAllocation> etfCanadaAssetAllocation = new HashMap<>();
-    final var rAssetAllocationForEtfCanada = new HoldingAssetAllocation().setHoldingType(
-        FinancialInstrumentType.ETF_CANADA)
-        .setAllocations(Collections.emptySortedMap());
+    final var rAssetAllocationForEtfCanada = HoldingAssetAllocation.builder()
+        .holdingType(FinancialInstrumentType.ETF_CANADA)
+        .allocations(Collections.emptySortedMap())
+        .build();
     etfCanadaAssetAllocation.put(etfCanada, rAssetAllocationForEtfCanada);
 
     final var req = new AssetAllocationData();
@@ -116,10 +117,11 @@ class AssetAllocationDataMapperTest {
       assetAllocations.put(region.getName(), BigDecimal.valueOf(region.ordinal()));
     }
 
-    final var rAssetAllocation = new HoldingAssetAllocation();
-    rAssetAllocation.setHoldingType(FinancialInstrumentType.ETF_US);
-    rAssetAllocation.setAllocations(assetAllocations);
-    rAssetAllocation.setProviders(List.of(DataProvider.MORNINGSTAR));
+    final var rAssetAllocation = HoldingAssetAllocation.builder()
+        .holdingType(FinancialInstrumentType.ETF_US)
+        .allocations(assetAllocations)
+        .providers(List.of(DataProvider.MORNINGSTAR))
+        .build();
 
     result.put(holding, rAssetAllocation);
     return result;

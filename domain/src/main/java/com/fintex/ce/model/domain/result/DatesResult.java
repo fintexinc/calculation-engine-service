@@ -1,13 +1,16 @@
 package com.fintex.ce.model.domain.result;
 
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
-
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 @Data
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 public abstract class DatesResult extends BaseCalculationResult {
 
   protected LocalDate performanceEndDate;

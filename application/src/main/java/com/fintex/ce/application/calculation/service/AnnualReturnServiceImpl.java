@@ -52,9 +52,10 @@ public class AnnualReturnServiceImpl implements CalculationService<ReturnCommand
         .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns)
-        .setWarnings(
-            monthlyReturnsAggregate.getErrorsAsWarnings());
+    return PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(weightedAveragePortfolioReturns)
+        .warnings(monthlyReturnsAggregate.getErrorsAsWarnings())
+        .build();
   }
 
 }

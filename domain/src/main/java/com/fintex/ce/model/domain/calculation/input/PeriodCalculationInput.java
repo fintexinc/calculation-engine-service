@@ -6,11 +6,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NavigableMap;
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.Accessors;
-
+@Builder
 @Data
-@Accessors(chain = true)
 public class PeriodCalculationInput {
 
   public PeriodCalculationInput(
@@ -27,6 +26,10 @@ public class PeriodCalculationInput {
     this.cipsd = cipsd;
     this.weightedAveragePortfolioReturns = weightedAveragePortfolioReturns;
     this.warnings = warnings;
+  }
+
+  public PeriodCalculationInput(final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns) {
+    this.weightedAveragePortfolioReturns = weightedAveragePortfolioReturns;
   }
 
   public PeriodCalculationInput() {
