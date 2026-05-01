@@ -16,11 +16,8 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * Base class for all PCE calculation data models that carry provider and validation information. Errors accumulated
- * while assembling the data are kept as {@link Notification}s so the full error context (code, message, severity,
- * holding id) is available at the REST boundary without further lookups.
- *
- * @param <T>
- *          self-type kept for backward compatibility with code that referenced the prior CRTP signature
+ * while assembling the data are kept as {@link Notification}s so the full error context (code, message, severity) is
+ * available at the REST boundary without further lookups.
  */
 @Getter
 @Setter
@@ -29,10 +26,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-public abstract class BaseCalculationData<T extends BaseCalculationData<T>> {
+public abstract class BaseCalculationData {
 
-  // todo remove and just use SecurityIdentifier. TMI-275
-  private String holdingId;
   @Builder.Default
   private List<DataProvider> providers = new ArrayList<>();
   @Builder.Default

@@ -11,7 +11,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class AverageMer extends BaseCalculationData<AverageMer> {
+public class AverageMer extends BaseCalculationData {
 
   private BigDecimal mer;
   private BigDecimal actualManagementFee;

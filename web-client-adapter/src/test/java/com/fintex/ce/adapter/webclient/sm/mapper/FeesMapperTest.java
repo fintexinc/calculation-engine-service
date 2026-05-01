@@ -50,7 +50,6 @@ class FeesMapperTest {
 
     FeeData result = sut.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getManagementFee()).isEqualByComparingTo("0.0125");
     assertThat(result.getManagementFeeProvider()).isEqualTo(DataProvider.MORNINGSTAR);
     assertThat(result.getManagementExpenseRatio()).isEqualByComparingTo("0.0225");
@@ -67,7 +66,6 @@ class FeesMapperTest {
   void shouldReturnEmptyFeeData_whenResponseIsNull() {
     FeeData result = sut.map(null, createHolding("SEC-002"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getManagementFee()).isNull();
     assertThat(result.getManagementExpenseRatio()).isNull();
     assertThat(result.getNetExpenseRatio()).isNull();
@@ -76,12 +74,11 @@ class FeesMapperTest {
   }
 
   @Test
-  void shouldMapOnlyHoldingId_whenResponseHasNullDatapoints() {
+  void shouldReturnEmptyFeeData_whenResponseHasNullDatapoints() {
     var smsResponse = new Fees();
 
     FeeData result = sut.map(smsResponse, createHolding("SEC-003"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-003");
     assertThat(result.getManagementFee()).isNull();
     assertThat(result.getManagementExpenseRatio()).isNull();
   }

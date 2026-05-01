@@ -58,12 +58,11 @@ class CreditQualityRestFetcherTest
   }
 
   @Override
-  protected CreditQuality createExpectedDomainModel(String holdingId) {
+  protected CreditQuality createExpectedDomainModel() {
     final CreditQuality tmpCreditQuality = new CreditQuality();
     tmpCreditQuality.setRatings(Map.of(
         CreditQualityRatingType.AAA, BigDecimal.valueOf(15.5),
         CreditQualityRatingType.AA, BigDecimal.valueOf(22.3)));
-    tmpCreditQuality.setHoldingId(holdingId);
     return tmpCreditQuality;
   }
 

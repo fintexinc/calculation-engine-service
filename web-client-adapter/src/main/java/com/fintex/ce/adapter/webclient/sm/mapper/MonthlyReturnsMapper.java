@@ -51,7 +51,6 @@ public class MonthlyReturnsMapper
         .returns(returnsMap)
         .currency(resolveCurrency(holding))
         .holdingType(holding.getHoldingType())
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

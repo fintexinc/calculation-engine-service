@@ -42,7 +42,6 @@ public class FixedIncomeStyleboxExposureMapper
     return FixedIncomeStyleboxExposure.builder()
         .boxValues(boxValuesMap)
         .holdingType(holding.getHoldingType())
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

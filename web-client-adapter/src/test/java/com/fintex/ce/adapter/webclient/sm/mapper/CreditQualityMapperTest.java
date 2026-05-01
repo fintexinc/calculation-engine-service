@@ -58,7 +58,6 @@ class CreditQualityMapperTest {
     assertThat(result.getRatings().get(BB)).isEqualByComparingTo("8.7");
     assertThat(result.getRatings().get(B)).isEqualByComparingTo("4.2");
     assertThat(result.getRatings().get(BELOW_B)).isEqualByComparingTo("2.4");
-    assertThat(result.getHoldingId()).isEqualTo("AGG.US");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
@@ -70,7 +69,6 @@ class CreditQualityMapperTest {
     CreditQuality result = mapper.map(smsResponse, holding);
 
     assertThat(result.getRatings()).isEmpty();
-    assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
     assertThat(result.getProviders()).isEmpty();
   }
 

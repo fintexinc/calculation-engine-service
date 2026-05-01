@@ -14,7 +14,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class FxRates extends BaseCalculationData<FxRates> {
+public class FxRates extends BaseCalculationData {
 
   private Map<LocalDate, FxRate> fxRates;
 

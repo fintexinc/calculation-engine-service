@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FeeData extends BaseCalculationData<FeeData> {
+public class FeeData extends BaseCalculationData {
 
   private BigDecimal managementFee;
   private DataProvider managementFeeProvider;

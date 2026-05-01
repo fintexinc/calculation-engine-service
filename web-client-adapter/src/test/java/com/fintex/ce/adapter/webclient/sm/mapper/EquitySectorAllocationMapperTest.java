@@ -42,7 +42,6 @@ class EquitySectorAllocationMapperTest {
     assertThat(result.getAllocations().get(EquitySectorAllocationType.TECHNOLOGY)).isEqualByComparingTo("28.5");
     assertThat(result.getAllocations().get(EquitySectorAllocationType.HEALTHCARE)).isEqualByComparingTo("15.3");
     assertThat(result.getAllocations().get(EquitySectorAllocationType.ENERGY)).isEqualByComparingTo("8.7");
-    assertThat(result.getHoldingId()).isEqualTo("XIU.TO");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
@@ -55,7 +54,6 @@ class EquitySectorAllocationMapperTest {
     EquitySector result = mapper.map(smsResponse, holding);
 
     assertThat(result.getAllocations()).isEmpty();
-    assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
     assertThat(result.getProviders()).isEmpty();
   }
 

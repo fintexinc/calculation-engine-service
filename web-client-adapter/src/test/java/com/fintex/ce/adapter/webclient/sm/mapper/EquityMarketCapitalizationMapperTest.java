@@ -43,7 +43,6 @@ class EquityMarketCapitalizationMapperTest {
     assertThat(result.getRatings().get(EquityMarketCapitalizationType.MEDIUM)).isEqualByComparingTo("12.33");
     assertThat(result.getRatings().get(EquityMarketCapitalizationType.SMALL)).isEqualByComparingTo("8.50");
     assertThat(result.getRatings().get(EquityMarketCapitalizationType.MICRO)).isEqualByComparingTo("3.50");
-    assertThat(result.getHoldingId()).isEqualTo("VTI");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
@@ -54,7 +53,6 @@ class EquityMarketCapitalizationMapperTest {
     HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("TEST.ID"));
 
     assertThat(result.getRatings()).isEmpty();
-    assertThat(result.getHoldingId()).isEqualTo("TEST.ID");
     assertThat(result.getProviders()).isEmpty();
   }
 

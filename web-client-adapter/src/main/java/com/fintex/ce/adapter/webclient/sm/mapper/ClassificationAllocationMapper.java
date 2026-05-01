@@ -47,7 +47,6 @@ public class ClassificationAllocationMapper
     return ClassificationAllocation.builder()
         .securityClassificationValues(classificationMap)
         .holdingType(holding.getHoldingType())
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

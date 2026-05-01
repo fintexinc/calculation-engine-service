@@ -24,7 +24,6 @@ public class FeesMapper implements SecurityMasterResponseMapper<FeeData, Fees> {
     final var fee12b1 = fees.map(Fees::getActual12B1Fee);
 
     return FeeData.builder()
-        .holdingId(holding.getSecurityIdentifier().getId())
         .managementFee(mgmtFee.map(d -> d.getValue()).orElse(null))
         .managementFeeProvider(mgmtFee.map(d -> d.getDataProvider()).orElse(null))
         .managementExpenseRatio(mer.map(d -> d.getValue()).orElse(null))

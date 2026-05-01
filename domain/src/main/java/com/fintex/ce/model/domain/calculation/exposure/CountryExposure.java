@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class CountryExposure extends BaseCalculationData<CountryExposure> {
+public class CountryExposure extends BaseCalculationData {
 
   private FinancialInstrumentType holdingType;
   private Map<String, BigDecimal> allocations;

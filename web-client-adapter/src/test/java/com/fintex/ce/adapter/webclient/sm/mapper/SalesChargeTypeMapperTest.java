@@ -28,7 +28,6 @@ class SalesChargeTypeMapperTest {
 
     SalesCharge result = sut.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getType()).isEqualTo(SalesChargeType.DEFERRED_SALES_CHARGE);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
@@ -37,19 +36,17 @@ class SalesChargeTypeMapperTest {
   void shouldReturnEmptySalesCharge_whenResponseIsNull() {
     SalesCharge result = sut.map(null, createHolding("SEC-002"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getType()).isNull();
     assertThat(result.getProviders()).isEmpty();
   }
 
   @Test
-  void shouldMapOnlyHoldingId_whenSalesChargeDatapointIsNull() {
+  void shouldReturnEmptySalesCharge_whenSalesChargeDatapointIsNull() {
     var smsResponse = mock(SalesChargeData.class);
     when(smsResponse.getSalesCharge()).thenReturn(null);
 
     SalesCharge result = sut.map(smsResponse, createHolding("SEC-003"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-003");
     assertThat(result.getType()).isNull();
     assertThat(result.getProviders()).isEmpty();
   }

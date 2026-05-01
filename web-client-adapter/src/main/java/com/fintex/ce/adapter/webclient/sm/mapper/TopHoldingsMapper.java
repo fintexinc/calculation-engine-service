@@ -38,7 +38,6 @@ public class TopHoldingsMapper implements SecurityMasterResponseMapper<CommonTop
 
     return CommonTopHoldings.builder()
         .holdings(holdings)
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

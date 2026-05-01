@@ -39,7 +39,6 @@ public class AssetAllocationSecurityMasterMapper
     return HoldingAssetAllocation.builder()
         .holdingType(holding.getHoldingType())
         .allocations(allocationMap)
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

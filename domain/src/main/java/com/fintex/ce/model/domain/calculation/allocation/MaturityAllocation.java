@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class MaturityAllocation extends BaseCalculationData<MaturityAllocation> {
+public class MaturityAllocation extends BaseCalculationData {
 
   private FinancialInstrumentType holdingType;
   @Builder.Default

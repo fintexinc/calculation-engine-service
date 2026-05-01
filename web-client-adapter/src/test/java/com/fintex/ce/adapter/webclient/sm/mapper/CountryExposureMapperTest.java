@@ -30,7 +30,6 @@ class CountryExposureMapperTest {
 
     CountryExposure result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-001");
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getAllocations()).hasSize(2);
@@ -42,7 +41,6 @@ class CountryExposureMapperTest {
   void shouldReturnEmptyAllocations_whenResponseIsNull() {
     CountryExposure result = mapper.map(null, createHolding("SEC-002"));
 
-    assertThat(result.getHoldingId()).isEqualTo("SEC-002");
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getAllocations()).isEmpty();
   }

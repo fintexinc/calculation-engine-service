@@ -42,7 +42,6 @@ public class CountryExposureMapper
     return CountryExposure.builder()
         .allocations(allocationMap)
         .holdingType(holding.getHoldingType())
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

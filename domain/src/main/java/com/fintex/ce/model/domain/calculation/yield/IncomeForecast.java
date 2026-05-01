@@ -12,7 +12,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class IncomeForecast extends BaseCalculationData<IncomeForecast> {
+public class IncomeForecast extends BaseCalculationData {
 
   private BigDecimal dividendYield;
   private String paymentFrequencyType;

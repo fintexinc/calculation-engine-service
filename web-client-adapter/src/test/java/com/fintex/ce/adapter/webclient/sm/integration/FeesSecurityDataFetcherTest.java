@@ -73,7 +73,6 @@ class FeesSecurityDataFetcherTest extends AbstractSecurityDataFetcherTest<FeeDat
     assertThat(result).containsOnlyKeys(etf1, fund1);
 
     FeeData etf1Fees = result.get(etf1);
-    assertThat(etf1Fees.getHoldingId()).isEqualTo(etf1MorningstarId);
     assertThat(etf1Fees.getManagementFee()).isEqualByComparingTo("0.0100");
     assertThat(etf1Fees.getManagementExpenseRatio()).isEqualByComparingTo("0.0200");
     assertThat(etf1Fees.getNetExpenseRatio()).isEqualByComparingTo("0.0300");
@@ -81,7 +80,6 @@ class FeesSecurityDataFetcherTest extends AbstractSecurityDataFetcherTest<FeeDat
     assertThat(etf1Fees.getActual12B1Fee()).isEqualByComparingTo("0.0500");
 
     FeeData fund1Fees = result.get(fund1);
-    assertThat(fund1Fees.getHoldingId()).isEqualTo(canadianFundFundservCode);
     assertThat(fund1Fees.getManagementFee()).isEqualByComparingTo("0.0150");
     assertThat(fund1Fees.getManagementExpenseRatio()).isEqualByComparingTo("0.0250");
     assertThat(fund1Fees.getNetExpenseRatio()).isEqualByComparingTo("0.0350");

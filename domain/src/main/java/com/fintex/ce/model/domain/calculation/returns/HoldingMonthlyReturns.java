@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class HoldingMonthlyReturns extends BaseCalculationData<HoldingMonthlyReturns> implements ReturnsData {
+public class HoldingMonthlyReturns extends BaseCalculationData implements ReturnsData {
 
   private String currency;
   private FinancialInstrumentType holdingType;

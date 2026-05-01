@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class Yield extends BaseCalculationData<Yield> {
+public class Yield extends BaseCalculationData {
 
   private BigDecimal dividendYield;
 

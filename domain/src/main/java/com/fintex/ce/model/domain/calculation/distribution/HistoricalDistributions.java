@@ -16,7 +16,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class HistoricalDistributions extends BaseCalculationData<HistoricalDistributions> {
+public class HistoricalDistributions extends BaseCalculationData {
 
   private String currency;
   private FinancialInstrumentType holdingType;

@@ -64,13 +64,12 @@ class FixedIncomeStyleboxExposureFetcherTest
   }
 
   @Override
-  protected FixedIncomeStyleboxExposure createExpectedDomainModel(String holdingId) {
+  protected FixedIncomeStyleboxExposure createExpectedDomainModel() {
     final FixedIncomeStyleboxExposure tmpFixedIncomeStyleboxExposure = new FixedIncomeStyleboxExposure();
     tmpFixedIncomeStyleboxExposure.setBoxValues(Map.of(
         FixedIncomeStyleBoxType.HIGH_LIMITED, BigDecimal.valueOf(15.5),
         FixedIncomeStyleBoxType.MEDIUM_MODERATE, BigDecimal.valueOf(22.3)));
     tmpFixedIncomeStyleboxExposure.setHoldingType(FinancialInstrumentType.ETF_CANADA);
-    tmpFixedIncomeStyleboxExposure.setHoldingId(holdingId);
     return tmpFixedIncomeStyleboxExposure;
   }
 

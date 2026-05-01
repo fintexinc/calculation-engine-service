@@ -63,12 +63,11 @@ class EquitySectorAllocationFetcherTest
   }
 
   @Override
-  protected EquitySector createExpectedDomainModel(String holdingId) {
+  protected EquitySector createExpectedDomainModel() {
     return EquitySector.builder()
         .allocations(Map.of(
             EquitySectorAllocationType.TECHNOLOGY, BigDecimal.valueOf(28.5),
             EquitySectorAllocationType.HEALTHCARE, BigDecimal.valueOf(15.3)))
-        .holdingId(holdingId)
         .build();
   }
 

@@ -14,7 +14,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class TreasuryBills extends BaseCalculationData<TreasuryBills> {
+public class TreasuryBills extends BaseCalculationData {
 
   private Currency currency;
   private Map<LocalDate, BigDecimal> monthlyReturns;

@@ -42,7 +42,6 @@ public class MaturityAllocationMapper
     return MaturityAllocation.builder()
         .maturityDurationValues(durationMap)
         .holdingType(holding.getHoldingType())
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }

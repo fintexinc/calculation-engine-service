@@ -44,7 +44,6 @@ public class EquityStyleboxExposureMapper
     return EquityStyleboxExposure.builder()
         .boxValues(boxValues)
         .holdingType(holding.getHoldingType())
-        .holdingId(holding.getSecurityIdentifier().getId())
         .providers(providers)
         .build();
   }
