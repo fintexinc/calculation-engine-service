@@ -1,6 +1,5 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.returns.FxRatesConversionComponent;
 import com.fintex.ce.application.returns.MonthlyReturnsGenerator;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.returns.ReturnsCutComponent;
@@ -15,7 +14,6 @@ import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
-import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -26,7 +24,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -34,14 +31,14 @@ import lombok.extern.slf4j.Slf4j;
 public class MonthlyReturnsService {
 
   private final SecurityDataFetcher<HoldingMonthlyReturns> monthlyReturnsSecurityDataFetcher;
-  private final FxRatesFetcher fxRatesFetcher;
+  private final FxRateService fxRateService;
   private final MonthlyReturnsGenerator monthlyReturnsGenerator;
 
   public MonthlyReturnsService(SecurityDataFetcher<HoldingMonthlyReturns> monthlyReturnsSecurityDataFetcher,
-      FxRatesFetcher fxRatesFetcher,
+      FxRateService fxRateService,
       MonthlyReturnsGenerator monthlyReturnsGenerator) {
     this.monthlyReturnsSecurityDataFetcher = monthlyReturnsSecurityDataFetcher;
-    this.fxRatesFetcher = fxRatesFetcher;
+    this.fxRateService = fxRateService;
     this.monthlyReturnsGenerator = monthlyReturnsGenerator;
   }
 
@@ -96,7 +93,7 @@ public class MonthlyReturnsService {
     ReturnsAggregate<HoldingMonthlyReturns> portfolioMonthlyReturnsAggregate = getMonthlyReturns(holdings, currency);
 
     portfolioMonthlyReturnsAggregate
-        .setFxRatesConversionComponent(new FxRatesConversionComponent())
+        .setFxRateService(fxRateService)
         .setFxRates(fetchFxRates(portfolioMonthlyReturnsAggregate.holdingCurrencyMap, currency,
             portfolioMonthlyReturnsAggregate.getPerformanceStartDate(), portfolioMonthlyReturnsAggregate
                 .getPerformanceEndDate()), currency)
@@ -114,7 +111,7 @@ public class MonthlyReturnsService {
     ReturnsAggregate<HoldingMonthlyReturns> benchmarkMonthlyReturnsAggregate = getMonthlyReturns(holdings, currency);
 
     benchmarkMonthlyReturnsAggregate
-        .setFxRatesConversionComponent(new FxRatesConversionComponent())
+        .setFxRateService(fxRateService)
         .setFxRates(fetchFxRates(benchmarkMonthlyReturnsAggregate.holdingCurrencyMap, currency,
             benchmarkMonthlyReturnsAggregate.getPerformanceStartDate(), benchmarkMonthlyReturnsAggregate
                 .getPerformanceEndDate()), currency)
@@ -130,13 +127,7 @@ public class MonthlyReturnsService {
       Map<PortfolioHolding, Currency> holdingCurrencies, Currency toCurrency,
       LocalDate from, LocalDate to) {
     log.debug("PortfolioHolding currencies: {}, target: {}", holdingCurrencies.values(), toCurrency);
-    DateRange dateRange = new DateRange(from, to);
-    return holdingCurrencies.values().stream()
-        .distinct()
-        .filter(fromCurrency -> !fromCurrency.equals(toCurrency))
-        .collect(Collectors.toMap(
-            fromCurrency -> new CurrencyExchangePair(fromCurrency, toCurrency),
-            fromCurrency -> fxRatesFetcher.fetch(new CurrencyExchangePair(fromCurrency, toCurrency), dateRange)));
+    return fxRateService.rates(holdingCurrencies, toCurrency, new DateRange(from, to));
   }
 
 }

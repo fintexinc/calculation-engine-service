@@ -45,23 +45,6 @@ When mocking external HTTP services (REST APIs):
 3. **Configure WireMock stub** to return this JSON
 4. This ensures: type safety, realistic data, easy refactoring when DTOs change
 
-```java
-// Example: Building WireMock response data
-var response = AssetAllocationResponse.builder()
-                .equityWeight(BigDecimal.valueOf(65.5))
-                .fixedIncomeWeight(BigDecimal.valueOf(30.2))
-                .cashWeight(BigDecimal.valueOf(4.3))
-                .build();
-
-String json = objectMapper.writeValueAsString(response);
-
-wireMockServer.
-
-stubFor(post(urlEqualTo("/graphql"))
-        .
-
-willReturn(okJson(json)));
-```
 
 ### Key Rules at a Glance
 
@@ -77,6 +60,7 @@ willReturn(okJson(json)));
 | Location        | Any module | Adapter module        | Bootstrap only |
 
 ---
+## 0) Tests are a code, so all rules in @CONTRIBUTING.md must be applied.
 
 ## 1) Global rules (apply to all tests)
 

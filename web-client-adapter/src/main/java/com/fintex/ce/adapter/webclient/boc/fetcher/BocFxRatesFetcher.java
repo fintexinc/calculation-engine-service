@@ -24,8 +24,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.fintex.ce.model.util.BigDecimalConstants.INVERSE_SCALE;
-import static com.fintex.ce.model.util.BigDecimalConstants.ROUNDING_MODE;
+import static com.fintex.ce.model.util.BigDecimalUtils.invert;
 
 /**
  * Fetches historical FX rates from the Bank of Canada Valet API. Implements the {@link FxRatesFetcher} port — the
@@ -69,7 +68,7 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
     if (inverseConfig != null) {
       NavigableMap<LocalDate, BigDecimal> rates = fetchFromSources(inverseConfig.getRateSources(), startDate, endDate);
       log.info("Fetched {} FX rates for {} (inverted from {})", rates.size(), currencyPair, inverseKey);
-      return invert(rates);
+      return invertRates(rates);
     }
 
     log.warn("No FX rate configuration for pair: {} or {}", directKey, inverseKey);
@@ -114,11 +113,11 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
     return mergedRates;
   }
 
-  private NavigableMap<LocalDate, BigDecimal> invert(NavigableMap<LocalDate, BigDecimal> rates) {
+  private NavigableMap<LocalDate, BigDecimal> invertRates(NavigableMap<LocalDate, BigDecimal> rates) {
     return rates.entrySet().stream()
         .collect(Collectors.toMap(
             Map.Entry::getKey,
-            e -> BigDecimal.ONE.divide(e.getValue(), INVERSE_SCALE, ROUNDING_MODE),
+            e -> invert(e.getValue()),
             (a, b) -> a,
             TreeMap::new));
   }

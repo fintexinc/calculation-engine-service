@@ -34,6 +34,55 @@ external-services:
               - IEXM0101   # monthly USD/CAD noon rate (1999–2017)
             end-date: "2016-12-31"
             frequency: MONTHLY
+      EUR_CAD:
+        rate-sources:
+          - path: /observations/FXEURCAD/json
+            series-names:
+              - FXEURCAD   # daily EUR/CAD rate (2017+)
+            start-date: "2017-01-01"
+            frequency: DAILY
+      GBP_CAD:
+        rate-sources:
+          - path: /observations/FXGBPCAD/json
+            series-names:
+              - FXGBPCAD   # daily GBP/CAD rate (2017+)
+            start-date: "2017-01-01"
+            frequency: DAILY
+      AUD_CAD:
+        rate-sources:
+          - path: /observations/FXAUDCAD/json
+            series-names:
+              - FXAUDCAD   # daily AUD/CAD rate (2017+)
+            start-date: "2017-01-01"
+            frequency: DAILY
+      JPY_CAD:
+        rate-sources:
+          - path: /observations/FXJPYCAD/json
+            series-names:
+              - FXJPYCAD   # daily JPY/CAD rate (2017+)
+            start-date: "2017-01-01"
+            frequency: DAILY
+      CNY_CAD:
+        rate-sources:
+          - path: /observations/FXCNYCAD/json
+            series-names:
+              - FXCNYCAD   # daily CNY/CAD rate (2017+)
+            start-date: "2017-01-01"
+            frequency: DAILY
+      MXN_CAD:
+        rate-sources:
+          - path: /observations/FXMXNCAD/json
+            series-names:
+              - FXMXNCAD   # daily MXN/CAD rate (2017+)
+            start-date: "2017-01-01"
+            frequency: DAILY
+      CHF_CAD:
+        rate-sources:
+          - path: /observations/FXCHFCAD/json
+            series-names:
+              - FXCHFCAD   # daily CHF/CAD rate (2017+)
+            start-date: "2017-01-01"
+            frequency: DAILY
   security-master:
     api-type: rest  # "rest" (default) or "graphql"
     rest:

@@ -9,9 +9,17 @@ import com.fintex.ce.application.validation.BenchmarkCpedDataValidation;
 import com.fintex.ce.application.validation.BenchmarkCpsdDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpedDataValidation;
 import com.fintex.ce.application.validation.PortfolioCpsdDataValidation;
+import com.fintex.ce.model.domain.CurrencyExchangePair;
+import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
@@ -26,9 +34,13 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
+import static com.fintex.ce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
+import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static com.fintex.wm.commons.domain.currency.Currency.CAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -45,9 +57,9 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetWeightedAverageWithCpsdAndCpedValidation_whenVerifyGetWeightedAverage() {
-    final var service = mock(MonthlyReturnsService.class);
-    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
-    final var portfolioBaseTotalReturns = mock(TreeMap.class);
+    var service = mock(MonthlyReturnsService.class);
+    var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
+    var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturns
         .validateCped(eq(LOCAL_DATE_NOW.plusMonths(3)))
@@ -65,9 +77,9 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetWeightedAverageWithCpsdAndCpedValidation_whenCheckResult() {
-    final var service = mock(MonthlyReturnsService.class);
-    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
-    final var portfolioBaseTotalReturns = mock(TreeMap.class);
+    var service = mock(MonthlyReturnsService.class);
+    var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
+    var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturns
         .validateCped(eq(LOCAL_DATE_NOW.plusMonths(3)))
@@ -79,7 +91,7 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(service).getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any());
 
-    final NavigableMap<LocalDate, BigDecimal> actual = service.getWeightedAverageWithCpsdAndCpedValidation(
+    NavigableMap<LocalDate, BigDecimal> actual = service.getWeightedAverageWithCpsdAndCpedValidation(
         monthlyReturns, LOCAL_DATE_NOW, LOCAL_DATE_NOW.plusMonths(3));
 
     assertSame(portfolioBaseTotalReturns, actual);
@@ -87,9 +99,9 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetWeightedAverageWithCpedValidation_whenVerifyGetWeightedAverage() {
-    final var service = mock(MonthlyReturnsService.class);
-    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
-    final var portfolioBaseTotalReturns = mock(TreeMap.class);
+    var service = mock(MonthlyReturnsService.class);
+    var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
+    var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturns
         .validateCped(eq(LOCAL_DATE_NOW))
@@ -106,9 +118,9 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetWeightedAverageWithCpedValidation_whenCheckResult() {
-    final var service = mock(MonthlyReturnsService.class);
-    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
-    final var portfolioBaseTotalReturns = mock(TreeMap.class);
+    var service = mock(MonthlyReturnsService.class);
+    var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
+    var portfolioBaseTotalReturns = mock(TreeMap.class);
 
     when(monthlyReturns
         .validateCped(eq(LOCAL_DATE_NOW))
@@ -119,7 +131,7 @@ class MonthlyReturnsServiceTest {
 
     doCallRealMethod().when(service).getWeightedAverageWithCpedValidation(any(), any());
 
-    final NavigableMap<LocalDate, BigDecimal> actual = service.getWeightedAverageWithCpedValidation(monthlyReturns,
+    NavigableMap<LocalDate, BigDecimal> actual = service.getWeightedAverageWithCpedValidation(monthlyReturns,
         LOCAL_DATE_NOW);
 
     assertSame(portfolioBaseTotalReturns, actual);
@@ -128,12 +140,12 @@ class MonthlyReturnsServiceTest {
   @Test
   void shouldGetMonthlyReturns_whenVerifyLoad() {
     try (MockedConstruction<ReturnsAggregate> mocked = Mockito.mockConstruction(ReturnsAggregate.class)) {
-      final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
-      final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
-      final var service = mock(MonthlyReturnsService.class, withSettings()
-          .useConstructor(monthlyReturnsFetcher, mock(FxRatesFetcher.class), gicMonthlyReturnsGenerator));
+      var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+      var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+      var service = mock(MonthlyReturnsService.class, withSettings()
+          .useConstructor(monthlyReturnsFetcher, mock(FxRateService.class), gicMonthlyReturnsGenerator));
 
-      final var holdings = mock(List.class);
+      var holdings = mock(List.class);
 
       when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
       doCallRealMethod().when(service).getMonthlyReturns(anyList(), any());
@@ -146,33 +158,33 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetMonthlyReturns_whenCheckResult() {
-    final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
-    final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
-    final var service = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(monthlyReturnsFetcher, mock(FxRatesFetcher.class), gicMonthlyReturnsGenerator));
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = mock(MonthlyReturnsService.class, withSettings()
+        .useConstructor(monthlyReturnsFetcher, mock(FxRateService.class), gicMonthlyReturnsGenerator));
 
-    final var originalMonthlyReturns = mock(Map.class);
+    var originalMonthlyReturns = mock(Map.class);
     when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(originalMonthlyReturns);
-    final ReturnsAggregate expected = mock(ReturnsAggregate.class);
+    ReturnsAggregate expected = mock(ReturnsAggregate.class);
     when(service.getMonthlyReturns(originalMonthlyReturns)).thenReturn(expected);
 
     doCallRealMethod().when(service).getMonthlyReturns(anyList(), any());
 
-    final var actual = service.getMonthlyReturns(mock(List.class), Currency.CAD);
+    var actual = service.getMonthlyReturns(mock(List.class), Currency.CAD);
 
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldGetMonthlyReturns_whenVerifyGicWasGenerated() {
-    final var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
-    final var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
-    final var service = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(monthlyReturnsFetcher, mock(FxRatesFetcher.class), gicMonthlyReturnsGenerator));
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = mock(MonthlyReturnsService.class, withSettings()
+        .useConstructor(monthlyReturnsFetcher, mock(FxRateService.class), gicMonthlyReturnsGenerator));
 
-    final var originalMonthlyReturns = mock(Map.class);
+    var originalMonthlyReturns = mock(Map.class);
     when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(originalMonthlyReturns);
-    final Map gicOriginalMonthlyReturns = mock(Map.class);
+    Map gicOriginalMonthlyReturns = mock(Map.class);
     when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(gicOriginalMonthlyReturns);
 
     doCallRealMethod().when(service).getMonthlyReturns(anyList(), any());
@@ -184,12 +196,12 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetPortfolioMonthlyReturns_whenVerifyGetMonthlyReturns() {
-    final var fxRatesFetcher = mock(FxRatesFetcher.class);
-    final var service = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
+    var fxRateService = mock(FxRateService.class);
+    var service = mock(MonthlyReturnsService.class, withSettings()
+        .useConstructor(mock(SecurityDataFetcher.class), fxRateService, mock(MonthlyReturnsGenerator.class)));
 
-    final var holdings = mock(List.class);
-    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
+    var holdings = mock(List.class);
+    var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     monthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(monthlyReturns);
 
@@ -202,11 +214,11 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetPortfolioMonthlyReturns_whenVerifyInit() {
-    final var fxRatesFetcher = mock(FxRatesFetcher.class);
-    final var service = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
+    var fxRateService = mock(FxRateService.class);
+    var service = mock(MonthlyReturnsService.class, withSettings()
+        .useConstructor(mock(SecurityDataFetcher.class), fxRateService, mock(MonthlyReturnsGenerator.class)));
 
-    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_SELF);
+    var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_SELF);
     monthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(monthlyReturns);
 
@@ -214,9 +226,9 @@ class MonthlyReturnsServiceTest {
 
     service.getPortfolioMonthlyReturns(mock(List.class), CAD, ReturnFactorScale.SCALE_OF_TWO);
 
-    final var inOrder = inOrder(monthlyReturns);
+    var inOrder = inOrder(monthlyReturns);
 
-    inOrder.verify(monthlyReturns).setFxRatesConversionComponent(any());
+    inOrder.verify(monthlyReturns).setFxRateService(any());
     inOrder.verify(monthlyReturns).setMonthlyReturnsCutComponent(eq(new ReturnsCutComponent()));
     inOrder.verify(monthlyReturns).setWeightedAverageComponent(eq(new WeightedAverageComponent(
         ReturnFactorScale.SCALE_OF_TWO)));
@@ -226,30 +238,30 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetPortfolioMonthlyReturns_whenCheckResult() {
-    final var fxRatesFetcher = mock(FxRatesFetcher.class);
-    final var service = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
+    var fxRateService = mock(FxRateService.class);
+    var service = mock(MonthlyReturnsService.class, withSettings()
+        .useConstructor(mock(SecurityDataFetcher.class), fxRateService, mock(MonthlyReturnsGenerator.class)));
 
-    final var holdings = mock(List.class);
-    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
+    var holdings = mock(List.class);
+    var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     monthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(monthlyReturns);
 
     doCallRealMethod().when(service).getPortfolioMonthlyReturns(anyList(), any(), any());
 
-    final var actual = service.getPortfolioMonthlyReturns(holdings, CAD, ReturnFactorScale.SCALE_OF_TWO);
+    var actual = service.getPortfolioMonthlyReturns(holdings, CAD, ReturnFactorScale.SCALE_OF_TWO);
 
     assertSame(monthlyReturns, actual);
   }
 
   @Test
   void shouldGetBenchmarkMonthlyReturns_whenVerifyGetMonthlyReturns() {
-    final var fxRatesFetcher = mock(FxRatesFetcher.class);
-    final var service = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
+    var fxRateService = mock(FxRateService.class);
+    var service = mock(MonthlyReturnsService.class, withSettings()
+        .useConstructor(mock(SecurityDataFetcher.class), fxRateService, mock(MonthlyReturnsGenerator.class)));
 
-    final var holdings = mock(List.class);
-    final var benchmarkMonthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
+    var holdings = mock(List.class);
+    var benchmarkMonthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
     benchmarkMonthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(benchmarkMonthlyReturns);
 
@@ -262,11 +274,11 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldGetBenchmarkMonthlyReturns_whenVerifyInit() {
-    final var fxRatesFetcher = mock(FxRatesFetcher.class);
-    final var service = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
+    var fxRateService = mock(FxRateService.class);
+    var service = mock(MonthlyReturnsService.class, withSettings()
+        .useConstructor(mock(SecurityDataFetcher.class), fxRateService, mock(MonthlyReturnsGenerator.class)));
 
-    final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_SELF);
+    var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_SELF);
     monthlyReturns.holdingCurrencyMap = new HashMap<>();
     when(service.getMonthlyReturns(anyList(), any())).thenReturn(monthlyReturns);
 
@@ -274,9 +286,9 @@ class MonthlyReturnsServiceTest {
 
     service.getBenchmarkMonthlyReturns(mock(List.class), CAD, ReturnFactorScale.SCALE_OF_TWO);
 
-    final var inOrder = inOrder(monthlyReturns);
+    var inOrder = inOrder(monthlyReturns);
 
-    inOrder.verify(monthlyReturns).setFxRatesConversionComponent(any());
+    inOrder.verify(monthlyReturns).setFxRateService(any());
     inOrder.verify(monthlyReturns).setMonthlyReturnsCutComponent(eq(new ReturnsCutComponent()));
     inOrder.verify(monthlyReturns).setWeightedAverageComponent(eq(new WeightedAverageComponent(
         ReturnFactorScale.SCALE_OF_TWO)));
@@ -285,21 +297,132 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void shouldGetBenchmarkMonthlyReturns_whenCheckResult() {
-    final var fxRatesFetcher = mock(FxRatesFetcher.class);
-    final var service = mock(MonthlyReturnsService.class, withSettings()
-        .useConstructor(mock(SecurityDataFetcher.class), fxRatesFetcher, mock(MonthlyReturnsGenerator.class)));
+  void shouldKeepOriginalReturnsAndAddWarning_whenFxRatesUnavailable() {
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var fxRatesFetcher = mock(FxRatesFetcher.class);
+    var fxRateService = new FxRateService(fxRatesFetcher);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = new MonthlyReturnsService(monthlyReturnsFetcher, fxRateService, gicMonthlyReturnsGenerator);
 
-    final var holdings = mock(List.class);
-    final var benchmarkMonthlyReturns = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
-    benchmarkMonthlyReturns.holdingCurrencyMap = new HashMap<>();
-    when(service.getMonthlyReturns(anyList(), any())).thenReturn(benchmarkMonthlyReturns);
+    PortfolioHolding holding = new PortfolioHolding(BigDecimal.valueOf(1000),
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
+    TreeMap<LocalDate, BigDecimal> originalReturns = new TreeMap<>();
+    originalReturns.put(toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(2)), BigDecimal.valueOf(0.01));
+    originalReturns.put(toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), BigDecimal.valueOf(0.02));
 
-    doCallRealMethod().when(service).getBenchmarkMonthlyReturns(anyList(), any(), any());
+    HoldingMonthlyReturns monthly = new HoldingMonthlyReturns();
+    monthly.setCurrency(Currency.USD.name());
+    monthly.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    monthly.setReturns(new TreeMap<>(originalReturns));
 
-    final var actual = service.getBenchmarkMonthlyReturns(holdings, CAD, ReturnFactorScale.SCALE_OF_TWO);
+    HashMap<PortfolioHolding, HoldingMonthlyReturns> fetched = new HashMap<>();
+    fetched.put(holding, monthly);
 
-    assertSame(benchmarkMonthlyReturns, actual);
+    when(monthlyReturnsFetcher.fetch(anyList(), anyList())).thenReturn(fetched);
+    when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(new HashMap<>());
+    when(fxRatesFetcher.fetch(any(CurrencyExchangePair.class), any(DateRange.class))).thenReturn(new TreeMap<>());
+
+    ReturnsAggregate<HoldingMonthlyReturns> aggregate = service.getPortfolioMonthlyReturns(
+        List.of(holding), CAD, ReturnFactorScale.SCALE_OF_TWO);
+    aggregate.fxRatesApplied();
+
+    assertEquals(originalReturns, aggregate.returnsMap.get(holding));
+    assertEquals(Currency.USD, aggregate.holdingCurrencyMap.get(holding));
+    List<BasePceException> exceptions = aggregate.notification.getExceptions();
+    assertEquals(1, exceptions.size());
+    assertEquals(FX_RATES_UNAVAILABLE, exceptions.getFirst().getErrorCode());
+  }
+
+  @Test
+  void shouldKeepAllReturnsUnconvertedAndAddWarning_whenRatesArePartiallyAvailable() {
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var fxRatesFetcher = mock(FxRatesFetcher.class);
+    var fxRateService = new FxRateService(fxRatesFetcher);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = new MonthlyReturnsService(monthlyReturnsFetcher, fxRateService, gicMonthlyReturnsGenerator);
+
+    PortfolioHolding holding = new PortfolioHolding(BigDecimal.valueOf(1000),
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
+    LocalDate firstMonth = toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(3));
+    LocalDate secondMonth = toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(2));
+    LocalDate thirdMonth = toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1));
+    TreeMap<LocalDate, BigDecimal> originalReturns = new TreeMap<>();
+    originalReturns.put(firstMonth, BigDecimal.valueOf(0.01));
+    originalReturns.put(secondMonth, BigDecimal.valueOf(0.02));
+    originalReturns.put(thirdMonth, BigDecimal.valueOf(0.03));
+
+    HoldingMonthlyReturns monthly = new HoldingMonthlyReturns();
+    monthly.setCurrency(Currency.USD.name());
+    monthly.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    monthly.setReturns(new TreeMap<>(originalReturns));
+
+    HashMap<PortfolioHolding, HoldingMonthlyReturns> fetched = new HashMap<>();
+    fetched.put(holding, monthly);
+
+    TreeMap<LocalDate, BigDecimal> partialRates = new TreeMap<>();
+    partialRates.put(thirdMonth, BigDecimal.valueOf(1.35));
+
+    when(monthlyReturnsFetcher.fetch(anyList(), anyList())).thenReturn(fetched);
+    when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(new HashMap<>());
+    when(fxRatesFetcher.fetch(any(CurrencyExchangePair.class), any(DateRange.class))).thenReturn(partialRates);
+
+    ReturnsAggregate<HoldingMonthlyReturns> aggregate = service.getPortfolioMonthlyReturns(
+        List.of(holding), CAD, ReturnFactorScale.SCALE_OF_TWO);
+    aggregate.fxRatesApplied();
+
+    assertEquals(originalReturns, aggregate.returnsMap.get(holding));
+    assertEquals(Currency.USD, aggregate.holdingCurrencyMap.get(holding));
+    List<BasePceException> exceptions = aggregate.notification.getExceptions();
+    assertEquals(1, exceptions.size());
+    assertEquals(FX_RATES_UNAVAILABLE, exceptions.getFirst().getErrorCode());
+  }
+
+  @Test
+  void shouldUpdateCurrencyToTarget_whenConversionSucceeds() {
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var fxRatesFetcher = mock(FxRatesFetcher.class);
+    var fxRateService = new FxRateService(fxRatesFetcher);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = new MonthlyReturnsService(monthlyReturnsFetcher, fxRateService, gicMonthlyReturnsGenerator);
+
+    PortfolioHolding holding = new PortfolioHolding(BigDecimal.valueOf(1000),
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("Ticker", FiIdentifierType.TICKER));
+    LocalDate firstMonth = toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(3));
+    LocalDate secondMonth = toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(2));
+    LocalDate thirdMonth = toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1));
+    TreeMap<LocalDate, BigDecimal> originalReturns = new TreeMap<>();
+    originalReturns.put(firstMonth, BigDecimal.valueOf(0.01));
+    originalReturns.put(secondMonth, BigDecimal.valueOf(0.02));
+    originalReturns.put(thirdMonth, BigDecimal.valueOf(0.03));
+
+    HoldingMonthlyReturns monthly = new HoldingMonthlyReturns();
+    monthly.setCurrency(Currency.USD.name());
+    monthly.setHoldingType(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    monthly.setReturns(new TreeMap<>(originalReturns));
+
+    HashMap<PortfolioHolding, HoldingMonthlyReturns> fetched = new HashMap<>();
+    fetched.put(holding, monthly);
+
+    TreeMap<LocalDate, BigDecimal> fullRates = new TreeMap<>();
+    fullRates.put(toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(4)), BigDecimal.valueOf(1.30));
+    fullRates.put(firstMonth, BigDecimal.valueOf(1.31));
+    fullRates.put(secondMonth, BigDecimal.valueOf(1.32));
+    fullRates.put(thirdMonth, BigDecimal.valueOf(1.33));
+
+    when(monthlyReturnsFetcher.fetch(anyList(), anyList())).thenReturn(fetched);
+    when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(new HashMap<>());
+    when(fxRatesFetcher.fetch(any(CurrencyExchangePair.class), any(DateRange.class))).thenReturn(fullRates);
+
+    ReturnsAggregate<HoldingMonthlyReturns> aggregate = service.getPortfolioMonthlyReturns(
+        List.of(holding), CAD, ReturnFactorScale.SCALE_OF_TWO);
+    aggregate.fxRatesApplied();
+
+    assertNotEquals(originalReturns, aggregate.returnsMap.get(holding));
+    assertEquals(CAD, aggregate.holdingCurrencyMap.get(holding));
+    assertTrue(aggregate.notification.getExceptions().isEmpty());
   }
 
 }
