@@ -8,11 +8,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.experimental.Accessors;
-
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 @Data
-@Accessors(chain = true)
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "metric", visible = true, defaultImpl = Void.class)
 @JsonSubTypes({
     @Type(value = PeriodCommand.class, names = {

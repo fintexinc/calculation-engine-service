@@ -156,8 +156,7 @@ class CommonHoldingsServiceImplTest {
       final var command = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(PortfolioHolding.class));
 
-      final var rawCommonHoldings = new CommonTopHoldings();
-      rawCommonHoldings.setHoldings(List.of());
+      final var rawCommonHoldings = new CommonTopHoldings(List.of());
       final var holdingsFromSms = Map.of(mock(PortfolioHolding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(PortfolioHolding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
@@ -191,8 +190,7 @@ class CommonHoldingsServiceImplTest {
       final var command = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(PortfolioHolding.class));
 
-      final var rawCommonHoldings = new CommonTopHoldings();
-      rawCommonHoldings.setHoldings(List.of());
+      final var rawCommonHoldings = new CommonTopHoldings(List.of());
       final var holdingsFromSms = Map.of(mock(PortfolioHolding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(PortfolioHolding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
@@ -227,8 +225,7 @@ class CommonHoldingsServiceImplTest {
       final var command = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(PortfolioHolding.class));
 
-      final var rawCommonHoldings = new CommonTopHoldings();
-      rawCommonHoldings.setHoldings(List.of());
+      final var rawCommonHoldings = new CommonTopHoldings(List.of());
       final var holdingsFromSms = Map.of(mock(PortfolioHolding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(PortfolioHolding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
@@ -264,8 +261,7 @@ class CommonHoldingsServiceImplTest {
       final var command = mock(TopCommonHoldingsCommand.class);
       final var holdings = List.of(mock(PortfolioHolding.class));
 
-      final var rawCommonHoldings = new CommonTopHoldings();
-      rawCommonHoldings.setHoldings(List.of());
+      final var rawCommonHoldings = new CommonTopHoldings(List.of());
       final var holdingsFromSms = Map.of(mock(PortfolioHolding.class), rawCommonHoldings);
       final var allocations = Map.of(mock(PortfolioHolding.class), mock(BigDecimal.class));
       final var accumulativeTypes = Set.of("E");
@@ -501,8 +497,6 @@ class CommonHoldingsServiceImplTest {
     expected.setHolding(parent);
 
     when(child.getValue()).thenReturn(TEN);
-    when(child.setHolding(parent)).thenReturn(expected);
-
     doCallRealMethod().when(sut).setParentAndCalculateWeight(anyMap(), any(), any());
     // ACT
     final CommonHolding actual = sut.setParentAndCalculateWeight(allocations, parent, child);
@@ -521,22 +515,17 @@ class CommonHoldingsServiceImplTest {
 
     final var allocations = Map.of(new PortfolioHolding(null, null, null), TEN);
     final var parent = new PortfolioHolding(null, null, null);
-    final var child = mock(CommonHolding.class);
-    final var expected = new CommonHolding();
-    expected.setWeight(BigDecimal.valueOf(100));
-    expected.setHolding(parent);
+    final var child = new CommonHolding();
+    child.setValue(TEN);
 
     when(sut.isLeafStock(any(), any())).thenReturn(true);
-    when(child.getValue()).thenReturn(TEN);
-    when(child.setHolding(parent)).thenReturn(expected);
-
     doCallRealMethod().when(sut).setParentAndCalculateWeight(anyMap(), any(), any());
     // ACT
     final CommonHolding actual = sut.setParentAndCalculateWeight(allocations, parent, child);
 
     // VERIFY
-    assertEquals(expected.getWeight(), actual.getWeight());
-    assertEquals(expected.getHolding(), actual.getHolding());
+    assertEquals(0, BigDecimal.TEN.compareTo(actual.getWeight()));
+    assertEquals(parent, actual.getHolding());
   }
 
   @Test
@@ -549,24 +538,19 @@ class CommonHoldingsServiceImplTest {
 
     final var parent = mock(PortfolioHolding.class);
     final var allocations = Map.of(parent, TEN);
-    final var child = mock(CommonHolding.class);
-    final var expected = new CommonHolding();
-    expected.setWeight(BigDecimal.valueOf(100));
-    expected.setHolding(parent);
+    final var child = new CommonHolding();
+    child.setValue(TEN);
+    child.setCompanyName("Apple Inc");
+    child.setType("E");
 
     when(sut.isLeafStock(any(), any())).thenReturn(false);
-    when(child.getValue()).thenReturn(TEN);
-    when(child.getCompanyName()).thenReturn("Apple Inc");
-    when(child.getType()).thenReturn("E");
-    when(child.setHolding(parent)).thenReturn(expected);
-
     doCallRealMethod().when(sut).setParentAndCalculateWeight(anyMap(), any(), any());
     // ACT
     final CommonHolding actual = sut.setParentAndCalculateWeight(allocations, parent, child);
 
     // VERIFY
-    assertEquals(expected.getWeight(), actual.getWeight());
-    assertEquals(expected.getHolding(), actual.getHolding());
+    assertEquals(0, BigDecimal.valueOf(100).compareTo(actual.getWeight()));
+    assertEquals(parent, actual.getHolding());
   }
 
   @Test
@@ -860,8 +844,6 @@ class CommonHoldingsServiceImplTest {
       final var firstLvlParent = mock(CommonHolding.class);
       final var child = mock(CommonHolding.class);
 
-      when(child.setHolding(any())).thenReturn(child);
-      when(child.setWeight(any())).thenReturn(child);
       when(child.getValue()).thenReturn(TEN);
       when(child.getWeight()).thenReturn(HUNDRED);
       when(firstLvlParent.getWeight()).thenReturn(TEN);

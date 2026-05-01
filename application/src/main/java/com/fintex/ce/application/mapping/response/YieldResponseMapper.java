@@ -30,10 +30,10 @@ public class YieldResponseMapper implements ResponseMapper<Yield, YieldResult> {
   @Override
   public YieldResult toResponse(Map<PortfolioHolding, Yield> domainMap, List<Warning> warnings) {
     BigDecimal weightedYield = calculateWeightedAverageYield(domainMap);
-    YieldResult response = new YieldResult();
-    response.setYield(weightedYield);
-    response.setWarnings(warnings);
-    return response;
+    return YieldResult.builder()
+        .yield(weightedYield)
+        .warnings(warnings)
+        .build();
   }
 
   private BigDecimal calculateWeightedAverageYield(Map<PortfolioHolding, Yield> holdingYieldMap) {

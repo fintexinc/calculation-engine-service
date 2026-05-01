@@ -34,7 +34,11 @@ public class StandardDeviationCalculationServiceImpl
 
   public StandardDeviationCalculation defineCalculationMethod(final PeriodCommand command) {
     final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    return new StandardDeviationCalculation(context, defaultPeriods).setScale(OUTPUT_SCALE);
+    return StandardDeviationCalculation.builder()
+        .input(context)
+        .defaultPeriods(defaultPeriods)
+        .scale(OUTPUT_SCALE)
+        .build();
   }
 
 }

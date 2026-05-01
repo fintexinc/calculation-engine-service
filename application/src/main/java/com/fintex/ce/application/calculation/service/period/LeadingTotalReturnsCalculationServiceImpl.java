@@ -60,7 +60,7 @@ public class LeadingTotalReturnsCalculationServiceImpl
         .fxRatesApplied()
         .getWeightedAverage();
 
-    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    return new PeriodCalculationInput(portfolioTotalReturns);
 
   }
 

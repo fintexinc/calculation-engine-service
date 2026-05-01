@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
@@ -43,8 +42,10 @@ class AnnualReturnCalculationTest {
         end, BigDecimal.TEN));
 
     doCallRealMethod().when(sut).populateBasicDetails(any(), any());
-    final AnnualReturnResult result = new AnnualReturnResult().setAnnualReturns(List.of());
-    result.setWarnings(List.of());
+    final AnnualReturnResult result = AnnualReturnResult.builder()
+        .annualReturns(List.of())
+        .warnings(List.of())
+        .build();
     sut.populateBasicDetails(result, portfolioReturns);
 
     assertEquals(end, result.getPerformanceEndDate());
@@ -189,7 +190,7 @@ class AnnualReturnCalculationTest {
 
     final List<KeyValueResult> keyValueDtoS = years.entrySet().stream().map(e -> new KeyValueResult(e.getKey(), e
         .getValue()))
-        .collect(Collectors.toList());
+        .toList();
 
     doCallRealMethod().when(sut).calculate();
     sut.calculate();

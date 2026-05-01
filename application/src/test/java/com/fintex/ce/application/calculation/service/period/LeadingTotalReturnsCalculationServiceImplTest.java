@@ -177,7 +177,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
 
     final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
-    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioBaseTotalReturn);
+    final var expected = new PeriodCalculationInput(portfolioBaseTotalReturn);
     assertEquals(actual, expected);
 
   }

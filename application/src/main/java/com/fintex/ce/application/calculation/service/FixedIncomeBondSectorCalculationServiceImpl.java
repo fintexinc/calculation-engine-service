@@ -92,10 +92,10 @@ public class FixedIncomeBondSectorCalculationServiceImpl
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
-      FixedIncomeSectorResult defaultResult = new FixedIncomeSectorResult();
-      defaultResult.setFixedIncomeSector(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return FixedIncomeSectorResult.builder()
+          .fixedIncomeSector(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
 
     Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash = getFixedIncomePlusCash(holdings, warnings, dataProviders);

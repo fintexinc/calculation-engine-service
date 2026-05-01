@@ -60,7 +60,7 @@ public class BestWorstPeriodsCalculationServiceImpl
         .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(weightedAveragePortfolioReturns);
+    return new PeriodCalculationInput(weightedAveragePortfolioReturns);
   }
 
   public Set<Long> getPeriods(final BestWorstPeriodsCommand command) {

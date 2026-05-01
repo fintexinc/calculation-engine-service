@@ -163,8 +163,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var actual = sut.buildPeriodCalculationInput(req, returnFactorScale);
 
-    final PeriodCalculationInput expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(
-        portfolioBaseTotalReturns);
+    final PeriodCalculationInput expected = new PeriodCalculationInput(portfolioBaseTotalReturns);
     Assertions.assertEquals(expected, actual);
   }
 

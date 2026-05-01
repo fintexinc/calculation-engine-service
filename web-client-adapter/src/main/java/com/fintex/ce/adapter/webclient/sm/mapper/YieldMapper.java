@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.yield.Yield;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.financial.Income;
 
 import org.springframework.stereotype.Component;
@@ -17,20 +18,16 @@ public class YieldMapper implements SecurityMasterResponseMapper<Yield, Income> 
 
   @Override
   public Yield map(Income smsResponse, PortfolioHolding holding) {
-    Yield result = new Yield()
-        .setHoldingId(holding.getSecurityIdentifier().getId());
+    final var dividendYieldDp = Optional.ofNullable(smsResponse).map(Income::getDividendYield);
+    final List<DataProvider> providers = dividendYieldDp
+        .map(d -> d.getDataProvider())
+        .map(List::of)
+        .orElseGet(List::of);
 
-    if (smsResponse == null) {
-      return result;
-    }
-
-    Optional.ofNullable(smsResponse.getDividendYield())
-        .ifPresent(dp -> {
-          result.setDividendYield(dp.getValue());
-          Optional.ofNullable(dp.getDataProvider())
-              .ifPresent(provider -> result.setProviders(List.of(provider)));
-        });
-
-    return result;
+    return Yield.builder()
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .dividendYield(dividendYieldDp.map(d -> d.getValue()).orElse(null))
+        .providers(providers)
+        .build();
   }
 }

@@ -262,7 +262,7 @@ class BestWorstPeriodsCalculationServiceImplTest {
     final var holdings = List.of(mock(PortfolioHolding.class));
 
     final var portfolioTotalReturns = mock(NavigableMap.class);
-    final var expected = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    final var expected = new PeriodCalculationInput(portfolioTotalReturns);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
         portfolioTotalReturns);
 

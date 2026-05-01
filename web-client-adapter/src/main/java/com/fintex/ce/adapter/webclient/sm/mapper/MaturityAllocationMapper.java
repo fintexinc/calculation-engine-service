@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.Maturities;
 import com.fintex.wm.commons.domain.allocation.MaturityDurationValue;
 
@@ -33,15 +34,16 @@ public class MaturityAllocationMapper
             MaturityDurationValue::getValue,
             BigDecimal::add));
 
-    MaturityAllocation result = new MaturityAllocation()
-        .setMaturityDurationValues(durationMap)
-        .setHoldingType(holding.getHoldingType())
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(Maturities::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return MaturityAllocation.builder()
+        .maturityDurationValues(durationMap)
+        .holdingType(holding.getHoldingType())
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.value.CountryValue;
 
@@ -23,7 +24,7 @@ public class CountryExposureMapper
 
   @Override
   public CountryExposure map(CountryAllocation smsResponse, PortfolioHolding holding) {
-    Map<String, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
+    final Map<String, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
         .map(CountryAllocation::getAllocation)
         .orElse(List.of())
         .stream()
@@ -33,15 +34,16 @@ public class CountryExposureMapper
             CountryValue::getValue,
             BigDecimal::add));
 
-    CountryExposure result = new CountryExposure()
-        .setAllocations(allocationMap)
-        .setHoldingType(holding.getHoldingType())
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(CountryAllocation::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return CountryExposure.builder()
+        .allocations(allocationMap)
+        .holdingType(holding.getHoldingType())
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

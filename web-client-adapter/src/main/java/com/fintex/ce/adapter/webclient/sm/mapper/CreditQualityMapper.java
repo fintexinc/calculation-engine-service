@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatings;
 
@@ -44,14 +45,15 @@ public class CreditQualityMapper
             (existing, replacement) -> existing,
             () -> new EnumMap<>(CreditQualityRatingType.class)));
 
-    CreditQuality result = new CreditQuality()
-        .setRatings(ratings)
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(CreditQualityRatings::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return CreditQuality.builder()
+        .ratings(ratings)
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

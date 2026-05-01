@@ -57,7 +57,7 @@ public class CorrelationCalculation
             numberOfMonths, e.getValue())));
     return returns.keySet().stream()
         .map(localDateBigDecimalMap -> getCorrelationPeriod(localDateBigDecimalMap, returns, numberOfMonths))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public boolean hasEnoughReturns(int numberOfMonths,
@@ -71,12 +71,14 @@ public class CorrelationCalculation
       return null;
     }
 
-    for (final var dto : correlationPeriodDtoS) {
-      if (!CollectionUtils.isEmpty(dto.getCorrelations())) {
-        dto.getCorrelations().forEach(e -> e.setValue(toUserScale(e.getValue())));
-      }
-    }
-    return correlationPeriodDtoS;
+    return correlationPeriodDtoS.stream()
+        .map(dto -> CollectionUtils.isEmpty(dto.correlations())
+            ? dto
+            : new CorrelationPeriodResult(dto.period(), dto.key(),
+                dto.correlations().stream()
+                    .map(e -> new CorrelationKeyValueResult(e.correlationKey(), toUserScale(e.value())))
+                    .toList()))
+        .toList();
   }
 
   @Override
@@ -84,13 +86,14 @@ public class CorrelationCalculation
     final List<CorrelationPeriodResult> correlationPeriods = periodValues.stream()
         .filter(v -> Objects.nonNull(v.getValue()))
         .flatMap(l -> setPeriod(l.getKey(), l.getValue()).stream())
-        .collect(Collectors.toList());
+        .toList();
     final List<HoldingsKeyResult> holdingsKeys = portfolioBaseTotalReturn.keySet().stream()
         .map(HoldingsKeyResult::buildHoldingsKeyResult)
-        .collect(Collectors.toList());
-    return new CorrelationResult()
-        .setCorrelationPeriods(correlationPeriods)
-        .setHoldingsKey(holdingsKeys);
+        .toList();
+    return CorrelationResult.builder()
+        .correlationPeriods(correlationPeriods)
+        .holdingsKey(holdingsKeys)
+        .build();
   }
 
   /**
@@ -104,7 +107,9 @@ public class CorrelationCalculation
    * @return mapped period.
    */
   public List<CorrelationPeriodResult> setPeriod(final String period, final List<CorrelationPeriodResult> periods) {
-    return periods.stream().map(e -> e.setPeriod(period)).collect(Collectors.toList());
+    return periods.stream()
+        .map(e -> new CorrelationPeriodResult(period, e.key(), e.correlations()))
+        .toList();
   }
 
   /**
@@ -160,12 +165,12 @@ public class CorrelationCalculation
   public CorrelationPeriodResult mapToCorrelationPeriodResult(final PortfolioHolding keyHolding,
       final int numberOfMonths,
       final Map<PortfolioHolding, BigDecimal> correlations) {
-    return new CorrelationPeriodResult()
-        .setPeriod(String.valueOf(numberOfMonths))
-        .setKey(createKey(keyHolding))
-        .setCorrelations(correlations.entrySet().stream()
+    return new CorrelationPeriodResult(
+        String.valueOf(numberOfMonths),
+        createKey(keyHolding),
+        correlations.entrySet().stream()
             .map(c -> new CorrelationKeyValueResult(createKey(c.getKey()), c.getValue()))
-            .collect(Collectors.toList()));
+            .toList());
   }
 
   /**

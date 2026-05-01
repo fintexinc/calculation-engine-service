@@ -57,6 +57,6 @@ public class DistributionOfReturnsServiceImpl
         .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    return new PeriodCalculationInput(portfolioTotalReturns);
   }
 }

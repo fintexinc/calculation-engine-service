@@ -60,18 +60,18 @@ public class EquityCountryExposureCalculationServiceImpl
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (areAllValuesInMapEmpty(exposures)) {
-      EquityCountryExposureResult defaultResult = new EquityCountryExposureResult();
-      defaultResult.setEquityCountryExposure(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return EquityCountryExposureResult.builder()
+          .equityCountryExposure(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
     final Map<CountryRegionType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings, CountryRegionType
         .values());
     final Map<CountryRegionType, BigDecimal> scaledValues = toUserScale(reScaleAbs(netProducts));
-    EquityCountryExposureResult result = new EquityCountryExposureResult();
-    result.setEquityCountryExposure(scaledValues);
-    result.setWarnings(warnings);
-    return result;
+    return EquityCountryExposureResult.builder()
+        .equityCountryExposure(scaledValues)
+        .warnings(warnings)
+        .build();
   }
 
   @Override

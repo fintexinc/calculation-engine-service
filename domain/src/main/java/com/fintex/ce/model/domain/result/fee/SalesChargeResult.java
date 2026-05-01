@@ -10,26 +10,30 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 
 import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalEquals;
 import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalHashCode;
 
+@SuperBuilder
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Schema(description = "Response for sales-charge metric. Contains sales charge breakdown by category.")
 public class SalesChargeResult extends BaseCalculationResult {
 
   @Schema(description = "Sales charge breakdown by category")
+  @Builder.Default
   private Map<SalesChargeCategory, SalesChargeEntry> salesCharges = new EnumMap<>(SalesChargeCategory.class);
 
   public record SalesChargeEntry(BigDecimal allocation, BigDecimal value, Set<SalesChargeHoldingEntry> holdings) {

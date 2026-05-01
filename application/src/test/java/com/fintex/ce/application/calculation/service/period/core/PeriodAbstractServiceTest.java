@@ -104,10 +104,10 @@ class PeriodAbstractServiceTest {
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
 
-    final PeriodCalculationInput expected = new PeriodCalculationInput();
-    expected.setCipsd(req.getCustomIntervalPsd());
-    expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
-
+    final PeriodCalculationInput expected = PeriodCalculationInput.builder()
+        .cipsd(req.getCustomIntervalPsd())
+        .weightedAveragePortfolioReturns(portfolioTotalReturns)
+        .build();
     doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
     final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(req, returnFactorScale);
 
@@ -135,10 +135,10 @@ class PeriodAbstractServiceTest {
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
 
-    final PeriodCalculationInput expected = new PeriodCalculationInput();
-    expected.setCipsd(req.getCustomIntervalPsd());
-    expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
-
+    final PeriodCalculationInput expected = PeriodCalculationInput.builder()
+        .cipsd(req.getCustomIntervalPsd())
+        .weightedAveragePortfolioReturns(portfolioTotalReturns)
+        .build();
     doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
     sut.buildPeriodCalculationInput(req, returnFactorScale);
 
@@ -167,10 +167,10 @@ class PeriodAbstractServiceTest {
     when(monthlyReturnsService.getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed())).thenReturn(
         portfolioTotalReturns);
 
-    final PeriodCalculationInput expected = new PeriodCalculationInput();
-    expected.setCipsd(req.getCustomIntervalPsd());
-    expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
-
+    final PeriodCalculationInput expected = PeriodCalculationInput.builder()
+        .cipsd(req.getCustomIntervalPsd())
+        .weightedAveragePortfolioReturns(portfolioTotalReturns)
+        .build();
     doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
     sut.buildPeriodCalculationInput(req, returnFactorScale);
 

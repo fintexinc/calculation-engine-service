@@ -306,10 +306,10 @@ class RollingCorrelationCalculationServiceImplTest {
 
     final var actual = sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
-    final var expected = new BenchmarkPeriodCalculationInput()
-        .setWeightedAverageBenchmarkReturns(benchmarkTotalReturns)
-        .setWeightedAveragePortfolioReturns(portfolioTotalReturns)
-        .setCipsd(LOCAL_DATE_NOW.plusDays(3));
+    final var expected = new BenchmarkPeriodCalculationInput();
+    expected.setWeightedAverageBenchmarkReturns(benchmarkTotalReturns);
+    expected.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    expected.setCipsd(LOCAL_DATE_NOW.plusDays(3));
 
     assertEquals(expected, actual);
   }

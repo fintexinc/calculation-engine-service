@@ -56,10 +56,10 @@ class CountryExposureCalculationImplTest {
           withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
       final var exposures = mock(Map.class);
-      final var expected = new CountryExposureResult();
-      expected.setCountryExposure(CountryExposureCalculationImpl.DEFAULT_MAP);
-      expected.setWarnings(List.of());
-
+      final var expected = CountryExposureResult.builder()
+          .countryExposure(CountryExposureCalculationImpl.DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(true);
       when(responseMapper.toEmptyResponse(any())).thenReturn(expected);
 

@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxValue;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxes;
@@ -33,15 +34,16 @@ public class FixedIncomeStyleboxExposureMapper
             (existing, replacement) -> existing,
             () -> new EnumMap<>(FixedIncomeStyleBoxType.class)));
 
-    FixedIncomeStyleboxExposure result = new FixedIncomeStyleboxExposure()
-        .setBoxValues(boxValuesMap)
-        .setHoldingType(holding.getHoldingType())
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(FixedIncomeStyleBoxes::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return FixedIncomeStyleboxExposure.builder()
+        .boxValues(boxValuesMap)
+        .holdingType(holding.getHoldingType())
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

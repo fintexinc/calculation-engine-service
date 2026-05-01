@@ -103,13 +103,14 @@ class DistributionOfReturnsCalculationTest {
     final var rollingTotalReturnsCalculation = mock(RollingTotalReturnsCalculation.class);
     final var command = new DistributionOfReturnsCommand();
 
-    final var calculatedMonthlyReturns = new DistributionOfReturnsIntervalResult();
-    final var calculatedAnnualReturns = new DistributionOfReturnsIntervalResult();
+    final var calculatedMonthlyReturns = new DistributionOfReturnsIntervalResult(null, null, 0, null, null);
+    final var calculatedAnnualReturns = new DistributionOfReturnsIntervalResult(null, null, 0, null, null);
 
     sut.rollingTotalReturnsCalculation = rollingTotalReturnsCalculation;
 
     when(sut.rollingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(returns);
-    when(sut.calculateDistributionOfReturnsFor(any(), any())).thenReturn(new DistributionOfReturnsIntervalResult());
+    when(sut.calculateDistributionOfReturnsFor(any(), any())).thenReturn(
+        new DistributionOfReturnsIntervalResult(null, null, 0, null, null));
 
     doCallRealMethod().when(sut).calculate(any());
     sut.calculate(command);
@@ -194,7 +195,7 @@ class DistributionOfReturnsCalculationTest {
       doCallRealMethod().when(sut).calculateDistributionOfReturnsFor(any(), any());
       final DistributionOfReturnsIntervalResult actual = sut.calculateDistributionOfReturnsFor(returns, command);
 
-      assertEquals(expected.getDistributionBin(), actual.getDistributionBin());
+      assertEquals(expected.distributionBin(), actual.distributionBin());
     }
   }
 
@@ -270,7 +271,7 @@ class DistributionOfReturnsCalculationTest {
         returnsBinWidthIncrements);
 
     final var expected = List.of(new DistributionRangeResult(5, TEN, 2L));
-    assertEquals(expected.get(0).getRange(), actual.get(0).getRange());
+    assertEquals(expected.get(0).range(), actual.get(0).range());
   }
 
   @Test
@@ -387,16 +388,18 @@ class DistributionOfReturnsCalculationTest {
     final var sut = mock(DistributionOfReturnsCalculation.class);
     final var returns = getPortfolioTotalReturns();
     final var calculatedMonthlyReturns = new DistributionOfReturnsIntervalResult(ONE, TWO, 10, TWELVE, List.of());
-    final var calculatedAnnualReturns = new DistributionOfReturnsIntervalResult();
+    final var calculatedAnnualReturns = new DistributionOfReturnsIntervalResult(null, null, 0, null, null);
 
     doCallRealMethod().when(sut).initializeResult(any(), any(), any());
     final DistributionOfReturnsResult actual = sut.initializeResult(calculatedMonthlyReturns,
         calculatedAnnualReturns, returns);
 
-    final var expected = new DistributionOfReturnsResult().setMonthlyReturns(calculatedMonthlyReturns).setYearlyReturns(
-        calculatedAnnualReturns);
-    assertEquals(expected.getMonthlyReturns().getDistributionIncrement(), actual.getMonthlyReturns()
-        .getDistributionIncrement());
+    final var expected = DistributionOfReturnsResult.builder()
+        .monthlyReturns(calculatedMonthlyReturns)
+        .yearlyReturns(calculatedAnnualReturns)
+        .build();
+    assertEquals(expected.getMonthlyReturns().distributionIncrement(), actual.getMonthlyReturns()
+        .distributionIncrement());
   }
 
   @Test
@@ -433,7 +436,7 @@ class DistributionOfReturnsCalculationTest {
     final var rangeOfPreviousBin = TEN;
     final List<DistributionRangeResult> rangeResDtoS = List.of(mock(DistributionRangeResult.class), previousBin);
 
-    when(previousBin.getRange()).thenReturn(rangeOfPreviousBin);
+    when(previousBin.range()).thenReturn(rangeOfPreviousBin);
 
     doCallRealMethod().when(sut).calculateFrequencyIfBinIntervalNotEqualsMin(any(), any(), anyList());
     sut.calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeResDtoS);

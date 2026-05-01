@@ -68,8 +68,10 @@ public class GrowthOf10KCalculationServiceImpl implements CalculationService<Ret
         .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns).setWarnings(
-        monthlyReturnsAggregate
-            .getErrorsAsWarnings());
+    return PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(portfolioTotalReturns)
+        .warnings(monthlyReturnsAggregate
+            .getErrorsAsWarnings())
+        .build();
   }
 }

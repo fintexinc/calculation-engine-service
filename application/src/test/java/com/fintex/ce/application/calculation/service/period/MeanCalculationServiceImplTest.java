@@ -81,7 +81,11 @@ class MeanCalculationServiceImplTest {
         .useConstructor(null, Set.of("12", "36", "60", "120")));
     final var req = mock(PeriodCommand.class);
     final var context = mock(PeriodCalculationInput.class);
-    final var expected = new MeanCalculation<>(context, Set.of("12", "36", "60", "120")).setScale(OUTPUT_SCALE);
+    final var expected = MeanCalculation.builder()
+        .input(context)
+        .defaultPeriods(Set.of("12", "36", "60", "120"))
+        .scale(OUTPUT_SCALE)
+        .build();
 
     when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(context);
 

@@ -37,10 +37,10 @@ public class MarRatioCalculation extends PeriodCalculationAbstract<MarRatioResul
     }
     final BigDecimal trailingTRValue = trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
     final MaxDrawdownEntry maxDrawdown = maxDrawdownCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
-    if (Objects.isNull(maxDrawdown.getValue()) || maxDrawdown.getValue().compareTo(BigDecimal.ZERO) == 0) {
+    if (Objects.isNull(maxDrawdown.value()) || maxDrawdown.value().compareTo(BigDecimal.ZERO) == 0) {
       return null;
     }
-    return DecimalUtils.divide(trailingTRValue, abs(maxDrawdown.getValue()));
+    return DecimalUtils.divide(trailingTRValue, abs(maxDrawdown.value()));
   }
 
   @Override

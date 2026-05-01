@@ -13,11 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Accessors(chain = true)
 @Schema(description = "Command for cross-portfolio analysis with multiple portfolios. Supports metric: common-performance-dates")
 public class MultiplePortfoliosCommand extends CalculationCommand implements BenchmarkHoldingsProvider {
   @Schema(description = "Set of portfolios to compare")

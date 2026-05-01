@@ -107,10 +107,10 @@ class EquityMarketCapCalculationServiceImplTest {
           .useConstructor(marketCapFetcher));
 
       final var exposures = mock(Map.class);
-      final var expected = new EquityMarketCapResult();
-      expected.setEquityMarketCapitalization(EquityMarketCapCalculationServiceImpl.DEFAULT_MAP);
-      expected.setWarnings(List.of());
-
+      final var expected = EquityMarketCapResult.builder()
+          .equityMarketCapitalization(EquityMarketCapCalculationServiceImpl.DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(true);
 
       doCallRealMethod().when(service).calculate(any(), any());

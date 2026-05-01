@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationTypeValue;
@@ -33,14 +34,15 @@ public class EquityMarketCapitalizationMapper
             (existing, replacement) -> existing,
             () -> new EnumMap<>(EquityMarketCapitalizationType.class)));
 
-    HoldingEquityMarketCap result = new HoldingEquityMarketCap()
-        .setRatings(ratingsMap)
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(EquityMarketCapitalization::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return HoldingEquityMarketCap.builder()
+        .ratings(ratingsMap)
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

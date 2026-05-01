@@ -5,17 +5,18 @@ import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.Accessors;
-
+import lombok.experimental.SuperBuilder;
+@SuperBuilder
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
 @NoArgsConstructor
-@Accessors(chain = true)
 @Schema(description = "Response for best-worst-periods metric. Contains best and worst performance periods analysis.")
 public class BestWorstPeriodsResult extends BaseCalculationResult {
 

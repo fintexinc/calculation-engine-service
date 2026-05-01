@@ -83,10 +83,10 @@ public class CommonHoldingsServiceImpl
         leaves);
     final List<TopCommonHoldingData> result = toFinalResult(leaves, sortedLeaves);
 
-    TopCommonHoldingsResult response = new TopCommonHoldingsResult();
-    response.setCommonHoldings(result);
-    response.setWarnings(warnings);
-    return response;
+    return TopCommonHoldingsResult.builder()
+        .commonHoldings(result)
+        .warnings(warnings)
+        .build();
   }
 
   /**
@@ -100,7 +100,7 @@ public class CommonHoldingsServiceImpl
    */
   public List<TopCommonHoldingData> toFinalResult(final Map<HoldingAggregator, List<CommonHolding>> leaves,
       final Map<HoldingAggregator, BigDecimal> sortedLeaves) {
-    return sortedLeaves.entrySet().stream().map(e -> mapToFinalResult(leaves, e)).collect(Collectors.toList());
+    return sortedLeaves.entrySet().stream().map(e -> mapToFinalResult(leaves, e)).toList();
   }
 
   /**
@@ -123,14 +123,15 @@ public class CommonHoldingsServiceImpl
         .map(h -> HoldingsKeyResult.buildFromHolding(h, calculateWeightWithinSameLeaves(sameLeaves, h))).collect(
             toSet());
 
-    return new TopCommonHoldingData()
-        .setName(sortedLeafEntry.getKey().getNameOrCompanyName())
-        .setAllocation(toUserScale(sortedLeafEntry.getValue()))
-        .setTicker(leaf.getTicker())
-        .setExchangeCode(leaf.getExchangeCode())
-        .setHoldingType(leaf.getType())
-        .setNumOfFunds(parentHoldings.size())
-        .setParentHolding(parents);
+    return TopCommonHoldingData.builder()
+        .name(sortedLeafEntry.getKey().getNameOrCompanyName())
+        .allocation(toUserScale(sortedLeafEntry.getValue()))
+        .ticker(leaf.getTicker())
+        .exchangeCode(leaf.getExchangeCode())
+        .holdingType(leaf.getType())
+        .numOfFunds(parentHoldings.size())
+        .parentHolding(parents)
+        .build();
   }
 
   /**
@@ -332,14 +333,16 @@ public class CommonHoldingsServiceImpl
       final PortfolioHolding parent,
       final CommonHolding child) {
     if (isLeafStock(parent, child)) {
-      return child.setHolding(parent).setWeight(toUserScale(child.getValue()));
+      child.setHolding(parent);
+      child.setWeight(toUserScale(child.getValue()));
+      return child;
     }
     final BigDecimal parentWeight = allocations.get(parent);
     final BigDecimal childInitWeight = Optional.ofNullable(child.getValue()).orElse(ZERO);
     final BigDecimal childWeight = parentWeight.multiply(childInitWeight);
-    return child
-        .setHolding(parent)
-        .setWeight(toUserScale(childWeight));
+    child.setHolding(parent);
+    child.setWeight(toUserScale(childWeight));
+    return child;
   }
 
   boolean isLeafStock(final PortfolioHolding parent, final CommonHolding child) {
@@ -366,9 +369,9 @@ public class CommonHoldingsServiceImpl
       final CommonHolding child) {
     final BigDecimal childInitWeight = Optional.ofNullable(child.getValue()).orElse(ZERO);
     final BigDecimal childWeight = firstLvlParent.getWeight().multiply(childInitWeight);
-    return child
-        .setHolding(firstLvlParent.getHolding())
-        .setWeight(toUserScale(childWeight));
+    child.setHolding(firstLvlParent.getHolding());
+    child.setWeight(toUserScale(childWeight));
+    return child;
   }
 
   private Map<PortfolioHolding, List<CommonHolding>> mapToCommonHoldingsDtos(

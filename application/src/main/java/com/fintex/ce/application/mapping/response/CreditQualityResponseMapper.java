@@ -29,10 +29,10 @@ public class CreditQualityResponseMapper implements ResponseMapper<CreditQuality
   @Override
   public CreditQualityResult toResponse(CreditQuality domain) {
     if (domain == null || domain.getRatings() == null) {
-      CreditQualityResult defaultResult = new CreditQualityResult();
-      defaultResult.setCreditQuality(DEFAULT_MAP);
-      defaultResult.setWarnings(List.of());
-      return defaultResult;
+      return CreditQualityResult.builder()
+          .creditQuality(DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
     }
     // Direct mapping not supported - need portfolio aggregation
     throw new UnsupportedOperationException("Use portfolio-level aggregation for CreditQuality");
@@ -50,19 +50,19 @@ public class CreditQualityResponseMapper implements ResponseMapper<CreditQuality
    */
   public CreditQualityResult fromCalculatedValues(Map<FixedIncomeCreditQuality, BigDecimal> creditQuality,
       List<Warning> warnings) {
-    CreditQualityResult result = new CreditQualityResult();
-    result.setCreditQuality(toUserScale(creditQuality));
-    result.setWarnings(warnings);
-    return result;
+    return CreditQualityResult.builder()
+        .creditQuality(toUserScale(creditQuality))
+        .warnings(warnings)
+        .build();
   }
 
   /**
    * Creates empty/default response with warnings.
    */
   public CreditQualityResult toEmptyResponse(List<Warning> warnings) {
-    CreditQualityResult result = new CreditQualityResult();
-    result.setCreditQuality(DEFAULT_MAP);
-    result.setWarnings(warnings);
-    return result;
+    return CreditQualityResult.builder()
+        .creditQuality(DEFAULT_MAP)
+        .warnings(warnings)
+        .build();
   }
 }

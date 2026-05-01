@@ -216,8 +216,8 @@ class RollingAbstractCalculationTest {
     doCallRealMethod().when(sut).getRollingIntervalResults(anySet());
     final Set<RollingIntervalResult> actual = sut.getRollingIntervalResults(result);
 
-    assertEquals("12", actual.stream().findFirst().get().getPeriod());
-    assertEquals(intervalRestDtos, actual.stream().findFirst().get().getValues());
+    assertEquals("12", actual.stream().findFirst().get().period());
+    assertEquals(intervalRestDtos, actual.stream().findFirst().get().values());
   }
 
   @Test
@@ -245,8 +245,8 @@ class RollingAbstractCalculationTest {
     doCallRealMethod().when(sut).mapRollingReturn(any());
     final Set<IntervalResult> actual = sut.mapRollingReturn(result);
 
-    assertEquals(NOW.plusMonths(1), actual.stream().findFirst().get().getKey());
-    assertEquals(ONE, actual.stream().findFirst().get().getValue());
+    assertEquals(NOW.plusMonths(1), actual.stream().findFirst().get().key());
+    assertEquals(ONE, actual.stream().findFirst().get().value());
   }
 
   @AfterAll

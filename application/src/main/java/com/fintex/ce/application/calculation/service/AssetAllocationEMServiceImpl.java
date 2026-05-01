@@ -72,10 +72,10 @@ public class AssetAllocationEMServiceImpl
     var warnings = new ArrayList<>(exposureData.warnings());
     final Map<AssetAllocationRegionEmType, BigDecimal> result = calculateNetProducts(exposures, holdings,
         AssetAllocationRegionEmType.values());
-    AssetAllocationEMResult emResult = new AssetAllocationEMResult();
-    emResult.setAssetAllocationEmergingMarkets(DecimalUtils.toUserScale(result));
-    emResult.setWarnings(warnings);
-    return emResult;
+    return AssetAllocationEMResult.builder()
+        .assetAllocationEmergingMarkets(DecimalUtils.toUserScale(result))
+        .warnings(warnings)
+        .build();
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings.CommonTopHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.holding.Holding;
 import com.fintex.wm.commons.domain.holding.SecurityHolding;
@@ -15,8 +16,6 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 /**
  * Maps SM TopHoldings response to PCE CommonTopHoldings domain model.
  */
@@ -30,31 +29,32 @@ public class TopHoldingsMapper implements SecurityMasterResponseMapper<CommonTop
         .orElse(List.of())
         .stream()
         .map(this::toCommonTopHolding)
-        .collect(Collectors.toList());
+        .toList();
 
-    CommonTopHoldings result = new CommonTopHoldings()
-        .setHoldings(holdings)
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(TopHoldings::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return CommonTopHoldings.builder()
+        .holdings(holdings)
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 
   private CommonTopHolding toCommonTopHolding(SecurityHolding sh) {
-    CommonTopHolding th = new CommonTopHolding();
-    th.setName(extractEnglishName(sh.getName()));
-    th.setCompanyName(sh.getCompanyName());
-    th.setType(sh.getType());
-    th.setValue(sh.getMarketValue());
-    th.setWeight(sh.getWeighting());
-    th.setIdentifiers(Optional.ofNullable(sh.getIdentifiers())
-        .map(IdentifiersDatapoint::getIdentifiers)
-        .orElse(List.of()));
-    th.setUnderlyingHoldings(mapUnderlyingHoldings(sh.getUnderlyingHoldings()));
-    return th;
+    return CommonTopHolding.builder()
+        .name(extractEnglishName(sh.getName()))
+        .companyName(sh.getCompanyName())
+        .type(sh.getType())
+        .value(sh.getMarketValue())
+        .weight(sh.getWeighting())
+        .identifiers(Optional.ofNullable(sh.getIdentifiers())
+            .map(IdentifiersDatapoint::getIdentifiers)
+            .orElse(List.of()))
+        .underlyingHoldings(mapUnderlyingHoldings(sh.getUnderlyingHoldings()))
+        .build();
   }
 
   private List<CommonTopHolding> mapUnderlyingHoldings(List<Holding> underlyingHoldings) {

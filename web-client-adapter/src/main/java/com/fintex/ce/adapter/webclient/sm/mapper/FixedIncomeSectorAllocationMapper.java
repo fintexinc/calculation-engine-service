@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeNameValue;
@@ -54,15 +55,16 @@ public class FixedIncomeSectorAllocationMapper
             FixedIncomeSectorAllocationTypeNameValue::getValue,
             BigDecimal::add));
 
-    FixedIncomeBondSecurities result = new FixedIncomeBondSecurities()
-        .setFixedIncomeBondSectors(allocationMap)
-        .setHoldingType(holding.getHoldingType())
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(FixedIncomeSectorAllocation::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return FixedIncomeBondSecurities.builder()
+        .fixedIncomeBondSectors(allocationMap)
+        .holdingType(holding.getHoldingType())
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

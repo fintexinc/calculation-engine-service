@@ -29,15 +29,15 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
   @Override
   public EquitySectorResult toResponse(EquitySector domain) {
     if (domain == null || domain.getAllocations() == null) {
-      EquitySectorResult defaultResult = new EquitySectorResult();
-      defaultResult.setEquitySector(DEFAULT_MAP);
-      defaultResult.setWarnings(List.of());
-      return defaultResult;
+      return EquitySectorResult.builder()
+          .equitySector(DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
     }
-    EquitySectorResult result = new EquitySectorResult();
-    result.setEquitySector(toUserScale(domain.getAllocations()));
-    result.setWarnings(List.of());
-    return result;
+    return EquitySectorResult.builder()
+        .equitySector(toUserScale(domain.getAllocations()))
+        .warnings(List.of())
+        .build();
   }
 
   @Override
@@ -48,22 +48,22 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
   public EquitySectorResult fromNetProducts(Map<EquitySectorAllocationType, BigDecimal> netProducts,
       List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
-      EquitySectorResult defaultResult = new EquitySectorResult();
-      defaultResult.setEquitySector(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return EquitySectorResult.builder()
+          .equitySector(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
-    EquitySectorResult result = new EquitySectorResult();
-    result.setEquitySector(toUserScale(netProducts));
-    result.setWarnings(warnings);
-    return result;
+    return EquitySectorResult.builder()
+        .equitySector(toUserScale(netProducts))
+        .warnings(warnings)
+        .build();
   }
 
   public EquitySectorResult toEmptyResponse(List<Warning> warnings) {
-    EquitySectorResult result = new EquitySectorResult();
-    result.setEquitySector(DEFAULT_MAP);
-    result.setWarnings(warnings);
-    return result;
+    return EquitySectorResult.builder()
+        .equitySector(DEFAULT_MAP)
+        .warnings(warnings)
+        .build();
   }
 
 }

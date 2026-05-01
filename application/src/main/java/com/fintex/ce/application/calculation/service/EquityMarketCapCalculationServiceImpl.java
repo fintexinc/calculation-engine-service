@@ -86,19 +86,19 @@ public class EquityMarketCapCalculationServiceImpl
     var exposures = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
-      EquityMarketCapResult defaultResult = new EquityMarketCapResult();
-      defaultResult.setEquityMarketCapitalization(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return EquityMarketCapResult.builder()
+          .equityMarketCapitalization(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
     final Map<EquityMarketCapitalizationType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
         EquityMarketCapitalizationType.values());
     final Map<EquityMarketCapitalizationType, BigDecimal> reScaled = toUserScale(groupedResults(reScaleAbs(
         netProducts)));
-    EquityMarketCapResult result = new EquityMarketCapResult();
-    result.setEquityMarketCapitalization(reScaled);
-    result.setWarnings(warnings);
-    return result;
+    return EquityMarketCapResult.builder()
+        .equityMarketCapitalization(reScaled)
+        .warnings(warnings)
+        .build();
   }
 
   Map<EquityMarketCapitalizationType, BigDecimal> groupedResults(

@@ -170,7 +170,7 @@ class MarRatioCalculationTest {
         withSettings().useConstructor(mock(PeriodCalculationInput.class), Set.of(), trailingTotalReturnsCalculation,
             maxDrawdownCalculation));
 
-    final MaxDrawdownEntry maxDrawdown = new MaxDrawdownEntry().setValue(ZERO);
+    final MaxDrawdownEntry maxDrawdown = new MaxDrawdownEntry(null, ZERO, null, null, null);
     when(maxDrawdownCalculation.calculatePeriodForNumberOfMonths(12)).thenReturn(maxDrawdown);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
@@ -188,7 +188,7 @@ class MarRatioCalculationTest {
         withSettings().useConstructor(mock(PeriodCalculationInput.class), Set.of(), trailingTotalReturnsCalculation,
             maxDrawdownCalculation));
 
-    final MaxDrawdownEntry maxDrawdown = new MaxDrawdownEntry().setValue(null);
+    final MaxDrawdownEntry maxDrawdown = new MaxDrawdownEntry(null, null, null, null, null);
     when(maxDrawdownCalculation.calculatePeriodForNumberOfMonths(12)).thenReturn(maxDrawdown);
 
     doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());

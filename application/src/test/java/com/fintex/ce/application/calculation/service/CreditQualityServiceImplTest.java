@@ -205,9 +205,10 @@ class CreditQualityServiceImplTest {
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
 
     final Map<FixedIncomeCreditQuality, BigDecimal> map = Map.of(HIGH_YIELD, ONE);
-    final CreditQualityResult expected = new CreditQualityResult();
-    expected.setCreditQuality(map);
-    expected.setWarnings(List.of());
+    final CreditQualityResult expected = CreditQualityResult.builder()
+        .creditQuality(map)
+        .warnings(List.of())
+        .build();
     when(responseMapper.fromCalculatedValues(any(), anyList())).thenReturn(expected);
 
     doCallRealMethod().when(sut).perform(any());

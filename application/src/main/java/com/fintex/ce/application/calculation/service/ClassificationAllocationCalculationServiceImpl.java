@@ -78,19 +78,19 @@ public class ClassificationAllocationCalculationServiceImpl
     var warnings = new ArrayList<>(exposureData.warnings());
 
     if (PortfolioUtils.areAllValuesZerosInMap(exposures)) {
-      ClassificationAllocationResult defaultResult = new ClassificationAllocationResult();
-      defaultResult.setClassificationAllocation(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return ClassificationAllocationResult.builder()
+          .classificationAllocation(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
 
     final Map<ClassificationAllocationType, BigDecimal> netProducts = calculateNetProducts(
         exposures, holdings, ClassificationAllocationType.values());
     final Map<ClassificationAllocationType, BigDecimal> scaledValues = toUserScale(reScale(netProducts));
-    ClassificationAllocationResult result = new ClassificationAllocationResult();
-    result.setClassificationAllocation(scaledValues);
-    result.setWarnings(warnings);
-    return result;
+    return ClassificationAllocationResult.builder()
+        .classificationAllocation(scaledValues)
+        .warnings(warnings)
+        .build();
   }
 
   @Override

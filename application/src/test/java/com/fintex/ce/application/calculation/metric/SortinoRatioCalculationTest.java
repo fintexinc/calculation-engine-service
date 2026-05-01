@@ -199,9 +199,11 @@ class SortinoRatioCalculationTest {
   @Test
   void shouldGetDownsideDeviation_whenCheckResult() {
     final var downsideDeviationCalculation = mock(DownsideDeviationCalculation.class);
-    final var context = new PeriodCalculationInput().setWeightedAveragePortfolioReturns(new TreeMap<>(Map.of(
-        LocalDate
-            .now(), TEN)));
+    final var context = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(new TreeMap<>(Map.of(
+            LocalDate
+                .now(), TEN)))
+        .build();
     final var sut = mock(SortinoRatioCalculation.class, withSettings()
         .useConstructor(context, Set.of(), new TreeMap<>(Map.of(LocalDate.now(), TEN)),
             downsideDeviationCalculation));

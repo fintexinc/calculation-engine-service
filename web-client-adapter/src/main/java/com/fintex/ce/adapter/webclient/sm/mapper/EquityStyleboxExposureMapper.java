@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.rating.StyleBoxType;
 import com.fintex.wm.commons.domain.rating.StyleBoxValue;
 import com.fintex.wm.commons.domain.rating.StyleBoxes;
@@ -35,15 +36,16 @@ public class EquityStyleboxExposureMapper
             StyleBoxValue::getValue,
             BigDecimal::add));
 
-    EquityStyleboxExposure result = new EquityStyleboxExposure()
-        .setBoxValues(boxValues)
-        .setHoldingType(holding.getHoldingType())
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(StyleBoxes::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return EquityStyleboxExposure.builder()
+        .boxValues(boxValues)
+        .holdingType(holding.getHoldingType())
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

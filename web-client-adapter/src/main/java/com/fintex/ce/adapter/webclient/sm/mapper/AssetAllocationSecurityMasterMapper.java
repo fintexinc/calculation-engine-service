@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
 import com.fintex.wm.commons.domain.value.NameValue;
 
@@ -30,15 +31,16 @@ public class AssetAllocationSecurityMasterMapper
         .stream()
         .collect(Collectors.toMap(NameValue::getName, NameValue::getValue));
 
-    HoldingAssetAllocation result = new HoldingAssetAllocation()
-        .setHoldingType(holding.getHoldingType())
-        .setAllocations(allocationMap)
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(AssetAllocation::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return HoldingAssetAllocation.builder()
+        .holdingType(holding.getHoldingType())
+        .allocations(allocationMap)
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

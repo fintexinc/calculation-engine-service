@@ -131,19 +131,48 @@ Where it's possible you can combine hierarchical test classes with implementatio
 
 **Do NOT duplicate near-identical tests or tests with the same pattern (boilerplate).** it is a key rule.
 
-### 1.5 Use `@Accessors(chain = true)` for test data setup
+### 1.5 Constructing test data
 
-When building Result/Command objects in tests, use fluent setters via `@Accessors(chain = true)`. These classes already
-have this annotation — use the chaining style for cleaner test data construction.
+Prefer immutable construction. Avoid setter-based construction in tests — it leaks mutability into fixtures and fights
+record/builder semantics. In order of preference:
 
-```java
-var result = new CalculationResult()
-    .setValue(BigDecimal.TEN)
-    .setCurrency("USD");
-```
+1. **Records** — pass every field via the canonical constructor; use `null` for the ones you don't care about:
 
-**Gotcha:** Lombok `@Accessors(chain = true)` on a parent class generates setters returning the parent type, which
-breaks fluent chains in subclasses. If you encounter this, apply `@Accessors(chain = true)` on each class individually.
+   ```java
+   var result = new TimeIntervalResult("12M", BigDecimal.TEN);
+   var partial = new MaxDrawdownEntry("12", BigDecimal.ZERO, null, null, null);
+   ```
+
+2. **Single-field constructor** — when a class has a `@AllArgsConstructor` with one local field, or a hand-written
+   single-field overload for the dominant construction case, call it directly instead of going through the builder:
+
+   ```java
+   return new SalesChargeResult(map);
+   return new PeriodCalculationInput(weightedAveragePortfolioReturns);
+   ```
+
+3. **Static factory method** — when several fields share the same type so multiple single-arg constructors would
+   collide, use a named factory (`ofX(...)`) instead. The name documents which field is being set:
+
+   ```java
+   AverageManagementExpenseCalculation.ofMarketValue(BigDecimal.TEN);
+   AverageManagementExpenseCalculation.ofActualManagementFee(BigDecimal.TEN);
+   ```
+
+4. **Builder** (`@Builder` / `@SuperBuilder`) — for multi-field cases. Set inherited fields in the same chain;
+   `BaseCalculationData` and `BaseCalculationResult` are `@SuperBuilder`, so `holdingId`, `providers`, `warnings`, etc.
+   are all reachable from the builder. Do not mix builder calls with post-build setters:
+
+   ```java
+   var data = HoldingAssetAllocation.builder()
+       .holdingType(ETF_US)
+       .allocations(map)
+       .holdingId("X")
+       .build();
+   ```
+
+**Mocks** — when verifying a flow that mutates fields via setters, use a real instance instead of a mock so the setters
+actually take effect; otherwise `actual.getX()` returns null/default and assertions fail.
 
 ### 1.6 Libraries and style
 

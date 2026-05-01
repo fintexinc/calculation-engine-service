@@ -65,9 +65,10 @@ class HoldingsFetcherTest extends AbstractSecurityMasterFetcherTest<CommonTopHol
     ch.setWeight(new BigDecimal("10.5"));
     ch.setValue(new BigDecimal("1000000"));
 
-    return new CommonTopHoldings()
-        .setHoldings(List.of(ch))
-        .setHoldingId(holdingId);
+    return CommonTopHoldings.builder()
+        .holdings(List.of(ch))
+        .holdingId(holdingId)
+        .build();
   }
 
   @Override

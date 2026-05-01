@@ -17,11 +17,8 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
-
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "Base command for portfolio-based calculations with holdings and optional benchmark")
 public abstract class PortfolioCommand extends CalculationCommand

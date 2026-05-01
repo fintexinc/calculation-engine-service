@@ -11,43 +11,25 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HoldingsKeyResult {
-
-  private FinancialInstrumentType type;
-  private SecurityIdentifier securityIdentifier;
-  private String key;
-  private BigDecimal allocation;
-  private String name;
-  private Currency currency;
+public record HoldingsKeyResult(
+    FinancialInstrumentType type,
+    SecurityIdentifier securityIdentifier,
+    String key,
+    BigDecimal allocation,
+    String name,
+    Currency currency) {
 
   public static HoldingsKeyResult buildHoldingsKeyResult(final PortfolioHolding holding) {
     return buildFromHolding(holding, null);
   }
 
   public static HoldingsKeyResult buildFromHolding(final PortfolioHolding holding, final BigDecimal allocation) {
-    HoldingsKeyResult result = new HoldingsKeyResult();
-    result.setType(holding.getHoldingType());
-    result.setSecurityIdentifier(holding.getSecurityIdentifier());
-
-    if (FinancialInstrumentType.CASH.equals(holding.getHoldingType())) {
-      result.setCurrency(((CashHolding) holding).getCurrency());
-    } else if (FinancialInstrumentType.GIC.equals(holding.getHoldingType())) {
-      result.setName(((GicHolding) holding).getName());
-    }
-
-    result.setKey(createKey(holding));
-    result.setAllocation(allocation);
-    return result;
+    final FinancialInstrumentType type = holding.getHoldingType();
+    final Currency currency = FinancialInstrumentType.CASH.equals(type) ? ((CashHolding) holding).getCurrency() : null;
+    final String name = FinancialInstrumentType.GIC.equals(type) ? ((GicHolding) holding).getName() : null;
+    return new HoldingsKeyResult(type, holding.getSecurityIdentifier(), createKey(holding), allocation, name, currency);
   }
 
   private static String createKey(final PortfolioHolding holding) {

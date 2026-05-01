@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.value.CountryValue;
 
@@ -29,14 +30,15 @@ public class EquityCountryAllocationMapper
         .stream()
         .collect(Collectors.toMap(CountryValue::getIsoCode, CountryValue::getValue));
 
-    EquityCountryAllocation result = new EquityCountryAllocation()
-        .setAllocations(allocationMap)
-        .setHoldingId(holding.getSecurityIdentifier().getId());
-
-    Optional.ofNullable(smsResponse)
+    final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(CountryAllocation::getDataProvider)
-        .ifPresent(dp -> result.setProviders(List.of(dp)));
+        .map(List::of)
+        .orElseGet(List::of);
 
-    return result;
+    return EquityCountryAllocation.builder()
+        .allocations(allocationMap)
+        .holdingId(holding.getSecurityIdentifier().getId())
+        .providers(providers)
+        .build();
   }
 }

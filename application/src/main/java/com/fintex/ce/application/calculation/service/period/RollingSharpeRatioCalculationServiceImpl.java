@@ -70,7 +70,7 @@ public class RollingSharpeRatioCalculationServiceImpl
         .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
             .getCustomPed());
 
-    return new PeriodCalculationInput().setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    return new PeriodCalculationInput(portfolioTotalReturns);
   }
 
 }

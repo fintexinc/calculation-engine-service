@@ -35,15 +35,15 @@ public class FixedIncomeStyleboxExposureResponseMapper
   @Override
   public FixedIncomeStyleboxExposureResult toResponse(FixedIncomeStyleboxExposure domain) {
     if (domain == null || domain.getBoxValues() == null) {
-      FixedIncomeStyleboxExposureResult defaultResult = new FixedIncomeStyleboxExposureResult();
-      defaultResult.setFixedIncomeStyleboxExposure(DEFAULT_MAP);
-      defaultResult.setWarnings(List.of());
-      return defaultResult;
+      return FixedIncomeStyleboxExposureResult.builder()
+          .fixedIncomeStyleboxExposure(DEFAULT_MAP)
+          .warnings(List.of())
+          .build();
     }
-    FixedIncomeStyleboxExposureResult result = new FixedIncomeStyleboxExposureResult();
-    result.setFixedIncomeStyleboxExposure(toUserScale(domain.getBoxValues()));
-    result.setWarnings(List.of());
-    return result;
+    return FixedIncomeStyleboxExposureResult.builder()
+        .fixedIncomeStyleboxExposure(toUserScale(domain.getBoxValues()))
+        .warnings(List.of())
+        .build();
   }
 
   @Override
@@ -66,15 +66,15 @@ public class FixedIncomeStyleboxExposureResponseMapper
   public FixedIncomeStyleboxExposureResult fromNetProducts(Map<FixedIncomeStyleBoxType, BigDecimal> netProducts,
       List<Warning> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
-      FixedIncomeStyleboxExposureResult defaultResult = new FixedIncomeStyleboxExposureResult();
-      defaultResult.setFixedIncomeStyleboxExposure(DEFAULT_MAP);
-      defaultResult.setWarnings(warnings);
-      return defaultResult;
+      return FixedIncomeStyleboxExposureResult.builder()
+          .fixedIncomeStyleboxExposure(DEFAULT_MAP)
+          .warnings(warnings)
+          .build();
     }
-    FixedIncomeStyleboxExposureResult result = new FixedIncomeStyleboxExposureResult();
-    result.setFixedIncomeStyleboxExposure(toUserScale(netProducts));
-    result.setWarnings(warnings);
-    return result;
+    return FixedIncomeStyleboxExposureResult.builder()
+        .fixedIncomeStyleboxExposure(toUserScale(netProducts))
+        .warnings(warnings)
+        .build();
   }
 
   /**
@@ -85,9 +85,9 @@ public class FixedIncomeStyleboxExposureResponseMapper
    * @return response with default (null) values for all stylebox types
    */
   public FixedIncomeStyleboxExposureResult toEmptyResponse(List<Warning> warnings) {
-    FixedIncomeStyleboxExposureResult result = new FixedIncomeStyleboxExposureResult();
-    result.setFixedIncomeStyleboxExposure(DEFAULT_MAP);
-    result.setWarnings(warnings);
-    return result;
+    return FixedIncomeStyleboxExposureResult.builder()
+        .fixedIncomeStyleboxExposure(DEFAULT_MAP)
+        .warnings(warnings)
+        .build();
   }
 }

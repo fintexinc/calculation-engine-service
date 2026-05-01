@@ -238,9 +238,7 @@ class ManagementFeeCalculationServiceImplTest {
 
     final var parameterTypes = List.of(ABSOLUTE, SCALED);
     final var averageMerCalculationDtoMap = getCalculationDtoMap();
-    final var expected = new ManagementFeeResult();
-    expected.setManagementFee(Map.of(SCALED, TEN, ABSOLUTE, ONE));
-
+    final var expected = new ManagementFeeResult(Map.of(SCALED, TEN, ABSOLUTE, ONE));
     when(sut.getAbsoluteAverageMer(averageMerCalculationDtoMap)).thenReturn(ONE);
     when(sut.getScaledAverageMer(averageMerCalculationDtoMap)).thenReturn(TEN);
 
@@ -289,19 +287,18 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   private Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> getCalculationDtoMap() {
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto1 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDto1.setMarketValue(new BigDecimal("10"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto2 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDto2.setMarketValue(new BigDecimal("20"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto3 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDto3.setMarketValue(new BigDecimal("30"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto4 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDto4.setMarketValue(new BigDecimal("40"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto5 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDto5.setMarketValue(new BigDecimal("50"));
-    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto6 = new AverageManagementExpenseCalculation();
-    averageManagementExpenseCalculationDto6.setMarketValue(new BigDecimal("60"));
-
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto1 = AverageManagementExpenseCalculation
+        .ofMarketValue(new BigDecimal("10"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto2 = AverageManagementExpenseCalculation
+        .ofMarketValue(new BigDecimal("20"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto3 = AverageManagementExpenseCalculation
+        .ofMarketValue(new BigDecimal("30"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto4 = AverageManagementExpenseCalculation
+        .ofMarketValue(new BigDecimal("40"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto5 = AverageManagementExpenseCalculation
+        .ofMarketValue(new BigDecimal("50"));
+    final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto6 = AverageManagementExpenseCalculation
+        .ofMarketValue(new BigDecimal("60"));
     return Map.of(MUTUAL_FUND_CANADA, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDto1),
         ETF_US, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDto2),
         ETF_CANADA, Map.of(mock(PortfolioHolding.class), averageManagementExpenseCalculationDto3),
@@ -316,8 +313,7 @@ class ManagementFeeCalculationServiceImplTest {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var holding = new PortfolioHolding(null, null, null);
-    var averageCalculation = new AverageManagementExpenseCalculation();
-    averageCalculation.setActualManagementFee(null);
+    var averageCalculation = AverageManagementExpenseCalculation.ofActualManagementFee(null);
     var expected = MISSING_MANAGEMENT_FEE.toExceptionForHolding(holding);
 
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
@@ -337,9 +333,7 @@ class ManagementFeeCalculationServiceImplTest {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var holding = new PortfolioHolding(null, null, null);
-    var averageCalculation = new AverageManagementExpenseCalculation();
-    averageCalculation.setActualManagementFee(null);
-
+    var averageCalculation = AverageManagementExpenseCalculation.ofActualManagementFee(null);
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(FinancialInstrumentType.STOCK_US, Map.of(holding, averageCalculation));
 
@@ -357,9 +351,7 @@ class ManagementFeeCalculationServiceImplTest {
     // SETUP
     var sut = mock(ManagementFeeCalculationServiceImpl.class);
     var holding = new PortfolioHolding(null, null, null);
-    var averageCalculation = new AverageManagementExpenseCalculation();
-    averageCalculation.setActualManagementFee(TEN);
-
+    var averageCalculation = AverageManagementExpenseCalculation.ofActualManagementFee(TEN);
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(ETF_US, Map.of(holding, averageCalculation));
 

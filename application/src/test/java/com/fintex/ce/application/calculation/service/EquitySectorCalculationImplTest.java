@@ -120,10 +120,10 @@ class EquitySectorCalculationImplTest {
 
       @SuppressWarnings("unchecked")
       final var exposures = mock(Map.class);
-      final var expected = new EquitySectorResult();
-      expected.setEquitySector(Map.of());
-      expected.setWarnings(List.of());
-
+      final var expected = EquitySectorResult.builder()
+          .equitySector(Map.of())
+          .warnings(List.of())
+          .build();
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(true);
       when(responseMapper.toEmptyResponse(any())).thenReturn(expected);
 

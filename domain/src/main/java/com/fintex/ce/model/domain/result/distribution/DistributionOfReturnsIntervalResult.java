@@ -2,20 +2,11 @@ package com.fintex.ce.model.domain.result.distribution;
 
 import java.math.BigDecimal;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Accessors(chain = true)
-public class DistributionOfReturnsIntervalResult {
-
-  private BigDecimal distributionMin;
-  private BigDecimal distributionMax;
-  private int distributionBin;
-  private BigDecimal distributionIncrement;
-  private List<DistributionRangeResult> distributionRange;
+public record DistributionOfReturnsIntervalResult(
+    BigDecimal distributionMin,
+    BigDecimal distributionMax,
+    int distributionBin,
+    BigDecimal distributionIncrement,
+    List<DistributionRangeResult> distributionRange) {
 }

@@ -6,29 +6,24 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.Accessors;
-
+import lombok.experimental.SuperBuilder;
 @Data
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@NoArgsConstructor
-@Accessors(chain = true)
 public class CommonTopHoldings extends BaseCalculationData<CommonTopHoldings> {
 
   private List<CommonTopHolding> holdings;
 
-  // For compatibility with R* serialization format
-  private String holdingsJson;
-
-  public CommonTopHoldings(String holdingsJson) {
-    this.holdingsJson = holdingsJson;
-  }
-
   @Data
+  @Builder
   @AllArgsConstructor
   @NoArgsConstructor
   public static class CommonTopHolding {

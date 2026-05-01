@@ -13,13 +13,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.AbstractMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
@@ -270,11 +270,11 @@ class MaxDrawdownCalculationTest {
 
     final MaxDrawdownEntry maxDrawDown = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    assertEquals(String.valueOf(TWELVE), maxDrawDown.getPeriod());
-    assertNull(maxDrawDown.getDrawdownTroughDate());
-    assertNull(maxDrawDown.getDrawdownStartDate());
-    assertNull(maxDrawDown.getRecoveryTime());
-    assertNull(maxDrawDown.getValue());
+    assertEquals(String.valueOf(TWELVE), maxDrawDown.period());
+    assertNull(maxDrawDown.drawdownTroughDate());
+    assertNull(maxDrawDown.drawdownStartDate());
+    assertNull(maxDrawDown.recoveryTime());
+    assertNull(maxDrawDown.value());
   }
 
   @Test
@@ -300,23 +300,27 @@ class MaxDrawdownCalculationTest {
 
     final MaxDrawdownEntry maxDrawDown = sut.calculatePeriodForNumberOfMonths(TWELVE);
 
-    assertEquals(String.valueOf(TWELVE), maxDrawDown.getPeriod());
-    assertNull(maxDrawDown.getDrawdownTroughDate());
-    assertNull(maxDrawDown.getDrawdownStartDate());
-    assertNull(maxDrawDown.getRecoveryTime());
-    assertNull(maxDrawDown.getValue());
+    assertEquals(String.valueOf(TWELVE), maxDrawDown.period());
+    assertNull(maxDrawDown.drawdownTroughDate());
+    assertNull(maxDrawDown.drawdownStartDate());
+    assertNull(maxDrawDown.recoveryTime());
+    assertNull(maxDrawDown.value());
   }
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var sut = mock(MaxDrawdownCalculation.class);
-    final var pairs = Set.of(Pair.of("12", new MaxDrawdownEntry()), Pair.of("22", new MaxDrawdownEntry()));
-    final var expected = pairs.stream().map(Pair::getValue).collect(Collectors.toList());
+    final var pairs = Set.of(
+        Pair.of("12", new MaxDrawdownEntry(null, null, null, null, null)),
+        Pair.of("22", new MaxDrawdownEntry(null, null, null, null, null)));
+    final var expected = pairs.stream()
+        .map(p -> new MaxDrawdownEntry(p.getKey(), null, null, null, null))
+        .toList();
 
     doCallRealMethod().when(sut).defineResponseType(anySet());
     final MaxDrawdownResult actual = sut.defineResponseType(pairs);
 
-    assertEquals(expected, actual.getMaxDrawdown());
+    assertEquals(new HashSet<>(expected), new HashSet<>(actual.getMaxDrawdown()));
   }
 
   @Test
