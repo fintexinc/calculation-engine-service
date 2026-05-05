@@ -19,6 +19,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +41,8 @@ abstract class AbstractPortfolioCalculationE2ETest {
 
   private static MockWebServer smsMockServer;
 
+  protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
   @Autowired
   protected WebTestClient webTestClient;
 
@@ -53,6 +59,30 @@ abstract class AbstractPortfolioCalculationE2ETest {
   protected abstract void assertPositiveResponseBody(String responseBody);
 
   private record HttpResponse(HttpStatusCode status, String responseBody) {
+  }
+
+  protected static String writeJson(Object value) {
+    try {
+      return OBJECT_MAPPER.writeValueAsString(value);
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  protected static JsonNode parseJson(String body) {
+    try {
+      return OBJECT_MAPPER.readTree(body);
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  protected static <T> T readJson(String body, Class<T> type) {
+    try {
+      return OBJECT_MAPPER.readValue(body, type);
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   private static void ensureSmsMockServerStarted() throws IOException {
