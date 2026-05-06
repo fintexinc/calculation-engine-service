@@ -14,10 +14,10 @@ class PortfolioCpedDataValidationTest {
   @Test
   void shouldGetCpedIsAfterPedExceptionCode_whenCheckResult() {
     // SETUP
-    final PortfolioCpedDataValidation sut = new PortfolioCpedDataValidation();
+    final PortfolioCpedDataValidation validation = new PortfolioCpedDataValidation();
 
     // ACT
-    final ErrorCode actual = sut.getCpedIsAfterPedExceptionCode();
+    final ErrorCode actual = validation.getCpedIsAfterPedExceptionCode();
 
     // VERIFY
     assertEquals(CPED_AFTER_PORTFOLIO_PED, actual);
@@ -26,10 +26,10 @@ class PortfolioCpedDataValidationTest {
   @Test
   void shouldGetCpedIsBeforePsdExceptionCode_whenCheckResult() {
     // SETUP
-    final PortfolioCpedDataValidation sut = new PortfolioCpedDataValidation();
+    final PortfolioCpedDataValidation validation = new PortfolioCpedDataValidation();
 
     // ACT
-    final ErrorCode actual = sut.getCpedIsBeforePsdExceptionCode();
+    final ErrorCode actual = validation.getCpedIsBeforePsdExceptionCode();
 
     // VERIFY
     assertEquals(CPED_BEFORE_PORTFOLIO_PSD, actual);

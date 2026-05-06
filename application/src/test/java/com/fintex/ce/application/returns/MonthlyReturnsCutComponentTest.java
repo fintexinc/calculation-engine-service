@@ -20,7 +20,7 @@ class MonthlyReturnsCutComponentTest {
   @Test
   void shouldCutReturnsByEndDate_whenCheckResult() {
     // SETUP
-    final ReturnsCutComponent sut = new ReturnsCutComponent();
+    final ReturnsCutComponent component = new ReturnsCutComponent();
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
@@ -37,7 +37,7 @@ class MonthlyReturnsCutComponentTest {
     expected.put(h3, getReturnsWithTheSameStartDate(4));
 
     // ACT
-    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> actual = sut.cutReturnsByEndDate(monthlyReturns,
+    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> actual = component.cutReturnsByEndDate(monthlyReturns,
         toLastDayOfMonth(LocalDate.now().plusMonths(4)));
 
     // VERIFY
@@ -48,7 +48,7 @@ class MonthlyReturnsCutComponentTest {
   @Test
   void shouldCutReturnsByStartDate_whenCheckResult() {
     // SETUP
-    final ReturnsCutComponent sut = new ReturnsCutComponent();
+    final ReturnsCutComponent component = new ReturnsCutComponent();
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
@@ -65,7 +65,7 @@ class MonthlyReturnsCutComponentTest {
     expected.put(h3, getReturnsWithTheSameEndDate(4));
 
     // ACT
-    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> actual = sut.cutReturnsByStartDate(monthlyReturns,
+    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> actual = component.cutReturnsByStartDate(monthlyReturns,
         toLastDayOfMonth(LocalDate.now().minusMonths(4)));
 
     // VERIFY

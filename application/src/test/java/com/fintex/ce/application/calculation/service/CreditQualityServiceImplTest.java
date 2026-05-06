@@ -62,7 +62,7 @@ class CreditQualityServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-    final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -73,8 +73,8 @@ class CreditQualityServiceImplTest {
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(command.getHoldings()).thenReturn(holdings);
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(command);
 
     verify(creditQualityFetcher).fetch(eq(holdings), any());
   }
@@ -87,7 +87,7 @@ class CreditQualityServiceImplTest {
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-      final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+      final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
           creditQualityFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -98,8 +98,8 @@ class CreditQualityServiceImplTest {
       final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
       when(command.getHoldings()).thenReturn(holdings);
 
-      doCallRealMethod().when(sut).perform(any());
-      sut.perform(command);
+      doCallRealMethod().when(service).perform(any());
+      service.perform(command);
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(any()));
     }
@@ -113,7 +113,7 @@ class CreditQualityServiceImplTest {
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-      final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+      final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
           creditQualityFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -124,10 +124,10 @@ class CreditQualityServiceImplTest {
       final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
       when(command.getHoldings()).thenReturn(holdings);
 
-      doCallRealMethod().when(sut).perform(any());
-      sut.perform(command);
+      doCallRealMethod().when(service).perform(any());
+      service.perform(command);
 
-      verify(sut).getFixedIncomeCreditQuality(eq(command), anyList());
+      verify(service).getFixedIncomeCreditQuality(eq(command), anyList());
     }
   }
 
@@ -139,7 +139,7 @@ class CreditQualityServiceImplTest {
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-      final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+      final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
           creditQualityFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -151,15 +151,15 @@ class CreditQualityServiceImplTest {
       when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(h, rawCq));
 
       final Map<PortfolioHolding, BigDecimal> fixed = Map.of(h, TEN);
-      when(sut.getFixedIncomeCreditQuality(any(), anyList())).thenReturn(fixed);
+      when(service.getFixedIncomeCreditQuality(any(), anyList())).thenReturn(fixed);
 
       final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
       when(command.getHoldings()).thenReturn(holdings);
 
-      doCallRealMethod().when(sut).perform(any());
-      sut.perform(command);
+      doCallRealMethod().when(service).perform(any());
+      service.perform(command);
 
-      verify(sut).calculate(eq(holdings), any(), eq(fixed));
+      verify(service).calculate(eq(holdings), any(), eq(fixed));
     }
   }
 
@@ -170,7 +170,7 @@ class CreditQualityServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-    final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -180,10 +180,10 @@ class CreditQualityServiceImplTest {
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
 
     final Map<FixedIncomeCreditQuality, BigDecimal> map = Map.of(HIGH_YIELD, ONE);
-    when(sut.calculate(any(), any(), any())).thenReturn(map);
+    when(service.calculate(any(), any(), any())).thenReturn(map);
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(mock(PortfolioHoldingsCommand.class));
+    doCallRealMethod().when(service).perform(any());
+    service.perform(mock(PortfolioHoldingsCommand.class));
 
     verify(responseMapper).fromCalculatedValues(eq(map), anyList());
   }
@@ -195,7 +195,7 @@ class CreditQualityServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-    final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -211,8 +211,8 @@ class CreditQualityServiceImplTest {
         .build();
     when(responseMapper.fromCalculatedValues(any(), anyList())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).perform(any());
-    final CreditQualityResult actual = sut.perform(mock(PortfolioHoldingsCommand.class));
+    doCallRealMethod().when(service).perform(any());
+    final CreditQualityResult actual = service.perform(mock(PortfolioHoldingsCommand.class));
 
     assertEquals(expected, actual);
   }
@@ -224,7 +224,7 @@ class CreditQualityServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-    final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -239,8 +239,8 @@ class CreditQualityServiceImplTest {
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of());
 
-    doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-    sut.getFixedIncomeCreditQuality(command, warnings);
+    doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), anyList());
+    service.getFixedIncomeCreditQuality(command, warnings);
 
     verify(assetAllocationFetcher).fetch(eq(holdings), any());
   }
@@ -253,7 +253,7 @@ class CreditQualityServiceImplTest {
       final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
       final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-      final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+      final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
           creditQualityFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -268,8 +268,8 @@ class CreditQualityServiceImplTest {
       mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(providers, defaultProviders)).thenReturn(
           providers);
 
-      doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-      sut.getFixedIncomeCreditQuality(command, warnings);
+      doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), anyList());
+      service.getFixedIncomeCreditQuality(command, warnings);
 
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, defaultProviders));
     }
@@ -282,7 +282,7 @@ class CreditQualityServiceImplTest {
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var responseMapper = mock(CreditQualityResponseMapper.class);
 
-    final var sut = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
+    final var service = mock(CreditQualityServiceImpl.class, withSettings().useConstructor(
         creditQualityFetcher, assetAllocationFetcher,
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
@@ -300,9 +300,9 @@ class CreditQualityServiceImplTest {
     final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
     when(command.getDataProviders()).thenReturn(providers);
 
-    doCallRealMethod().when(sut).getFixedIncomeValue(any());
-    doCallRealMethod().when(sut).getFixedIncomeCreditQuality(any(), anyList());
-    final Map<PortfolioHolding, BigDecimal> actual = sut.getFixedIncomeCreditQuality(command, warnings);
+    doCallRealMethod().when(service).getFixedIncomeValue(any());
+    doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), anyList());
+    final Map<PortfolioHolding, BigDecimal> actual = service.getFixedIncomeCreditQuality(command, warnings);
 
     assertEquals(Map.of(h, HUNDRED), actual);
   }
@@ -365,14 +365,14 @@ class CreditQualityServiceImplTest {
   @Test
   void shouldCalculateCreditQualityRatingTypes_whenVerifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
+      final CreditQualityServiceImpl service = mock(CreditQualityServiceImpl.class);
 
       final List<PortfolioHolding> holdings = List.of(mock(PortfolioHolding.class));
 
-      when(sut.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
+      when(service.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
-      doCallRealMethod().when(sut).calculateCreditQualityRatingTypes(any(), any(), any());
-      sut.calculateCreditQualityRatingTypes(holdings, Map.of(), Map.of());
+      doCallRealMethod().when(service).calculateCreditQualityRatingTypes(any(), any(), any());
+      service.calculateCreditQualityRatingTypes(holdings, Map.of(), Map.of());
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.calculateInitialPortfolioWeight(holdings));
     }
@@ -381,7 +381,7 @@ class CreditQualityServiceImplTest {
   @Test
   void shouldCalculateCreditQualityRatingTypes_whenVerifyCalculateSumProductRating() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
+      final CreditQualityServiceImpl service = mock(CreditQualityServiceImpl.class);
 
       final PortfolioHolding h = mock(PortfolioHolding.class);
       Map<PortfolioHolding, BigDecimal> weights = Map.of(h, TEN);
@@ -392,14 +392,14 @@ class CreditQualityServiceImplTest {
       final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
       final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
-      when(sut.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
+      when(service.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
-      doCallRealMethod().when(sut).calculateCreditQualityRatingTypes(any(), any(), any());
-      final Map<CreditQualityRatingType, BigDecimal> actual = sut.calculateCreditQualityRatingTypes(holdings, creditQ,
+      doCallRealMethod().when(service).calculateCreditQualityRatingTypes(any(), any(), any());
+      final Map<CreditQualityRatingType, BigDecimal> actual = service.calculateCreditQualityRatingTypes(holdings, creditQ,
           fixedCreditQ);
 
       for (CreditQualityRatingType rating : CreditQualityRatingType.values()) {
-        verify(sut).calculateSumProductRating(creditQ, fixedCreditQ, weights, rating);
+        verify(service).calculateSumProductRating(creditQ, fixedCreditQ, weights, rating);
       }
       assertEquals(CreditQualityRatingType.values().length, actual.size());
     }
@@ -456,20 +456,20 @@ class CreditQualityServiceImplTest {
   @Test
   void shouldCalculate_whenVerifyReScale() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
-      final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
+      final CreditQualityServiceImpl service = mock(CreditQualityServiceImpl.class);
 
       final PortfolioHolding h = mock(PortfolioHolding.class);
 
       Map<CreditQualityRatingType, BigDecimal> rescaled = Map.of(AAA, TEN);
 
-      when(sut.calculateCreditQualityRatingTypes(any(), any(), any())).thenReturn(rescaled);
+      when(service.calculateCreditQualityRatingTypes(any(), any(), any())).thenReturn(rescaled);
 
       final List<PortfolioHolding> holdings = List.of(h);
       final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
       final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);
+      doCallRealMethod().when(service).calculate(any(), any(), any());
+      final Map<FixedIncomeCreditQuality, BigDecimal> actual = service.calculate(holdings, creditQ, fixedCreditQ);
 
       mockedCalculationUtils.verify(() -> CalculationUtils.reScaleAbs(rescaled));
     }
@@ -478,7 +478,7 @@ class CreditQualityServiceImplTest {
   @Test
   void shouldCalculate_whenVerifyToFixedIncomeCreditQuality() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
-      final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
+      final CreditQualityServiceImpl service = mock(CreditQualityServiceImpl.class);
 
       final PortfolioHolding h = mock(PortfolioHolding.class);
 
@@ -490,17 +490,17 @@ class CreditQualityServiceImplTest {
       final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
       final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);
+      doCallRealMethod().when(service).calculate(any(), any(), any());
+      final Map<FixedIncomeCreditQuality, BigDecimal> actual = service.calculate(holdings, creditQ, fixedCreditQ);
 
-      verify(sut).toFixedIncomeCreditQuality(rescaled);
+      verify(service).toFixedIncomeCreditQuality(rescaled);
     }
   }
 
   @Test
   void shouldCalculate_whenCheckResult() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
-      final CreditQualityServiceImpl sut = mock(CreditQualityServiceImpl.class);
+      final CreditQualityServiceImpl service = mock(CreditQualityServiceImpl.class);
 
       final PortfolioHolding h = mock(PortfolioHolding.class);
 
@@ -509,14 +509,14 @@ class CreditQualityServiceImplTest {
       mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(any())).thenReturn(rescaled);
 
       final HashMap<FixedIncomeCreditQuality, BigDecimal> expected = new HashMap<>();
-      when(sut.toFixedIncomeCreditQuality(rescaled)).thenReturn(expected);
+      when(service.toFixedIncomeCreditQuality(rescaled)).thenReturn(expected);
 
       final List<PortfolioHolding> holdings = List.of(h);
       final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQ = Map.of(h, Map.of());
       final Map<PortfolioHolding, BigDecimal> fixedCreditQ = Map.of(h, ONE);
 
-      doCallRealMethod().when(sut).calculate(any(), any(), any());
-      final Map<FixedIncomeCreditQuality, BigDecimal> actual = sut.calculate(holdings, creditQ, fixedCreditQ);
+      doCallRealMethod().when(service).calculate(any(), any(), any());
+      final Map<FixedIncomeCreditQuality, BigDecimal> actual = service.calculate(holdings, creditQ, fixedCreditQ);
 
       assertSame(expected, actual);
     }

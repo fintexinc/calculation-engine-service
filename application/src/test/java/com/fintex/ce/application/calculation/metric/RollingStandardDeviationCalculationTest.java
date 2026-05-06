@@ -57,32 +57,32 @@ class RollingStandardDeviationCalculationTest {
   void shouldCalculateRollingValue_whenCheckResult() {
     final var standardDeviationCalculation = mock(StandardDeviationCalculation.class);
     final var context = mock(PeriodCalculationInput.class);
-    final var sut = mock(RollingStandardDeviationCalculation.class, withSettings().useConstructor(context, Set
+    final var calculation = mock(RollingStandardDeviationCalculation.class, withSettings().useConstructor(context, Set
         .of(), standardDeviationCalculation));
     final int numberOfMonths = 12;
 
     when(standardDeviationCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculateRollingValue(numberOfMonths, portfolioReturns);
-    final BigDecimal actual = sut.calculateRollingValue(numberOfMonths, portfolioReturns);
+    doCallRealMethod().when(calculation).calculateRollingValue(numberOfMonths, portfolioReturns);
+    final BigDecimal actual = calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
 
     Assertions.assertEquals(TEN, actual);
   }
 
   @Test
   void shouldDefineResponseType_whenVerifyGetRollingIntervalResultS() {
-    final var sut = mock(RollingStandardDeviationCalculation.class);
+    final var calculation = mock(RollingStandardDeviationCalculation.class);
     final var result = Set.of(Pair.of("12", portfolioReturns));
 
-    doCallRealMethod().when(sut).defineResponseType(result);
-    sut.defineResponseType(result);
+    doCallRealMethod().when(calculation).defineResponseType(result);
+    calculation.defineResponseType(result);
 
-    verify(sut).getRollingIntervalResults(result);
+    verify(calculation).getRollingIntervalResults(result);
   }
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
-    final var sut = mock(RollingStandardDeviationCalculation.class);
+    final var calculation = mock(RollingStandardDeviationCalculation.class);
     final var periodValues = Set.of(Pair.of("12", portfolioReturns));
 
     final LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
@@ -90,10 +90,10 @@ class RollingStandardDeviationCalculationTest {
     final var intervalResult = new RollingIntervalResult("12", res);
     final var expected = new RollingStandardDeviationResult(Set.of(intervalResult));
 
-    when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
+    when(calculation.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
 
-    doCallRealMethod().when(sut).defineResponseType(periodValues);
-    final RollingStandardDeviationResult actual = sut.defineResponseType(periodValues);
+    doCallRealMethod().when(calculation).defineResponseType(periodValues);
+    final RollingStandardDeviationResult actual = calculation.defineResponseType(periodValues);
 
     Assertions.assertEquals(expected.getRollingStandardDeviation(), actual.getRollingStandardDeviation());
   }

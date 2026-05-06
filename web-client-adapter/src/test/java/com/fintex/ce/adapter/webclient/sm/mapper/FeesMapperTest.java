@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class FeesMapperTest {
 
-  private final FeesMapper sut = new FeesMapper();
+  private final FeesMapper mapper = new FeesMapper();
 
   @Test
   void shouldMapAllFieldsAndProviders_whenResponseHasValues() {
@@ -48,7 +48,7 @@ class FeesMapperTest {
     smsResponse.setGrossExpenseRatio(grossExpenseRatio);
     smsResponse.setActual12B1Fee(actual12B1Fee);
 
-    FeeData result = sut.map(smsResponse, createHolding("SEC-001"));
+    FeeData result = mapper.map(smsResponse, createHolding("SEC-001"));
 
     assertThat(result.getManagementFee()).isEqualByComparingTo("0.0125");
     assertThat(result.getManagementFeeProvider()).isEqualTo(DataProvider.MORNINGSTAR);
@@ -64,7 +64,7 @@ class FeesMapperTest {
 
   @Test
   void shouldReturnEmptyFeeData_whenResponseIsNull() {
-    FeeData result = sut.map(null, createHolding("SEC-002"));
+    FeeData result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getManagementFee()).isNull();
     assertThat(result.getManagementExpenseRatio()).isNull();
@@ -77,7 +77,7 @@ class FeesMapperTest {
   void shouldReturnEmptyFeeData_whenResponseHasNullDatapoints() {
     var smsResponse = new Fees();
 
-    FeeData result = sut.map(smsResponse, createHolding("SEC-003"));
+    FeeData result = mapper.map(smsResponse, createHolding("SEC-003"));
 
     assertThat(result.getManagementFee()).isNull();
     assertThat(result.getManagementExpenseRatio()).isNull();
@@ -92,7 +92,7 @@ class FeesMapperTest {
     var smsResponse = new Fees();
     smsResponse.setManagementExpenseRatio(mer);
 
-    FeeData result = sut.map(smsResponse, createHolding("SEC-004"));
+    FeeData result = mapper.map(smsResponse, createHolding("SEC-004"));
 
     assertThat(result.getManagementExpenseRatio()).isEqualByComparingTo("0.019");
     assertThat(result.getManagementExpenseRatioProvider()).isEqualTo(DataProvider.MORNINGSTAR);

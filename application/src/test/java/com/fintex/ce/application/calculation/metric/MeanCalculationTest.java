@@ -24,7 +24,7 @@ class MeanCalculationTest {
   @Test
   void shouldCalculateAverageForPeriod_whenReturnsContainEnoughData() {
     try (var util = Mockito.mockStatic(CalculationUtils.class)) {
-      final var sut = mock(MeanCalculation.class);
+      final var calculation = mock(MeanCalculation.class);
       final var returns = mock(NavigableMap.class);
       final var periodStartDate = mock(LocalDate.class);
       final var portfolioTotalReturnsByPeriod = mock(SortedMap.class);
@@ -32,16 +32,16 @@ class MeanCalculationTest {
       final var numberOfMonths = 12;
       final var nowDate = LocalDate.now();
 
-      when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(nowDate);
-      when(sut.getPortfolioTotalReturns()).thenReturn(returns);
+      when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(nowDate);
+      when(calculation.getPortfolioTotalReturns()).thenReturn(returns);
       when(returns.size()).thenReturn(15);
-      when(sut.getPeriodStartDate(Mockito.anyInt(), Mockito.any(NavigableMap.class))).thenReturn(periodStartDate);
-      when(sut.getSubMapByPeriodStartDate(Mockito.any(), Mockito.any())).thenReturn(portfolioTotalReturnsByPeriod);
+      when(calculation.getPeriodStartDate(Mockito.anyInt(), Mockito.any(NavigableMap.class))).thenReturn(periodStartDate);
+      when(calculation.getSubMapByPeriodStartDate(Mockito.any(), Mockito.any())).thenReturn(portfolioTotalReturnsByPeriod);
 
       util.when(() -> CalculationUtils.average(Mockito.any())).thenReturn(BigDecimal.ONE);
-      doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
+      doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
 
-      final BigDecimal result = sut.calculatePeriodForNumberOfMonths(numberOfMonths);
+      final BigDecimal result = calculation.calculatePeriodForNumberOfMonths(numberOfMonths);
 
       Assertions.assertEquals(BigDecimal.ONE, result);
     }
@@ -49,15 +49,15 @@ class MeanCalculationTest {
 
   @Test
   void shouldMapIntervalsToMeanResult_whenDefineResponseTypeIsCalled() {
-    final MeanCalculation<MeanResult> sut = mock(MeanCalculation.class);
+    final MeanCalculation<MeanResult> calculation = mock(MeanCalculation.class);
     final var results = mock(Set.class);
     final var timeIntervals = mock(Set.class);
 
-    when(sut.formTimeIntervalResult(results)).thenReturn(timeIntervals);
+    when(calculation.formTimeIntervalResult(results)).thenReturn(timeIntervals);
 
-    doCallRealMethod().when(sut).defineResponseType(any());
+    doCallRealMethod().when(calculation).defineResponseType(any());
 
-    final MeanResult result = sut.defineResponseType(results);
+    final MeanResult result = calculation.defineResponseType(results);
 
     Assertions.assertEquals(timeIntervals, result.getMean());
 

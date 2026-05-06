@@ -50,7 +50,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -59,9 +59,9 @@ class CommonHoldingsServiceImplTest {
       when(command.getHoldings()).thenReturn(holdings);
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
       mockedPortfolioUtils.verify(() -> PortfolioUtils.calculateInitialPortfolioWeight(holdings));
@@ -74,7 +74,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -84,9 +84,9 @@ class CommonHoldingsServiceImplTest {
       when(command.getHoldings()).thenReturn(holdings);
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
       verify(fetcher).fetch(eq(holdings), any());
@@ -99,7 +99,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -109,12 +109,12 @@ class CommonHoldingsServiceImplTest {
       when(command.getHoldings()).thenReturn(holdings);
       when(fetcher.fetch(any(), any())).thenReturn(Map.of());
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
-      verify(sut).getNumOfFundsMin(command);
+      verify(service).getNumOfFundsMin(command);
     }
   }
 
@@ -124,7 +124,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -133,14 +133,14 @@ class CommonHoldingsServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(Map.of());
       when(command.getHoldings()).thenReturn(holdings);
       when(fetcher.fetch(any(), any())).thenReturn(Map.of());
-      when(sut.getNumOfFundsMin(any())).thenReturn(1);
+      when(service.getNumOfFundsMin(any())).thenReturn(1);
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
-      verify(sut).getAccumulativeTypes(command);
+      verify(service).getAccumulativeTypes(command);
     }
   }
 
@@ -150,7 +150,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -165,16 +165,16 @@ class CommonHoldingsServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
       when(command.getHoldings()).thenReturn(holdings);
       when(fetcher.fetch(any(), any())).thenReturn(holdingsFromSms);
-      when(sut.getNumOfFundsMin(any())).thenReturn(1);
-      when(sut.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
-      when(sut.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
+      when(service.getNumOfFundsMin(any())).thenReturn(1);
+      when(service.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
+      when(service.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
-      verify(sut).calculateTopCommonHoldings(anyMap(), eq(allocations), eq(accumulativeTypes));
+      verify(service).calculateTopCommonHoldings(anyMap(), eq(allocations), eq(accumulativeTypes));
     }
   }
 
@@ -184,7 +184,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -199,17 +199,17 @@ class CommonHoldingsServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
       when(command.getHoldings()).thenReturn(holdings);
       when(fetcher.fetch(any(), any())).thenReturn(holdingsFromSms);
-      when(sut.getNumOfFundsMin(any())).thenReturn(1);
-      when(sut.getTopCommonHoldingsNumber(any())).thenReturn(123);
-      when(sut.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
-      when(sut.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
+      when(service.getNumOfFundsMin(any())).thenReturn(1);
+      when(service.getTopCommonHoldingsNumber(any())).thenReturn(123);
+      when(service.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
+      when(service.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
-      verify(sut).filterTopCommon(1, 123, leaves);
+      verify(service).filterTopCommon(1, 123, leaves);
     }
   }
 
@@ -219,7 +219,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -235,17 +235,17 @@ class CommonHoldingsServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
       when(command.getHoldings()).thenReturn(holdings);
       when(fetcher.fetch(any(), any())).thenReturn(holdingsFromSms);
-      when(sut.getNumOfFundsMin(any())).thenReturn(1);
-      when(sut.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
-      when(sut.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
-      when(sut.filterTopCommon(anyInt(), anyInt(), any())).thenReturn(sortedLeaves);
+      when(service.getNumOfFundsMin(any())).thenReturn(1);
+      when(service.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
+      when(service.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
+      when(service.filterTopCommon(anyInt(), anyInt(), any())).thenReturn(sortedLeaves);
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
-      verify(sut).toFinalResult(leaves, sortedLeaves);
+      verify(service).toFinalResult(leaves, sortedLeaves);
     }
   }
 
@@ -255,7 +255,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -272,15 +272,15 @@ class CommonHoldingsServiceImplTest {
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(allocations);
       when(command.getHoldings()).thenReturn(holdings);
       when(fetcher.fetch(any(), any())).thenReturn(holdingsFromSms);
-      when(sut.getNumOfFundsMin(any())).thenReturn(1);
-      when(sut.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
-      when(sut.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
-      when(sut.filterTopCommon(anyInt(), anyInt(), any())).thenReturn(sortedLeaves);
-      when(sut.toFinalResult(anyMap(), anyMap())).thenReturn(topCommonHoldings);
+      when(service.getNumOfFundsMin(any())).thenReturn(1);
+      when(service.getAccumulativeTypes(any())).thenReturn(accumulativeTypes);
+      when(service.calculateTopCommonHoldings(anyMap(), anyMap(), anySet())).thenReturn(leaves);
+      when(service.filterTopCommon(anyInt(), anyInt(), any())).thenReturn(sortedLeaves);
+      when(service.toFinalResult(anyMap(), anyMap())).thenReturn(topCommonHoldings);
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      final TopCommonHoldingsResult actual = sut.perform(command);
+      final TopCommonHoldingsResult actual = service.perform(command);
 
       // VERIFY
       assertEquals(topCommonHoldings, actual.getCommonHoldings());
@@ -292,7 +292,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHolding.class)));
@@ -301,12 +301,12 @@ class CommonHoldingsServiceImplTest {
     final var sortedLeaves = Map.of(aggregator, ten);
     final var entry = new AbstractMap.SimpleEntry<>(aggregator, ten);
 
-    doCallRealMethod().when(sut).toFinalResult(anyMap(), anyMap());
+    doCallRealMethod().when(service).toFinalResult(anyMap(), anyMap());
     // ACT
-    var actual = sut.toFinalResult(leaves, sortedLeaves);
+    var actual = service.toFinalResult(leaves, sortedLeaves);
 
     // VERIFY
-    verify(sut).mapToFinalResult(leaves, entry);
+    verify(service).mapToFinalResult(leaves, entry);
   }
 
   @Test
@@ -314,18 +314,18 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var leaves = Map.of(mock(HoldingAggregator.class), List.of(mock(CommonHolding.class)));
     final var sortedLeaves = Map.of(mock(HoldingAggregator.class), TEN);
     final var expected = new TopCommonHoldingData();
 
-    when(sut.mapToFinalResult(anyMap(), any())).thenReturn(expected);
+    when(service.mapToFinalResult(anyMap(), any())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).toFinalResult(anyMap(), anyMap());
+    doCallRealMethod().when(service).toFinalResult(anyMap(), anyMap());
     // ACT
-    final List<TopCommonHoldingData> actual = sut.toFinalResult(leaves, sortedLeaves);
+    final List<TopCommonHoldingData> actual = service.toFinalResult(leaves, sortedLeaves);
 
     // VERIFY
     assertEquals(expected, actual.get(0));
@@ -336,7 +336,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var command = mock(TopCommonHoldingsCommand.class);
@@ -344,9 +344,9 @@ class CommonHoldingsServiceImplTest {
 
     when(command.getNumOfFundsMin()).thenReturn(null);
 
-    doCallRealMethod().when(sut).getNumOfFundsMin(any());
+    doCallRealMethod().when(service).getNumOfFundsMin(any());
     // ACT
-    final int actual = sut.getNumOfFundsMin(command);
+    final int actual = service.getNumOfFundsMin(command);
 
     // VERIFY
     assertEquals(expected, actual);
@@ -357,7 +357,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var command = mock(TopCommonHoldingsCommand.class);
@@ -365,9 +365,9 @@ class CommonHoldingsServiceImplTest {
 
     when(command.getNumOfFundsMin()).thenReturn(expected);
 
-    doCallRealMethod().when(sut).getNumOfFundsMin(any());
+    doCallRealMethod().when(service).getNumOfFundsMin(any());
     // ACT
-    final int actual = sut.getNumOfFundsMin(command);
+    final int actual = service.getNumOfFundsMin(command);
 
     // VERIFY
     assertEquals(expected, actual);
@@ -378,16 +378,16 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulativeTypes = Set.of("E");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulativeTypes));
 
     final var command = mock(TopCommonHoldingsCommand.class);
 
     when(command.getAccumulateHoldingTypes()).thenReturn(accumulativeTypes);
 
-    doCallRealMethod().when(sut).getAccumulativeTypes(any());
+    doCallRealMethod().when(service).getAccumulativeTypes(any());
     // ACT
-    final Set<String> actual = sut.getAccumulativeTypes(command);
+    final Set<String> actual = service.getAccumulativeTypes(command);
 
     // VERIFY
     assertEquals(accumulativeTypes, actual);
@@ -398,16 +398,16 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulativeTypes = Set.of();
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulativeTypes));
 
     final var command = mock(TopCommonHoldingsCommand.class);
 
     when(command.getAccumulateHoldingTypes()).thenReturn(Set.of());
 
-    doCallRealMethod().when(sut).getAccumulativeTypes(any());
+    doCallRealMethod().when(service).getAccumulativeTypes(any());
     // ACT
-    final Set<String> actual = sut.getAccumulativeTypes(command);
+    final Set<String> actual = service.getAccumulativeTypes(command);
 
     // VERIFY
     assertEquals(accumulativeTypes, actual);
@@ -419,16 +419,16 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
     final var firstLvlChild = mock(CommonHolding.class);
 
     when(firstLvlChild.getUnderlyingHoldings()).thenReturn(null);
 
-    doCallRealMethod().when(sut).secondLevelLeaves(firstLvlChild);
+    doCallRealMethod().when(service).secondLevelLeaves(firstLvlChild);
     // ACT
-    final Stream<CommonHolding> actual = sut.secondLevelLeaves(firstLvlChild);
+    final Stream<CommonHolding> actual = service.secondLevelLeaves(firstLvlChild);
 
     // VERIFY
     assertEquals(firstLvlChild, actual.findFirst().orElseThrow());
@@ -439,7 +439,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
     final var firstLvlChild = mock(CommonHolding.class);
@@ -450,9 +450,9 @@ class CommonHoldingsServiceImplTest {
     when(underlyingHolding.getName()).thenReturn(null);
     when(firstLvlChild.getUnderlyingHoldings()).thenReturn(underlyingHoldings);
 
-    doCallRealMethod().when(sut).secondLevelLeaves(firstLvlChild);
+    doCallRealMethod().when(service).secondLevelLeaves(firstLvlChild);
     // ACT
-    final Stream<CommonHolding> actual = sut.secondLevelLeaves(firstLvlChild);
+    final Stream<CommonHolding> actual = service.secondLevelLeaves(firstLvlChild);
 
     // VERIFY
     assertEquals(Stream.of().findFirst(), actual.findFirst());
@@ -463,7 +463,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var holdingAggregator = mock(HoldingAggregator.class);
@@ -473,9 +473,9 @@ class CommonHoldingsServiceImplTest {
 
     when(commonHolding.getWeight()).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).filterTopCommon(anyInt(), anyInt(), anyMap());
+    doCallRealMethod().when(service).filterTopCommon(anyInt(), anyInt(), anyMap());
     // ACT
-    final Map<HoldingAggregator, BigDecimal> actual = sut.filterTopCommon(1, 10, leaves);
+    final Map<HoldingAggregator, BigDecimal> actual = service.filterTopCommon(1, 10, leaves);
 
     // VERIFY
     assertEquals(expected, actual);
@@ -486,7 +486,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var allocations = Map.of(new PortfolioHolding(null, null, null), TEN);
@@ -497,12 +497,12 @@ class CommonHoldingsServiceImplTest {
     expected.setHolding(parent);
 
     when(child.getValue()).thenReturn(TEN);
-    doCallRealMethod().when(sut).setParentAndCalculateWeight(anyMap(), any(), any());
+    doCallRealMethod().when(service).setParentAndCalculateWeight(anyMap(), any(), any());
     // ACT
-    final CommonHolding actual = sut.setParentAndCalculateWeight(allocations, parent, child);
+    final CommonHolding actual = service.setParentAndCalculateWeight(allocations, parent, child);
 
     // VERIFY
-    verify(sut).isLeafStock(parent, child);
+    verify(service).isLeafStock(parent, child);
   }
 
   @Test
@@ -510,7 +510,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var allocations = Map.of(new PortfolioHolding(null, null, null), TEN);
@@ -518,10 +518,10 @@ class CommonHoldingsServiceImplTest {
     final var child = new CommonHolding();
     child.setValue(TEN);
 
-    when(sut.isLeafStock(any(), any())).thenReturn(true);
-    doCallRealMethod().when(sut).setParentAndCalculateWeight(anyMap(), any(), any());
+    when(service.isLeafStock(any(), any())).thenReturn(true);
+    doCallRealMethod().when(service).setParentAndCalculateWeight(anyMap(), any(), any());
     // ACT
-    final CommonHolding actual = sut.setParentAndCalculateWeight(allocations, parent, child);
+    final CommonHolding actual = service.setParentAndCalculateWeight(allocations, parent, child);
 
     // VERIFY
     assertEquals(0, BigDecimal.TEN.compareTo(actual.getWeight()));
@@ -533,7 +533,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var parent = mock(PortfolioHolding.class);
@@ -543,10 +543,10 @@ class CommonHoldingsServiceImplTest {
     child.setCompanyName("Apple Inc");
     child.setType("E");
 
-    when(sut.isLeafStock(any(), any())).thenReturn(false);
-    doCallRealMethod().when(sut).setParentAndCalculateWeight(anyMap(), any(), any());
+    when(service.isLeafStock(any(), any())).thenReturn(false);
+    doCallRealMethod().when(service).setParentAndCalculateWeight(anyMap(), any(), any());
     // ACT
-    final CommonHolding actual = sut.setParentAndCalculateWeight(allocations, parent, child);
+    final CommonHolding actual = service.setParentAndCalculateWeight(allocations, parent, child);
 
     // VERIFY
     assertEquals(0, BigDecimal.valueOf(100).compareTo(actual.getWeight()));
@@ -559,7 +559,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var commonHolding = mock(CommonHolding.class);
@@ -571,9 +571,9 @@ class CommonHoldingsServiceImplTest {
       when(sameLeaves.get(0).getHolding()).thenReturn(parentHolding);
       when(commonHolding.getWeight()).thenReturn(expected);
 
-      doCallRealMethod().when(sut).calculateWeightWithinSameLeaves(anyList(), any());
+      doCallRealMethod().when(service).calculateWeightWithinSameLeaves(anyList(), any());
       // ACT
-      final BigDecimal actual = sut.calculateWeightWithinSameLeaves(sameLeaves, parentHolding);
+      final BigDecimal actual = service.calculateWeightWithinSameLeaves(sameLeaves, parentHolding);
 
       // VERIFY
       mockedDecimalUtils.verify(() -> DecimalUtils.toUserScale(TEN));
@@ -585,7 +585,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, defaultPeriods));
 
     final var commonHolding = mock(CommonHolding.class);
@@ -597,9 +597,9 @@ class CommonHoldingsServiceImplTest {
     when(sameLeaves.get(0).getHolding()).thenReturn(parentHolding);
     when(commonHolding.getWeight()).thenReturn(expected);
 
-    doCallRealMethod().when(sut).calculateWeightWithinSameLeaves(anyList(), any());
+    doCallRealMethod().when(service).calculateWeightWithinSameLeaves(anyList(), any());
     // ACT
-    final BigDecimal actual = sut.calculateWeightWithinSameLeaves(sameLeaves, parentHolding);
+    final BigDecimal actual = service.calculateWeightWithinSameLeaves(sameLeaves, parentHolding);
 
     // VERIFY
     assertEquals(expected.doubleValue(), actual.doubleValue());
@@ -611,7 +611,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var holdingAggregator = mock(HoldingAggregator.class);
@@ -624,12 +624,12 @@ class CommonHoldingsServiceImplTest {
 
       when(commonHolding.getHolding()).thenReturn(holding);
       when(commonHolding.getWeight()).thenReturn(TEN);
-      when(sut.calculateWeightWithinSameLeaves(anyList(), any())).thenReturn(TEN);
+      when(service.calculateWeightWithinSameLeaves(anyList(), any())).thenReturn(TEN);
       mockedHoldingsKeyResult.when(() -> HoldingsKeyResult.buildFromHolding(any(), any())).thenReturn(holdingsKey);
 
-      doCallRealMethod().when(sut).mapToFinalResult(anyMap(), any());
+      doCallRealMethod().when(service).mapToFinalResult(anyMap(), any());
       // ACT
-      sut.mapToFinalResult(leaves, sortedLeafEntry);
+      service.mapToFinalResult(leaves, sortedLeafEntry);
 
       // VERIFY
       mockedHoldingsKeyResult.verify(() -> HoldingsKeyResult.buildFromHolding(holding, TEN));
@@ -642,7 +642,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var holdingAggregator = mock(HoldingAggregator.class);
@@ -657,12 +657,12 @@ class CommonHoldingsServiceImplTest {
       when(commonHolding.getWeight()).thenReturn(TEN);
       mockedHoldingsKeyResult.when(() -> HoldingsKeyResult.buildFromHolding(any(), any())).thenReturn(holdingsKey);
 
-      doCallRealMethod().when(sut).mapToFinalResult(anyMap(), any());
+      doCallRealMethod().when(service).mapToFinalResult(anyMap(), any());
       // ACT
-      sut.mapToFinalResult(leaves, sortedLeafEntry);
+      service.mapToFinalResult(leaves, sortedLeafEntry);
 
       // VERIFY
-      verify(sut).calculateWeightWithinSameLeaves(List.of(commonHolding), holding);
+      verify(service).calculateWeightWithinSameLeaves(List.of(commonHolding), holding);
     }
   }
 
@@ -672,7 +672,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var holdingAggregator = new HoldingAggregator("Tesla", null, null);
@@ -687,12 +687,12 @@ class CommonHoldingsServiceImplTest {
 
       when(commonHolding.getHolding()).thenReturn(holding);
       when(commonHolding.getWeight()).thenReturn(TEN);
-      when(sut.calculateWeightWithinSameLeaves(anyList(), any())).thenReturn(TEN);
+      when(service.calculateWeightWithinSameLeaves(anyList(), any())).thenReturn(TEN);
       mockedHoldingsKeyResult.when(() -> HoldingsKeyResult.buildFromHolding(any(), any())).thenReturn(holdingsKey);
 
-      doCallRealMethod().when(sut).mapToFinalResult(anyMap(), any());
+      doCallRealMethod().when(service).mapToFinalResult(anyMap(), any());
       // ACT
-      final TopCommonHoldingData actual = sut.mapToFinalResult(leaves, sortedLeafEntry);
+      final TopCommonHoldingData actual = service.mapToFinalResult(leaves, sortedLeafEntry);
 
       // VERIFY
       assertEquals(expected, actual);
@@ -705,7 +705,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var holdingAggregator = new HoldingAggregator("Tesla", null, null);
@@ -721,12 +721,12 @@ class CommonHoldingsServiceImplTest {
       when(commonHolding.getTicker()).thenReturn("H");
       when(commonHolding.getHolding()).thenReturn(holding);
       when(commonHolding.getWeight()).thenReturn(TEN);
-      when(sut.calculateWeightWithinSameLeaves(anyList(), any())).thenReturn(TEN);
+      when(service.calculateWeightWithinSameLeaves(anyList(), any())).thenReturn(TEN);
       mockedHoldingsKeyResult.when(() -> HoldingsKeyResult.buildFromHolding(any(), any())).thenReturn(holdingsKey);
 
-      doCallRealMethod().when(sut).mapToFinalResult(anyMap(), any());
+      doCallRealMethod().when(service).mapToFinalResult(anyMap(), any());
       // ACT
-      final TopCommonHoldingData actual = sut.mapToFinalResult(leaves, sortedLeafEntry);
+      final TopCommonHoldingData actual = service.mapToFinalResult(leaves, sortedLeafEntry);
 
       // VERIFY
       assertEquals(expected, actual);
@@ -738,7 +738,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulativeTypes = Set.of("E");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulativeTypes));
 
     final var holding = mock(PortfolioHolding.class);
@@ -746,12 +746,12 @@ class CommonHoldingsServiceImplTest {
     final var holdings = Map.of(holding, List.of(commonHolding));
     final var allocations = Map.of(holding, TEN);
 
-    doCallRealMethod().when(sut).calculateTopCommonHoldings(anyMap(), anyMap(), anySet());
+    doCallRealMethod().when(service).calculateTopCommonHoldings(anyMap(), anyMap(), anySet());
     // ACT
-    sut.calculateTopCommonHoldings(holdings, allocations, accumulativeTypes);
+    service.calculateTopCommonHoldings(holdings, allocations, accumulativeTypes);
 
     // VERIFY
-    verify(sut).firstLevelLeaves(allocations, holding, List.of(commonHolding));
+    verify(service).firstLevelLeaves(allocations, holding, List.of(commonHolding));
   }
 
   @Test
@@ -759,7 +759,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulativeTypes = Set.of("E");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulativeTypes));
 
     final var holding = mock(PortfolioHolding.class);
@@ -767,14 +767,14 @@ class CommonHoldingsServiceImplTest {
     final var holdings = Map.of(holding, List.of(commonHolding));
     final var allocations = Map.of(holding, TEN);
 
-    when(sut.firstLevelLeaves(anyMap(), any(), anyList())).thenReturn(Stream.of(commonHolding));
+    when(service.firstLevelLeaves(anyMap(), any(), anyList())).thenReturn(Stream.of(commonHolding));
 
-    doCallRealMethod().when(sut).calculateTopCommonHoldings(anyMap(), anyMap(), anySet());
+    doCallRealMethod().when(service).calculateTopCommonHoldings(anyMap(), anyMap(), anySet());
     // ACT
-    sut.calculateTopCommonHoldings(holdings, allocations, accumulativeTypes);
+    service.calculateTopCommonHoldings(holdings, allocations, accumulativeTypes);
 
     // VERIFY
-    verify(sut).secondLevelLeaves(commonHolding);
+    verify(service).secondLevelLeaves(commonHolding);
   }
 
   @Test
@@ -783,7 +783,7 @@ class CommonHoldingsServiceImplTest {
     final var accumulateTypes = Set.of("FE");
     final var fetcher = mock(SecurityDataFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
     final var allocations = Map.of(mock(PortfolioHolding.class), TEN);
@@ -793,15 +793,15 @@ class CommonHoldingsServiceImplTest {
 
     when(child.getType()).thenReturn("E");
     when(child.getUnderlyingHoldings()).thenReturn(null);
-    when(sut.setParentAndCalculateWeight(anyMap(), any(), any())).thenReturn(child);
+    when(service.setParentAndCalculateWeight(anyMap(), any(), any())).thenReturn(child);
 
-    doCallRealMethod().when(sut).firstLevelLeaves(anyMap(), any(), anyList());
+    doCallRealMethod().when(service).firstLevelLeaves(anyMap(), any(), anyList());
     // ACT
-    final Stream<CommonHolding> actual = sut.firstLevelLeaves(allocations, parent, firstLevelChildren);
+    final Stream<CommonHolding> actual = service.firstLevelLeaves(allocations, parent, firstLevelChildren);
 
     // VERIFY
     assertEquals(1, actual.toList().size());
-    verify(sut).setParentAndCalculateWeight(allocations, parent, child);
+    verify(service).setParentAndCalculateWeight(allocations, parent, child);
   }
 
   @Test
@@ -809,7 +809,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
     final var allocations = Map.of(mock(PortfolioHolding.class), TEN);
@@ -822,11 +822,11 @@ class CommonHoldingsServiceImplTest {
     when(child.getCompanyName()).thenReturn("Apple Inc");
     when(child.getValue()).thenReturn(TEN);
     when(child.getUnderlyingHoldings()).thenReturn(null);
-    when(sut.setParentAndCalculateWeight(anyMap(), any(), any())).thenReturn(child);
+    when(service.setParentAndCalculateWeight(anyMap(), any(), any())).thenReturn(child);
 
-    doCallRealMethod().when(sut).firstLevelLeaves(anyMap(), any(), anyList());
+    doCallRealMethod().when(service).firstLevelLeaves(anyMap(), any(), anyList());
     // ACT
-    final Stream<CommonHolding> actual = sut.firstLevelLeaves(allocations, parent, firstLevelChildren);
+    final Stream<CommonHolding> actual = service.firstLevelLeaves(allocations, parent, firstLevelChildren);
 
     // VERIFY
     assertEquals(expected.getWeight(), actual.findFirst().orElseThrow().getWeight());
@@ -838,7 +838,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var accumulateTypes = Set.of("FE");
       final var fetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, accumulateTypes));
 
       final var firstLvlParent = mock(CommonHolding.class);
@@ -848,9 +848,9 @@ class CommonHoldingsServiceImplTest {
       when(child.getWeight()).thenReturn(HUNDRED);
       when(firstLvlParent.getWeight()).thenReturn(TEN);
       mockedDecimalUtils.when(() -> DecimalUtils.toUserScale(TEN)).thenReturn(TEN);
-      doCallRealMethod().when(sut).setParentAndCalculateWeightSecondLvlLeaf(any(), any());
+      doCallRealMethod().when(service).setParentAndCalculateWeightSecondLvlLeaf(any(), any());
       // ACT
-      final CommonHolding actual = sut.setParentAndCalculateWeightSecondLvlLeaf(firstLvlParent, child);
+      final CommonHolding actual = service.setParentAndCalculateWeightSecondLvlLeaf(firstLvlParent, child);
 
       // VERIFY
       assertEquals(HUNDRED, actual.getWeight());
@@ -862,7 +862,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
     final var parent = mock(PortfolioHolding.class);
@@ -872,9 +872,9 @@ class CommonHoldingsServiceImplTest {
     when(child.getCompanyName()).thenReturn("test");
     when(child.getType()).thenReturn("E");
 
-    doCallRealMethod().when(sut).isLeafStock(any(), any());
+    doCallRealMethod().when(service).isLeafStock(any(), any());
     // ACT
-    final boolean actual = sut.isLeafStock(parent, child);
+    final boolean actual = service.isLeafStock(parent, child);
 
     // VERIFY
     assertTrue(actual);
@@ -885,7 +885,7 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
     final var parent = mock(PortfolioHolding.class);
@@ -895,9 +895,9 @@ class CommonHoldingsServiceImplTest {
     when(child.getCompanyName()).thenReturn("test");
     when(child.getType()).thenReturn("FE");
 
-    doCallRealMethod().when(sut).isLeafStock(any(), any());
+    doCallRealMethod().when(service).isLeafStock(any(), any());
     // ACT
-    final boolean actual = sut.isLeafStock(parent, child);
+    final boolean actual = service.isLeafStock(parent, child);
 
     // VERIFY
     assertFalse(actual);
@@ -908,15 +908,15 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
     final TopCommonHoldingsCommand req = mock(TopCommonHoldingsCommand.class);
     doReturn(null).when(req).getNumOfTopCommonHoldings();
 
-    doCallRealMethod().when(sut).getTopCommonHoldingsNumber(req);
+    doCallRealMethod().when(service).getTopCommonHoldingsNumber(req);
     // ACT
-    final int actual = sut.getTopCommonHoldingsNumber(req);
+    final int actual = service.getTopCommonHoldingsNumber(req);
 
     // VERIFY
     final int expected = 10;
@@ -928,15 +928,15 @@ class CommonHoldingsServiceImplTest {
     // SETUP
     final var accumulateTypes = Set.of("FE");
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+    final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
         .useConstructor(fetcher, accumulateTypes));
 
     final TopCommonHoldingsCommand req = mock(TopCommonHoldingsCommand.class);
     doReturn(11).when(req).getNumOfTopCommonHoldings();
 
-    doCallRealMethod().when(sut).getTopCommonHoldingsNumber(req);
+    doCallRealMethod().when(service).getTopCommonHoldingsNumber(req);
     // ACT
-    final int actual = sut.getTopCommonHoldingsNumber(req);
+    final int actual = service.getTopCommonHoldingsNumber(req);
 
     // VERIFY
     final int expected = 11;
@@ -949,7 +949,7 @@ class CommonHoldingsServiceImplTest {
       // SETUP
       final var fetcher = mock(SecurityDataFetcher.class);
       final var defaultPeriods = Set.of();
-      final var sut = mock(CommonHoldingsServiceImpl.class, withSettings()
+      final var service = mock(CommonHoldingsServiceImpl.class, withSettings()
           .useConstructor(fetcher, defaultPeriods));
 
       final var command = mock(TopCommonHoldingsCommand.class);
@@ -959,12 +959,12 @@ class CommonHoldingsServiceImplTest {
       when(command.getHoldings()).thenReturn(holdings);
       when(fetcher.fetch(any(), any())).thenReturn(Map.of());
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
-      verify(sut).getTopCommonHoldingsNumber(command);
+      verify(service).getTopCommonHoldingsNumber(command);
     }
   }
 }

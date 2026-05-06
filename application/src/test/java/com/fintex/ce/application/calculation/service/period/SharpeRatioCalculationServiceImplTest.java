@@ -22,35 +22,35 @@ class SharpeRatioCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TBillsFetcher.class);
-    final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
 
     final var weightedAverageInput = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(weightedAverageInput);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(weightedAverageInput);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    service.defineCalculationMethod(req);
 
-    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_ONE);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_ONE);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     final var tBillsFetcher = mock(TBillsFetcher.class);
-    final var sut = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
 
     final var context = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(context);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    service.defineCalculationMethod(req);
 
     verify(tBillsFetcher).fetch(Currency.CAD);
   }

@@ -52,19 +52,19 @@ class CorrelationCalculationTest {
     final var context = mock(PeriodCalculationInput.class);
     final var map = mock(Map.class);
     final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), map);
-    final var sut = mock(CorrelationCalculation.class, withSettings()
+    final var calculation = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
     final var treeMap = mock(TreeMap.class);
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
-    when(sut.hasEnoughReturns(anyInt(), any())).thenReturn(true);
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
+    when(calculation.hasEnoughReturns(anyInt(), any())).thenReturn(true);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
 
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut).calculatePortfolioBaseTotalReturnValuesByPeriod(TWELVE, map);
+    verify(calculation).calculatePortfolioBaseTotalReturnValuesByPeriod(TWELVE, map);
   }
 
   @Test
@@ -72,19 +72,19 @@ class CorrelationCalculationTest {
     final var context = mock(PeriodCalculationInput.class);
     final var map = mock(Map.class);
     final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), map);
-    final var sut = mock(CorrelationCalculation.class, withSettings()
+    final var calculation = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
     final var treeMap = mock(TreeMap.class);
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
-    when(sut.hasEnoughReturns(anyInt(), any())).thenReturn(false);
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
+    when(calculation.hasEnoughReturns(anyInt(), any())).thenReturn(false);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
 
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut, times(0)).calculatePortfolioBaseTotalReturnValuesByPeriod(TWELVE, map);
+    verify(calculation, times(0)).calculatePortfolioBaseTotalReturnValuesByPeriod(TWELVE, map);
   }
 
   @Test
@@ -92,20 +92,20 @@ class CorrelationCalculationTest {
     final var context = mock(PeriodCalculationInput.class);
     final var monthlyReturns = mock(Map.class);
     final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), monthlyReturns);
-    final var sut = mock(CorrelationCalculation.class, withSettings()
+    final var calculation = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
     final var treeMap = mock(TreeMap.class);
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
-    when(sut.hasEnoughReturns(anyInt(), any())).thenReturn(true);
+    when(calculation.hasEnoughReturns(anyInt(), any())).thenReturn(true);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
 
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut).getCorrelationPeriod(any(), any(), eq(TWELVE));
+    verify(calculation).getCorrelationPeriod(any(), any(), eq(TWELVE));
   }
 
   @Test
@@ -113,20 +113,20 @@ class CorrelationCalculationTest {
     final var context = mock(PeriodCalculationInput.class);
     final var monthlyReturns = mock(Map.class);
     final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), monthlyReturns);
-    final var sut = mock(CorrelationCalculation.class, withSettings()
+    final var calculation = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
     final var treeMap = mock(TreeMap.class);
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
-    when(sut.hasEnoughReturns(anyInt(), any())).thenReturn(false);
+    when(calculation.hasEnoughReturns(anyInt(), any())).thenReturn(false);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
 
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut, times(0)).getCorrelationPeriod(any(), any(), eq(TWELVE));
+    verify(calculation, times(0)).getCorrelationPeriod(any(), any(), eq(TWELVE));
   }
 
   @Test
@@ -135,17 +135,17 @@ class CorrelationCalculationTest {
     final var map = mock(Map.class);
     final var holding = mock(PortfolioHolding.class);
     final var portfolioBaseTotalReturn = Map.of(holding, map);
-    final var sut = mock(CorrelationCalculation.class, withSettings()
+    final var calculation = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
     final var treeMap = mock(TreeMap.class);
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut).hasEnoughReturns(eq(TWELVE),
+    verify(calculation).hasEnoughReturns(eq(TWELVE),
         argThat(entry -> entry.getKey().equals(holding) && entry.getValue().equals(map)));
   }
 
@@ -154,20 +154,20 @@ class CorrelationCalculationTest {
     final var context = mock(PeriodCalculationInput.class);
     final var monthlyReturns = mock(Map.class);
     final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), monthlyReturns);
-    final var sut = mock(CorrelationCalculation.class, withSettings()
+    final var calculation = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
     final var treeMap = mock(TreeMap.class);
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
     final var correlationPeriod = mock(CorrelationPeriodResult.class);
-    when(sut.getCorrelationPeriod(any(), any(), anyInt())).thenReturn(correlationPeriod);
+    when(calculation.getCorrelationPeriod(any(), any(), anyInt())).thenReturn(correlationPeriod);
 
     when(monthlyReturns.size()).thenReturn(14);
-    doCallRealMethod().when(sut).hasEnoughReturns(anyInt(), any());
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    final List<CorrelationPeriodResult> correlationPeriodDtoS = sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).hasEnoughReturns(anyInt(), any());
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final List<CorrelationPeriodResult> correlationPeriodDtoS = calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
     assertEquals(1, correlationPeriodDtoS.size());
     assertEquals(correlationPeriod, correlationPeriodDtoS.get(0));
@@ -178,69 +178,69 @@ class CorrelationCalculationTest {
     final var context = mock(PeriodCalculationInput.class);
     final var monthlyReturns = mock(Map.class);
     final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), monthlyReturns);
-    final var sut = mock(CorrelationCalculation.class, withSettings()
+    final var calculation = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
     final var treeMap = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(BigDecimal.ONE.intValue());
 
-    when(sut.hasEnoughReturns(anyInt(), any())).thenReturn(false);
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
+    when(calculation.hasEnoughReturns(anyInt(), any())).thenReturn(false);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
 
-    final List<CorrelationPeriodResult> correlationPeriodDtoS = sut.calculatePeriodForNumberOfMonths(TWELVE);
+    final List<CorrelationPeriodResult> correlationPeriodDtoS = calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
     assertTrue(correlationPeriodDtoS.isEmpty());
   }
 
   @Test
   void shouldCalculatePortfolioBaseTotalReturnValuesByPeriod_whenVerifyGetPeriodStartDate() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     final var map = mock(Map.class);
 
     when(treeMap.size()).thenReturn(BigDecimal.ONE.intValue());
-    when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
 
-    doCallRealMethod().when(sut).calculatePortfolioBaseTotalReturnValuesByPeriod(anyInt(), anyMap());
-    sut.calculatePortfolioBaseTotalReturnValuesByPeriod(TWELVE, map);
+    doCallRealMethod().when(calculation).calculatePortfolioBaseTotalReturnValuesByPeriod(anyInt(), anyMap());
+    calculation.calculatePortfolioBaseTotalReturnValuesByPeriod(TWELVE, map);
 
-    verify(sut).getPeriodStartDate(TWELVE, new TreeMap<>(map));
+    verify(calculation).getPeriodStartDate(TWELVE, new TreeMap<>(map));
   }
 
   @Test
   void shouldCalculatePortfolioBaseTotalReturnValuesByPeriod_whenVerifyGetSubMapByPeriodStartDate() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     final var map = mock(Map.class);
     final var date = LocalDate.now();
 
-    when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(BigDecimal.ONE.intValue());
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
 
-    doCallRealMethod().when(sut).calculatePortfolioBaseTotalReturnValuesByPeriod(anyInt(), anyMap());
-    sut.calculatePortfolioBaseTotalReturnValuesByPeriod(TWELVE, map);
+    doCallRealMethod().when(calculation).calculatePortfolioBaseTotalReturnValuesByPeriod(anyInt(), anyMap());
+    calculation.calculatePortfolioBaseTotalReturnValuesByPeriod(TWELVE, map);
 
-    verify(sut).getSubMapByPeriodStartDate(date, new TreeMap<>(map));
+    verify(calculation).getSubMapByPeriodStartDate(date, new TreeMap<>(map));
   }
 
   @Test
   void shouldCalculatePortfolioBaseTotalReturnValuesByPeriod_whenCheckResult() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var treeMap = mock(TreeMap.class);
     final var map = mock(Map.class);
     final var date = LocalDate.now();
 
     when(treeMap.size()).thenReturn(BigDecimal.ONE.intValue());
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     final var portfolioBaseTotalReturnByPeriodStartDate = Map.of(date, BigDecimalConstants.TWELVE, date.plusMonths(1),
         TWO);
-    when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(new TreeMap<>(
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(new TreeMap<>(
         portfolioBaseTotalReturnByPeriodStartDate));
 
-    doCallRealMethod().when(sut).calculatePortfolioBaseTotalReturnValuesByPeriod(anyInt(), anyMap());
-    final TreeMap<LocalDate, BigDecimal> result = new TreeMap<>(sut.calculatePortfolioBaseTotalReturnValuesByPeriod(
+    doCallRealMethod().when(calculation).calculatePortfolioBaseTotalReturnValuesByPeriod(anyInt(), anyMap());
+    final TreeMap<LocalDate, BigDecimal> result = new TreeMap<>(calculation.calculatePortfolioBaseTotalReturnValuesByPeriod(
         TWELVE, map));
 
     assertEquals(2, result.size());
@@ -250,153 +250,153 @@ class CorrelationCalculationTest {
 
   @Test
   void shouldGetCorrelationPeriod_whenVerifyCalculateCorrelation() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, ONE);
     final var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US, null);
     final var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
     final var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
-    when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
+    when(calculation.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
 
-    doCallRealMethod().when(sut).getCorrelationPeriod(any(), any(), anyInt());
-    sut.getCorrelationPeriod(mutualFundsHolding, holdings, TWELVE);
+    doCallRealMethod().when(calculation).getCorrelationPeriod(any(), any(), anyInt());
+    calculation.getCorrelationPeriod(mutualFundsHolding, holdings, TWELVE);
 
-    verify(sut).calculateCorrelation(map, map);
+    verify(calculation).calculateCorrelation(map, map);
   }
 
   @Test
   void shouldGetCorrelationPeriod_whenVerifyMapToCorrelationPeriodResult() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, ONE);
     final var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US, null);
     final var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
     final var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
-    when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
+    when(calculation.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
 
-    doCallRealMethod().when(sut).getCorrelationPeriod(any(), any(), anyInt());
-    sut.getCorrelationPeriod(mutualFundsHolding, holdings, TWELVE);
+    doCallRealMethod().when(calculation).getCorrelationPeriod(any(), any(), anyInt());
+    calculation.getCorrelationPeriod(mutualFundsHolding, holdings, TWELVE);
 
-    verify(sut).mapToCorrelationPeriodResult(eq(mutualFundsHolding), eq(TWELVE), any());
+    verify(calculation).mapToCorrelationPeriodResult(eq(mutualFundsHolding), eq(TWELVE), any());
   }
 
   @Test
   void shouldCalculateCorrelation_whenVerifyCalculateNumerator() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var map = mock(Map.class);
 
-    when(sut.calculateNumerator(any(), any())).thenReturn(BigDecimal.ONE);
-    when(sut.calculateDenominator(any(), any())).thenReturn(BigDecimal.ONE);
-    when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
-    doCallRealMethod().when(sut).calculateCorrelation(any(), any());
+    when(calculation.calculateNumerator(any(), any())).thenReturn(BigDecimal.ONE);
+    when(calculation.calculateDenominator(any(), any())).thenReturn(BigDecimal.ONE);
+    when(calculation.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
+    doCallRealMethod().when(calculation).calculateCorrelation(any(), any());
 
-    sut.calculateCorrelation(map, map);
+    calculation.calculateCorrelation(map, map);
 
-    verify(sut).calculateNumerator(map, map);
+    verify(calculation).calculateNumerator(map, map);
   }
 
   @Test
   void shouldCalculateCorrelation_whenVerifyCalculateDenominator() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var map = mock(Map.class);
 
-    when(sut.calculateNumerator(any(), any())).thenReturn(BigDecimal.ONE);
-    when(sut.calculateDenominator(any(), any())).thenReturn(BigDecimal.ONE);
-    when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
+    when(calculation.calculateNumerator(any(), any())).thenReturn(BigDecimal.ONE);
+    when(calculation.calculateDenominator(any(), any())).thenReturn(BigDecimal.ONE);
+    when(calculation.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
 
-    doCallRealMethod().when(sut).calculateCorrelation(any(), any());
-    sut.calculateCorrelation(map, map);
+    doCallRealMethod().when(calculation).calculateCorrelation(any(), any());
+    calculation.calculateCorrelation(map, map);
 
-    verify(sut).calculateDenominator(map, map);
+    verify(calculation).calculateDenominator(map, map);
   }
 
   @Test
   void shouldCalculateCorrelation_whenCheckResult() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var map = mock(Map.class);
 
-    when(sut.calculateNumerator(any(), any())).thenReturn(BigDecimalConstants.TWELVE);
-    when(sut.calculateDenominator(any(), any())).thenReturn(TWO);
-    when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
-    doCallRealMethod().when(sut).calculateCorrelation(any(), any());
+    when(calculation.calculateNumerator(any(), any())).thenReturn(BigDecimalConstants.TWELVE);
+    when(calculation.calculateDenominator(any(), any())).thenReturn(TWO);
+    when(calculation.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
+    doCallRealMethod().when(calculation).calculateCorrelation(any(), any());
 
-    final BigDecimal result = sut.calculateCorrelation(map, map);
+    final BigDecimal result = calculation.calculateCorrelation(map, map);
 
     assertEquals(toUserScale(BigDecimal.valueOf(6)), toUserScale(result));
   }
 
   @Test
   void shouldCalculateNumerator_whenCheckResult() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map1 = Map.of(date, TWO, date.plusMonths(1), BigDecimalConstants.TWELVE);
     final var map2 = Map.of(date, ONE, date.plusMonths(1), BigDecimalConstants.TWELVE);
 
-    when(sut.calculateNumerator(any(), any())).thenReturn(BigDecimalConstants.TWELVE);
-    when(sut.calculateDenominator(any(), any())).thenReturn(TWO);
-    when(sut.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
-    doCallRealMethod().when(sut).calculateNumerator(any(), any());
+    when(calculation.calculateNumerator(any(), any())).thenReturn(BigDecimalConstants.TWELVE);
+    when(calculation.calculateDenominator(any(), any())).thenReturn(TWO);
+    when(calculation.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
+    doCallRealMethod().when(calculation).calculateNumerator(any(), any());
 
-    final BigDecimal result = sut.calculateNumerator(map1, map2);
+    final BigDecimal result = calculation.calculateNumerator(map1, map2);
 
     assertEquals(toUserScale(BigDecimal.valueOf(146)), toUserScale(result));
   }
 
   @Test
   void shouldCalculateDenominator_whenCheckResult() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map1 = Map.of(date, TWO, date.plusMonths(1), BigDecimalConstants.TWELVE);
     final var map2 = Map.of(date, ONE, date.plusMonths(1), BigDecimalConstants.TWELVE);
 
-    when(sut.getSumOfSquaredValues(any())).thenReturn(BigDecimalConstants.TWELVE);
+    when(calculation.getSumOfSquaredValues(any())).thenReturn(BigDecimalConstants.TWELVE);
 
-    doCallRealMethod().when(sut).calculateDenominator(any(), any());
-    final BigDecimal result = sut.calculateDenominator(map1, map2);
+    doCallRealMethod().when(calculation).calculateDenominator(any(), any());
+    final BigDecimal result = calculation.calculateDenominator(map1, map2);
 
     assertEquals(toUserScale(BigDecimal.valueOf(12)), toUserScale(result));
   }
 
   @Test
   void shouldCalculateDenominator_whenVerifyGetSumOfSquaredValues() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var map = mock(Map.class);
 
-    when(sut.getSumOfSquaredValues(any())).thenReturn(BigDecimalConstants.TWELVE);
+    when(calculation.getSumOfSquaredValues(any())).thenReturn(BigDecimalConstants.TWELVE);
 
-    doCallRealMethod().when(sut).calculateDenominator(any(), any());
-    sut.calculateDenominator(map, map);
+    doCallRealMethod().when(calculation).calculateDenominator(any(), any());
+    calculation.calculateDenominator(map, map);
 
-    verify(sut, times(2)).getSumOfSquaredValues(map);
+    verify(calculation, times(2)).getSumOfSquaredValues(map);
   }
 
   @Test
   void shouldGetSumOfSquaredValues_whenCheckResults() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();
     final var map = Map.of(date, TWO, date.plusMonths(1), BigDecimalConstants.TWELVE);
 
-    when(sut.getSumOfSquaredValues(any())).thenReturn(BigDecimalConstants.TWELVE);
+    when(calculation.getSumOfSquaredValues(any())).thenReturn(BigDecimalConstants.TWELVE);
 
-    doCallRealMethod().when(sut).getSumOfSquaredValues(any());
-    final BigDecimal sumOfSquaredValues = sut.getSumOfSquaredValues(map);
+    doCallRealMethod().when(calculation).getSumOfSquaredValues(any());
+    final BigDecimal sumOfSquaredValues = calculation.getSumOfSquaredValues(map);
 
     assertEquals(toUserScale(BigDecimal.valueOf(148)), toUserScale(sumOfSquaredValues));
   }
 
   @Test
   void shouldBuildCorrelationPeriodResult_whenMappingCorrelationValues() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
     final var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV));
     final var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV));
     final var map = Map.of(mutualFundsHolding, BigDecimalConstants.TWELVE);
 
-    doCallRealMethod().when(sut).mapToCorrelationPeriodResult(any(), anyInt(), any());
-    final CorrelationPeriodResult correlationPeriod = sut.mapToCorrelationPeriodResult(usEtfHolding, TWELVE, map);
+    doCallRealMethod().when(calculation).mapToCorrelationPeriodResult(any(), anyInt(), any());
+    final CorrelationPeriodResult correlationPeriod = calculation.mapToCorrelationPeriodResult(usEtfHolding, TWELVE, map);
 
     assertEquals(String.valueOf(TWELVE), correlationPeriod.period());
     assertEquals("ETF_US_TEST", correlationPeriod.key());
@@ -411,15 +411,15 @@ class CorrelationCalculationTest {
     final var map = Map.of(new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV)), mock(Map.class));
     final var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), map);
-    final var sut = mock(CorrelationCalculation.class, withSettings()
+    final var calculation = mock(CorrelationCalculation.class, withSettings()
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
     final var listMock = List.of(new CorrelationPeriodResult(null, null, null));
     final var pairs = Set.of(Pair.of("2000-01-12", listMock), Pair.of("2020-01-05", listMock));
-    when(sut.setPeriod(anyString(), anyList())).thenReturn(listMock);
+    when(calculation.setPeriod(anyString(), anyList())).thenReturn(listMock);
 
-    doCallRealMethod().when(sut).defineResponseType(anySet());
-    final CorrelationResult result = sut.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anySet());
+    final CorrelationResult result = calculation.defineResponseType(pairs);
 
     assertEquals(2, result.getCorrelationPeriods().size());
     Assertions.assertEquals(listMock.get(0), result.getCorrelationPeriods().get(0));
@@ -429,29 +429,29 @@ class CorrelationCalculationTest {
 
   @Test
   void shouldReturnEmptyList_whenFormattingEmptyCorrelationPeriods() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
 
     final List<CorrelationPeriodResult> expected = List.of();
 
-    doCallRealMethod().when(sut).toUserFormat(any());
-    final var actual = sut.toUserFormat(List.of());
+    doCallRealMethod().when(calculation).toUserFormat(any());
+    final var actual = calculation.toUserFormat(List.of());
 
     ComparisonUtils.compareCollections(expected, actual);
   }
 
   @Test
   void shouldReturnNull_whenFormattingNullCorrelationPeriods() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
 
-    doCallRealMethod().when(sut).toUserFormat(any());
-    final var actual = sut.toUserFormat(null);
+    doCallRealMethod().when(calculation).toUserFormat(any());
+    final var actual = calculation.toUserFormat(null);
 
     assertNull(actual);
   }
 
   @Test
   void shouldKeepValuesUnchanged_whenFormattingAlreadyScaledCorrelationPeriods() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
 
     final var correlationPeriod = new CorrelationPeriodResult(null, null, List.of());
     final var argument = List.of(correlationPeriod);
@@ -459,15 +459,15 @@ class CorrelationCalculationTest {
     final var correlationPeriodDtoExpected = new CorrelationPeriodResult(null, null, List.of());
     final var expected = List.of(correlationPeriodDtoExpected);
 
-    doCallRealMethod().when(sut).toUserFormat(any());
-    final var actual = sut.toUserFormat(argument);
+    doCallRealMethod().when(calculation).toUserFormat(any());
+    final var actual = calculation.toUserFormat(argument);
 
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldRoundCorrelationValues_whenFormattingCorrelationPeriods() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
 
     final var correlationKeyValueResult = new CorrelationKeyValueResult(null, new BigDecimal("0.123456789112345"));
     final var correlationPeriod = new CorrelationPeriodResult(null, null, List.of(correlationKeyValueResult));
@@ -478,22 +478,22 @@ class CorrelationCalculationTest {
         List.of(correlationKeyValueResultExpected));
     final var expected = List.of(correlationPeriodDtoExpected);
 
-    doCallRealMethod().when(sut).toUserFormat(any());
-    final var actual = sut.toUserFormat(argument);
+    doCallRealMethod().when(calculation).toUserFormat(any());
+    final var actual = calculation.toUserFormat(argument);
 
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldSetPeriod_whenCheckResult() {
-    final var sut = mock(CorrelationCalculation.class);
+    final var calculation = mock(CorrelationCalculation.class);
 
     final String period = "SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE";
     final var correlationPeriod = new CorrelationPeriodResult("20", null, null);
     final var periods = List.of(correlationPeriod);
 
-    doCallRealMethod().when(sut).setPeriod(anyString(), anyList());
-    final var actual = sut.setPeriod(period, periods);
+    doCallRealMethod().when(calculation).setPeriod(anyString(), anyList());
+    final var actual = calculation.setPeriod(period, periods);
 
     assertEquals(period, actual.get(0).period());
   }

@@ -33,112 +33,112 @@ class Growth10KCalculationTest {
   void shouldCalculate_whenVerifyCalculateGrowth10K() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    doCallRealMethod().when(sut).calculate();
-    sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    calculation.calculate();
 
-    verify(sut).calculateGrowth10K(portfolioReturns);
+    verify(calculation).calculateGrowth10K(portfolioReturns);
   }
 
   @Test
   void shouldCalculate_whenVerifyGetPortfolioEndDate() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    when(sut.calculateGrowth10K(portfolioReturns)).thenReturn(mock(List.class));
+    when(calculation.calculateGrowth10K(portfolioReturns)).thenReturn(mock(List.class));
 
-    doCallRealMethod().when(sut).calculate();
-    sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    calculation.calculate();
 
-    verify(sut).getPortfolioEndDate(portfolioReturns);
+    verify(calculation).getPortfolioEndDate(portfolioReturns);
   }
 
   @Test
   void shouldCalculate_whenVerifyGetPortfolioStartDate() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    when(sut.calculateGrowth10K(portfolioReturns)).thenReturn(mock(List.class));
+    when(calculation.calculateGrowth10K(portfolioReturns)).thenReturn(mock(List.class));
 
-    doCallRealMethod().when(sut).calculate();
-    sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    calculation.calculate();
 
-    verify(sut).getPortfolioStartDate(portfolioReturns);
+    verify(calculation).getPortfolioStartDate(portfolioReturns);
   }
 
   @Test
   void shouldCalculateGrowth10K_whenVerifySetFirstGrowth10KValue() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    doCallRealMethod().when(sut).calculateGrowth10K(portfolioReturns);
-    sut.calculateGrowth10K(portfolioReturns);
+    doCallRealMethod().when(calculation).calculateGrowth10K(portfolioReturns);
+    calculation.calculateGrowth10K(portfolioReturns);
 
-    verify(sut).setFirstGrowth10KValue(eq(portfolioReturns), any());
+    verify(calculation).setFirstGrowth10KValue(eq(portfolioReturns), any());
   }
 
   @Test
   void shouldCalculateGrowth10K_whenVerifyCalculateGrowth10K() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    doCallRealMethod().when(sut).calculateGrowth10K(portfolioReturns);
-    sut.calculateGrowth10K(portfolioReturns);
+    doCallRealMethod().when(calculation).calculateGrowth10K(portfolioReturns);
+    calculation.calculateGrowth10K(portfolioReturns);
 
-    verify(sut).calculateGrowth10K(eq(portfolioReturns), any());
+    verify(calculation).calculateGrowth10K(eq(portfolioReturns), any());
   }
 
   @Test
   void shouldCalculateGrowth10K_whenVerifyPopulateGrowth10KValuesAfterLastDate() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    doCallRealMethod().when(sut).calculateGrowth10K(portfolioReturns);
-    sut.calculateGrowth10K(portfolioReturns);
+    doCallRealMethod().when(calculation).calculateGrowth10K(portfolioReturns);
+    calculation.calculateGrowth10K(portfolioReturns);
 
-    verify(sut).populateGrowth10KValuesAfterLastDate(eq(portfolioReturns), any());
+    verify(calculation).populateGrowth10KValuesAfterLastDate(eq(portfolioReturns), any());
   }
 
   @Test
   void shouldCalculateGrowth10K_whenVerifyReturnsEmptyMapWhenPortfolioReturnsIsNull() {
-    final var sut = mock(Growth10KCalculation.class);
+    final var calculation = mock(Growth10KCalculation.class);
 
-    doCallRealMethod().when(sut).calculateGrowth10K(any());
-    final List<KeyValueResult> growth10K = sut.calculateGrowth10K(null);
+    doCallRealMethod().when(calculation).calculateGrowth10K(any());
+    final List<KeyValueResult> growth10K = calculation.calculateGrowth10K(null);
 
     assertTrue(growth10K.isEmpty());
   }
 
   @Test
   void shouldCalculateGrowth10K_whenVerifyReturnsEmptyMapWhenPortfolioReturnsIsEmpty() {
-    final var sut = mock(Growth10KCalculation.class);
+    final var calculation = mock(Growth10KCalculation.class);
 
-    doCallRealMethod().when(sut).calculateGrowth10K(any());
-    final List<KeyValueResult> growth10K = sut.calculateGrowth10K(new TreeMap<>(Map.of()));
+    doCallRealMethod().when(calculation).calculateGrowth10K(any());
+    final List<KeyValueResult> growth10K = calculation.calculateGrowth10K(new TreeMap<>(Map.of()));
 
     assertTrue(growth10K.isEmpty());
   }
 
   @Test
   void shouldSetFirstGrowth10KValue_whenCheckResult() {
-    final var sut = mock(Growth10KCalculation.class);
+    final var calculation = mock(Growth10KCalculation.class);
     final TreeMap<LocalDate, BigDecimal> growth10K = new TreeMap<>();
     final var portfolioReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).setFirstGrowth10KValue(any(), any());
-    sut.setFirstGrowth10KValue(portfolioReturns, growth10K);
+    doCallRealMethod().when(calculation).setFirstGrowth10KValue(any(), any());
+    calculation.setFirstGrowth10KValue(portfolioReturns, growth10K);
 
     assertEquals(1, growth10K.size());
     assertEquals(portfolioReturns.firstKey().minusMonths(1), growth10K.firstKey());
@@ -147,37 +147,37 @@ class Growth10KCalculationTest {
 
   @Test
   void shouldCalculateGrowth10K_whenVerifyGetGrowth10KValue() {
-    final var sut = mock(Growth10KCalculation.class);
+    final var calculation = mock(Growth10KCalculation.class);
     final TreeMap<LocalDate, BigDecimal> growth10K = new TreeMap<>();
     final var portfolioReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).calculateGrowth10K(any(), any());
-    sut.calculateGrowth10K(portfolioReturns, growth10K);
+    doCallRealMethod().when(calculation).calculateGrowth10K(any(), any());
+    calculation.calculateGrowth10K(portfolioReturns, growth10K);
 
-    verify(sut, times(12)).getGrowth10KValue(any(), any());
+    verify(calculation, times(12)).getGrowth10KValue(any(), any());
   }
 
   @Test
   void shouldCalculateGrowth10K_whenCheckResultDates() {
-    final var sut = mock(Growth10KCalculation.class);
+    final var calculation = mock(Growth10KCalculation.class);
     final TreeMap<LocalDate, BigDecimal> growth10K = new TreeMap<>();
     final var portfolioReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).calculateGrowth10K(any(), any());
-    sut.calculateGrowth10K(portfolioReturns, growth10K);
+    doCallRealMethod().when(calculation).calculateGrowth10K(any(), any());
+    calculation.calculateGrowth10K(portfolioReturns, growth10K);
 
     assertEquals(portfolioReturns.keySet(), growth10K.keySet());
   }
 
   @Test
   void shouldGetGrowth10KValue_whenCheckResultDates() {
-    final var sut = mock(Growth10KCalculation.class);
+    final var calculation = mock(Growth10KCalculation.class);
     final var portfolioReturns = getPortfolioReturns();
     final TreeMap<LocalDate, BigDecimal> growth10K = new TreeMap<>(Map.of(portfolioReturns.firstKey(), new BigDecimal(
         10300)));
 
-    doCallRealMethod().when(sut).getGrowth10KValue(any(), any());
-    final BigDecimal growth10KValue = sut.getGrowth10KValue(growth10K, portfolioReturns.firstEntry());
+    doCallRealMethod().when(calculation).getGrowth10KValue(any(), any());
+    final BigDecimal growth10KValue = calculation.getGrowth10KValue(growth10K, portfolioReturns.firstEntry());
 
     assertEquals(growth10K.firstKey(), portfolioReturns.firstKey());
     assertEquals(toUserScale(new BigDecimal(103000.0000000000)), growth10KValue);
@@ -187,45 +187,45 @@ class Growth10KCalculationTest {
   void shouldPopulateGrowth10KValuesAfterLastDate_whenVerifyGetNextPortfolioReturnsMonth() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    when(sut.getPortfolioEndDate(any())).thenReturn(toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
-    when(sut.getNextPortfolioReturnsMonth(any())).thenReturn(LocalDate.now());
-    when(sut.putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(any(), any()))
+    when(calculation.getPortfolioEndDate(any())).thenReturn(toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
+    when(calculation.getNextPortfolioReturnsMonth(any())).thenReturn(LocalDate.now());
+    when(calculation.putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(any(), any()))
         .thenReturn(toLastDayOfMonth(LocalDate.of(2021, 6, 1)));
 
-    doCallRealMethod().when(sut).populateGrowth10KValuesAfterLastDate(any(), any());
-    sut.populateGrowth10KValuesAfterLastDate(portfolioReturns, new TreeMap<>(Map.of()));
+    doCallRealMethod().when(calculation).populateGrowth10KValuesAfterLastDate(any(), any());
+    calculation.populateGrowth10KValuesAfterLastDate(portfolioReturns, new TreeMap<>(Map.of()));
 
-    verify(sut).getNextPortfolioReturnsMonth(any());
+    verify(calculation).getNextPortfolioReturnsMonth(any());
   }
 
   @Test
   void shouldPopulateGrowth10KValuesAfterLastDate_whenVerifyPutDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    when(sut.getPortfolioEndDate(any())).thenReturn(toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
-    when(sut.getNextPortfolioReturnsMonth(any())).thenReturn(LocalDate.of(2021, 5, 31));
-    when(sut.putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(any(), any()))
+    when(calculation.getPortfolioEndDate(any())).thenReturn(toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
+    when(calculation.getNextPortfolioReturnsMonth(any())).thenReturn(LocalDate.of(2021, 5, 31));
+    when(calculation.putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(any(), any()))
         .thenReturn(toLastDayOfMonth(LocalDate.of(2021, 6, 1)));
 
-    doCallRealMethod().when(sut).populateGrowth10KValuesAfterLastDate(any(), any());
-    sut.populateGrowth10KValuesAfterLastDate(portfolioReturns, new TreeMap<>(Map.of()));
+    doCallRealMethod().when(calculation).populateGrowth10KValuesAfterLastDate(any(), any());
+    calculation.populateGrowth10KValuesAfterLastDate(portfolioReturns, new TreeMap<>(Map.of()));
 
-    verify(sut).putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(any(), any());
+    verify(calculation).putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(any(), any());
   }
 
   @Test
   void shouldGetNextPortfolioReturnsMonth_whenCheckResult() {
-    final var sut = mock(Growth10KCalculation.class);
+    final var calculation = mock(Growth10KCalculation.class);
     final var growth10K = new TreeMap<>(Map.of(toLastDayOfMonth(LocalDate.of(2021, 5, 1)), ONE));
 
-    doCallRealMethod().when(sut).getNextPortfolioReturnsMonth(any());
-    final LocalDate nextPortfolioReturnsMonth = sut.getNextPortfolioReturnsMonth(growth10K);
+    doCallRealMethod().when(calculation).getNextPortfolioReturnsMonth(any());
+    final LocalDate nextPortfolioReturnsMonth = calculation.getNextPortfolioReturnsMonth(growth10K);
 
     assertEquals(toLastDayOfMonth(LocalDate.of(2021, 6, 1)), nextPortfolioReturnsMonth);
   }
@@ -234,11 +234,11 @@ class Growth10KCalculationTest {
   void shouldGetPortfolioEndDate_whenCheckResultWhenCustomEndDateIsNull() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    doCallRealMethod().when(sut).getPortfolioEndDate(any());
-    final LocalDate portfolioEndDate = sut.getPortfolioEndDate(getPortfolioReturns());
+    doCallRealMethod().when(calculation).getPortfolioEndDate(any());
+    final LocalDate portfolioEndDate = calculation.getPortfolioEndDate(getPortfolioReturns());
 
     assertEquals(toLastDayOfMonth(LocalDate.of(2020, 12, 20)), portfolioEndDate);
   }
@@ -249,11 +249,11 @@ class Growth10KCalculationTest {
     final var dateRange = new DateRange(
         toLastDayOfMonth(LocalDate.of(2020, 5, 1)),
         toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    doCallRealMethod().when(sut).getPortfolioEndDate(any());
-    final LocalDate portfolioEndDate = sut.getPortfolioEndDate(getPortfolioReturns());
+    doCallRealMethod().when(calculation).getPortfolioEndDate(any());
+    final LocalDate portfolioEndDate = calculation.getPortfolioEndDate(getPortfolioReturns());
 
     assertEquals(toLastDayOfMonth(LocalDate.of(2021, 5, 20)), portfolioEndDate);
   }
@@ -262,11 +262,11 @@ class Growth10KCalculationTest {
   void shouldGetPortfolioStartDate_whenCheckResultWhenCustomStartDateIsNull() {
     final var portfolioReturns = getPortfolioReturns();
     final var dateRange = DateRange.UNBOUNDED;
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    doCallRealMethod().when(sut).getPortfolioStartDate(any());
-    final LocalDate portfolioEndDate = sut.getPortfolioStartDate(getPortfolioReturns());
+    doCallRealMethod().when(calculation).getPortfolioStartDate(any());
+    final LocalDate portfolioEndDate = calculation.getPortfolioStartDate(getPortfolioReturns());
 
     assertEquals(toLastDayOfMonth(LocalDate.of(2019, 12, 20)), portfolioEndDate);
   }
@@ -277,25 +277,25 @@ class Growth10KCalculationTest {
     final var dateRange = new DateRange(
         toLastDayOfMonth(LocalDate.of(2020, 5, 1)),
         toLastDayOfMonth(LocalDate.of(2021, 5, 1)));
-    final var sut = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
+    final var calculation = mock(Growth10KCalculation.class, withSettings().useConstructor(portfolioReturns, dateRange,
         false));
 
-    doCallRealMethod().when(sut).getPortfolioStartDate(any());
-    final LocalDate portfolioEndDate = sut.getPortfolioStartDate(getPortfolioReturns());
+    doCallRealMethod().when(calculation).getPortfolioStartDate(any());
+    final LocalDate portfolioEndDate = calculation.getPortfolioStartDate(getPortfolioReturns());
 
     assertEquals(toLastDayOfMonth(LocalDate.of(2020, 5, 20)), portfolioEndDate);
   }
 
   @Test
   void shouldPutDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth_whenCheckResult() {
-    final var sut = mock(Growth10KCalculation.class);
+    final var calculation = mock(Growth10KCalculation.class);
     final var date1 = toLastDayOfMonth(LocalDate.of(2021, 5, 31));
     final var date2 = toLastDayOfMonth(LocalDate.of(2021, 4, 30));
     final var growth10K = new TreeMap<>(Map.of(date1, ONE));
 
-    when(sut.getNextPortfolioReturnsMonth(any())).thenReturn(LocalDate.now());
-    doCallRealMethod().when(sut).putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(any(), any());
-    sut.putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(growth10K, date2);
+    when(calculation.getNextPortfolioReturnsMonth(any())).thenReturn(LocalDate.now());
+    doCallRealMethod().when(calculation).putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(any(), any());
+    calculation.putDefaultGrowth10KValueAndGetNextPortfolioReturnsMonth(growth10K, date2);
 
     assertEquals(2, growth10K.size());
     assertEquals(date2, growth10K.firstKey());

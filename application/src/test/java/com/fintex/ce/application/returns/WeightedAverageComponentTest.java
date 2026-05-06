@@ -36,7 +36,7 @@ class WeightedAverageComponentTest {
   @Test
   void shouldCollectMonthlyWeightEntries_whenCheckResult() {
     // SETUP
-    final var sut = mock(WeightedAverageComponent.class);
+    final var component = mock(WeightedAverageComponent.class);
     final var holding = mock(PortfolioHolding.class);
     final var date = LocalDate.of(2020, 10, 10);
     final var oldValue = new BigDecimal("2.2");
@@ -44,10 +44,10 @@ class WeightedAverageComponentTest {
 
     final var map = Map.of(holding, expectedNewValue);
 
-    doCallRealMethod().when(sut).collectMonthlyWeightEntries(any());
+    doCallRealMethod().when(component).collectMonthlyWeightEntries(any());
 
     // ACT
-    final Function<Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>, TreeMap<LocalDate, BigDecimal>> actualFunction = sut
+    final Function<Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>, TreeMap<LocalDate, BigDecimal>> actualFunction = component
         .collectMonthlyWeightEntries(map);
 
     final Map<LocalDate, BigDecimal> actual = actualFunction.apply(Map.entry(holding, new TreeMap<>(Map.of(date,
@@ -61,17 +61,17 @@ class WeightedAverageComponentTest {
   void shouldCalculateEndingPortfolioWeight_whenVefiryCalculateInitialPortfolioWeight() {
     try (var portfolioUtilsMock = mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var sut = mock(WeightedAverageComponent.class);
+      final var component = mock(WeightedAverageComponent.class);
 
       final var holding = mock(PortfolioHolding.class);
       final var pBaseTotalReturn = Map.of(holding, new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE)));
 
-      when(sut.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
+      when(component.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
 
-      doCallRealMethod().when(sut).calculateEndingPortfolioWeight(anyMap());
+      doCallRealMethod().when(component).calculateEndingPortfolioWeight(anyMap());
 
       // ACT
-      sut.calculateEndingPortfolioWeight(pBaseTotalReturn);
+      component.calculateEndingPortfolioWeight(pBaseTotalReturn);
 
       // VERIFY
       portfolioUtilsMock.verify(() -> PortfolioUtils.calculateInitialPortfolioWeight(eq(Set.of(holding))));
@@ -82,20 +82,20 @@ class WeightedAverageComponentTest {
   void shouldCalculateEndingPortfolioWeight_whenVerifyCollectMonthlyWeightEntries() {
     try (var portfolioUtilsMock = mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var sut = mock(WeightedAverageComponent.class);
+      final var component = mock(WeightedAverageComponent.class);
 
       final var holding = mock(PortfolioHolding.class);
       var map = mock(TreeMap.class);
       portfolioUtilsMock.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(anyCollection())).thenReturn(map);
-      when(sut.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
+      when(component.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
 
-      doCallRealMethod().when(sut).calculateEndingPortfolioWeight(anyMap());
+      doCallRealMethod().when(component).calculateEndingPortfolioWeight(anyMap());
 
       // ACT
-      sut.calculateEndingPortfolioWeight(Map.of());
+      component.calculateEndingPortfolioWeight(Map.of());
 
       // VERIFY
-      verify(sut).collectMonthlyWeightEntries(same(map));
+      verify(component).collectMonthlyWeightEntries(same(map));
     }
   }
 
@@ -107,16 +107,16 @@ class WeightedAverageComponentTest {
           when(sumProductMock.setMap2KeyFinder(any())).thenReturn(sumProductMock);
           when(sumProductMock.calculate()).thenReturn(new TreeMap());
         })) {
-      final var sut = mock(WeightedAverageComponent.class,
+      final var component = mock(WeightedAverageComponent.class,
           withSettings().useConstructor(ReturnFactorScale.AS_IS));
 
       final var holding = mock(PortfolioHolding.class);
-      when(sut.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
+      when(component.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
 
-      doCallRealMethod().when(sut).calculateTotalPortfolioReturnFactor(anyMap(), anyMap());
+      doCallRealMethod().when(component).calculateTotalPortfolioReturnFactor(anyMap(), anyMap());
 
       // ACT
-      sut.calculateTotalPortfolioReturnFactor(Map.of(), Map.of());
+      component.calculateTotalPortfolioReturnFactor(Map.of(), Map.of());
 
       // VERIFY
       assertEquals(1, sumProductMockedConstruction.constructed().size());
@@ -136,16 +136,16 @@ class WeightedAverageComponentTest {
           when(sumProductMock.calculate()).thenReturn(map);
         })) {
 
-      final var sut = mock(WeightedAverageComponent.class,
+      final var component = mock(WeightedAverageComponent.class,
           withSettings().useConstructor(ReturnFactorScale.SCALE_OF_TWO));
 
       final var holding = mock(PortfolioHolding.class);
-      when(sut.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
+      when(component.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
 
-      doCallRealMethod().when(sut).calculateTotalPortfolioReturnFactor(anyMap(), anyMap());
+      doCallRealMethod().when(component).calculateTotalPortfolioReturnFactor(anyMap(), anyMap());
 
       // ACT
-      final var actual = sut.calculateTotalPortfolioReturnFactor(Map.of(), Map.of());
+      final var actual = component.calculateTotalPortfolioReturnFactor(Map.of(), Map.of());
 
       // VERIFY
       Assertions.assertNotNull(actual);
@@ -156,33 +156,33 @@ class WeightedAverageComponentTest {
   @Test
   void shouldCalculateWeightedAverage_whenVerifyCalculateEndingPortfolioWeight() {
     // SETUP
-    final var sut = mock(WeightedAverageComponent.class);
+    final var component = mock(WeightedAverageComponent.class);
     final var returns = mock(Map.class);
 
-    doCallRealMethod().when(sut).calculateWeightedAverage(anyMap());
+    doCallRealMethod().when(component).calculateWeightedAverage(anyMap());
 
     // ACT
-    sut.calculateWeightedAverage(returns);
+    component.calculateWeightedAverage(returns);
 
     // VERIFY
-    verify(sut).calculateEndingPortfolioWeight(returns);
+    verify(component).calculateEndingPortfolioWeight(returns);
   }
 
   @Test
   void shouldCalculateWeightedAverage_whenVerifyCalculateTotalPortfolioReturnFacto() {
     // SETUP
-    final var sut = mock(WeightedAverageComponent.class);
+    final var component = mock(WeightedAverageComponent.class);
     final var returns = mock(Map.class);
     final var endingPortfolioWeight = mock(Map.class);
 
-    when(sut.calculateEndingPortfolioWeight(anyMap())).thenReturn(endingPortfolioWeight);
+    when(component.calculateEndingPortfolioWeight(anyMap())).thenReturn(endingPortfolioWeight);
 
-    doCallRealMethod().when(sut).calculateWeightedAverage(anyMap());
+    doCallRealMethod().when(component).calculateWeightedAverage(anyMap());
 
     // ACT
-    sut.calculateWeightedAverage(returns);
+    component.calculateWeightedAverage(returns);
 
     // VERIFY
-    verify(sut).calculateTotalPortfolioReturnFactor(returns, endingPortfolioWeight);
+    verify(component).calculateTotalPortfolioReturnFactor(returns, endingPortfolioWeight);
   }
 }

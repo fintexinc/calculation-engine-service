@@ -30,20 +30,20 @@ class InformationRatioCalculationServiceImplTest {
     final var command = mock(PeriodCommand.class);
     final var context = mock(BenchmarkPeriodCalculationInput.class);
 
-    final var sut = mock(InformationRatioCalculationServiceImpl.class,
+    final var service = mock(InformationRatioCalculationServiceImpl.class,
         withSettings().useConstructor(monthlyReturnsService, defaultPeriod));
 
     when(context.getCipsd()).thenReturn(LocalDate.MIN);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap());
-    when(sut.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO))
+    when(service.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO))
         .thenReturn(context);
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
+    doCallRealMethod().when(service).defineCalculationMethod(any());
 
     // ACT
-    final PeriodCalculationAbstract<InformationRatioResult, ?> actual = sut.defineCalculationMethod(command);
+    final PeriodCalculationAbstract<InformationRatioResult, ?> actual = service.defineCalculationMethod(command);
 
     // VERIFY
-    verify(sut).buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    verify(service).buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
   }
 
 }

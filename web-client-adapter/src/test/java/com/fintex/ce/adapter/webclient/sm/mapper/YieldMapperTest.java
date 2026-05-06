@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class YieldMapperTest {
 
-  private final YieldMapper sut = new YieldMapper();
+  private final YieldMapper mapper = new YieldMapper();
 
   @Test
   void shouldMapDividendYieldAndProvider_whenResponseHasValues() {
@@ -27,7 +27,7 @@ class YieldMapperTest {
     var smsResponse = new Income();
     smsResponse.setDividendYield(dividendYield);
 
-    Yield result = sut.map(smsResponse, createHolding("SEC-001"));
+    Yield result = mapper.map(smsResponse, createHolding("SEC-001"));
 
     assertThat(result.getDividendYield()).isEqualByComparingTo("0.035");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -35,7 +35,7 @@ class YieldMapperTest {
 
   @Test
   void shouldReturnEmptyYield_whenResponseIsNull() {
-    Yield result = sut.map(null, createHolding("SEC-002"));
+    Yield result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getDividendYield()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -46,7 +46,7 @@ class YieldMapperTest {
     var smsResponse = new Income();
     smsResponse.setDividendYield(null);
 
-    Yield result = sut.map(smsResponse, createHolding("SEC-003"));
+    Yield result = mapper.map(smsResponse, createHolding("SEC-003"));
 
     assertThat(result.getDividendYield()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -61,7 +61,7 @@ class YieldMapperTest {
     var smsResponse = new Income();
     smsResponse.setDividendYield(dividendYield);
 
-    Yield result = sut.map(smsResponse, createHolding("SEC-004"));
+    Yield result = mapper.map(smsResponse, createHolding("SEC-004"));
 
     assertThat(result.getDividendYield()).isEqualByComparingTo("0.025");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);

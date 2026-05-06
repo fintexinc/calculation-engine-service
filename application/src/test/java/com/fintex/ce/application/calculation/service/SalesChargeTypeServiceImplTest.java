@@ -23,16 +23,16 @@ class SalesChargeTypeServiceImplTest {
   void shouldPerform_whenVerifyLoad() {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
+    final var service = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
     final var command = mock(PortfolioHoldingsCommand.class);
 
     final var salesCharge = mock(Map.class);
     when(fetcher.fetch(any(), any())).thenReturn(salesCharge);
-    when(sut.getSalesChargeCalculation(salesCharge)).thenReturn(mock(SalesChargeCalculation.class));
+    when(service.getSalesChargeCalculation(salesCharge)).thenReturn(mock(SalesChargeCalculation.class));
 
-    doCallRealMethod().when(sut).perform(any());
+    doCallRealMethod().when(service).perform(any());
     // ACT
-    sut.perform(command);
+    service.perform(command);
 
     // VERIFY
     verify(fetcher).fetch(any(), any());
@@ -42,38 +42,38 @@ class SalesChargeTypeServiceImplTest {
   void shouldPerform_whenVerifyGetSalesChargeCalculation() {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
+    final var service = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
     final var command = mock(PortfolioHoldingsCommand.class);
 
     final var salesCharge = mock(Map.class);
     when(fetcher.fetch(any(), any())).thenReturn(salesCharge);
-    when(sut.getSalesChargeCalculation(salesCharge)).thenReturn(mock(SalesChargeCalculation.class));
+    when(service.getSalesChargeCalculation(salesCharge)).thenReturn(mock(SalesChargeCalculation.class));
 
-    doCallRealMethod().when(sut).perform(any());
+    doCallRealMethod().when(service).perform(any());
     // ACT
-    sut.perform(command);
+    service.perform(command);
 
     // VERIFY
-    verify(sut).getSalesChargeCalculation(salesCharge);
+    verify(service).getSalesChargeCalculation(salesCharge);
   }
 
   @Test
   void shouldPerform_whenCheckResult() {
     // SETUP
     final var fetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
+    final var service = mock(SalesChargeServiceImpl.class, withSettings().useConstructor(fetcher));
     final var command = mock(PortfolioHoldingsCommand.class);
     final SalesChargeCalculation calculation = mock(SalesChargeCalculation.class);
     final SalesChargeResult expected = mock(SalesChargeResult.class);
 
     final var salesCharge = mock(Map.class);
     when(fetcher.fetch(any(), any())).thenReturn(salesCharge);
-    when(sut.getSalesChargeCalculation(salesCharge)).thenReturn(calculation);
+    when(service.getSalesChargeCalculation(salesCharge)).thenReturn(calculation);
     when(calculation.calculate()).thenReturn(expected);
 
-    doCallRealMethod().when(sut).perform(any());
+    doCallRealMethod().when(service).perform(any());
     // ACT
-    final SalesChargeResult actual = sut.perform(command);
+    final SalesChargeResult actual = service.perform(command);
 
     // VERIFY
     assertSame(expected, actual);

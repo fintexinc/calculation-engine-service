@@ -50,16 +50,16 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenCheckResult() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
+    final var service = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
         .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
     final var result = mock(ManagementFeeResult.class);
 
-    when(sut.calculateAverageValue(any(), any())).thenReturn(result);
+    when(service.calculateAverageValue(any(), any())).thenReturn(result);
 
-    doCallRealMethod().when(sut).perform(any());
+    doCallRealMethod().when(service).perform(any());
     // ACT
-    final var actual = sut.perform(mock(AverageMerCommand.class));
+    final var actual = service.perform(mock(AverageMerCommand.class));
 
     // VERIFY
     assertSame(result, actual);
@@ -70,7 +70,7 @@ class ManagementFeeCalculationServiceImplTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var feesFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
+      final var service = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
       final var command = mock(AverageMerCommand.class);
@@ -81,13 +81,13 @@ class ManagementFeeCalculationServiceImplTest {
       mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(anyList(), anyList()))
           .thenReturn(defaultProviders);
       when(command.getHoldings()).thenReturn(holdings);
-      when(sut.calculateAverageValue(any(), any())).thenReturn(result);
+      when(service.calculateAverageValue(any(), any())).thenReturn(result);
       when(feesFetcher.fetch(any(), any())).thenReturn(Map.of());
 
-      doCallRealMethod().when(sut).perform(any());
-      doCallRealMethod().when(sut).fetchData(any());
+      doCallRealMethod().when(service).perform(any());
+      doCallRealMethod().when(service).fetchData(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
       verify(feesFetcher).fetch(holdings, defaultProviders);
@@ -98,7 +98,7 @@ class ManagementFeeCalculationServiceImplTest {
   void shouldPerform_whenVerifySetNullForScaledIfHoldingContainsNoFunds() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
+    final var service = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
         .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
     final var result = mock(ManagementFeeResult.class);
@@ -106,16 +106,16 @@ class ManagementFeeCalculationServiceImplTest {
     final var managementFee = mock(Map.class);
 
     when(result.getManagementFee()).thenReturn(managementFee);
-    when(sut.calculateAverageValue(any(), any())).thenReturn(result);
+    when(service.calculateAverageValue(any(), any())).thenReturn(result);
 
-    doCallRealMethod().when(sut).perform(any());
-    doCallRealMethod().when(sut).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(
+    doCallRealMethod().when(service).perform(any());
+    doCallRealMethod().when(service).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(
         (ManagementFeeResult) any(), (AverageMerCommand) any());
     // ACT
-    sut.perform(command);
+    service.perform(command);
 
     // VERIFY
-    verify(sut).setNullForScaledIfHoldingContainsNoFunds(managementFee, command);
+    verify(service).setNullForScaledIfHoldingContainsNoFunds(managementFee, command);
 
   }
 
@@ -124,7 +124,7 @@ class ManagementFeeCalculationServiceImplTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var feesFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
+      final var service = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
       final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
@@ -134,15 +134,15 @@ class ManagementFeeCalculationServiceImplTest {
       when(feesFetcher.fetch(any(), any())).thenReturn(map);
       mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(anyList(), any(ParameterType[].class)))
           .thenReturn(parameterTypes);
-      when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
+      when(service.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
-      doCallRealMethod().when(sut).perform(any());
-      doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+      doCallRealMethod().when(service).perform(any());
+      doCallRealMethod().when(service).calculateAverageValue(any(), any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
-      verify(sut).calculateAverageValue(parameterTypes, map);
+      verify(service).calculateAverageValue(parameterTypes, map);
     }
   }
 
@@ -151,7 +151,7 @@ class ManagementFeeCalculationServiceImplTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var feesFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
+      final var service = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
       final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
@@ -160,11 +160,11 @@ class ManagementFeeCalculationServiceImplTest {
 
       when(command.getParameterTypes()).thenReturn(parameterTypes);
       when(feesFetcher.fetch(any(), any())).thenReturn(map);
-      when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
+      when(service.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(parameterTypes, SCALED, ABSOLUTE));
@@ -176,7 +176,7 @@ class ManagementFeeCalculationServiceImplTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var feesFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
+      final var service = mock(ManagementFeeCalculationServiceImpl.class, withSettings()
           .useConstructor(feesFetcher, DEFAULT_DATA_PROPERTIES));
 
       final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
@@ -186,12 +186,12 @@ class ManagementFeeCalculationServiceImplTest {
       when(command.getDataProviders()).thenReturn(providers);
       when(command.getHoldings()).thenReturn(List.of());
       when(feesFetcher.fetch(any(), any())).thenReturn(Map.of());
-      when(sut.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
+      when(service.calculateAverageValue(any(), any())).thenReturn(mock(ManagementFeeResult.class));
 
-      doCallRealMethod().when(sut).perform(any());
-      doCallRealMethod().when(sut).fetchData(any());
+      doCallRealMethod().when(service).perform(any());
+      doCallRealMethod().when(service).fetchData(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, List.of(DataProvider.MORNINGSTAR)));
@@ -201,18 +201,18 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenCheckResult() {
     // SETUP
-    final var sut = mock(ManagementFeeCalculationServiceImpl.class);
+    final var service = mock(ManagementFeeCalculationServiceImpl.class);
 
     final var calculationDtoMap = getCalculationDtoMap();
     calculationDtoMap.get(MUTUAL_FUND_CANADA).forEach((key, value) -> value.setActualManagementFee(TEN));
     calculationDtoMap.get(ETF_US).forEach((key, value) -> value.setActualManagementFee(ONE));
     calculationDtoMap.get(ETF_CANADA).forEach((key, value) -> value.setActualManagementFee(ZERO));
 
-    doCallRealMethod().when(sut).setFeeValues(any(), any());
-    doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
-    doCallRealMethod().when(sut).validateManagementFee(any(), any());
+    doCallRealMethod().when(service).setFeeValues(any(), any());
+    doCallRealMethod().when(service).setInitialFeeAndModifiedFeeValues(any());
+    doCallRealMethod().when(service).validateManagementFee(any(), any());
     // ACT
-    sut.setInitialFeeAndModifiedFeeValues(calculationDtoMap);
+    service.setInitialFeeAndModifiedFeeValues(calculationDtoMap);
 
     // VERIFY
     // Only FUNDS (children of FUND type) have their fees validated and set
@@ -234,17 +234,17 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void shouldCalculateAverageValue_whenCheckResult() {
     // SETUP
-    final var sut = mock(ManagementFeeCalculationServiceImpl.class);
+    final var service = mock(ManagementFeeCalculationServiceImpl.class);
 
     final var parameterTypes = List.of(ABSOLUTE, SCALED);
     final var averageMerCalculationDtoMap = getCalculationDtoMap();
     final var expected = new ManagementFeeResult(Map.of(SCALED, TEN, ABSOLUTE, ONE));
-    when(sut.getAbsoluteAverageMer(averageMerCalculationDtoMap)).thenReturn(ONE);
-    when(sut.getScaledAverageMer(averageMerCalculationDtoMap)).thenReturn(TEN);
+    when(service.getAbsoluteAverageMer(averageMerCalculationDtoMap)).thenReturn(ONE);
+    when(service.getScaledAverageMer(averageMerCalculationDtoMap)).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    final var actual = sut.calculateAverageValue(parameterTypes, averageMerCalculationDtoMap);
+    final var actual = service.calculateAverageValue(parameterTypes, averageMerCalculationDtoMap);
 
     // VERIFY
     assertEquals(expected, actual);
@@ -253,37 +253,37 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void shouldCalculateAverageValue_whenVerifyGetAbsoluteAverageMer() {
     // SETUP
-    final var sut = mock(ManagementFeeCalculationServiceImpl.class);
+    final var service = mock(ManagementFeeCalculationServiceImpl.class);
 
     final var parameterTypes = List.of(ABSOLUTE);
     final var averageMerCalculationDtoMap = getCalculationDtoMap();
 
-    when(sut.getAbsoluteAverageMer(averageMerCalculationDtoMap)).thenReturn(ONE);
+    when(service.getAbsoluteAverageMer(averageMerCalculationDtoMap)).thenReturn(ONE);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    sut.calculateAverageValue(parameterTypes, averageMerCalculationDtoMap);
+    service.calculateAverageValue(parameterTypes, averageMerCalculationDtoMap);
 
     // VERIFY
-    verify(sut).getAbsoluteAverageMer(averageMerCalculationDtoMap);
+    verify(service).getAbsoluteAverageMer(averageMerCalculationDtoMap);
   }
 
   @Test
   void shouldCalculateAverageValue_whenVerifyGetScaledAverageMer() {
     // SETUP
-    final var sut = mock(ManagementFeeCalculationServiceImpl.class);
+    final var service = mock(ManagementFeeCalculationServiceImpl.class);
 
     final var parameterTypes = List.of(SCALED);
     final var averageMerCalculationDtoMap = getCalculationDtoMap();
 
-    when(sut.getScaledAverageMer(averageMerCalculationDtoMap)).thenReturn(TEN);
+    when(service.getScaledAverageMer(averageMerCalculationDtoMap)).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    sut.calculateAverageValue(parameterTypes, averageMerCalculationDtoMap);
+    service.calculateAverageValue(parameterTypes, averageMerCalculationDtoMap);
 
     // VERIFY
-    verify(sut).getScaledAverageMer(averageMerCalculationDtoMap);
+    verify(service).getScaledAverageMer(averageMerCalculationDtoMap);
   }
 
   private Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> getCalculationDtoMap() {
@@ -311,7 +311,7 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenExpectExceptionWhenHoldingIsFundAndManagementFeeIsEmpty() {
     // SETUP
-    var sut = mock(ManagementFeeCalculationServiceImpl.class);
+    var service = mock(ManagementFeeCalculationServiceImpl.class);
     var holding = new PortfolioHolding(null, null, null);
     var averageCalculation = AverageManagementExpenseCalculation.ofActualManagementFee(null);
     var expected = MISSING_MANAGEMENT_FEE.toExceptionForHolding(holding);
@@ -319,10 +319,10 @@ class ManagementFeeCalculationServiceImplTest {
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(MUTUAL_FUND_CANADA, Map.of(holding, averageCalculation));
 
-    doCallRealMethod().when(sut).validateManagementFee(any(), any());
-    doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
+    doCallRealMethod().when(service).validateManagementFee(any(), any());
+    doCallRealMethod().when(service).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    var actualException = assertThrows(CalculationException.class, () -> sut.setInitialFeeAndModifiedFeeValues(map));
+    var actualException = assertThrows(CalculationException.class, () -> service.setInitialFeeAndModifiedFeeValues(map));
 
     // VERIFY
     assertEquals(expected.getErrorCode(), actualException.getErrorCode());
@@ -331,16 +331,16 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenNothingHappensIfHoldingsIsOnlyCashAndStocks() {
     // SETUP
-    var sut = mock(ManagementFeeCalculationServiceImpl.class);
+    var service = mock(ManagementFeeCalculationServiceImpl.class);
     var holding = new PortfolioHolding(null, null, null);
     var averageCalculation = AverageManagementExpenseCalculation.ofActualManagementFee(null);
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(FinancialInstrumentType.STOCK_US, Map.of(holding, averageCalculation));
 
-    doCallRealMethod().when(sut).validateManagementFee(any(), any());
-    doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
+    doCallRealMethod().when(service).validateManagementFee(any(), any());
+    doCallRealMethod().when(service).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    List<Warning> warnings = sut.setInitialFeeAndModifiedFeeValues(map);
+    List<Warning> warnings = service.setInitialFeeAndModifiedFeeValues(map);
 
     // VERIFY
     assertTrue(warnings.isEmpty());
@@ -349,16 +349,16 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void shouldSetInitialFeeAndModifiedFeeValues_whenNothingHappensIfHoldingsIsFundAndContainsManagementFee() {
     // SETUP
-    var sut = mock(ManagementFeeCalculationServiceImpl.class);
+    var service = mock(ManagementFeeCalculationServiceImpl.class);
     var holding = new PortfolioHolding(null, null, null);
     var averageCalculation = AverageManagementExpenseCalculation.ofActualManagementFee(TEN);
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     map.put(ETF_US, Map.of(holding, averageCalculation));
 
-    doCallRealMethod().when(sut).validateManagementFee(any(), any());
-    doCallRealMethod().when(sut).setInitialFeeAndModifiedFeeValues(any());
+    doCallRealMethod().when(service).validateManagementFee(any(), any());
+    doCallRealMethod().when(service).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    List<Warning> warnings = sut.setInitialFeeAndModifiedFeeValues(map);
+    List<Warning> warnings = service.setInitialFeeAndModifiedFeeValues(map);
 
     // VERIFY
     assertTrue(warnings.isEmpty());

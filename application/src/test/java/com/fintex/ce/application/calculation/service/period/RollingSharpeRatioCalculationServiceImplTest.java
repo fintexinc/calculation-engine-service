@@ -35,7 +35,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, defaultPeriods));
 
     final var command = mock(RollingCalculationCommand.class);
@@ -43,12 +43,12 @@ class RollingSharpeRatioCalculationServiceImplTest {
 
     when(command.getHoldings()).thenReturn(holdings);
     when(command.getCurrency()).thenReturn(Currency.CAD);
-    when(sut.defineCalculationMethod(command)).thenReturn(mock(RollingSharpeRatioCalculation.class));
+    when(service.defineCalculationMethod(command)).thenReturn(mock(RollingSharpeRatioCalculation.class));
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(command);
 
-    verify(sut).defineCalculationMethod(command);
+    verify(service).defineCalculationMethod(command);
 
   }
 
@@ -57,7 +57,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, defaultPeriods));
 
     final var command = mock(RollingCalculationCommand.class);
@@ -66,11 +66,11 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final var rollingPeriods = Set.of("12");
 
     when(command.getHoldings()).thenReturn(holdings);
-    when(sut.defineCalculationMethod(command)).thenReturn(rollingCorrelationCalculation);
+    when(service.defineCalculationMethod(command)).thenReturn(rollingCorrelationCalculation);
     when(command.getRollingPeriods()).thenReturn(rollingPeriods);
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(command);
 
     verify(rollingCorrelationCalculation).calculate(rollingPeriods);
   }
@@ -80,35 +80,35 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, defaultPeriods));
 
     final var command = mock(RollingCalculationCommand.class);
     final var input = mock(BenchmarkPeriodCalculationInput.class);
 
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(input);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(input);
     when(command.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(command);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    service.defineCalculationMethod(command);
 
-    verify(sut).buildPeriodCalculationInput(command, SCALE_OF_ONE);
+    verify(service).buildPeriodCalculationInput(command, SCALE_OF_ONE);
   }
 
   @Test
   void shouldBuildCalculationDto_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, mock(TBillsFetcher.class), Set.of()));
 
     final TreeMap portfolioBaseTotalReturn = mock(TreeMap.class);
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(
         portfolioBaseTotalReturn);
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
 
-    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(mock(RollingCalculationCommand.class),
+    final PeriodCalculationInput actual = service.buildPeriodCalculationInput(mock(RollingCalculationCommand.class),
         SCALE_OF_TWO);
 
     final PeriodCalculationInput expected = new PeriodCalculationInput(portfolioBaseTotalReturn);
@@ -118,10 +118,10 @@ class RollingSharpeRatioCalculationServiceImplTest {
   @Test
   void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, mock(TBillsFetcher.class), Set.of()));
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
 
     final var command = mock(RollingCalculationCommand.class);
     final var holdings = mock(List.class);
@@ -129,7 +129,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
     when(command.getHoldings()).thenReturn(holdings);
     when(command.getCurrency()).thenReturn(Currency.CAD);
 
-    sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
+    service.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
@@ -137,7 +137,7 @@ class RollingSharpeRatioCalculationServiceImplTest {
   @Test
   void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, mock(TBillsFetcher.class), Set.of()));
 
     final var command = mock(RollingCalculationCommand.class);
@@ -148,9 +148,9 @@ class RollingSharpeRatioCalculationServiceImplTest {
     final var monthlyReturns = mock(ReturnsAggregate.class);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
 
-    sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
+    service.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, LOCAL_DATE_NOW,
         LOCAL_DATE_NOW.plusMonths(1));

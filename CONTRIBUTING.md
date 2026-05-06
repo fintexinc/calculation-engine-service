@@ -97,6 +97,21 @@ void shouldThrowException_whenSecurityNotFound() { ... }
 void shouldFetchFromSM_whenSecurityIdIsValid() { ... }
 ```
 
+### Naming the system under test
+
+Don't name test variables/fields `sut`. Pick a descriptive name derived from the type under test — typically the noun
+matching the test class's suffix:
+
+- `*CalculationTest` → `calculation`
+- `*ServiceTest` / `*ServiceImplTest` → `service`
+- `*FetcherTest` / `*FetcherImplTest` → `fetcher`
+- `*MapperTest` → `mapper`
+- `*ValidatorTest` / `*DataValidationTest` → `validator` / `validation`
+- other suffixes (`*ComponentTest`, `*GeneratorTest`, `*ResolverTest`, `*HandlerTest`, etc.) → matching noun
+
+If the test exercises more than one collaborator, qualify each (`sharpeRatioCalculation`, `standardDeviationCalculation`)
+rather than falling back to `sut`.
+
 ### Avoid Duplicate Tests
 
 - Use `@ParameterizedTest` when same logic with different inputs

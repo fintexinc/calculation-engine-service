@@ -29,19 +29,19 @@ class LeadingTotalReturnsCalculationTest {
 
   @Test
   void shouldDelegateToFormTimeIntervalResult_whenDefiningResponseType() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", BigDecimal.ONE));
 
-    doCallRealMethod().when(sut).defineResponseType(anySet());
-    sut.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anySet());
+    calculation.defineResponseType(pairs);
 
-    verify(sut).formTimeIntervalResult(pairs);
+    verify(calculation).formTimeIntervalResult(pairs);
   }
 
   @Test
   void shouldReturnLeadingTotalReturn_whenDefiningResponseType() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
 
@@ -49,101 +49,101 @@ class LeadingTotalReturnsCalculationTest {
         new TimeIntervalResult("2000-01-12", ZERO),
         new TimeIntervalResult("2020-01-05", BigDecimal.ONE));
 
-    when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
+    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).defineResponseType(anySet());
-    final var actual = sut.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anySet());
+    final var actual = calculation.defineResponseType(pairs);
 
     assertEquals(expected, actual.getLeadingTotalReturn());
   }
 
   @Test
   void shouldReturnNull_whenPeriodIsGreaterThanAvailableReturns() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var period = 11;
     final var portfolioTotalReturn = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
     when(portfolioTotalReturn.size()).thenReturn(10);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    final var actual = sut.calculatePeriodForNumberOfMonths(period);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final var actual = calculation.calculatePeriodForNumberOfMonths(period);
 
     assertNull(actual);
   }
 
   @Test
   void shouldCallCalculateProductForPeriod_whenPeriodFitsReturns() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var period = 6;
     final var portfolioTotalReturn = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
     when(portfolioTotalReturn.size()).thenReturn(120);
-    when(sut.calculateProductForPeriod(period, portfolioTotalReturn)).thenReturn(TEN);
+    when(calculation.calculateProductForPeriod(period, portfolioTotalReturn)).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    sut.calculatePeriodForNumberOfMonths(period);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    calculation.calculatePeriodForNumberOfMonths(period);
 
-    verify(sut).calculateProductForPeriod(period, portfolioTotalReturn);
+    verify(calculation).calculateProductForPeriod(period, portfolioTotalReturn);
   }
 
   @Test
   void shouldSubtractOneWithoutAnnualization_whenPeriodIsLessThanTwelveMonths() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var period = 6;
     final var portfolioTotalReturn = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
     when(portfolioTotalReturn.size()).thenReturn(120);
-    when(sut.calculateProductForPeriod(period, portfolioTotalReturn)).thenReturn(TEN);
+    when(calculation.calculateProductForPeriod(period, portfolioTotalReturn)).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    final var actual = sut.calculatePeriodForNumberOfMonths(period);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final var actual = calculation.calculatePeriodForNumberOfMonths(period);
 
     assertEquals(0, BigDecimal.valueOf(9).compareTo(actual));
   }
 
   @Test
   void shouldSubtractOneWithoutAnnualization_whenPeriodEqualsTwelveMonths() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var period = 12;
     final var portfolioTotalReturn = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
     when(portfolioTotalReturn.size()).thenReturn(120);
-    when(sut.calculateProductForPeriod(period, portfolioTotalReturn)).thenReturn(TEN);
+    when(calculation.calculateProductForPeriod(period, portfolioTotalReturn)).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    final var actual = sut.calculatePeriodForNumberOfMonths(period);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final var actual = calculation.calculatePeriodForNumberOfMonths(period);
 
     assertEquals(0, BigDecimal.valueOf(9).compareTo(actual));
   }
 
   @Test
   void shouldAnnualizeReturn_whenPeriodIsGreaterThanTwelveMonths() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var period = 24;
     final var portfolioTotalReturn = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturn);
     when(portfolioTotalReturn.size()).thenReturn(120);
-    when(sut.calculateProductForPeriod(period, portfolioTotalReturn)).thenReturn(TEN);
+    when(calculation.calculateProductForPeriod(period, portfolioTotalReturn)).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    final var actual = sut.calculatePeriodForNumberOfMonths(period);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final var actual = calculation.calculatePeriodForNumberOfMonths(period);
 
     assertEquals(0, BigDecimal.valueOf(2.1622776601683795).compareTo(actual));
   }
 
   @Test
   void shouldKeepFirstNMonths_whenFilteringRequiredMonths() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var period = 3;
     final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
@@ -158,15 +158,15 @@ class LeadingTotalReturnsCalculationTest {
     expected.put(LocalDate.of(2019, 2, 28), ONE);
     expected.put(LocalDate.of(2019, 3, 31), ONE);
 
-    doCallRealMethod().when(sut).filterRequiredMonthsForPeriod(anyLong(), any());
-    final var actual = sut.filterRequiredMonthsForPeriod(period, returns);
+    doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(anyLong(), any());
+    final var actual = calculation.filterRequiredMonthsForPeriod(period, returns);
 
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldKeepSingleFirstMonth_whenFilteringForOneMonthPeriod() {
-    final var sut = mock(LeadingTotalReturnsCalculation.class);
+    final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
     final var period = 1;
     final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
@@ -176,8 +176,8 @@ class LeadingTotalReturnsCalculationTest {
     final NavigableMap<LocalDate, BigDecimal> expected = new TreeMap<>();
     expected.put(LocalDate.of(2019, 1, 31), ONE);
 
-    doCallRealMethod().when(sut).filterRequiredMonthsForPeriod(anyLong(), any());
-    final var actual = sut.filterRequiredMonthsForPeriod(period, returns);
+    doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(anyLong(), any());
+    final var actual = calculation.filterRequiredMonthsForPeriod(period, returns);
 
     assertEquals(expected, actual);
   }

@@ -29,11 +29,11 @@ class FixedIncomeBondSectorCalculationTest {
 
     Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash = Map.of(aom, BigDecimal.valueOf(0.6081876));
 
-    var sut = new FixedIncomeBondSectorCalculation(exposures, List.of(aom), List.of(), fixedIncomePlusCash);
+    var calculation = new FixedIncomeBondSectorCalculation(exposures, List.of(aom), List.of(), fixedIncomePlusCash);
 
     FixedIncomeSectorResult expected = getExpectedOfAom();
 
-    final FixedIncomeSectorResult actual = sut.calculate();
+    final FixedIncomeSectorResult actual = calculation.calculate();
 
     ComparisonUtils.compareMaps(expected.getFixedIncomeSector(), actual.getFixedIncomeSector());
     Assertions.assertEquals(expected.getWarnings(), actual.getWarnings());
@@ -99,11 +99,11 @@ class FixedIncomeBondSectorCalculationTest {
         BigDecimal
             .valueOf(0.3489427));
 
-    var sut = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(), fixedIncomePlusCash);
+    var calculation = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(), fixedIncomePlusCash);
 
     FixedIncomeSectorResult expected = getExpectedOfAomAndRbf605();
 
-    final FixedIncomeSectorResult actual = sut.calculate();
+    final FixedIncomeSectorResult actual = calculation.calculate();
 
     ComparisonUtils.compareMaps(expected.getFixedIncomeSector(), actual.getFixedIncomeSector());
     Assertions.assertEquals(expected.getWarnings(), actual.getWarnings());
@@ -125,11 +125,11 @@ class FixedIncomeBondSectorCalculationTest {
         BigDecimal
             .valueOf(0.0));
 
-    var sut = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(), fixedIncomePlusCash);
+    var calculation = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(), fixedIncomePlusCash);
 
     FixedIncomeSectorResult expected = getExpectedOfAom();
 
-    final FixedIncomeSectorResult actual = sut.calculate();
+    final FixedIncomeSectorResult actual = calculation.calculate();
 
     ComparisonUtils.compareMaps(expected.getFixedIncomeSector(), actual.getFixedIncomeSector());
     Assertions.assertEquals(expected.getWarnings(), actual.getWarnings());

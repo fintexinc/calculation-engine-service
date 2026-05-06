@@ -28,7 +28,7 @@ class SortinoRatioCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TBillsFetcher.class);
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(SortinoRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(SortinoRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
     final var command = mock(PeriodCommand.class);
@@ -36,13 +36,13 @@ class SortinoRatioCalculationServiceImplTest {
     final var treeMap = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.TEN));
 
     when(input.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(input);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(input);
     when(command.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(command);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    service.defineCalculationMethod(command);
 
-    verify(sut).buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
+    verify(service).buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
   }
 }

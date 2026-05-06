@@ -14,10 +14,10 @@ class BenchmarkCpsdDataValidationTest {
   @Test
   void shouldGetCpsdIsBeforePsdExceptionCode_whenCheckResult() {
     // SETUP
-    final BenchmarkCpsdDataValidation sut = new BenchmarkCpsdDataValidation();
+    final BenchmarkCpsdDataValidation validation = new BenchmarkCpsdDataValidation();
 
     // ACT
-    final ErrorCode actual = sut.getCpsdIsBeforePsdExceptionCode();
+    final ErrorCode actual = validation.getCpsdIsBeforePsdExceptionCode();
 
     // VERIFY
     assertEquals(CPSD_BEFORE_BENCHMARK_PSD, actual);
@@ -26,10 +26,10 @@ class BenchmarkCpsdDataValidationTest {
   @Test
   void shouldGetCpsdIsAfterPedExceptionCode_whenCheckResult() {
     // SETUP
-    final BenchmarkCpsdDataValidation sut = new BenchmarkCpsdDataValidation();
+    final BenchmarkCpsdDataValidation validation = new BenchmarkCpsdDataValidation();
 
     // ACT
-    final ErrorCode actual = sut.getCpsdIsAfterPedExceptionCode();
+    final ErrorCode actual = validation.getCpsdIsAfterPedExceptionCode();
 
     // VERIFY
     assertEquals(CPSD_AFTER_BENCHMARK_PED, actual);

@@ -56,16 +56,16 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenCheckResult() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+    final var service = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
         DEFAULT_DATA_PROPERTIES));
 
     final var result = mock(AverageMerResult.class);
 
-    when(sut.calculateAverageValue(any(), any())).thenReturn(result);
+    when(service.calculateAverageValue(any(), any())).thenReturn(result);
 
-    doCallRealMethod().when(sut).perform(any());
+    doCallRealMethod().when(service).perform(any());
     // ACT
-    final var actual = sut.perform(mock(AverageMerCommand.class));
+    final var actual = service.perform(mock(AverageMerCommand.class));
 
     // VERIFY
     assertSame(result, actual);
@@ -75,7 +75,7 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyLoad() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+    final var service = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
         DEFAULT_DATA_PROPERTIES));
 
     final var command = mock(AverageMerCommand.class);
@@ -85,13 +85,13 @@ class MERCalculationServiceImplTest {
 
     when(command.getHoldings()).thenReturn(holdings);
     when(command.getDataProviders()).thenReturn(providers);
-    when(sut.calculateAverageValue(any(), any())).thenReturn(result);
+    when(service.calculateAverageValue(any(), any())).thenReturn(result);
     when(feesFetcher.fetch(any(), any())).thenReturn(Map.of());
 
-    doCallRealMethod().when(sut).perform(any());
-    doCallRealMethod().when(sut).fetchData(any());
+    doCallRealMethod().when(service).perform(any());
+    doCallRealMethod().when(service).fetchData(any());
     // ACT
-    sut.perform(command);
+    service.perform(command);
 
     // VERIFY
     verify(feesFetcher).fetch(holdings, providers);
@@ -101,19 +101,19 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyResDtoSetWarnings() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+    final var service = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
         DEFAULT_DATA_PROPERTIES));
 
     final var command = mock(AverageMerCommand.class);
     final var result = mock(AverageMerResult.class);
     final var warnings = mock(List.class);
 
-    when(sut.calculateAverageValue(any(), any())).thenReturn(result);
-    when(sut.setInitialFeeAndModifiedFeeValues(any())).thenReturn(warnings);
+    when(service.calculateAverageValue(any(), any())).thenReturn(result);
+    when(service.setInitialFeeAndModifiedFeeValues(any())).thenReturn(warnings);
 
-    doCallRealMethod().when(sut).perform(any());
+    doCallRealMethod().when(service).perform(any());
     // ACT
-    sut.perform(command);
+    service.perform(command);
 
     // VERIFY
     verify(result).setWarnings(warnings);
@@ -124,7 +124,7 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifySetInitialFeeAndModifiedFeeValues() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+    final var service = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
         DEFAULT_DATA_PROPERTIES));
 
     final var command = mock(AverageMerCommand.class);
@@ -132,15 +132,15 @@ class MERCalculationServiceImplTest {
 
     when(command.getHoldings()).thenReturn(List.of());
     when(feesFetcher.fetch(any(), any())).thenReturn(Map.of());
-    when(sut.calculateAverageValue(any(), any())).thenReturn(result);
+    when(service.calculateAverageValue(any(), any())).thenReturn(result);
 
-    doCallRealMethod().when(sut).perform(any());
-    doCallRealMethod().when(sut).fetchData(any());
+    doCallRealMethod().when(service).perform(any());
+    doCallRealMethod().when(service).fetchData(any());
     // ACT
-    sut.perform(command);
+    service.perform(command);
 
     // VERIFY
-    verify(sut).setInitialFeeAndModifiedFeeValues(any());
+    verify(service).setInitialFeeAndModifiedFeeValues(any());
 
   }
 
@@ -148,7 +148,7 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyGetResultAndSetNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+    final var service = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
         DEFAULT_DATA_PROPERTIES));
 
     final var result = mock(AverageMerResult.class);
@@ -156,16 +156,16 @@ class MERCalculationServiceImplTest {
     final var managementExpenseRatio = mock(Map.class);
 
     when(result.getManagementExpenseRatio()).thenReturn(managementExpenseRatio);
-    when(sut.calculateAverageValue(any(), any())).thenReturn(result);
+    when(service.calculateAverageValue(any(), any())).thenReturn(result);
 
-    doCallRealMethod().when(sut).perform(any());
-    doCallRealMethod().when(sut).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(any(
+    doCallRealMethod().when(service).perform(any());
+    doCallRealMethod().when(service).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(any(
         AverageMerResult.class), any());
     // ACT
-    sut.perform(command);
+    service.perform(command);
 
     // VERIFY
-    verify(sut).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(managementExpenseRatio, command);
+    verify(service).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(managementExpenseRatio, command);
 
   }
 
@@ -173,23 +173,23 @@ class MERCalculationServiceImplTest {
   void shouldPerform_whenVerifyCalculateAverageMER() {
     // SETUP
     final var feesFetcher = mock(SecurityDataFetcher.class);
-    final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+    final var service = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
         DEFAULT_DATA_PROPERTIES));
 
     final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
     final var command = mock(AverageMerCommand.class);
     final var parameterTypes = List.of(SCALED, ABSOLUTE);
 
-    when(sut.fetchData(any())).thenReturn(map);
+    when(service.fetchData(any())).thenReturn(map);
     when(command.getParameterTypes()).thenReturn(parameterTypes);
-    when(sut.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
+    when(service.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
 
-    doCallRealMethod().when(sut).perform(any());
+    doCallRealMethod().when(service).perform(any());
     // ACT
-    sut.perform(command);
+    service.perform(command);
 
     // VERIFY
-    verify(sut).calculateAverageValue(parameterTypes, map);
+    verify(service).calculateAverageValue(parameterTypes, map);
   }
 
   @Test
@@ -197,7 +197,7 @@ class MERCalculationServiceImplTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var feesFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+      final var service = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
           DEFAULT_DATA_PROPERTIES));
 
       final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
@@ -206,11 +206,11 @@ class MERCalculationServiceImplTest {
 
       when(command.getParameterTypes()).thenReturn(parameterTypes);
       when(feesFetcher.fetch(any(), any())).thenReturn(map);
-      when(sut.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
+      when(service.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
 
-      doCallRealMethod().when(sut).perform(any());
+      doCallRealMethod().when(service).perform(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(parameterTypes, SCALED, ABSOLUTE));
@@ -222,7 +222,7 @@ class MERCalculationServiceImplTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
       final var feesFetcher = mock(SecurityDataFetcher.class);
-      final var sut = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
+      final var service = mock(MERCalculationServiceImpl.class, withSettings().useConstructor(feesFetcher,
           DEFAULT_DATA_PROPERTIES));
 
       final HashMap<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> map = new HashMap<>();
@@ -232,12 +232,12 @@ class MERCalculationServiceImplTest {
       when(command.getDataProviders()).thenReturn(providers);
       when(command.getHoldings()).thenReturn(List.of());
       when(feesFetcher.fetch(any(), any())).thenReturn(Map.of());
-      when(sut.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
+      when(service.calculateAverageValue(any(), any())).thenReturn(mock(AverageMerResult.class));
 
-      doCallRealMethod().when(sut).perform(any());
-      doCallRealMethod().when(sut).fetchData(any());
+      doCallRealMethod().when(service).perform(any());
+      doCallRealMethod().when(service).fetchData(any());
       // ACT
-      sut.perform(command);
+      service.perform(command);
 
       // VERIFY
       mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, List.of(DataProvider.MORNINGSTAR)));
@@ -485,7 +485,7 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldCalculateAverageMER_whenVerifyGetScaledAverageMer() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
     final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var parameterTypes = mock(List.class);
@@ -493,54 +493,54 @@ class MERCalculationServiceImplTest {
 
     when(parameterTypes.contains(SCALED)).thenReturn(true);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    sut.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
+    service.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
 
     // VERIFY
-    verify(sut).getScaledAverageMer(averageMerCalculationDtos);
+    verify(service).getScaledAverageMer(averageMerCalculationDtos);
   }
 
   @Test
   void shouldCalculateAverageMER_whenVerifyGetAbsoluteAverageMer() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
 
     final var parameterTypes = mock(List.class);
     final var averageMerCalculationDtos = mock(Map.class);
 
     when(parameterTypes.contains(ABSOLUTE)).thenReturn(true);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    sut.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
+    service.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
 
     // VERIFY
-    verify(sut).getAbsoluteAverageMer(averageMerCalculationDtos);
+    verify(service).getAbsoluteAverageMer(averageMerCalculationDtos);
   }
 
   @Test
   void shouldCalculateAverageMER_whenVerifyGetForceReportFeeAverageMer() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
 
     final var parameterTypes = mock(List.class);
     final var averageMerCalculationDtos = mock(Map.class);
 
     when(parameterTypes.contains(FORCE_REPORT_FEE)).thenReturn(true);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    sut.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
+    service.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
 
     // VERIFY
-    verify(sut).getForceReportFeeAverageMer(averageMerCalculationDtos);
+    verify(service).getForceReportFeeAverageMer(averageMerCalculationDtos);
   }
 
   @Test
   void shouldCalculateAverageMER_whenCheckResult1() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
 
     final var expected = new AverageMerResult();
     expected.getManagementExpenseRatio().putAll(Map.of(SCALED, ZERO, ABSOLUTE, ONE, FORCE_REPORT_FEE, TEN));
@@ -552,13 +552,13 @@ class MERCalculationServiceImplTest {
     when(parameterTypes.contains(ABSOLUTE)).thenReturn(true);
     when(parameterTypes.contains(FORCE_REPORT_FEE)).thenReturn(true);
 
-    when(sut.getScaledAverageMer(averageMerCalculationDtos)).thenReturn(ZERO);
-    when(sut.getAbsoluteAverageMer(averageMerCalculationDtos)).thenReturn(ONE);
-    when(sut.getForceReportFeeAverageMer(averageMerCalculationDtos)).thenReturn(TEN);
+    when(service.getScaledAverageMer(averageMerCalculationDtos)).thenReturn(ZERO);
+    when(service.getAbsoluteAverageMer(averageMerCalculationDtos)).thenReturn(ONE);
+    when(service.getForceReportFeeAverageMer(averageMerCalculationDtos)).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    final var actual = sut.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
+    final var actual = service.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
 
     // VERIFY
     assertEquals(expected, actual);
@@ -567,7 +567,7 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldCalculateAverageMER_whenCheckResult2() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
 
     final var expected = new AverageMerResult();
     expected.getManagementExpenseRatio().putAll(Map.of(SCALED, ZERO, ABSOLUTE, ONE));
@@ -578,12 +578,12 @@ class MERCalculationServiceImplTest {
     when(parameterTypes.contains(SCALED)).thenReturn(true);
     when(parameterTypes.contains(ABSOLUTE)).thenReturn(true);
 
-    when(sut.getScaledAverageMer(averageMerCalculationDtos)).thenReturn(ZERO);
-    when(sut.getAbsoluteAverageMer(averageMerCalculationDtos)).thenReturn(ONE);
+    when(service.getScaledAverageMer(averageMerCalculationDtos)).thenReturn(ZERO);
+    when(service.getAbsoluteAverageMer(averageMerCalculationDtos)).thenReturn(ONE);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    final var actual = sut.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
+    final var actual = service.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
 
     // VERIFY
     assertEquals(expected, actual);
@@ -592,7 +592,7 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldCalculateAverageMER_whenCheckResult3() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
 
     final var expected = new AverageMerResult();
     expected.getManagementExpenseRatio().putAll(Map.of(SCALED, ZERO));
@@ -602,11 +602,11 @@ class MERCalculationServiceImplTest {
 
     when(parameterTypes.contains(SCALED)).thenReturn(true);
 
-    when(sut.getScaledAverageMer(averageMerCalculationDtos)).thenReturn(ZERO);
+    when(service.getScaledAverageMer(averageMerCalculationDtos)).thenReturn(ZERO);
 
-    doCallRealMethod().when(sut).calculateAverageValue(any(), any());
+    doCallRealMethod().when(service).calculateAverageValue(any(), any());
     // ACT
-    final var actual = sut.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
+    final var actual = service.calculateAverageValue(parameterTypes, averageMerCalculationDtos);
 
     // VERIFY
     assertEquals(expected, actual);
@@ -615,7 +615,7 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldHandleFeesForUsEtf_whenVerifySetFeeValues() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
     final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var holding = mock(PortfolioHolding.class);
@@ -625,19 +625,19 @@ class MERCalculationServiceImplTest {
     when(input.getNetExpenseRatio()).thenReturn(bigDecimal);
     when(input.getGrossExpenseRatio()).thenReturn(mock(BigDecimal.class));
 
-    doCallRealMethod().when(sut).handleFeeDataForUsEtfAndMutualFund(any(), any());
+    doCallRealMethod().when(service).handleFeeDataForUsEtfAndMutualFund(any(), any());
 
     // ACT
-    sut.handleFeeDataForUsEtfAndMutualFund(input, holding);
+    service.handleFeeDataForUsEtfAndMutualFund(input, holding);
 
     // VERIFY
-    verify(sut).setFeeValues(eq(input), same(bigDecimal));
+    verify(service).setFeeValues(eq(input), same(bigDecimal));
   }
 
   @Test
   void shouldHandleFeesForUsEtf_whenCheckResult() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
     final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var holding = mock(PortfolioHolding.class);
@@ -647,10 +647,10 @@ class MERCalculationServiceImplTest {
     when(input.getNetExpenseRatio()).thenReturn(bigDecimal);
     when(input.getGrossExpenseRatio()).thenReturn(mock(BigDecimal.class));
 
-    doCallRealMethod().when(sut).handleFeeDataForUsEtfAndMutualFund(any(), any());
+    doCallRealMethod().when(service).handleFeeDataForUsEtfAndMutualFund(any(), any());
 
     // ACT
-    final Optional<Warning> actual = sut.handleFeeDataForUsEtfAndMutualFund(input, holding);
+    final Optional<Warning> actual = service.handleFeeDataForUsEtfAndMutualFund(input, holding);
 
     // VERIFY
     assertEquals(Optional.empty(), actual);
@@ -659,7 +659,7 @@ class MERCalculationServiceImplTest {
   @Test
   void shouldHandleFeesForCanadaMutualHedgeFundsAndEtf_whenReturnsTwoWarningsInCaseOfAbsentDataForCanadaHedgeFund() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
     final PceExceptionCollector notification = new PceExceptionCollector();
 
     final var holding = new PortfolioHolding(null, FinancialInstrumentType.HEDGE_FUND_CANADA, null);
@@ -668,10 +668,10 @@ class MERCalculationServiceImplTest {
         MISSING_ACTUAL_MANAGEMENT_FEE
             .warning(holding)));
 
-    doCallRealMethod().when(sut).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
+    doCallRealMethod().when(service).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
 
     // ACT
-    final Optional<List<Warning>> actual = sut.handleFeeDataForCanadaMutualHedgeFundsAndEtf(input, holding);
+    final Optional<List<Warning>> actual = service.handleFeeDataForCanadaMutualHedgeFundsAndEtf(input, holding);
 
     // VERIFY
     assertEquals(expected, actual);

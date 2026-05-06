@@ -30,7 +30,7 @@ class AssetAllocationDataMapperTest {
   @Test
   void shouldMapForAA_whenCheckResult() {
     // SETUP
-    final var sut = mock(AssetAllocationDataMapper.class);
+    final var mapper = mock(AssetAllocationDataMapper.class);
 
     final PortfolioHolding etfUs = mock(PortfolioHolding.class);
     final PortfolioHolding canadaPooledFundHolding = mock(PortfolioHolding.class);
@@ -79,9 +79,9 @@ class AssetAllocationDataMapperTest {
     expected.put(gicHolding, overrideDefaultValues(AssetAllocationDataMapper.DEFAULT_MAP,
         Map.of(AssetAllocationRegion.FIXED_INCOME, BigDecimal.ONE)));
 
-    doCallRealMethod().when(sut).mapForAA(any());
+    doCallRealMethod().when(mapper).mapForAA(any());
     // ACT
-    final var actual = sut.mapForAA(req);
+    final var actual = mapper.mapForAA(req);
 
     // VERIFY
     Assertions.assertNotNull(actual);

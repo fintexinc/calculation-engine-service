@@ -52,176 +52,176 @@ class StandardDeviationCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeriodStartDate() {
-    final var sut = mock(StandardDeviationCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(StandardDeviationCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set.of()));
     final var treeMap = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
-    when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
 
-    verify(sut).getPeriodStartDate(12, treeMap);
+    verify(calculation).getPeriodStartDate(12, treeMap);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculatePeriodForNumberOfMonths() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
     final var returns = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(returns);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(returns);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut).calculatePeriodForNumberOfMonths(TWELVE, returns);
+    verify(calculation).calculatePeriodForNumberOfMonths(TWELVE, returns);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetSubMapByPeriodStartDate() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
-    when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
     final var periodStartDate = LocalDate.now();
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
 
-    sut.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
+    calculation.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
 
-    verify(sut).getSubMapByPeriodStartDate(periodStartDate, treeMap);
+    verify(calculation).getSubMapByPeriodStartDate(periodStartDate, treeMap);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResult() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
     when(treeMap.size()).thenReturn(1);
 
-    final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
+    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
 
     assertNull(actual);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResult2() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
     when(treeMap.size()).thenReturn(20);
 
-    final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(ONE.intValue(), treeMap);
+    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(ONE.intValue(), treeMap);
 
     assertNull(actual);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateStandardDeviation() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
-    when(sut.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
     final LocalDate periodStartDate = LocalDate.now();
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
 
-    verify(sut).calculateStandardDeviation(treeMap, TWELVE);
+    verify(calculation).calculateStandardDeviation(treeMap, TWELVE);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenNumberOfMonthsBiggerThanReturnsSize() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
     final var returns = mock(NavigableMap.class);
 
     when(returns.size()).thenReturn(11);
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any(NavigableMap.class));
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any(NavigableMap.class));
 
-    final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(12, returns);
+    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(12, returns);
 
     assertNull(actual);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenNumberOfMonthsBiggerLessThan12() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any(NavigableMap.class));
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any(NavigableMap.class));
 
-    final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(11, mock(NavigableMap.class));
+    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(11, mock(NavigableMap.class));
 
     assertNull(actual);
   }
 
   @Test
   void shouldCalculateStandardDeviation_whenVerifyCalculateNumerator() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
     final var treeMap = new TreeMap();
     treeMap.put(LocalDate.now(), TEN);
     treeMap.put(LocalDate.now().minusMonths(1), TEN);
     treeMap.put(LocalDate.now().minusMonths(5), TEN);
 
-    when(sut.calculateNumerator(any(), any())).thenReturn(BigDecimal.ONE);
-    doCallRealMethod().when(sut).calculateStandardDeviation(any(), anyInt());
+    when(calculation.calculateNumerator(any(), any())).thenReturn(BigDecimal.ONE);
+    doCallRealMethod().when(calculation).calculateStandardDeviation(any(), anyInt());
 
-    sut.calculateStandardDeviation(treeMap, TWELVE);
+    calculation.calculateStandardDeviation(treeMap, TWELVE);
 
-    verify(sut).calculateNumerator(treeMap, TEN.setScale(15, RoundingMode.UNNECESSARY));
+    verify(calculation).calculateNumerator(treeMap, TEN.setScale(15, RoundingMode.UNNECESSARY));
   }
 
   @Test
   void shouldCalculateStandardDeviation_whenCheckResult() {
-    final var sut = mock(StandardDeviationCalculation.class);
-    doCallRealMethod().when(sut).setScale(anyInt());
-    sut.setScale(OUTPUT_SCALE);
+    final var calculation = mock(StandardDeviationCalculation.class);
+    doCallRealMethod().when(calculation).setScale(anyInt());
+    calculation.setScale(OUTPUT_SCALE);
     final var treeMap = new TreeMap();
     treeMap.put(LocalDate.now(), ONE);
     treeMap.put(LocalDate.now().minusMonths(1), TEN);
     treeMap.put(LocalDate.now().minusMonths(5), TEN);
 
-    when(sut.calculateNumerator(any(), any())).thenReturn(BigDecimal.TEN);
-    doCallRealMethod().when(sut).calculateStandardDeviation(any(), anyInt());
-    final BigDecimal actual = sut.calculateStandardDeviation(treeMap, TWELVE);
+    when(calculation.calculateNumerator(any(), any())).thenReturn(BigDecimal.TEN);
+    doCallRealMethod().when(calculation).calculateStandardDeviation(any(), anyInt());
+    final BigDecimal actual = calculation.calculateStandardDeviation(treeMap, TWELVE);
 
     assertEquals(toUserScale(BigDecimal.valueOf(3.30289129537908)), actual);
   }
 
   @Test
   void shouldCalculateNumerator_whenCheckResult() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
 
-    doCallRealMethod().when(sut).calculateNumerator(any(), any());
-    doCallRealMethod().when(sut).overrideTotalReturns(any());
+    doCallRealMethod().when(calculation).calculateNumerator(any(), any());
+    doCallRealMethod().when(calculation).overrideTotalReturns(any());
 
-    final NavigableMap<LocalDate, BigDecimal> totalReturns = sut.overrideTotalReturns(map);
-    final BigDecimal actual = sut.calculateNumerator(totalReturns, CalculationUtils.average(totalReturns));
+    final NavigableMap<LocalDate, BigDecimal> totalReturns = calculation.overrideTotalReturns(map);
+    final BigDecimal actual = calculation.calculateNumerator(totalReturns, CalculationUtils.average(totalReturns));
 
     assertEquals(toUserScale(BigDecimal.valueOf(3.08915891708201E-05)), toUserScale(actual));
   }
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
-    final var sut = mock(StandardDeviationCalculation.class);
+    final var calculation = mock(StandardDeviationCalculation.class);
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
     final var interval1 = new TimeIntervalResult("2000-01-12", ZERO);
     final var interval2 = new TimeIntervalResult("2020-01-05", ONE);
     final var expected = Set.of(interval1, interval2);
 
-    when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
+    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).defineResponseType(anySet());
-    final StandardDeviationResult actual = (StandardDeviationResult) sut.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anySet());
+    final StandardDeviationResult actual = (StandardDeviationResult) calculation.defineResponseType(pairs);
 
     assertEquals(expected, actual.getStandardDeviation());
   }

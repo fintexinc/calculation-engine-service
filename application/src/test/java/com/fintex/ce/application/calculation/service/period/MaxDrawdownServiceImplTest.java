@@ -31,7 +31,7 @@ class MaxDrawdownServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
+    final var service = mock(MaxDrawdownServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var benchmarkContext = mock(PeriodCalculationInput.class);
@@ -39,20 +39,20 @@ class MaxDrawdownServiceImplTest {
         BigDecimal.TEN));
 
     final var req = mock(PeriodCommand.class);
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
-    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyInitializeGrowthOf10KMap() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
+    final var service = mock(MaxDrawdownServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var benchmarkContext = mock(PeriodCalculationInput.class);
@@ -60,20 +60,20 @@ class MaxDrawdownServiceImplTest {
         BigDecimal.TEN));
 
     final var req = mock(PeriodCommand.class);
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
-    verify(sut).initializeGrowthOf10KMap(eq(benchmarkContext), any());
+    verify(service).initializeGrowthOf10KMap(eq(benchmarkContext), any());
   }
 
   @Test
   void shouldInitializeGrowthOf10KMap_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
+    final var service = mock(MaxDrawdownServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var context = mock(PeriodCalculationInput.class);
@@ -82,8 +82,8 @@ class MaxDrawdownServiceImplTest {
 
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).initializeGrowthOf10KMap(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = sut.initializeGrowthOf10KMap(context, growth10KCalculation);
+    doCallRealMethod().when(service).initializeGrowthOf10KMap(any(), any());
+    final NavigableMap<LocalDate, BigDecimal> actual = service.initializeGrowthOf10KMap(context, growth10KCalculation);
 
     assertNotNull(actual.entrySet().stream().findFirst());
   }
@@ -91,7 +91,7 @@ class MaxDrawdownServiceImplTest {
   @Test
   void shouldInitializeGrowthOf10KMap_whenCheckResult2() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(MaxDrawdownServiceImpl.class, withSettings()
+    final var service = mock(MaxDrawdownServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var context = mock(PeriodCalculationInput.class);
@@ -100,8 +100,8 @@ class MaxDrawdownServiceImplTest {
 
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).initializeGrowthOf10KMap(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = sut.initializeGrowthOf10KMap(context, growth10KCalculation);
+    doCallRealMethod().when(service).initializeGrowthOf10KMap(any(), any());
+    final NavigableMap<LocalDate, BigDecimal> actual = service.initializeGrowthOf10KMap(context, growth10KCalculation);
 
     assertFalse(actual.entrySet().stream().findFirst().isPresent());
   }

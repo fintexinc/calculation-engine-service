@@ -37,11 +37,11 @@ class ReturnsTest {
     final PortfolioHolding holding = mock(PortfolioHolding.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
 
-    final ReturnsAggregate sut = new ReturnsAggregate();
+    final ReturnsAggregate returnsAggregate = new ReturnsAggregate();
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
 
     // ACT
-    final ReturnsAggregate actual = sut.initForNavPrices(Map.of(holding, historicalNavPrices));
+    final ReturnsAggregate actual = returnsAggregate.initForNavPrices(Map.of(holding, historicalNavPrices));
 
     // VERIFY
     assertNotNull(actual);
@@ -53,11 +53,11 @@ class ReturnsTest {
     final PortfolioHolding holding = mock(PortfolioHolding.class);
     final HistoricalNavPrices historicalNavPrices = mock(HistoricalNavPrices.class);
 
-    final ReturnsAggregate sut = new ReturnsAggregate();
+    final ReturnsAggregate returnsAggregate = new ReturnsAggregate();
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
 
     // ACT
-    final ReturnsAggregate actual = sut.initOnlyWithReturnsDataValidation(Map.of(holding, historicalNavPrices));
+    final ReturnsAggregate actual = returnsAggregate.initOnlyWithReturnsDataValidation(Map.of(holding, historicalNavPrices));
 
     // VERIFY
     assertNotNull(actual);
@@ -72,12 +72,12 @@ class ReturnsTest {
     final HoldingMonthlyReturns monthlyReturnsMissing = mock(HoldingMonthlyReturns.class);
     monthlyReturnsMissing.setErrors(List.of(ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toNotification("id", null, null, null)));
 
-    final ReturnsAggregate sut = new ReturnsAggregate();
+    final ReturnsAggregate returnsAggregate = new ReturnsAggregate();
     Mockito.when(monthlyReturns.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
     Mockito.when(monthlyReturnsMissing.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
 
     // ACT
-    final ReturnsAggregate actual = sut.initOnlyWithReturnsDataValidation(Map.of(holding, monthlyReturns,
+    final ReturnsAggregate actual = returnsAggregate.initOnlyWithReturnsDataValidation(Map.of(holding, monthlyReturns,
         holdingMissingReturns,
         monthlyReturnsMissing));
 
@@ -93,7 +93,7 @@ class ReturnsTest {
     final HoldingMonthlyReturns monthlyReturns = mock(HoldingMonthlyReturns.class);
     final HoldingMonthlyReturns monthlyReturnsMissing = mock(HoldingMonthlyReturns.class);
 
-    final ReturnsAggregate sut = new ReturnsAggregate();
+    final ReturnsAggregate returnsAggregate = new ReturnsAggregate();
     Mockito.when(monthlyReturns.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
     Mockito.when(monthlyReturnsMissing.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
     Mockito.when(monthlyReturns.hasMonthlyReturnsErrors()).thenReturn(false);
@@ -102,7 +102,7 @@ class ReturnsTest {
         List.of(ErrorCode.CPED_AFTER_PORTFOLIO_PED.toNotification("id", null, null, null)));
 
     // VERIFY
-    assertThrows(CalculationsFailedException.class, () -> sut.initOnlyWithReturnsDataValidation(Map.of(holding,
+    assertThrows(CalculationsFailedException.class, () -> returnsAggregate.initOnlyWithReturnsDataValidation(Map.of(holding,
         monthlyReturns, holdingMissingReturns, monthlyReturnsMissing)));
 
   }
@@ -116,20 +116,20 @@ class ReturnsTest {
     final CpsdDataValidation cpsdDataValidation = mock(CpsdDataValidation.class);
     final CpedDataValidation cpedDataValidation = mock(CpedDataValidation.class);
 
-    final ReturnsAggregate sut = new ReturnsAggregate();
+    final ReturnsAggregate returnsAggregate = new ReturnsAggregate();
     final TreeMap returns = new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE));
 
-    sut.setCpsdDataValidation(cpsdDataValidation);
-    sut.setCpedDataValidation(cpedDataValidation);
-    sut.performanceStartDate = LocalDate.now().minusMonths(7);
-    sut.performanceEndDate = LocalDate.now().plusMonths(7);
-    sut.returnsMap = Map.of(holding, returns);
+    returnsAggregate.setCpsdDataValidation(cpsdDataValidation);
+    returnsAggregate.setCpedDataValidation(cpedDataValidation);
+    returnsAggregate.performanceStartDate = LocalDate.now().minusMonths(7);
+    returnsAggregate.performanceEndDate = LocalDate.now().plusMonths(7);
+    returnsAggregate.returnsMap = Map.of(holding, returns);
     Mockito.when(command.getStartDate()).thenReturn(LocalDate.now().minusMonths(7));
     Mockito.when(command.getEndDate()).thenReturn(LocalDate.now().plusMonths(7));
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(returns);
 
     // ACT
-    final ReturnsAggregate actual = sut.validateAndUpdateCpsdAndCped(Map.of(holding, historicalNavPrices),
+    final ReturnsAggregate actual = returnsAggregate.validateAndUpdateCpsdAndCped(Map.of(holding, historicalNavPrices),
         command);
 
     // VERIFY
@@ -145,20 +145,20 @@ class ReturnsTest {
     final CpsdDataValidation cpsdDataValidation = mock(CpsdDataValidation.class);
     final CpedDataValidation cpedDataValidation = mock(CpedDataValidation.class);
 
-    final ReturnsAggregate sut = new ReturnsAggregate();
+    final ReturnsAggregate returnsAggregate = new ReturnsAggregate();
     final TreeMap returns = new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE));
 
-    sut.setCpsdDataValidation(cpsdDataValidation);
-    sut.setCpedDataValidation(cpedDataValidation);
-    sut.performanceEndDate = LocalDate.now().minusMonths(7);
-    sut.performanceStartDate = LocalDate.now().plusMonths(7);
-    sut.returnsMap = Map.of(holding, returns);
+    returnsAggregate.setCpsdDataValidation(cpsdDataValidation);
+    returnsAggregate.setCpedDataValidation(cpedDataValidation);
+    returnsAggregate.performanceEndDate = LocalDate.now().minusMonths(7);
+    returnsAggregate.performanceStartDate = LocalDate.now().plusMonths(7);
+    returnsAggregate.returnsMap = Map.of(holding, returns);
     Mockito.when(command.getStartDate()).thenReturn(LocalDate.now().minusMonths(7));
     Mockito.when(command.getEndDate()).thenReturn(LocalDate.now().plusMonths(7));
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(returns);
 
     // ACT
-    final ReturnsAggregate actual = sut.validateMonthlyDataMissing(Map.of(holding, historicalNavPrices),
+    final ReturnsAggregate actual = returnsAggregate.validateMonthlyDataMissing(Map.of(holding, historicalNavPrices),
         command);
 
     // VERIFY
@@ -167,28 +167,28 @@ class ReturnsTest {
 
   @Test
   void shouldGetErrors_whenReturnsEmptyListWhenNoErrors() {
-    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
-    assertTrue(sut.getErrors().isEmpty());
+    ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = new ReturnsAggregate<>();
+    assertTrue(returnsAggregate.getErrors().isEmpty());
   }
 
   @Test
   void shouldGetErrors_whenReturnsListOfErrorsWhenErrorsExist() {
-    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
+    ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = new ReturnsAggregate<>();
     CalculationException error = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id");
-    sut.notification.add(error);
-    List<BasePceException> errors = sut.getErrors();
+    returnsAggregate.notification.add(error);
+    List<BasePceException> errors = returnsAggregate.getErrors();
     assertEquals(1, errors.size());
     assertEquals(error, errors.get(0));
   }
 
   @Test
   void shouldGetErrors_whenReturnsMultipleErrorsWhenMultipleErrorsExist() {
-    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
+    ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = new ReturnsAggregate<>();
     CalculationException error1 = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id");
     CalculationException error2 = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id2");
-    sut.notification.add(error1);
-    sut.notification.add(error2);
-    List<BasePceException> errors = sut.getErrors();
+    returnsAggregate.notification.add(error1);
+    returnsAggregate.notification.add(error2);
+    List<BasePceException> errors = returnsAggregate.getErrors();
     assertEquals(2, errors.size());
     assertTrue(errors.contains(error1));
     assertTrue(errors.contains(error2));
@@ -196,7 +196,7 @@ class ReturnsTest {
 
   @Test
   void shouldValidateReturns_whenRemovesEntriesWithInvalidDates() {
-    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
+    ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = new ReturnsAggregate<>();
     PortfolioHolding holding1 = mock(PortfolioHolding.class);
     PortfolioHolding holding2 = mock(PortfolioHolding.class);
     TreeMap<LocalDate, BigDecimal> returns1 = new TreeMap<>(Map.of(
@@ -210,27 +210,27 @@ class ReturnsTest {
 
     returnsMap.put(holding1, returns1);
     returnsMap.put(holding2, returns2);
-    sut.returnsMap = returnsMap;
-    sut.findPedAndPsd();
+    returnsAggregate.returnsMap = returnsMap;
+    returnsAggregate.findPedAndPsd();
 
-    sut.validateReturns();
-    System.out.println(sut.returnsMap);
-    assertFalse(sut.returnsMap.containsKey(holding2));
+    returnsAggregate.validateReturns();
+    System.out.println(returnsAggregate.returnsMap);
+    assertFalse(returnsAggregate.returnsMap.containsKey(holding2));
   }
 
   @Test
   void shouldGetErrorsAsWarnings_whenReturnsEmptyListWhenNoErrors() {
-    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
-    List<Warning> warnings = sut.getErrorsAsWarnings();
+    ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = new ReturnsAggregate<>();
+    List<Warning> warnings = returnsAggregate.getErrorsAsWarnings();
     assertTrue(warnings.isEmpty());
   }
 
   @Test
   void shouldGetErrorsAsWarnings_whenReturnsListOfWarningsWhenErrorsExist() {
-    ReturnsAggregate<HoldingMonthlyReturns> sut = new ReturnsAggregate<>();
+    ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = new ReturnsAggregate<>();
     CalculationException error = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id");
-    sut.notification.add(error);
-    List<Warning> warnings = sut.getErrorsAsWarnings();
+    returnsAggregate.notification.add(error);
+    List<Warning> warnings = returnsAggregate.getErrorsAsWarnings();
     assertEquals(1, warnings.size());
     assertEquals(error.getId(), warnings.get(0).getId());
     assertEquals(error.getMessage(), warnings.get(0).getMessage());

@@ -47,13 +47,13 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldSetFeeValues_whenCheckResult() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final var req = mock(AverageManagementExpenseCalculation.class);
 
-    doCallRealMethod().when(sut).setFeeValues(any(), any());
+    doCallRealMethod().when(service).setFeeValues(any(), any());
     // ACT
 
-    sut.setFeeValues(req, TEN);
+    service.setFeeValues(req, TEN);
 
     // VERIFY
     verify(req).setInitialFee(TEN);
@@ -64,21 +64,21 @@ class AverageManagementExpenseCalculationServiceTest {
   void shouldGetScaledAverageMer_whenCallsGetAbsoluteAndForceReportFeeHoldingList() {
     // SETUP
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> holdings = getAverageMerCalculationDtoMap();
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
-    doCallRealMethod().when(sut).getScaledAverageMer(anyMap());
+    final var service = mock(AverageManagementExpenseCalculationService.class);
+    doCallRealMethod().when(service).getScaledAverageMer(anyMap());
 
     // ACT
-    sut.getScaledAverageMer(holdings);
+    service.getScaledAverageMer(holdings);
 
     // VERIFY
-    verify(sut).getAbsoluteAndForceReportFeeHoldingList(holdings);
+    verify(service).getAbsoluteAndForceReportFeeHoldingList(holdings);
   }
 
   @Test
   void shouldGetScaledAverageMer_whenWhenParameterTypeAbsoluteCallsGetAverageMerByParameterTypeWithAllFinancialInstrumentTypes() {
     // SETUP
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> holdings = getAverageMerCalculationDtoMap();
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final List<AverageManagementExpenseCalculation> absoluteHoldings = Stream.of(holdings.get(
         FinancialInstrumentType.MUTUAL_FUND_CANADA), holdings.get(FinancialInstrumentType.SEGREGATED_FUND_CANADA),
         holdings.get(
@@ -89,21 +89,21 @@ class AverageManagementExpenseCalculationServiceTest {
         .map(Map::values)
         .flatMap(Collection::stream)
         .toList();
-    doCallRealMethod().when(sut).getAbsoluteAverageMer(anyMap());
+    doCallRealMethod().when(service).getAbsoluteAverageMer(anyMap());
 
     // ACT
-    sut.getAbsoluteAverageMer(holdings);
+    service.getAbsoluteAverageMer(holdings);
 
     // VERIFY
-    verify(sut).getAverageMerByParameterType(absoluteHoldings);
+    verify(service).getAverageMerByParameterType(absoluteHoldings);
   }
 
   @Test
   void shouldGetAbsoluteAndForceReportFeeHoldingList_whenIsPappedProperly() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> holdings = getAverageMerCalculationDtoMap();
-    doCallRealMethod().when(sut).getAbsoluteAndForceReportFeeHoldingList(anyMap());
+    doCallRealMethod().when(service).getAbsoluteAndForceReportFeeHoldingList(anyMap());
     final List<AverageManagementExpenseCalculation> absoluteOrForceReportFeeHoldings = Stream.of(holdings.get(
         FinancialInstrumentType.MUTUAL_FUND_CANADA), holdings.get(FinancialInstrumentType.SEGREGATED_FUND_CANADA),
         holdings.get(
@@ -113,7 +113,7 @@ class AverageManagementExpenseCalculationServiceTest {
         .flatMap(Collection::stream)
         .toList();
     // ACT
-    final List<AverageManagementExpenseCalculation> result = sut.getAbsoluteAndForceReportFeeHoldingList(holdings);
+    final List<AverageManagementExpenseCalculation> result = service.getAbsoluteAndForceReportFeeHoldingList(holdings);
 
     // VERIFY
     assertEquals(absoluteOrForceReportFeeHoldings, result);
@@ -122,75 +122,75 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldGetAverageMerByParameterType_whenCallsCalculateAverageManagementExpenseRatio() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList = List.of(
         new AverageManagementExpenseCalculation(), new AverageManagementExpenseCalculation());
-    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
+    doCallRealMethod().when(service).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // ACT
-    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
+    service.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // VERIFY
-    verify(sut, times(2)).calculateAverageManagementExpenseRatio(any(), any());
+    verify(service, times(2)).calculateAverageManagementExpenseRatio(any(), any());
   }
 
   @Test
   void shouldGetAverageMerByParameterType_whenCallsCalculateMarketValueQualified() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList = List.of(
         new AverageManagementExpenseCalculation(), new AverageManagementExpenseCalculation());
-    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
+    doCallRealMethod().when(service).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // ACT
-    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
+    service.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // VERIFY
-    verify(sut, times(2)).calculateMarketValueQualified(any());
+    verify(service, times(2)).calculateMarketValueQualified(any());
   }
 
   @Test
   void shouldGetAverageMerByParameterType_whenCallsCalculatePercentageQualified() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList = List.of(
         new AverageManagementExpenseCalculation(), new AverageManagementExpenseCalculation());
-    doCallRealMethod().when(sut).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
+    doCallRealMethod().when(service).getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // ACT
-    sut.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
+    service.getAverageMerByParameterType(averageManagementExpenseCalculationDtoList);
 
     // VERIFY
-    verify(sut, times(2)).calculatePercentageQualified(any(), any());
+    verify(service, times(2)).calculatePercentageQualified(any(), any());
   }
 
   @Test
   void shouldGetAverageMerByParameterType_whenCallsGetAmountOfMarketValueQualified() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
-    doCallRealMethod().when(sut).getAverageMerByParameterType(anyList());
+    final var service = mock(AverageManagementExpenseCalculationService.class);
+    doCallRealMethod().when(service).getAverageMerByParameterType(anyList());
 
     // ACT
-    sut.getAverageMerByParameterType(anyList());
+    service.getAverageMerByParameterType(anyList());
 
     // VERIFY
-    verify(sut).getAmountOfMarketValues(anyList());
+    verify(service).getAmountOfMarketValues(anyList());
   }
 
   @Test
   void shouldGetScaledAverageMer_whenWhenParameterTypeScaledCallsGetAverageMerByParameterTypeWithCanadaMutualFundsUsEtfAndCanadaEtfHoldings() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
 
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> holdings = getAverageMerCalculationDtoMap();
-    doCallRealMethod().when(sut).getScaledAverageMer(anyMap());
-    doCallRealMethod().when(sut).getAbsoluteAndForceReportFeeHoldingList(anyMap());
+    doCallRealMethod().when(service).getScaledAverageMer(anyMap());
+    doCallRealMethod().when(service).getAbsoluteAndForceReportFeeHoldingList(anyMap());
 
     // ACT
-    sut.getScaledAverageMer(holdings);
+    service.getScaledAverageMer(holdings);
 
     // VERIFY
-    verify(sut).getAverageMerByParameterType(
+    verify(service).getAverageMerByParameterType(
         Stream.of(holdings.get(FinancialInstrumentType.MUTUAL_FUND_CANADA), holdings.get(
             FinancialInstrumentType.SEGREGATED_FUND_CANADA),
             holdings.get(FinancialInstrumentType.ETF_US), holdings.get(FinancialInstrumentType.ETF_CANADA))
@@ -201,31 +201,31 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldGetForceReportFeeAverageMer_whenWhenParameterTypeForceReportFeeCallsGetAbsoluteAndForceReportFeeHoldingList() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
 
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> holdings = getAverageMerCalculationDtoMap();
-    doCallRealMethod().when(sut).getForceReportFeeAverageMer(anyMap());
+    doCallRealMethod().when(service).getForceReportFeeAverageMer(anyMap());
 
     // ACT
-    sut.getForceReportFeeAverageMer(holdings);
+    service.getForceReportFeeAverageMer(holdings);
 
     // VERIFY
-    verify(sut).getAbsoluteAndForceReportFeeHoldingList(holdings);
+    verify(service).getAbsoluteAndForceReportFeeHoldingList(holdings);
   }
 
   @Test
   void shouldGetForceReportFeeAverageMer_whenWhenParameterTypeForceReportFeeCallsGetAverageMerByParameterTypeWithCanadaMutualFundsUsEtfAndCanadaEtfHoldings() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> holdings = getAverageMerCalculationDtoMap();
-    doCallRealMethod().when(sut).getForceReportFeeAverageMer(anyMap());
-    doCallRealMethod().when(sut).getAbsoluteAndForceReportFeeHoldingList(anyMap());
+    doCallRealMethod().when(service).getForceReportFeeAverageMer(anyMap());
+    doCallRealMethod().when(service).getAbsoluteAndForceReportFeeHoldingList(anyMap());
 
     // ACT
-    sut.getForceReportFeeAverageMer(holdings);
+    service.getForceReportFeeAverageMer(holdings);
 
     // VERIFY
-    verify(sut).getAverageMerByParameterType(Stream.of(holdings.get(FinancialInstrumentType.MUTUAL_FUND_CANADA),
+    verify(service).getAverageMerByParameterType(Stream.of(holdings.get(FinancialInstrumentType.MUTUAL_FUND_CANADA),
         holdings.get(
             FinancialInstrumentType.SEGREGATED_FUND_CANADA), holdings.get(FinancialInstrumentType.ETF_US), holdings.get(
                 FinancialInstrumentType.ETF_CANADA))
@@ -237,30 +237,30 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldGetForceReportFeeAverageMer_whenCallsIsMerPresentForAHolding4Times() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> holdings = getAverageMerCalculationDtoMap();
-    doCallRealMethod().when(sut).getForceReportFeeAverageMer(anyMap());
+    doCallRealMethod().when(service).getForceReportFeeAverageMer(anyMap());
 
     // ACT
-    sut.getForceReportFeeAverageMer(holdings);
+    service.getForceReportFeeAverageMer(holdings);
 
     // VERIFY
-    verify(sut, times(6)).isMerPresentForHolding(any(), any());
+    verify(service, times(6)).isMerPresentForHolding(any(), any());
   }
 
   @Test
   void shouldGetForceReportFeeAverageMer_whenReturnsNullWhenMerValueIsNull() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> holdings = getAverageMerCalculationDtoMap();
     final Function<AverageManagementExpenseCalculation, BigDecimal> expenseRatioFunction = AverageManagementExpenseCalculation::getManagementExpenseRatio;
-    when(sut.isMerPresentForHolding(holdings.get(FinancialInstrumentType.MUTUAL_FUND_CANADA), expenseRatioFunction))
+    when(service.isMerPresentForHolding(holdings.get(FinancialInstrumentType.MUTUAL_FUND_CANADA), expenseRatioFunction))
         .thenReturn(
             true);
 
-    doCallRealMethod().when(sut).getForceReportFeeAverageMer(anyMap());
+    doCallRealMethod().when(service).getForceReportFeeAverageMer(anyMap());
     // ACT
-    final BigDecimal forceReportFeeAverageMer = sut.getForceReportFeeAverageMer(holdings);
+    final BigDecimal forceReportFeeAverageMer = service.getForceReportFeeAverageMer(holdings);
 
     // VERIFY
     assertNull(forceReportFeeAverageMer);
@@ -269,15 +269,15 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldIsMerPresentForAHolding_whenReturnsTrueIfMerIsAbsent() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
 
     final Map<PortfolioHolding, AverageManagementExpenseCalculation> mockAverageMerCalculationDtoList = Map.of(mock(
         PortfolioHolding.class), new AverageManagementExpenseCalculation());
     final Function<AverageManagementExpenseCalculation, BigDecimal> functionMock = mock(Function.class);
-    doCallRealMethod().when(sut).isMerPresentForHolding(any(), any());
+    doCallRealMethod().when(service).isMerPresentForHolding(any(), any());
 
     // ACT
-    final boolean presentForAHolding = sut.isMerPresentForHolding(mockAverageMerCalculationDtoList, functionMock);
+    final boolean presentForAHolding = service.isMerPresentForHolding(mockAverageMerCalculationDtoList, functionMock);
 
     // VERIFY
     assertTrue(presentForAHolding);
@@ -286,7 +286,7 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldIsMerPresentForAHolding_whenReturnsFalseIfMerIsPresent() {
     // SETUP
-    final var sut = mock(MERCalculationServiceImpl.class);
+    final var service = mock(MERCalculationServiceImpl.class);
 
     final AverageManagementExpenseCalculation mockAverageManagementExpenseCalculation = mock(
         AverageManagementExpenseCalculation.class);
@@ -294,9 +294,9 @@ class AverageManagementExpenseCalculationServiceTest {
     final Map<PortfolioHolding, AverageManagementExpenseCalculation> mockAverageMerCalculationDtoList = Map.of(mock(
         PortfolioHolding.class), mockAverageManagementExpenseCalculation);
 
-    doCallRealMethod().when(sut).isMerPresentForHolding(any(), any());
+    doCallRealMethod().when(service).isMerPresentForHolding(any(), any());
     // ACT
-    final boolean presentForAHolding = sut.isMerPresentForHolding(
+    final boolean presentForAHolding = service.isMerPresentForHolding(
         mockAverageMerCalculationDtoList, AverageManagementExpenseCalculation::getManagementExpenseRatio);
 
     // VERIFY
@@ -306,16 +306,16 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperly() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculation = AverageManagementExpenseCalculation
         .builder()
         .modifiedFee(new BigDecimal("0.97"))
         .percentageQualified(new BigDecimal("34"))
         .build();
-    doCallRealMethod().when(sut).calculateAverageManagementExpenseRatio(any(), any());
+    doCallRealMethod().when(service).calculateAverageManagementExpenseRatio(any(), any());
 
     // ACT
-    final BigDecimal result = sut.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
+    final BigDecimal result = service.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
         averageManagementExpenseCalculation);
 
     // VERIFY
@@ -325,15 +325,15 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperlyWhenModifiedFeeIsNull() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculation = AverageManagementExpenseCalculation
         .builder()
         .percentageQualified(new BigDecimal("34"))
         .build();
-    doCallRealMethod().when(sut).calculateAverageManagementExpenseRatio(any(), any());
+    doCallRealMethod().when(service).calculateAverageManagementExpenseRatio(any(), any());
 
     // ACT
-    final BigDecimal result = sut.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
+    final BigDecimal result = service.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
         averageManagementExpenseCalculation);
 
     // VERIFY
@@ -343,15 +343,15 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldCalculateAverageManagementExpenseRatio_whenAverageManagementExpenseRatioValueIsCalculatedProperlyWhenPercentageQualifiedIsNull() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculation = AverageManagementExpenseCalculation
         .builder()
         .modifiedFee(new BigDecimal("0.97"))
         .build();
-    doCallRealMethod().when(sut).calculateAverageManagementExpenseRatio(any(), any());
+    doCallRealMethod().when(service).calculateAverageManagementExpenseRatio(any(), any());
 
     // ACT
-    final BigDecimal result = sut.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
+    final BigDecimal result = service.calculateAverageManagementExpenseRatio(new BigDecimal("30"),
         averageManagementExpenseCalculation);
 
     // VERIFY
@@ -361,15 +361,15 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldCalculatePercentageQualified_whenAverageMerCalculationDtoisMappedProperly() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculation = AverageManagementExpenseCalculation
         .builder()
         .marketValueQualified(new BigDecimal("50000"))
         .build();
-    doCallRealMethod().when(sut).calculatePercentageQualified(any(), any());
+    doCallRealMethod().when(service).calculatePercentageQualified(any(), any());
 
     // ACT
-    sut.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
+    service.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
 
     // VERIFY
     assertEquals(new BigDecimal("0.714285714285714"), averageManagementExpenseCalculation.getPercentageQualified());
@@ -378,11 +378,11 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldCalculatePercentageQualified_whenAverageMerCalculationDtoisMappedProperlyWhenMarketValueQualifiedIsNull() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
 
     // ACT
-    sut.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
+    service.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
 
     // VERIFY
     assertNull(averageManagementExpenseCalculation.getPercentageQualified());
@@ -391,14 +391,14 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldCalculatePercentageQualified_whenAverageMerCalculationDtoisMappedProperlyWhenMarketValueQualifiedIsZero() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculation = AverageManagementExpenseCalculation
         .builder()
         .marketValueQualified(BigDecimal.ZERO)
         .build();
 
     // ACT
-    sut.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
+    service.calculatePercentageQualified(averageManagementExpenseCalculation, new BigDecimal("70000"));
 
     // VERIFY
     assertNull(averageManagementExpenseCalculation.getPercentageQualified());
@@ -407,16 +407,16 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldCalculateMarketValueQualified_whenIsMappedProperlyWhenModifiedFeeValueExists() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculation = AverageManagementExpenseCalculation
         .builder()
         .modifiedFee(new BigDecimal("100"))
         .marketValue(new BigDecimal("10000"))
         .build();
-    doCallRealMethod().when(sut).calculateMarketValueQualified(averageManagementExpenseCalculation);
+    doCallRealMethod().when(service).calculateMarketValueQualified(averageManagementExpenseCalculation);
 
     // ACT
-    sut.calculateMarketValueQualified(averageManagementExpenseCalculation);
+    service.calculateMarketValueQualified(averageManagementExpenseCalculation);
 
     // VERIFY
     assertEquals(averageManagementExpenseCalculation.getMarketValue(), averageManagementExpenseCalculation
@@ -426,12 +426,12 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldCalculateMarketValueQualified_whenIsMappedProperlyWhenModifiedFeeValueIsNull() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculation = new AverageManagementExpenseCalculation();
-    doCallRealMethod().when(sut).calculateMarketValueQualified(averageManagementExpenseCalculation);
+    doCallRealMethod().when(service).calculateMarketValueQualified(averageManagementExpenseCalculation);
 
     // ACT
-    sut.calculateMarketValueQualified(averageManagementExpenseCalculation);
+    service.calculateMarketValueQualified(averageManagementExpenseCalculation);
 
     // VERIFY
     assertEquals(new BigDecimal(BigInteger.ZERO), averageManagementExpenseCalculation.getMarketValueQualified());
@@ -440,7 +440,7 @@ class AverageManagementExpenseCalculationServiceTest {
   @Test
   void shouldGetAmountOfMarketValueQualified_whenReturnsCorrectValue() {
     // SETUP
-    final var sut = mock(AverageManagementExpenseCalculationService.class);
+    final var service = mock(AverageManagementExpenseCalculationService.class);
     final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto1 = AverageManagementExpenseCalculation
         .ofMarketValue(new BigDecimal("10"));
     final AverageManagementExpenseCalculation averageManagementExpenseCalculationDto2 = AverageManagementExpenseCalculation
@@ -450,10 +450,10 @@ class AverageManagementExpenseCalculationServiceTest {
     final List<AverageManagementExpenseCalculation> averageManagementExpenseCalculationDtoList = List.of(
         averageManagementExpenseCalculationDto1, averageManagementExpenseCalculationDto2,
         averageManagementExpenseCalculationDto3);
-    doCallRealMethod().when(sut).getAmountOfMarketValues(any());
+    doCallRealMethod().when(service).getAmountOfMarketValues(any());
 
     // ACT
-    final BigDecimal amountOfMarketValueQualified = sut.getAmountOfMarketValues(
+    final BigDecimal amountOfMarketValueQualified = service.getAmountOfMarketValues(
         averageManagementExpenseCalculationDtoList);
 
     // VERIFY
@@ -465,7 +465,7 @@ class AverageManagementExpenseCalculationServiceTest {
     try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
       // SETUP
 
-      final var sut = mock(AverageManagementExpenseCalculationService.class);
+      final var service = mock(AverageManagementExpenseCalculationService.class);
 
       final var command = mock(AverageMerCommand.class);
       final var result = new AverageMerResult();
@@ -482,11 +482,11 @@ class AverageManagementExpenseCalculationServiceTest {
 
       when(command.getHoldings()).thenReturn(holdings);
 
-      doCallRealMethod().when(sut).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(anyMap(), any());
-      doCallRealMethod().when(sut).setNullForScaledIfHoldingContainsNoFunds(any(), any());
-      doCallRealMethod().when(sut).setNullForForcedReportFeeIfHoldingContainsNoFunds(any(), any());
+      doCallRealMethod().when(service).setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(anyMap(), any());
+      doCallRealMethod().when(service).setNullForScaledIfHoldingContainsNoFunds(any(), any());
+      doCallRealMethod().when(service).setNullForForcedReportFeeIfHoldingContainsNoFunds(any(), any());
       // ACT
-      sut.setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(result.getManagementExpenseRatio(), command);
+      service.setNullForScaledAndForcedReportFeeIfHoldingContainsNoFunds(result.getManagementExpenseRatio(), command);
 
       // VERIFY
       Assertions.assertNotNull(result);

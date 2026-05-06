@@ -30,54 +30,54 @@ class MarRatioCalculationServiceImplTest {
   void shouldPerform_whenVerifyValidateMarRatio() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
     final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(command.getHoldings()).thenReturn(holdings);
-    when(sut.defineCalculationMethod(any())).thenReturn(mock(MarRatioCalculation.class));
+    when(service.defineCalculationMethod(any())).thenReturn(mock(MarRatioCalculation.class));
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(command);
 
-    verify(sut).defineCalculationMethod(command);
+    verify(service).defineCalculationMethod(command);
   }
 
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
     final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(command.getHoldings()).thenReturn(holdings);
-    when(sut.defineCalculationMethod(any())).thenReturn(mock(MarRatioCalculation.class));
+    when(service.defineCalculationMethod(any())).thenReturn(mock(MarRatioCalculation.class));
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(command);
 
-    verify(sut).defineCalculationMethod(command);
+    verify(service).defineCalculationMethod(command);
   }
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
     final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
     when(command.getHoldings()).thenReturn(holdings);
     final var calculationMethod = mock(MarRatioCalculation.class);
-    when(sut.defineCalculationMethod(any())).thenReturn(calculationMethod);
+    when(service.defineCalculationMethod(any())).thenReturn(calculationMethod);
     when(command.getPeriods()).thenReturn(Set.of("12"));
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(command);
 
     verify(calculationMethod).calculate(Set.of("12"));
   }
@@ -86,20 +86,20 @@ class MarRatioCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var defaultPeriods = Set.of();
-    final var sut = mock(MarRatioCalculationServiceImpl.class, withSettings()
+    final var service = mock(MarRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, defaultPeriods));
     final var benchmarkContext = mock(PeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
         BigDecimal.TEN));
 
     final var req = mock(PeriodCommand.class);
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
-    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 }

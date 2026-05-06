@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 class SalesChargeTypeMapperTest {
 
-  private final SalesChargeMapper sut = new SalesChargeMapper();
+  private final SalesChargeMapper mapper = new SalesChargeMapper();
 
   @Test
   void shouldMapValueAndProvider_whenResponseHasValues() {
@@ -26,7 +26,7 @@ class SalesChargeTypeMapperTest {
     when(salesCharge.getValue()).thenReturn(SalesChargeType.DEFERRED_SALES_CHARGE);
     when(salesCharge.getDataProvider()).thenReturn(DataProvider.MORNINGSTAR);
 
-    SalesCharge result = sut.map(smsResponse, createHolding("SEC-001"));
+    SalesCharge result = mapper.map(smsResponse, createHolding("SEC-001"));
 
     assertThat(result.getType()).isEqualTo(SalesChargeType.DEFERRED_SALES_CHARGE);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -34,7 +34,7 @@ class SalesChargeTypeMapperTest {
 
   @Test
   void shouldReturnEmptySalesCharge_whenResponseIsNull() {
-    SalesCharge result = sut.map(null, createHolding("SEC-002"));
+    SalesCharge result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getType()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -45,7 +45,7 @@ class SalesChargeTypeMapperTest {
     var smsResponse = mock(SalesChargeData.class);
     when(smsResponse.getSalesCharge()).thenReturn(null);
 
-    SalesCharge result = sut.map(smsResponse, createHolding("SEC-003"));
+    SalesCharge result = mapper.map(smsResponse, createHolding("SEC-003"));
 
     assertThat(result.getType()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -59,7 +59,7 @@ class SalesChargeTypeMapperTest {
     when(salesCharge.getValue()).thenReturn(SalesChargeType.FRONT_END_CHARGE);
     when(salesCharge.getDataProvider()).thenReturn(DataProvider.MORNINGSTAR);
 
-    SalesCharge result = sut.map(smsResponse, createHolding("SEC-004"));
+    SalesCharge result = mapper.map(smsResponse, createHolding("SEC-004"));
 
     assertThat(result.getType()).isEqualTo(SalesChargeType.FRONT_END_CHARGE);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
