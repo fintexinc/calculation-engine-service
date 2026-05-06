@@ -61,40 +61,40 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldReturnNull_whenMonthsExceedAvailablePeriod() {
-    final var sut = mock(RollingAbstractCalculation.class);
+    final var calculation = mock(RollingAbstractCalculation.class);
     final var numberOfMonths = 120;
     final var portfolioReturns = totalPortfolioReturns;
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    final NavigableMap actual = sut.calculatePeriodForNumberOfMonths(numberOfMonths, portfolioReturns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    final NavigableMap actual = calculation.calculatePeriodForNumberOfMonths(numberOfMonths, portfolioReturns);
 
     Assertions.assertNull(actual);
   }
 
   @Test
   void shouldCheckEachEntryRange_whenCalculatingRollingPeriod() {
-    final var sut = mock(RollingAbstractCalculation.class);
+    final var calculation = mock(RollingAbstractCalculation.class);
     final var numberOfMonths = 12;
     final var portfolioReturns = totalPortfolioReturns;
     final LocalDate startDateOfRollingReturn = NOW.plusMonths(1).plusMonths(11);
     final LocalDate ped = NOW.plusMonths(13);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(numberOfMonths, portfolioReturns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(numberOfMonths, portfolioReturns);
 
-    verify(sut).isInRange(buildEntry(1), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(2), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(3), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(4), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(5), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(6), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(7), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(8), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(9), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(10), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(11), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(12), startDateOfRollingReturn, ped);
-    verify(sut).isInRange(buildEntry(13), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(1), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(2), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(3), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(4), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(5), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(6), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(7), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(8), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(9), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(10), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(11), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(12), startDateOfRollingReturn, ped);
+    verify(calculation).isInRange(buildEntry(13), startDateOfRollingReturn, ped);
   }
 
   private Map.Entry<LocalDate, BigDecimal> buildEntry(int monthsToAdd) {
@@ -103,24 +103,24 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldCalculateRollingValueForEachEntry_whenAllEntriesAreInRange() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
     final var numberOfMonths = 12;
     final var portfolioReturns = totalPortfolioReturns;
 
-    when(sut.isInRange(any(), any(), any())).thenReturn(true);
+    when(calculation.isInRange(any(), any(), any())).thenReturn(true);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(numberOfMonths, portfolioReturns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(numberOfMonths, portfolioReturns);
 
-    verify(sut, times(13)).calculateRollingValue(eq(12), any());
+    verify(calculation, times(13)).calculateRollingValue(eq(12), any());
   }
 
   @Test
   void shouldRoundValuesToUserScale_whenFormattingRollingReturns() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
@@ -132,8 +132,8 @@ class RollingAbstractCalculationTest {
     expected.put(NOW.plusMonths(1), BigDecimal.valueOf(1.1234567891));
     expected.put(NOW.plusMonths(2), BigDecimal.valueOf(1.1234567899));
 
-    doCallRealMethod().when(sut).toUserFormat(any());
-    final NavigableMap<LocalDate, BigDecimal> actual = sut.toUserFormat(totalPortfolioReturns);
+    doCallRealMethod().when(calculation).toUserFormat(any());
+    final NavigableMap<LocalDate, BigDecimal> actual = calculation.toUserFormat(totalPortfolioReturns);
 
     ComparisonUtils.compareMaps(expected, actual);
     assertEquals(expected.size(), actual.size());
@@ -141,20 +141,20 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldReturnNull_whenFormattingNullRollingReturns() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
 
-    doCallRealMethod().when(sut).toUserFormat(any());
-    final NavigableMap<LocalDate, BigDecimal> actual = sut.toUserFormat(null);
+    doCallRealMethod().when(calculation).toUserFormat(any());
+    final NavigableMap<LocalDate, BigDecimal> actual = calculation.toUserFormat(null);
 
     Assertions.assertNull(actual);
   }
 
   @Test
   void shouldReturnTrue_whenEntryDateIsWithinRange() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
@@ -163,15 +163,15 @@ class RollingAbstractCalculationTest {
     final var startDateOfRollingReturn = NOW;
     final var ped = NOW.plusMonths(2);
 
-    doCallRealMethod().when(sut).isInRange(any(), any(), any());
-    final var actual = sut.isInRange(returnEntry, startDateOfRollingReturn, ped);
+    doCallRealMethod().when(calculation).isInRange(any(), any(), any());
+    final var actual = calculation.isInRange(returnEntry, startDateOfRollingReturn, ped);
 
     Assertions.assertTrue(actual);
   }
 
   @Test
   void shouldReturnFalse_whenEntryDateIsOutsideRange() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
@@ -180,30 +180,30 @@ class RollingAbstractCalculationTest {
     final var startDateOfRollingReturn = NOW;
     final var ped = NOW.plusMonths(2);
 
-    doCallRealMethod().when(sut).isInRange(any(), any(), any());
-    final var actual = sut.isInRange(returnEntry, startDateOfRollingReturn, ped);
+    doCallRealMethod().when(calculation).isInRange(any(), any(), any());
+    final var actual = calculation.isInRange(returnEntry, startDateOfRollingReturn, ped);
 
     Assertions.assertFalse(actual);
   }
 
   @Test
   void shouldDelegateToOverloadedMethod_whenCalculatingByMonthsOnly() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
     final var numberOfMonths = 12;
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(new TreeMap());
+    when(calculation.getPortfolioTotalReturns()).thenReturn(new TreeMap());
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    sut.calculatePeriodForNumberOfMonths(numberOfMonths);
-    verify(sut).calculatePeriodForNumberOfMonths(12, new TreeMap<>());
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    calculation.calculatePeriodForNumberOfMonths(numberOfMonths);
+    verify(calculation).calculatePeriodForNumberOfMonths(12, new TreeMap<>());
   }
 
   @Test
   void shouldMapRollingIntervals_whenBuildingRollingIntervalResults() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
@@ -211,10 +211,10 @@ class RollingAbstractCalculationTest {
     final LinkedHashSet<IntervalResult> intervalRestDtos = new LinkedHashSet<>();
     intervalRestDtos.add(new IntervalResult(NOW, TWO));
 
-    when(sut.mapRollingReturn(any())).thenReturn(intervalRestDtos);
+    when(calculation.mapRollingReturn(any())).thenReturn(intervalRestDtos);
 
-    doCallRealMethod().when(sut).getRollingIntervalResults(anySet());
-    final Set<RollingIntervalResult> actual = sut.getRollingIntervalResults(result);
+    doCallRealMethod().when(calculation).getRollingIntervalResults(anySet());
+    final Set<RollingIntervalResult> actual = calculation.getRollingIntervalResults(result);
 
     assertEquals("12", actual.stream().findFirst().get().period());
     assertEquals(intervalRestDtos, actual.stream().findFirst().get().values());
@@ -222,28 +222,28 @@ class RollingAbstractCalculationTest {
 
   @Test
   void shouldReturnNull_whenMappingRollingReturnWithNullValues() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
     final var result = Pair.of("12", null);
 
-    doCallRealMethod().when(sut).mapRollingReturn(any());
-    final Set actual = sut.mapRollingReturn(result);
+    doCallRealMethod().when(calculation).mapRollingReturn(any());
+    final Set actual = calculation.mapRollingReturn(result);
 
     assertNull(actual);
   }
 
   @Test
   void shouldMapEntriesToIntervalResults_whenRollingReturnContainsValues() {
-    final var sut = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
+    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
         PeriodCalculationInput.class),
         Set
             .of()));
     final Pair<String, NavigableMap<LocalDate, BigDecimal>> result = Pair.of("12", totalPortfolioReturns);
 
-    doCallRealMethod().when(sut).mapRollingReturn(any());
-    final Set<IntervalResult> actual = sut.mapRollingReturn(result);
+    doCallRealMethod().when(calculation).mapRollingReturn(any());
+    final Set<IntervalResult> actual = calculation.mapRollingReturn(result);
 
     assertEquals(NOW.plusMonths(1), actual.stream().findFirst().get().key());
     assertEquals(ONE, actual.stream().findFirst().get().value());

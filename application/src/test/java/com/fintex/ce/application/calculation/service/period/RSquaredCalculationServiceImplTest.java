@@ -29,7 +29,7 @@ class RSquaredCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TBillsFetcher.class);
-    final var sut = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
+    final var service = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
         null));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
@@ -38,20 +38,20 @@ class RSquaredCalculationServiceImplTest {
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
-    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     final var tBillsFetcher = mock(TBillsFetcher.class);
-    final var sut = mock(RSquaredCalculationServiceImpl.class, withSettings()
+    final var service = mock(RSquaredCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
@@ -60,12 +60,12 @@ class RSquaredCalculationServiceImplTest {
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
     verify(tBillsFetcher).fetch(Currency.CAD);
   }
@@ -74,7 +74,7 @@ class RSquaredCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       final var tBillsFetcher = mock(TBillsFetcher.class);
-      final var sut = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
+      final var service = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
           null));
 
       final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
@@ -83,12 +83,12 @@ class RSquaredCalculationServiceImplTest {
 
       when(req.getCurrency()).thenReturn(Currency.CAD);
       when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
-      when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+      when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
       when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);
 
-      doCallRealMethod().when(sut).defineCalculationMethod(req);
-      sut.defineCalculationMethod(req);
+      doCallRealMethod().when(service).defineCalculationMethod(req);
+      service.defineCalculationMethod(req);
 
       mockedPeriodCalculationAbstract.verify(() -> PeriodCalculationAbstract.calculateExcessReturn(treeMap, treeMap),
           Mockito.times(2));

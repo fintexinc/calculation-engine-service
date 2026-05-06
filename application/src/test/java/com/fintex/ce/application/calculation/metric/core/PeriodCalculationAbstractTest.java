@@ -73,13 +73,13 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldNotAddSinceCustomIntervalPeriod_whenPeriodAlreadyPresent() {
-    final PeriodCalculationAbstract sut = mock(PeriodCalculationAbstract.class);
+    final PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class);
 
-    when(sut.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(false);
+    when(calculation.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(false);
 
-    doCallRealMethod().when(sut).addSinceCustomIntervalPerformanceStartDate(any(), any());
+    doCallRealMethod().when(calculation).addSinceCustomIntervalPerformanceStartDate(any(), any());
     final Set<Pair<String, BigDecimal>> results = new HashSet<>();
-    sut.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SINCE_PERFORMANCE_START_DATE.name(), YEAR_TO_DATE
+    calculation.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SINCE_PERFORMANCE_START_DATE.name(), YEAR_TO_DATE
         .name(), "12"));
 
     assertEquals(0, results.size());
@@ -268,33 +268,33 @@ class PeriodCalculationAbstractTest {
   @Test
   void shouldReturnInputPeriods_whenInputPeriodsProvided() {
     final Set<String> periods = Set.of("3");
-    final PeriodCalculationAbstract sut = mock(PeriodCalculationAbstract.class,
+    final PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), periods));
 
-    doCallRealMethod().when(sut).getInitialPeriods(any());
+    doCallRealMethod().when(calculation).getInitialPeriods(any());
     final Set<String> userP = Set.of("5");
-    final Set actual = sut.getInitialPeriods(userP);
+    final Set actual = calculation.getInitialPeriods(userP);
 
     assertEquals(userP, actual);
   }
 
   @Test
   void shouldReturnNull_whenPeriodExceedsPortfolioSizeForProduct() {
-    final var sut = mock(PeriodCalculationAbstract.class);
+    final var calculation = mock(PeriodCalculationAbstract.class);
 
     final TreeMap<LocalDate, BigDecimal> aReturns = new TreeMap<>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE));
 
-    doCallRealMethod().when(sut).filterRequiredMonthsForPeriod(1, aReturns);
+    doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(1, aReturns);
 
-    doCallRealMethod().when(sut).calculateProductForPeriod(eq(1), any());
-    final BigDecimal actual = sut.calculateProductForPeriod(1, aReturns);
+    doCallRealMethod().when(calculation).calculateProductForPeriod(eq(1), any());
+    final BigDecimal actual = calculation.calculateProductForPeriod(1, aReturns);
 
     assertEquals(0, ONE.compareTo(actual));
   }
 
   @Test
   void shouldCalculateProductForRequestedPeriod_whenEnoughDataExists() {
-    final PeriodCalculationAbstract sut = mock(PeriodCalculationAbstract.class);
+    final PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class);
 
     final TreeMap<LocalDate, BigDecimal> aReturns = new TreeMap<>(Map.of(
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(2)), ONE,
@@ -302,17 +302,17 @@ class PeriodCalculationAbstractTest {
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), TEN,
         toLastDayOfMonth(LOCAL_DATE_NOW), BigDecimal.valueOf(2)));
 
-    doCallRealMethod().when(sut).filterRequiredMonthsForPeriod(3, aReturns);
+    doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(3, aReturns);
 
-    doCallRealMethod().when(sut).calculateProductForPeriod(eq(3), any());
-    final BigDecimal actual = sut.calculateProductForPeriod(3, aReturns);
+    doCallRealMethod().when(calculation).calculateProductForPeriod(eq(3), any());
+    final BigDecimal actual = calculation.calculateProductForPeriod(3, aReturns);
 
     assertEquals(0, BigDecimal.valueOf(20).compareTo(actual));
   }
 
   @Test
   void shouldCalculateBenchmarkProductForRequestedPeriod_whenEnoughDataExists() {
-    final var sut = mock(PeriodCalculationAbstract.class);
+    final var calculation = mock(PeriodCalculationAbstract.class);
 
     final var portfolioTotalReturns = new TreeMap<LocalDate, BigDecimal>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW
         .minusMonths(2)), BigDecimal.valueOf(5)));
@@ -322,11 +322,11 @@ class PeriodCalculationAbstractTest {
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), TEN,
         toLastDayOfMonth(LOCAL_DATE_NOW), BigDecimal.valueOf(2)));
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
-    doCallRealMethod().when(sut).filterRequiredMonthsForPeriod(3, portfolioTotalReturns);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
+    doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(3, portfolioTotalReturns);
 
-    doCallRealMethod().when(sut).getBenchmarkValues(eq(3), any());
-    final List list = sut.getBenchmarkValues(3, aReturns);
+    doCallRealMethod().when(calculation).getBenchmarkValues(eq(3), any());
+    final List list = calculation.getBenchmarkValues(3, aReturns);
 
     assertEquals(List.of(BigDecimal.valueOf(11)), list);
   }
@@ -519,11 +519,11 @@ class PeriodCalculationAbstractTest {
     final var portfolioTotalReturns = new TreeMap<>(returns);
     when(input.getWeightedAveragePortfolioReturns()).thenReturn(portfolioTotalReturns);
 
-    final var sut = mock(PeriodCalculationAbstract.class,
+    final var calculation = mock(PeriodCalculationAbstract.class,
         withSettings().useConstructor(input, null));
 
-    doCallRealMethod().when(sut).isSinceCustomIntervalPerformanceStartDateValid();
-    final boolean actual = sut.isSinceCustomIntervalPerformanceStartDateValid();
+    doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
+    final boolean actual = calculation.isSinceCustomIntervalPerformanceStartDateValid();
 
     assertFalse(actual);
   }
@@ -536,10 +536,10 @@ class PeriodCalculationAbstractTest {
     final var portfolioTotalReturns = new TreeMap<>(returns);
     when(input.getWeightedAveragePortfolioReturns()).thenReturn(portfolioTotalReturns);
 
-    final var sut = mock(PeriodCalculationAbstract.class, withSettings().useConstructor(input, null));
+    final var calculation = mock(PeriodCalculationAbstract.class, withSettings().useConstructor(input, null));
 
-    doCallRealMethod().when(sut).isSinceCustomIntervalPerformanceStartDateValid();
-    final boolean actual = sut.isSinceCustomIntervalPerformanceStartDateValid();
+    doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
+    final boolean actual = calculation.isSinceCustomIntervalPerformanceStartDateValid();
 
     assertFalse(actual);
   }
@@ -547,14 +547,14 @@ class PeriodCalculationAbstractTest {
   @Test
   void shouldAddSinceCustomIntervalPeriod_whenCustomStartDateEqualsPortfolioStart() {
     final var input = mock(PeriodCalculationInput.class);
-    final var sut = mock(PeriodCalculationAbstract.class, withSettings().useConstructor(input, null));
+    final var calculation = mock(PeriodCalculationAbstract.class, withSettings().useConstructor(input, null));
     final Map<LocalDate, BigDecimal> returns = Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE, LOCAL_DATE_NOW.plusMonths(1),
         TWO);
-    sut.cipsd = LOCAL_DATE_NOW;
-    sut.portfolioTotalReturns = new TreeMap<>(returns);
+    calculation.cipsd = LOCAL_DATE_NOW;
+    calculation.portfolioTotalReturns = new TreeMap<>(returns);
 
-    doCallRealMethod().when(sut).isSinceCustomIntervalPerformanceStartDateValid();
-    final boolean actual = sut.isSinceCustomIntervalPerformanceStartDateValid();
+    doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
+    final boolean actual = calculation.isSinceCustomIntervalPerformanceStartDateValid();
 
     assertTrue(actual);
   }
@@ -642,7 +642,7 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldRestrictTBillsRangeToReturnsWindow_whenBothInputsProvided() {
-    final var sut = mock(PeriodCalculationAbstract.class);
+    final var calculation = mock(PeriodCalculationAbstract.class);
     final LocalDate date = LocalDate.now();
     final TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(date, ONE, date.plusMonths(1), TWO));
     final TreeMap<LocalDate, BigDecimal> tBills = new TreeMap<>(Map.of(
@@ -654,8 +654,8 @@ class PeriodCalculationAbstractTest {
         date, ONE,
         date.plusMonths(1), TWO));
 
-    doCallRealMethod().when(sut).restrictTBillsRange(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = sut.restrictTBillsRange(tBills, returns);
+    doCallRealMethod().when(calculation).restrictTBillsRange(any(), any());
+    final NavigableMap<LocalDate, BigDecimal> actual = calculation.restrictTBillsRange(tBills, returns);
 
     ComparisonUtils.compareMaps(expected, actual);
     assertEquals(expected.size(), actual.size());
@@ -663,7 +663,7 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldRestrictTBillsRangeUsingPortfolioReturns_whenOnlyTBillsProvided() {
-    final var sut = mock(PeriodCalculationAbstract.class);
+    final var calculation = mock(PeriodCalculationAbstract.class);
     final LocalDate date = LocalDate.now();
     final TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(date, ONE, date.plusMonths(1), TWO));
     final TreeMap<LocalDate, BigDecimal> tBills = new TreeMap<>(Map.of(
@@ -671,15 +671,15 @@ class PeriodCalculationAbstractTest {
         date, ONE,
         date.plusMonths(1), TWO,
         date.plusMonths(2), TEN));
-    sut.portfolioTotalReturns = returns;
+    calculation.portfolioTotalReturns = returns;
 
     final var expected = new TreeMap<>(Map.of(
         date, ONE,
         date.plusMonths(1), TWO));
 
-    doCallRealMethod().when(sut).restrictTBillsRange(any());
-    doCallRealMethod().when(sut).restrictTBillsRange(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = sut.restrictTBillsRange(tBills);
+    doCallRealMethod().when(calculation).restrictTBillsRange(any());
+    doCallRealMethod().when(calculation).restrictTBillsRange(any(), any());
+    final NavigableMap<LocalDate, BigDecimal> actual = calculation.restrictTBillsRange(tBills);
 
     ComparisonUtils.compareMaps(expected, actual);
     assertEquals(expected.size(), actual.size());

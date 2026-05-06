@@ -35,27 +35,27 @@ class AnnualReturnServiceImplTest {
   @Test
   void shouldPerform_whenVerifyBuildAnnualReturnCalculation() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
+    final var service = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
     final var command = mock(ReturnCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var context = mock(PeriodCalculationInput.class);
 
     when(command.getHoldings()).thenReturn(holdings);
-    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(service.buildWeightedAverageInput(any())).thenReturn(context);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
-    when(sut.buildAnnualReturnCalculation(any())).thenReturn(mock(AnnualReturnCalculation.class));
+    when(service.buildAnnualReturnCalculation(any())).thenReturn(mock(AnnualReturnCalculation.class));
 
-    doCallRealMethod().when(sut).perform(command);
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(command);
+    service.perform(command);
 
-    verify(sut).buildAnnualReturnCalculation(context);
+    verify(service).buildAnnualReturnCalculation(context);
   }
 
   @Test
   void shouldCalculate_whenVerifyBuildWeightedAverageInput() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
+    final var service = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
     final var command = mock(ReturnCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
@@ -64,16 +64,16 @@ class AnnualReturnServiceImplTest {
     when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
 
     final var context = mock(PeriodCalculationInput.class);
-    when(sut.buildWeightedAverageInput(any())).thenReturn(context);
+    when(service.buildWeightedAverageInput(any())).thenReturn(context);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
 
     final var annual = mock(AnnualReturnCalculation.class);
     final var result = mock(AnnualReturnResult.class);
     when(annual.calculate()).thenReturn(result);
-    when(sut.buildAnnualReturnCalculation(any())).thenReturn(annual);
+    when(service.buildAnnualReturnCalculation(any())).thenReturn(annual);
 
-    doCallRealMethod().when(sut).perform(command);
-    final AnnualReturnResult actual = sut.perform(command);
+    doCallRealMethod().when(service).perform(command);
+    final AnnualReturnResult actual = service.perform(command);
 
     assertSame(actual, result);
 
@@ -82,7 +82,7 @@ class AnnualReturnServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInput_whenVerifyBuildPeriodCalculationInput() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
+    final var service = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var annual = mock(ReturnCommand.class);
     final var monthlyReturns = mock(ReturnsAggregate.class);
@@ -92,8 +92,8 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturns);
 
-    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
-    sut.buildWeightedAverageInput(annual);
+    doCallRealMethod().when(service).buildWeightedAverageInput(any());
+    service.buildWeightedAverageInput(annual);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
@@ -101,7 +101,7 @@ class AnnualReturnServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenCheckResult() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
+    final var service = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
     final var holdings = List.of(mock(PortfolioHolding.class));
     final NavigableMap map = new TreeMap<>();
@@ -116,8 +116,8 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
-    final PeriodCalculationInput actual = sut.buildWeightedAverageInput(annual);
+    doCallRealMethod().when(service).buildWeightedAverageInput(any());
+    final PeriodCalculationInput actual = service.buildWeightedAverageInput(annual);
 
     final var expected = PeriodCalculationInput.builder()
         .weightedAveragePortfolioReturns(map)
@@ -129,7 +129,7 @@ class AnnualReturnServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
+    final var service = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var monthlyReturns = mock(ReturnsAggregate.class);
@@ -144,8 +144,8 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
-    sut.buildWeightedAverageInput(annual);
+    doCallRealMethod().when(service).buildWeightedAverageInput(any());
+    service.buildWeightedAverageInput(annual);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, LOCAL_DATE_NOW
         .minusMonths(2), LOCAL_DATE_NOW);
@@ -154,7 +154,7 @@ class AnnualReturnServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
+    final var service = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
     final var holdings = List.of(mock(PortfolioHolding.class));
     final var monthlyReturns = mock(ReturnsAggregate.class);
@@ -167,8 +167,8 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
-    sut.buildWeightedAverageInput(annual);
+    doCallRealMethod().when(service).buildWeightedAverageInput(any());
+    service.buildWeightedAverageInput(annual);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
@@ -176,14 +176,14 @@ class AnnualReturnServiceImplTest {
   @Test
   void shouldBuildAnnualReturnCalculation_whenVerify() {
     try (var mockedAnnualReturnCalculation = mockConstruction(AnnualReturnCalculation.class)) {
-      final var sut = mock(AnnualReturnServiceImpl.class);
+      final var service = mock(AnnualReturnServiceImpl.class);
       final var input = mock(PeriodCalculationInput.class);
       final var map = mock(NavigableMap.class);
 
       when(input.getWeightedAveragePortfolioReturns()).thenReturn(map);
-      doCallRealMethod().when(sut).buildAnnualReturnCalculation(any());
+      doCallRealMethod().when(service).buildAnnualReturnCalculation(any());
 
-      final AnnualReturnCalculation actual = sut.buildAnnualReturnCalculation(input);
+      final AnnualReturnCalculation actual = service.buildAnnualReturnCalculation(input);
 
       final List<AnnualReturnCalculation> constructed = mockedAnnualReturnCalculation.constructed();
 
@@ -196,7 +196,7 @@ class AnnualReturnServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenCheckMonthlyReturnsWarnings() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
+    final var service = mock(AnnualReturnServiceImpl.class, withSettings().useConstructor(monthlyReturnsService));
 
     final var holdings = List.of(mock(PortfolioHolding.class));
     final NavigableMap map = new TreeMap<>();
@@ -213,8 +213,8 @@ class AnnualReturnServiceImplTest {
     when(annual.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(annual.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildWeightedAverageInput(any());
-    final PeriodCalculationInput actual = sut.buildWeightedAverageInput(annual);
+    doCallRealMethod().when(service).buildWeightedAverageInput(any());
+    final PeriodCalculationInput actual = service.buildWeightedAverageInput(annual);
 
     final var expected = PeriodCalculationInput.builder()
         .weightedAveragePortfolioReturns(map)

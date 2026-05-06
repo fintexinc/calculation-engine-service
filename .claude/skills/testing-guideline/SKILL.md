@@ -158,7 +158,25 @@ record/builder semantics. In order of preference:
 **Mocks** — when verifying a flow that mutates fields via setters, use a real instance instead of a mock so the setters
 actually take effect; otherwise `actual.getX()` returns null/default and assertions fail.
 
-### 1.6 Libraries and style
+### 1.6 Naming the system under test
+
+Don't use `sut` for the system-under-test variable or field. Pick a descriptive name derived from the type under
+test — readers shouldn't have to scroll back to the `mock(...)` call to remember what's being tested. The canonical
+mapping is by the test class's suffix:
+
+| Test class suffix | Variable name |
+|---|---|
+| `*CalculationTest` | `calculation` |
+| `*ServiceTest`, `*ServiceImplTest` | `service` |
+| `*FetcherTest`, `*FetcherImplTest` | `fetcher` |
+| `*MapperTest` | `mapper` |
+| `*ValidatorTest`, `*DataValidationTest` | `validator` / `validation` |
+| `*ComponentTest`, `*GeneratorTest`, `*ResolverTest`, `*HandlerTest`, `*CheckerTest`, etc. | matching noun |
+
+If a single test exercises more than one collaborator, qualify the names (`sharpeRatioCalculation`,
+`standardDeviationCalculation`) instead of falling back to `sut`.
+
+### 1.7 Libraries and style
 
 - JUnit 5 only.
 - Prefer AssertJ assertions (`assertThat(...)`) for readability.

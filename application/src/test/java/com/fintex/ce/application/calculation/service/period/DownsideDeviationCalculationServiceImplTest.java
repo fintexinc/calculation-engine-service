@@ -26,7 +26,7 @@ class DownsideDeviationCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
     final var tBillsFetcher = mock(TBillsFetcher.class);
-    final var sut = mock(DownsideDeviationCalculationServiceImpl.class, withSettings()
+    final var service = mock(DownsideDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, Set.of()));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
@@ -34,15 +34,15 @@ class DownsideDeviationCalculationServiceImplTest {
         BigDecimal.TEN));
 
     final var req = mock(PeriodCommand.class);
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
     when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
-    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_ONE);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_ONE);
   }
 }

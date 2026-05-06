@@ -30,22 +30,22 @@ class PeriodAbstractServiceTest {
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodAbstractService.class, withSettings()
+    final var service = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var dto = mock(PeriodCommand.class);
-    when(sut.defineCalculationMethod(any())).thenReturn(mock(PeriodCalculationAbstract.class));
+    when(service.defineCalculationMethod(any())).thenReturn(mock(PeriodCalculationAbstract.class));
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(dto);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(dto);
 
-    verify(sut).defineCalculationMethod(dto);
+    verify(service).defineCalculationMethod(dto);
   }
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodAbstractService.class, withSettings()
+    final var service = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var dto = mock(PeriodCommand.class);
@@ -53,10 +53,10 @@ class PeriodAbstractServiceTest {
     when(dto.getPeriods()).thenReturn(periods);
 
     final var pCalculation = mock(PeriodCalculationAbstract.class);
-    when(sut.defineCalculationMethod(any())).thenReturn(pCalculation);
+    when(service.defineCalculationMethod(any())).thenReturn(pCalculation);
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(dto);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(dto);
 
     verify(pCalculation).calculate(periods);
   }
@@ -64,7 +64,7 @@ class PeriodAbstractServiceTest {
   @Test
   void shouldPerform_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodAbstractService.class, withSettings()
+    final var service = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var dto = mock(PeriodCommand.class);
@@ -72,13 +72,13 @@ class PeriodAbstractServiceTest {
     when(dto.getPeriods()).thenReturn(periods);
 
     final var pCalculation = mock(PeriodCalculationAbstract.class);
-    when(sut.defineCalculationMethod(any())).thenReturn(pCalculation);
+    when(service.defineCalculationMethod(any())).thenReturn(pCalculation);
 
     final var expected = mock(PeriodResult.class);
     when(pCalculation.calculate(any())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).perform(any());
-    final PeriodResult actual = sut.perform(dto);
+    doCallRealMethod().when(service).perform(any());
+    final PeriodResult actual = service.perform(dto);
 
     Assertions.assertSame(expected, actual);
   }
@@ -86,7 +86,7 @@ class PeriodAbstractServiceTest {
   @Test
   void shouldBuildCalculationDto_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodAbstractService.class, withSettings()
+    final var service = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var req = mock(PeriodCommand.class);
@@ -108,8 +108,8 @@ class PeriodAbstractServiceTest {
         .cipsd(req.getCustomIntervalPsd())
         .weightedAveragePortfolioReturns(portfolioTotalReturns)
         .build();
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(req, returnFactorScale);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    final PeriodCalculationInput actual = service.buildPeriodCalculationInput(req, returnFactorScale);
 
     assertEquals(expected, actual);
   }
@@ -117,7 +117,7 @@ class PeriodAbstractServiceTest {
   @Test
   void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodAbstractService.class, withSettings()
+    final var service = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var req = mock(PeriodCommand.class);
@@ -139,8 +139,8 @@ class PeriodAbstractServiceTest {
         .cipsd(req.getCustomIntervalPsd())
         .weightedAveragePortfolioReturns(portfolioTotalReturns)
         .build();
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(req, returnFactorScale);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
@@ -149,7 +149,7 @@ class PeriodAbstractServiceTest {
   @Test
   void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpedValidation() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodAbstractService.class, withSettings()
+    final var service = mock(PeriodAbstractService.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var req = mock(PeriodCommand.class);
@@ -171,8 +171,8 @@ class PeriodAbstractServiceTest {
         .cipsd(req.getCustomIntervalPsd())
         .weightedAveragePortfolioReturns(portfolioTotalReturns)
         .build();
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(req, returnFactorScale);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpedValidation(monthlyReturns, req.getCustomPed());
   }

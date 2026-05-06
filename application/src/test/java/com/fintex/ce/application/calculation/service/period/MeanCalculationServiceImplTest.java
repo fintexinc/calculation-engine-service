@@ -77,7 +77,7 @@ class MeanCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenCheckResult() {
     // SETUP
-    final var sut = mock(MeanCalculationServiceImpl.class, withSettings()
+    final var service = mock(MeanCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of("12", "36", "60", "120")));
     final var req = mock(PeriodCommand.class);
     final var context = mock(PeriodCalculationInput.class);
@@ -87,11 +87,11 @@ class MeanCalculationServiceImplTest {
         .scale(OUTPUT_SCALE)
         .build();
 
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(context);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
+    doCallRealMethod().when(service).defineCalculationMethod(any());
     // ACT
-    final MeanCalculation actual = sut.defineCalculationMethod(req);
+    final MeanCalculation actual = service.defineCalculationMethod(req);
 
     // VERIFY
     assertEquals(expected, actual);

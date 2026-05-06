@@ -36,24 +36,24 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var command = mock(LeadingTotalReturnCommand.class);
     final var leadingTotalReturnCalculation = mock(LeadingTotalReturnsCalculation.class);
 
-    when(sut.defineCalculationMethod(any())).thenReturn(leadingTotalReturnCalculation);
+    when(service.defineCalculationMethod(any())).thenReturn(leadingTotalReturnCalculation);
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(command);
 
-    verify(sut).defineCalculationMethod(command);
+    verify(service).defineCalculationMethod(command);
   }
 
   @Test
   void shouldPerform_whenVerifyLeadingTotalReturnCalculationCalculate() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var command = mock(LeadingTotalReturnCommand.class);
@@ -61,10 +61,10 @@ class LeadingTotalReturnsCalculationServiceImplTest {
     final var leadingTotalReturnCalculation = mock(LeadingTotalReturnsCalculation.class);
 
     when(command.getPeriods()).thenReturn(periods);
-    when(sut.defineCalculationMethod(any())).thenReturn(leadingTotalReturnCalculation);
+    when(service.defineCalculationMethod(any())).thenReturn(leadingTotalReturnCalculation);
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(command);
 
     verify(leadingTotalReturnCalculation).calculate(periods);
 
@@ -72,23 +72,23 @@ class LeadingTotalReturnsCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class);
+    final var service = mock(LeadingTotalReturnsCalculationServiceImpl.class);
 
     final var command = mock(LeadingTotalReturnCommand.class);
     final var input = mock(PeriodCalculationInput.class);
 
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(input);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(input);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(command);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    service.defineCalculationMethod(command);
 
-    verify(sut).buildPeriodCalculationInput(command, SCALE_OF_TWO);
+    verify(service).buildPeriodCalculationInput(command, SCALE_OF_TWO);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyLeadingTotalReturnCalculationConstructor() {
     final var defaultPeriods = Set.of("3", "6", "12", "24");
-    final LeadingTotalReturnsCalculationServiceImpl sut = Mockito.spy(new LeadingTotalReturnsCalculationServiceImpl(
+    final LeadingTotalReturnsCalculationServiceImpl service = Mockito.spy(new LeadingTotalReturnsCalculationServiceImpl(
         null, defaultPeriods));
 
     final var command = mock(LeadingTotalReturnCommand.class);
@@ -97,10 +97,10 @@ class LeadingTotalReturnsCalculationServiceImplTest {
     context.setCipsd(cipsd);
     context.setWeightedAveragePortfolioReturns(mock(TreeMap.class));
 
-    doReturn(context).when(sut).buildPeriodCalculationInput(any(), any());
+    doReturn(context).when(service).buildPeriodCalculationInput(any(), any());
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    final var actual = sut.defineCalculationMethod(command);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    final var actual = service.defineCalculationMethod(command);
 
     ComparisonUtils.compareCollections(defaultPeriods, actual.getDefaultPeriods());
     assertEquals(context.getCipsd(), actual.getCipsd());
@@ -110,7 +110,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   @Test
   void shouldBuildCalculationDto_whenVerifyGetPortfolioMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var command = mock(LeadingTotalReturnCommand.class);
@@ -122,9 +122,9 @@ class LeadingTotalReturnsCalculationServiceImplTest {
     final var monthlyReturns = mock(ReturnsAggregate.class, RETURNS_SELF);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
 
-    sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
+    service.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD, SCALE_OF_TWO);
   }
@@ -132,7 +132,7 @@ class LeadingTotalReturnsCalculationServiceImplTest {
   @Test
   void shouldBuildCalculationDto_whenVerifyGetWeightedAverage() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var command = mock(LeadingTotalReturnCommand.class);
@@ -149,15 +149,15 @@ class LeadingTotalReturnsCalculationServiceImplTest {
         .getWeightedAverage()).thenReturn(mock(TreeMap.class));
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
 
-    sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
+    service.buildPeriodCalculationInput(command, SCALE_OF_TWO);
   }
 
   @Test
   void shouldBuildCalculationDto_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(LeadingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var command = mock(LeadingTotalReturnCommand.class);
@@ -173,9 +173,9 @@ class LeadingTotalReturnsCalculationServiceImplTest {
         .getWeightedAverage()).thenReturn(portfolioBaseTotalReturn);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
 
-    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, SCALE_OF_TWO);
+    final PeriodCalculationInput actual = service.buildPeriodCalculationInput(command, SCALE_OF_TWO);
 
     final var expected = new PeriodCalculationInput(portfolioBaseTotalReturn);
     assertEquals(actual, expected);

@@ -25,21 +25,21 @@ class TrackingErrorCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(TrackingErrorCalculationServiceImpl.class, withSettings()
+    final var service = mock(TrackingErrorCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
-    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 
 }

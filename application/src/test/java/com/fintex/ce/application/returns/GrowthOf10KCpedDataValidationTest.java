@@ -17,19 +17,19 @@ class GrowthOf10KCpedDataValidationTest {
   @Test
   void shouldValidate_whenVerify() {
     // SETUP
-    final GrowthOf10KCpedDataValidation sut = mock(GrowthOf10KCpedDataValidation.class);
+    final GrowthOf10KCpedDataValidation validation = mock(GrowthOf10KCpedDataValidation.class);
     var collector = new PceExceptionCollector();
 
     final var cped = LocalDate.now();
     final var psd = LocalDate.now().minusMonths(1);
     final var ped = LocalDate.now().plusMonths(10);
 
-    doCallRealMethod().when(sut).validate(any(), any(), any(), any());
+    doCallRealMethod().when(validation).validate(any(), any(), any(), any());
     // ACT
-    sut.validate(cped, psd, ped, collector);
+    validation.validate(cped, psd, ped, collector);
 
     // VERIFY
-    verify(sut).validateCpedIsBeforePsd(cped, psd, collector);
+    verify(validation).validateCpedIsBeforePsd(cped, psd, collector);
   }
 
 }

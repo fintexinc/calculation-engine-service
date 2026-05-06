@@ -22,20 +22,20 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
     // SETUP
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var set = mock(Set.class);
-    final var sut = mock(TrailingTotalReturnsCalculationServiceImpl.class,
+    final var service = mock(TrailingTotalReturnsCalculationServiceImpl.class,
         withSettings().useConstructor(monthlyReturnsService, set));
 
     final PeriodCommand req = mock(PeriodCommand.class);
 
-    when(sut.buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO)).thenReturn(
+    when(service.buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO)).thenReturn(
         new PeriodCalculationInput());
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
     // ACT
-    sut.defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
     // VERIFY
-    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO);
   }
 
 }

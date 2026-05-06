@@ -27,13 +27,13 @@ import static org.mockito.Mockito.when;
 
 class GlobalExceptionHandlerTest {
 
-  private final GlobalExceptionHandler sut = new GlobalExceptionHandler();
+  private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
   @Test
   void unexpectedException_returns500WithGenericNotificationAndNoLeakedMessage() {
     Exception exception = new RuntimeException("internal stack trace that must not leak");
 
-    ResponseEntity<ErrorResponse> response = sut.handleUnexpected(exception);
+    ResponseEntity<ErrorResponse> response = handler.handleUnexpected(exception);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     assertThat(response.getBody()).isNotNull();
@@ -49,7 +49,7 @@ class GlobalExceptionHandlerTest {
   void calculationException_returnsMatchingHttpStatus() {
     CalculationException exception = ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX.toException();
 
-    ResponseEntity<ErrorResponse> response = sut.handlePceException(exception);
+    ResponseEntity<ErrorResponse> response = handler.handlePceException(exception);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isNotNull();
@@ -65,7 +65,7 @@ class GlobalExceptionHandlerTest {
     CalculationException error2 = ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.toException();
     CalculationsFailedException composite = new CalculationsFailedException(List.of(error1, error2));
 
-    ResponseEntity<ErrorResponse> response = sut.handleCalculationsFailed(composite);
+    ResponseEntity<ErrorResponse> response = handler.handleCalculationsFailed(composite);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isNotNull();
@@ -85,7 +85,7 @@ class GlobalExceptionHandlerTest {
     when(exception.getMessage()).thenReturn("validation failed");
     when(exception.getBindingResult()).thenReturn(bindingResult);
 
-    ResponseEntity<ErrorResponse> response = sut.handleMethodArgumentNotValid(exception);
+    ResponseEntity<ErrorResponse> response = handler.handleMethodArgumentNotValid(exception);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isNotNull();
@@ -103,7 +103,7 @@ class GlobalExceptionHandlerTest {
     when(exception.getMessage()).thenReturn("validation failed");
     when(exception.getBindingResult()).thenReturn(bindingResult);
 
-    ResponseEntity<ErrorResponse> response = sut.handleMethodArgumentNotValid(exception);
+    ResponseEntity<ErrorResponse> response = handler.handleMethodArgumentNotValid(exception);
 
     assertThat(response.getBody()).isNotNull();
     Notification notification = response.getBody().getNotifications().get(0);
@@ -121,7 +121,7 @@ class GlobalExceptionHandlerTest {
     when(exception.getMessage()).thenReturn("validation failed");
     when(exception.getBindingResult()).thenReturn(bindingResult);
 
-    ResponseEntity<ErrorResponse> response = sut.handleMethodArgumentNotValid(exception);
+    ResponseEntity<ErrorResponse> response = handler.handleMethodArgumentNotValid(exception);
 
     assertThat(response.getBody()).isNotNull();
     Notification notification = response.getBody().getNotifications().get(0);
@@ -135,7 +135,7 @@ class GlobalExceptionHandlerTest {
     when(violation.getMessage()).thenReturn(ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.name());
     var exception = new ConstraintViolationException("violation", Set.of(violation));
 
-    ResponseEntity<ErrorResponse> response = sut.handleConstraintViolation(exception);
+    ResponseEntity<ErrorResponse> response = handler.handleConstraintViolation(exception);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isNotNull();

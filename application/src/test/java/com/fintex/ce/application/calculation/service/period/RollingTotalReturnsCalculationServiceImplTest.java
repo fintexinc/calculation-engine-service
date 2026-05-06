@@ -37,7 +37,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
   @Test
   void shouldPerform_whenCheckResult() {
-    final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
     final var holding = new PortfolioHolding(BigDecimal.valueOf(50000), FinancialInstrumentType.MUTUAL_FUND_CANADA,
@@ -51,18 +51,18 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
     final var expected = mock(RollingTotalReturnsResult.class);
 
-    when(sut.defineCalculationMethod(any())).thenReturn(rollingCalculation);
+    when(service.defineCalculationMethod(any())).thenReturn(rollingCalculation);
     when(rollingCalculation.calculate(any())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).perform(any());
-    final var actual = sut.perform(req);
+    doCallRealMethod().when(service).perform(any());
+    final var actual = service.perform(req);
 
     assertSame(expected, actual);
   }
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
-    final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
     final var holding = new PortfolioHolding(BigDecimal.valueOf(50000), FinancialInstrumentType.MUTUAL_FUND_CANADA,
@@ -75,17 +75,17 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
 
-    when(sut.defineCalculationMethod(any())).thenReturn(rollingCalculation);
+    when(service.defineCalculationMethod(any())).thenReturn(rollingCalculation);
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(req);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(req);
 
     verify(rollingCalculation).calculate(req.getRollingPeriods());
   }
 
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
-    final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
     final var holding = new PortfolioHolding(BigDecimal.valueOf(50000), FinancialInstrumentType.MUTUAL_FUND_CANADA,
@@ -97,17 +97,17 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
     final var rollingCalculation = mock(RollingTotalReturnsCalculation.class);
 
-    when(sut.defineCalculationMethod(req)).thenReturn(rollingCalculation);
+    when(service.defineCalculationMethod(req)).thenReturn(rollingCalculation);
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(req);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(req);
 
-    verify(sut).defineCalculationMethod(req);
+    verify(service).defineCalculationMethod(req);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenCheckResult() {
-    final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of("10", "20")));
 
     final var req = new RollingCalculationCommand();
@@ -116,11 +116,11 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var portfolioTotalReturns = mock(TreeMap.class);
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
 
-    when(sut.buildPeriodCalculationInput(req, returnFactorScale)).thenReturn(context);
+    when(service.buildPeriodCalculationInput(req, returnFactorScale)).thenReturn(context);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(portfolioTotalReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    final var actual = sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    final var actual = service.defineCalculationMethod(req);
 
     assertEquals(context.getWeightedAveragePortfolioReturns(), actual.getPortfolioTotalReturns());
     ComparisonUtils.compareCollections(Set.of("10", "20"), actual.getDefaultPeriods());
@@ -128,7 +128,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
-    final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null));
 
     final var req = new RollingCalculationCommand();
@@ -136,18 +136,18 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
     final var input = mock(PeriodCalculationInput.class);
 
-    when(sut.buildPeriodCalculationInput(req, returnFactorScale)).thenReturn(input);
+    when(service.buildPeriodCalculationInput(req, returnFactorScale)).thenReturn(input);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    service.defineCalculationMethod(req);
 
-    verify(sut).buildPeriodCalculationInput(req, returnFactorScale);
+    verify(service).buildPeriodCalculationInput(req, returnFactorScale);
   }
 
   @Test
   void shouldBuildWeightedAverageInputDto_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, Set.of()));
 
     final var req = new RollingCalculationCommand();
@@ -159,9 +159,9 @@ class RollingTotalReturnsCalculationServiceImplTest {
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any()))
         .thenReturn(portfolioBaseTotalReturns);
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
 
-    final var actual = sut.buildPeriodCalculationInput(req, returnFactorScale);
+    final var actual = service.buildPeriodCalculationInput(req, returnFactorScale);
 
     final PeriodCalculationInput expected = new PeriodCalculationInput(portfolioBaseTotalReturns);
     Assertions.assertEquals(expected, actual);
@@ -170,7 +170,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, null));
 
     final var holding = new PortfolioHolding(BigDecimal.valueOf(50000), FinancialInstrumentType.MUTUAL_FUND_CANADA,
@@ -182,8 +182,8 @@ class RollingTotalReturnsCalculationServiceImplTest {
     req.setCustomPed(LocalDate.now().plusMonths(10));
     final var returnFactorScale = ReturnFactorScale.SCALE_OF_TWO;
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(req, returnFactorScale);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(req.getHoldings(), req.getCurrency(), returnFactorScale);
   }
@@ -191,7 +191,7 @@ class RollingTotalReturnsCalculationServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
+    final var service = mock(RollingTotalReturnsCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, null));
 
     final var holding = new PortfolioHolding(BigDecimal.valueOf(50000), FinancialInstrumentType.MUTUAL_FUND_CANADA,
@@ -205,8 +205,8 @@ class RollingTotalReturnsCalculationServiceImplTest {
     final var monthlyReturns = mock(ReturnsAggregate.class);
 
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any())).thenReturn(monthlyReturns);
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(req, returnFactorScale);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, req.getCustomPsd(), req
         .getCustomPed());

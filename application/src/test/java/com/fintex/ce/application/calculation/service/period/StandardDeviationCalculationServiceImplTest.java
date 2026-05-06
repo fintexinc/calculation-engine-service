@@ -80,7 +80,7 @@ class StandardDeviationCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenCheckResult() {
     // SETUP
-    final var sut = mock(StandardDeviationCalculationServiceImpl.class, withSettings()
+    final var service = mock(StandardDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of("12", "36", "60", "120")));
     final var req = mock(PeriodCommand.class);
     final var context = mock(PeriodCalculationInput.class);
@@ -90,11 +90,11 @@ class StandardDeviationCalculationServiceImplTest {
         .scale(OUTPUT_SCALE)
         .build();
 
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(context);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
+    doCallRealMethod().when(service).defineCalculationMethod(any());
     // ACT
-    final StandardDeviationCalculation actual = sut.defineCalculationMethod(req);
+    final StandardDeviationCalculation actual = service.defineCalculationMethod(req);
 
     // VERIFY
     assertEquals(expected, actual);

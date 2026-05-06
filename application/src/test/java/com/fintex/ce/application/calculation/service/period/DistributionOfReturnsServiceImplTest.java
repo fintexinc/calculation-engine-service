@@ -29,7 +29,7 @@ class DistributionOfReturnsServiceImplTest {
   @Test
   void shouldBuildCalculationDto_whenVerifyGetPortfolioTotalReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
+    final var service = mock(DistributionOfReturnsServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
     final List holdings = mock(List.class);
 
@@ -37,8 +37,8 @@ class DistributionOfReturnsServiceImplTest {
     when(command.getHoldings()).thenReturn(holdings);
     when(command.getCurrency()).thenReturn(Currency.CAD);
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(command.getHoldings(), Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
@@ -47,7 +47,7 @@ class DistributionOfReturnsServiceImplTest {
   @Test
   void shouldBuildCalculationDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
+    final var service = mock(DistributionOfReturnsServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
     final List holdings = mock(List.class);
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
@@ -61,8 +61,8 @@ class DistributionOfReturnsServiceImplTest {
     when(monthlyReturnsService.getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency(),
         ReturnFactorScale.SCALE_OF_TWO)).thenReturn(monthlyReturnsAggregate);
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command
         .getCustomPsd(),
@@ -72,7 +72,7 @@ class DistributionOfReturnsServiceImplTest {
   @Test
   void shouldBuildCalculationDto_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(DistributionOfReturnsServiceImpl.class, withSettings()
+    final var service = mock(DistributionOfReturnsServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
     final List holdings = mock(List.class);
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
@@ -95,8 +95,8 @@ class DistributionOfReturnsServiceImplTest {
         .cipsd(command.getCustomIntervalPsd())
         .weightedAveragePortfolioReturns(portfolioTotalReturns)
         .build();
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    final PeriodCalculationInput actual = service.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
 
     assertEquals(expected, actual);
   }

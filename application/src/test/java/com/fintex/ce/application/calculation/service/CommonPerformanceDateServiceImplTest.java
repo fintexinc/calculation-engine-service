@@ -30,16 +30,16 @@ class CommonPerformanceDateServiceImplTest {
 
   @Test
   void shouldCommonPerformanceDateFor_whenHoldingsIsEmpty() {
-    final var sut = mock(CommonPerformanceDateServiceImpl.class);
+    final var service = mock(CommonPerformanceDateServiceImpl.class);
     final var expected = DateRange.UNBOUNDED;
 
     final List holdings = List.of();
-    doCallRealMethod().when(sut).getPortfolioMonthlyReturns(anyList());
-    doCallRealMethod().when(sut).commonPerformanceDateFor(any());
+    doCallRealMethod().when(service).getPortfolioMonthlyReturns(anyList());
+    doCallRealMethod().when(service).commonPerformanceDateFor(any());
 
-    final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = sut.getPortfolioMonthlyReturns(holdings);
+    final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = service.getPortfolioMonthlyReturns(holdings);
 
-    final DateRange actual = sut.commonPerformanceDateFor(monthlyReturnsAggregate);
+    final DateRange actual = service.commonPerformanceDateFor(monthlyReturnsAggregate);
 
     assertEquals(expected, actual);
   }
@@ -47,7 +47,7 @@ class CommonPerformanceDateServiceImplTest {
   @Test
   void shouldCommonPerformanceDate_whenVerifyValidate() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(CommonPerformanceDateServiceImpl.class,
+    final var service = mock(CommonPerformanceDateServiceImpl.class,
         withSettings().useConstructor(monthlyReturnsService));
 
     final MultiplePortfoliosCommand request = mock(MultiplePortfoliosCommand.class);
@@ -56,26 +56,26 @@ class CommonPerformanceDateServiceImplTest {
 
     doReturn(benchmarkHoldings).when(request).getBenchmarkHoldings();
     doReturn(portfolios).when(request).getPortfolios();
-    doReturn(DateRange.UNBOUNDED).when(sut).commonPerformanceDateFor(any());
+    doReturn(DateRange.UNBOUNDED).when(service).commonPerformanceDateFor(any());
 
-    doCallRealMethod().when(sut).perform(any());
-    sut.perform(request);
+    doCallRealMethod().when(service).perform(any());
+    service.perform(request);
   }
 
   @Test
   void shouldCollectAllPortfolioHoldings_whenCheckResultIsEmptyWhenPortfolioIsEmpty() {
-    final var sut = mock(CommonPerformanceDateServiceImpl.class);
+    final var service = mock(CommonPerformanceDateServiceImpl.class);
 
-    doCallRealMethod().when(sut).collectAllPortfolioHoldings(anySet());
+    doCallRealMethod().when(service).collectAllPortfolioHoldings(anySet());
 
-    final List<PortfolioHolding> actual = sut.collectAllPortfolioHoldings(Set.of());
+    final List<PortfolioHolding> actual = service.collectAllPortfolioHoldings(Set.of());
 
     assertTrue(actual.isEmpty());
   }
 
   @Test
   void shouldCollectAllPortfolioHoldings_whenCheckResult() {
-    final var sut = mock(CommonPerformanceDateServiceImpl.class);
+    final var service = mock(CommonPerformanceDateServiceImpl.class);
     final var portfolio1 = mock(MultiplePortfoliosCommand.Portfolio.class);
     final var portfolio2 = mock(MultiplePortfoliosCommand.Portfolio.class);
 
@@ -88,9 +88,9 @@ class CommonPerformanceDateServiceImplTest {
     when(portfolio1.getHoldings()).thenReturn(holdings1);
     when(portfolio2.getHoldings()).thenReturn(holdings2);
 
-    doCallRealMethod().when(sut).collectAllPortfolioHoldings(anySet());
+    doCallRealMethod().when(service).collectAllPortfolioHoldings(anySet());
 
-    final List<PortfolioHolding> actual = sut.collectAllPortfolioHoldings(Set.of(portfolio1, portfolio2));
+    final List<PortfolioHolding> actual = service.collectAllPortfolioHoldings(Set.of(portfolio1, portfolio2));
 
     assertEquals(2, actual.size());
     assertTrue(List.of(holding1, holding2).containsAll(actual));
@@ -99,12 +99,12 @@ class CommonPerformanceDateServiceImplTest {
   @Test
   void shouldCommonPerformanceDateFor_whenEmptyMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(CommonPerformanceDateServiceImpl.class,
+    final var service = mock(CommonPerformanceDateServiceImpl.class,
         withSettings().useConstructor(monthlyReturnsService));
     final var returns = new ReturnsAggregate<HoldingMonthlyReturns>();
-    doCallRealMethod().when(sut).commonPerformanceDateFor(any());
+    doCallRealMethod().when(service).commonPerformanceDateFor(any());
 
-    DateRange dateRange = sut.commonPerformanceDateFor(returns);
+    DateRange dateRange = service.commonPerformanceDateFor(returns);
 
     assertNotNull(dateRange);
     assertNull(dateRange.end());

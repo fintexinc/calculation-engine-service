@@ -41,7 +41,7 @@ class IncomeForecastCalculationServiceImplTest {
   private SecurityDataFetcher incomeForecastFetcher;
 
   @InjectMocks
-  private IncomeForecastCalculationServiceImpl sut;
+  private IncomeForecastCalculationServiceImpl service;
 
   @BeforeEach
   void setUp() {
@@ -52,7 +52,7 @@ class IncomeForecastCalculationServiceImplTest {
   void shouldTestPerform_whenConditionIsMet() {
     IncomeForecastCommand command = new IncomeForecastCommand(); // Initialize with some mock data if needed
     when(incomeForecastFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
-    IncomeForecastResult response = sut.perform(command);
+    IncomeForecastResult response = service.perform(command);
     assertNotNull(response);
   }
   @Test
@@ -61,7 +61,7 @@ class IncomeForecastCalculationServiceImplTest {
     List<String> dates = List.of("1-30", "3-15", "6-20", "10-12");
     BigDecimal amount = BigDecimal.TEN;
     int terms = 12;
-    List<Income> incomes = sut.calculateIncome(dividendYield, dates, amount, terms, Calendar.getInstance());
+    List<Income> incomes = service.calculateIncome(dividendYield, dates, amount, terms, Calendar.getInstance());
     assertEquals(4, incomes.size());
   }
 
@@ -71,7 +71,7 @@ class IncomeForecastCalculationServiceImplTest {
     List<String> dates = List.of(); // Empty array
     BigDecimal amount = BigDecimal.TEN;
     int terms = 12;
-    List<Income> incomes = sut.calculateIncome(dividendYield, dates, amount, terms, Calendar.getInstance());
+    List<Income> incomes = service.calculateIncome(dividendYield, dates, amount, terms, Calendar.getInstance());
     assertTrue(incomes.stream().allMatch(income -> income.getAmount().equals(BigDecimal.ZERO)));
   }
 
@@ -96,7 +96,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -146,7 +146,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -194,7 +194,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(incomeForecast.getSchedule()).thenReturn(schedule);
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -244,7 +244,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(incomeForecast.getPaymentFrequencyType()).thenReturn("AT_MATURITY");
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -278,7 +278,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -318,7 +318,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -351,7 +351,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -388,7 +388,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -425,7 +425,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -462,7 +462,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -499,7 +499,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);
@@ -532,7 +532,7 @@ class IncomeForecastCalculationServiceImplTest {
     Mockito.when(gicHolding.getClientIntRate()).thenReturn(new BigDecimal("5"));
 
     // ACT
-    final IncomeForecastResult result = sut.perform(command);
+    final IncomeForecastResult result = service.perform(command);
 
     // VERIFY
     Assertions.assertNotNull(result);

@@ -57,32 +57,32 @@ class RollingSharpeRatioCalculationTest {
   void shouldReturnSharpeRatioValue_whenCalculatingRollingValue() {
     final var context = mock(PeriodCalculationInput.class);
     final var sharpeRatioCalculation = mock(SharpeRatioCalculation.class);
-    final var sut = mock(RollingSharpeRatioCalculation.class, withSettings().useConstructor(context, Set.of(),
+    final var calculation = mock(RollingSharpeRatioCalculation.class, withSettings().useConstructor(context, Set.of(),
         sharpeRatioCalculation));
     final int numberOfMonths = 12;
 
     when(sharpeRatioCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculateRollingValue(numberOfMonths, portfolioReturns);
-    final BigDecimal actual = sut.calculateRollingValue(numberOfMonths, portfolioReturns);
+    doCallRealMethod().when(calculation).calculateRollingValue(numberOfMonths, portfolioReturns);
+    final BigDecimal actual = calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
 
     Assertions.assertEquals(TEN, actual);
   }
 
   @Test
   void shouldDelegateToRollingIntervalResults_whenDefiningResponseType() {
-    final var sut = mock(RollingSharpeRatioCalculation.class);
+    final var calculation = mock(RollingSharpeRatioCalculation.class);
     final var result = Set.of(Pair.of("12", portfolioReturns));
 
-    doCallRealMethod().when(sut).defineResponseType(result);
-    sut.defineResponseType(result);
+    doCallRealMethod().when(calculation).defineResponseType(result);
+    calculation.defineResponseType(result);
 
-    verify(sut).getRollingIntervalResults(result);
+    verify(calculation).getRollingIntervalResults(result);
   }
 
   @Test
   void shouldMapRollingSharpeRatioResult_whenDefiningResponseType() {
-    final var sut = mock(RollingSharpeRatioCalculation.class);
+    final var calculation = mock(RollingSharpeRatioCalculation.class);
     final var periodValues = Set.of(Pair.of("12", portfolioReturns));
 
     final LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
@@ -90,10 +90,10 @@ class RollingSharpeRatioCalculationTest {
     final var intervalResult = new RollingIntervalResult("12", res);
     final var expected = new RollingSharpeRatioResult(Set.of(intervalResult));
 
-    when(sut.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
+    when(calculation.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
 
-    doCallRealMethod().when(sut).defineResponseType(periodValues);
-    final RollingSharpeRatioResult actual = sut.defineResponseType(periodValues);
+    doCallRealMethod().when(calculation).defineResponseType(periodValues);
+    final RollingSharpeRatioResult actual = calculation.defineResponseType(periodValues);
 
     Assertions.assertEquals(expected.getRollingSharpeRatio(), actual.getRollingSharpeRatio());
   }

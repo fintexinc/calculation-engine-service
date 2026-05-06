@@ -33,7 +33,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when2PercentAnnualFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(2))
@@ -44,7 +44,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_2_PERCENT_ANNUAL);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -53,7 +53,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when10PercentAnnualFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(10))
@@ -63,7 +63,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_10_PERCENT_ANNUAL);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -72,7 +72,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when5PercentSemiAnnualFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(5))
@@ -84,7 +84,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_SEMI_ANNUAL);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -93,7 +93,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when5PercentQuarterlyFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(5))
@@ -105,7 +105,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_QUARTERLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -114,7 +114,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when5PercentMonthlyFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(5))
@@ -126,7 +126,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_MONTHLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -135,7 +135,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when5PercentBiMonthlyFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(5))
@@ -147,7 +147,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_BI_MONTHLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -156,7 +156,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when5PercentWeeklyFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(5))
@@ -168,7 +168,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_WEEKLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -177,7 +177,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when5PercentBiWeeklyFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(5))
@@ -189,7 +189,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_BI_WEEKLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -198,7 +198,7 @@ class GicMonthlyReturnsGeneratorTest {
   @Test
   void shouldGenerateGicMonthlyReturns_when5PercentDailyFrequency() {
     // SETUP
-    final var sut = new MonthlyReturnsGenerator();
+    final var generator = new MonthlyReturnsGenerator();
     final var gicHolding = GicHolding.builder()
         .holdingType(FinancialInstrumentType.GIC)
         .clientIntRate(BigDecimal.valueOf(5))
@@ -210,7 +210,7 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_DAILY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = sut.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);

@@ -37,7 +37,7 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldPerform_whenVerifyBuildWeightedAverageInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
+    final var service = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
     final var command = mock(ReturnCommand.class);
@@ -46,20 +46,20 @@ class GrowthOf10KCalculationServiceImplTest {
     final var calculation = mock(Growth10KCalculation.class);
 
     when(command.getHoldings()).thenReturn(holdings);
-    when(sut.buildPeriodCalculationInput(any())).thenReturn(context);
+    when(service.buildPeriodCalculationInput(any())).thenReturn(context);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
-    when(sut.buildGrowth10kCalculation(any(), any())).thenReturn(calculation);
+    when(service.buildGrowth10kCalculation(any(), any())).thenReturn(calculation);
 
-    doCallRealMethod().when(sut).perform(command);
-    sut.perform(command);
+    doCallRealMethod().when(service).perform(command);
+    service.perform(command);
 
-    verify(sut).buildPeriodCalculationInput(command);
+    verify(service).buildPeriodCalculationInput(command);
   }
 
   @Test
   void shouldGrowth10KCalculation_whenCalculateCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
+    final var service = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
     final var command = mock(ReturnCommand.class);
@@ -73,14 +73,14 @@ class GrowthOf10KCalculationServiceImplTest {
     final var result = mock(Growth10KResult.class);
 
     final var context = mock(PeriodCalculationInput.class);
-    when(sut.buildPeriodCalculationInput(any())).thenReturn(context);
+    when(service.buildPeriodCalculationInput(any())).thenReturn(context);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap<>());
 
-    when(sut.buildGrowth10kCalculation(command, context)).thenReturn(growth10KCalculation);
+    when(service.buildGrowth10kCalculation(command, context)).thenReturn(growth10KCalculation);
     when(growth10KCalculation.calculate()).thenReturn(result);
 
-    doCallRealMethod().when(sut).perform(any());
-    final Growth10KResult actual = sut.perform(command);
+    doCallRealMethod().when(service).perform(any());
+    final Growth10KResult actual = service.perform(command);
 
     assertSame(result, actual);
   }
@@ -88,7 +88,7 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
+    final var service = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
     final List<PortfolioHolding> holdings = List.of(mock(PortfolioHolding.class));
@@ -104,8 +104,8 @@ class GrowthOf10KCalculationServiceImplTest {
     when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
-    sut.buildPeriodCalculationInput(command);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any());
+    service.buildPeriodCalculationInput(command);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(
         holdings,
@@ -116,7 +116,7 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
+    final var service = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
     final var holdings = List.of(mock(PortfolioHolding.class));
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
@@ -139,8 +139,8 @@ class GrowthOf10KCalculationServiceImplTest {
     when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
-    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any());
+    final PeriodCalculationInput actual = service.buildPeriodCalculationInput(command);
 
     assertEquals(expected, actual);
   }
@@ -148,7 +148,7 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenCheckResultWithWarnings() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
+    final var service = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
     final var holdings = List.of(mock(PortfolioHolding.class));
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
@@ -172,8 +172,8 @@ class GrowthOf10KCalculationServiceImplTest {
     when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
-    final PeriodCalculationInput actual = sut.buildPeriodCalculationInput(command);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any());
+    final PeriodCalculationInput actual = service.buildPeriodCalculationInput(command);
 
     assertEquals(expected, actual);
   }
@@ -181,7 +181,7 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetWeightedAverageWithCpsdAndCpedValidation() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
+    final var service = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
     final var holdings = List.of(mock(PortfolioHolding.class));
@@ -197,8 +197,8 @@ class GrowthOf10KCalculationServiceImplTest {
     when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
-    sut.buildPeriodCalculationInput(command);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any());
+    service.buildPeriodCalculationInput(command);
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate,
         LOCAL_DATE_NOW.minusMonths(2), LOCAL_DATE_NOW);
@@ -207,7 +207,7 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyMonthlyReturnsSetValidation() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
+    final var service = mock(GrowthOf10KCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService));
 
     final var holdings = List.of(mock(PortfolioHolding.class));
@@ -223,8 +223,8 @@ class GrowthOf10KCalculationServiceImplTest {
     when(command.getCustomPed()).thenReturn(LOCAL_DATE_NOW);
     when(command.getCustomPsd()).thenReturn(LOCAL_DATE_NOW.minusMonths(2));
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any());
-    sut.buildPeriodCalculationInput(command);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any());
+    service.buildPeriodCalculationInput(command);
 
     verify(monthlyReturnsAggregate).setCpedDataValidation(new PortfolioCpedDataValidation());
     verify(monthlyReturnsAggregate).setCpsdDataValidation(new PortfolioCpsdDataValidation());
@@ -233,13 +233,13 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldBuildGrowth10kCalculation_whenVerifyConstructionGrowth10KCalculation() {
     try (var mockedGrowth10KCalculation = Mockito.mockConstruction(Growth10KCalculation.class)) {
-      final var sut = mock(GrowthOf10KCalculationServiceImpl.class);
+      final var service = mock(GrowthOf10KCalculationServiceImpl.class);
       final var command = mock(ReturnCommand.class);
       final var context = mock(PeriodCalculationInput.class);
 
-      doCallRealMethod().when(sut).buildGrowth10kCalculation(any(), any());
+      doCallRealMethod().when(service).buildGrowth10kCalculation(any(), any());
 
-      final Growth10KCalculation actual = sut.buildGrowth10kCalculation(command, context);
+      final Growth10KCalculation actual = service.buildGrowth10kCalculation(command, context);
 
       verify(context).getWeightedAveragePortfolioReturns();
 
@@ -253,13 +253,13 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldBuildGrowth10kCalculation_whenVerifyCustomDatesUsed() {
     try (var mockedGrowth10KCalculation = Mockito.mockConstruction(Growth10KCalculation.class)) {
-      final var sut = mock(GrowthOf10KCalculationServiceImpl.class);
+      final var service = mock(GrowthOf10KCalculationServiceImpl.class);
       final var command = mock(ReturnCommand.class);
       final var context = mock(PeriodCalculationInput.class);
 
-      doCallRealMethod().when(sut).buildGrowth10kCalculation(any(), any());
+      doCallRealMethod().when(service).buildGrowth10kCalculation(any(), any());
 
-      sut.buildGrowth10kCalculation(command, context);
+      service.buildGrowth10kCalculation(command, context);
 
       verify(command).getCustomPsd();
       verify(command).getCustomPed();

@@ -23,21 +23,21 @@ class DownsideCaptureCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
-    final var sut = mock(DownsideCaptureCalculationServiceImpl.class, withSettings()
+    final var service = mock(DownsideCaptureCalculationServiceImpl.class, withSettings()
         .useConstructor(null, Set.of()));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
     final var req = mock(PeriodCommand.class);
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(req);
-    sut.defineCalculationMethod(req);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    service.defineCalculationMethod(req);
 
-    verify(sut).buildPeriodCalculationInput(req, ReturnFactorScale.AS_IS);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.AS_IS);
   }
 }

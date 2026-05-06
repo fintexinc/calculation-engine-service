@@ -30,7 +30,7 @@ class AssetAllocationDataValidatorTest {
   @Test
   void validate_verifyValidateNonStock() {
     // SETUP
-    final var sut = mock(AssetAllocationDataValidator.class);
+    final var validator = mock(AssetAllocationDataValidator.class);
 
     final var req = mock(AssetAllocationData.class);
     final var warnings = mock(List.class);
@@ -45,23 +45,23 @@ class AssetAllocationDataValidatorTest {
     when(req.getMutualFundFdsResponse()).thenReturn(mutualFund);
     when(req.getBenchmarkIndexFdsResponse()).thenReturn(benchmarkIndex);
 
-    doNothing().when(sut).validateNonStock(anyMap(), anyList());
+    doNothing().when(validator).validateNonStock(anyMap(), anyList());
 
-    doCallRealMethod().when(sut).validate(any(), anyList());
+    doCallRealMethod().when(validator).validate(any(), anyList());
     // ACT
-    sut.validate(req, warnings);
+    validator.validate(req, warnings);
 
     // VERIFY
-    verify(sut).validateNonStock(etfUs, warnings);
-    verify(sut).validateNonStock(etfCanada, warnings);
-    verify(sut).validateNonStock(mutualFund, warnings);
-    verify(sut).validateNonStock(benchmarkIndex, warnings);
+    verify(validator).validateNonStock(etfUs, warnings);
+    verify(validator).validateNonStock(etfCanada, warnings);
+    verify(validator).validateNonStock(mutualFund, warnings);
+    verify(validator).validateNonStock(benchmarkIndex, warnings);
   }
 
   @Test
   void validateNonStock_verifyValidateForEachHolding() {
     // SETUP
-    final var sut = mock(AssetAllocationDataValidator.class);
+    final var validator = mock(AssetAllocationDataValidator.class);
 
     final var rAssetAllocation1 = mock(HoldingAssetAllocation.class);
     final var rAssetAllocation1Map = mock(Map.class);
@@ -78,36 +78,36 @@ class AssetAllocationDataValidatorTest {
 
     final var warnings = mock(List.class);
 
-    doCallRealMethod().when(sut).validateNonStock(anyMap(), anyList());
+    doCallRealMethod().when(validator).validateNonStock(anyMap(), anyList());
     // ACT
-    sut.validateNonStock(holdings, warnings);
+    validator.validateNonStock(holdings, warnings);
 
     // VERIFY
-    holdings.forEach((holding, rAssetAllocation) -> verify(sut).validate(holding, rAssetAllocation.getAllocations(),
+    holdings.forEach((holding, rAssetAllocation) -> verify(validator).validate(holding, rAssetAllocation.getAllocations(),
         warnings));
   }
 
   @Test
   void validate_assetAllocationsIsEmpty() {
     // SETUP
-    final var sut = mock(AssetAllocationDataValidator.class);
+    final var validator = mock(AssetAllocationDataValidator.class);
 
     final var holding = mock(PortfolioHolding.class);
     final var assetAllocation = new HashMap<String, BigDecimal>();
     final var warnings = mock(List.class);
 
-    doCallRealMethod().when(sut).validate(any(), anyMap(), anyList());
+    doCallRealMethod().when(validator).validate(any(), anyMap(), anyList());
     // ACT
-    sut.validate(holding, assetAllocation, warnings);
+    validator.validate(holding, assetAllocation, warnings);
 
     // VERIFY
-    verify(sut).validateWhenAssetAllocationIsEmpty(holding, warnings);
+    verify(validator).validateWhenAssetAllocationIsEmpty(holding, warnings);
   }
 
   @Test
   void validate_assetAllocationRegionIsIncorrect() {
     // SETUP
-    final var sut = mock(AssetAllocationDataValidator.class);
+    final var validator = mock(AssetAllocationDataValidator.class);
 
     final var holding = mock(PortfolioHolding.class);
     final var assetAllocation = new HashMap<String, BigDecimal>();
@@ -115,9 +115,9 @@ class AssetAllocationDataValidatorTest {
     assetAllocation.put("AssetAllocationRegionThatDoesn'tExists Either", BigDecimal.ONE);
     final var warnings = new ArrayList<Warning>();
 
-    doCallRealMethod().when(sut).validate(any(), anyMap(), anyList());
+    doCallRealMethod().when(validator).validate(any(), anyMap(), anyList());
     // ACT
-    sut.validate(holding, assetAllocation, warnings);
+    validator.validate(holding, assetAllocation, warnings);
 
     // VERIFY
     assertEquals(2, warnings.size());
@@ -127,16 +127,16 @@ class AssetAllocationDataValidatorTest {
   @Test
   void validateWhenAssetAllocationIsEmpty_addWarningToWarningsList() {
     // SETUP
-    final var sut = mock(AssetAllocationDataValidator.class);
+    final var validator = mock(AssetAllocationDataValidator.class);
 
     final var holding = mock(PortfolioHolding.class);
     final var warnings = new ArrayList<Warning>();
 
     when(holding.getIdsString()).thenReturn("generateUserIdentifier");
 
-    doCallRealMethod().when(sut).validateWhenAssetAllocationIsEmpty(any(), anyList());
+    doCallRealMethod().when(validator).validateWhenAssetAllocationIsEmpty(any(), anyList());
     // ACT
-    sut.validateWhenAssetAllocationIsEmpty(holding, warnings);
+    validator.validateWhenAssetAllocationIsEmpty(holding, warnings);
 
     // VERIFY
     assertEquals(1, warnings.size());

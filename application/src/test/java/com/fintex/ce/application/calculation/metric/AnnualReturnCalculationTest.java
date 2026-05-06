@@ -32,7 +32,7 @@ class AnnualReturnCalculationTest {
 
   @Test
   void shouldPopulatePeriodDates_whenBasicDetailsArePopulated() {
-    final var sut = mock(AnnualReturnCalculation.class);
+    final var calculation = mock(AnnualReturnCalculation.class);
 
     final var end = LocalDate.now().plusMonths(3);
     final var start = LocalDate.now().plusMonths(1);
@@ -41,12 +41,12 @@ class AnnualReturnCalculationTest {
         start, BigDecimal.ONE,
         end, BigDecimal.TEN));
 
-    doCallRealMethod().when(sut).populateBasicDetails(any(), any());
+    doCallRealMethod().when(calculation).populateBasicDetails(any(), any());
     final AnnualReturnResult result = AnnualReturnResult.builder()
         .annualReturns(List.of())
         .warnings(List.of())
         .build();
-    sut.populateBasicDetails(result, portfolioReturns);
+    calculation.populateBasicDetails(result, portfolioReturns);
 
     assertEquals(end, result.getPerformanceEndDate());
     assertEquals(start, result.getPerformanceStartDate());
@@ -55,7 +55,7 @@ class AnnualReturnCalculationTest {
 
   @Test
   void shouldCalculateAnnualReturn_whenYearHasTwelveMonthlyReturns() {
-    final var sut = mock(AnnualReturnCalculation.class);
+    final var calculation = mock(AnnualReturnCalculation.class);
 
     final var date = LocalDate.of(2020, 12, 1);
 
@@ -75,8 +75,8 @@ class AnnualReturnCalculationTest {
 
     final var portfolioReturns = new TreeMap<>(map);
 
-    doCallRealMethod().when(sut).calculateAnnualReturns(any(), any());
-    final TreeMap<Integer, BigDecimal> actual = sut.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
+    doCallRealMethod().when(calculation).calculateAnnualReturns(any(), any());
+    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
 
     assertEquals(1, actual.size());
     assertEquals(0, actual.get(date.getYear()).compareTo(new BigDecimal("999999999999")));
@@ -84,7 +84,7 @@ class AnnualReturnCalculationTest {
 
   @Test
   void shouldReturnEmptyAnnualReturns_whenYearHasLessThanTwelveMonthlyReturns() {
-    final var sut = mock(AnnualReturnCalculation.class);
+    final var calculation = mock(AnnualReturnCalculation.class);
 
     final var date = LocalDate.of(2020, 12, 1);
 
@@ -103,15 +103,15 @@ class AnnualReturnCalculationTest {
 
     final var portfolioReturns = new TreeMap<>(map);
 
-    doCallRealMethod().when(sut).calculateAnnualReturns(any(), any());
-    final TreeMap<Integer, BigDecimal> actual = sut.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
+    doCallRealMethod().when(calculation).calculateAnnualReturns(any(), any());
+    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
 
     assertEquals(0, actual.size());
   }
 
   @Test
   void shouldReturnEmptyAnnualReturns_whenYearDoesNotContainEndOfYearReturn() {
-    final var sut = mock(AnnualReturnCalculation.class);
+    final var calculation = mock(AnnualReturnCalculation.class);
 
     final var date = LocalDate.of(2020, 12, 1);
 
@@ -131,15 +131,15 @@ class AnnualReturnCalculationTest {
 
     final var portfolioReturns = new TreeMap<>(map);
 
-    doCallRealMethod().when(sut).calculateAnnualReturns(any(), any());
-    final TreeMap<Integer, BigDecimal> actual = sut.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
+    doCallRealMethod().when(calculation).calculateAnnualReturns(any(), any());
+    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
 
     assertEquals(0, actual.size());
   }
 
   @Test
   void shouldReturnEmptyAnnualReturns_whenYearContainsGapInMonthlyReturns() {
-    final var sut = mock(AnnualReturnCalculation.class);
+    final var calculation = mock(AnnualReturnCalculation.class);
 
     final var date = LocalDate.of(2020, 12, 1);
 
@@ -159,8 +159,8 @@ class AnnualReturnCalculationTest {
 
     final var portfolioReturns = new TreeMap<>(map);
 
-    doCallRealMethod().when(sut).calculateAnnualReturns(any(), any());
-    final TreeMap<Integer, BigDecimal> actual = sut.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
+    doCallRealMethod().when(calculation).calculateAnnualReturns(any(), any());
+    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
 
     assertEquals(0, actual.size());
   }
@@ -168,34 +168,34 @@ class AnnualReturnCalculationTest {
   @Test
   void shouldDelegateToCalculateAnnualReturns_whenCalculateIsCalled() {
     final var returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE, LOCAL_DATE_NOW.plusMonths(1), TEN));
-    final var sut = mock(AnnualReturnCalculation.class, withSettings().useConstructor(returns, List.of()));
+    final var calculation = mock(AnnualReturnCalculation.class, withSettings().useConstructor(returns, List.of()));
 
     final HashSet<Integer> years = new HashSet<>();
     years.add(LOCAL_DATE_NOW.getYear());
     years.add(LOCAL_DATE_NOW.plusMonths(1).getYear());
 
-    doCallRealMethod().when(sut).calculate();
-    sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    calculation.calculate();
 
-    verify(sut).calculateAnnualReturns(new TreeMap<>(returns), years);
+    verify(calculation).calculateAnnualReturns(new TreeMap<>(returns), years);
   }
 
   @Test
   void shouldPopulateBasicDetails_whenCalculateIsCalled() {
     final var returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE, LOCAL_DATE_NOW.plusMonths(1), TEN));
-    final var sut = mock(AnnualReturnCalculation.class, withSettings().useConstructor(returns, List.of()));
+    final var calculation = mock(AnnualReturnCalculation.class, withSettings().useConstructor(returns, List.of()));
 
     final TreeMap<Integer, BigDecimal> years = new TreeMap<>();
-    when(sut.calculateAnnualReturns(any(), any())).thenReturn(years);
+    when(calculation.calculateAnnualReturns(any(), any())).thenReturn(years);
 
     final List<KeyValueResult> keyValueDtoS = years.entrySet().stream().map(e -> new KeyValueResult(e.getKey(), e
         .getValue()))
         .toList();
 
-    doCallRealMethod().when(sut).calculate();
-    sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    calculation.calculate();
 
-    verify(sut).populateBasicDetails(
+    verify(calculation).populateBasicDetails(
         argThat(arg -> (arg).getAnnualReturns().equals(keyValueDtoS)),
         eq(returns));
   }
@@ -203,13 +203,13 @@ class AnnualReturnCalculationTest {
   @Test
   void shouldReturnAnnualReturnResult_whenCalculateIsCalled() {
     final var returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE, LOCAL_DATE_NOW.plusMonths(1), TEN));
-    final var sut = mock(AnnualReturnCalculation.class, withSettings().useConstructor(returns, List.of()));
+    final var calculation = mock(AnnualReturnCalculation.class, withSettings().useConstructor(returns, List.of()));
 
     final TreeMap<Integer, BigDecimal> param = new TreeMap<>();
-    when(sut.calculateAnnualReturns(any(), any())).thenReturn(param);
+    when(calculation.calculateAnnualReturns(any(), any())).thenReturn(param);
 
-    doCallRealMethod().when(sut).calculate();
-    final AnnualReturnResult actual = sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    final AnnualReturnResult actual = calculation.calculate();
 
     assertEquals(List.of(), actual.getAnnualReturns());
   }

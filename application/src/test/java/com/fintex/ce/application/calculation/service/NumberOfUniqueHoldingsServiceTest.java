@@ -38,23 +38,23 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldReturnNumberOfUniqueHoldingsMetric_whenGetMetricInvoked() {
-    var sut = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
 
-    assertEquals(CalculationMetric.NUMBER_OF_UNIQUE_HOLDINGS, sut.getMetric());
+    assertEquals(CalculationMetric.NUMBER_OF_UNIQUE_HOLDINGS, service.getMetric());
   }
 
   @Test
   void shouldNotInvokeFetcher_whenGetMetricInvoked() {
-    var sut = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
 
-    sut.getMetric();
+    service.getMetric();
 
     verifyNoInteractions(fetcher);
   }
 
   @Test
   void shouldPassHoldingsAndProvidersToFetcher_whenPerformInvoked() {
-    var sut = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
     var holdings = List.of(mock(PortfolioHolding.class));
     var providers = List.of(DataProvider.MORNINGSTAR);
     var command = PortfolioHoldingsCommand.builder()
@@ -63,17 +63,17 @@ class NumberOfUniqueHoldingsServiceTest {
         .build();
     when(fetcher.fetch(any(), any())).thenReturn(Map.of());
 
-    sut.perform(command);
+    service.perform(command);
 
     verify(fetcher).fetch(holdings, providers);
   }
 
   @Test
   void shouldReturnResultWithEmptyWarningsAndZeroCount_whenFetcherReturnsEmptyMap() {
-    var sut = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
     when(fetcher.fetch(any(), any())).thenReturn(Map.of());
 
-    NumberOfUniqueHoldingsResult result = sut.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
 
     assertNotNull(result);
     assertEquals(0L, result.getNumberOfUniqueHoldings());
@@ -83,7 +83,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldEmitAggregatedMissingIdentifiersWarning_withCountOfSecurities() {
-    var sut = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
     PortfolioHolding h3 = mock(PortfolioHolding.class);
@@ -92,7 +92,7 @@ class NumberOfUniqueHoldingsServiceTest {
         h2, holdingIdentifiers(List.of()),
         h3, holdingIdentifiers(id("A", FiIdentifierType.MORNINGSTAR_ID))));
 
-    NumberOfUniqueHoldingsResult result = sut.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
 
     assertEquals(1L, result.getNumberOfUniqueHoldings());
     assertEquals(1, result.getWarnings().size());
@@ -103,7 +103,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldEmitAggregatedNullIdValueWarning_withCountOfUnderlyingHoldings() {
-    var sut = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
     when(fetcher.fetch(any(), any())).thenReturn(Map.of(
@@ -114,7 +114,7 @@ class NumberOfUniqueHoldingsServiceTest {
             id(null, FiIdentifierType.MORNINGSTAR_ID),
             id(null, FiIdentifierType.MORNINGSTAR_ID))));
 
-    NumberOfUniqueHoldingsResult result = sut.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
 
     assertEquals(2L, result.getNumberOfUniqueHoldings());
     assertEquals(1, result.getWarnings().size());
@@ -125,14 +125,14 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldEmitBothAggregatedWarnings_whenBothFailureModesOccur() {
-    var sut = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
     when(fetcher.fetch(any(), any())).thenReturn(Map.of(
         h1, holdingIdentifiers(List.of()),
         h2, holdingIdentifiers(id(null, FiIdentifierType.MORNINGSTAR_ID))));
 
-    NumberOfUniqueHoldingsResult result = sut.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
 
     assertEquals(1L, result.getNumberOfUniqueHoldings());
     assertEquals(2, result.getWarnings().size());
@@ -150,10 +150,10 @@ class NumberOfUniqueHoldingsServiceTest {
       Map<PortfolioHolding, HoldingIdentifiers> fetched,
       Long expectedCount,
       int expectedWarnings) {
-    var sut = new NumberOfUniqueHoldingsService(fetcher, configuredType);
+    var service = new NumberOfUniqueHoldingsService(fetcher, configuredType);
     when(fetcher.fetch(any(), any())).thenReturn(fetched);
 
-    NumberOfUniqueHoldingsResult result = sut.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
 
     assertEquals(expectedCount, result.getNumberOfUniqueHoldings());
     assertEquals(expectedWarnings, result.getWarnings().size());

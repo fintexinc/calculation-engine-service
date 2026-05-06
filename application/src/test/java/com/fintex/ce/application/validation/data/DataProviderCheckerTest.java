@@ -29,7 +29,7 @@ class DataProviderCheckerTest {
       // SETUP
       final var defaults = List.of(DataProvider.MORNINGSTAR);
       final var defaultDataProperties = new DefaultDataProperties(defaults);
-      final var sut = new DataProviderChecker(defaultDataProperties);
+      final var checker = new DataProviderChecker(defaultDataProperties);
       final var map = mock(Map.class);
       final var list = mock(List.class);
       when(map.values()).thenReturn(list);
@@ -44,7 +44,7 @@ class DataProviderCheckerTest {
       when(assetAllocationData.getUsFundsFdsResponse()).thenReturn(map);
 
       // ACT
-      sut.check(list, assetAllocationData);
+      checker.check(list, assetAllocationData);
 
       // VERIFY
       verify(map, times(7)).values();
@@ -57,11 +57,11 @@ class DataProviderCheckerTest {
   @Test
   void clearAssetAllocation_checkResult() {
     // SETUP
-    final var sut = new DataProviderChecker(new DefaultDataProperties(List.of()));
+    final var checker = new DataProviderChecker(new DefaultDataProperties(List.of()));
     final HoldingAssetAllocation assetAllocation = mock(HoldingAssetAllocation.class);
 
     // ACT
-    sut.clearAssetAllocation().apply(assetAllocation, null);
+    checker.clearAssetAllocation().apply(assetAllocation, null);
 
     // VERIFY
     verify(assetAllocation).setAllocations(argThat(Map::isEmpty));

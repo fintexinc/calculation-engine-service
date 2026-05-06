@@ -24,8 +24,8 @@ class PeriodBenchmarkAbstractServiceTest {
   @Test
   void buildWeightedAverageInputDto_verifyСutArgumentToTheSameEndDateWhenPedIsGreater() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodBenchmarkAbstractService.class);
-    sut.monthlyReturnsService = monthlyReturnsService;
+    final var service = mock(PeriodBenchmarkAbstractService.class);
+    service.monthlyReturnsService = monthlyReturnsService;
 
     final var portfolioHoldings = mock(List.class);
     final var benchmarkHoldings = mock(List.class);
@@ -51,8 +51,8 @@ class PeriodBenchmarkAbstractServiceTest {
     when(benchmarkMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate)).thenReturn(
         benchmark1);
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(req, returnFactorScale);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(portfolioMonthlyReturnsAggregate).cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate);
     verify(benchmarkMonthlyReturnsAggregate).cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate);
@@ -61,8 +61,8 @@ class PeriodBenchmarkAbstractServiceTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetPortfolioMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodBenchmarkAbstractService.class);
-    sut.monthlyReturnsService = monthlyReturnsService;
+    final var service = mock(PeriodBenchmarkAbstractService.class);
+    service.monthlyReturnsService = monthlyReturnsService;
 
     final var portfolioHoldings = mock(List.class);
     final var benchmarkHoldings = mock(List.class);
@@ -80,8 +80,8 @@ class PeriodBenchmarkAbstractServiceTest {
     when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(
         ReturnsAggregate.class));
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(req, returnFactorScale);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(portfolioHoldings, Currency.CAD, returnFactorScale);
   }
@@ -89,7 +89,7 @@ class PeriodBenchmarkAbstractServiceTest {
   @Test
   void shouldBuildWeightedAverageInputDto_whenVerifyGetBenchmarkMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(PeriodBenchmarkAbstractService.class, withSettings().useConstructor(monthlyReturnsService,
+    final var service = mock(PeriodBenchmarkAbstractService.class, withSettings().useConstructor(monthlyReturnsService,
         null));
 
     final var portfolioHoldings = mock(List.class);
@@ -108,8 +108,8 @@ class PeriodBenchmarkAbstractServiceTest {
     when(monthlyReturnsService.getBenchmarkMonthlyReturns(anyList(), any(), any())).thenReturn(mock(
         ReturnsAggregate.class));
 
-    doCallRealMethod().when(sut).buildPeriodCalculationInput(any(), any());
-    sut.buildPeriodCalculationInput(req, returnFactorScale);
+    doCallRealMethod().when(service).buildPeriodCalculationInput(any(), any());
+    service.buildPeriodCalculationInput(req, returnFactorScale);
 
     verify(monthlyReturnsService).getBenchmarkMonthlyReturns(benchmarkHoldings, Currency.CAD, returnFactorScale);
   }

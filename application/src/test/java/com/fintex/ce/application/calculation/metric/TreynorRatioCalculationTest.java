@@ -38,52 +38,52 @@ class TreynorRatioCalculationTest {
   void shouldResolvePeriodStartDate_whenCalculatingPeriod() {
     final var beta = mock(BetaCalculation.class);
     final var tBills = mock(TreeMap.class);
-    final var sut = mock(TreynorRatioCalculation.class,
+    final var calculation = mock(TreynorRatioCalculation.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(tBills);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(tBills);
     when(tBills.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut).getPeriodStartDate(TWELVE, tBills);
+    verify(calculation).getPeriodStartDate(TWELVE, tBills);
   }
 
   @Test
   void shouldCalculateAnnualizedReturnsForPortfolioAndRiskFree_whenCalculatingPeriod() {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
-    final var sut = mock(TreynorRatioCalculation.class,
+    final var calculation = mock(TreynorRatioCalculation.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut, times(2)).calculateAverageArithmeticAnnualizedReturn(any(), eq(date), eq(TWELVE));
+    verify(calculation, times(2)).calculateAverageArithmeticAnnualizedReturn(any(), eq(date), eq(TWELVE));
   }
 
   @Test
   void shouldDelegateToBetaCalculation_whenCalculatingPeriod() {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
-    final var sut = mock(TreynorRatioCalculation.class,
+    final var calculation = mock(TreynorRatioCalculation.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
     verify(beta).calculatePeriodForNumberOfMonths(TWELVE);
   }
@@ -92,18 +92,18 @@ class TreynorRatioCalculationTest {
   void shouldReturnNull_whenBetaIsNull() {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
-    final var sut = mock(TreynorRatioCalculation.class,
+    final var calculation = mock(TreynorRatioCalculation.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(beta.calculatePeriodForNumberOfMonths(TWELVE)).thenReturn(null);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    final var actual = sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final var actual = calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
     assertNull(actual);
   }
@@ -112,60 +112,60 @@ class TreynorRatioCalculationTest {
   void shouldCalculateTreynorRatio_whenInputsAreAvailable() {
     final var tBills = mock(TreeMap.class);
     final var beta = mock(BetaCalculation.class);
-    final var sut = mock(TreynorRatioCalculation.class,
+    final var calculation = mock(TreynorRatioCalculation.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
-    when(sut.calculateAverageArithmeticAnnualizedReturn(any(), any(), anyInt())).thenReturn(TEN);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.calculateAverageArithmeticAnnualizedReturn(any(), any(), anyInt())).thenReturn(TEN);
     when(beta.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(ONE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(sut).calculateTreynorRatio(TEN, TEN, ONE);
+    verify(calculation).calculateTreynorRatio(TEN, TEN, ONE);
   }
 
   @Test
   void shouldReturnNull_whenPortfolioSizeIsLessThanPeriod() {
-    final var sut = mock(TreynorRatioCalculation.class);
+    final var calculation = mock(TreynorRatioCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(10);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
     assertNull(actual);
   }
 
   @Test
   void shouldMapIntervalResults_whenDefiningResponseType() {
-    final var sut = mock(TreynorRatioCalculation.class);
+    final var calculation = mock(TreynorRatioCalculation.class);
     final var pairs = Set.of(Pair.of("2015-01-01", ZERO), Pair.of("2018-02-02", ONE));
 
     final var interval1 = new TimeIntervalResult("2015-01-01", ZERO);
     final var interval2 = new TimeIntervalResult("2018-02-02", ONE);
     final var expected = Set.of(interval1, interval2);
 
-    when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
-    doCallRealMethod().when(sut).defineResponseType(anySet());
+    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
+    doCallRealMethod().when(calculation).defineResponseType(anySet());
 
-    final TreynorRatioResult result = sut.defineResponseType(pairs);
+    final TreynorRatioResult result = calculation.defineResponseType(pairs);
 
     assertEquals(expected, result.getTreynorRatio());
   }
 
   @Test
   void shouldCalculateTreynorRatioValue_whenValuesProvided() {
-    final var sut = mock(TreynorRatioCalculation.class);
+    final var calculation = mock(TreynorRatioCalculation.class);
 
-    doCallRealMethod().when(sut).calculateTreynorRatio(any(), any(), any());
-    final BigDecimal returnValue = sut.calculateTreynorRatio(TEN, TWO, TEN);
+    doCallRealMethod().when(calculation).calculateTreynorRatio(any(), any(), any());
+    final BigDecimal returnValue = calculation.calculateTreynorRatio(TEN, TWO, TEN);
 
     assertEquals(toUserScale(BigDecimal.valueOf(0.8)), toUserScale(returnValue));
   }

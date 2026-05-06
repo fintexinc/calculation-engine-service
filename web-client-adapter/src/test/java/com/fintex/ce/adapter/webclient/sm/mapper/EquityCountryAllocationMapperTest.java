@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EquityCountryAllocationMapperTest {
 
-  private final EquityCountryAllocationMapper sut = new EquityCountryAllocationMapper();
+  private final EquityCountryAllocationMapper mapper = new EquityCountryAllocationMapper();
 
   @Test
   void shouldMapAllocationsAndProvider_whenResponseHasCountryValues() {
@@ -33,7 +33,7 @@ class EquityCountryAllocationMapperTest {
     smsResponse.setAllocation(List.of(canada, usa));
     smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
 
-    EquityCountryAllocation result = sut.map(smsResponse, createHolding("SEC-001"));
+    EquityCountryAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getAllocations()).hasSize(2);
@@ -43,7 +43,7 @@ class EquityCountryAllocationMapperTest {
 
   @Test
   void shouldReturnEmptyAllocations_whenResponseIsNull() {
-    EquityCountryAllocation result = sut.map(null, createHolding("SEC-002"));
+    EquityCountryAllocation result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getAllocations()).isEmpty();
@@ -54,7 +54,7 @@ class EquityCountryAllocationMapperTest {
     var smsResponse = new CountryAllocation();
     smsResponse.setAllocation(null);
 
-    EquityCountryAllocation result = sut.map(smsResponse, createHolding("SEC-003"));
+    EquityCountryAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -66,7 +66,7 @@ class EquityCountryAllocationMapperTest {
     smsResponse.setAllocation(List.of());
     smsResponse.setDataProvider(null);
 
-    EquityCountryAllocation result = sut.map(smsResponse, createHolding("SEC-004"));
+    EquityCountryAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
 
     assertThat(result.getProviders()).isEmpty();
   }

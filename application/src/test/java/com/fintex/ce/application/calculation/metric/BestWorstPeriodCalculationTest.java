@@ -35,10 +35,10 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculate_whenCalculateMonthRollingCumulativeReturnsReturnsNull() {
     final TreeMap<LocalDate, BigDecimal> portfolioReturns = null;
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
-    doCallRealMethod().when(sut).calculate();
-    final BestWorstPeriodsResult result = sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    final BestWorstPeriodsResult result = calculation.calculate();
 
     assertNull(result);
   }
@@ -46,44 +46,44 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculate_whenVerifyCalculateMonthRollingCumulativeReturns() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of(
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of(
         12L)));
 
-    when(sut.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
-    doNothing().when(sut).calculateBestWorstPeriodValues(any(), any());
+    when(calculation.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
+    doNothing().when(calculation).calculateBestWorstPeriodValues(any(), any());
 
-    doCallRealMethod().when(sut).calculate();
-    sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    calculation.calculate();
 
-    verify(sut).calculateMonthRollingCumulativeReturns(any());
+    verify(calculation).calculateMonthRollingCumulativeReturns(any());
   }
 
   @Test
   void shouldCalculate_whenVerifyCalculateBestWorstPeriodValues() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of(12L,
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of(12L,
         24L)));
 
-    when(sut.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
-    doNothing().when(sut).calculateBestWorstPeriodValues(any(), any());
+    when(calculation.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
+    doNothing().when(calculation).calculateBestWorstPeriodValues(any(), any());
 
-    doCallRealMethod().when(sut).calculate();
-    sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    calculation.calculate();
 
-    verify(sut, times(2)).calculateBestWorstPeriodValues(any(), any());
+    verify(calculation, times(2)).calculateBestWorstPeriodValues(any(), any());
   }
 
   @Test
   void shouldCalculate_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final TreeMap<LocalDate, BigDecimal> weightedAveragePortfolioMReturns = getPortfolioReturns();
-    when(sut.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
-    doNothing().when(sut).calculateBestWorstPeriodValues(any(), any());
+    when(calculation.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
+    doNothing().when(calculation).calculateBestWorstPeriodValues(any(), any());
 
-    doCallRealMethod().when(sut).calculate();
-    final BestWorstPeriodsResult result = sut.calculate();
+    doCallRealMethod().when(calculation).calculate();
+    final BestWorstPeriodsResult result = calculation.calculate();
 
     assertEquals(result.getPerformanceEndDate(), LocalDate.of(2020, 12, 31));
     assertEquals(result.getPerformanceStartDate(), LocalDate.of(2019, 12, 31));
@@ -99,10 +99,10 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateMonthRollingCumulativeReturns_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
-    doCallRealMethod().when(sut).calculateMonthRollingCumulativeReturns(any());
-    final TreeMap<LocalDate, BigDecimal> returns = sut.calculateMonthRollingCumulativeReturns(12L);
+    doCallRealMethod().when(calculation).calculateMonthRollingCumulativeReturns(any());
+    final TreeMap<LocalDate, BigDecimal> returns = calculation.calculateMonthRollingCumulativeReturns(12L);
 
     assertFalse(returns.isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.010943190803711")), returns.firstEntry().getValue());
@@ -114,148 +114,148 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyGetStartOfPeriodsDate() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
-    when(sut.getStartOfPeriodsDate(any(), any())).thenReturn(LocalDate.now());
+    when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(LocalDate.now());
 
     final TreeMap<LocalDate, BigDecimal> rollingCumulativeReturns = mock(TreeMap.class);
     when(rollingCumulativeReturns.lastKey()).thenReturn(LocalDate.now().plusMonths(1));
 
-    doCallRealMethod().when(sut).calculateBestWorstPeriodValues(any(), any());
-    sut.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
+    doCallRealMethod().when(calculation).calculateBestWorstPeriodValues(any(), any());
+    calculation.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
 
-    verify(sut).getStartOfPeriodsDate(3L, rollingCumulativeReturns);
+    verify(calculation).getStartOfPeriodsDate(3L, rollingCumulativeReturns);
   }
 
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyGetSubMapByStartPeriodDate() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var startOfPeriod = LocalDate.now();
-    when(sut.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
+    when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
     final var rollingCumulativeReturns = mock(TreeMap.class);
     when(rollingCumulativeReturns.lastKey()).thenReturn(startOfPeriod.plusMonths(1));
-    when(sut.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
+    when(calculation.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
 
-    doCallRealMethod().when(sut).calculateBestWorstPeriodValues(any(), any());
-    sut.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
+    doCallRealMethod().when(calculation).calculateBestWorstPeriodValues(any(), any());
+    calculation.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
 
-    verify(sut).getMapByPeriodStartDate(rollingCumulativeReturns, startOfPeriod);
+    verify(calculation).getMapByPeriodStartDate(rollingCumulativeReturns, startOfPeriod);
   }
 
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculateNumberOfPeriods() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var startOfPeriod = LocalDate.now();
-    when(sut.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
+    when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
 
     final var rollingCumulativeReturns = mock(TreeMap.class);
     when(rollingCumulativeReturns.lastKey()).thenReturn(startOfPeriod.plusMonths(1));
-    when(sut.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
+    when(calculation.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
 
-    doCallRealMethod().when(sut).calculateBestWorstPeriodValues(any(), any());
-    sut.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
+    doCallRealMethod().when(calculation).calculateBestWorstPeriodValues(any(), any());
+    calculation.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
 
-    verify(sut).calculateNumberOfPeriods(3L, rollingCumulativeReturns);
+    verify(calculation).calculateNumberOfPeriods(3L, rollingCumulativeReturns);
   }
 
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculateAverage() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var startOfPeriod = LocalDate.now();
-    when(sut.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
+    when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
 
     final var rollingCumulativeReturns = mock(TreeMap.class);
     when(rollingCumulativeReturns.lastKey()).thenReturn(startOfPeriod.plusMonths(1));
-    when(sut.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
+    when(calculation.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
 
-    doCallRealMethod().when(sut).calculateBestWorstPeriodValues(any(), any());
-    sut.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
+    doCallRealMethod().when(calculation).calculateBestWorstPeriodValues(any(), any());
+    calculation.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
 
-    verify(sut).calculateAverage(3L, rollingCumulativeReturns);
+    verify(calculation).calculateAverage(3L, rollingCumulativeReturns);
   }
 
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculateBestPeriodValue() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var startOfPeriod = LocalDate.now();
-    when(sut.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
+    when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
     final var rollingCumulativeReturns = mock(TreeMap.class);
     when(rollingCumulativeReturns.lastKey()).thenReturn(startOfPeriod.plusMonths(1));
-    when(sut.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
+    when(calculation.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
 
-    doCallRealMethod().when(sut).calculateBestWorstPeriodValues(any(), any());
-    sut.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
+    doCallRealMethod().when(calculation).calculateBestWorstPeriodValues(any(), any());
+    calculation.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
 
-    verify(sut).calculateBestPeriodValue(3L, rollingCumulativeReturns);
+    verify(calculation).calculateBestPeriodValue(3L, rollingCumulativeReturns);
   }
 
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculateWorstPeriodValue() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var startOfPeriod = LocalDate.now();
-    when(sut.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
+    when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
     final var rollingCumulativeReturns = mock(TreeMap.class);
     when(rollingCumulativeReturns.lastKey()).thenReturn(startOfPeriod.plusMonths(1));
-    when(sut.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
+    when(calculation.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
 
-    doCallRealMethod().when(sut).calculateBestWorstPeriodValues(any(), any());
-    sut.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
+    doCallRealMethod().when(calculation).calculateBestWorstPeriodValues(any(), any());
+    calculation.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
 
-    verify(sut).calculateWorstPeriodValue(3L, rollingCumulativeReturns);
+    verify(calculation).calculateWorstPeriodValue(3L, rollingCumulativeReturns);
   }
 
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculatePositive() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var startOfPeriod = LocalDate.now();
-    when(sut.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
+    when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
     final var rollingCumulativeReturns = mock(TreeMap.class);
     when(rollingCumulativeReturns.lastKey()).thenReturn(startOfPeriod.plusMonths(1));
-    when(sut.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
+    when(calculation.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
 
-    doCallRealMethod().when(sut).calculateBestWorstPeriodValues(any(), any());
-    sut.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
+    doCallRealMethod().when(calculation).calculateBestWorstPeriodValues(any(), any());
+    calculation.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
 
-    verify(sut).calculatePositive(3L, rollingCumulativeReturns);
+    verify(calculation).calculatePositive(3L, rollingCumulativeReturns);
   }
 
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyGetDefaultValues() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var startOfPeriod = LocalDate.now();
-    when(sut.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
+    when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
     final var rollingCumulativeReturns = mock(TreeMap.class);
     when(rollingCumulativeReturns.lastKey()).thenReturn(startOfPeriod.minusMonths(1));
-    when(sut.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
+    when(calculation.getMapByPeriodStartDate(any(), any())).thenReturn(rollingCumulativeReturns);
 
-    doCallRealMethod().when(sut).calculateBestWorstPeriodValues(any(), any());
-    sut.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
+    doCallRealMethod().when(calculation).calculateBestWorstPeriodValues(any(), any());
+    calculation.calculateBestWorstPeriodValues(3L, rollingCumulativeReturns);
 
-    verify(sut).addDefaultValues(3L);
+    verify(calculation).addDefaultValues(3L);
   }
 
   @Test
   void shouldGetSubMapByPeriodStartDate_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
     final var rollingReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).getMapByPeriodStartDate(any(), any());
-    final TreeMap<LocalDate, BigDecimal> returns = sut.getMapByPeriodStartDate(rollingReturns, LocalDate.of(2020, 05,
+    doCallRealMethod().when(calculation).getMapByPeriodStartDate(any(), any());
+    final TreeMap<LocalDate, BigDecimal> returns = calculation.getMapByPeriodStartDate(rollingReturns, LocalDate.of(2020, 05,
         31));
 
     assertFalse(returns.isEmpty());
@@ -266,275 +266,275 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateNumberOfPeriods_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
     final var rollingReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).calculateNumberOfPeriods(any(), any());
-    sut.calculateNumberOfPeriods(12L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateNumberOfPeriods(any(), any());
+    calculation.calculateNumberOfPeriods(12L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getNumberOfPeriods().isEmpty());
-    assertEquals(12L, sut.bestWorstPeriodData.getNumberOfPeriods().get(0).period());
-    assertEquals(BigDecimal.valueOf(13), sut.bestWorstPeriodData.getNumberOfPeriods().get(0).value());
+    assertFalse(calculation.bestWorstPeriodData.getNumberOfPeriods().isEmpty());
+    assertEquals(12L, calculation.bestWorstPeriodData.getNumberOfPeriods().get(0).period());
+    assertEquals(BigDecimal.valueOf(13), calculation.bestWorstPeriodData.getNumberOfPeriods().get(0).value());
   }
 
   @Test
   void shouldCalculateAverage_whenCheckResultWhenPeriodIsLessThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
-    doCallRealMethod().when(sut).calculateAverage(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
+    doCallRealMethod().when(calculation).calculateAverage(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
 
-    doCallRealMethod().when(sut).calculateAverage(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
-    sut.calculateAverage(3L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateAverage(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
+    calculation.calculateAverage(3L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getAverage().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getAverage().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("1.011499443237")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getAverage().get(0).value()));
-    assertEquals(3L, sut.bestWorstPeriodData.getAverage().get(0).period());
+        calculation.bestWorstPeriodData.getAverage().get(0).value()));
+    assertEquals(3L, calculation.bestWorstPeriodData.getAverage().get(0).period());
   }
 
   @Test
   void shouldCalculateAverage_whenVerifyAnnualize() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
-    doCallRealMethod().when(sut).calculateAverage(any(), any());
-    sut.calculateAverage(12L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateAverage(any(), any());
+    calculation.calculateAverage(12L, rollingReturns);
 
-    verify(sut).annualize(any(), eq(12L));
+    verify(calculation).annualize(any(), eq(12L));
   }
 
   @Test
   void shouldCalculateAverage_whenCheckResultWhenPeriodIsMoreThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).calculateAverage(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
-    sut.calculateAverage(24L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateAverage(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
+    calculation.calculateAverage(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getAverage().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getAverage().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.418273402146778")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getAverage().get(0).value()));
-    assertEquals(24L, sut.bestWorstPeriodData.getAverage().get(0).period());
+        calculation.bestWorstPeriodData.getAverage().get(0).value()));
+    assertEquals(24L, calculation.bestWorstPeriodData.getAverage().get(0).period());
   }
 
   @Test
   void shouldCalculateBestPeriodValue_whenVerifyAnnualize() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
     final var rollingReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).calculateBestPeriodValue(any(), any());
-    sut.calculateBestPeriodValue(12L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateBestPeriodValue(any(), any());
+    calculation.calculateBestPeriodValue(12L, rollingReturns);
 
-    verify(sut).annualize(any(), eq(12L));
+    verify(calculation).annualize(any(), eq(12L));
   }
 
   @Test
   void shouldCalculateBestPeriodValue_whenCheckResultWhenPeriodIsLessThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
     final var rollingReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).calculateBestPeriodValue(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
-    sut.calculateBestPeriodValue(6L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateBestPeriodValue(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
+    calculation.calculateBestPeriodValue(6L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getBestPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getBestPeriodDate().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getBestPeriodPct().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getBestPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("1.03431353421321")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getBestPeriodPct().get(0).value()));
-    assertEquals(6L, sut.bestWorstPeriodData.getBestPeriodPct().get(0).period());
-    assertEquals(6L, sut.bestWorstPeriodData.getBestPeriodDate().get(0).period());
-    assertEquals(LocalDate.of(2020, 03, 31), sut.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
+        calculation.bestWorstPeriodData.getBestPeriodPct().get(0).value()));
+    assertEquals(6L, calculation.bestWorstPeriodData.getBestPeriodPct().get(0).period());
+    assertEquals(6L, calculation.bestWorstPeriodData.getBestPeriodDate().get(0).period());
+    assertEquals(LocalDate.of(2020, 03, 31), calculation.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
         .endDate());
-    assertEquals(LocalDate.of(2019, 10, 1), sut.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
+    assertEquals(LocalDate.of(2019, 10, 1), calculation.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
         .startDate());
   }
 
   @Test
   void shouldCalculateBestPeriodValue_whenCheckResultWhenPeriodIsMoreThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
     final var rollingReturns = getPortfolioReturns();
 
-    doCallRealMethod().when(sut).calculateBestPeriodValue(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
-    sut.calculateBestPeriodValue(24L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateBestPeriodValue(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
+    calculation.calculateBestPeriodValue(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getBestPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getBestPeriodDate().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getBestPeriodPct().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getBestPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.426293635340637")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getBestPeriodPct().get(0).value()));
-    assertEquals(24L, sut.bestWorstPeriodData.getBestPeriodPct().get(0).period());
-    assertEquals(24L, sut.bestWorstPeriodData.getBestPeriodDate().get(0).period());
-    assertEquals(LocalDate.of(2020, 03, 31), sut.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
+        calculation.bestWorstPeriodData.getBestPeriodPct().get(0).value()));
+    assertEquals(24L, calculation.bestWorstPeriodData.getBestPeriodPct().get(0).period());
+    assertEquals(24L, calculation.bestWorstPeriodData.getBestPeriodDate().get(0).period());
+    assertEquals(LocalDate.of(2020, 03, 31), calculation.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
         .endDate());
-    assertEquals(LocalDate.of(2018, 04, 1), sut.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
+    assertEquals(LocalDate.of(2018, 04, 1), calculation.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
         .startDate());
   }
 
   @Test
   void shouldCalculateBestPeriodValue_whenCheckResultWhenPeriodIsMoreThenTwelveAndTwoWorstPeriodValueAreEqual() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
     rollingReturns.put(rollingReturns.lastKey(), rollingReturns.get(LocalDate.of(2020, 03, 31)));
 
-    doCallRealMethod().when(sut).calculateBestPeriodValue(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
-    sut.calculateBestPeriodValue(24L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateBestPeriodValue(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
+    calculation.calculateBestPeriodValue(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getBestPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getBestPeriodDate().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getBestPeriodPct().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getBestPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.426293635340637")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getBestPeriodPct().get(0).value()));
-    assertEquals(24L, sut.bestWorstPeriodData.getBestPeriodPct().get(0).period());
-    assertEquals(24L, sut.bestWorstPeriodData.getBestPeriodDate().get(0).period());
-    assertEquals(LocalDate.of(2020, 12, 31), sut.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
+        calculation.bestWorstPeriodData.getBestPeriodPct().get(0).value()));
+    assertEquals(24L, calculation.bestWorstPeriodData.getBestPeriodPct().get(0).period());
+    assertEquals(24L, calculation.bestWorstPeriodData.getBestPeriodDate().get(0).period());
+    assertEquals(LocalDate.of(2020, 12, 31), calculation.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
         .endDate());
-    assertEquals(LocalDate.of(2019, 1, 1), sut.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
+    assertEquals(LocalDate.of(2019, 1, 1), calculation.bestWorstPeriodData.getBestPeriodDate().get(0).interval()
         .startDate());
   }
 
   @Test
   void shouldCalculateWorstPeriodValue_whenCheckResultWhenPeriodIsLessThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
-    doCallRealMethod().when(sut).calculateWorstPeriodValue(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
-    doCallRealMethod().when(sut).calculateWorstPeriodValue(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
-    sut.calculateWorstPeriodValue(6L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateWorstPeriodValue(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
+    doCallRealMethod().when(calculation).calculateWorstPeriodValue(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
+    calculation.calculateWorstPeriodValue(6L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.994895485347306")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getWorstPeriodPct().get(0).value()));
-    assertEquals(6L, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).period());
-    assertEquals(6L, sut.bestWorstPeriodData.getWorstPeriodDate().get(0).period());
-    assertEquals(LocalDate.of(2020, 1, 31), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
+        calculation.bestWorstPeriodData.getWorstPeriodPct().get(0).value()));
+    assertEquals(6L, calculation.bestWorstPeriodData.getWorstPeriodPct().get(0).period());
+    assertEquals(6L, calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).period());
+    assertEquals(LocalDate.of(2020, 1, 31), calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
         .endDate());
-    assertEquals(LocalDate.of(2019, 8, 1), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
+    assertEquals(LocalDate.of(2019, 8, 1), calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
         .startDate());
   }
 
   @Test
   void shouldCalculateWorstPeriodValue_whenCheckResultWhenPeriodIsMoreThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
-    doCallRealMethod().when(sut).calculateWorstPeriodValue(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
+    doCallRealMethod().when(calculation).calculateWorstPeriodValue(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
 
-    sut.calculateWorstPeriodValue(24L, rollingReturns);
+    calculation.calculateWorstPeriodValue(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.412407690911978")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getWorstPeriodPct().get(0).value()));
-    assertEquals(24L, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).period());
-    assertEquals(24L, sut.bestWorstPeriodData.getWorstPeriodDate().get(0).period());
-    assertEquals(LocalDate.of(2020, 1, 31), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
+        calculation.bestWorstPeriodData.getWorstPeriodPct().get(0).value()));
+    assertEquals(24L, calculation.bestWorstPeriodData.getWorstPeriodPct().get(0).period());
+    assertEquals(24L, calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).period());
+    assertEquals(LocalDate.of(2020, 1, 31), calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
         .endDate());
-    assertEquals(LocalDate.of(2018, 2, 1), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
+    assertEquals(LocalDate.of(2018, 2, 1), calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
         .startDate());
   }
 
   @Test
   void shouldCalculateWorstPeriodValue_whenCheckResultWhenPeriodIsMoreThenTwelveAndTwoWorstPeriodValueAreEqual() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
     rollingReturns.put(rollingReturns.lastKey(), rollingReturns.get(LocalDate.of(2020, 1, 31)));
 
-    doCallRealMethod().when(sut).calculateWorstPeriodValue(any(), any());
-    doCallRealMethod().when(sut).annualize(any(), any());
-    sut.calculateWorstPeriodValue(24L, rollingReturns);
+    doCallRealMethod().when(calculation).calculateWorstPeriodValue(any(), any());
+    doCallRealMethod().when(calculation).annualize(any(), any());
+    calculation.calculateWorstPeriodValue(24L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
     assertEquals(DecimalUtils.toUserScale(new BigDecimal("0.412407690911978")), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getWorstPeriodPct().get(0).value()));
-    assertEquals(24L, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).period());
-    assertEquals(24L, sut.bestWorstPeriodData.getWorstPeriodDate().get(0).period());
-    assertEquals(LocalDate.of(2020, 12, 31), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
+        calculation.bestWorstPeriodData.getWorstPeriodPct().get(0).value()));
+    assertEquals(24L, calculation.bestWorstPeriodData.getWorstPeriodPct().get(0).period());
+    assertEquals(24L, calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).period());
+    assertEquals(LocalDate.of(2020, 12, 31), calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
         .endDate());
-    assertEquals(LocalDate.of(2019, 1, 1), sut.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
+    assertEquals(LocalDate.of(2019, 1, 1), calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).interval()
         .startDate());
   }
 
   @Test
   void shouldCalculatePositive_whenVerifyGetNumberOfPeriodsByPeriod() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
-    when(sut.getNumberOfPeriodsByPeriod(any())).thenReturn(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
-    doCallRealMethod().when(sut).calculatePositive(any(), any());
+    when(calculation.getNumberOfPeriodsByPeriod(any())).thenReturn(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
+    doCallRealMethod().when(calculation).calculatePositive(any(), any());
 
-    sut.calculatePositive(6L, rollingReturns);
+    calculation.calculatePositive(6L, rollingReturns);
 
-    verify(sut).getNumberOfPeriodsByPeriod(6L);
+    verify(calculation).getNumberOfPeriodsByPeriod(6L);
   }
 
   @Test
   void shouldCalculatePositive_whenCheckResultWhenAllPositive() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
-    when(sut.getNumberOfPeriodsByPeriod(any())).thenReturn(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
+    when(calculation.getNumberOfPeriodsByPeriod(any())).thenReturn(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
 
-    doCallRealMethod().when(sut).calculatePositive(any(), any());
-    sut.calculatePositive(6L, rollingReturns);
+    doCallRealMethod().when(calculation).calculatePositive(any(), any());
+    calculation.calculatePositive(6L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getPctPositive().isEmpty());
-    assertEquals(6L, sut.bestWorstPeriodData.getPctPositive().get(0).period());
-    assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(1)), DecimalUtils.toUserScale(sut.bestWorstPeriodData
+    assertFalse(calculation.bestWorstPeriodData.getPctPositive().isEmpty());
+    assertEquals(6L, calculation.bestWorstPeriodData.getPctPositive().get(0).period());
+    assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(1)), DecimalUtils.toUserScale(calculation.bestWorstPeriodData
         .getPctPositive().get(0).value()));
   }
 
   @Test
   void shouldCalculatePositive_whenCheckResultWhenTwoRecordsAreNegative() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
     final var rollingReturns = getPortfolioReturns();
     rollingReturns.put(rollingReturns.firstKey(), BigDecimal.valueOf(-1.01094319080371));
     rollingReturns.put(rollingReturns.lastKey(), BigDecimal.valueOf(-1.01094319080371));
-    when(sut.getNumberOfPeriodsByPeriod(any())).thenReturn(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
+    when(calculation.getNumberOfPeriodsByPeriod(any())).thenReturn(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
 
-    doCallRealMethod().when(sut).calculatePositive(any(), any());
-    sut.calculatePositive(6L, rollingReturns);
+    doCallRealMethod().when(calculation).calculatePositive(any(), any());
+    calculation.calculatePositive(6L, rollingReturns);
 
-    assertFalse(sut.bestWorstPeriodData.getPctPositive().isEmpty());
-    assertEquals(6L, sut.bestWorstPeriodData.getPctPositive().get(0).period());
+    assertFalse(calculation.bestWorstPeriodData.getPctPositive().isEmpty());
+    assertEquals(6L, calculation.bestWorstPeriodData.getPctPositive().get(0).period());
     assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(0.846153846153846)), DecimalUtils.toUserScale(
-        sut.bestWorstPeriodData.getPctPositive().get(0).value()));
+        calculation.bestWorstPeriodData.getPctPositive().get(0).value()));
   }
 
   @Test
   void shouldGetNumberOfPeriodsByPeriod_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
-    sut.bestWorstPeriodData.getNumberOfPeriods().add(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
+    calculation.bestWorstPeriodData.getNumberOfPeriods().add(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
 
-    doCallRealMethod().when(sut).getNumberOfPeriodsByPeriod(any());
-    final PeriodValueResult numberOfPeriodsByPeriod = sut.getNumberOfPeriodsByPeriod(6L);
+    doCallRealMethod().when(calculation).getNumberOfPeriodsByPeriod(any());
+    final PeriodValueResult numberOfPeriodsByPeriod = calculation.getNumberOfPeriodsByPeriod(6L);
 
     assertEquals(6L, numberOfPeriodsByPeriod.period());
     assertEquals(BigDecimal.valueOf(13), numberOfPeriodsByPeriod.value());
@@ -543,10 +543,10 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldGetPeriodStartDate_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
-    doCallRealMethod().when(sut).getStartOfPeriodsDate(anyLong(), any());
-    final LocalDate periodStartDate = sut.getStartOfPeriodsDate(12L, getPortfolioReturns());
+    doCallRealMethod().when(calculation).getStartOfPeriodsDate(anyLong(), any());
+    final LocalDate periodStartDate = calculation.getStartOfPeriodsDate(12L, getPortfolioReturns());
 
     assertEquals(toLastDayOfMonth(LocalDate.of(2020, 11, 1)), periodStartDate);
   }
@@ -554,32 +554,32 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldGetDefaultValues_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var sut = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
 
-    doCallRealMethod().when(sut).addDefaultValues(any());
-    sut.addDefaultValues(6L);
+    doCallRealMethod().when(calculation).addDefaultValues(any());
+    calculation.addDefaultValues(6L);
 
-    assertFalse(sut.bestWorstPeriodData.getPctPositive().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getBestPeriodDate().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getBestPeriodPct().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getNumberOfPeriods().isEmpty());
-    assertFalse(sut.bestWorstPeriodData.getAverage().isEmpty());
-    assertEquals(6L, sut.bestWorstPeriodData.getPctPositive().get(0).period());
-    assertEquals(null, sut.bestWorstPeriodData.getPctPositive().get(0).value());
-    assertEquals(6L, sut.bestWorstPeriodData.getWorstPeriodDate().get(0).period());
-    assertNull(sut.bestWorstPeriodData.getWorstPeriodDate().get(0).interval());
-    assertEquals(6L, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).period());
-    assertEquals(null, sut.bestWorstPeriodData.getWorstPeriodPct().get(0).value());
-    assertEquals(6L, sut.bestWorstPeriodData.getBestPeriodDate().get(0).period());
-    assertNull(sut.bestWorstPeriodData.getBestPeriodDate().get(0).interval());
-    assertEquals(6L, sut.bestWorstPeriodData.getBestPeriodPct().get(0).period());
-    assertEquals(null, sut.bestWorstPeriodData.getBestPeriodPct().get(0).value());
-    assertEquals(6L, sut.bestWorstPeriodData.getNumberOfPeriods().get(0).period());
-    assertEquals(ZERO, sut.bestWorstPeriodData.getNumberOfPeriods().get(0).value());
-    assertEquals(6L, sut.bestWorstPeriodData.getAverage().get(0).period());
-    assertEquals(null, sut.bestWorstPeriodData.getAverage().get(0).value());
+    assertFalse(calculation.bestWorstPeriodData.getPctPositive().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getWorstPeriodDate().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getWorstPeriodPct().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getBestPeriodDate().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getBestPeriodPct().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getNumberOfPeriods().isEmpty());
+    assertFalse(calculation.bestWorstPeriodData.getAverage().isEmpty());
+    assertEquals(6L, calculation.bestWorstPeriodData.getPctPositive().get(0).period());
+    assertEquals(null, calculation.bestWorstPeriodData.getPctPositive().get(0).value());
+    assertEquals(6L, calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).period());
+    assertNull(calculation.bestWorstPeriodData.getWorstPeriodDate().get(0).interval());
+    assertEquals(6L, calculation.bestWorstPeriodData.getWorstPeriodPct().get(0).period());
+    assertEquals(null, calculation.bestWorstPeriodData.getWorstPeriodPct().get(0).value());
+    assertEquals(6L, calculation.bestWorstPeriodData.getBestPeriodDate().get(0).period());
+    assertNull(calculation.bestWorstPeriodData.getBestPeriodDate().get(0).interval());
+    assertEquals(6L, calculation.bestWorstPeriodData.getBestPeriodPct().get(0).period());
+    assertEquals(null, calculation.bestWorstPeriodData.getBestPeriodPct().get(0).value());
+    assertEquals(6L, calculation.bestWorstPeriodData.getNumberOfPeriods().get(0).period());
+    assertEquals(ZERO, calculation.bestWorstPeriodData.getNumberOfPeriods().get(0).value());
+    assertEquals(6L, calculation.bestWorstPeriodData.getAverage().get(0).period());
+    assertEquals(null, calculation.bestWorstPeriodData.getAverage().get(0).value());
   }
 
   private TreeMap<LocalDate, BigDecimal> getPortfolioReturns() {

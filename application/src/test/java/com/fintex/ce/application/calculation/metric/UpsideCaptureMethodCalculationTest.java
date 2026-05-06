@@ -36,30 +36,30 @@ class UpsideCaptureMethodCalculationTest {
     final BenchmarkPeriodCalculationInput context = mock(BenchmarkPeriodCalculationInput.class);
     when(context.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
-    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
+    final var calculation = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
 
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
 
-    doCallRealMethod().when(sut).defineResponseType(anySet());
-    sut.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anySet());
+    calculation.defineResponseType(pairs);
 
-    verify(sut).formTimeIntervalResult(pairs);
+    verify(calculation).formTimeIntervalResult(pairs);
   }
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
-    final var sut = mock(UpsideCaptureCalculation.class);
+    final var calculation = mock(UpsideCaptureCalculation.class);
 
     final var pairs = Set.of(Pair.of("2009-01-01", ONE), Pair.of("2013-01-05", TEN));
 
     final var expected = Set.of(
         new TimeIntervalResult("2000-01-12", ZERO),
         new TimeIntervalResult("2020-01-05", BigDecimal.ONE));
-    when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
+    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).defineResponseType(anySet());
-    final UpsideCaptureResult actual = sut.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anySet());
+    final UpsideCaptureResult actual = calculation.defineResponseType(pairs);
 
     assertEquals(expected, actual.getUpsideCapture());
   }
@@ -69,12 +69,12 @@ class UpsideCaptureMethodCalculationTest {
     final BenchmarkPeriodCalculationInput context = mock(BenchmarkPeriodCalculationInput.class);
     when(context.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
-    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
+    final var calculation = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
 
     final var entry = new AbstractMap.SimpleEntry<>(LocalDate.now(), new BigDecimal(String.valueOf(BigDecimal.ONE)));
 
-    doCallRealMethod().when(sut).filterCaptureExpression(any());
-    final boolean actual = sut.filterCaptureExpression(entry);
+    doCallRealMethod().when(calculation).filterCaptureExpression(any());
+    final boolean actual = calculation.filterCaptureExpression(entry);
 
     assertTrue(actual);
   }
@@ -84,13 +84,13 @@ class UpsideCaptureMethodCalculationTest {
     final BenchmarkPeriodCalculationInput context = mock(BenchmarkPeriodCalculationInput.class);
     when(context.getWeightedAverageBenchmarkReturns()).thenReturn(new TreeMap<>());
 
-    final var sut = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
+    final var calculation = mock(UpsideCaptureCalculation.class, withSettings().useConstructor(context, null));
 
     final Map.Entry<LocalDate, BigDecimal> entry = new AbstractMap.SimpleEntry<>(
         LocalDate.now(), new BigDecimal(String.valueOf(BigDecimal.ONE.subtract(HUNDRED))));
 
-    doCallRealMethod().when(sut).filterCaptureExpression(any());
-    final boolean actual = sut.filterCaptureExpression(entry);
+    doCallRealMethod().when(calculation).filterCaptureExpression(any());
+    final boolean actual = calculation.filterCaptureExpression(entry);
 
     assertFalse(actual);
   }

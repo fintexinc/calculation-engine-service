@@ -39,10 +39,10 @@ class SalesChargeTypeCalculationTest {
 
   @Test
   void shouldReturnDefaultMap_whenSalesChargeDataIsEmpty() {
-    final var sut = new SalesChargeCalculation(Map.of());
+    final var calculation = new SalesChargeCalculation(Map.of());
 
     final var expected = new SalesChargeResult(DEFAULT_MAP);
-    final var actual = sut.calculate();
+    final var actual = calculation.calculate();
 
     assertEquals(expected, actual);
   }
@@ -57,7 +57,7 @@ class SalesChargeTypeCalculationTest {
     dataFromFds.put(holding2, new SalesCharge(FRONT_END_CHARGE));
     dataFromFds.put(holding3, new SalesCharge(LOW_SALES_CHARGE));
 
-    final var sut = new SalesChargeCalculation(dataFromFds);
+    final var calculation = new SalesChargeCalculation(dataFromFds);
 
     final var rbf605 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF605", scaled(0.10));
     final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.20));
@@ -70,7 +70,7 @@ class SalesChargeTypeCalculationTest {
         SalesChargeCategory.DEFERRED_SALES_CHARGE, s1,
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s2,
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, s3));
-    final var actual = sut.calculate();
+    final var actual = calculation.calculate();
 
     assertEquals(expected, actual);
   }
@@ -89,7 +89,7 @@ class SalesChargeTypeCalculationTest {
     dataFromFds.put(holding2, new SalesCharge(VOLUME_SALES_CHARGE));
     dataFromFds.put(holding3, new SalesCharge(DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT));
 
-    final var sut = new SalesChargeCalculation(dataFromFds);
+    final var calculation = new SalesChargeCalculation(dataFromFds);
 
     final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.51));
     final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", scaled(0.49));
@@ -100,7 +100,7 @@ class SalesChargeTypeCalculationTest {
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s2,
         SalesChargeCategory.DEFERRED_SALES_CHARGE, s3));
-    final var actual = sut.calculate();
+    final var actual = calculation.calculate();
 
     assertEquals(expected, actual);
   }
@@ -115,7 +115,7 @@ class SalesChargeTypeCalculationTest {
     addHoldingAndRSalesCharge(dataFromFds, "RBF610", 25_000, DEFERRED_SALES_CHARGE_ON_MARKET_VALUE);
     addHoldingAndRSalesCharge(dataFromFds, "RBF611", 20_000, DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT);
 
-    final var sut = new SalesChargeCalculation(dataFromFds);
+    final var calculation = new SalesChargeCalculation(dataFromFds);
 
     final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", scaled(0.10));
     final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF607", scaled(0.15));
@@ -133,7 +133,7 @@ class SalesChargeTypeCalculationTest {
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, s2,
         SalesChargeCategory.DEFERRED_SALES_CHARGE, s3));
-    final var actual = sut.calculate();
+    final var actual = calculation.calculate();
 
     assertEquals(expected, actual);
   }
@@ -142,10 +142,10 @@ class SalesChargeTypeCalculationTest {
   void shouldReturnDefaultMap_whenNoHoldingsProvided() {
     final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
 
-    final var sut = new SalesChargeCalculation(dataFromFds);
+    final var calculation = new SalesChargeCalculation(dataFromFds);
 
     final var expected = new SalesChargeResult(DEFAULT_MAP);
-    final var actual = sut.calculate();
+    final var actual = calculation.calculate();
 
     assertEquals(expected, actual);
   }
@@ -157,7 +157,7 @@ class SalesChargeTypeCalculationTest {
     addHoldingAndRSalesCharge(dataFromFds, "RBF607", 50_000, VOLUME_SALES_CHARGE);
     addHoldingAndRSalesCharge(dataFromFds, "RBF608", 50_000, FORMULA_ONE);
 
-    final var sut = new SalesChargeCalculation(dataFromFds);
+    final var calculation = new SalesChargeCalculation(dataFromFds);
 
     final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", BigDecimal.valueOf(
         0.3333333333));
@@ -172,7 +172,7 @@ class SalesChargeTypeCalculationTest {
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
         SalesChargeCategory.DEFERRED_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO));
-    final var actual = sut.calculate();
+    final var actual = calculation.calculate();
 
     assertEquals(expected, actual);
   }
@@ -182,7 +182,7 @@ class SalesChargeTypeCalculationTest {
     final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 150_000, FRONT_END_CHARGE);
 
-    final var sut = new SalesChargeCalculation(dataFromFds);
+    final var calculation = new SalesChargeCalculation(dataFromFds);
     final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND_CANADA-RBF606", BigDecimal.valueOf(
         1));
 
@@ -192,7 +192,7 @@ class SalesChargeTypeCalculationTest {
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
         SalesChargeCategory.DEFERRED_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO));
-    final var actual = sut.calculate();
+    final var actual = calculation.calculate();
 
     assertEquals(expected, actual);
   }

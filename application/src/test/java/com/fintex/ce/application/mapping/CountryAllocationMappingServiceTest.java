@@ -32,13 +32,13 @@ class CountryAllocationMappingServiceTest {
   @Test
   void shouldInitCountryAllocationMapping_whenCheckResult() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
-    doCallRealMethod().when(sut).getCountryAllocationInputStream();
-    doCallRealMethod().when(sut).initCountryAllocationMapping();
+    doCallRealMethod().when(service).getCountryAllocationInputStream();
+    doCallRealMethod().when(service).initCountryAllocationMapping();
 
     // ACT
-    final Map<String, CountryAllocation> actual = sut.initCountryAllocationMapping();
+    final Map<String, CountryAllocation> actual = service.initCountryAllocationMapping();
 
     // VERIFY
     assertFalse(actual.isEmpty());
@@ -52,42 +52,42 @@ class CountryAllocationMappingServiceTest {
   @Test
   void shouldInitCountryAllocationMapping_whenVerifyGetCountryAllocationInputStream() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
-    when(sut.getCountryAllocationInputStream()).thenReturn(this.getClass().getResourceAsStream(
+    when(service.getCountryAllocationInputStream()).thenReturn(this.getClass().getResourceAsStream(
         "/jsons/country-allocation-mapping.json"));
-    doCallRealMethod().when(sut).initCountryAllocationMapping();
+    doCallRealMethod().when(service).initCountryAllocationMapping();
 
     // ACT
-    sut.initCountryAllocationMapping();
+    service.initCountryAllocationMapping();
 
     // VERIFY
-    verify(sut).getCountryAllocationInputStream();
+    verify(service).getCountryAllocationInputStream();
   }
 
   @Test
   void shouldInitCountryAllocationMapping_whenVerifyException() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
-    when(sut.getCountryAllocationInputStream()).thenReturn(null);
-    doCallRealMethod().when(sut).initCountryAllocationMapping();
+    when(service.getCountryAllocationInputStream()).thenReturn(null);
+    doCallRealMethod().when(service).initCountryAllocationMapping();
 
     // VERIFY
-    assertThrows(com.fintex.ce.model.error.exceptions.CalculationException.class, sut::initCountryAllocationMapping);
+    assertThrows(com.fintex.ce.model.error.exceptions.CalculationException.class, service::initCountryAllocationMapping);
   }
 
   @Test
   void shouldSumAllocations_whenCheckResult() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
     final HashMap<CountryRegionType, BigDecimal> map = new HashMap<>();
 
-    doCallRealMethod().when(sut).sumAllocations(any(), any(), any());
+    doCallRealMethod().when(service).sumAllocations(any(), any(), any());
 
     // ACT
-    sut.sumAllocations(map, BigDecimal.TEN, CountryRegionType.EMERGING_MARKET);
+    service.sumAllocations(map, BigDecimal.TEN, CountryRegionType.EMERGING_MARKET);
 
     // VERIFY
     assertEquals(1, map.size());
@@ -98,120 +98,120 @@ class CountryAllocationMappingServiceTest {
   @Test
   void shouldMapToRegions_whenVerifyAllocationEmpty() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
     final Map<String, BigDecimal> allocations = new HashMap<>();
 
-    sut.countryAllocationMap = mock(HashMap.class);
+    service.countryAllocationMap = mock(HashMap.class);
 
-    doCallRealMethod().when(sut).mapToRegions(any(), any(), any(), any());
+    doCallRealMethod().when(service).mapToRegions(any(), any(), any(), any());
 
     // ACT
     final ArrayList<Warning> warnings = new ArrayList<>();
-    sut.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
+    service.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
     assertEquals(1, warnings.size());
-    verify(sut.countryAllocationMap, times(0)).get(any());
+    verify(service.countryAllocationMap, times(0)).get(any());
   }
 
   @Test
   void shouldMapToRegions_whenVerifyGetAllocationNotFound() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
     final Map<String, BigDecimal> allocations = Map.of("T", BigDecimal.ONE);
 
-    sut.countryAllocationMap = mock(HashMap.class);
+    service.countryAllocationMap = mock(HashMap.class);
 
-    doCallRealMethod().when(sut).mapToRegions(any(), any(), any(), any());
+    doCallRealMethod().when(service).mapToRegions(any(), any(), any(), any());
 
     // ACT
     final ArrayList<Warning> warnings = new ArrayList<>();
-    sut.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
+    service.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
     assertEquals(1, warnings.size());
-    verify(sut.countryAllocationMap).get("T");
+    verify(service.countryAllocationMap).get("T");
   }
 
   @Test
   void shouldMapToRegions_whenVerifyGetRegionIsNull() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
     final Map<String, BigDecimal> allocations = Map.of("T", BigDecimal.ONE);
 
-    sut.countryAllocationMap = mock(HashMap.class);
-    when(sut.countryAllocationMap.get(any())).thenReturn(mock(CountryAllocation.class));
+    service.countryAllocationMap = mock(HashMap.class);
+    when(service.countryAllocationMap.get(any())).thenReturn(mock(CountryAllocation.class));
 
-    doCallRealMethod().when(sut).mapToRegions(any(), any(), any(), any());
+    doCallRealMethod().when(service).mapToRegions(any(), any(), any(), any());
 
     // ACT
     final ArrayList<Warning> warnings = new ArrayList<>();
-    sut.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
+    service.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
     assertEquals(1, warnings.size());
-    verify(sut.countryAllocationMap).get("T");
+    verify(service.countryAllocationMap).get("T");
   }
 
   @Test
   void shouldMapToRegions_whenCheckResult() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
     final Map<String, BigDecimal> allocations = Map.of("T", BigDecimal.ONE);
 
-    sut.countryAllocationMap = mock(HashMap.class);
+    service.countryAllocationMap = mock(HashMap.class);
     final CountryAllocation dto = mock(CountryAllocation.class);
     when(dto.getRegion()).thenReturn(CountryRegionType.CANADA);
-    when(sut.countryAllocationMap.get(any())).thenReturn(dto);
+    when(service.countryAllocationMap.get(any())).thenReturn(dto);
 
-    doCallRealMethod().when(sut).mapToRegions(any(), any(), any(), any());
+    doCallRealMethod().when(service).mapToRegions(any(), any(), any(), any());
 
     // ACT
-    sut.mapToRegions(mock(PortfolioHolding.class), allocations, new ArrayList<>(),
+    service.mapToRegions(mock(PortfolioHolding.class), allocations, new ArrayList<>(),
         ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
-    verify(sut).sumAllocations(argThat(Map::isEmpty), eq(BigDecimal.ONE), eq(CountryRegionType.CANADA));
+    verify(service).sumAllocations(argThat(Map::isEmpty), eq(BigDecimal.ONE), eq(CountryRegionType.CANADA));
   }
 
   @Test
   void shouldMapToCountryRegions_whenVerifyMapToRegions() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<String, BigDecimal> allocations = Map.of("T", BigDecimal.ONE);
 
-    doCallRealMethod().when(sut).mapToCountryRegions(any(), any(), any());
+    doCallRealMethod().when(service).mapToCountryRegions(any(), any(), any());
 
     // ACT
     final List<Warning> warnings = List.of(mock(Warning.class));
-    sut.mapToCountryRegions(Map.of(h, allocations), warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
+    service.mapToCountryRegions(Map.of(h, allocations), warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
-    verify(sut).mapToRegions(h, allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
+    verify(service).mapToRegions(h, allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
   }
 
   @Test
   void shouldMapToCountryRegions_whenCheckResult() {
     // SETUP
-    final var sut = mock(CountryAllocationMappingService.class);
+    final var service = mock(CountryAllocationMappingService.class);
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<String, BigDecimal> allocations = Map.of("T", BigDecimal.ONE);
     final List<Warning> warnings = List.of(mock(Warning.class));
 
     final Map<CountryRegionType, BigDecimal> emergingMarket = Map.of(CountryRegionType.EMERGING_MARKET, BigDecimal.ONE);
-    when(sut.mapToRegions(h, allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY)).thenReturn(emergingMarket);
+    when(service.mapToRegions(h, allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY)).thenReturn(emergingMarket);
 
-    doCallRealMethod().when(sut).mapToCountryRegions(any(), any(), any());
+    doCallRealMethod().when(service).mapToCountryRegions(any(), any(), any());
 
     // ACT
-    final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> actual = sut.mapToCountryRegions(Map.of(h,
+    final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> actual = service.mapToCountryRegions(Map.of(h,
         allocations),
         warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 

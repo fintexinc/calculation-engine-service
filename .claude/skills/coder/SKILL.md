@@ -94,7 +94,7 @@ Pure logic, no data fetching.
 - **Extract repeated code into utility methods** - if you write the same 3+ lines twice, create a util
 - **DI:** `@RequiredArgsConstructor` with final fields, not `@AllArgsConstructor`
 - **Max 5-7 deps** per class; max 3 nesting levels (early returns)
-- **Tests:** JUnit 5 + Mockito, no Spring context for unit tests. Naming: `shouldDoSomething_whenCondition`
+- **Tests:** JUnit 5 + Mockito, no Spring context for unit tests. Naming: `shouldDoSomething_whenCondition`. Don't use `sut` for the system-under-test variable — pick a descriptive name from the type under test (e.g. `calculation`, `service`, `fetcher`, `mapper`).
 
 ## 4) External Calls (SM)
 

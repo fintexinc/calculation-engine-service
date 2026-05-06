@@ -32,7 +32,7 @@ class CorrelationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyGetPortfolioMonthlyReturns() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(CorrelationServiceImpl.class,
+    final var service = mock(CorrelationServiceImpl.class,
         withSettings().useConstructor(Set.of(), monthlyReturnsService));
 
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
@@ -57,8 +57,8 @@ class CorrelationServiceImplTest {
 
     when(monthlyReturnsAggregate.cutByPsd().getWeightedAverage()).thenReturn(portfolioTotalReturns);
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(command);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    service.defineCalculationMethod(command);
 
     verify(monthlyReturnsService).getPortfolioMonthlyReturns(holdings, Currency.CAD,
         ReturnFactorScale.SCALE_OF_TWO);
@@ -67,7 +67,7 @@ class CorrelationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenCheckResult() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(CorrelationServiceImpl.class,
+    final var service = mock(CorrelationServiceImpl.class,
         withSettings().useConstructor(Set.of(), monthlyReturnsService));
 
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class, RETURNS_DEEP_STUBS);
@@ -97,8 +97,8 @@ class CorrelationServiceImplTest {
         .build();
     final var expected = new CorrelationCalculation(context, baseTotalReturns, Set.of());
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    final var actual = sut.defineCalculationMethod(command);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    final var actual = service.defineCalculationMethod(command);
 
     assertEquals(expected, actual);
   }
@@ -106,7 +106,7 @@ class CorrelationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyReqDtoSetReqCurrencyToCashHolding() {
     final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var sut = mock(CorrelationServiceImpl.class,
+    final var service = mock(CorrelationServiceImpl.class,
         withSettings().useConstructor(null, monthlyReturnsService));
     final var command = mock(PeriodCommand.class);
     PeriodCalculationInput context = mock(PeriodCalculationInput.class);
@@ -114,42 +114,42 @@ class CorrelationServiceImplTest {
     when(monthlyReturnsService.getPortfolioMonthlyReturns(anyList(), any(), any()))
         .thenReturn(mock(ReturnsAggregate.class, RETURNS_SELF));
 
-    when(sut.buildPeriodCalculationInput(any(), any())).thenReturn(context);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
     when(context.getCipsd()).thenReturn(LocalDate.now());
 
-    doCallRealMethod().when(sut).defineCalculationMethod(any());
-    sut.defineCalculationMethod(command);
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+    service.defineCalculationMethod(command);
 
     verify(command).setReqCurrencyToCashHolding();
   }
 
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
-    final var sut = mock(CorrelationServiceImpl.class, withSettings().useConstructor(Set.of(), null));
+    final var service = mock(CorrelationServiceImpl.class, withSettings().useConstructor(Set.of(), null));
 
     final var command = mock(PeriodCommand.class);
 
-    when(sut.defineCalculationMethod(any())).thenReturn(mock(CorrelationCalculation.class));
-    doCallRealMethod().when(sut).perform(any());
+    when(service.defineCalculationMethod(any())).thenReturn(mock(CorrelationCalculation.class));
+    doCallRealMethod().when(service).perform(any());
 
-    sut.perform(command);
+    service.perform(command);
 
-    verify(sut).defineCalculationMethod(command);
+    verify(service).defineCalculationMethod(command);
   }
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
-    final var sut = mock(CorrelationServiceImpl.class, withSettings().useConstructor(Set.of(), null));
+    final var service = mock(CorrelationServiceImpl.class, withSettings().useConstructor(Set.of(), null));
 
     final var command = mock(PeriodCommand.class);
     final var set = mock(Set.class);
     final var correlationCalculation = mock(CorrelationCalculation.class);
 
     when(command.getPeriods()).thenReturn(set);
-    when(sut.defineCalculationMethod(any())).thenReturn(correlationCalculation);
-    doCallRealMethod().when(sut).perform(any());
+    when(service.defineCalculationMethod(any())).thenReturn(correlationCalculation);
+    doCallRealMethod().when(service).perform(any());
 
-    sut.perform(command);
+    service.perform(command);
 
     verify(correlationCalculation).calculate(set);
   }

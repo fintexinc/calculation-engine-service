@@ -38,178 +38,178 @@ class SharpeRatioCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenNumberOfMonthGreaterThanTBillsResultNull() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var tBills = mock(TreeMap.class);
-    sut.tBills = tBills;
+    calculation.tBills = tBills;
 
     when(tBills.size()).thenReturn(20);
     when(returns.size()).thenReturn(100);
-    when(sut.calculateSharpeRatio(any(), any(), any())).thenReturn(TEN);
+    when(calculation.calculateSharpeRatio(any(), any(), any())).thenReturn(TEN);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(100, returns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(100, returns);
 
     assertNull(actual);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeriodStartDate() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var tBills = mock(TreeMap.class);
-    sut.tBills = tBills;
+    calculation.tBills = tBills;
 
     when(tBills.size()).thenReturn(TWELVE);
     when(returns.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    verify(sut).getPeriodStartDate(TWELVE, returns);
+    verify(calculation).getPeriodStartDate(TWELVE, returns);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateAverageArithmeticAnnualizedReturn() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var date = LocalDate.now();
     final var tBills = mock(TreeMap.class);
-    sut.tBills = tBills;
+    calculation.tBills = tBills;
 
     when(tBills.size()).thenReturn(TWELVE);
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(returns.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    verify(sut).calculateAverageArithmeticAnnualizedReturn(returns, date, TWELVE);
+    verify(calculation).calculateAverageArithmeticAnnualizedReturn(returns, date, TWELVE);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculationOfAnnualizedRiskFreeRate() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var date = LocalDate.now();
     final var restrictedTBills = mock(NavigableMap.class);
     final var tBills = mock(TreeMap.class);
-    sut.tBills = tBills;
+    calculation.tBills = tBills;
 
     when(tBills.size()).thenReturn(TWELVE);
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(returns.size()).thenReturn(TWELVE);
-    when(sut.restrictTBillsRange(any(), any())).thenReturn(restrictedTBills);
+    when(calculation.restrictTBillsRange(any(), any())).thenReturn(restrictedTBills);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    verify(sut).calculateAverageArithmeticAnnualizedReturn(restrictedTBills, date, TWELVE);
+    verify(calculation).calculateAverageArithmeticAnnualizedReturn(restrictedTBills, date, TWELVE);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetStandardDeviation() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var date = LocalDate.now();
     final var tBills = mock(TreeMap.class);
-    sut.tBills = tBills;
+    calculation.tBills = tBills;
 
     when(tBills.size()).thenReturn(TWELVE);
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(returns.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    verify(sut).getStandardDeviation(TWELVE, returns);
+    verify(calculation).getStandardDeviation(TWELVE, returns);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateSharpeRatio() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var date = LocalDate.now();
     final var one = ONE;
     final var tBills = mock(TreeMap.class);
-    sut.tBills = tBills;
+    calculation.tBills = tBills;
 
     when(tBills.size()).thenReturn(TWELVE);
-    when(sut.getPeriodStartDate(anyInt(), any())).thenReturn(date);
-    when(sut.calculateAverageArithmeticAnnualizedReturn(any(), any(), anyInt())).thenReturn(one);
-    when(sut.getStandardDeviation(anyInt(), any())).thenReturn(one);
+    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
+    when(calculation.calculateAverageArithmeticAnnualizedReturn(any(), any(), anyInt())).thenReturn(one);
+    when(calculation.getStandardDeviation(anyInt(), any())).thenReturn(one);
     when(returns.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    sut.calculatePeriodForNumberOfMonths(TWELVE, returns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    verify(sut).calculateSharpeRatio(one, one, one);
+    verify(calculation).calculateSharpeRatio(one, one, one);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenPortfolioSizeIsLessThanTwelve() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final var treeMap = mock(TreeMap.class);
 
-    when(sut.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal resultValue = sut.calculatePeriodForNumberOfMonths(ONE.intValue());
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final BigDecimal resultValue = calculation.calculatePeriodForNumberOfMonths(ONE.intValue());
 
     assertNull(resultValue);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResult() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final var returns = mock(TreeMap.class);
     final var tBills = mock(TreeMap.class);
-    sut.tBills = tBills;
+    calculation.tBills = tBills;
 
     when(tBills.size()).thenReturn(TWELVE);
     when(returns.size()).thenReturn(TWELVE);
 
-    doCallRealMethod().when(sut).calculatePeriodForNumberOfMonths(anyInt(), any());
-    final BigDecimal actual = sut.calculatePeriodForNumberOfMonths(ONE.intValue(), returns);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
+    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(ONE.intValue(), returns);
 
     assertNull(actual);
   }
 
   @Test
   void shouldCalculateSharpeRatio_whenCheckResult() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
 
-    doCallRealMethod().when(sut).calculateSharpeRatio(any(), any(), any());
+    doCallRealMethod().when(calculation).calculateSharpeRatio(any(), any(), any());
 
-    final BigDecimal returnValue = sut.calculateSharpeRatio(TEN, TWO, TEN);
+    final BigDecimal returnValue = calculation.calculateSharpeRatio(TEN, TWO, TEN);
 
     assertEquals(toUserScale(valueOf(0.8)), toUserScale(returnValue));
   }
 
   @Test
   void shouldCalculateSharpeRatio_whenCheckResult2() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
 
-    doCallRealMethod().when(sut).calculateSharpeRatio(any(), any(), any());
+    doCallRealMethod().when(calculation).calculateSharpeRatio(any(), any(), any());
 
-    final BigDecimal returnValue = sut.calculateSharpeRatio(TEN, TWO, ZERO);
+    final BigDecimal returnValue = calculation.calculateSharpeRatio(TEN, TWO, ZERO);
 
     assertNull(returnValue);
   }
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
-    final var sut = mock(SharpeRatioCalculation.class);
+    final var calculation = mock(SharpeRatioCalculation.class);
     final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
     final TimeIntervalResult interval1 = new TimeIntervalResult("2000-01-12", ZERO);
     final TimeIntervalResult interval2 = new TimeIntervalResult("2020-01-05", BigDecimal.ONE);
     final Set<TimeIntervalResult> expected = Set.of(interval1, interval2);
-    when(sut.formTimeIntervalResult(anySet())).thenReturn(expected);
+    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
 
-    doCallRealMethod().when(sut).defineResponseType(anySet());
-    final SharpeRatioResult result = sut.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anySet());
+    final SharpeRatioResult result = calculation.defineResponseType(pairs);
 
     assertEquals(expected, result.getSharpeRatio());
   }
@@ -217,29 +217,29 @@ class SharpeRatioCalculationTest {
   @Test
   void shouldGetStandardDeviation_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      final var sut = mock(SharpeRatioCalculation.class);
+      final var calculation = mock(SharpeRatioCalculation.class);
       final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
       returns.put(LocalDate.now().minusMonths(1), ONE);
       returns.put(LocalDate.now().minusMonths(2), TEN);
       returns.put(LocalDate.now().minusMonths(3), BigDecimalConstants.TWELVE);
 
-      sut.tBills = new TreeMap<>();
-      sut.standardDeviationCalculation = mock(StandardDeviationCalculation.class);
+      calculation.tBills = new TreeMap<>();
+      calculation.standardDeviationCalculation = mock(StandardDeviationCalculation.class);
 
-      when(sut.standardDeviationCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(ONE);
+      when(calculation.standardDeviationCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(ONE);
 
-      doCallRealMethod().when(sut).getStandardDeviation(anyInt(), any());
-      sut.getStandardDeviation(TWELVE, returns);
+      doCallRealMethod().when(calculation).getStandardDeviation(anyInt(), any());
+      calculation.getStandardDeviation(TWELVE, returns);
 
       mockedPeriodCalculationAbstract.verify(() -> PeriodCalculationAbstract.calculateExcessReturn(returns,
-          sut.tBills));
+          calculation.tBills));
     }
   }
 
   @Test
   void shouldGetStandardDeviation_whenVerifyPeriodForNumberOfMonths() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      final var sut = mock(SharpeRatioCalculation.class);
+      final var calculation = mock(SharpeRatioCalculation.class);
       final var periodCalculationAbstract = mock(PeriodCalculationAbstract.class);
 
       final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
@@ -247,17 +247,17 @@ class SharpeRatioCalculationTest {
       returns.put(LocalDate.now().minusMonths(2), TEN);
       returns.put(LocalDate.now().minusMonths(3), BigDecimalConstants.TWELVE);
 
-      sut.tBills = new TreeMap<>();
-      sut.standardDeviationCalculation = mock(StandardDeviationCalculation.class);
+      calculation.tBills = new TreeMap<>();
+      calculation.standardDeviationCalculation = mock(StandardDeviationCalculation.class);
 
       mockedPeriodCalculationAbstract.when(() -> PeriodCalculationAbstract.calculateExcessReturn(any(), any()))
           .thenReturn((TreeMap) returns);
-      when(sut.standardDeviationCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(ONE);
+      when(calculation.standardDeviationCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenReturn(ONE);
 
-      doCallRealMethod().when(sut).getStandardDeviation(anyInt(), any());
-      sut.getStandardDeviation(TWELVE, returns);
+      doCallRealMethod().when(calculation).getStandardDeviation(anyInt(), any());
+      calculation.getStandardDeviation(TWELVE, returns);
 
-      verify(sut.standardDeviationCalculation).calculatePeriodForNumberOfMonths(eq(TWELVE), any());
+      verify(calculation.standardDeviationCalculation).calculatePeriodForNumberOfMonths(eq(TWELVE), any());
     }
   }
 
