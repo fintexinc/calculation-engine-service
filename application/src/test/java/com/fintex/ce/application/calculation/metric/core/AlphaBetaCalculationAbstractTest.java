@@ -115,7 +115,8 @@ class AlphaBetaCalculationAbstractTest {
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
     calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(calculation, times(2)).getSubMapByPeriodStartDate(periodStartDate, treeMap);
+    // Three calls: portfolio window (validation), portfolio excess return submap, benchmark excess return submap.
+    verify(calculation, times(3)).getSubMapByPeriodStartDate(periodStartDate, treeMap);
   }
 
   @Test
@@ -253,7 +254,8 @@ class AlphaBetaCalculationAbstractTest {
     final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 
     doCallRealMethod().when(calculation).calculateNumerator(any(), any(), any(), any());
-    final BigDecimal result = calculation.calculateNumerator(portfolioExcessReturnByPeriod, benchmarkExcessReturnByPeriod,
+    final BigDecimal result = calculation.calculateNumerator(portfolioExcessReturnByPeriod,
+        benchmarkExcessReturnByPeriod,
         portfolioExcessAverage, benchmarkExcessAverage);
 
     assertEquals(toUserScale(BigDecimal.valueOf(0.995047103096247)), toUserScale(result));

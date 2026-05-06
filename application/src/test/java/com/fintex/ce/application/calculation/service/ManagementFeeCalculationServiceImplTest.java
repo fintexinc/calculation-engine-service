@@ -322,7 +322,8 @@ class ManagementFeeCalculationServiceImplTest {
     doCallRealMethod().when(service).validateManagementFee(any(), any());
     doCallRealMethod().when(service).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    var actualException = assertThrows(CalculationException.class, () -> service.setInitialFeeAndModifiedFeeValues(map));
+    var actualException = assertThrows(CalculationException.class, () -> service.setInitialFeeAndModifiedFeeValues(
+        map));
 
     // VERIFY
     assertEquals(expected.getErrorCode(), actualException.getErrorCode());

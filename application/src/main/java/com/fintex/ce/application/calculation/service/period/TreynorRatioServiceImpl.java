@@ -6,6 +6,7 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
@@ -46,7 +47,9 @@ public class TreynorRatioServiceImpl extends PeriodBenchmarkAbstractService<Trey
         ReturnFactorScale.SCALE_OF_TWO);
     BenchmarkPeriodCalculationInput treynorRatioInput = buildPeriodCalculationInput(command,
         ReturnFactorScale.SCALE_OF_ONE);
-    var tBills = tBillsProvider.fetch(command.getCurrency());
+    var tBills = TBillsValidator.requireNonEmpty(
+
+        tBillsProvider.fetch().get(command.getCurrency()), command.getCurrency());
     NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = calculateExcessReturn(betaInput
         .getWeightedAveragePortfolioReturns(), tBills);
     NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn = calculateExcessReturn(betaInput

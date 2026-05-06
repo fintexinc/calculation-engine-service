@@ -99,7 +99,8 @@ class TrackingErrorCalculationTest {
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
     calculation.calculatePeriodForNumberOfMonths(24);
 
-    verify(calculation).getPeriodStartDate(eq(24), argThat(argument -> argument == calculation.portfolioReturnOverBenchmark));
+    verify(calculation).getPeriodStartDate(eq(24), argThat(
+        argument -> argument == calculation.portfolioReturnOverBenchmark));
   }
 
   @Test
@@ -290,7 +291,8 @@ class TrackingErrorCalculationTest {
     expected.put(LocalDate.now().minusMonths(5), BigDecimal.valueOf(100.0));
 
     doCallRealMethod().when(calculation).calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, TWO);
-    final TreeMap<LocalDate, BigDecimal> actual = calculation.calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate,
+    final TreeMap<LocalDate, BigDecimal> actual = calculation.calculateDiffPortfolioAndAVGPortfolio(
+        subMapByPeriodStartDate,
         TWO);
 
     assertEquals(expected, actual);

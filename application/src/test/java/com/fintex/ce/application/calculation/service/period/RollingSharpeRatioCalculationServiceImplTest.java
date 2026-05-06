@@ -7,12 +7,17 @@ import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationIn
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -20,6 +25,7 @@ import static com.fintex.ce.application.util.ReturnFactorScale.SCALE_OF_ONE;
 import static com.fintex.ce.application.util.ReturnFactorScale.SCALE_OF_TWO;
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -27,7 +33,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
 class RollingSharpeRatioCalculationServiceImplTest {
 
   @Test
@@ -88,7 +93,8 @@ class RollingSharpeRatioCalculationServiceImplTest {
 
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(input);
     when(command.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
+        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
 
     doCallRealMethod().when(service).defineCalculationMethod(any());
     service.defineCalculationMethod(command);
@@ -154,6 +160,28 @@ class RollingSharpeRatioCalculationServiceImplTest {
 
     verify(monthlyReturnsService).getWeightedAverageWithCpsdAndCpedValidation(monthlyReturns, LOCAL_DATE_NOW,
         LOCAL_DATE_NOW.plusMonths(1));
+  }
+
+  @Test
+  void shouldThrowMissingTBillRate_whenTBillSeriesEmptyForRequestedCurrency() {
+    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var service = mock(RollingSharpeRatioCalculationServiceImpl.class, withSettings()
+        .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
+
+    final var command = mock(RollingCalculationCommand.class);
+    final var input = mock(PeriodCalculationInput.class);
+
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(input);
+    when(command.getCurrency()).thenReturn(Currency.EUR);
+    // EUR is outside the supported currencies; TBillsFetcher pre-populates it as an empty TreeMap.
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.EUR, new TreeMap<>()));
+
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+
+    CalculationException ex = assertThrows(CalculationException.class,
+        () -> service.defineCalculationMethod(command));
+    assertEquals(ErrorCode.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, ex.getErrorCode());
   }
 
 }

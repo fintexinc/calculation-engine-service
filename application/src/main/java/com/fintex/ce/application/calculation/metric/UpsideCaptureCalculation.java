@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.UpDownSideCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.UpsideCaptureResult;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,10 +22,7 @@ public class UpsideCaptureCalculation extends UpDownSideCalculationAbstract<Upsi
 
   @Override
   public UpsideCaptureResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final UpsideCaptureResult result = new UpsideCaptureResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setUpsideCapture(timeIntervals);
-    return result;
+    return new UpsideCaptureResult(formTimeIntervalResult(periodValues));
   }
 
   @Override

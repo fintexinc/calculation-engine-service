@@ -110,6 +110,9 @@ external-services:
           top: /api/v1/wealth/securities/top-holdings
         returns:
           monthly: /api/v1/wealth/securities/returns/monthly
+        reference:
+          # SMS exposes combined US + CAD T-Bill monthly returns at this endpoint; PCE selects the side it needs.
+          treasury-rates: /api/v1/wealth/reference/treasury-rates
 
 rest-template:
   rest-template-pool:

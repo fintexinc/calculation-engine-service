@@ -240,8 +240,9 @@ class CorrelationCalculationTest {
         portfolioBaseTotalReturnByPeriodStartDate));
 
     doCallRealMethod().when(calculation).calculatePortfolioBaseTotalReturnValuesByPeriod(anyInt(), anyMap());
-    final TreeMap<LocalDate, BigDecimal> result = new TreeMap<>(calculation.calculatePortfolioBaseTotalReturnValuesByPeriod(
-        TWELVE, map));
+    final TreeMap<LocalDate, BigDecimal> result = new TreeMap<>(calculation
+        .calculatePortfolioBaseTotalReturnValuesByPeriod(
+            TWELVE, map));
 
     assertEquals(2, result.size());
     assertEquals(toUserScale(BigDecimal.valueOf(5)), toUserScale(result.firstEntry().getValue()));
@@ -396,7 +397,8 @@ class CorrelationCalculationTest {
     final var map = Map.of(mutualFundsHolding, BigDecimalConstants.TWELVE);
 
     doCallRealMethod().when(calculation).mapToCorrelationPeriodResult(any(), anyInt(), any());
-    final CorrelationPeriodResult correlationPeriod = calculation.mapToCorrelationPeriodResult(usEtfHolding, TWELVE, map);
+    final CorrelationPeriodResult correlationPeriod = calculation.mapToCorrelationPeriodResult(usEtfHolding, TWELVE,
+        map);
 
     assertEquals(String.valueOf(TWELVE), correlationPeriod.period());
     assertEquals("ETF_US_TEST", correlationPeriod.key());

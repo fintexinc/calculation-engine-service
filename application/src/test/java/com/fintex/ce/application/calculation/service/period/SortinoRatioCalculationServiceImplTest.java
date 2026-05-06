@@ -21,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
 class SortinoRatioCalculationServiceImplTest {
 
   @Test
@@ -38,7 +37,7 @@ class SortinoRatioCalculationServiceImplTest {
     when(input.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(input);
     when(command.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, treeMap, Currency.USD, treeMap));
 
     doCallRealMethod().when(service).defineCalculationMethod(any());
     service.defineCalculationMethod(command);

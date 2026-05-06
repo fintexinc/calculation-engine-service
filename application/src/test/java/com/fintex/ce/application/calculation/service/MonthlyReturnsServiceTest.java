@@ -13,7 +13,9 @@ import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -37,9 +39,11 @@ import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static com.fintex.wm.commons.domain.currency.Currency.CAD;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -423,6 +427,94 @@ class MonthlyReturnsServiceTest {
     assertNotEquals(originalReturns, aggregate.returnsMap.get(holding));
     assertEquals(CAD, aggregate.holdingCurrencyMap.get(holding));
     assertTrue(aggregate.notification.getExceptions().isEmpty());
+  }
+
+  @Test
+  void shouldThrowSecurityNotFound_whenHoldingNotInSmResponse() {
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = new MonthlyReturnsService(monthlyReturnsFetcher, mock(FxRateService.class),
+        gicMonthlyReturnsGenerator);
+    PortfolioHolding holding = mock(PortfolioHolding.class);
+
+    when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
+    when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(new HashMap<>());
+
+    CalculationException exception = assertThrows(CalculationException.class,
+        () -> service.getMonthlyReturns(List.of(holding), CAD));
+
+    assertEquals(ErrorCode.SECURITY_NOT_FOUND_IN_SM.getCode(), exception.getErrorCode().getCode());
+  }
+
+  @Test
+  void shouldThrowMissingMonthlyReturns_whenHoldingReturnsAreEmpty() {
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = new MonthlyReturnsService(monthlyReturnsFetcher, mock(FxRateService.class),
+        gicMonthlyReturnsGenerator);
+    PortfolioHolding holding = mock(PortfolioHolding.class);
+    HoldingMonthlyReturns emptyReturns = HoldingMonthlyReturns.builder()
+        .returns(new TreeMap<>())
+        .build();
+    HashMap<PortfolioHolding, HoldingMonthlyReturns> fetched = new HashMap<>();
+    fetched.put(holding, emptyReturns);
+
+    when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(fetched);
+    when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(new HashMap<>());
+
+    CalculationException exception = assertThrows(CalculationException.class,
+        () -> service.getMonthlyReturns(List.of(holding), CAD));
+
+    assertEquals(ErrorCode.MISSING_MONTHLY_RETURNS.getCode(), exception.getErrorCode().getCode());
+  }
+
+  @Test
+  void shouldNotThrow_whenAllHoldingsHaveMonthlyReturns() {
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = new MonthlyReturnsService(monthlyReturnsFetcher, mock(FxRateService.class),
+        gicMonthlyReturnsGenerator);
+    PortfolioHolding holding = mock(PortfolioHolding.class);
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    returns.put(LOCAL_DATE_NOW, BigDecimal.ONE);
+    HoldingMonthlyReturns nonEmpty = HoldingMonthlyReturns.builder()
+        .returns(returns)
+        .build();
+    HashMap<PortfolioHolding, HoldingMonthlyReturns> fetched = new HashMap<>();
+    fetched.put(holding, nonEmpty);
+
+    when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(fetched);
+    when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(new HashMap<>());
+
+    assertDoesNotThrow(() -> service.getMonthlyReturns(List.of(holding), CAD));
+  }
+
+  @Test
+  void shouldNotThrow_whenPortfolioContainsCashHolding() {
+    // CASH holdings are intentionally excluded from the SM request (HoldingMappingUtils.isSkipped) and from the GIC
+    // generator, so they never appear in originalMonthlyReturns. The validator must skip them — otherwise any
+    // cash-bearing portfolio gets a misleading SECURITY_NOT_FOUND_IN_SM (HTTP 400).
+    var monthlyReturnsFetcher = mock(SecurityDataFetcher.class);
+    var gicMonthlyReturnsGenerator = mock(MonthlyReturnsGenerator.class);
+    var service = new MonthlyReturnsService(monthlyReturnsFetcher, mock(FxRateService.class),
+        gicMonthlyReturnsGenerator);
+
+    PortfolioHolding security = mock(PortfolioHolding.class);
+    when(security.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    PortfolioHolding cash = mock(PortfolioHolding.class);
+    when(cash.getHoldingType()).thenReturn(FinancialInstrumentType.CASH);
+
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    returns.put(LOCAL_DATE_NOW, BigDecimal.ONE);
+    HoldingMonthlyReturns nonEmpty = HoldingMonthlyReturns.builder().returns(returns).build();
+    HashMap<PortfolioHolding, HoldingMonthlyReturns> fetched = new HashMap<>();
+    // Only the security is in the SM response; cash is intentionally absent.
+    fetched.put(security, nonEmpty);
+
+    when(monthlyReturnsFetcher.fetch(any(), any())).thenReturn(fetched);
+    when(gicMonthlyReturnsGenerator.generateGicMonthlyReturns(anyList())).thenReturn(new HashMap<>());
+
+    assertDoesNotThrow(() -> service.getMonthlyReturns(List.of(security, cash), CAD));
   }
 
 }

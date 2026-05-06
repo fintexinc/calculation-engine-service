@@ -395,7 +395,8 @@ class CreditQualityServiceImplTest {
       when(service.calculateSumProductRating(any(), any(), any(), any())).thenReturn(BigDecimal.ZERO);
 
       doCallRealMethod().when(service).calculateCreditQualityRatingTypes(any(), any(), any());
-      final Map<CreditQualityRatingType, BigDecimal> actual = service.calculateCreditQualityRatingTypes(holdings, creditQ,
+      final Map<CreditQualityRatingType, BigDecimal> actual = service.calculateCreditQualityRatingTypes(holdings,
+          creditQ,
           fixedCreditQ);
 
       for (CreditQualityRatingType rating : CreditQualityRatingType.values()) {

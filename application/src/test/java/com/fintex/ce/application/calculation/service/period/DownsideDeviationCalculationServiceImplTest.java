@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
 class DownsideDeviationCalculationServiceImplTest {
 
   @Test
@@ -38,7 +37,8 @@ class DownsideDeviationCalculationServiceImplTest {
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
-    when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, weightedAverageReturns, Currency.USD,
+        weightedAverageReturns));
 
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);

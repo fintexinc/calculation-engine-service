@@ -39,6 +39,11 @@ public class RollingCorrelationCalculation extends RollingAbstractCalculation<Ro
     return correlationCalculation.calculateCorrelation(portfolioReturns, benchmarkReturns);
   }
 
+  @Override
+  public int availableMonths() {
+    return Math.min(super.availableMonths(), benchmarkTotalReturns.size());
+  }
+
   /**
    * If needed reinitializes Portfolio Returns.
    * <p>

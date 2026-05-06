@@ -5,6 +5,7 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.BetaResult;
@@ -44,7 +45,9 @@ public class BetaCalculationServiceImpl extends PeriodBenchmarkAbstractService<B
   public PeriodCalculationAbstract<BetaResult, ?> defineCalculationMethod(final PeriodCommand command) {
     final BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command,
         ReturnFactorScale.SCALE_OF_TWO);
-    final var tBills = tBillsProvider.fetch(command.getCurrency());
+    final var tBills = TBillsValidator.requireNonEmpty(
+
+        tBillsProvider.fetch().get(command.getCurrency()), command.getCurrency());
     final NavigableMap<LocalDate, BigDecimal> portfolioExccessReturn = calculateExcessReturn(context
         .getWeightedAveragePortfolioReturns(), tBills);
     final NavigableMap<LocalDate, BigDecimal> benchmarkExccessReturn = calculateExcessReturn(context

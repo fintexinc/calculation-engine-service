@@ -76,7 +76,8 @@ class AnnualReturnCalculationTest {
     final var portfolioReturns = new TreeMap<>(map);
 
     doCallRealMethod().when(calculation).calculateAnnualReturns(any(), any());
-    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
+    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date
+        .getYear()));
 
     assertEquals(1, actual.size());
     assertEquals(0, actual.get(date.getYear()).compareTo(new BigDecimal("999999999999")));
@@ -104,7 +105,8 @@ class AnnualReturnCalculationTest {
     final var portfolioReturns = new TreeMap<>(map);
 
     doCallRealMethod().when(calculation).calculateAnnualReturns(any(), any());
-    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
+    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date
+        .getYear()));
 
     assertEquals(0, actual.size());
   }
@@ -132,7 +134,8 @@ class AnnualReturnCalculationTest {
     final var portfolioReturns = new TreeMap<>(map);
 
     doCallRealMethod().when(calculation).calculateAnnualReturns(any(), any());
-    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
+    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date
+        .getYear()));
 
     assertEquals(0, actual.size());
   }
@@ -160,7 +163,8 @@ class AnnualReturnCalculationTest {
     final var portfolioReturns = new TreeMap<>(map);
 
     doCallRealMethod().when(calculation).calculateAnnualReturns(any(), any());
-    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date.getYear()));
+    final TreeMap<Integer, BigDecimal> actual = calculation.calculateAnnualReturns(portfolioReturns, Set.of(date
+        .getYear()));
 
     assertEquals(0, actual.size());
   }

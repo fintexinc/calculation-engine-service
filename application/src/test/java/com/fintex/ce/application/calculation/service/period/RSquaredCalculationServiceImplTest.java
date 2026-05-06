@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.TreeMap;
 
 import static org.mockito.Mockito.any;
@@ -20,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
 class RSquaredCalculationServiceImplTest {
 
   RSquaredCalculationServiceImplTest() {
@@ -37,7 +37,8 @@ class RSquaredCalculationServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
+        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
@@ -59,7 +60,8 @@ class RSquaredCalculationServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
+        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
@@ -67,7 +69,7 @@ class RSquaredCalculationServiceImplTest {
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);
 
-    verify(tBillsFetcher).fetch(Currency.CAD);
+    verify(tBillsFetcher).fetch();
   }
 
   @Test
@@ -78,11 +80,11 @@ class RSquaredCalculationServiceImplTest {
           null));
 
       final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
-      final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>();
+      final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE));
       final var req = mock(PeriodCommand.class);
 
       when(req.getCurrency()).thenReturn(Currency.CAD);
-      when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
+      when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, treeMap, Currency.USD, treeMap));
       when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
       when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);

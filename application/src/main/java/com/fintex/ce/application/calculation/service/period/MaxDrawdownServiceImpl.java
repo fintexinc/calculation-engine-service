@@ -25,7 +25,7 @@ import java.util.TreeMap;
 public class MaxDrawdownServiceImpl extends PeriodAbstractService<MaxDrawdownResult, PeriodCommand> {
 
   public MaxDrawdownServiceImpl(
-      final MonthlyReturnsService monthlyReturnsService,
+      MonthlyReturnsService monthlyReturnsService,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
   }
@@ -35,26 +35,21 @@ public class MaxDrawdownServiceImpl extends PeriodAbstractService<MaxDrawdownRes
     return CalculationMetric.MAX_DRAWDOWN;
   }
 
-  public MaxDrawdownCalculation defineCalculationMethod(final PeriodCommand command) {
-    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    final var growth10KCalculation = new Growth10KCalculation(context.getWeightedAveragePortfolioReturns(), null,
+  public MaxDrawdownCalculation defineCalculationMethod(PeriodCommand command) {
+    PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    var growth10KCalculation = new Growth10KCalculation(context.getWeightedAveragePortfolioReturns(), null,
         false);
-    final NavigableMap<LocalDate, BigDecimal> growth10K = initializeGrowthOf10KMap(context, growth10KCalculation);
+    NavigableMap<LocalDate, BigDecimal> growth10K = initializeGrowthOf10KMap(context, growth10KCalculation);
     return new MaxDrawdownCalculation(context, defaultPeriods, growth10K, DecimalUtils::toUserScale);
   }
 
-  public NavigableMap<LocalDate, BigDecimal> initializeGrowthOf10KMap(final PeriodCalculationInput context,
-      final Growth10KCalculation growth10KCalculation) {
-    final NavigableMap<LocalDate, BigDecimal> growth10K = new TreeMap<>();
+  public NavigableMap<LocalDate, BigDecimal> initializeGrowthOf10KMap(PeriodCalculationInput context,
+      Growth10KCalculation growth10KCalculation) {
+    NavigableMap<LocalDate, BigDecimal> growth10K = new TreeMap<>();
     if (!CollectionUtils.isEmpty(context.getWeightedAveragePortfolioReturns())) {
       growth10KCalculation.setFirstGrowth10KValue(context.getWeightedAveragePortfolioReturns(), growth10K);
       growth10KCalculation.calculateGrowth10K(context.getWeightedAveragePortfolioReturns(), growth10K);
     }
     return growth10K;
-  }
-
-  @Override
-  public void addSpecificChecks(PeriodCommand command) {
-    // There are no specific checks for MaxDrawdownCalculation
   }
 }

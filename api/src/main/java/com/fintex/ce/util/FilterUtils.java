@@ -4,9 +4,20 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class FilterUtils {
+
+  /**
+   * Instrument types that are NOT sent to Security Master (and are NOT looked up there). Single source of truth shared
+   * by the SM-side request filter ({@code HoldingMappingUtils.isSkipped}) and the application-side validators that must
+   * not flag these as "not found" — for these types the calculation either uses internally-generated returns (GIC, via
+   * {@code MonthlyReturnsGenerator}) or is allocated zero weight (CASH).
+   */
+  public static final Set<FinancialInstrumentType> NOT_SENT_TO_SM_TYPES = Set.of(
+      FinancialInstrumentType.CASH,
+      FinancialInstrumentType.GIC);
 
   public static final Predicate<PortfolioHolding> CANADA_MUTUAL_PREDICATE = h -> FinancialInstrumentType.MUTUAL_FUND_CANADA
       .equals(h

@@ -7,14 +7,8 @@ import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.calculation.PeriodCalculationService;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import com.fintex.ce.model.domain.enumeration.Period;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.error.ErrorCode;
-
-import org.springframework.util.CollectionUtils;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,37 +31,24 @@ public abstract class PeriodAbstractService<E extends PeriodResult, R extends Pe
     this.defaultPeriods = defaultPeriods;
   }
 
-  public abstract PeriodCalculationAbstract<E, ?> defineCalculationMethod(final R command);
+  public abstract PeriodCalculationAbstract<E, ?> defineCalculationMethod(R command);
 
   @Override
-  public E perform(final R command) {
-    final PeriodCalculationAbstract<E, ?> calculationMethod = defineCalculationMethod(command);
+  public E perform(R command) {
+    PeriodCalculationAbstract<E, ?> calculationMethod = defineCalculationMethod(command);
     return calculationMethod.calculate(command.getPeriods());
   }
 
-  public PeriodCalculationInput buildPeriodCalculationInput(final R command,
-      final ReturnFactorScale returnFactorScale) {
-    final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = monthlyReturnsService
+  public PeriodCalculationInput buildPeriodCalculationInput(R command,
+      ReturnFactorScale returnFactorScale) {
+    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = monthlyReturnsService
         .getPortfolioMonthlyReturns(
             command.getHoldings(), command.getCurrency(), returnFactorScale);
 
-    final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
+    NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = monthlyReturnsService
         .getWeightedAverageWithCpedValidation(monthlyReturnsAggregate, command.getCustomPed());
 
     return new PeriodCalculationInput(command.getCustomIntervalPsd(), portfolioTotalReturns);
   }
 
-  public void addSpecificChecks(final PeriodCommand command) {
-    if (CollectionUtils.isEmpty(command.getPeriods())) {
-      return;
-    }
-    for (String period : command.getPeriods()) {
-      if (StringUtils.isNumeric(period) && Integer.parseInt(period) < 12) {
-        throw ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12.toException();
-      }
-      if (Period.YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
-        throw ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.toException();
-      }
-    }
-  }
 }

@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,7 +75,8 @@ class DownsideDeviationCalculationTest {
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
     calculation.calculatePeriodForNumberOfMonths(TWELVE);
-    verify(calculation).getSubMapByPeriodStartDate(date, treeMap);
+    // Twice now: once for the validation window (vs portfolio total returns), once for the excess-return submap.
+    verify(calculation, times(2)).getSubMapByPeriodStartDate(date, treeMap);
   }
 
   @Test

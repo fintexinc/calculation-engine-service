@@ -35,8 +35,10 @@ class MeanCalculationTest {
       when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(nowDate);
       when(calculation.getPortfolioTotalReturns()).thenReturn(returns);
       when(returns.size()).thenReturn(15);
-      when(calculation.getPeriodStartDate(Mockito.anyInt(), Mockito.any(NavigableMap.class))).thenReturn(periodStartDate);
-      when(calculation.getSubMapByPeriodStartDate(Mockito.any(), Mockito.any())).thenReturn(portfolioTotalReturnsByPeriod);
+      when(calculation.getPeriodStartDate(Mockito.anyInt(), Mockito.any(NavigableMap.class))).thenReturn(
+          periodStartDate);
+      when(calculation.getSubMapByPeriodStartDate(Mockito.any(), Mockito.any())).thenReturn(
+          portfolioTotalReturnsByPeriod);
 
       util.when(() -> CalculationUtils.average(Mockito.any())).thenReturn(BigDecimal.ONE);
       doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());

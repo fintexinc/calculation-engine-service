@@ -83,7 +83,8 @@ class AssetAllocationDataValidatorTest {
     validator.validateNonStock(holdings, warnings);
 
     // VERIFY
-    holdings.forEach((holding, rAssetAllocation) -> verify(validator).validate(holding, rAssetAllocation.getAllocations(),
+    holdings.forEach((holding, rAssetAllocation) -> verify(validator).validate(holding, rAssetAllocation
+        .getAllocations(),
         warnings));
   }
 

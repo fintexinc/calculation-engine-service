@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.Warning;
 
 import org.springframework.util.CollectionUtils;
 
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -49,8 +51,8 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
   public NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns;
   public LocalDate cipsd;
 
-  protected PeriodCalculationAbstract(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods) {
+  protected PeriodCalculationAbstract(PeriodCalculationInput input,
+      Set<String> defaultPeriods) {
     this.cipsd = input.getCipsd();
     this.portfolioTotalReturns = input.getWeightedAveragePortfolioReturns();
     this.defaultPeriods = defaultPeriods;
@@ -63,7 +65,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          number of months
    * @return calculated value for the given period
    */
-  public abstract V calculatePeriodForNumberOfMonths(final int numberOfMonths);
+  public abstract V calculatePeriodForNumberOfMonths(int numberOfMonths);
 
   /**
    * Calculates periods
@@ -72,9 +74,9 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          entered periods
    * @return calculated periods
    */
-  public Set<Pair<String, V>> calculatePeriods(final Set<String> periods) {
-    final Set<String> initialPeriods = getInitialPeriods(periods);
-    final Set<Pair<String, V>> result = initialPeriods.stream()
+  public Set<Pair<String, V>> calculatePeriods(Set<String> periods) {
+    Set<String> initialPeriods = getInitialPeriods(periods);
+    Set<Pair<String, V>> result = initialPeriods.stream()
         .filter(periodStr -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(periodStr))
         .map(this::calculateForPeriod).collect(Collectors.toSet());
     addSinceCustomIntervalPerformanceStartDate(result, initialPeriods);
@@ -88,9 +90,9 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          period
    * @return result for a single period
    */
-  public Pair<String, V> calculateForPeriod(final String period) {
-    final int months = getNumberOfMonthsFor(portfolioTotalReturns, Objects.requireNonNull(period).trim());
-    final V result = calculatePeriodForNumberOfMonths(months);
+  public Pair<String, V> calculateForPeriod(String period) {
+    int months = getNumberOfMonthsFor(portfolioTotalReturns, Objects.requireNonNull(period).trim());
+    V result = calculatePeriodForNumberOfMonths(months);
     return Pair.of(period, toUserFormat(result));
   }
 
@@ -102,7 +104,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * @return scaled BigDecimal value
    */
   @SuppressWarnings(value = "unchecked")
-  public V toUserFormat(final V value) {
+  public V toUserFormat(V value) {
     if (value instanceof BigDecimal) {
       return (V) toUserScale((BigDecimal) value);
     }
@@ -128,10 +130,10 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * @param periods
    *          requested periods
    */
-  public void addSinceCustomIntervalPerformanceStartDate(final Set<Pair<String, V>> resultSet,
-      final Set<String> periods) {
+  public void addSinceCustomIntervalPerformanceStartDate(Set<Pair<String, V>> resultSet,
+      Set<String> periods) {
     if (isSinceCustomIntervalPerformanceStartDateValid()) {
-      final V periodValue = calculatePeriodForCustomIntervalStartDate();
+      V periodValue = calculatePeriodForCustomIntervalStartDate();
       resultSet.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), toUserFormat(periodValue)));
     } else if (cipsd != null || periods.contains(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name())) {
       resultSet.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
@@ -144,7 +146,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * @return result of CIPSD
    */
   public V calculatePeriodForCustomIntervalStartDate() {
-    final int months = getMonthsBetweenDates(cipsd, portfolioTotalReturns.lastKey(), firstDayOfMonth());
+    int months = getMonthsBetweenDates(cipsd, portfolioTotalReturns.lastKey(), firstDayOfMonth());
     return calculatePeriodForNumberOfMonths(months);
   }
 
@@ -157,7 +159,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          user entered period
    * @return number of months
    */
-  public int getNumberOfMonthsFor(final NavigableMap<LocalDate, BigDecimal> returns, final String period) {
+  public int getNumberOfMonthsFor(NavigableMap<LocalDate, BigDecimal> returns, String period) {
     if (isNumeric(period)) {
       return Integer.parseInt(period);
     } else if (YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
@@ -175,8 +177,8 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          entered returns
    * @return number of months since the beginning of the year
    */
-  public int getNumberOfMonthsForYearToDate(final Map<LocalDate, BigDecimal> returns) {
-    final LocalDate endDate = returns.keySet().stream().max(LocalDate::compareTo).orElseThrow();
+  public int getNumberOfMonthsForYearToDate(Map<LocalDate, BigDecimal> returns) {
+    LocalDate endDate = returns.keySet().stream().max(LocalDate::compareTo).orElseThrow();
     return getMonthsBetweenDates(endDate, endDate, firstDayOfYear());
   }
 
@@ -187,9 +189,9 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          given returns
    * @return number of months
    */
-  public int getNumberOfMonthsForSinceInception(final NavigableMap<LocalDate, BigDecimal> returns) {
-    final LocalDate endDate = returns.lastKey();
-    final LocalDate startDate = returns.firstKey();
+  public int getNumberOfMonthsForSinceInception(NavigableMap<LocalDate, BigDecimal> returns) {
+    LocalDate endDate = returns.lastKey();
+    LocalDate startDate = returns.firstKey();
     return getMonthsBetweenDates(startDate, endDate, firstDayOfMonth());
   }
 
@@ -202,9 +204,9 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          given map
    * @return product
    */
-  public BigDecimal calculateProductForPeriod(final int numberOfMonths,
-      final NavigableMap<LocalDate, BigDecimal> returns) {
-    final NavigableMap<LocalDate, BigDecimal> monthsList = filterRequiredMonthsForPeriod(numberOfMonths, returns);
+  public BigDecimal calculateProductForPeriod(int numberOfMonths,
+      NavigableMap<LocalDate, BigDecimal> returns) {
+    NavigableMap<LocalDate, BigDecimal> monthsList = filterRequiredMonthsForPeriod(numberOfMonths, returns);
     return product(monthsList);
   }
 
@@ -217,16 +219,16 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          given map
    * @return product
    */
-  public List<BigDecimal> getBenchmarkValues(final int numberOfMonths,
-      final NavigableMap<LocalDate, BigDecimal> returns) {
-    final NavigableMap<LocalDate, BigDecimal> monthsList = filterRequiredMonthsForPeriod(numberOfMonths,
+  public List<BigDecimal> getBenchmarkValues(int numberOfMonths,
+      NavigableMap<LocalDate, BigDecimal> returns) {
+    NavigableMap<LocalDate, BigDecimal> monthsList = filterRequiredMonthsForPeriod(numberOfMonths,
         getPortfolioTotalReturns());
     return monthsList.keySet().stream().filter(returns::containsKey).map(returns::get).toList();
   }
 
-  public NavigableMap<LocalDate, BigDecimal> filterRequiredMonthsForPeriod(final long numberOfMonths,
-      final NavigableMap<LocalDate, BigDecimal> returns) {
-    final LocalDate startOfPeriod = toLastDayOfMonth(returns.lastKey().minusMonths(numberOfMonths - 1));
+  public NavigableMap<LocalDate, BigDecimal> filterRequiredMonthsForPeriod(long numberOfMonths,
+      NavigableMap<LocalDate, BigDecimal> returns) {
+    LocalDate startOfPeriod = toLastDayOfMonth(returns.lastKey().minusMonths(numberOfMonths - 1));
     return returns.tailMap(startOfPeriod, true);
   }
 
@@ -237,7 +239,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          user entered periods
    * @return periods
    */
-  public Set<String> getInitialPeriods(final Set<String> periods) {
+  public Set<String> getInitialPeriods(Set<String> periods) {
     return CollectionUtils.isEmpty(periods) ? this.defaultPeriods : periods;
   }
 
@@ -248,11 +250,44 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          entered periods
    * @return final result
    */
-  public T calculate(final Set<String> periods) {
-    final Set<Pair<String, V>> periodsResult = calculatePeriods(periods);
-    final T result = defineResponseType(periodsResult);
+  public T calculate(Set<String> periods) {
+    Set<Pair<String, V>> periodsResult = calculatePeriods(periods);
+    T result = defineResponseType(periodsResult);
     populateBasicDetails(result);
+    addInsufficientDataWarnings(result, periodsResult);
     return result;
+  }
+
+  /**
+   * Appends a {@link ErrorCode#INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD} warning for every period whose value is
+   * {@code null} because the requested number of months exceeds the available monthly returns. Symbolic periods (e.g.
+   * YEAR_TO_DATE, SINCE_PERFORMANCE_START_DATE) are resolved via {@link #getNumberOfMonthsFor} so they get the same
+   * treatment as numeric ones. {@code SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE} is skipped — its validity is gated
+   * by CIPSD position, not by month count. Lets API consumers distinguish "no result, not enough data" from a generic
+   * null without overriding the spec's null contract.
+   */
+  public void addInsufficientDataWarnings(T result, Set<Pair<String, V>> periodsResult) {
+    int availableMonths = availableMonths();
+    List<Warning> warnings = new ArrayList<>(result.getWarnings());
+    periodsResult.stream()
+        .filter(pair -> pair.getValue() == null)
+        // Period keys may carry whitespace from `application.yml` SpEL splits (e.g. "12, 36, 60, 120" → " 36").
+        // calculateForPeriod trims before resolving but stores the original in the pair, so trim again here.
+        .filter(pair -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(pair.getKey().trim()))
+        .filter(pair -> getNumberOfMonthsFor(portfolioTotalReturns, pair.getKey().trim()) > availableMonths)
+        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.warning(null, pair.getKey().trim(),
+            availableMonths))
+        .forEach(warnings::add);
+    result.setWarnings(warnings);
+  }
+
+  /**
+   * Number of months a metric can actually compute against. Subclasses that depend on additional series (benchmark,
+   * excess returns, T-Bills, etc.) must override this so the warning fires whenever the calculation will return
+   * {@code null} due to insufficient data on any input — not just the portfolio side.
+   */
+  public int availableMonths() {
+    return portfolioTotalReturns.size();
   }
 
   /**
@@ -261,7 +296,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * @param result
    *          period-based result object to populate
    */
-  public void populateBasicDetails(final T result) {
+  public void populateBasicDetails(T result) {
     result.setCustomIntervalPerformanceStartDate(cipsd);
     result.setPerformanceEndDate(portfolioTotalReturns.lastKey());
     result.setPerformanceStartDate(portfolioTotalReturns.firstKey());
@@ -274,7 +309,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          calculated value per requested period
    * @return populated period-based result object
    */
-  public abstract T defineResponseType(final Set<Pair<String, V>> periodValues);
+  public abstract T defineResponseType(Set<Pair<String, V>> periodValues);
 
   /**
    * returns period start date by number of months. Last date in returns map minus (numberOfMonths - 1)
@@ -285,7 +320,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          portfolio or benchmark returns
    * @return period start date by number of months
    */
-  public LocalDate getPeriodStartDate(final int numberOfMonths, final SortedMap<LocalDate, BigDecimal> returns) {
+  public LocalDate getPeriodStartDate(int numberOfMonths, SortedMap<LocalDate, BigDecimal> returns) {
     return toLastDayOfMonth(returns.lastKey().minusMonths(numberOfMonths - ONE_MONTH));
   }
 
@@ -298,8 +333,8 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          portfolio or benchmark returns
    * @return calculated map
    */
-  public SortedMap<LocalDate, BigDecimal> getSubMapByPeriodStartDate(final LocalDate periodStartDate,
-      final NavigableMap<LocalDate, BigDecimal> returns) {
+  public SortedMap<LocalDate, BigDecimal> getSubMapByPeriodStartDate(LocalDate periodStartDate,
+      NavigableMap<LocalDate, BigDecimal> returns) {
     return returns.subMap(periodStartDate, true, returns.lastKey(), true);
   }
 
@@ -311,8 +346,8 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * @return calculated excess returns
    */
   public static NavigableMap<LocalDate, BigDecimal> calculateExcessReturn(
-      final SortedMap<LocalDate, BigDecimal> totalReturns,
-      final NavigableMap<LocalDate, BigDecimal> tBills) {
+      SortedMap<LocalDate, BigDecimal> totalReturns,
+      NavigableMap<LocalDate, BigDecimal> tBills) {
     return totalReturns.entrySet()
         .stream()
         .filter(entry -> tBills.containsKey(entry.getKey()))
@@ -340,7 +375,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * @return
    */
   public NavigableMap<LocalDate, BigDecimal> overrideTotalReturns(
-      final NavigableMap<LocalDate, BigDecimal> totalReturns) {
+      NavigableMap<LocalDate, BigDecimal> totalReturns) {
     return totalReturns.entrySet()
         .stream().collect(toTreeMap(Map.Entry::getKey, e -> DecimalUtils.divide(e.getValue().multiply(HUNDRED).subtract(
             HUNDRED), HUNDRED)));
@@ -349,12 +384,12 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
   /**
    * restricts TBills to be within portfolioTotalReturns start and end date
    */
-  public NavigableMap<LocalDate, BigDecimal> restrictTBillsRange(final NavigableMap<LocalDate, BigDecimal> tBills) {
+  public NavigableMap<LocalDate, BigDecimal> restrictTBillsRange(NavigableMap<LocalDate, BigDecimal> tBills) {
     return restrictTBillsRange(tBills, this.portfolioTotalReturns);
   }
 
-  public NavigableMap<LocalDate, BigDecimal> restrictTBillsRange(final NavigableMap<LocalDate, BigDecimal> tBills,
-      final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns) {
+  public NavigableMap<LocalDate, BigDecimal> restrictTBillsRange(NavigableMap<LocalDate, BigDecimal> tBills,
+      NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns) {
     return tBills.subMap(portfolioTotalReturns.firstKey(), true, portfolioTotalReturns.lastKey(), true);
   }
 
@@ -369,18 +404,41 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          number of month in period
    * @return annualized return
    */
-  public BigDecimal calculateAverageArithmeticAnnualizedReturn(final NavigableMap<LocalDate, BigDecimal> returns,
-      final LocalDate periodStartDate,
-      final int numberOfMonths) {
-    final SortedMap<LocalDate, BigDecimal> returnsInPeriod = getSubMapByPeriodStartDate(periodStartDate, returns);
+  public BigDecimal calculateAverageArithmeticAnnualizedReturn(NavigableMap<LocalDate, BigDecimal> returns,
+      LocalDate periodStartDate,
+      int numberOfMonths) {
+    SortedMap<LocalDate, BigDecimal> returnsInPeriod = getSubMapByPeriodStartDate(periodStartDate, returns);
     return divide(sum(returnsInPeriod), numberOfMonths).multiply(TWELVE);
   }
 
+  /**
+   * Throws {@link ErrorCode#MISSING_TBILL_RATE} for the first date in {@code windowDates} that has no entry in
+   * {@code tBillsDerivedSeries}. Defends metrics whose count gate (numberOfMonths &gt; series.size()) doesn't catch
+   * date-alignment mismatches — e.g. T-Bills with a publication lag relative to portfolio returns, where
+   * {@link #calculateAverageArithmeticAnnualizedReturn} would otherwise silently divide by {@code numberOfMonths}
+   * against an undersized window, and {@link #getSubMapByPeriodStartDate} would crash with
+   * {@link IllegalArgumentException} when {@code series.lastKey() < periodStartDate}.
+   *
+   * <p>
+   * {@code tBillsDerivedSeries} is either tBills directly (Sharpe, Sortino, Treynor) or an excess-return series derived
+   * from tBills (DownsideDeviation, Alpha, Beta, R-Squared) — in either case the upstream cause of any gap is a missing
+   * T-Bill rate, so {@code MISSING_TBILL_RATE} is the appropriate diagnostic.
+   */
+  public void validateTBillsCoverage(SortedMap<LocalDate, BigDecimal> windowDates,
+      NavigableMap<LocalDate, BigDecimal> tBillsDerivedSeries) {
+    windowDates.keySet().stream()
+        .filter(date -> !tBillsDerivedSeries.containsKey(date))
+        .findFirst()
+        .ifPresent(date -> {
+          throw ErrorCode.MISSING_TBILL_RATE.toException(date);
+        });
+  }
+
   @Override
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    final PeriodCalculationAbstract<?, ?> that = (PeriodCalculationAbstract<?, ?>) o;
+    PeriodCalculationAbstract<?, ?> that = (PeriodCalculationAbstract<?, ?>) o;
     return Objects.equals(defaultPeriods, that.defaultPeriods) &&
         Objects.equals(portfolioTotalReturns, that.portfolioTotalReturns) &&
         Objects.equals(cipsd, that.cipsd);

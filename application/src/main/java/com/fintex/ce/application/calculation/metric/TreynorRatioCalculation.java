@@ -28,19 +28,26 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
       final NavigableMap<LocalDate, BigDecimal> tBills,
       final BetaCalculation betaCalculation) {
     super(input, defaultPeriods);
-    this.tBills = tBills;
+    // Pre-restrict T-Bills to the portfolio date range once at construction (matches Sortino). Without this,
+    // subsequent getSubMapByPeriodStartDate / lastKey calls on a non-overlapping T-Bill series throw
+    // NoSuchElementException (or IllegalArgumentException for partial overlap), surfacing as HTTP 500 instead of
+    // the documented null/RET-008 contract.
+    this.tBills = restrictTBillsRange(tBills);
     this.betaCalculation = betaCalculation;
   }
 
   @Override
   public BigDecimal calculatePeriodForNumberOfMonths(int numberOfMonths) {
-    if (numberOfMonths > getPortfolioTotalReturns().size() || numberOfMonths < TWELVE.intValue()) {
+    if (numberOfMonths > getPortfolioTotalReturns().size()
+        || numberOfMonths > tBills.size()
+        || numberOfMonths < TWELVE.intValue()) {
       return null;
     }
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
+    validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, getPortfolioTotalReturns()), tBills);
     final BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(getPortfolioTotalReturns(),
         periodStartDate, numberOfMonths);
-    final BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(restrictTBillsRange(tBills),
+    final BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(tBills,
         periodStartDate, numberOfMonths);
     final BigDecimal beta = betaCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
     if (Objects.isNull(beta)) {
@@ -63,6 +70,19 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
     log.info("annualizedPortfolioReturn: {}, annualizedRiskFreeRate: {}, beta: {}",
         annualizedPortfolioReturn, annualizedRiskFreeRate, beta);
     return divide(annualizedPortfolioReturn.subtract(annualizedRiskFreeRate), beta);
+  }
+
+  /**
+   * Treynor returns null whenever its composed {@link BetaCalculation} returns null (benchmark or excess-return series
+   * shorter than the period) or when the T-Bill series is shorter than the period. Without this override
+   * {@code availableMonths()} would fall back to {@code portfolioTotalReturns.size()} and {@code RET-008} would be
+   * silently skipped for those cases. Treynor sits outside the {@code BenchmarkWeightedAverageCalculation} chain, so
+   * the inherited overrides don't reach it — delegate to the composed Beta and fold in {@code tBills} explicitly.
+   */
+  @Override
+  public int availableMonths() {
+    return Math.min(super.availableMonths(),
+        Math.min(betaCalculation.availableMonths(), tBills.size()));
   }
 
 }

@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.AlphaBetaCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.AlphaResult;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -27,10 +26,7 @@ public class AlphaCalculation extends AlphaBetaCalculationAbstract<AlphaResult> 
 
   @Override
   public AlphaResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final AlphaResult result = new AlphaResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setAlpha(timeIntervals);
-    return result;
+    return new AlphaResult(formTimeIntervalResult(periodValues));
   }
 
   @Override

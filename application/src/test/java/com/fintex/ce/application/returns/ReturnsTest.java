@@ -57,7 +57,8 @@ class ReturnsTest {
     Mockito.when(historicalNavPrices.getReturns()).thenReturn(new TreeMap(Map.of(LocalDate.now(), BigDecimal.ONE)));
 
     // ACT
-    final ReturnsAggregate actual = returnsAggregate.initOnlyWithReturnsDataValidation(Map.of(holding, historicalNavPrices));
+    final ReturnsAggregate actual = returnsAggregate.initOnlyWithReturnsDataValidation(Map.of(holding,
+        historicalNavPrices));
 
     // VERIFY
     assertNotNull(actual);
@@ -102,7 +103,8 @@ class ReturnsTest {
         List.of(ErrorCode.CPED_AFTER_PORTFOLIO_PED.toNotification("id", null, null, null)));
 
     // VERIFY
-    assertThrows(CalculationsFailedException.class, () -> returnsAggregate.initOnlyWithReturnsDataValidation(Map.of(holding,
+    assertThrows(CalculationsFailedException.class, () -> returnsAggregate.initOnlyWithReturnsDataValidation(Map.of(
+        holding,
         monthlyReturns, holdingMissingReturns, monthlyReturnsMissing)));
 
   }

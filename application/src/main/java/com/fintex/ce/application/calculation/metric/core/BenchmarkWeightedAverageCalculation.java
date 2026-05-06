@@ -24,4 +24,9 @@ public abstract class BenchmarkWeightedAverageCalculation<T extends PeriodResult
     this.benchmarkTotalReturns = input.getWeightedAverageBenchmarkReturns();
   }
 
+  @Override
+  public int availableMonths() {
+    return Math.min(super.availableMonths(), benchmarkTotalReturns.size());
+  }
+
 }
