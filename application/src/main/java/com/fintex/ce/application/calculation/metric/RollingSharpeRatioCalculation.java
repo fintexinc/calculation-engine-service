@@ -3,6 +3,8 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.RollingAbstractCalculation;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -22,9 +24,22 @@ public class RollingSharpeRatioCalculation extends RollingAbstractCalculation<Ro
     this.sharpeRatioCalculation = sharpeRatioCalculation;
   }
 
+  /**
+   * Per-window Sharpe ratio. A missing T-Bill rate inside one window must NOT poison sibling windows: the non-rolling
+   * Sharpe spec treats {@link ErrorCode#MISSING_TBILL_RATE} as a request-terminating 400, but the rolling spec treats
+   * each window as independent (null on per-window failure, request continues), so we catch the per-window throw and
+   * degrade to {@code null} here. Other calculation errors still propagate.
+   */
   @Override
   public BigDecimal calculateRollingValue(final int numberOfMonths, final NavigableMap<LocalDate, BigDecimal> returns) {
-    return sharpeRatioCalculation.calculatePeriodForNumberOfMonths(numberOfMonths, returns);
+    try {
+      return sharpeRatioCalculation.calculatePeriodForNumberOfMonths(numberOfMonths, returns);
+    } catch (CalculationException e) {
+      if (ErrorCode.MISSING_TBILL_RATE.equals(e.getErrorCode())) {
+        return null;
+      }
+      throw e;
+    }
   }
 
   @Override

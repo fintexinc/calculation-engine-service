@@ -21,8 +21,10 @@ public class PeriodsNotContainingYearToDateReqValidator extends AbstractPeriodsN
 
   @Override
   public List<CalculationMetric> supportedMetrics() {
+    // Rolling and leading metrics only — non-rolling metrics that need the same check (incl. MAR_RATIO)
+    // are already covered by PeriodContainYearToDateReqValidator via TWELVE_MONTH_MINIMUM_METRICS.
     return List.of(
-        MAR_RATIO, ROLLING_TOTAL_RETURNS, ROLLING_STANDARD_DEVIATION, ROLLING_SHARPE_RATIO,
+        ROLLING_TOTAL_RETURNS, ROLLING_STANDARD_DEVIATION, ROLLING_SHARPE_RATIO,
         ROLLING_CORRELATION, LEADING_TOTAL_RETURNS);
   }
 }

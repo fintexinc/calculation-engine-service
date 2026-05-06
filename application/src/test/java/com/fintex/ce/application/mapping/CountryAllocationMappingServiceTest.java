@@ -74,7 +74,8 @@ class CountryAllocationMappingServiceTest {
     doCallRealMethod().when(service).initCountryAllocationMapping();
 
     // VERIFY
-    assertThrows(com.fintex.ce.model.error.exceptions.CalculationException.class, service::initCountryAllocationMapping);
+    assertThrows(com.fintex.ce.model.error.exceptions.CalculationException.class,
+        service::initCountryAllocationMapping);
   }
 
   @Test
@@ -206,7 +207,8 @@ class CountryAllocationMappingServiceTest {
     final List<Warning> warnings = List.of(mock(Warning.class));
 
     final Map<CountryRegionType, BigDecimal> emergingMarket = Map.of(CountryRegionType.EMERGING_MARKET, BigDecimal.ONE);
-    when(service.mapToRegions(h, allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY)).thenReturn(emergingMarket);
+    when(service.mapToRegions(h, allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY)).thenReturn(
+        emergingMarket);
 
     doCallRealMethod().when(service).mapToCountryRegions(any(), any(), any());
 

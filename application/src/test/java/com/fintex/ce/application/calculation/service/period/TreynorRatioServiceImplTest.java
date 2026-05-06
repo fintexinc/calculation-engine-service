@@ -5,12 +5,14 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TBillsFetcher;
+import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -23,7 +25,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
 class TreynorRatioServiceImplTest {
 
   TreynorRatioServiceImplTest() {
@@ -37,14 +38,16 @@ class TreynorRatioServiceImplTest {
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
-    final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
+    final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
+        BigDecimal.ONE));
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(CAD);
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
-    when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, weightedAverageReturns, Currency.USD,
+        weightedAverageReturns));
 
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);
@@ -60,19 +63,21 @@ class TreynorRatioServiceImplTest {
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
-    final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
+    final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
+        BigDecimal.ONE));
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(CAD);
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
-    when(tBillsFetcher.fetch(any())).thenReturn(weightedAverageReturns);
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, weightedAverageReturns, Currency.USD,
+        weightedAverageReturns));
 
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);
 
-    verify(tBillsFetcher).fetch(CAD);
+    verify(tBillsFetcher).fetch();
   }
 
   @Test
@@ -84,11 +89,11 @@ class TreynorRatioServiceImplTest {
           .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
       final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
-      final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>();
+      final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE));
       final var req = mock(PeriodCommand.class);
 
       when(req.getCurrency()).thenReturn(CAD);
-      when(tBillsFetcher.fetch(any())).thenReturn(treeMap);
+      when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, treeMap, Currency.USD, treeMap));
       when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
       when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);

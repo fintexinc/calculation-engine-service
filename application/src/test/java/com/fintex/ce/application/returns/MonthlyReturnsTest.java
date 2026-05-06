@@ -49,130 +49,130 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVeryfyNoActionWhenThisPedIsAfterOtherPed() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
     final var other = mock(ReturnsAggregate.class);
 
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW;
+    returns.performanceEndDate = LOCAL_DATE_NOW;
     other.performanceEndDate = LOCAL_DATE_NOW.minusMonths(1);
 
     doCallRealMethod().when(other).getPerformanceEndDate();
-    doCallRealMethod().when(monthlyReturns).cutArgumentToTheSameEndDate(any());
+    doCallRealMethod().when(returns).cutArgumentToTheSameEndDate(any());
 
-    monthlyReturns.cutArgumentToTheSameEndDate(other);
+    returns.cutArgumentToTheSameEndDate(other);
 
-    verify(monthlyReturns).cutArgumentToTheSameEndDate(other);
+    verify(returns).cutArgumentToTheSameEndDate(other);
     verify(other).getPerformanceEndDate();
-    verifyNoMoreInteractions(monthlyReturns, other);
+    verifyNoMoreInteractions(returns, other);
   }
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenCheckResultWhenThisPedIsAfterOtherPed() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
     final var other = mock(ReturnsAggregate.class);
 
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW;
+    returns.performanceEndDate = LOCAL_DATE_NOW;
     other.performanceEndDate = LOCAL_DATE_NOW.minusMonths(1);
 
     doCallRealMethod().when(other).getPerformanceEndDate();
-    doCallRealMethod().when(monthlyReturns).cutArgumentToTheSameEndDate(any());
+    doCallRealMethod().when(returns).cutArgumentToTheSameEndDate(any());
 
-    final var actual = monthlyReturns.cutArgumentToTheSameEndDate(other);
+    final var actual = returns.cutArgumentToTheSameEndDate(other);
 
     assertSame(other, actual);
   }
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVerifyCutReturnsByEndDateWhenThisPedIsBeforeOtherPed() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
     final var other = mock(ReturnsAggregate.class);
 
     final var otherMonthlyReturns = mock(Map.class);
     other.returnsMap = otherMonthlyReturns;
 
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW;
+    returns.performanceEndDate = LOCAL_DATE_NOW;
     other.performanceEndDate = LOCAL_DATE_NOW.plusMonths(1);
     doCallRealMethod().when(other).getPerformanceEndDate();
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    doCallRealMethod().when(monthlyReturns).cutArgumentToTheSameEndDate(any());
+    doCallRealMethod().when(returns).cutArgumentToTheSameEndDate(any());
 
-    monthlyReturns.cutArgumentToTheSameEndDate(other);
+    returns.cutArgumentToTheSameEndDate(other);
 
     verify(monthlyReturnsCutComponent).cutReturnsByEndDate(otherMonthlyReturns, LOCAL_DATE_NOW);
   }
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenVerifyInitWhenThisPedIsBeforeOtherPed() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
     final var other = mock(ReturnsAggregate.class);
 
     other.returnsMap = mock(Map.class);
 
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW;
+    returns.performanceEndDate = LOCAL_DATE_NOW;
     other.performanceEndDate = LOCAL_DATE_NOW.plusMonths(1);
     doCallRealMethod().when(other).getPerformanceEndDate();
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    doCallRealMethod().when(monthlyReturns).cutArgumentToTheSameEndDate(any());
+    doCallRealMethod().when(returns).cutArgumentToTheSameEndDate(any());
 
-    monthlyReturns.cutArgumentToTheSameEndDate(other);
+    returns.cutArgumentToTheSameEndDate(other);
 
     verify(other).findPedAndPsd();
   }
 
   @Test
   void shouldCutArgumentToTheSameEndDateWhenPedIsGreater_whenCheckResult2WhenThisPedIsBeforeOtherPed() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
     final var other = mock(ReturnsAggregate.class);
 
     other.returnsMap = mock(Map.class);
 
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW;
+    returns.performanceEndDate = LOCAL_DATE_NOW;
     other.performanceEndDate = LOCAL_DATE_NOW.plusMonths(1);
     doCallRealMethod().when(other).getPerformanceEndDate();
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
     final var cutedMonthlyReturns = mock(Map.class);
     when(monthlyReturnsCutComponent.cutReturnsByEndDate(any(), any())).thenReturn(cutedMonthlyReturns);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
     final var clonedOther = mock(ReturnsAggregate.class);
     final var initedOther = mock(ReturnsAggregate.class);
     when(other.findPedAndPsd()).thenReturn(initedOther);
-    doCallRealMethod().when(monthlyReturns).cutArgumentToTheSameEndDate(any());
+    doCallRealMethod().when(returns).cutArgumentToTheSameEndDate(any());
 
-    final var actual = monthlyReturns.cutArgumentToTheSameEndDate(other);
+    final var actual = returns.cutArgumentToTheSameEndDate(other);
 
     assertSame(initedOther, actual);
   }
 
   @Test
   void shouldFxRatesApplied_whenVerifyConvert() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
     final var holdingCurrency = mock(Map.class);
-    monthlyReturns.notification = new PceExceptionCollector();
+    returns.notification = new PceExceptionCollector();
 
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.holdingCurrencyMap = holdingCurrency;
+    returns.returnsMap = monthlyReturns;
+    returns.holdingCurrencyMap = holdingCurrency;
 
-    doCallRealMethod().when(monthlyReturns).setFxRateService(any());
-    doCallRealMethod().when(monthlyReturns).setFxRates(any(), any());
+    doCallRealMethod().when(returns).setFxRateService(any());
+    doCallRealMethod().when(returns).setFxRates(any(), any());
     var fxRateService = mock(FxRateService.class);
-    monthlyReturns.setFxRateService(fxRateService);
-    monthlyReturns.setFxRates(Map.of(), Currency.CAD);
+    returns.setFxRateService(fxRateService);
+    returns.setFxRates(Map.of(), Currency.CAD);
 
-    doCallRealMethod().when(monthlyReturns).fxRatesApplied();
+    doCallRealMethod().when(returns).fxRatesApplied();
 
-    monthlyReturns.fxRatesApplied();
+    returns.fxRatesApplied();
 
     Assertions.assertNotNull(monthlyReturns);
     verify(fxRateService).convertReturns(eq(monthlyReturns), eq(holdingCurrency), any(), any(), any());
@@ -180,19 +180,19 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByCpedIfCpedEmptyCutByPed_whenVerifyCutReturnsByEndDateWhenCpedIsNotNull() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW.plusMonths(3);
+    returns.returnsMap = monthlyReturns;
+    returns.performanceEndDate = LOCAL_DATE_NOW.plusMonths(3);
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    doCallRealMethod().when(monthlyReturns).cutByCpedIfCpedEmptyCutByPed(any());
+    doCallRealMethod().when(returns).cutByCpedIfCpedEmptyCutByPed(any());
 
-    monthlyReturns.cutByCpedIfCpedEmptyCutByPed(LOCAL_DATE_NOW);
+    returns.cutByCpedIfCpedEmptyCutByPed(LOCAL_DATE_NOW);
 
     Assertions.assertNotNull(monthlyReturns);
     monthlyReturnsCutComponent.cutReturnsByEndDate(monthlyReturns, LOCAL_DATE_NOW);
@@ -200,19 +200,19 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByCpedIfCpedEmptyCutByPed_whenVerifyCutReturnsByEndDateWhenCpedIsNull() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW;
+    returns.returnsMap = monthlyReturns;
+    returns.performanceEndDate = LOCAL_DATE_NOW;
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    doCallRealMethod().when(monthlyReturns).cutByCpedIfCpedEmptyCutByPed(any());
+    doCallRealMethod().when(returns).cutByCpedIfCpedEmptyCutByPed(any());
 
-    monthlyReturns.cutByCpedIfCpedEmptyCutByPed(null);
+    returns.cutByCpedIfCpedEmptyCutByPed(null);
 
     Assertions.assertNotNull(monthlyReturns);
     monthlyReturnsCutComponent.cutReturnsByEndDate(monthlyReturns, LOCAL_DATE_NOW);
@@ -220,19 +220,19 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByPed_whenVerifyCutReturnsByEndDate() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW;
+    returns.returnsMap = monthlyReturns;
+    returns.performanceEndDate = LOCAL_DATE_NOW;
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    doCallRealMethod().when(monthlyReturns).cutByPed();
+    doCallRealMethod().when(returns).cutByPed();
 
-    monthlyReturns.cutByPed();
+    returns.cutByPed();
 
     Assertions.assertNotNull(monthlyReturns);
     monthlyReturnsCutComponent.cutReturnsByEndDate(monthlyReturns, LOCAL_DATE_NOW);
@@ -240,19 +240,19 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByPsd_whenVerifyCutReturnsByEndDate() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.performanceStartDate = LOCAL_DATE_NOW;
+    returns.returnsMap = monthlyReturns;
+    returns.performanceStartDate = LOCAL_DATE_NOW;
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    doCallRealMethod().when(monthlyReturns).cutByPsd();
+    doCallRealMethod().when(returns).cutByPsd();
 
-    monthlyReturns.cutByPsd();
+    returns.cutByPsd();
 
     Assertions.assertNotNull(monthlyReturns);
     monthlyReturnsCutComponent.cutReturnsByStartDate(monthlyReturns, LOCAL_DATE_NOW);
@@ -260,19 +260,19 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByCpsdIfCpsdEmptyCutByPsd_whenVerifyCutReturnsByEndDateWhenCpedIsNotNull() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.performanceStartDate = LOCAL_DATE_NOW.plusMonths(3);
+    returns.returnsMap = monthlyReturns;
+    returns.performanceStartDate = LOCAL_DATE_NOW.plusMonths(3);
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    doCallRealMethod().when(monthlyReturns).cutByCpsdIfCpsdEmptyCutByPsd(any());
+    doCallRealMethod().when(returns).cutByCpsdIfCpsdEmptyCutByPsd(any());
 
-    monthlyReturns.cutByCpsdIfCpsdEmptyCutByPsd(LOCAL_DATE_NOW);
+    returns.cutByCpsdIfCpsdEmptyCutByPsd(LOCAL_DATE_NOW);
 
     Assertions.assertNotNull(monthlyReturns);
     monthlyReturnsCutComponent.cutReturnsByStartDate(monthlyReturns, LOCAL_DATE_NOW);
@@ -280,19 +280,19 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldCutByCpsdIfCpsdEmptyCutByPsd_whenVerifyCutReturnsByEndDateWhenCpedIsNull() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.performanceStartDate = LOCAL_DATE_NOW.plusMonths(3);
+    returns.returnsMap = monthlyReturns;
+    returns.performanceStartDate = LOCAL_DATE_NOW.plusMonths(3);
 
-    doCallRealMethod().when(monthlyReturns).setMonthlyReturnsCutComponent(any());
+    doCallRealMethod().when(returns).setMonthlyReturnsCutComponent(any());
     final var monthlyReturnsCutComponent = mock(ReturnsCutComponent.class);
-    monthlyReturns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
+    returns.setMonthlyReturnsCutComponent(monthlyReturnsCutComponent);
 
-    doCallRealMethod().when(monthlyReturns).cutByCpsdIfCpsdEmptyCutByPsd(any());
+    doCallRealMethod().when(returns).cutByCpsdIfCpsdEmptyCutByPsd(any());
 
-    monthlyReturns.cutByCpsdIfCpsdEmptyCutByPsd(LOCAL_DATE_NOW);
+    returns.cutByCpsdIfCpsdEmptyCutByPsd(LOCAL_DATE_NOW);
 
     Assertions.assertNotNull(monthlyReturns);
     monthlyReturnsCutComponent.cutReturnsByStartDate(monthlyReturns, LOCAL_DATE_NOW.plusMonths(3));
@@ -300,63 +300,63 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldGetWeightedAverage_whenVerifyGetWeightedAverage() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.notification = new PceExceptionCollector();
+    returns.returnsMap = monthlyReturns;
+    returns.notification = new PceExceptionCollector();
 
-    doCallRealMethod().when(monthlyReturns).setWeightedAverageComponent(any());
+    doCallRealMethod().when(returns).setWeightedAverageComponent(any());
     final var weightedAverageComponent = mock(WeightedAverageComponent.class);
-    monthlyReturns.setWeightedAverageComponent(weightedAverageComponent);
+    returns.setWeightedAverageComponent(weightedAverageComponent);
 
-    doCallRealMethod().when(monthlyReturns).getWeightedAverage();
+    doCallRealMethod().when(returns).getWeightedAverage();
 
-    monthlyReturns.getWeightedAverage();
+    returns.getWeightedAverage();
 
     verify(weightedAverageComponent).calculateWeightedAverage(monthlyReturns);
   }
 
   @Test
   void shouldGetWeightedAverage_whenCheckResult() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.notification = new PceExceptionCollector();
+    returns.returnsMap = monthlyReturns;
+    returns.notification = new PceExceptionCollector();
 
-    doCallRealMethod().when(monthlyReturns).setWeightedAverageComponent(any());
+    doCallRealMethod().when(returns).setWeightedAverageComponent(any());
     final var weightedAverageComponent = mock(WeightedAverageComponent.class);
-    monthlyReturns.setWeightedAverageComponent(weightedAverageComponent);
+    returns.setWeightedAverageComponent(weightedAverageComponent);
 
     final var portfolioBaseTotalReturns = mock(NavigableMap.class);
     when(weightedAverageComponent.calculateWeightedAverage(any())).thenReturn(portfolioBaseTotalReturns);
 
-    doCallRealMethod().when(monthlyReturns).getWeightedAverage();
+    doCallRealMethod().when(returns).getWeightedAverage();
 
-    monthlyReturns.getWeightedAverage();
+    returns.getWeightedAverage();
 
     verify(weightedAverageComponent).calculateWeightedAverage(monthlyReturns);
   }
 
   @Test
   void shouldValidateCped_whenVerifyValidatePortfolioCped() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
     PceExceptionCollector notification = mock(PceExceptionCollector.class);
-    monthlyReturns.notification = notification;
+    returns.notification = notification;
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW.plusMonths(2);
-    monthlyReturns.performanceStartDate = LOCAL_DATE_NOW.plusMonths(1);
+    returns.returnsMap = monthlyReturns;
+    returns.performanceEndDate = LOCAL_DATE_NOW.plusMonths(2);
+    returns.performanceStartDate = LOCAL_DATE_NOW.plusMonths(1);
 
-    doCallRealMethod().when(monthlyReturns).setCpedDataValidation(any());
+    doCallRealMethod().when(returns).setCpedDataValidation(any());
     final var cpedDataValidation = mock(PortfolioCpedDataValidation.class);
-    monthlyReturns.setCpedDataValidation(cpedDataValidation);
+    returns.setCpedDataValidation(cpedDataValidation);
 
-    doCallRealMethod().when(monthlyReturns).validateCped(any());
+    doCallRealMethod().when(returns).validateCped(any());
 
-    monthlyReturns.validateCped(LOCAL_DATE_NOW);
+    returns.validateCped(LOCAL_DATE_NOW);
 
     verify(cpedDataValidation)
         .validate(eq(LOCAL_DATE_NOW), eq(LOCAL_DATE_NOW.plusMonths(1)), eq(LOCAL_DATE_NOW.plusMonths(2)), same(
@@ -365,22 +365,22 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateCpsd_whenVerifyValidatePortfolioCped() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
     PceExceptionCollector notification = mock(PceExceptionCollector.class);
-    monthlyReturns.notification = notification;
+    returns.notification = notification;
 
     final var monthlyReturns = mock(Map.class);
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.performanceEndDate = LOCAL_DATE_NOW.plusMonths(2);
-    monthlyReturns.performanceStartDate = LOCAL_DATE_NOW.plusMonths(1);
+    returns.returnsMap = monthlyReturns;
+    returns.performanceEndDate = LOCAL_DATE_NOW.plusMonths(2);
+    returns.performanceStartDate = LOCAL_DATE_NOW.plusMonths(1);
 
-    doCallRealMethod().when(monthlyReturns).setCpsdDataValidation(any());
+    doCallRealMethod().when(returns).setCpsdDataValidation(any());
     final var portfolioCpsdDataValidation = mock(PortfolioCpsdDataValidation.class);
-    monthlyReturns.setCpsdDataValidation(portfolioCpsdDataValidation);
+    returns.setCpsdDataValidation(portfolioCpsdDataValidation);
 
-    doCallRealMethod().when(monthlyReturns).validateCpsd(any());
+    doCallRealMethod().when(returns).validateCpsd(any());
 
-    monthlyReturns.validateCpsd(LOCAL_DATE_NOW);
+    returns.validateCpsd(LOCAL_DATE_NOW);
 
     verify(portfolioCpsdDataValidation)
         .validate(eq(LOCAL_DATE_NOW), eq(LOCAL_DATE_NOW.plusMonths(1)), eq(LOCAL_DATE_NOW.plusMonths(2)), same(
@@ -389,7 +389,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase1() {
-    final var monthlyReturns = new ReturnsAggregate();
+    final var returns = new ReturnsAggregate();
     var monthlyReturns = new HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>();
     var h1 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
@@ -412,10 +412,10 @@ class MonthlyReturnsTest {
         LocalDate.of(2017, 1, 1), ONE,
         LocalDate.of(2017, 2, 1), ONE)));
 
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.findPedAndPsd();
+    returns.returnsMap = monthlyReturns;
+    returns.findPedAndPsd();
 
-    var validatedReturns = monthlyReturns.validateReturns();
+    var validatedReturns = returns.validateReturns();
 
     var expectedErrorList = List.of(
         HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h2),
@@ -427,7 +427,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase2() {
-    final var monthlyReturns = new ReturnsAggregate();
+    final var returns = new ReturnsAggregate();
     var monthlyReturns = new HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>();
     var h1 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
@@ -450,10 +450,10 @@ class MonthlyReturnsTest {
         LocalDate.of(2017, 1, 1), ONE,
         LocalDate.of(2017, 2, 1), ONE)));
 
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.findPedAndPsd();
+    returns.returnsMap = monthlyReturns;
+    returns.findPedAndPsd();
 
-    var validatedReturns = monthlyReturns.validateReturns();
+    var validatedReturns = returns.validateReturns();
 
     var expectedErrorList = List.of(
         HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h1),
@@ -466,7 +466,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateMonthlyReturns_whenCheckExceptionCase3() {
-    final var monthlyReturns = new ReturnsAggregate();
+    final var returns = new ReturnsAggregate();
     var monthlyReturns = new HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>();
     var h1 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
@@ -490,10 +490,10 @@ class MonthlyReturnsTest {
         LocalDate.of(2021, 3, 1), ONE,
         LocalDate.of(2021, 4, 1), ONE)));
 
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.findPedAndPsd();
+    returns.returnsMap = monthlyReturns;
+    returns.findPedAndPsd();
 
-    var validatedReturns = monthlyReturns.validateReturns();
+    var validatedReturns = returns.validateReturns();
 
     var expectedErrorList = List.of(
         HOLDING_PSD_OUT_OF_RANGE.toExceptionForHolding(h3),
@@ -504,7 +504,7 @@ class MonthlyReturnsTest {
 
   @Test
   void shouldValidateMonthlyReturns_whenCase4NoExceptionThrown() {
-    final var monthlyReturns = new ReturnsAggregate();
+    final var returns = new ReturnsAggregate();
     var monthlyReturns = new HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>();
     var h1 = new PortfolioHolding(TWO, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier("cEtf1",
         FiIdentifierType.TICKER));
@@ -527,23 +527,23 @@ class MonthlyReturnsTest {
         LocalDate.of(2020, 1, 1), ONE,
         LocalDate.of(2020, 2, 1), ONE)));
 
-    monthlyReturns.returnsMap = monthlyReturns;
-    monthlyReturns.findPedAndPsd();
+    returns.returnsMap = monthlyReturns;
+    returns.findPedAndPsd();
 
-    assertDoesNotThrow(monthlyReturns::validateReturns);
+    assertDoesNotThrow(returns::validateReturns);
 
   }
 
   @Test
   void shouldGetMonthlyReturns_whenCheckResult() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
     final var monthlyReturns = Map.of(mock(PortfolioHolding.class), new TreeMap<>(Map.of(LOCAL_DATE_NOW,
         BigDecimal.ONE)));
-    monthlyReturns.returnsMap = monthlyReturns;
+    returns.returnsMap = monthlyReturns;
 
-    doCallRealMethod().when(monthlyReturns).getReturnsMap();
+    doCallRealMethod().when(returns).getReturnsMap();
 
-    final var actual = monthlyReturns.getReturnsMap();
+    final var actual = returns.getReturnsMap();
 
     assertNotSame(monthlyReturns, actual);
   }
@@ -551,14 +551,14 @@ class MonthlyReturnsTest {
   @Test
   void shouldGetMonthlyReturns_whenVerifyCopy() {
     try (var mapUtilsMock = mockStatic(MapUtils.class)) {
-      final var monthlyReturns = mock(ReturnsAggregate.class);
+      final var returns = mock(ReturnsAggregate.class);
       final var monthlyReturns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE));
       final var holdingMonthlyReturns = Map.of(mock(PortfolioHolding.class), monthlyReturns);
-      monthlyReturns.returnsMap = holdingMonthlyReturns;
+      returns.returnsMap = holdingMonthlyReturns;
 
-      doCallRealMethod().when(monthlyReturns).getReturnsMap();
+      doCallRealMethod().when(returns).getReturnsMap();
 
-      final var actual = monthlyReturns.getReturnsMap();
+      final var actual = returns.getReturnsMap();
 
       mapUtilsMock.verify(() -> MapUtils.copyTreeMap(eq(monthlyReturns), any()));
     }
@@ -567,14 +567,14 @@ class MonthlyReturnsTest {
   @Test
   void shouldFindPsdAmongHoldings_whenCheckResult() {
     final var holding = mock(PortfolioHolding.class);
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
-    monthlyReturns.returnsMap = Map.of(holding,
+    returns.returnsMap = Map.of(holding,
         new TreeMap<>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE, toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)),
             ONE)));
 
-    doCallRealMethod().when(monthlyReturns).findPsdAmongMonthlyReturns();
-    final LocalDate psd = monthlyReturns.findPsdAmongMonthlyReturns();
+    doCallRealMethod().when(returns).findPsdAmongMonthlyReturns();
+    final LocalDate psd = returns.findPsdAmongMonthlyReturns();
 
     assertEquals(toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), psd);
   }
@@ -582,22 +582,22 @@ class MonthlyReturnsTest {
   @Test
   void shouldFindPedAmongHoldings_whenCheckResult() {
     final var holding = mock(PortfolioHolding.class);
-    final var monthlyReturns = mock(ReturnsAggregate.class);
-    monthlyReturns.returnsMap = Map.of(holding,
+    final var returns = mock(ReturnsAggregate.class);
+    returns.returnsMap = Map.of(holding,
         new TreeMap<>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE, toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)),
             ONE)));
 
-    doCallRealMethod().when(monthlyReturns).findPedAmongMonthlyReturns();
-    doCallRealMethod().when(monthlyReturns).findPed(any());
-    final LocalDate ped = monthlyReturns.findPedAmongMonthlyReturns();
+    doCallRealMethod().when(returns).findPedAmongMonthlyReturns();
+    doCallRealMethod().when(returns).findPed(any());
+    final LocalDate ped = returns.findPedAmongMonthlyReturns();
 
     assertEquals(toLastDayOfMonth(LOCAL_DATE_NOW), ped);
   }
 
   @Test
   void shouldRetrieveHoldingCurrencies_whenCheckResult() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
-    monthlyReturns.notification = new PceExceptionCollector();
+    final var returns = mock(ReturnsAggregate.class);
+    returns.notification = new PceExceptionCollector();
 
     final var holding1 = mock(PortfolioHolding.class);
     final var holding2 = mock(PortfolioHolding.class);
@@ -609,19 +609,19 @@ class MonthlyReturnsTest {
 
     final var originalMReturns = Map.of(holding1, rMonthlyReturns1, holding2, rMonthlyReturns2);
 
-    doCallRealMethod().when(monthlyReturns).retrieveHoldingCurrencies(anyMap());
+    doCallRealMethod().when(returns).retrieveHoldingCurrencies(anyMap());
 
-    final var actual = monthlyReturns.retrieveHoldingCurrencies(originalMReturns);
+    final var actual = returns.retrieveHoldingCurrencies(originalMReturns);
 
     final var expected = Map.of(holding1, Currency.CAD, holding2, Currency.USD);
     assertEquals(expected, actual);
-    assertTrue(monthlyReturns.notification.getExceptions().isEmpty());
+    assertTrue(returns.notification.getExceptions().isEmpty());
   }
 
   @Test
   void shouldRetrieveHoldingCurrencies_whenCurrencyIsNull() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
-    monthlyReturns.notification = new PceExceptionCollector();
+    final var returns = mock(ReturnsAggregate.class);
+    returns.notification = new PceExceptionCollector();
 
     final var holding1 = mock(PortfolioHolding.class);
     final var holding2 = mock(PortfolioHolding.class);
@@ -633,19 +633,19 @@ class MonthlyReturnsTest {
 
     final var originalMReturns = Map.of(holding1, rMonthlyReturns1, holding2, rMonthlyReturns2);
 
-    doCallRealMethod().when(monthlyReturns).retrieveHoldingCurrencies(anyMap());
+    doCallRealMethod().when(returns).retrieveHoldingCurrencies(anyMap());
 
-    final var actual = monthlyReturns.retrieveHoldingCurrencies(originalMReturns);
+    final var actual = returns.retrieveHoldingCurrencies(originalMReturns);
 
     final var expected = new HashMap<PortfolioHolding, Currency>();
     expected.put(holding2, Currency.USD);
     assertEquals(expected, actual);
-    assertFalse(monthlyReturns.notification.getExceptions().isEmpty());
+    assertFalse(returns.notification.getExceptions().isEmpty());
   }
 
   @Test
   void shouldRetrieveReturns_whenCheckResult() {
-    final var monthlyReturns = mock(ReturnsAggregate.class);
+    final var returns = mock(ReturnsAggregate.class);
 
     final var holding1 = mock(PortfolioHolding.class);
     final var holding2 = mock(PortfolioHolding.class);
@@ -660,9 +660,9 @@ class MonthlyReturnsTest {
 
     final var originalMReturns = Map.of(holding1, rMonthlyReturns1, holding2, rMonthlyReturns2);
 
-    doCallRealMethod().when(monthlyReturns).retrieveReturns(anyMap());
+    doCallRealMethod().when(returns).retrieveReturns(anyMap());
 
-    final var actual = monthlyReturns.retrieveReturns(originalMReturns);
+    final var actual = returns.retrieveReturns(originalMReturns);
 
     final var expected = Map.of(holding1, monthlyReturn1, holding2, monthlyReturns2);
     assertEquals(expected, actual);
@@ -679,10 +679,10 @@ class MonthlyReturnsTest {
 
     final var rMonthlyReturnsMap = Map.of(holding, rMonthlyReturns);
 
-    final var monthlyReturns = new ReturnsAggregate(rMonthlyReturnsMap);
+    final var returns = new ReturnsAggregate(rMonthlyReturnsMap);
 
-    assertEquals(Map.of(holding, Currency.CAD), monthlyReturns.holdingCurrencyMap);
-    assertEquals(Map.of(holding, monthlyReturns), monthlyReturns.returnsMap);
+    assertEquals(Map.of(holding, Currency.CAD), returns.holdingCurrencyMap);
+    assertEquals(Map.of(holding, monthlyReturns), returns.returnsMap);
   }
 
 }

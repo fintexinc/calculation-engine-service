@@ -4,7 +4,6 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
@@ -99,10 +98,7 @@ public class StandardDeviationCalculation<T extends PeriodResult> extends Period
 
   @Override
   public T defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final StandardDeviationResult result = new StandardDeviationResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setStandardDeviation(timeIntervals);
-    return (T) result;
+    return (T) new StandardDeviationResult(formTimeIntervalResult(periodValues));
   }
 
 }

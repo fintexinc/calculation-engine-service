@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,6 +37,7 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
       return null;
     }
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
+    validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, getPortfolioTotalReturns()), tBills);
     final BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(getPortfolioTotalReturns(),
         periodStartDate, numberOfMonths);
     final BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(tBills, periodStartDate,
@@ -48,10 +48,7 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
 
   @Override
   public SortinoRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final SortinoRatioResult result = new SortinoRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setSortinoRatio(timeIntervals);
-    return result;
+    return new SortinoRatioResult(formTimeIntervalResult(periodValues));
   }
 
   /**
@@ -86,6 +83,11 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
       return null;
     }
     return divide(diff, downsideDeviation);
+  }
+
+  @Override
+  public int availableMonths() {
+    return Math.min(super.availableMonths(), tBills.size());
   }
 
 }

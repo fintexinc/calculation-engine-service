@@ -3,7 +3,6 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -45,6 +44,8 @@ public class DownsideDeviationCalculation<T extends PeriodResult> extends Period
       return null;
     }
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
+    validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, getPortfolioTotalReturns()),
+        portfolioExcessReturn);
     final SortedMap<LocalDate, BigDecimal> portfolioExcessReturnsInPeriod = getSubMapByPeriodStartDate(periodStartDate,
         portfolioExcessReturn);
     final TreeMap<LocalDate, BigDecimal> downsideReturnSquared = calculateDownsideReturnSquared(
@@ -54,10 +55,7 @@ public class DownsideDeviationCalculation<T extends PeriodResult> extends Period
 
   @Override
   public T defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final DownsideDeviationResult result = new DownsideDeviationResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setDownsideDeviation(timeIntervals);
-    return (T) result;
+    return (T) new DownsideDeviationResult(formTimeIntervalResult(periodValues));
   }
 
   /**
@@ -86,5 +84,10 @@ public class DownsideDeviationCalculation<T extends PeriodResult> extends Period
     return portfolioExcessReturnsInPeriod.entrySet().stream()
         .filter(e -> e.getValue().compareTo(BigDecimal.ZERO) < 0)
         .collect(toTreeMap(Map.Entry::getKey, e -> pow(e.getValue(), TWO)));
+  }
+
+  @Override
+  public int availableMonths() {
+    return Math.min(super.availableMonths(), portfolioExcessReturn.size());
   }
 }

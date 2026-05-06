@@ -3,20 +3,26 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.sm.TBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Map;
 import java.util.TreeMap;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
 class SharpeRatioCalculationServiceImplTest {
 
   @Test
@@ -28,7 +34,8 @@ class SharpeRatioCalculationServiceImplTest {
     final var weightedAverageInput = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
+        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(weightedAverageInput);
 
     doCallRealMethod().when(service).defineCalculationMethod(any());
@@ -45,14 +52,35 @@ class SharpeRatioCalculationServiceImplTest {
 
     final var context = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
-    when(tBillsFetcher.fetch(any())).thenReturn(new TreeMap<>());
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
+        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
 
     doCallRealMethod().when(service).defineCalculationMethod(any());
     service.defineCalculationMethod(req);
 
-    verify(tBillsFetcher).fetch(Currency.CAD);
+    verify(tBillsFetcher).fetch();
+  }
+
+  @Test
+  void shouldThrowTBillSeriesNotAvailable_whenTBillSeriesEmptyForRequestedCurrency() {
+    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
+        .useConstructor(null, tBillsFetcher, null));
+
+    final var context = mock(PeriodCalculationInput.class);
+    final PeriodCommand req = mock(PeriodCommand.class);
+    when(req.getCurrency()).thenReturn(Currency.EUR);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
+    // EUR is outside the supported currencies; TBillsFetcher pre-populates it as an empty TreeMap.
+    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.EUR, new TreeMap<>()));
+
+    doCallRealMethod().when(service).defineCalculationMethod(any());
+
+    CalculationException ex = assertThrows(CalculationException.class,
+        () -> service.defineCalculationMethod(req));
+    assertEquals(ErrorCode.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, ex.getErrorCode());
   }
 
 }

@@ -193,7 +193,8 @@ class DistributionOfReturnsCalculationTest {
       mockedDecimalUtils.when(() -> DecimalUtils.getMaxValue(returns)).thenReturn(TEN_THOUSAND);
 
       doCallRealMethod().when(calculation).calculateDistributionOfReturnsFor(any(), any());
-      final DistributionOfReturnsIntervalResult actual = calculation.calculateDistributionOfReturnsFor(returns, command);
+      final DistributionOfReturnsIntervalResult actual = calculation.calculateDistributionOfReturnsFor(returns,
+          command);
 
       assertEquals(expected.distributionBin(), actual.distributionBin());
     }
@@ -263,11 +264,13 @@ class DistributionOfReturnsCalculationTest {
 
     when(calculation.calculateBinInterval(any(), anyInt(), any())).thenReturn(TEN);
     when(calculation.calculateFrequencyOfReturns(any(), any(), any(), anyList())).thenReturn(10L);
-    when(calculation.initializeDistributionRange(anyInt(), any(), anyLong())).thenReturn(new DistributionRangeResult(5, TEN,
+    when(calculation.initializeDistributionRange(anyInt(), any(), anyLong())).thenReturn(new DistributionRangeResult(5,
+        TEN,
         2L));
 
     doCallRealMethod().when(calculation).calculateDistributionOfReturns(any(), any(), anyLong(), any());
-    final List<DistributionRangeResult> actual = calculation.calculateDistributionOfReturns(returns, returnsMIN, numberOfBins,
+    final List<DistributionRangeResult> actual = calculation.calculateDistributionOfReturns(returns, returnsMIN,
+        numberOfBins,
         returnsBinWidthIncrements);
 
     final var expected = List.of(new DistributionRangeResult(5, TEN, 2L));
@@ -451,8 +454,10 @@ class DistributionOfReturnsCalculationTest {
     final var rangeOfPreviousBin = TWO;
     final var binInterval = HUNDRED;
 
-    doCallRealMethod().when(calculation).calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeOfPreviousBin);
-    final long actual = calculation.calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval, rangeOfPreviousBin);
+    doCallRealMethod().when(calculation).calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval,
+        rangeOfPreviousBin);
+    final long actual = calculation.calculateFrequencyIfBinIntervalNotEqualsMin(returns, binInterval,
+        rangeOfPreviousBin);
 
     assertEquals(2, actual);
   }

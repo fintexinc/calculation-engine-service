@@ -20,7 +20,7 @@ public class TrailingTotalReturnsCalculationServiceImpl
       PeriodAbstractService<TrailingTotalReturnsResult, PeriodCommand> {
 
   public TrailingTotalReturnsCalculationServiceImpl(
-      final MonthlyReturnsService monthlyReturnsService,
+      MonthlyReturnsService monthlyReturnsService,
       @Value("#{'${default.periods.trailing-total-returns}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
   }
@@ -30,14 +30,9 @@ public class TrailingTotalReturnsCalculationServiceImpl
     return CalculationMetric.TRAILING_TOTAL_RETURNS;
   }
 
-  public TrailingTotalReturnsCalculation defineCalculationMethod(final PeriodCommand command) {
-    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+  public TrailingTotalReturnsCalculation defineCalculationMethod(PeriodCommand command) {
+    PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
     return new TrailingTotalReturnsCalculation(context, defaultPeriods);
-  }
-
-  @Override
-  public void addSpecificChecks(final PeriodCommand command) {
-    // Empty as there are no specific checks for the current calculation
   }
 
 }

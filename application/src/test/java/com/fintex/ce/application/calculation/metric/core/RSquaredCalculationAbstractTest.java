@@ -115,7 +115,8 @@ class RSquaredCalculationAbstractTest {
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
     calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
-    verify(calculation, times(2)).getSubMapByPeriodStartDate(periodStartDate, treeMap);
+    // Three calls: portfolio window (validation), portfolio excess return submap, benchmark excess return submap.
+    verify(calculation, times(3)).getSubMapByPeriodStartDate(periodStartDate, treeMap);
   }
 
   @Test
@@ -268,7 +269,8 @@ class RSquaredCalculationAbstractTest {
     final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 
     doCallRealMethod().when(calculation).calculateTotalSumOfSquares(any(), any());
-    final BigDecimal result = calculation.calculateTotalSumOfSquares(benchmarkExcessReturnByPeriod, benchmarkExcessAverage);
+    final BigDecimal result = calculation.calculateTotalSumOfSquares(benchmarkExcessReturnByPeriod,
+        benchmarkExcessAverage);
 
     assertEquals(toUserScale(BigDecimal.valueOf(0.974940892337108)), toUserScale(result));
   }

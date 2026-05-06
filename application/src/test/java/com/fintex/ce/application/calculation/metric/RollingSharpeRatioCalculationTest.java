@@ -4,10 +4,11 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,9 @@ import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TEN_THOUSAND;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static java.math.BigDecimal.TEN;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anySet;
@@ -66,7 +70,40 @@ class RollingSharpeRatioCalculationTest {
     doCallRealMethod().when(calculation).calculateRollingValue(numberOfMonths, portfolioReturns);
     final BigDecimal actual = calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
 
-    Assertions.assertEquals(TEN, actual);
+    assertEquals(TEN, actual);
+  }
+
+  @Test
+  void shouldReturnNullForWindow_whenSingleSharpeRatioWindowMissesTBillRate() {
+    var context = mock(PeriodCalculationInput.class);
+    var sharpeRatioCalculation = mock(SharpeRatioCalculation.class);
+    var calculation = mock(RollingSharpeRatioCalculation.class, withSettings().useConstructor(context, Set.of(),
+        sharpeRatioCalculation));
+
+    when(sharpeRatioCalculation.calculatePeriodForNumberOfMonths(anyInt(), any()))
+        .thenThrow(new CalculationException(ErrorCode.MISSING_TBILL_RATE, LocalDate.now().minusMonths(6)));
+
+    doCallRealMethod().when(calculation).calculateRollingValue(12, portfolioReturns);
+    BigDecimal actual = calculation.calculateRollingValue(12, portfolioReturns);
+
+    assertNull(actual);
+  }
+
+  @Test
+  void shouldPropagateOtherCalculationExceptions_whenSharpeRatioFailsForUnrelatedReason() {
+    var context = mock(PeriodCalculationInput.class);
+    var sharpeRatioCalculation = mock(SharpeRatioCalculation.class);
+    var calculation = mock(RollingSharpeRatioCalculation.class, withSettings().useConstructor(context, Set.of(),
+        sharpeRatioCalculation));
+
+    var unrelated = new CalculationException(ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD, "12", 0);
+    when(sharpeRatioCalculation.calculatePeriodForNumberOfMonths(anyInt(), any())).thenThrow(unrelated);
+
+    doCallRealMethod().when(calculation).calculateRollingValue(12, portfolioReturns);
+
+    CalculationException thrown = assertThrows(CalculationException.class,
+        () -> calculation.calculateRollingValue(12, portfolioReturns));
+    assertEquals(ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD, thrown.getErrorCode());
   }
 
   @Test
@@ -95,7 +132,7 @@ class RollingSharpeRatioCalculationTest {
     doCallRealMethod().when(calculation).defineResponseType(periodValues);
     final RollingSharpeRatioResult actual = calculation.defineResponseType(periodValues);
 
-    Assertions.assertEquals(expected.getRollingSharpeRatio(), actual.getRollingSharpeRatio());
+    assertEquals(expected.getRollingSharpeRatio(), actual.getRollingSharpeRatio());
   }
 
   @AfterAll

@@ -7,6 +7,7 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
 import com.fintex.ce.application.returns.ReturnsAggregate;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
@@ -51,7 +52,8 @@ public class RollingSharpeRatioCalculationServiceImpl
   @Override
   public RollingSharpeRatioCalculation defineCalculationMethod(final RollingCalculationCommand command) {
     final PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
-    final var tBills = tBillsProvider.fetch(command.getCurrency());
+    final var tBills = TBillsValidator.requireNonEmpty(
+        tBillsProvider.fetch().get(command.getCurrency()), command.getCurrency());
 
     final var standardDeviationCalculation = new StandardDeviationCalculation<SharpeRatioResult>(input, defaultPeriods);
     final var sharpeRatioCalculation = new SharpeRatioCalculation(input, defaultPeriods, tBills,

@@ -37,7 +37,8 @@ class CommonPerformanceDateServiceImplTest {
     doCallRealMethod().when(service).getPortfolioMonthlyReturns(anyList());
     doCallRealMethod().when(service).commonPerformanceDateFor(any());
 
-    final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = service.getPortfolioMonthlyReturns(holdings);
+    final ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate = service.getPortfolioMonthlyReturns(
+        holdings);
 
     final DateRange actual = service.commonPerformanceDateFor(monthlyReturnsAggregate);
 

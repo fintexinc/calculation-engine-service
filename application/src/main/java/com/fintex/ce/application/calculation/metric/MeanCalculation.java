@@ -4,7 +4,6 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.MeanResult;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -73,10 +72,7 @@ public class MeanCalculation<T extends PeriodResult> extends PeriodCalculationAb
 
   @Override
   public T defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final MeanResult result = new MeanResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setMean(timeIntervals);
-    return (T) result;
+    return (T) new MeanResult(formTimeIntervalResult(periodValues));
   }
 
 }

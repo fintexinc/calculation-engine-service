@@ -321,6 +321,14 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD(
+      Codes.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD,
+      "Insufficient monthly returns to calculate period %s months (only %s available)",
+      "The requested period exceeds the number of monthly returns available, so the metric cannot be computed",
+      "Request a smaller period or extend the available monthly returns history",
+      HttpStatus.OK,
+      Severity.WARNING),
+
   HOLDING_PSD_OUT_OF_RANGE(
       Codes.HOLDING_PSD_OUT_OF_RANGE,
       "Holding performance start date is not within common performance date range.",
@@ -335,6 +343,36 @@ public enum ErrorCode {
       "A server-side invariant was violated — a required parameter was null when computing the earliest or latest available NAV date",
       "Contact support; this indicates a bug in the calculation pipeline rather than invalid input",
       HttpStatus.INTERNAL_SERVER_ERROR,
+      Severity.ERROR),
+
+  // ============================================
+  // SEC-xxx — Security catalog (existence) errors
+  // ============================================
+  SECURITY_NOT_FOUND_IN_SM(
+      Codes.SECURITY_NOT_FOUND_IN_SM,
+      "Security not found in Security Master: %s",
+      "The requested security identifier is not present in Security Master, so no data can be retrieved",
+      "Verify the security identifier and that the security has been imported into Security Master",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  // ============================================
+  // TBL-xxx — T-Bill (risk-free rate) errors
+  // ============================================
+  MISSING_TBILL_RATE(
+      Codes.MISSING_TBILL_RATE,
+      "Missing T-Bill rate for date %s",
+      "T-Bill rate is required for every month in the calculation interval but is missing for the specified date",
+      "Ensure T-Bill rates are available for the requested currency and date range",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY(
+      Codes.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY,
+      "T-Bill rates are not available for currency %s",
+      "The metric requires a T-Bill (risk-free rate) series but Security Master provides no rates for the requested currency",
+      "Use a supported currency (CAD or USD) or ensure T-Bill rates are available for the requested currency",
+      HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
   // ============================================
@@ -861,7 +899,7 @@ public enum ErrorCode {
   private final HttpStatus httpStatus;
   private final Severity severity;
 
-  public String getFormattedMessage(final Object... args) {
+  public String getFormattedMessage(Object... args) {
     if (args == null || args.length == 0) {
       return message;
     }
@@ -913,29 +951,29 @@ public enum ErrorCode {
     return new ValidationException(this, formatArgs).withFieldName(fieldName);
   }
 
-  public Warning warning(final PortfolioHolding holding) {
+  public Warning warning(PortfolioHolding holding) {
     return new Warning(holding == null ? null : holding.getIdsString(), message, code);
   }
 
-  public Warning warning(final PortfolioHolding holding, final Object... formatArgs) {
+  public Warning warning(PortfolioHolding holding, Object... formatArgs) {
     return new Warning(holding == null ? null : holding.getIdsString(), getFormattedMessage(formatArgs), code);
   }
 
-  public Notification asNotification(final Object... formatArgs) {
+  public Notification asNotification(Object... formatArgs) {
     return buildNotification(null, null, getFormattedMessage(formatArgs), null);
   }
 
-  public Notification toNotificationForHolding(final PortfolioHolding holding, final Object... formatArgs) {
+  public Notification toNotificationForHolding(PortfolioHolding holding, Object... formatArgs) {
     return buildNotification(holding == null ? null : holding.getIdsString(), null, getFormattedMessage(formatArgs),
         null);
   }
 
-  public Notification toNotificationForField(final String fieldName, final Object... formatArgs) {
+  public Notification toNotificationForField(String fieldName, Object... formatArgs) {
     return buildNotification(null, fieldName, getFormattedMessage(formatArgs), null);
   }
 
-  public Notification toNotification(final String id, final String fieldName, final String formattedMessage,
-      final Map<String, Object> metadata) {
+  public Notification toNotification(String id, String fieldName, String formattedMessage,
+      Map<String, Object> metadata) {
     return buildNotification(id, fieldName, formattedMessage == null ? message : formattedMessage, metadata);
   }
 
@@ -943,8 +981,8 @@ public enum ErrorCode {
     return buildNotification(null, null, message, null);
   }
 
-  private Notification buildNotification(final String id, final String fieldName, final String formattedMessage,
-      final Map<String, Object> metadata) {
+  private Notification buildNotification(String id, String fieldName, String formattedMessage,
+      Map<String, Object> metadata) {
     return Notification.builder()
         .uuid(id == null ? UUID.randomUUID().toString() : id)
         .code(code)
@@ -998,6 +1036,13 @@ public enum ErrorCode {
     // FX
     public static final String FX_RATES_UNAVAILABLE = "FX-001";
 
+    // T-Bill (risk-free rate)
+    public static final String MISSING_TBILL_RATE = "TBL-001";
+    public static final String TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY = "TBL-002";
+
+    // Security catalog (existence)
+    public static final String SECURITY_NOT_FOUND_IN_SM = "SEC-001";
+
     // Returns / NAV
     public static final String MISSING_MONTHLY_RETURNS = "RET-001";
     public static final String MISSING_HISTORICAL_NAV_PRICES = "RET-002";
@@ -1006,6 +1051,7 @@ public enum ErrorCode {
     public static final String HOLDING_MISSING_LATEST_MONTHLY_RETURN = "RET-005";
     public static final String HOLDING_PSD_OUT_OF_RANGE = "RET-006";
     public static final String NAV_PARAM_MISSING = "RET-007";
+    public static final String INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD = "RET-008";
 
     // Performance Dates
     public static final String CPSD_AFTER_CPED = "PFD-001";

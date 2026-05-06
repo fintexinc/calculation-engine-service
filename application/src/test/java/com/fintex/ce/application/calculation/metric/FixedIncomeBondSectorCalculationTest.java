@@ -99,7 +99,8 @@ class FixedIncomeBondSectorCalculationTest {
         BigDecimal
             .valueOf(0.3489427));
 
-    var calculation = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(), fixedIncomePlusCash);
+    var calculation = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(),
+        fixedIncomePlusCash);
 
     FixedIncomeSectorResult expected = getExpectedOfAomAndRbf605();
 
@@ -125,7 +126,8 @@ class FixedIncomeBondSectorCalculationTest {
         BigDecimal
             .valueOf(0.0));
 
-    var calculation = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(), fixedIncomePlusCash);
+    var calculation = new FixedIncomeBondSectorCalculation(exposures, List.of(aom, rbf605), List.of(),
+        fixedIncomePlusCash);
 
     FixedIncomeSectorResult expected = getExpectedOfAom();
 

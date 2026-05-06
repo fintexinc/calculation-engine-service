@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,34 +24,42 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
 
   public StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation;
 
-  public SharpeRatioCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods,
-      final NavigableMap<LocalDate, BigDecimal> tBills,
-      final StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation) {
+  public SharpeRatioCalculation(PeriodCalculationInput input,
+      Set<String> defaultPeriods,
+      NavigableMap<LocalDate, BigDecimal> tBills,
+      StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation) {
     super(input, defaultPeriods);
     this.tBills = tBills;
     this.standardDeviationCalculation = standardDeviationCalculation;
   }
 
   @Override
-  public BigDecimal calculatePeriodForNumberOfMonths(final int numberOfMonths) {
+  public BigDecimal calculatePeriodForNumberOfMonths(int numberOfMonths) {
     return calculatePeriodForNumberOfMonths(numberOfMonths, getPortfolioTotalReturns());
   }
 
-  public BigDecimal calculatePeriodForNumberOfMonths(final int numberOfMonths,
-      final NavigableMap<LocalDate, BigDecimal> returns) {
-    if (numberOfMonths > returns.size()
-        || numberOfMonths > this.tBills.size()
-        || numberOfMonths < TWELVE.intValue()) {
+  public BigDecimal calculatePeriodForNumberOfMonths(int numberOfMonths,
+      NavigableMap<LocalDate, BigDecimal> returns) {
+    if (numberOfMonths > returns.size() || numberOfMonths < TWELVE.intValue()) {
       return null;
     }
-    final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, returns);
-    final BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(returns, periodStartDate,
+    LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, returns);
+    validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, returns));
+    BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(returns, periodStartDate,
         numberOfMonths);
-    final BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(
+    BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(
         restrictTBillsRange(tBills, returns), periodStartDate, numberOfMonths);
-    final BigDecimal standardDeviation = getStandardDeviation(numberOfMonths, returns);
+    BigDecimal standardDeviation = getStandardDeviation(numberOfMonths, returns);
     return calculateSharpeRatio(annualizedPortfolioReturn, annualizedRiskFreeRate, standardDeviation);
+  }
+
+  /**
+   * Verifies that {@link #tBills} contains a rate for every month present in the period window. Delegates to the shared
+   * {@link PeriodCalculationAbstract#validateTBillsCoverage(SortedMap, NavigableMap)} so all T-Bill-dependent metrics
+   * use the same per-date check.
+   */
+  public void validateTBillsCoverage(SortedMap<LocalDate, BigDecimal> returnsInPeriod) {
+    validateTBillsCoverage(returnsInPeriod, tBills);
   }
 
   /**
@@ -62,8 +69,8 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
    *          number of month in period
    * @return standard deviation by period
    */
-  public BigDecimal getStandardDeviation(final int numberOfMonths, final SortedMap<LocalDate, BigDecimal> returns) {
-    final NavigableMap<LocalDate, BigDecimal> excessReturn = calculateExcessReturn(returns, tBills);
+  public BigDecimal getStandardDeviation(int numberOfMonths, SortedMap<LocalDate, BigDecimal> returns) {
+    NavigableMap<LocalDate, BigDecimal> excessReturn = calculateExcessReturn(returns, tBills);
     return standardDeviationCalculation.calculatePeriodForNumberOfMonths(numberOfMonths, excessReturn);
   }
 
@@ -78,9 +85,9 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
    *          calculated standard deviation value
    * @return calculated sharpe ratio
    */
-  public BigDecimal calculateSharpeRatio(final BigDecimal annualizedPortfolioReturn,
-      final BigDecimal annualizedRiskFreeRate,
-      final BigDecimal standardDeviation) {
+  public BigDecimal calculateSharpeRatio(BigDecimal annualizedPortfolioReturn,
+      BigDecimal annualizedRiskFreeRate,
+      BigDecimal standardDeviation) {
     log.debug("annualizedPortfolioReturn: {}, annualizedRiskFreeRate: {}, standardDeviation: {}",
         annualizedPortfolioReturn, annualizedRiskFreeRate, standardDeviation);
     if (standardDeviation.compareTo(ZERO) == 0) {
@@ -90,11 +97,8 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
   }
 
   @Override
-  public SharpeRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final SharpeRatioResult result = new SharpeRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setSharpeRatio(timeIntervals);
-    return result;
+  public SharpeRatioResult defineResponseType(Set<Pair<String, BigDecimal>> periodValues) {
+    return new SharpeRatioResult(formTimeIntervalResult(periodValues));
   }
 
 }

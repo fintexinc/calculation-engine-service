@@ -44,7 +44,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_2_PERCENT_ANNUAL);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -63,7 +64,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_10_PERCENT_ANNUAL);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -84,7 +86,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_SEMI_ANNUAL);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -105,7 +108,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_QUARTERLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -126,7 +130,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_MONTHLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -147,7 +152,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_BI_MONTHLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -168,7 +174,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_WEEKLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -189,7 +196,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_BI_WEEKLY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);
@@ -210,7 +218,8 @@ class GicMonthlyReturnsGeneratorTest {
         RETURN_OF_5_PERCENT_DAILY);
 
     // ACT
-    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(gicHolding));
+    final Map<PortfolioHolding, HoldingMonthlyReturns> actual = generator.generateGicMonthlyReturns(List.of(
+        gicHolding));
 
     // VERIFY
     assertEquals(expected, actual);

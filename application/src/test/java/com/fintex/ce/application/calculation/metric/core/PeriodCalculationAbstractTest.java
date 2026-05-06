@@ -14,7 +14,9 @@ import com.fintex.ce.model.error.exceptions.CalculationException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,6 +28,7 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
@@ -38,7 +41,6 @@ import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,15 +59,15 @@ import static org.mockito.Mockito.withSettings;
 
 class PeriodCalculationAbstractTest {
 
-  final int TWELVE = 12;
+  int TWELVE = 12;
 
   @Test
   void shouldAddSinceCustomIntervalPeriod_whenSinceCustomIntervalStartDateIsValid() {
-    final PeriodCalculationInput w = mock(PeriodCalculationInput.class);
+    PeriodCalculationInput w = mock(PeriodCalculationInput.class);
     when(w.getCipsd()).thenReturn(null);
-    final PeriodCalculationAbstract p = new TrailingTotalReturnsCalculation(w, Set.of());
+    PeriodCalculationAbstract p = new TrailingTotalReturnsCalculation(w, Set.of());
 
-    final Set<Pair<String, BigDecimal>> results = new HashSet<>();
+    Set<Pair<String, BigDecimal>> results = new HashSet<>();
     p.addSinceCustomIntervalPerformanceStartDate(results, Set.of());
 
     assertEquals(0, results.size());
@@ -73,40 +75,41 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldNotAddSinceCustomIntervalPeriod_whenPeriodAlreadyPresent() {
-    final PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class);
 
     when(calculation.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(false);
 
     doCallRealMethod().when(calculation).addSinceCustomIntervalPerformanceStartDate(any(), any());
-    final Set<Pair<String, BigDecimal>> results = new HashSet<>();
-    calculation.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SINCE_PERFORMANCE_START_DATE.name(), YEAR_TO_DATE
-        .name(), "12"));
+    Set<Pair<String, BigDecimal>> results = new HashSet<>();
+    calculation.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SINCE_PERFORMANCE_START_DATE.name(),
+        YEAR_TO_DATE
+            .name(), "12"));
 
     assertEquals(0, results.size());
   }
 
   @Test
   void shouldCalculateFromCustomIntervalStartDate_whenSinceCustomIntervalPeriodRequested() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final WeightedAverageInput w = mock(WeightedAverageInput.class);
+    WeightedAverageInput w = mock(WeightedAverageInput.class);
     when(w.getCipsd()).thenReturn(LocalDate.now());
 
     when(p.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(false);
 
     doCallRealMethod().when(p).addSinceCustomIntervalPerformanceStartDate(any(), any());
-    final Set<Pair<String, BigDecimal>> results = new HashSet<>();
+    Set<Pair<String, BigDecimal>> results = new HashSet<>();
     p.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name()));
 
     assertEquals(1, results.size());
-    final Pair<String, BigDecimal> actual = results.stream().findFirst().orElseThrow();
+    Pair<String, BigDecimal> actual = results.stream().findFirst().orElseThrow();
     assertEquals(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), actual.getKey());
     assertNull(actual.getValue());
   }
 
   @Test
   void shouldCalculatePeriodForCustomIntervalStartDate_whenAddingSinceCustomIntervalPeriod() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     when(p.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(true);
 
@@ -119,16 +122,16 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldAddSinceCustomIntervalResult_whenCustomIntervalValueIsCalculated() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     when(p.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(true);
 
-    final BigDecimal one = ONE;
+    BigDecimal one = ONE;
     when(p.calculatePeriodForCustomIntervalStartDate()).thenReturn(one);
     when(p.toUserFormat(any())).thenReturn(one);
 
     doCallRealMethod().when(p).addSinceCustomIntervalPerformanceStartDate(any(), any());
-    final HashSet<Pair<String, BigDecimal>> resultSet = new HashSet<>();
+    HashSet<Pair<String, BigDecimal>> resultSet = new HashSet<>();
     p.addSinceCustomIntervalPerformanceStartDate(resultSet, Set.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE
         .name()));
 
@@ -137,9 +140,9 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldDelegateToCalculatePeriodForNumberOfMonths_whenCalculatingSinceCustomInterval() {
-    final var context = mock(PeriodCalculationInput.class);
+    var context = mock(PeriodCalculationInput.class);
     when(context.getCipsd()).thenReturn(LOCAL_DATE_NOW);
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
         withSettings().useConstructor(context, null));
 
     p.portfolioTotalReturns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE, LOCAL_DATE_NOW.plusMonths(2), ONE));
@@ -152,29 +155,29 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldReturnProvidedMonths_whenPeriodIsNumeric() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    final String period = "3";
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
+    String period = "3";
 
     doCallRealMethod().when(p).getNumberOfMonthsFor(any(), any());
-    final int actual = p.getNumberOfMonthsFor(returns, period);
+    int actual = p.getNumberOfMonthsFor(returns, period);
 
     assertEquals(3, actual);
   }
 
   @Test
   void shouldCalculateMonthsFromYearStart_whenPeriodIsYearToDate() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    final String period = YEAR_TO_DATE.name();
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
+    String period = YEAR_TO_DATE.name();
 
-    final int months = 10;
+    int months = 10;
     when(p.getNumberOfMonthsForYearToDate(any())).thenReturn(months);
 
     doCallRealMethod().when(p).getNumberOfMonthsFor(any(), any());
-    final int actual = p.getNumberOfMonthsFor(returns, period);
+    int actual = p.getNumberOfMonthsFor(returns, period);
 
     assertEquals(months, actual);
     verify(p).getNumberOfMonthsForYearToDate(returns);
@@ -182,16 +185,16 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldCalculateMonthsFromInception_whenPeriodIsSinceInception() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    final String period = SINCE_PERFORMANCE_START_DATE.name();
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
+    String period = SINCE_PERFORMANCE_START_DATE.name();
 
-    final int months = 15;
+    int months = 15;
     when(p.getNumberOfMonthsForSinceInception(any())).thenReturn(months);
 
     doCallRealMethod().when(p).getNumberOfMonthsFor(any(), any());
-    final int actual = p.getNumberOfMonthsFor(returns, period);
+    int actual = p.getNumberOfMonthsFor(returns, period);
 
     assertEquals(months, actual);
     verify(p).getNumberOfMonthsForSinceInception(returns);
@@ -199,13 +202,13 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldReturnNull_whenPeriodFormatIsUnsupported() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    final String period = "TEST";
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
+    String period = "TEST";
 
     doCallRealMethod().when(p).getNumberOfMonthsFor(any(), any());
-    final CalculationException e = assertThrows(CalculationException.class, () -> p.getNumberOfMonthsFor(returns,
+    CalculationException e = assertThrows(CalculationException.class, () -> p.getNumberOfMonthsFor(returns,
         period));
 
     assertTrue(e.getMessage().contains(period));
@@ -213,9 +216,9 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldDelegateToCalculatePeriods_whenCalculateIsCalled() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final Set<String> periods = Set.of("1");
+    Set<String> periods = Set.of("1");
 
     doCallRealMethod().when(p).calculate(any());
     p.calculate(periods);
@@ -225,10 +228,10 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldAddSinceCustomIntervalPeriod_whenCalculatingPeriods() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final String interval = "12";
-    final Set<String> periods = Set.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), interval);
+    String interval = "12";
+    Set<String> periods = Set.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), interval);
 
     doCallRealMethod().when(p).getInitialPeriods(any());
     doCallRealMethod().when(p).calculatePeriods(any());
@@ -240,10 +243,10 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldDelegateToDefineResponseType_whenCalculateIsCalled() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final Set<String> periods = Set.of("1");
-    final Set<Object> periodsR = Set.of(mock(Object.class));
+    Set<String> periods = Set.of("1");
+    Set<Object> periodsR = Set.of(mock(Object.class));
 
     when(p.calculatePeriods(any())).thenReturn(periodsR);
 
@@ -255,48 +258,48 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldReturnDefaultPeriods_whenInputPeriodsEmpty() {
-    final Set<String> periods = Set.of("3");
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
+    Set<String> periods = Set.of("3");
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), periods));
 
     doCallRealMethod().when(p).getInitialPeriods(any());
-    final Set actual = p.getInitialPeriods(Set.of());
+    Set actual = p.getInitialPeriods(Set.of());
 
     assertEquals(periods, actual);
   }
 
   @Test
   void shouldReturnInputPeriods_whenInputPeriodsProvided() {
-    final Set<String> periods = Set.of("3");
-    final PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class,
+    Set<String> periods = Set.of("3");
+    PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), periods));
 
     doCallRealMethod().when(calculation).getInitialPeriods(any());
-    final Set<String> userP = Set.of("5");
-    final Set actual = calculation.getInitialPeriods(userP);
+    Set<String> userP = Set.of("5");
+    Set actual = calculation.getInitialPeriods(userP);
 
     assertEquals(userP, actual);
   }
 
   @Test
   void shouldReturnNull_whenPeriodExceedsPortfolioSizeForProduct() {
-    final var calculation = mock(PeriodCalculationAbstract.class);
+    var calculation = mock(PeriodCalculationAbstract.class);
 
-    final TreeMap<LocalDate, BigDecimal> aReturns = new TreeMap<>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE));
+    TreeMap<LocalDate, BigDecimal> aReturns = new TreeMap<>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW), ONE));
 
     doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(1, aReturns);
 
     doCallRealMethod().when(calculation).calculateProductForPeriod(eq(1), any());
-    final BigDecimal actual = calculation.calculateProductForPeriod(1, aReturns);
+    BigDecimal actual = calculation.calculateProductForPeriod(1, aReturns);
 
     assertEquals(0, ONE.compareTo(actual));
   }
 
   @Test
   void shouldCalculateProductForRequestedPeriod_whenEnoughDataExists() {
-    final PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class);
 
-    final TreeMap<LocalDate, BigDecimal> aReturns = new TreeMap<>(Map.of(
+    TreeMap<LocalDate, BigDecimal> aReturns = new TreeMap<>(Map.of(
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(2)), ONE,
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(3)), BigDecimal.valueOf(5),
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), TEN,
@@ -305,18 +308,18 @@ class PeriodCalculationAbstractTest {
     doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(3, aReturns);
 
     doCallRealMethod().when(calculation).calculateProductForPeriod(eq(3), any());
-    final BigDecimal actual = calculation.calculateProductForPeriod(3, aReturns);
+    BigDecimal actual = calculation.calculateProductForPeriod(3, aReturns);
 
     assertEquals(0, BigDecimal.valueOf(20).compareTo(actual));
   }
 
   @Test
   void shouldCalculateBenchmarkProductForRequestedPeriod_whenEnoughDataExists() {
-    final var calculation = mock(PeriodCalculationAbstract.class);
+    var calculation = mock(PeriodCalculationAbstract.class);
 
-    final var portfolioTotalReturns = new TreeMap<LocalDate, BigDecimal>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW
+    var portfolioTotalReturns = new TreeMap<LocalDate, BigDecimal>(Map.of(toLastDayOfMonth(LOCAL_DATE_NOW
         .minusMonths(2)), BigDecimal.valueOf(5)));
-    final var aReturns = new TreeMap<LocalDate, BigDecimal>(Map.of(
+    var aReturns = new TreeMap<LocalDate, BigDecimal>(Map.of(
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(3)), ONE,
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(2)), BigDecimal.valueOf(11),
         toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), TEN,
@@ -326,21 +329,21 @@ class PeriodCalculationAbstractTest {
     doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(3, portfolioTotalReturns);
 
     doCallRealMethod().when(calculation).getBenchmarkValues(eq(3), any());
-    final List list = calculation.getBenchmarkValues(3, aReturns);
+    List list = calculation.getBenchmarkValues(3, aReturns);
 
     assertEquals(List.of(BigDecimal.valueOf(11)), list);
   }
 
   @Test
   void shouldPopulateBasicDetails_whenCalculateIsCalled() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final Set<String> periods = Set.of("1");
-    final PeriodResult result = mock(PeriodResult.class);
+    Set<String> periods = Set.of("1");
+    PeriodResult result = mock(PeriodResult.class);
     when(p.defineResponseType(any())).thenReturn(result);
 
     doCallRealMethod().when(p).calculate(any());
-    final PeriodResult actual = p.calculate(periods);
+    PeriodResult actual = p.calculate(periods);
 
     verify(p).populateBasicDetails(result);
     assertEquals(result, actual);
@@ -348,11 +351,11 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldReadInitialPeriods_whenCalculatingPeriods() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     when(p.getInitialPeriods(any())).thenReturn(Set.of());
 
-    final Set<String> periods = Set.of("2");
+    Set<String> periods = Set.of("2");
 
     doCallRealMethod().when(p).calculatePeriods(any());
     p.calculatePeriods(periods);
@@ -362,10 +365,10 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldCalculateValueForEachPeriod_whenCalculatingPeriods() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final String period = "2";
-    final Set<String> periods = Set.of(period);
+    String period = "2";
+    Set<String> periods = Set.of(period);
 
     when(p.getInitialPeriods(any())).thenReturn(periods);
 
@@ -377,17 +380,17 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldAppendSinceCustomIntervalPeriod_whenCalculatingPeriods() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final String period = "2";
-    final Set<String> periods = Set.of(period);
-    final Pair<String, BigDecimal> pair = Pair.of(period, ONE);
+    String period = "2";
+    Set<String> periods = Set.of(period);
+    Pair<String, BigDecimal> pair = Pair.of(period, ONE);
 
     when(p.getInitialPeriods(any())).thenReturn(periods);
     when(p.calculateForPeriod(any())).thenReturn(pair);
 
     doCallRealMethod().when(p).calculatePeriods(any());
-    final Set actual = p.calculatePeriods(periods);
+    Set actual = p.calculatePeriods(periods);
 
     verify(p).addSinceCustomIntervalPerformanceStartDate(Set.of(pair), periods);
     assertEquals(Set.of(pair), actual);
@@ -395,7 +398,7 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldDelegateToCalculatePeriodForNumberOfMonths_whenCalculatingForPeriod() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
     p.portfolioTotalReturns = new TreeMap();
 
     String period = "3 ";
@@ -408,9 +411,9 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldResolveNumberOfMonths_whenCalculatingForPeriod() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final int months = 10;
+    int months = 10;
     when(p.getNumberOfMonthsFor(any(), any())).thenReturn(months);
 
     doCallRealMethod().when(p).calculateForPeriod(any());
@@ -421,46 +424,46 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldReturnPeriodPair_whenCalculationSucceeds() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final BigDecimal one = ONE;
+    BigDecimal one = ONE;
     when(p.calculatePeriodForNumberOfMonths(0)).thenReturn(one);
-    final String period = "32";
+    String period = "32";
 
     when(p.toUserFormat(any())).thenReturn(one);
     doCallRealMethod().when(p).calculateForPeriod(any());
-    final Pair actual = p.calculateForPeriod(period);
+    Pair actual = p.calculateForPeriod(period);
 
     assertEquals(Pair.of(period, toUserScale(one)), actual);
   }
 
   @Test
   void shouldRoundValuesToUserFormat_whenFormattingResult() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final BigDecimal one = ONE;
+    BigDecimal one = ONE;
 
     doCallRealMethod().when(p).toUserFormat(any());
 
-    final BigDecimal actual = (BigDecimal) p.toUserFormat(one);
+    BigDecimal actual = (BigDecimal) p.toUserFormat(one);
 
     assertEquals(toUserScale(one), actual);
   }
 
   @Test
   void shouldPopulateDateDetails_whenSettingPeriodDates() {
-    final var context = mock(PeriodCalculationInput.class);
+    var context = mock(PeriodCalculationInput.class);
     when(context.getCipsd()).thenReturn(LOCAL_DATE_NOW);
 
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
         withSettings().useConstructor(context, Set.of()));
 
-    final TreeMap kvTreeMap = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE, LOCAL_DATE_NOW.plusMonths(1),
+    TreeMap kvTreeMap = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE, LOCAL_DATE_NOW.plusMonths(1),
         ONE));
     p.portfolioTotalReturns = kvTreeMap;
 
     doCallRealMethod().when(p).populateBasicDetails(any());
-    final TrailingTotalReturnsResult actual = new TrailingTotalReturnsResult();
+    TrailingTotalReturnsResult actual = new TrailingTotalReturnsResult();
     p.populateBasicDetails(actual);
 
     assertEquals(LOCAL_DATE_NOW, actual.getCustomIntervalPerformanceStartDate());
@@ -468,111 +471,92 @@ class PeriodCalculationAbstractTest {
     assertEquals(LOCAL_DATE_NOW.plusMonths(1), actual.getPerformanceEndDate());
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "[{index}] date={0}-{1}-{2} expectedMonth={1}")
   @CsvSource({
       "2020, 4, 30",
       "2020, 1, 31",
       "2020, 12, 31",
   })
   void shouldReturnMonthIndex_whenCalculatingNumberOfMonthsForYearToDate(int year, int month, int dayOfMonth) {
-    final PeriodCalculationAbstract t = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract t = mock(PeriodCalculationAbstract.class);
     doCallRealMethod().when(t).getNumberOfMonthsForYearToDate(anyMap());
 
-    final Map<LocalDate, BigDecimal> aReturns = Map.of(LocalDate.of(year, month, dayOfMonth), ONE);
+    Map<LocalDate, BigDecimal> aReturns = Map.of(LocalDate.of(year, month, dayOfMonth), ONE);
 
-    final int actual = t.getNumberOfMonthsForYearToDate(aReturns);
+    int actual = t.getNumberOfMonthsForYearToDate(aReturns);
 
     assertEquals(month, actual);
   }
 
-  @Test
-  void shouldCalculateYearToDateMonths_whenCurrentDateAfterYearStart() {
-    final PeriodCalculationAbstract t = mock(PeriodCalculationAbstract.class);
+  @ParameterizedTest(name = "[{index}] {0} (returns={1}, expectedMonths={2})")
+  @MethodSource("sinceInceptionMonthCountCases")
+  void shouldReturnEntryCount_whenCalculatingNumberOfMonthsForSinceInception(
+      String name,
+      NavigableMap<LocalDate, BigDecimal> returns,
+      int expectedMonths) {
+    PeriodCalculationAbstract t = mock(PeriodCalculationAbstract.class);
     doCallRealMethod().when(t).getNumberOfMonthsForSinceInception(any(NavigableMap.class));
 
-    final NavigableMap<LocalDate, BigDecimal> aReturns = new TreeMap<>(Map.of(LocalDate.of(2020, 4, 30), ONE));
+    int actual = t.getNumberOfMonthsForSinceInception(returns);
 
-    final int actual = t.getNumberOfMonthsForSinceInception(aReturns);
-
-    assertEquals(1, actual);
+    assertEquals(expectedMonths, actual);
   }
 
-  @Test
-  void shouldCalculateYearToDateMonths_whenCurrentDateInJanuary() {
-    final PeriodCalculationAbstract t = mock(PeriodCalculationAbstract.class);
-    doCallRealMethod().when(t).getNumberOfMonthsForSinceInception(any(NavigableMap.class));
-
-    final NavigableMap<LocalDate, BigDecimal> aReturns = new TreeMap<>(Map.of(
-        toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), ONE,
-        toLastDayOfMonth(LOCAL_DATE_NOW), ONE));
-
-    final int actual = t.getNumberOfMonthsForSinceInception(aReturns);
-
-    assertEquals(2, actual);
+  static Stream<Arguments> sinceInceptionMonthCountCases() {
+    return Stream.of(
+        Arguments.of("single entry", new TreeMap<>(Map.of(LocalDate.of(2020, 4, 30), ONE)), 1),
+        Arguments.of("two consecutive months",
+            new TreeMap<>(Map.of(
+                toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), ONE,
+                toLastDayOfMonth(LOCAL_DATE_NOW), ONE)),
+            2));
   }
 
-  @Test
-  void shouldAddSinceCustomIntervalPeriod_whenCustomStartDateAfterPortfolioStart() {
-    final var input = mock(PeriodCalculationInput.class);
-    when(input.getCipsd()).thenReturn(LOCAL_DATE_NOW);
-    final Map<LocalDate, BigDecimal> returns = Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE);
-    final var portfolioTotalReturns = new TreeMap<>(returns);
-    when(input.getWeightedAveragePortfolioReturns()).thenReturn(portfolioTotalReturns);
-
-    final var calculation = mock(PeriodCalculationAbstract.class,
-        withSettings().useConstructor(input, null));
+  @ParameterizedTest(name = "[{index}] {0} (cipsd={1}, expectedValid={3})")
+  @MethodSource("sinceCustomIntervalValidityCases")
+  void shouldDetermineSinceCustomIntervalValidity(
+      String name,
+      LocalDate cipsd,
+      NavigableMap<LocalDate, BigDecimal> portfolioReturns,
+      boolean expectedValid) {
+    var calculation = mock(PeriodCalculationAbstract.class);
+    calculation.cipsd = cipsd;
+    calculation.portfolioTotalReturns = new TreeMap<>(portfolioReturns);
 
     doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
-    final boolean actual = calculation.isSinceCustomIntervalPerformanceStartDateValid();
+    boolean actual = calculation.isSinceCustomIntervalPerformanceStartDateValid();
 
-    assertFalse(actual);
+    assertEquals(expectedValid, actual);
   }
 
-  @Test
-  void shouldAddSinceCustomIntervalPeriod_whenCustomStartDateBeforePortfolioStart() {
-    final var input = mock(PeriodCalculationInput.class);
-    when(input.getCipsd()).thenReturn(LOCAL_DATE_NOW);
-    final Map<LocalDate, BigDecimal> returns = Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE);
-    final var portfolioTotalReturns = new TreeMap<>(returns);
-    when(input.getWeightedAveragePortfolioReturns()).thenReturn(portfolioTotalReturns);
-
-    final var calculation = mock(PeriodCalculationAbstract.class, withSettings().useConstructor(input, null));
-
-    doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
-    final boolean actual = calculation.isSinceCustomIntervalPerformanceStartDateValid();
-
-    assertFalse(actual);
-  }
-
-  @Test
-  void shouldAddSinceCustomIntervalPeriod_whenCustomStartDateEqualsPortfolioStart() {
-    final var input = mock(PeriodCalculationInput.class);
-    final var calculation = mock(PeriodCalculationAbstract.class, withSettings().useConstructor(input, null));
-    final Map<LocalDate, BigDecimal> returns = Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE, LOCAL_DATE_NOW.plusMonths(1),
-        TWO);
-    calculation.cipsd = LOCAL_DATE_NOW;
-    calculation.portfolioTotalReturns = new TreeMap<>(returns);
-
-    doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
-    final boolean actual = calculation.isSinceCustomIntervalPerformanceStartDateValid();
-
-    assertTrue(actual);
+  static Stream<Arguments> sinceCustomIntervalValidityCases() {
+    NavigableMap<LocalDate, BigDecimal> singleEntry = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE));
+    NavigableMap<LocalDate, BigDecimal> rangeEntries = new TreeMap<>(Map.of(
+        LOCAL_DATE_NOW.minusMonths(1), ONE,
+        LOCAL_DATE_NOW.plusMonths(1), TWO));
+    return Stream.of(
+        // Note: cases 1 and 2 currently have identical inputs (the original "before" test had the same data
+        // as the "after" test); preserved as-is to keep behavior. Fix the inputs to genuinely test "before"
+        // when revisiting.
+        Arguments.of("custom start date after portfolio start", LOCAL_DATE_NOW, singleEntry, false),
+        Arguments.of("custom start date before portfolio start", LOCAL_DATE_NOW, singleEntry, false),
+        Arguments.of("custom start date within portfolio range", LOCAL_DATE_NOW, rangeEntries, true));
   }
 
   @Test
   void shouldReturnPeriodStartDate_whenOffsetProvided() {
-    final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
+    ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     doCallRealMethod().when(excessReturnsCalculation).getPeriodStartDate(anyInt(), any());
-    final LocalDate periodStartDate = excessReturnsCalculation.getPeriodStartDate(12, getPortfolioReturns());
+    LocalDate periodStartDate = excessReturnsCalculation.getPeriodStartDate(12, getPortfolioReturns());
 
     assertEquals(toLastDayOfMonth(LocalDate.of(2020, 12, 1).minusMonths(11)), periodStartDate);
   }
 
   @Test
   void shouldReturnSubMapFromStartDate_whenFilteringReturns() {
-    final ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
+    ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
     doCallRealMethod().when(excessReturnsCalculation).getSubMapByPeriodStartDate(any(), any());
-    final SortedMap<LocalDate, BigDecimal> subMap = excessReturnsCalculation
+    SortedMap<LocalDate, BigDecimal> subMap = excessReturnsCalculation
         .getSubMapByPeriodStartDate(toLastDayOfMonth(LocalDate.of(2020, 12, 1).minusMonths(2)), getPortfolioReturns());
 
     assertEquals(3, subMap.size());
@@ -582,15 +566,15 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldConvertTotalReturnsToMonthlyChanges_whenOverridingReturns() {
-    final BetaCalculation betaCalculation = mock(BetaCalculation.class);
-    final LocalDate date = LocalDate.of(2020, 12, 1);
-    final TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>(Map.of(toLastDayOfMonth(date), BigDecimal
+    BetaCalculation betaCalculation = mock(BetaCalculation.class);
+    LocalDate date = LocalDate.of(2020, 12, 1);
+    TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>(Map.of(toLastDayOfMonth(date), BigDecimal
         .valueOf(1.01094319080371),
         toLastDayOfMonth(date.minusMonths(1)), BigDecimal.valueOf(1.02297440154456)));
     when(betaCalculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
     doCallRealMethod().when(betaCalculation).overrideTotalReturns(any());
 
-    final NavigableMap<LocalDate, BigDecimal> totalReturns = betaCalculation.overrideTotalReturns(
+    NavigableMap<LocalDate, BigDecimal> totalReturns = betaCalculation.overrideTotalReturns(
         portfolioTotalReturns);
 
     assertEquals(2, totalReturns.size());
@@ -600,23 +584,23 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldCreateTimeIntervalResults_whenFormattingPairs() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    final Set<TimeIntervalResult> expected = Set.of(new TimeIntervalResult("2000-01-12", ONE));
+    Set<TimeIntervalResult> expected = Set.of(new TimeIntervalResult("2000-01-12", ONE));
 
-    final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ONE));
+    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ONE));
 
     doCallRealMethod().when(p).formTimeIntervalResult(anySet());
-    final Set actual = p.formTimeIntervalResult(pairs);
+    Set actual = p.formTimeIntervalResult(pairs);
 
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldUseSubMapFromPeriodStartDate_whenCalculatingAverageArithmeticAnnualizedReturn() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
-    final TreeMap treeMap = mock(TreeMap.class);
-    final LocalDate date = LocalDate.now();
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    TreeMap treeMap = mock(TreeMap.class);
+    LocalDate date = LocalDate.now();
 
     doCallRealMethod().when(p).calculateAverageArithmeticAnnualizedReturn(any(), any(), anyInt());
 
@@ -627,35 +611,35 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldCalculateAverageArithmeticAnnualizedReturn_whenSubMapContainsReturns() {
-    final PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
-    final TreeMap treeMap = mock(TreeMap.class);
-    final LocalDate date = LocalDate.now();
-    final TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(date, ONE, date.plusMonths(1), TWO));
+    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
+    TreeMap treeMap = mock(TreeMap.class);
+    LocalDate date = LocalDate.now();
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(date, ONE, date.plusMonths(1), TWO));
 
     when(p.getSubMapByPeriodStartDate(any(), any())).thenReturn(returns);
     doCallRealMethod().when(p).calculateAverageArithmeticAnnualizedReturn(any(), any(), anyInt());
 
-    final BigDecimal returnValue = p.calculateAverageArithmeticAnnualizedReturn(treeMap, date, TWELVE);
+    BigDecimal returnValue = p.calculateAverageArithmeticAnnualizedReturn(treeMap, date, TWELVE);
 
     assertEquals(toUserScale(BigDecimal.valueOf(3)), toUserScale(returnValue));
   }
 
   @Test
   void shouldRestrictTBillsRangeToReturnsWindow_whenBothInputsProvided() {
-    final var calculation = mock(PeriodCalculationAbstract.class);
-    final LocalDate date = LocalDate.now();
-    final TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(date, ONE, date.plusMonths(1), TWO));
-    final TreeMap<LocalDate, BigDecimal> tBills = new TreeMap<>(Map.of(
+    var calculation = mock(PeriodCalculationAbstract.class);
+    LocalDate date = LocalDate.now();
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(date, ONE, date.plusMonths(1), TWO));
+    TreeMap<LocalDate, BigDecimal> tBills = new TreeMap<>(Map.of(
         date.minusMonths(1), ZERO,
         date, ONE,
         date.plusMonths(1), TWO,
         date.plusMonths(2), TEN));
-    final var expected = new TreeMap<>(Map.of(
+    var expected = new TreeMap<>(Map.of(
         date, ONE,
         date.plusMonths(1), TWO));
 
     doCallRealMethod().when(calculation).restrictTBillsRange(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = calculation.restrictTBillsRange(tBills, returns);
+    NavigableMap<LocalDate, BigDecimal> actual = calculation.restrictTBillsRange(tBills, returns);
 
     ComparisonUtils.compareMaps(expected, actual);
     assertEquals(expected.size(), actual.size());
@@ -663,30 +647,79 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldRestrictTBillsRangeUsingPortfolioReturns_whenOnlyTBillsProvided() {
-    final var calculation = mock(PeriodCalculationAbstract.class);
-    final LocalDate date = LocalDate.now();
-    final TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(date, ONE, date.plusMonths(1), TWO));
-    final TreeMap<LocalDate, BigDecimal> tBills = new TreeMap<>(Map.of(
+    var calculation = mock(PeriodCalculationAbstract.class);
+    LocalDate date = LocalDate.now();
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(date, ONE, date.plusMonths(1), TWO));
+    TreeMap<LocalDate, BigDecimal> tBills = new TreeMap<>(Map.of(
         date.minusMonths(1), ZERO,
         date, ONE,
         date.plusMonths(1), TWO,
         date.plusMonths(2), TEN));
     calculation.portfolioTotalReturns = returns;
 
-    final var expected = new TreeMap<>(Map.of(
+    var expected = new TreeMap<>(Map.of(
         date, ONE,
         date.plusMonths(1), TWO));
 
     doCallRealMethod().when(calculation).restrictTBillsRange(any());
     doCallRealMethod().when(calculation).restrictTBillsRange(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = calculation.restrictTBillsRange(tBills);
+    NavigableMap<LocalDate, BigDecimal> actual = calculation.restrictTBillsRange(tBills);
 
     ComparisonUtils.compareMaps(expected, actual);
     assertEquals(expected.size(), actual.size());
   }
 
+  @ParameterizedTest(name = "[{index}] {0} (returnsSize={1}, period={2}, value={3}, expectedWarnings={4}, expectedCode={5})")
+  @MethodSource("insufficientDataWarningCases")
+  void shouldHandleInsufficientDataWarning(
+      String name,
+      int returnsSize,
+      String period,
+      BigDecimal value,
+      int expectedWarningCount,
+      String expectedCode) {
+    var calculation = mock(PeriodCalculationAbstract.class);
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    for (int i = 0; i < returnsSize; i++) {
+      returns.put(LOCAL_DATE_NOW.minusMonths(i), ONE);
+    }
+    calculation.portfolioTotalReturns = returns;
+    TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
+    Set<Pair<String, BigDecimal>> periodValues = Set.of(Pair.of(period, value));
+
+    doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
+    doCallRealMethod().when(calculation).availableMonths();
+    doCallRealMethod().when(calculation).getNumberOfMonthsFor(any(), any());
+    doCallRealMethod().when(calculation).getNumberOfMonthsForYearToDate(any());
+    doCallRealMethod().when(calculation).getNumberOfMonthsForSinceInception(any());
+    calculation.addInsufficientDataWarnings(result, periodValues);
+
+    assertEquals(expectedWarningCount, result.getWarnings().size());
+    if (expectedCode != null) {
+      assertEquals(expectedCode, result.getWarnings().get(0).getCode());
+    }
+  }
+
+  static Stream<Arguments> insufficientDataWarningCases() {
+    return Stream.of(
+        // Numeric periods.
+        Arguments.of("numeric period exceeds available months", 1, "12", null, 1, "RET-008"),
+        Arguments.of("numeric period fits available months", 12, "12", null, 0, null),
+        Arguments.of("value is not null (period not exceeded)", 1, "12", ONE, 0, null),
+        // Period keys carrying whitespace (e.g. SpEL split of "12, 36" yields " 36") must be trimmed before
+        // getNumberOfMonthsFor — otherwise isNumeric() rejects them and the dispatch throws.
+        Arguments.of("whitespace-padded numeric period exceeds available months", 1, " 36", null, 1, "RET-008"),
+        // Symbolic YEAR_TO_DATE: with 13 entries the resolved YTD month count is always ≤ 12 ≤ 13, so it fits.
+        // Confirms symbolic periods are resolved (would warn if the resolution returned 0 default from the mock).
+        Arguments.of("symbolic YEAR_TO_DATE fits available months", 13, YEAR_TO_DATE.name(), null, 0, null),
+        // SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE is gated by CIPSD position, not month count, so it's
+        // explicitly skipped by addInsufficientDataWarnings — no warning fires regardless of returns size.
+        Arguments.of("SINCE_CUSTOM_INTERVAL is skipped", 1,
+            SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null, 0, null));
+  }
+
   private TreeMap<LocalDate, BigDecimal> getPortfolioReturns() {
-    final LocalDate date = LocalDate.of(2020, 12, 1);
+    LocalDate date = LocalDate.of(2020, 12, 1);
     Map<LocalDate, BigDecimal> map = new HashMap<>();
     map.put(toLastDayOfMonth(date), new BigDecimal("1.01222986673534"));
     map.put(toLastDayOfMonth(date.minusMonths(12)), new BigDecimal("1.01094319080371"));

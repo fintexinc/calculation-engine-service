@@ -35,6 +35,10 @@ abstract class PortfolioBenchmarkCalculationAbstract<T extends PeriodResult>
       return null;
     }
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
+    final SortedMap<LocalDate, BigDecimal> portfolioWindow = getSubMapByPeriodStartDate(periodStartDate,
+        getPortfolioTotalReturns());
+    validateTBillsCoverage(portfolioWindow, portfolioExcessReturn);
+    validateTBillsCoverage(portfolioWindow, benchmarkExcessReturn);
     final SortedMap<LocalDate, BigDecimal> portfolioExcessReturnByPeriod = getSubMapByPeriodStartDate(periodStartDate,
         portfolioExcessReturn);
     final SortedMap<LocalDate, BigDecimal> benchmarkExcessReturnByPeriod = getSubMapByPeriodStartDate(periodStartDate,
@@ -54,5 +58,11 @@ abstract class PortfolioBenchmarkCalculationAbstract<T extends PeriodResult>
         || numberOfMonths > portfolioExcessReturn.size()
         || numberOfMonths > benchmarkExcessReturn.size()
         || numberOfMonths < BigDecimalConstants.TWELVE.intValue();
+  }
+
+  @Override
+  public int availableMonths() {
+    return Math.min(super.availableMonths(),
+        Math.min(portfolioExcessReturn.size(), benchmarkExcessReturn.size()));
   }
 }

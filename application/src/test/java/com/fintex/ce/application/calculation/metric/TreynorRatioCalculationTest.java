@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -34,15 +36,31 @@ class TreynorRatioCalculationTest {
 
   final int TWELVE = 12;
 
+  /** Real 12-month portfolio + tBills so the constructor's restrictTBillsRange call doesn't NPE on mocks. */
+  private static PeriodCalculationInput input() {
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    for (int i = 0; i < 12; i++) {
+      returns.put(LocalDate.now().minusMonths(i), ONE);
+    }
+    return PeriodCalculationInput.builder().weightedAveragePortfolioReturns(returns).build();
+  }
+
+  private static TreeMap<LocalDate, BigDecimal> tBills() {
+    TreeMap<LocalDate, BigDecimal> tBills = new TreeMap<>();
+    for (int i = 0; i < 12; i++) {
+      tBills.put(LocalDate.now().minusMonths(i), ONE);
+    }
+    return tBills;
+  }
+
   @Test
   void shouldResolvePeriodStartDate_whenCalculatingPeriod() {
     final var beta = mock(BetaCalculation.class);
-    final var tBills = mock(TreeMap.class);
+    final var tBills = tBills();
     final var calculation = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(input(), Set.of(), tBills, beta));
 
     when(calculation.getPortfolioTotalReturns()).thenReturn(tBills);
-    when(tBills.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
     calculation.calculatePeriodForNumberOfMonths(TWELVE);
@@ -52,10 +70,10 @@ class TreynorRatioCalculationTest {
 
   @Test
   void shouldCalculateAnnualizedReturnsForPortfolioAndRiskFree_whenCalculatingPeriod() {
-    final var tBills = mock(TreeMap.class);
+    final var tBills = tBills();
     final var beta = mock(BetaCalculation.class);
     final var calculation = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(input(), Set.of(), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
@@ -71,10 +89,10 @@ class TreynorRatioCalculationTest {
 
   @Test
   void shouldDelegateToBetaCalculation_whenCalculatingPeriod() {
-    final var tBills = mock(TreeMap.class);
+    final var tBills = tBills();
     final var beta = mock(BetaCalculation.class);
     final var calculation = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(input(), Set.of(), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
@@ -90,10 +108,10 @@ class TreynorRatioCalculationTest {
 
   @Test
   void shouldReturnNull_whenBetaIsNull() {
-    final var tBills = mock(TreeMap.class);
+    final var tBills = tBills();
     final var beta = mock(BetaCalculation.class);
     final var calculation = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(input(), Set.of(), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
@@ -110,10 +128,10 @@ class TreynorRatioCalculationTest {
 
   @Test
   void shouldCalculateTreynorRatio_whenInputsAreAvailable() {
-    final var tBills = mock(TreeMap.class);
+    final var tBills = tBills();
     final var beta = mock(BetaCalculation.class);
     final var calculation = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(mock(PeriodCalculationInput.class), mock(Set.class), tBills, beta));
+        withSettings().useConstructor(input(), Set.of(), tBills, beta));
     final var treeMap = mock(TreeMap.class);
     final var date = LocalDate.now();
 
@@ -168,6 +186,66 @@ class TreynorRatioCalculationTest {
     final BigDecimal returnValue = calculation.calculateTreynorRatio(TEN, TWO, TEN);
 
     assertEquals(toUserScale(BigDecimal.valueOf(0.8)), toUserScale(returnValue));
+  }
+
+  @Test
+  void shouldReturnNull_whenTBillsDoNotOverlapPortfolioRange() {
+    // Portfolio runs over the last 12 months; T-Bills are pre-2000, no overlap. restrictTBillsRange yields an empty
+    // submap, so the count gate (numberOfMonths > tBills.size()) short-circuits to null before any subMap call.
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    for (int i = 0; i < 12; i++) {
+      portfolioReturns.put(LocalDate.now().minusMonths(i), ONE);
+    }
+    PeriodCalculationInput input = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(portfolioReturns)
+        .build();
+    NavigableMap<LocalDate, BigDecimal> nonOverlappingTBills = new TreeMap<>(Map.of(
+        LocalDate.of(1999, 1, 31), ONE));
+
+    final var beta = mock(BetaCalculation.class);
+    final var calculation = mock(TreynorRatioCalculation.class,
+        withSettings().useConstructor(input, Set.of(), nonOverlappingTBills, beta));
+
+    doCallRealMethod().when(calculation).getPortfolioTotalReturns();
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(TWELVE);
+
+    assertNull(actual);
+  }
+
+  @Test
+  void shouldThrowMissingTBillRate_whenTBillsHavePublicationLag() {
+    // Publication-lag scenario: portfolio covers the last 13 months but T-Bills only the prior 12 (lagging by 1
+    // month). Count gate passes (tBills.size() == 12 == numberOfMonths) but the period window starts AFTER the last
+    // T-Bill date — the per-date validateTBillsCoverage check must throw MISSING_TBILL_RATE instead of letting
+    // calculateAverageArithmeticAnnualizedReturn silently divide an undersized window by numberOfMonths.
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    for (int i = 0; i < 13; i++) {
+      portfolioReturns.put(LocalDate.now().minusMonths(i), ONE);
+    }
+    PeriodCalculationInput input = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(portfolioReturns)
+        .build();
+    NavigableMap<LocalDate, BigDecimal> laggingTBills = new TreeMap<>();
+    for (int i = 1; i <= 12; i++) {
+      laggingTBills.put(LocalDate.now().minusMonths(i), ONE);
+    }
+
+    final var beta = mock(BetaCalculation.class);
+    final var calculation = mock(TreynorRatioCalculation.class,
+        withSettings().useConstructor(input, Set.of(), laggingTBills, beta));
+
+    doCallRealMethod().when(calculation).getPortfolioTotalReturns();
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+    doCallRealMethod().when(calculation).getPeriodStartDate(anyInt(), any());
+    doCallRealMethod().when(calculation).getSubMapByPeriodStartDate(any(), any());
+    doCallRealMethod().when(calculation).validateTBillsCoverage(any(), any());
+
+    com.fintex.ce.model.error.exceptions.CalculationException ex = org.junit.jupiter.api.Assertions.assertThrows(
+        com.fintex.ce.model.error.exceptions.CalculationException.class,
+        () -> calculation.calculatePeriodForNumberOfMonths(TWELVE));
+    org.junit.jupiter.api.Assertions.assertEquals(
+        com.fintex.ce.model.error.ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
   }
 
 }

@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.RSquaredCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.RSquaredResult;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,10 +24,7 @@ public class RSquaredCalculation extends RSquaredCalculationAbstract<RSquaredRes
 
   @Override
   public RSquaredResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final RSquaredResult result = new RSquaredResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setRSquared(timeIntervals);
-    return result;
+    return new RSquaredResult(formTimeIntervalResult(periodValues));
   }
 
 }

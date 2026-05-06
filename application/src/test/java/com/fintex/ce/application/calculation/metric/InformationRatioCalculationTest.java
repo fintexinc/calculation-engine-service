@@ -28,7 +28,8 @@ class InformationRatioCalculationTest {
     final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
+    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12",
+        "24"),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     final var portfolioTotalReturn = mock(TreeMap.class);
@@ -56,7 +57,8 @@ class InformationRatioCalculationTest {
     final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
+    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12",
+        "24"),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     final var portfolioTotalReturn = mock(TreeMap.class);
@@ -83,7 +85,8 @@ class InformationRatioCalculationTest {
     final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
+    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12",
+        "24"),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     final var portfolioTotalReturn = mock(TreeMap.class);
@@ -105,7 +108,8 @@ class InformationRatioCalculationTest {
     final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
+    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12",
+        "24"),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     final var portfolioTotalReturn = mock(TreeMap.class);
@@ -127,7 +131,8 @@ class InformationRatioCalculationTest {
     final var input = mock(BenchmarkPeriodCalculationInput.class);
     final var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     final var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12", "24"),
+    final var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12",
+        "24"),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     final Set<Pair<String, BigDecimal>> periodAndInformationRatio = mock(Set.class);

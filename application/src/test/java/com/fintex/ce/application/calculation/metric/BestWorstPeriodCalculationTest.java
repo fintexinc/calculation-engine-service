@@ -35,7 +35,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculate_whenCalculateMonthRollingCumulativeReturnsReturnsNull() {
     final TreeMap<LocalDate, BigDecimal> portfolioReturns = null;
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     doCallRealMethod().when(calculation).calculate();
     final BestWorstPeriodsResult result = calculation.calculate();
@@ -46,8 +47,9 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculate_whenVerifyCalculateMonthRollingCumulativeReturns() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of(
-        12L)));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of(
+            12L)));
 
     when(calculation.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
     doNothing().when(calculation).calculateBestWorstPeriodValues(any(), any());
@@ -61,8 +63,9 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculate_whenVerifyCalculateBestWorstPeriodValues() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of(12L,
-        24L)));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of(12L,
+            24L)));
 
     when(calculation.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
     doNothing().when(calculation).calculateBestWorstPeriodValues(any(), any());
@@ -76,7 +79,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculate_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final TreeMap<LocalDate, BigDecimal> weightedAveragePortfolioMReturns = getPortfolioReturns();
     when(calculation.calculateMonthRollingCumulativeReturns(any())).thenReturn(mock(TreeMap.class));
@@ -99,7 +103,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateMonthRollingCumulativeReturns_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     doCallRealMethod().when(calculation).calculateMonthRollingCumulativeReturns(any());
     final TreeMap<LocalDate, BigDecimal> returns = calculation.calculateMonthRollingCumulativeReturns(12L);
@@ -114,7 +119,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyGetStartOfPeriodsDate() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(LocalDate.now());
 
@@ -130,7 +136,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyGetSubMapByStartPeriodDate() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var startOfPeriod = LocalDate.now();
     when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
@@ -147,7 +154,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculateNumberOfPeriods() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var startOfPeriod = LocalDate.now();
     when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
@@ -165,7 +173,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculateAverage() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var startOfPeriod = LocalDate.now();
     when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
@@ -183,7 +192,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculateBestPeriodValue() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var startOfPeriod = LocalDate.now();
     when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
@@ -200,7 +210,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculateWorstPeriodValue() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var startOfPeriod = LocalDate.now();
     when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
@@ -217,7 +228,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyCalculatePositive() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var startOfPeriod = LocalDate.now();
     when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
@@ -234,7 +246,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestWorstPeriodValues_whenVerifyGetDefaultValues() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var startOfPeriod = LocalDate.now();
     when(calculation.getStartOfPeriodsDate(any(), any())).thenReturn(startOfPeriod);
@@ -251,11 +264,13 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldGetSubMapByPeriodStartDate_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
     final var rollingReturns = getPortfolioReturns();
 
     doCallRealMethod().when(calculation).getMapByPeriodStartDate(any(), any());
-    final TreeMap<LocalDate, BigDecimal> returns = calculation.getMapByPeriodStartDate(rollingReturns, LocalDate.of(2020, 05,
+    final TreeMap<LocalDate, BigDecimal> returns = calculation.getMapByPeriodStartDate(rollingReturns, LocalDate.of(
+        2020, 05,
         31));
 
     assertFalse(returns.isEmpty());
@@ -266,7 +281,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateNumberOfPeriods_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
     final var rollingReturns = getPortfolioReturns();
 
     doCallRealMethod().when(calculation).calculateNumberOfPeriods(any(), any());
@@ -280,7 +296,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateAverage_whenCheckResultWhenPeriodIsLessThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     doCallRealMethod().when(calculation).calculateAverage(any(), any());
@@ -299,7 +316,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateAverage_whenVerifyAnnualize() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     doCallRealMethod().when(calculation).calculateAverage(any(), any());
@@ -311,7 +329,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateAverage_whenCheckResultWhenPeriodIsMoreThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
 
@@ -328,7 +347,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestPeriodValue_whenVerifyAnnualize() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
     final var rollingReturns = getPortfolioReturns();
 
     doCallRealMethod().when(calculation).calculateBestPeriodValue(any(), any());
@@ -340,7 +360,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestPeriodValue_whenCheckResultWhenPeriodIsLessThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
     final var rollingReturns = getPortfolioReturns();
 
     doCallRealMethod().when(calculation).calculateBestPeriodValue(any(), any());
@@ -362,7 +383,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestPeriodValue_whenCheckResultWhenPeriodIsMoreThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
     final var rollingReturns = getPortfolioReturns();
 
     doCallRealMethod().when(calculation).calculateBestPeriodValue(any(), any());
@@ -384,7 +406,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateBestPeriodValue_whenCheckResultWhenPeriodIsMoreThenTwelveAndTwoWorstPeriodValueAreEqual() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     rollingReturns.put(rollingReturns.lastKey(), rollingReturns.get(LocalDate.of(2020, 03, 31)));
@@ -408,7 +431,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateWorstPeriodValue_whenCheckResultWhenPeriodIsLessThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     doCallRealMethod().when(calculation).calculateWorstPeriodValue(any(), any());
@@ -432,7 +456,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateWorstPeriodValue_whenCheckResultWhenPeriodIsMoreThenTwelve() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     doCallRealMethod().when(calculation).calculateWorstPeriodValue(any(), any());
@@ -455,7 +480,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculateWorstPeriodValue_whenCheckResultWhenPeriodIsMoreThenTwelveAndTwoWorstPeriodValueAreEqual() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     rollingReturns.put(rollingReturns.lastKey(), rollingReturns.get(LocalDate.of(2020, 1, 31)));
@@ -479,7 +505,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculatePositive_whenVerifyGetNumberOfPeriodsByPeriod() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     when(calculation.getNumberOfPeriodsByPeriod(any())).thenReturn(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
@@ -493,7 +520,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldCalculatePositive_whenCheckResultWhenAllPositive() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     when(calculation.getNumberOfPeriodsByPeriod(any())).thenReturn(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
@@ -503,14 +531,16 @@ class BestWorstPeriodCalculationTest {
 
     assertFalse(calculation.bestWorstPeriodData.getPctPositive().isEmpty());
     assertEquals(6L, calculation.bestWorstPeriodData.getPctPositive().get(0).period());
-    assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(1)), DecimalUtils.toUserScale(calculation.bestWorstPeriodData
-        .getPctPositive().get(0).value()));
+    assertEquals(DecimalUtils.toUserScale(BigDecimal.valueOf(1)), DecimalUtils.toUserScale(
+        calculation.bestWorstPeriodData
+            .getPctPositive().get(0).value()));
   }
 
   @Test
   void shouldCalculatePositive_whenCheckResultWhenTwoRecordsAreNegative() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     final var rollingReturns = getPortfolioReturns();
     rollingReturns.put(rollingReturns.firstKey(), BigDecimal.valueOf(-1.01094319080371));
@@ -529,7 +559,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldGetNumberOfPeriodsByPeriod_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     calculation.bestWorstPeriodData.getNumberOfPeriods().add(new PeriodValueResult(6L, BigDecimal.valueOf(13)));
 
@@ -543,7 +574,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldGetPeriodStartDate_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     doCallRealMethod().when(calculation).getStartOfPeriodsDate(anyLong(), any());
     final LocalDate periodStartDate = calculation.getStartOfPeriodsDate(12L, getPortfolioReturns());
@@ -554,7 +586,8 @@ class BestWorstPeriodCalculationTest {
   @Test
   void shouldGetDefaultValues_whenCheckResult() {
     final var portfolioReturns = getPortfolioReturns();
-    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set.of()));
+    final var calculation = mock(BestWorstPeriodCalculation.class, withSettings().useConstructor(portfolioReturns, Set
+        .of()));
 
     doCallRealMethod().when(calculation).addDefaultValues(any());
     calculation.addDefaultValues(6L);

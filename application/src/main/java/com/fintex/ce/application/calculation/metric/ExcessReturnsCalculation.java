@@ -4,7 +4,6 @@ import com.fintex.ce.application.calculation.metric.core.BenchmarkWeightedAverag
 import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.ExcessReturnsResult;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,10 +41,7 @@ public class ExcessReturnsCalculation extends BenchmarkWeightedAverageCalculatio
 
   @Override
   public ExcessReturnsResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final ExcessReturnsResult result = new ExcessReturnsResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setExcessReturns(timeIntervals);
-    return result;
+    return new ExcessReturnsResult(formTimeIntervalResult(periodValues));
   }
 
   /**
