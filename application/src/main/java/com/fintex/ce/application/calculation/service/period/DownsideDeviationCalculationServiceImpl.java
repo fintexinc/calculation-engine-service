@@ -9,7 +9,7 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.sm.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,14 +22,14 @@ public class DownsideDeviationCalculationServiceImpl
     extends
       PeriodAbstractService<DownsideDeviationResult, PeriodCommand> {
 
-  private final TBillsFetcher tBillsProvider;
+  private final TreasuryBillsFetcher treasuryBillsFetcher;
 
   public DownsideDeviationCalculationServiceImpl(
       @Autowired final MonthlyReturnsService monthlyReturnsService,
-      @Autowired final TBillsFetcher tBillsProvider,
+      @Autowired final TreasuryBillsFetcher treasuryBillsFetcher,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
-    this.tBillsProvider = tBillsProvider;
+    this.treasuryBillsFetcher = treasuryBillsFetcher;
   }
 
   @Override
@@ -40,8 +40,7 @@ public class DownsideDeviationCalculationServiceImpl
   public DownsideDeviationCalculation<DownsideDeviationResult> defineCalculationMethod(final PeriodCommand command) {
     final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
     final var tBills = TBillsValidator.requireNonEmpty(
-
-        tBillsProvider.fetch().get(command.getCurrency()), command.getCurrency());
+        treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
     return new DownsideDeviationCalculation<>(context, defaultPeriods, tBills);
   }
 }

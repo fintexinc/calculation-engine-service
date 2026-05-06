@@ -6,7 +6,7 @@ import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationIn
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
-import com.fintex.ce.port.webclient.sm.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Assertions;
@@ -31,7 +31,7 @@ class AlphaCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(AlphaCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
@@ -39,8 +39,8 @@ class AlphaCalculationServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
-        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
+    when(tBillsFetcher.fetch(Currency.CAD))
+        .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
@@ -53,7 +53,7 @@ class AlphaCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(AlphaCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
@@ -61,8 +61,8 @@ class AlphaCalculationServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
-        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
+    when(tBillsFetcher.fetch(Currency.CAD))
+        .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
@@ -70,13 +70,13 @@ class AlphaCalculationServiceImplTest {
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);
 
-    verify(tBillsFetcher).fetch();
+    verify(tBillsFetcher).fetch(Currency.CAD);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      final var tBillsFetcher = mock(TBillsFetcher.class);
+      final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
       final var service = mock(AlphaCalculationServiceImpl.class, withSettings()
           .useConstructor(null, tBillsFetcher, null));
 
@@ -85,7 +85,7 @@ class AlphaCalculationServiceImplTest {
       final var req = mock(PeriodCommand.class);
 
       when(req.getCurrency()).thenReturn(Currency.CAD);
-      when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, treeMap, Currency.USD, treeMap));
+      when(tBillsFetcher.fetch(Currency.CAD)).thenReturn(treeMap);
       when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
       when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);
@@ -100,7 +100,7 @@ class AlphaCalculationServiceImplTest {
 
   @Test
   void shouldThrowMissingTBillRate_whenTBillSeriesEmptyForRequestedCurrency() {
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(AlphaCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
@@ -108,8 +108,8 @@ class AlphaCalculationServiceImplTest {
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.EUR);
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
-    // EUR is outside the SELECTORS map; TBillsFetcher pre-populates it as an empty TreeMap.
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.EUR, new TreeMap<>()));
+    // EUR is outside the SELECTORS map; TreasuryBillsFetcher pre-populates it as an empty TreeMap.
+    when(tBillsFetcher.fetch(Currency.EUR)).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(service).defineCalculationMethod(req);
 

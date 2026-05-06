@@ -68,6 +68,9 @@ public abstract class BasePceException extends RuntimeException {
 
   public BasePceException withHolding(PortfolioHolding holding) {
     this.id = ErrorParams.holdingId(holding);
+    if (this.id != null) {
+      metadata.put(ErrorParams.HOLDING_ID, this.id);
+    }
     return this;
   }
 

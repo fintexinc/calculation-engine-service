@@ -16,3 +16,6 @@ logging:
     include-query-string: true
     include-payload: true
 
+sms:
+  runner:
+    enabled: false

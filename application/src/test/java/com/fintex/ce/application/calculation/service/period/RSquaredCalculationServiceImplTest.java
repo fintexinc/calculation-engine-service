@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.sm.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class RSquaredCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
         null));
 
@@ -37,8 +37,8 @@ class RSquaredCalculationServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
-        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
+    when(tBillsFetcher.fetch(Currency.CAD))
+        .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
@@ -51,7 +51,7 @@ class RSquaredCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(RSquaredCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, null));
 
@@ -60,8 +60,8 @@ class RSquaredCalculationServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)),
-        Currency.USD, new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE))));
+    when(tBillsFetcher.fetch(Currency.CAD))
+        .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
@@ -69,13 +69,13 @@ class RSquaredCalculationServiceImplTest {
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);
 
-    verify(tBillsFetcher).fetch();
+    verify(tBillsFetcher).fetch(Currency.CAD);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      final var tBillsFetcher = mock(TBillsFetcher.class);
+      final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
       final var service = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
           null));
 
@@ -84,7 +84,7 @@ class RSquaredCalculationServiceImplTest {
       final var req = mock(PeriodCommand.class);
 
       when(req.getCurrency()).thenReturn(Currency.CAD);
-      when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, treeMap, Currency.USD, treeMap));
+      when(tBillsFetcher.fetch(Currency.CAD)).thenReturn(treeMap);
       when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
       when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);

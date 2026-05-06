@@ -4,7 +4,7 @@ import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.sm.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class SortinoRatioCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
     final var service = mock(SortinoRatioCalculationServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
@@ -37,7 +37,7 @@ class SortinoRatioCalculationServiceImplTest {
     when(input.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(input);
     when(command.getCurrency()).thenReturn(Currency.CAD);
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, treeMap, Currency.USD, treeMap));
+    when(tBillsFetcher.fetch(Currency.CAD)).thenReturn(treeMap);
 
     doCallRealMethod().when(service).defineCalculationMethod(any());
     service.defineCalculationMethod(command);

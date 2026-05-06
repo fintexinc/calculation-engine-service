@@ -10,7 +10,7 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.sm.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,14 +20,14 @@ import java.util.Set;
 @Service
 public class SortinoRatioCalculationServiceImpl extends PeriodAbstractService<SortinoRatioResult, PeriodCommand> {
 
-  private final TBillsFetcher tBillsProvider;
+  private final TreasuryBillsFetcher treasuryBillsFetcher;
 
   public SortinoRatioCalculationServiceImpl(
       final MonthlyReturnsService monthlyReturnsService,
-      final TBillsFetcher tBillsProvider,
+      final TreasuryBillsFetcher treasuryBillsFetcher,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
-    this.tBillsProvider = tBillsProvider;
+    this.treasuryBillsFetcher = treasuryBillsFetcher;
   }
 
   @Override
@@ -40,7 +40,7 @@ public class SortinoRatioCalculationServiceImpl extends PeriodAbstractService<So
     final PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
     final var tBills = TBillsValidator.requireNonEmpty(
 
-        tBillsProvider.fetch().get(command.getCurrency()), command.getCurrency());
+        treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
     final DownsideDeviationCalculation<SortinoRatioResult> downsideDeviationCalculation = new DownsideDeviationCalculation<>(
         input, defaultPeriods, tBills);
     return new SortinoRatioCalculation(input, defaultPeriods, tBills, downsideDeviationCalculation);

@@ -5,6 +5,8 @@ import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
+import org.springframework.stereotype.Component;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -19,43 +21,42 @@ import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ZERO;
 
+/**
+ * Stateless component that computes the portfolio-level weighted-average return time series for a per-holding returns
+ * map. The {@link ReturnFactorScale} is supplied per call so the bean carries no request-time configuration.
+ */
+@Component
 @EqualsAndHashCode
 public class WeightedAverageComponent {
 
-  private final ReturnFactorScale returnFactorScale;
-
-  public WeightedAverageComponent(final ReturnFactorScale returnFactorScale) {
-    this.returnFactorScale = returnFactorScale;
-  }
-
   public NavigableMap<LocalDate, BigDecimal> calculateWeightedAverage(
-      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns) {
-    final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight = calculateEndingPortfolioWeight(
+      Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns,
+      ReturnFactorScale returnFactorScale) {
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight = calculateEndingPortfolioWeight(
         returns);
-    return new TreeMap<>(calculateTotalPortfolioReturnFactor(returns, endingPortfolioWeight));
+    return new TreeMap<>(calculateTotalPortfolioReturnFactor(returns, endingPortfolioWeight, returnFactorScale));
   }
 
   public Map<LocalDate, BigDecimal> calculateTotalPortfolioReturnFactor(
-      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> portfolioBaseTotalReturn,
-      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight) {
-    final NavigableMap<LocalDate, BigDecimal> calculate = new SumProduct<>(portfolioBaseTotalReturn,
-        endingPortfolioWeight)
+      Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> portfolioBaseTotalReturn,
+      Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight,
+      ReturnFactorScale returnFactorScale) {
+    NavigableMap<LocalDate, BigDecimal> calculate = new SumProduct<>(portfolioBaseTotalReturn, endingPortfolioWeight)
         .setMap2KeyFinder(date -> toLastDayOfMonth(date.minusMonths(1)))
         .calculate();
     return calculate.entrySet().stream().collect(toTreeMap(Map.Entry::getKey, returnFactorScale.getFormula()));
   }
 
   public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> calculateEndingPortfolioWeight(
-      final Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> pBaseTotalReturn) {
-    final Map<PortfolioHolding, BigDecimal> initialWeights = PortfolioUtils.calculateInitialPortfolioWeight(
-        pBaseTotalReturn
-            .keySet());
-    return pBaseTotalReturn.entrySet().stream().collect(toMap(Map.Entry::getKey, collectMonthlyWeightEntries(
-        initialWeights)));
+      Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> portfolioBaseTotalReturn) {
+    Map<PortfolioHolding, BigDecimal> initialWeights = PortfolioUtils.calculateInitialPortfolioWeight(
+        portfolioBaseTotalReturn.keySet());
+    return portfolioBaseTotalReturn.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, collectMonthlyWeightEntries(initialWeights)));
   }
 
   /**
-   * Works for monthly rebalance
+   * Works for monthly rebalance.
    *
    * @param initialWeights
    *          initial holdings weights of portfolio
@@ -64,12 +65,11 @@ public class WeightedAverageComponent {
   public Function<Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>, TreeMap<LocalDate, BigDecimal>> collectMonthlyWeightEntries(
       Map<PortfolioHolding, BigDecimal> initialWeights) {
     return topEntry -> {
-      final Map<LocalDate, BigDecimal> hBaseTotalReturns = new HashMap<>(topEntry.getValue());
-      final LocalDate initDate = topEntry.getValue().keySet().stream().min(LocalDate::compareTo).orElseThrow();
-      // add a month before start date to be able to refer to this date from other calculations
+      Map<LocalDate, BigDecimal> hBaseTotalReturns = new HashMap<>(topEntry.getValue());
+      LocalDate initDate = topEntry.getValue().keySet().stream().min(LocalDate::compareTo).orElseThrow();
       hBaseTotalReturns.put(toLastDayOfMonth(initDate.minusMonths(1)), ZERO);
-      return hBaseTotalReturns.entrySet().stream().collect(toTreeMap(Map.Entry::getKey, e -> initialWeights.get(topEntry
-          .getKey())));
+      return hBaseTotalReturns.entrySet().stream().collect(toTreeMap(Map.Entry::getKey,
+          entry -> initialWeights.get(topEntry.getKey())));
     };
   }
 }

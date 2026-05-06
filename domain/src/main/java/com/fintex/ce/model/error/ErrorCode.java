@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 
+import static com.fintex.ce.model.error.ErrorParams.HOLDING_ID;
 import static com.fintex.ce.model.error.ErrorParams.holdingId;
 import static com.fintex.ce.model.error.ErrorParams.paramMetadata;
 import static com.fintex.ce.model.error.ErrorParams.prepend;
@@ -979,7 +980,11 @@ public enum ErrorCode {
   public Notification toNotificationForHolding(PortfolioHolding holding, Object... formatArgs) {
     String id = holdingId(holding);
     Object[] allArgs = prepend(id, formatArgs);
-    return buildNotification(id, null, getFormattedMessage(allArgs), paramMetadata(allArgs));
+    Map<String, Object> metadata = paramMetadata(allArgs);
+    if (id != null) {
+      metadata.put(HOLDING_ID, id);
+    }
+    return buildNotification(id, null, getFormattedMessage(allArgs), metadata);
   }
 
   public Notification toNotificationForField(String fieldName, Object... formatArgs) {

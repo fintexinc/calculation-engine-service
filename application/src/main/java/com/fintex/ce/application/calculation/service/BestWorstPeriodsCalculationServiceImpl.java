@@ -1,9 +1,11 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.BestWorstPeriodCalculation;
-import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.application.returns.MonthlyReturnsContext;
+import com.fintex.ce.application.returns.WeightedAverageResult;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
@@ -12,9 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.NavigableMap;
 import java.util.Set;
 
 import static com.fintex.ce.application.util.ReturnFactorScale.SCALE_OF_TWO;
@@ -31,7 +30,7 @@ public class BestWorstPeriodsCalculationServiceImpl
   public Set<Long> defaultPeriods;
 
   @Autowired
-  public BestWorstPeriodsCalculationServiceImpl(final MonthlyReturnsService monthlyReturnsService) {
+  public BestWorstPeriodsCalculationServiceImpl(MonthlyReturnsService monthlyReturnsService) {
     this.monthlyReturnsService = monthlyReturnsService;
   }
 
@@ -41,8 +40,8 @@ public class BestWorstPeriodsCalculationServiceImpl
   }
 
   @Override
-  public BestWorstPeriodsResult perform(final BestWorstPeriodsCommand command) {
-    final PeriodCalculationInput context = buildWeightedAverageInput(command);
+  public BestWorstPeriodsResult perform(BestWorstPeriodsCommand command) {
+    PeriodCalculationInput context = buildWeightedAverageInput(command);
     return buildBestWorstPeriodCalculation(command, context).calculate();
   }
 
@@ -51,22 +50,18 @@ public class BestWorstPeriodsCalculationServiceImpl
     return new BestWorstPeriodCalculation(context.getWeightedAveragePortfolioReturns(), getPeriods(command));
   }
 
-  public PeriodCalculationInput buildWeightedAverageInput(final BestWorstPeriodsCommand command) {
-    final ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(command
-        .getHoldings(), command
-            .getCurrency(), SCALE_OF_TWO);
-
-    final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(monthlyReturnsAggregate, command.getCustomPsd(), command
-            .getCustomPed());
-
-    return new PeriodCalculationInput(weightedAveragePortfolioReturns);
+  public PeriodCalculationInput buildWeightedAverageInput(BestWorstPeriodsCommand command) {
+    MonthlyReturnsContext<HoldingMonthlyReturns> monthlyReturnsContext = monthlyReturnsService
+        .getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency());
+    WeightedAverageResult<HoldingMonthlyReturns> result = monthlyReturnsService
+        .calculateWeightedAverageWithCpsdAndCped(monthlyReturnsContext, command.getCustomPsd(), command.getCustomPed(),
+            SCALE_OF_TWO);
+    return new PeriodCalculationInput(result.weightedAverage());
   }
 
-  public Set<Long> getPeriods(final BestWorstPeriodsCommand command) {
+  public Set<Long> getPeriods(BestWorstPeriodsCommand command) {
     return !isEmpty(command.getBestWorstTimeIntervalPeriods())
         ? command.getBestWorstTimeIntervalPeriods()
         : defaultPeriods;
   }
-
 }

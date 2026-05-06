@@ -4,9 +4,12 @@ import com.fintex.ce.application.calculation.metric.CorrelationCalculation;
 import com.fintex.ce.application.calculation.metric.RollingCorrelationCalculation;
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
-import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.application.returns.MonthlyReturnsContext;
+import com.fintex.ce.application.returns.ReturnsSnapshot;
+import com.fintex.ce.application.returns.WeightedAverageResult;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
@@ -18,8 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Set;
 
 @Service
@@ -48,50 +51,49 @@ public class RollingCorrelationCalculationServiceImpl
   public RollingCorrelationCalculation defineCalculationMethod(RollingCalculationCommand command) {
     BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
     Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturn = getBaseTotalReturns(command);
-    var correlationCalculation = new CorrelationCalculation(context, baseTotalReturn, defaultPeriods);
-    return new RollingCorrelationCalculation(context, defaultPeriods, correlationCalculation, context
-        .getWeightedAverageBenchmarkReturns());
+    CorrelationCalculation correlationCalculation = new CorrelationCalculation(context, baseTotalReturn,
+        defaultPeriods);
+    return new RollingCorrelationCalculation(context, defaultPeriods, correlationCalculation,
+        context.getWeightedAverageBenchmarkReturns());
   }
 
   public Map<PortfolioHolding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand command) {
-    ReturnsAggregate monthlyReturnsAggregate = monthlyReturnsService.getPortfolioMonthlyReturns(command.getHoldings(),
-        command
-            .getCurrency(), ReturnFactorScale.SCALE_OF_TWO);
-
-    return monthlyReturnsAggregate
-        .validateCped(command.getCustomPed())
-        .cutByCpedIfCpedEmptyCutByPed(command.getCustomPed())
-        .fxRatesApplied()
-        .getReturnsMap();
+    MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = monthlyReturnsService.getPortfolioMonthlyReturns(
+        command.getHoldings(), command.getCurrency());
+    ReturnsSnapshot<HoldingMonthlyReturns> postFx = monthlyReturnsService.applyValidateCutAndFx(portfolioContext,
+        command.getCustomPed());
+    return new HashMap<>(postFx.returnsMap());
   }
 
   @Override
   public BenchmarkPeriodCalculationInput buildPeriodCalculationInput(RollingCalculationCommand command,
       ReturnFactorScale returnFactorScale) {
-    PceExceptionCollector notification = new PceExceptionCollector();
+    PceExceptionCollector collector = new PceExceptionCollector();
 
-    ReturnsAggregate portfolioMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
-        .getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency(), returnFactorScale));
-    ReturnsAggregate benchmarkMonthlyReturnsAggregate = notification.tryCatch(() -> monthlyReturnsService
-        .getBenchmarkMonthlyReturns(command.getBenchmarkHoldings(), command.getCurrency(), returnFactorScale));
-    notification.throwIfAny();
+    MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = collector.tryCatch(
+        () -> monthlyReturnsService.getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency()));
+    MonthlyReturnsContext<HoldingMonthlyReturns> benchmarkContext = collector.tryCatch(
+        () -> monthlyReturnsService.getBenchmarkMonthlyReturns(command.getBenchmarkHoldings(), command.getCurrency()));
+    collector.throwIfAny();
 
-    portfolioMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(benchmarkMonthlyReturnsAggregate);
-    benchmarkMonthlyReturnsAggregate.cutArgumentToTheSameEndDate(portfolioMonthlyReturnsAggregate);
+    LocalDate commonEnd = monthlyReturnsService.commonPerformanceEndDate(portfolioContext, benchmarkContext);
+    MonthlyReturnsContext<HoldingMonthlyReturns> alignedPortfolio = monthlyReturnsService.trimContextToEnd(
+        portfolioContext, commonEnd);
+    MonthlyReturnsContext<HoldingMonthlyReturns> alignedBenchmark = monthlyReturnsService.trimContextToEnd(
+        benchmarkContext, commonEnd);
 
-    NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = notification.tryCatch(() -> monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(portfolioMonthlyReturnsAggregate, command.getCustomPsd(), command
-            .getCustomPed()));
-    NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = notification.tryCatch(() -> monthlyReturnsService
-        .getWeightedAverageWithCpsdAndCpedValidation(benchmarkMonthlyReturnsAggregate, command.getCustomPsd(), command
-            .getCustomPed()));
-    notification.throwIfAny();
+    WeightedAverageResult<HoldingMonthlyReturns> portfolioResult = collector.tryCatch(
+        () -> monthlyReturnsService.calculateWeightedAverageWithCpsdAndCped(alignedPortfolio, command.getCustomPsd(),
+            command.getCustomPed(), returnFactorScale));
+    WeightedAverageResult<HoldingMonthlyReturns> benchmarkResult = collector.tryCatch(
+        () -> monthlyReturnsService.calculateWeightedAverageWithCpsdAndCped(alignedBenchmark, command.getCustomPsd(),
+            command.getCustomPed(), returnFactorScale));
+    collector.throwIfAny();
 
-    var result = new BenchmarkPeriodCalculationInput();
-    result.setWeightedAverageBenchmarkReturns(benchmarkTotalReturns);
-    result.setWeightedAveragePortfolioReturns(portfolioTotalReturns);
+    BenchmarkPeriodCalculationInput result = new BenchmarkPeriodCalculationInput();
+    result.setWeightedAverageBenchmarkReturns(benchmarkResult.weightedAverage());
+    result.setWeightedAveragePortfolioReturns(portfolioResult.weightedAverage());
     result.setCipsd(command.getCustomIntervalPsd());
     return result;
   }
-
 }

@@ -10,7 +10,7 @@ import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationIn
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.AlphaResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.sm.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,14 +26,14 @@ import static com.fintex.ce.application.calculation.metric.core.PeriodCalculatio
 @Service
 public class AlphaCalculationServiceImpl extends PeriodBenchmarkAbstractService<AlphaResult, PeriodCommand> {
 
-  private final TBillsFetcher tBillsProvider;
+  private final TreasuryBillsFetcher treasuryBillsFetcher;
 
   public AlphaCalculationServiceImpl(
       @Autowired final MonthlyReturnsService monthlyReturnsService,
-      @Autowired final TBillsFetcher tBillsProvider,
+      @Autowired final TreasuryBillsFetcher treasuryBillsFetcher,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
     super(monthlyReturnsService, defaultPeriods);
-    this.tBillsProvider = tBillsProvider;
+    this.treasuryBillsFetcher = treasuryBillsFetcher;
   }
 
   @Override
@@ -47,7 +47,7 @@ public class AlphaCalculationServiceImpl extends PeriodBenchmarkAbstractService<
         ReturnFactorScale.SCALE_OF_ONE);
     final var tBills = TBillsValidator.requireNonEmpty(
 
-        tBillsProvider.fetch().get(command.getCurrency()), command.getCurrency());
+        treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
     final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = calculateExcessReturn(context
         .getWeightedAveragePortfolioReturns(), tBills);
     final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn = calculateExcessReturn(context
