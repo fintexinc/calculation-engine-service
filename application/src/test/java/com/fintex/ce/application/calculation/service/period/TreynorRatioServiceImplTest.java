@@ -4,8 +4,7 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.sm.TBillsFetcher;
-import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -33,7 +32,7 @@ class TreynorRatioServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(TreynorRatioServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
@@ -46,8 +45,7 @@ class TreynorRatioServiceImplTest {
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, weightedAverageReturns, Currency.USD,
-        weightedAverageReturns));
+    when(tBillsFetcher.fetch(CAD)).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);
@@ -58,7 +56,7 @@ class TreynorRatioServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(TreynorRatioServiceImpl.class, withSettings()
         .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
@@ -71,20 +69,19 @@ class TreynorRatioServiceImplTest {
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, weightedAverageReturns, Currency.USD,
-        weightedAverageReturns));
+    when(tBillsFetcher.fetch(CAD)).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);
 
-    verify(tBillsFetcher).fetch();
+    verify(tBillsFetcher).fetch(CAD);
   }
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-      final var tBillsFetcher = mock(TBillsFetcher.class);
+      final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
       final var service = mock(TreynorRatioServiceImpl.class, withSettings()
           .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
 
@@ -93,7 +90,7 @@ class TreynorRatioServiceImplTest {
       final var req = mock(PeriodCommand.class);
 
       when(req.getCurrency()).thenReturn(CAD);
-      when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, treeMap, Currency.USD, treeMap));
+      when(tBillsFetcher.fetch(CAD)).thenReturn(treeMap);
       when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
       when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(treeMap);
       when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(treeMap);

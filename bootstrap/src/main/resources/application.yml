@@ -15,6 +15,9 @@ cache:
       enabled: true
       max-entries: 4096
       recency-cutoff-days: 1
+    t-bills:
+      enabled: true
+      refresh-after: 24h
 
 external-services:
   bank-of-canada:

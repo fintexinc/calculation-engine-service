@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.returns.ReturnsAggregate;
+import com.fintex.ce.application.returns.ReturnsSnapshot;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
@@ -9,12 +9,10 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.error.PceExceptionCollector;
-import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,20 +39,20 @@ public class CommonPerformanceDateServiceImpl
   public CommonPerformanceDatesResult perform(MultiplePortfoliosCommand command) {
     List<PortfolioHolding> portfolioHoldings = collectAllPortfolioHoldings(command.getPortfolios());
 
-    var collector = new PceExceptionCollector();
-    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForPortfolios = collector.tryCatch(
+    PceExceptionCollector collector = new PceExceptionCollector();
+    ReturnsSnapshot<HoldingMonthlyReturns> portfolioSnapshot = collector.tryCatch(
         () -> getPortfolioMonthlyReturns(portfolioHoldings));
     DateRange commonPerformanceDateForPortfolios = collector.tryCatch(
-        () -> commonPerformanceDateFor(monthlyReturnsAggregateForPortfolios));
-    ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregateForBenchmark = collector.tryCatch(
+        () -> commonPerformanceDateFor(portfolioSnapshot));
+    ReturnsSnapshot<HoldingMonthlyReturns> benchmarkSnapshot = collector.tryCatch(
         () -> getPortfolioMonthlyReturns(command.getBenchmarkHoldings()));
     DateRange commonPerformanceDatesForBenchmarks = collector.tryCatch(
-        () -> commonPerformanceDateFor(monthlyReturnsAggregateForBenchmark));
+        () -> commonPerformanceDateFor(benchmarkSnapshot));
     collector.throwIfAny();
 
-    List<Notification> warnings = Stream.of(monthlyReturnsAggregateForPortfolios, monthlyReturnsAggregateForBenchmark)
+    List<Notification> warnings = Stream.of(portfolioSnapshot, benchmarkSnapshot)
         .filter(Objects::nonNull)
-        .flatMap(a -> a.getErrorsAsWarnings().stream())
+        .flatMap(snapshot -> snapshot.getErrorsAsWarnings().stream())
         .toList();
 
     return CommonPerformanceDatesResult.builder()
@@ -70,22 +68,21 @@ public class CommonPerformanceDateServiceImpl
     if (CollectionUtils.isEmpty(portfolios)) {
       return List.of();
     }
-    return portfolios.stream().flatMap(p -> p.getHoldings().stream()).toList();
+    return portfolios.stream().flatMap(portfolio -> portfolio.getHoldings().stream()).toList();
   }
 
-  DateRange commonPerformanceDateFor(ReturnsAggregate<HoldingMonthlyReturns> monthlyReturnsAggregate) {
-    if (ObjectUtils.isEmpty(monthlyReturnsAggregate)) {
+  DateRange commonPerformanceDateFor(ReturnsSnapshot<HoldingMonthlyReturns> snapshot) {
+    if (snapshot == null
+        || (snapshot.performanceStartDate() == null && snapshot.performanceEndDate() == null)) {
       return DateRange.UNBOUNDED;
     }
-    return new DateRange(monthlyReturnsAggregate.getPerformanceStartDate(), monthlyReturnsAggregate
-        .getPerformanceEndDate());
+    return new DateRange(snapshot.performanceStartDate(), snapshot.performanceEndDate());
   }
 
-  ReturnsAggregate<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<PortfolioHolding> holdings) {
+  ReturnsSnapshot<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<PortfolioHolding> holdings) {
     if (CollectionUtils.isEmpty(holdings)) {
-      return new ReturnsAggregate<>();
+      return ReturnsSnapshot.empty();
     }
-    return monthlyReturnsService.getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(holdings, Currency.CAD);
+    return monthlyReturnsService.getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(holdings);
   }
-
 }

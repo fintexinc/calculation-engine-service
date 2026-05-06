@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.sm.TBillsFetcher;
+import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class DownsideDeviationCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
-    final var tBillsFetcher = mock(TBillsFetcher.class);
+    final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(DownsideDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(null, tBillsFetcher, Set.of()));
 
@@ -37,8 +37,7 @@ class DownsideDeviationCalculationServiceImplTest {
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
-    when(tBillsFetcher.fetch()).thenReturn(Map.of(Currency.CAD, weightedAverageReturns, Currency.USD,
-        weightedAverageReturns));
+    when(tBillsFetcher.fetch(Currency.CAD)).thenReturn(weightedAverageReturns);
 
     doCallRealMethod().when(service).defineCalculationMethod(req);
     service.defineCalculationMethod(req);
