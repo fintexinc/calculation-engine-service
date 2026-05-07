@@ -2,38 +2,59 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
+import com.fintex.wm.commons.domain.datapoint.DatapointMetadata;
+import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
 import com.fintex.wm.commons.domain.financial.Fees;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import java.math.BigDecimal;
+
+import static com.fintex.ce.model.util.BigDecimalUtils.percentageToRatio;
 
 /**
- * Maps Security Master Fees response to Fees domain model.
+ * Maps the Security Master {@link Fees} response to the engine-side {@link FeeData} model.
+ *
+ * <p>
+ * SMS sends fee fields in <i>percentage</i> form ({@code 1.51} = 1.51%); the engine works in <i>ratio</i> form
+ * ({@code 0.0151}). This mapper is the single boundary that converts: every fee field goes through
+ * {@link com.fintex.ce.model.util.BigDecimalUtils#percentageToRatio}. Currency is passed through as-is.
  */
 @Component
 public class FeesMapper implements SecurityMasterResponseMapper<FeeData, Fees> {
 
   @Override
-  public FeeData map(Fees smsResponse, PortfolioHolding holding) {
-    final var fees = Optional.ofNullable(smsResponse);
-    final var mgmtFee = fees.map(Fees::getManagementFee);
-    final var mer = fees.map(Fees::getManagementExpenseRatio);
-    final var ner = fees.map(Fees::getNetExpenseRatio);
-    final var ger = fees.map(Fees::getGrossExpenseRatio);
-    final var fee12b1 = fees.map(Fees::getActual12B1Fee);
-
+  public FeeData map(Fees fees, PortfolioHolding holding) {
+    if (fees == null) {
+      return FeeData.builder().build();
+    }
     return FeeData.builder()
-        .managementFee(mgmtFee.map(d -> d.getValue()).orElse(null))
-        .managementFeeProvider(mgmtFee.map(d -> d.getDataProvider()).orElse(null))
-        .managementExpenseRatio(mer.map(d -> d.getValue()).orElse(null))
-        .managementExpenseRatioProvider(mer.map(d -> d.getDataProvider()).orElse(null))
-        .netExpenseRatio(ner.map(d -> d.getValue()).orElse(null))
-        .netExpenseRatioProvider(ner.map(d -> d.getDataProvider()).orElse(null))
-        .grossExpenseRatio(ger.map(d -> d.getValue()).orElse(null))
-        .grossExpenseRatioProvider(ger.map(d -> d.getDataProvider()).orElse(null))
-        .actual12B1Fee(fee12b1.map(d -> d.getValue()).orElse(null))
-        .actual12B1FeeProvider(fee12b1.map(d -> d.getDataProvider()).orElse(null))
+        .managementFee(ratio(fees.getManagementFee()))
+        .managementFeeProvider(provider(fees.getManagementFee()))
+        .managementExpenseRatio(ratio(fees.getManagementExpenseRatio()))
+        .managementExpenseRatioProvider(provider(fees.getManagementExpenseRatio()))
+        .netExpenseRatio(ratio(fees.getNetExpenseRatio()))
+        .netExpenseRatioProvider(provider(fees.getNetExpenseRatio()))
+        .grossExpenseRatio(ratio(fees.getGrossExpenseRatio()))
+        .grossExpenseRatioProvider(provider(fees.getGrossExpenseRatio()))
+        .actual12B1Fee(ratio(fees.getActual12B1Fee()))
+        .actual12B1FeeProvider(provider(fees.getActual12B1Fee()))
+        .currency(currency(fees.getCurrency()))
         .build();
+  }
+
+  private static BigDecimal ratio(FloatDatapoint dp) {
+    return dp == null ? null : percentageToRatio(dp.getValue());
+  }
+
+  private static DataProvider provider(DatapointMetadata dp) {
+    return dp == null ? null : dp.getDataProvider();
+  }
+
+  private static Currency currency(CurrencyDatapoint dp) {
+    return dp == null ? null : dp.getValue();
   }
 }

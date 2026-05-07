@@ -644,6 +644,25 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  MISSING_FUND_FEE_DATA(
+      Codes.MISSING_FUND_FEE_DATA,
+      "The holding %s has no fee data; one of MER, Net Expense Ratio, Gross Expense Ratio, "
+          + "or Management Fee is required",
+      "All four fee fields (MER, NER, GER, Management Fee) are null for this fund holding",
+      "Populate at least one of MER, NER, GER, or Management Fee for this security",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  SMS_NO_DATA_FOR_HOLDING(
+      Codes.SMS_NO_DATA_FOR_HOLDING,
+      "Security Master returned no data for holding %s",
+      "Security Master did not include this fund holding in its /fees response — the security is unknown to SMS "
+          + "or its data provider has no fee record for it",
+      "Verify the security identifier exists in Security Master, switch to a data provider that covers it, or "
+          + "remove the holding from the request",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
   MISSING_NER_AND_GER(
       Codes.MISSING_NER_AND_GER,
       "The holding is missing both Net Expense Ratio and Gross Expense Ratio",
@@ -773,6 +792,16 @@ public enum ErrorCode {
       "Duplicate holding found in request",
       "The request contains two or more identical holdings",
       "Remove duplicate holdings from the request",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  HOLDING_TYPE_NOT_LEAF(
+      Codes.HOLDING_TYPE_NOT_LEAF,
+      "The holding %s has unsupported holding type %s; pick a specific subtype",
+      "Holding type must be a leaf instrument type, not a parent category",
+      "Use a leaf holding type such as MUTUAL_FUND_CANADA, ETF_CANADA, ETF_US, "
+          + "MUTUAL_FUND_US, HEDGE_FUND_CANADA, SEGREGATED_FUND_CANADA, STOCK_CANADA, "
+          + "STOCK_US, CASH, GIC, POOLED_FUND_CANADA, or FIXED_INCOME",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -1123,6 +1152,8 @@ public enum ErrorCode {
     public static final String MISSING_NER_AND_GER = "MER-002";
     public static final String MISSING_MANAGEMENT_FEE = "MER-003";
     public static final String MISSING_SALES_CHARGE_TYPE = "MER-004";
+    public static final String MISSING_FUND_FEE_DATA = "MER-005";
+    public static final String SMS_NO_DATA_FOR_HOLDING = "MER-006";
 
     // Best / Worst Periods
     public static final String BEST_WORST_TIME_INTERVAL_NOT_POSITIVE = "BWP-001";
@@ -1143,6 +1174,7 @@ public enum ErrorCode {
     public static final String HOLDING_VALUE_NEGATIVE_OR_NULL = "HLD-001";
     public static final String DUPLICATE_HOLDING = "HLD-002";
     public static final String HOLDING_VALUES_SUM_NOT_POSITIVE = "HLD-003";
+    public static final String HOLDING_TYPE_NOT_LEAF = "HLD-004";
 
     // Mutual Fund classification
     public static final String INVALID_SHARE_CLASS = "MF-001";

@@ -53,15 +53,16 @@ class FeesSecurityDataFetcherTest extends AbstractSecurityDataFetcherTest<FeeDat
 
   @Override
   protected List<SecurityAttributeResult<Fees>> smsResponseForComplexScenario() {
+    // SMS sends fees in percentage form (e.g. 1.00 meaning 1.00%); the mapper converts to ratio form (0.0100).
     return new FeesSmsResponseAppender()
         .append(
             etf1MorningstarId,
             FiIdentifierType.MORNINGSTAR_ID,
-            new FeesValues("0.0100", "0.0200", "0.0300", "0.0400", "0.0500"))
+            new FeesValues("1.00", "2.00", "3.00", "4.00", "5.00"))
         .append(
             canadianFundFundservCode,
             FiIdentifierType.FUNDSERV,
-            new FeesValues("0.0150", "0.0250", "0.0350", "0.0450", "0.0550"))
+            new FeesValues("1.50", "2.50", "3.50", "4.50", "5.50"))
         .build();
   }
 

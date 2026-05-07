@@ -161,6 +161,9 @@ public enum CalculationMetric {
   @Schema(description = "Management fee — weighted average management fee across holdings")
   MANAGEMENT_FEE("management-fee", AverageMerCommand.class),
 
+  @Schema(description = "Annual and monthly fee dollar amounts for the portfolio (Σ value × MER and that ÷ 12)")
+  FEES("fees", AverageMerCommand.class),
+
   @Schema(description = "Sales charge breakdown by holding")
   SALES_CHARGE("sales-charge", PortfolioHoldingsCommand.class),
 

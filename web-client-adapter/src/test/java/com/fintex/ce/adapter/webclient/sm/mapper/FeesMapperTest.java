@@ -15,30 +15,34 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * SMS returns fee fields in percentage form (e.g. {@code 1.51} meaning 1.51%). The mapper must convert to ratio form
+ * ({@code 0.0151}) at the adapter boundary so the rest of the engine works in consistent units.
+ */
 class FeesMapperTest {
 
   private final FeesMapper mapper = new FeesMapper();
 
   @Test
-  void shouldMapAllFieldsAndProviders_whenResponseHasValues() {
+  void mapsPercentageValuesToRatioForm() {
     var managementFee = new ManagementFeeDatapoint();
-    managementFee.setValue(BigDecimal.valueOf(0.0125));
+    managementFee.setValue(new BigDecimal("1.25"));
     managementFee.setDataProvider(DataProvider.MORNINGSTAR);
 
     var mer = new FloatDatapoint();
-    mer.setValue(BigDecimal.valueOf(0.0225));
+    mer.setValue(new BigDecimal("2.25"));
     mer.setDataProvider(DataProvider.MORNINGSTAR);
 
     var netExpenseRatio = new FloatDatapoint();
-    netExpenseRatio.setValue(BigDecimal.valueOf(0.021));
+    netExpenseRatio.setValue(new BigDecimal("2.10"));
     netExpenseRatio.setDataProvider(DataProvider.MORNINGSTAR);
 
     var grossExpenseRatio = new FloatDatapoint();
-    grossExpenseRatio.setValue(BigDecimal.valueOf(0.025));
+    grossExpenseRatio.setValue(new BigDecimal("2.50"));
     grossExpenseRatio.setDataProvider(DataProvider.MORNINGSTAR);
 
     var actual12B1Fee = new FloatDatapoint();
-    actual12B1Fee.setValue(BigDecimal.valueOf(0.0025));
+    actual12B1Fee.setValue(new BigDecimal("0.25"));
     actual12B1Fee.setDataProvider(DataProvider.MORNINGSTAR);
 
     var smsResponse = new Fees();
@@ -63,7 +67,7 @@ class FeesMapperTest {
   }
 
   @Test
-  void shouldReturnEmptyFeeData_whenResponseIsNull() {
+  void returnsAllNullFeeData_whenResponseIsNull() {
     FeeData result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getManagementFee()).isNull();
@@ -74,7 +78,7 @@ class FeesMapperTest {
   }
 
   @Test
-  void shouldReturnEmptyFeeData_whenResponseHasNullDatapoints() {
+  void returnsAllNullFeeData_whenResponseHasNullDatapoints() {
     var smsResponse = new Fees();
 
     FeeData result = mapper.map(smsResponse, createHolding("SEC-003"));
@@ -84,9 +88,9 @@ class FeesMapperTest {
   }
 
   @Test
-  void shouldMapPartialFields_whenSomeValuesArePresent() {
+  void mapsPartialFields_keepingNullFieldsNull() {
     var mer = new FloatDatapoint();
-    mer.setValue(BigDecimal.valueOf(0.019));
+    mer.setValue(new BigDecimal("1.90"));
     mer.setDataProvider(DataProvider.MORNINGSTAR);
 
     var smsResponse = new Fees();

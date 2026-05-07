@@ -8,7 +8,7 @@ import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQualit
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.enumeration.ParameterType;
+import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
@@ -34,6 +34,7 @@ import com.fintex.ce.model.domain.result.exposure.FixedIncomeGeographicExposureR
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
+import com.fintex.ce.model.domain.result.fee.FeesResult;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
@@ -226,11 +227,15 @@ class CalculationTestDataProvider {
                 FixedIncomeCreditQuality.AAA, BigDecimal.valueOf(25.0)))), CreditQualityResult.class),
 
         fee(CalculationMetric.MER, init(new AverageMerResult(), r -> r.setManagementExpenseRatio(Map.of(
-            ParameterType.SCALED,
+            FeeAggregationMode.FUNDS_ONLY,
             BigDecimal.valueOf(1.25)))), AverageMerResult.class),
         fee(CalculationMetric.MANAGEMENT_FEE, init(new ManagementFeeResult(), r -> r.setManagementFee(Map.of(
-            ParameterType.ABSOLUTE,
+            FeeAggregationMode.WHOLE_PORTFOLIO,
             BigDecimal.valueOf(0.85)))), ManagementFeeResult.class),
+        fee(CalculationMetric.FEES, init(new FeesResult(), r -> {
+          r.setAnnualFee(Map.of(FeeAggregationMode.FUNDS_ONLY, BigDecimal.valueOf(125.0)));
+          r.setMonthlyFee(Map.of(FeeAggregationMode.FUNDS_ONLY, BigDecimal.valueOf(125.0 / 12.0)));
+        }), FeesResult.class),
 
         entry(CalculationMetric.ANNUAL_RETURNS, returnCommand(), annualReturnResult(), AnnualReturnResult.class),
         entry(CalculationMetric.GROWTH_OF_10K, returnCommand(), growth10kResult(), Growth10KResult.class),
@@ -313,7 +318,7 @@ class CalculationTestDataProvider {
   private static AverageMerCommand averageMerCommand() {
     AverageMerCommand cmd = new AverageMerCommand();
     cmd.setHoldings(List.of(DUMMY_HOLDING));
-    cmd.setParameterTypes(List.of(ParameterType.SCALED, ParameterType.ABSOLUTE));
+    cmd.setParameterTypes(List.of(FeeAggregationMode.FUNDS_ONLY, FeeAggregationMode.WHOLE_PORTFOLIO));
     return cmd;
   }
 
