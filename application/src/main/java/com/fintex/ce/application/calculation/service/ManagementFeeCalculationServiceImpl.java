@@ -8,9 +8,9 @@ import com.fintex.ce.model.domain.enumeration.ParameterType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -67,7 +67,7 @@ public class ManagementFeeCalculationServiceImpl
   }
 
   @Override
-  public List<Warning> setInitialFeeAndModifiedFeeValues(
+  public List<Notification> setInitialFeeAndModifiedFeeValues(
       final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupOfMers) {
     return groupOfMers.entrySet().stream()
         .filter(e -> FUNDS.contains(e.getKey()))
@@ -78,7 +78,7 @@ public class ManagementFeeCalculationServiceImpl
         .toList();
   }
 
-  public Optional<List<Warning>> validateManagementFee(
+  public Optional<List<Notification>> validateManagementFee(
       AverageManagementExpenseCalculation averageManagementExpenseCalculation,
       PortfolioHolding holding) {
     if (Objects.isNull(averageManagementExpenseCalculation.getActualManagementFee())) {

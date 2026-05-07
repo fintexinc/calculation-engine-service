@@ -3,7 +3,7 @@ package com.fintex.ce.application.mapping.response;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +49,7 @@ class CountryExposureResponseMapperTest {
 
   @Test
   void shouldReturnDefaultMapAndPassWarnings_whenNetProductsAreEmpty() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
 
     CountryExposureResult result = mapper.fromNetProducts(Map.of(), warnings);
 
@@ -60,7 +60,7 @@ class CountryExposureResponseMapperTest {
 
   @Test
   void shouldMapAndScaleValues_whenUsingFromNetProducts() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
     Map<CountryRegionType, BigDecimal> netProducts = Map.of(
         CountryRegionType.CANADA, new BigDecimal("0.1"),
         CountryRegionType.UNITED_STATES, new BigDecimal("0.2"));

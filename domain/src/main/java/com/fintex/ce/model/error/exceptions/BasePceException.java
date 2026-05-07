@@ -2,6 +2,7 @@ package com.fintex.ce.model.error.exceptions;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ErrorParams;
 
 import java.io.Serial;
 import java.util.LinkedHashMap;
@@ -31,8 +32,6 @@ public abstract class BasePceException extends RuntimeException {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  private static final String PARAM_KEY_PREFIX = "param-";
-
   private final ErrorCode errorCode;
   private String id;
   private String fieldName;
@@ -41,7 +40,7 @@ public abstract class BasePceException extends RuntimeException {
   protected BasePceException(ErrorCode errorCode, Object... formatArgs) {
     super(errorCode.getFormattedMessage(formatArgs));
     this.errorCode = errorCode;
-    putAutoParams(formatArgs);
+    ErrorParams.putParams(metadata, formatArgs);
   }
 
   protected BasePceException(ErrorCode errorCode, Map<String, Object> parameters) {
@@ -68,17 +67,8 @@ public abstract class BasePceException extends RuntimeException {
   }
 
   public BasePceException withHolding(PortfolioHolding holding) {
-    this.id = holding == null ? null : holding.getIdsString();
+    this.id = ErrorParams.holdingId(holding);
     return this;
-  }
-
-  private void putAutoParams(Object[] formatArgs) {
-    if (formatArgs == null) {
-      return;
-    }
-    for (int i = 0; i < formatArgs.length; i++) {
-      metadata.put(PARAM_KEY_PREFIX + (i + 1), formatArgs[i]);
-    }
   }
 
   private static Object[] parametersToArray(Map<String, Object> parameters) {

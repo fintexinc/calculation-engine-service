@@ -9,8 +9,8 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.error.PceExceptionCollector;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -52,7 +52,7 @@ public class CommonPerformanceDateServiceImpl
         () -> commonPerformanceDateFor(monthlyReturnsAggregateForBenchmark));
     collector.throwIfAny();
 
-    List<Warning> warnings = Stream.of(monthlyReturnsAggregateForPortfolios, monthlyReturnsAggregateForBenchmark)
+    List<Notification> warnings = Stream.of(monthlyReturnsAggregateForPortfolios, monthlyReturnsAggregateForBenchmark)
         .filter(Objects::nonNull)
         .flatMap(a -> a.getErrorsAsWarnings().stream())
         .toList();

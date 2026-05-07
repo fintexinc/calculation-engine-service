@@ -4,7 +4,7 @@ import com.fintex.ce.model.domain.calculation.allocation.CountryAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -108,7 +108,7 @@ class CountryAllocationMappingServiceTest {
     doCallRealMethod().when(service).mapToRegions(any(), any(), any(), any());
 
     // ACT
-    final ArrayList<Warning> warnings = new ArrayList<>();
+    final ArrayList<Notification> warnings = new ArrayList<>();
     service.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
@@ -128,7 +128,7 @@ class CountryAllocationMappingServiceTest {
     doCallRealMethod().when(service).mapToRegions(any(), any(), any(), any());
 
     // ACT
-    final ArrayList<Warning> warnings = new ArrayList<>();
+    final ArrayList<Notification> warnings = new ArrayList<>();
     service.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
@@ -149,7 +149,7 @@ class CountryAllocationMappingServiceTest {
     doCallRealMethod().when(service).mapToRegions(any(), any(), any(), any());
 
     // ACT
-    final ArrayList<Warning> warnings = new ArrayList<>();
+    final ArrayList<Notification> warnings = new ArrayList<>();
     service.mapToRegions(mock(PortfolioHolding.class), allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
@@ -190,7 +190,7 @@ class CountryAllocationMappingServiceTest {
     doCallRealMethod().when(service).mapToCountryRegions(any(), any(), any());
 
     // ACT
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Notification> warnings = List.of(mock(Notification.class));
     service.mapToCountryRegions(Map.of(h, allocations), warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY);
 
     // VERIFY
@@ -204,7 +204,7 @@ class CountryAllocationMappingServiceTest {
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final Map<String, BigDecimal> allocations = Map.of("T", BigDecimal.ONE);
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Notification> warnings = List.of(mock(Notification.class));
 
     final Map<CountryRegionType, BigDecimal> emergingMarket = Map.of(CountryRegionType.EMERGING_MARKET, BigDecimal.ONE);
     when(service.mapToRegions(h, allocations, warnings, ErrorCode.PORTFOLIO_MISSING_CURRENCY)).thenReturn(

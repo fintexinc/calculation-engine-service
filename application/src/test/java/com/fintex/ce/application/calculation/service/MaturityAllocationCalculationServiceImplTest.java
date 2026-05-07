@@ -8,8 +8,8 @@ import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -78,7 +78,7 @@ class MaturityAllocationCalculationServiceImplTest {
     final var holdings = List.of(holding);
     final var exposures = Map.of(holding, Map.of(MaturityAllocationType.FIVE_TO_SEVEN_YEARS, BigDecimal.TEN));
     final var netProducts = mock(Map.class);
-    final List<Warning> warnings = List.of();
+    final List<Notification> warnings = List.of();
     when(service.calculateNetProducts(exposures, holdings, MaturityAllocationType.values())).thenReturn(netProducts);
 
     doCallRealMethod().when(service).calculate(any(), any());

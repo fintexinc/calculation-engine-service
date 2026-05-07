@@ -4,8 +4,8 @@ import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -41,12 +41,12 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
   }
 
   @Override
-  public EquitySectorResult toResponse(Map<PortfolioHolding, EquitySector> domainMap, List<Warning> warnings) {
+  public EquitySectorResult toResponse(Map<PortfolioHolding, EquitySector> domainMap, List<Notification> warnings) {
     throw new UnsupportedOperationException("Use service-level aggregation for EquitySector");
   }
 
   public EquitySectorResult fromNetProducts(Map<EquitySectorAllocationType, BigDecimal> netProducts,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
       return EquitySectorResult.builder()
           .equitySector(DEFAULT_MAP)
@@ -59,7 +59,7 @@ public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, 
         .build();
   }
 
-  public EquitySectorResult toEmptyResponse(List<Warning> warnings) {
+  public EquitySectorResult toEmptyResponse(List<Notification> warnings) {
     return EquitySectorResult.builder()
         .equitySector(DEFAULT_MAP)
         .warnings(warnings)

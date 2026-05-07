@@ -3,7 +3,7 @@ package com.fintex.ce.application.mapping;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,12 +52,12 @@ class GeographicAllocationMappingServiceTest {
     Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
     holdingAllocations.put(holding, new HashMap<>());
 
-    List<Warning> warnings = new ArrayList<>();
+    List<Notification> warnings = new ArrayList<>();
     geographicAllocationMappingService.mapToGeographicRegions(holdingAllocations, warnings,
-        ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT);
+        ErrorCode.MISSING_EQUITY_GEOGRAPHIC_EXPOSURE);
 
     assertEquals(1, warnings.size());
-    assertEquals(ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT.getCode(), warnings.get(0).getCode());
+    assertEquals(ErrorCode.MISSING_EQUITY_GEOGRAPHIC_EXPOSURE.getCode(), warnings.get(0).getCode());
   }
 
   @Test
@@ -67,7 +67,7 @@ class GeographicAllocationMappingServiceTest {
     Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = new HashMap<>();
     holdingAllocations.put(holding, allocations);
 
-    List<Warning> warnings = new ArrayList<>();
+    List<Notification> warnings = new ArrayList<>();
     geographicAllocationMappingService.mapToGeographicRegions(holdingAllocations, warnings,
         ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT);
 

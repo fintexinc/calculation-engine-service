@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -48,7 +48,7 @@ public class MaturityAllocationResponseMapper implements ResponseMapper<Maturity
 
   @Override
   public MaturityAllocationResult toResponse(Map<PortfolioHolding, MaturityAllocation> domainMap,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     // This method requires complex aggregation with holding weights
     // Delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for MaturityAllocation");
@@ -64,7 +64,7 @@ public class MaturityAllocationResponseMapper implements ResponseMapper<Maturity
    * @return the result with scaled values
    */
   public MaturityAllocationResult fromNetProducts(Map<MaturityAllocationType, BigDecimal> netProducts,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
       return MaturityAllocationResult.builder()
           .maturityAllocation(DEFAULT_MAP)
@@ -84,7 +84,7 @@ public class MaturityAllocationResponseMapper implements ResponseMapper<Maturity
    *          list of warnings to include in response
    * @return response with default (null) values for all maturity types
    */
-  public MaturityAllocationResult toEmptyResponse(List<Warning> warnings) {
+  public MaturityAllocationResult toEmptyResponse(List<Notification> warnings) {
     return MaturityAllocationResult.builder()
         .maturityAllocation(DEFAULT_MAP)
         .warnings(warnings)

@@ -7,12 +7,17 @@ import com.fintex.wm.commons.error.HttpStatus;
 import com.fintex.wm.commons.error.Notification;
 import com.fintex.wm.commons.error.Severity;
 
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
+
+import static com.fintex.ce.model.error.ErrorParams.holdingId;
+import static com.fintex.ce.model.error.ErrorParams.paramMetadata;
+import static com.fintex.ce.model.error.ErrorParams.prepend;
 
 /**
  * Catalog of every error and warning produced by the calculation engine. Each constant carries the code, human-readable
@@ -29,7 +34,7 @@ public enum ErrorCode {
   // ============================================
   MISSING_SECTOR_NAME(
       Codes.MISSING_SECTOR_NAME,
-      "The holding is missing values for Sector Name",
+      "The holding %s is missing values for Sector Name",
       "Sector Name is absent in the data provider response for this holding",
       "Populate Sector Name in the source data or verify the data provider mapping",
       HttpStatus.OK,
@@ -37,7 +42,7 @@ public enum ErrorCode {
 
   MISSING_STYLE_BOX(
       Codes.MISSING_STYLE_BOX,
-      "The holding is missing values for Style Box",
+      "The holding %s is missing values for Style Box",
       "Style Box is absent in the data provider response for this holding",
       "Populate Style Box values in the source data",
       HttpStatus.OK,
@@ -45,7 +50,7 @@ public enum ErrorCode {
 
   UNKNOWN_TYPE_FROM_DATA_POINT(
       Codes.UNKNOWN_TYPE_FROM_DATA_POINT,
-      "The holding returned an Unknown Type: %s from Data Point %s",
+      "The holding %s returned an Unknown Type: %s from Data Point %s",
       "The data provider returned a value that does not map to any known type",
       "Add the unknown value to the corresponding mapping table",
       HttpStatus.OK,
@@ -53,7 +58,7 @@ public enum ErrorCode {
 
   MISSING_EQUITY_SECTOR_ALLOCATION(
       Codes.MISSING_EQUITY_SECTOR_ALLOCATION,
-      "The holding is missing values for Equity Sector Allocation",
+      "The holding %s is missing values for Equity Sector Allocation",
       "Equity Sector Allocation is absent in the data provider response",
       "Populate Equity Sector Allocation in the source data",
       HttpStatus.OK,
@@ -61,7 +66,7 @@ public enum ErrorCode {
 
   MISSING_EQUITY_STYLEBOX_EXPOSURE(
       Codes.MISSING_EQUITY_STYLEBOX_EXPOSURE,
-      "The holding is missing values for Equity Stylebox Exposure",
+      "The holding %s is missing values for Equity Stylebox Exposure",
       "Equity Stylebox Exposure is absent in the data provider response",
       "Populate Equity Stylebox Exposure in the source data",
       HttpStatus.OK,
@@ -69,7 +74,7 @@ public enum ErrorCode {
 
   MISSING_FIXED_INCOME_STYLEBOX_EXPOSURE(
       Codes.MISSING_FIXED_INCOME_STYLEBOX_EXPOSURE,
-      "The holding is missing values for Fixed Income Stylebox Exposure",
+      "The holding %s is missing values for Fixed Income Stylebox Exposure",
       "Fixed Income Stylebox Exposure is absent in the data provider response",
       "Populate Fixed Income Stylebox Exposure in the source data",
       HttpStatus.OK,
@@ -77,7 +82,7 @@ public enum ErrorCode {
 
   MISSING_CLASSIFICATION_ALLOCATION(
       Codes.MISSING_CLASSIFICATION_ALLOCATION,
-      "The holding is missing values for Classification Allocation",
+      "The holding %s is missing values for Classification Allocation",
       "Classification Allocation is absent in the data provider response",
       "Populate Classification Allocation in the source data",
       HttpStatus.OK,
@@ -85,7 +90,7 @@ public enum ErrorCode {
 
   MISSING_MATURITY_ALLOCATION(
       Codes.MISSING_MATURITY_ALLOCATION,
-      "The holding is missing values for Maturity Allocation",
+      "The holding %s is missing values for Maturity Allocation",
       "Maturity Allocation is absent in the data provider response",
       "Populate Maturity Allocation in the source data",
       HttpStatus.OK,
@@ -93,7 +98,7 @@ public enum ErrorCode {
 
   MISSING_INCOME_FORECAST_DIVIDEND_YIELD(
       Codes.MISSING_INCOME_FORECAST_DIVIDEND_YIELD,
-      "The holding is missing dividend yield/interest rate value for Income Forecast",
+      "The holding %s is missing dividend yield/interest rate value for Income Forecast",
       "Dividend yield or interest rate is required for Income Forecast calculations",
       "Populate dividend yield or interest rate for this holding",
       HttpStatus.OK,
@@ -101,7 +106,7 @@ public enum ErrorCode {
 
   MISSING_YIELD_DIVIDEND_YIELD(
       Codes.MISSING_YIELD_DIVIDEND_YIELD,
-      "The holding is missing dividend yield values for Average Yield calculation",
+      "The holding %s is missing dividend yield values for Average Yield calculation",
       "Dividend yield is required for the Average Yield calculation",
       "Populate dividend yield for this holding",
       HttpStatus.OK,
@@ -109,7 +114,7 @@ public enum ErrorCode {
 
   MISSING_INCOME_FORECAST_PAYOUT_SCHEDULE(
       Codes.MISSING_INCOME_FORECAST_PAYOUT_SCHEDULE,
-      "The holding is missing a payout schedule values for Income Forecast",
+      "The holding %s is missing a payout schedule values for Income Forecast",
       "Payout schedule is required for Income Forecast calculations",
       "Populate the payout schedule for this holding",
       HttpStatus.OK,
@@ -117,7 +122,7 @@ public enum ErrorCode {
 
   MISSING_INCOME_FORECAST_PAYMENT_FREQUENCY(
       Codes.MISSING_INCOME_FORECAST_PAYMENT_FREQUENCY,
-      "The holding is missing a payment frequency type value for Income Forecast",
+      "The holding %s is missing a payment frequency type value for Income Forecast",
       "Payment frequency is required for Income Forecast calculations",
       "Populate the payment frequency type for this holding",
       HttpStatus.OK,
@@ -125,7 +130,7 @@ public enum ErrorCode {
 
   MISSING_INCOME_FORECAST_MATURITY_DATE(
       Codes.MISSING_INCOME_FORECAST_MATURITY_DATE,
-      "The holding is missing a maturity date value for Income Forecast",
+      "The holding %s is missing a maturity date value for Income Forecast",
       "Maturity date is required for Income Forecast calculations",
       "Populate the maturity date for this holding",
       HttpStatus.OK,
@@ -133,7 +138,7 @@ public enum ErrorCode {
 
   MISSING_INCOME_FORECAST_ISSUE_DATE(
       Codes.MISSING_INCOME_FORECAST_ISSUE_DATE,
-      "The holding is missing a issue date value for Income Forecast",
+      "The holding %s is missing a issue date value for Income Forecast",
       "Issue date is required for Income Forecast calculations",
       "Populate the issue date for this holding",
       HttpStatus.OK,
@@ -141,7 +146,7 @@ public enum ErrorCode {
 
   MISSING_EQUITY_COUNTRY_EXPOSURE(
       Codes.MISSING_EQUITY_COUNTRY_EXPOSURE,
-      "The holding is missing values for Equity Country Exposure",
+      "The holding %s is missing values for Equity Country Exposure",
       "Equity Country Exposure is absent in the data provider response",
       "Populate Equity Country Exposure in the source data",
       HttpStatus.OK,
@@ -149,7 +154,7 @@ public enum ErrorCode {
 
   MISSING_EQUITY_GEOGRAPHIC_EXPOSURE(
       Codes.MISSING_EQUITY_GEOGRAPHIC_EXPOSURE,
-      "The holding is missing values for Equity Geographic Exposure",
+      "The holding %s is missing values for Equity Geographic Exposure",
       "Equity Geographic Exposure is absent in the data provider response",
       "Populate Equity Geographic Exposure in the source data",
       HttpStatus.OK,
@@ -157,7 +162,7 @@ public enum ErrorCode {
 
   MISSING_EQUITY_MARKET_CAPITALIZATION(
       Codes.MISSING_EQUITY_MARKET_CAPITALIZATION,
-      "The holding is missing values Equity Market Capitalization",
+      "The holding %s is missing values Equity Market Capitalization",
       "Equity Market Capitalization is absent in the data provider response",
       "Populate Equity Market Capitalization in the source data",
       HttpStatus.OK,
@@ -165,7 +170,7 @@ public enum ErrorCode {
 
   MISSING_ASSET_ALLOCATION(
       Codes.MISSING_ASSET_ALLOCATION,
-      "The holding is missing values for Asset Allocation",
+      "The holding %s is missing values for Asset Allocation",
       "Asset Allocation is absent in the data provider response",
       "Populate Asset Allocation in the source data",
       HttpStatus.OK,
@@ -173,7 +178,7 @@ public enum ErrorCode {
 
   MISSING_BOND_COUNTRY_EXPOSURE(
       Codes.MISSING_BOND_COUNTRY_EXPOSURE,
-      "The holding is missing values for Bond Country Exposure",
+      "The holding %s is missing values for Bond Country Exposure",
       "Bond Country Exposure is absent in the data provider response",
       "Populate Bond Country Exposure in the source data",
       HttpStatus.OK,
@@ -181,7 +186,7 @@ public enum ErrorCode {
 
   MISSING_CREDIT_QUALITY(
       Codes.MISSING_CREDIT_QUALITY,
-      "The holding is missing values for Credit Quality",
+      "The holding %s is missing values for Credit Quality",
       "Credit Quality is absent in the data provider response",
       "Populate Credit Quality in the source data",
       HttpStatus.OK,
@@ -189,7 +194,7 @@ public enum ErrorCode {
 
   MISSING_FIXED_INCOME_BOND_SECTOR(
       Codes.MISSING_FIXED_INCOME_BOND_SECTOR,
-      "The holding is missing values for Fixed Income Bond Sector",
+      "The holding %s is missing values for Fixed Income Bond Sector",
       "Fixed Income Bond Sector is absent in the data provider response",
       "Populate Fixed Income Bond Sector in the source data",
       HttpStatus.OK,
@@ -197,7 +202,7 @@ public enum ErrorCode {
 
   MISSING_MANAGEMENT_EXPENSE_RATIO(
       Codes.MISSING_MANAGEMENT_EXPENSE_RATIO,
-      "The holding is missing Management Expense Ratio",
+      "The holding %s is missing Management Expense Ratio",
       "Management Expense Ratio (MER) is absent in the data provider response",
       "Populate MER in the source data",
       HttpStatus.OK,
@@ -205,7 +210,7 @@ public enum ErrorCode {
 
   MISSING_ACTUAL_MANAGEMENT_FEE(
       Codes.MISSING_ACTUAL_MANAGEMENT_FEE,
-      "The holding is missing Actual Management Fee",
+      "The holding %s is missing Actual Management Fee",
       "Actual Management Fee is absent in the data provider response",
       "Populate Actual Management Fee in the source data",
       HttpStatus.OK,
@@ -213,7 +218,7 @@ public enum ErrorCode {
 
   MISSING_NET_EXPENSE_RATIO(
       Codes.MISSING_NET_EXPENSE_RATIO,
-      "The holding is missing Net Expense Ratio",
+      "The holding %s is missing Net Expense Ratio",
       "Net Expense Ratio is absent in the data provider response",
       "Populate Net Expense Ratio in the source data",
       HttpStatus.OK,
@@ -221,7 +226,7 @@ public enum ErrorCode {
 
   MISSING_GROSS_EXPENSE_RATIO(
       Codes.MISSING_GROSS_EXPENSE_RATIO,
-      "The holding is missing Gross Expense Ratio",
+      "The holding %s is missing Gross Expense Ratio",
       "Gross Expense Ratio is absent in the data provider response",
       "Populate Gross Expense Ratio in the source data",
       HttpStatus.OK,
@@ -229,7 +234,7 @@ public enum ErrorCode {
 
   MISSING_BUSINESS_COUNTRY_CODE(
       Codes.MISSING_BUSINESS_COUNTRY_CODE,
-      "The holding is missing Business country Code",
+      "The holding %s is missing Business country Code",
       "Business country code is absent in the data provider response",
       "Populate the Business country code in the source data",
       HttpStatus.OK,
@@ -237,7 +242,7 @@ public enum ErrorCode {
 
   MISSING_COMPANY_NAME(
       Codes.MISSING_COMPANY_NAME,
-      "Company name does not exist for this stock.",
+      "Company name does not exist for stock %s.",
       "Company name is absent in the data provider response for this stock",
       "Populate the company name for this stock",
       HttpStatus.OK,
@@ -245,7 +250,7 @@ public enum ErrorCode {
 
   UNDERLYING_FUND_MISSING_UNDERLYING_HOLDINGS(
       Codes.UNDERLYING_FUND_MISSING_UNDERLYING_HOLDINGS,
-      "This holding contains an underlying fund that is missing underlying holdings data",
+      "Holding %s contains an underlying fund that is missing underlying holdings data",
       "An underlying fund has no underlying holdings data in the data provider response",
       "Populate underlying holdings data for the underlying fund",
       HttpStatus.OK,
@@ -253,7 +258,7 @@ public enum ErrorCode {
 
   MISSING_HOLDING_IDENTIFIERS(
       Codes.MISSING_HOLDING_IDENTIFIERS,
-      "%d portfolio securities are missing underlying holding identifiers of the configured comparison type",
+      "%s portfolio securities are missing underlying holding identifiers of the configured comparison type",
       "Some portfolio securities had no underlying holding identifiers of the configured comparison type returned by the data provider",
       "Populate underlying holding identifiers for the affected securities in the source data",
       HttpStatus.OK,
@@ -261,7 +266,7 @@ public enum ErrorCode {
 
   MISSING_UNDERLYING_HOLDING_ID_VALUE(
       Codes.MISSING_UNDERLYING_HOLDING_ID_VALUE,
-      "%d underlying holdings have a null identifier value for the configured comparison type",
+      "%s underlying holdings have a null identifier value for the configured comparison type",
       "The data provider returned underlying holdings whose identifier value is null for the configured comparison type",
       "Populate identifier values for the affected underlying holdings in the source data",
       HttpStatus.OK,
@@ -272,7 +277,7 @@ public enum ErrorCode {
   // ============================================
   FX_RATES_UNAVAILABLE(
       Codes.FX_RATES_UNAVAILABLE,
-      "FX rates unavailable for %s -> %s; values returned in the original currency",
+      "FX rates unavailable for holding %s: %s -> %s; values returned in the original currency",
       "FX rates could not be obtained — the upstream provider was unreachable, returned no data, or the cache held no entries for the requested range — so the affected holding's amounts are not converted to the target currency",
       "Verify Bank of Canada availability and that the currency pair is configured; ensure rates exist for the requested date range",
       HttpStatus.OK,
@@ -889,7 +894,7 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR);
 
-  private static final Map<String, ErrorCode> BY_CODE = java.util.Arrays.stream(values())
+  private static final Map<String, ErrorCode> BY_CODE = Arrays.stream(values())
       .collect(java.util.stream.Collectors.toUnmodifiableMap(ErrorCode::getCode, e -> e));
 
   private final String code;
@@ -920,56 +925,65 @@ public enum ErrorCode {
   }
 
   public CalculationException toException(Object... formatArgs) {
+    requireErrorSeverity();
     return new CalculationException(this, formatArgs);
   }
 
   public CalculationException toExceptionForHolding(PortfolioHolding holding, Object... formatArgs) {
+    requireErrorSeverity();
     return new CalculationException(this, formatArgs).withHolding(holding);
   }
 
   public CalculationException toExceptionForId(String id, Object... formatArgs) {
+    requireErrorSeverity();
     return new CalculationException(this, formatArgs).withId(id);
   }
 
   public CalculationException toExceptionForField(String fieldName, Object... formatArgs) {
+    requireErrorSeverity();
     return new CalculationException(this, formatArgs).withFieldName(fieldName);
   }
 
   public ValidationException toValidationException(Object... formatArgs) {
+    requireErrorSeverity();
     return new ValidationException(this, formatArgs);
   }
 
   public ValidationException toValidationExceptionForHolding(PortfolioHolding holding, Object... formatArgs) {
+    requireErrorSeverity();
     return new ValidationException(this, formatArgs).withHolding(holding);
   }
 
   public ValidationException toValidationExceptionForId(String id, Object... formatArgs) {
+    requireErrorSeverity();
     return new ValidationException(this, formatArgs).withId(id);
   }
 
   public ValidationException toValidationExceptionForField(String fieldName, Object... formatArgs) {
+    requireErrorSeverity();
     return new ValidationException(this, formatArgs).withFieldName(fieldName);
   }
 
-  public Warning warning(PortfolioHolding holding) {
-    return new Warning(holding == null ? null : holding.getIdsString(), message, code);
-  }
-
-  public Warning warning(PortfolioHolding holding, Object... formatArgs) {
-    return new Warning(holding == null ? null : holding.getIdsString(), getFormattedMessage(formatArgs), code);
+  private void requireErrorSeverity() {
+    if (severity != Severity.ERROR) {
+      throw new IllegalStateException("Cannot create an exception for ErrorCode " + name() + " with severity "
+          + severity + "; only " + Severity.ERROR + " severity may be thrown as an exception. "
+          + "Use one of the toNotification*/asNotification methods instead.");
+    }
   }
 
   public Notification asNotification(Object... formatArgs) {
-    return buildNotification(null, null, getFormattedMessage(formatArgs), null);
+    return buildNotification(null, null, getFormattedMessage(formatArgs), paramMetadata(formatArgs));
   }
 
   public Notification toNotificationForHolding(PortfolioHolding holding, Object... formatArgs) {
-    return buildNotification(holding == null ? null : holding.getIdsString(), null, getFormattedMessage(formatArgs),
-        null);
+    String id = holdingId(holding);
+    Object[] allArgs = prepend(id, formatArgs);
+    return buildNotification(id, null, getFormattedMessage(allArgs), paramMetadata(allArgs));
   }
 
   public Notification toNotificationForField(String fieldName, Object... formatArgs) {
-    return buildNotification(null, fieldName, getFormattedMessage(formatArgs), null);
+    return buildNotification(null, fieldName, getFormattedMessage(formatArgs), paramMetadata(formatArgs));
   }
 
   public Notification toNotification(String id, String fieldName, String formattedMessage,
@@ -991,7 +1005,7 @@ public enum ErrorCode {
         .action(action)
         .severity(severity)
         .fieldName(fieldName)
-        .metadata(metadata == null ? new HashMap<>() : metadata)
+        .metadata(metadata == null ? new LinkedHashMap<>() : metadata)
         .build();
   }
 

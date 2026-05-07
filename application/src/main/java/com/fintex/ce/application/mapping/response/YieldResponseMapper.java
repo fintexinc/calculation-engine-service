@@ -5,8 +5,8 @@ import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.yield.Yield;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -28,7 +28,7 @@ public class YieldResponseMapper implements ResponseMapper<Yield, YieldResult> {
   }
 
   @Override
-  public YieldResult toResponse(Map<PortfolioHolding, Yield> domainMap, List<Warning> warnings) {
+  public YieldResult toResponse(Map<PortfolioHolding, Yield> domainMap, List<Notification> warnings) {
     BigDecimal weightedYield = calculateWeightedAverageYield(domainMap);
     return YieldResult.builder()
         .yield(weightedYield)

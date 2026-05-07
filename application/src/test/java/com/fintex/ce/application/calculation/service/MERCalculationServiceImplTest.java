@@ -6,12 +6,12 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.PceExceptionCollector;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -309,15 +309,15 @@ class MERCalculationServiceImplTest {
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation aDto2 = mock(AverageManagementExpenseCalculation.class);
 
-    final Warning w1 = new Warning(null, "ANY1");
-    final Warning w2 = new Warning(null, "ANY2");
+    final Notification w1 = Notification.builder().message("ANY1").build();
+    final Notification w2 = Notification.builder().message("ANY2").build();
 
     when(m.handleFeeDataForUsEtfAndMutualFund(aDto1, h1)).thenReturn(Optional.of(w1));
     when(m.handleFeeDataForCanadaMutualHedgeFundsAndEtf(aDto2, h2)).thenReturn(Optional.of(List.of(w2)));
 
     doCallRealMethod().when(m).setInitialFeeAndModifiedFeeValues(anyMap());
     // ACT
-    final List<Warning> actual = m.setInitialFeeAndModifiedFeeValues(Map.of(
+    final List<Notification> actual = m.setInitialFeeAndModifiedFeeValues(Map.of(
         FinancialInstrumentType.ETF_US, Map.of(h1, aDto1),
         FinancialInstrumentType.ETF_CANADA, Map.of(h2, aDto2),
         FinancialInstrumentType.STOCK_CANADA,
@@ -391,7 +391,8 @@ class MERCalculationServiceImplTest {
 
     doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
     // ACT
-    final Optional<List<Warning>> warning = merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(a,
+    final Optional<List<Notification>> warning = merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(
+        a,
         h);
 
     // VERIFY
@@ -411,15 +412,17 @@ class MERCalculationServiceImplTest {
 
     doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
     // ACT
-    final Optional<List<Warning>> warning = merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(a,
+    final Optional<List<Notification>> warning = merCalculationServiceMock.handleFeeDataForCanadaMutualHedgeFundsAndEtf(
+        a,
         h);
 
     // VERIFY
     verify(h).getIdsString();
     verify(a, times(2)).getActualManagementFee();
     assertTrue(warning.isPresent());
-    assertEquals(List.of(new Warning(null, "The holding is missing Management Expense Ratio",
-        MISSING_MANAGEMENT_EXPENSE_RATIO.getCode())), warning.get());
+    assertEquals(1, warning.get().size());
+    assertEquals(MISSING_MANAGEMENT_EXPENSE_RATIO.getCode(), warning.get().get(0).getCode());
+    assertEquals("The holding null is missing Management Expense Ratio", warning.get().get(0).getMessage());
   }
 
   @Test
@@ -434,7 +437,7 @@ class MERCalculationServiceImplTest {
 
     doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any());
     // ACT
-    final Optional<Warning> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h);
+    final Optional<Notification> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h);
 
     // VERIFY
     verify(a, times(3)).getNetExpenseRatio();
@@ -453,14 +456,14 @@ class MERCalculationServiceImplTest {
 
     doCallRealMethod().when(merCalculationServiceMock).handleFeeDataForUsEtfAndMutualFund(any(), any());
     // ACT
-    final Optional<Warning> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h);
+    final Optional<Notification> warning = merCalculationServiceMock.handleFeeDataForUsEtfAndMutualFund(a, h);
 
     // VERIFY
     verify(h).getIdsString();
     verify(a, times(2)).getGrossExpenseRatio();
     assertTrue(warning.isPresent());
-    assertEquals(new Warning(null, "The holding is missing Net Expense Ratio",
-        MISSING_NET_EXPENSE_RATIO.getCode()), warning.get());
+    assertEquals(MISSING_NET_EXPENSE_RATIO.getCode(), warning.get().getCode());
+    assertEquals("The holding null is missing Net Expense Ratio", warning.get().getMessage());
   }
 
   @Test
@@ -650,7 +653,7 @@ class MERCalculationServiceImplTest {
     doCallRealMethod().when(service).handleFeeDataForUsEtfAndMutualFund(any(), any());
 
     // ACT
-    final Optional<Warning> actual = service.handleFeeDataForUsEtfAndMutualFund(input, holding);
+    final Optional<Notification> actual = service.handleFeeDataForUsEtfAndMutualFund(input, holding);
 
     // VERIFY
     assertEquals(Optional.empty(), actual);
@@ -664,16 +667,16 @@ class MERCalculationServiceImplTest {
 
     final var holding = new PortfolioHolding(null, FinancialInstrumentType.HEDGE_FUND_CANADA, null);
     final var input = mock(AverageManagementExpenseCalculation.class);
-    final Optional<List<Warning>> expected = Optional.of(List.of(MISSING_MANAGEMENT_EXPENSE_RATIO.warning(holding),
-        MISSING_ACTUAL_MANAGEMENT_FEE
-            .warning(holding)));
 
     doCallRealMethod().when(service).handleFeeDataForCanadaMutualHedgeFundsAndEtf(any(), any());
 
     // ACT
-    final Optional<List<Warning>> actual = service.handleFeeDataForCanadaMutualHedgeFundsAndEtf(input, holding);
+    final Optional<List<Notification>> actual = service.handleFeeDataForCanadaMutualHedgeFundsAndEtf(input, holding);
 
     // VERIFY
-    assertEquals(expected, actual);
+    assertTrue(actual.isPresent());
+    assertEquals(2, actual.get().size());
+    assertEquals(MISSING_MANAGEMENT_EXPENSE_RATIO.getCode(), actual.get().get(0).getCode());
+    assertEquals(MISSING_ACTUAL_MANAGEMENT_FEE.getCode(), actual.get().get(1).getCode());
   }
 }

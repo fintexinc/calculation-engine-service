@@ -1,6 +1,6 @@
 package com.fintex.ce.model.domain.result;
 
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -20,5 +20,5 @@ public abstract class BaseCalculationResult {
 
   @Schema(description = "List of warnings encountered during the calculation")
   @Builder.Default
-  protected List<Warning> warnings = new ArrayList<>();
+  protected List<Notification> warnings = new ArrayList<>();
 }

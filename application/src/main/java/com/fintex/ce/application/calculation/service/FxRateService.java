@@ -3,15 +3,16 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.error.PceExceptionCollector;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -34,8 +35,8 @@ import static java.math.BigDecimal.ONE;
  * end-of-month FX rates. When the rates required to convert a holding are unavailable — the upstream provider was
  * unreachable, the pair is not configured, or one of the lookup dates has no rate — the holding's returns are passed
  * through unchanged in the original currency and a {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE}
- * warning is added to the supplied {@link PceExceptionCollector}. Conversion is therefore best-effort and never throws
- * on missing FX data.
+ * warning is appended to the supplied warnings list. Conversion is therefore best-effort and never throws on missing FX
+ * data.
  */
 @Slf4j
 @Service
@@ -61,15 +62,15 @@ public class FxRateService {
 
   /**
    * Converts per-holding monthly returns from each holding's source currency into {@code toCurrency}, falling back to
-   * the original currency for any holding whose required rates are unavailable and recording an
-   * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} warning on {@code notification}.
+   * the original currency for any holding whose required rates are unavailable and appending an
+   * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} warning to {@code warnings}.
    */
   public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> convertReturns(
       Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns,
       Map<PortfolioHolding, Currency> holdingCurrencies,
       Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates,
       Currency toCurrency,
-      PceExceptionCollector notification) {
+      List<Notification> warnings) {
     return returns.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> {
       Currency fromCurrency = holdingCurrencies.get(entry.getKey());
       if (fromCurrency == null || fromCurrency.equals(toCurrency)) {
@@ -80,7 +81,7 @@ public class FxRateService {
           ? null
           : tryConvert(rates, entry.getValue());
       if (converted == null) {
-        notification.add(FX_RATES_UNAVAILABLE.toExceptionForHolding(entry.getKey(), fromCurrency, toCurrency));
+        warnings.add(FX_RATES_UNAVAILABLE.toNotificationForHolding(entry.getKey(), fromCurrency, toCurrency));
         return entry.getValue();
       }
       return converted;

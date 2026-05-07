@@ -15,9 +15,9 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -95,7 +95,7 @@ public class AssetAllocationEMServiceImpl
       final List<PortfolioHolding> holdings,
       final Map<PortfolioHolding, Map<AssetAllocationRegion, BigDecimal>> assetAllocations,
       final List<DataProvider> providers) {
-    List<Warning> warnings = new ArrayList<>();
+    List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, EquityCountryAllocation> rawCountryAllocations = countryAllocationSecurityDataFetcher.fetch(
         holdings, providers);
     Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = rawCountryAllocations.entrySet().stream()

@@ -14,10 +14,10 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -106,7 +106,7 @@ public class FixedIncomeBondSectorCalculationServiceImpl
   }
 
   private Map<PortfolioHolding, BigDecimal> getFixedIncomePlusCash(final List<PortfolioHolding> holdings,
-      final List<Warning> warnings, final List<DataProvider> dataProviders) {
+      final List<Notification> warnings, final List<DataProvider> dataProviders) {
     final Map<PortfolioHolding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         holdings, dataProviders);
     var assetAllocations = assetAllocationDataMapper.toRegionExposures(rawData);

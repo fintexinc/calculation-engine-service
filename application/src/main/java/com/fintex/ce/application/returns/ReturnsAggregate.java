@@ -13,7 +13,6 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.PceExceptionCollector;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -21,6 +20,7 @@ import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,6 @@ import lombok.Getter;
 
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
-import static com.fintex.ce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_HISTORICAL_NAV_PRICES_FOR_MONTH;
@@ -49,6 +48,8 @@ import static java.util.stream.Collectors.toList;
 @EqualsAndHashCode
 public class ReturnsAggregate<T extends ReturnsData> {
   public PceExceptionCollector notification = new PceExceptionCollector();
+  @Getter
+  public List<Notification> warnings = new ArrayList<>();
   public Map<PortfolioHolding, Currency> holdingCurrencyMap;
   public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returnsMap;
   @Getter
@@ -175,7 +176,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
 
   public ReturnsAggregate<T> fxRatesApplied() {
     ifAnyErrorsThrowException();
-    returnsMap = fxRateService.convertReturns(returnsMap, holdingCurrencyMap, fxRates, fxTargetCurrency, notification);
+    returnsMap = fxRateService.convertReturns(returnsMap, holdingCurrencyMap, fxRates, fxTargetCurrency, warnings);
     updateCurrenciesAfterConversion();
     return this;
   }
@@ -184,9 +185,9 @@ public class ReturnsAggregate<T extends ReturnsData> {
     if (fxTargetCurrency == null) {
       return;
     }
-    Set<String> failedHoldingIds = notification.getExceptions().stream()
-        .filter(e -> e.getErrorCode() == ErrorCode.FX_RATES_UNAVAILABLE)
-        .map(BasePceException::getId)
+    Set<String> failedHoldingIds = warnings.stream()
+        .filter(n -> ErrorCode.Codes.FX_RATES_UNAVAILABLE.equals(n.getCode()))
+        .map(Notification::getUuid)
         .collect(Collectors.toSet());
     holdingCurrencyMap.replaceAll((holding, current) -> {
       if (current == null || current.equals(fxTargetCurrency)) {
@@ -371,7 +372,7 @@ public class ReturnsAggregate<T extends ReturnsData> {
 
   public ReturnsAggregate<T> ifAnyErrorsThrowException() {
     notification.throwIfAnyNonAllowed(List.of(HOLDING_PSD_OUT_OF_RANGE, MISSING_MONTHLY_RETURNS,
-        HOLDING_MISSING_CURRENCY_FROM_FDS, FX_RATES_UNAVAILABLE));
+        HOLDING_MISSING_CURRENCY_FROM_FDS));
     return this;
   }
 
@@ -412,9 +413,12 @@ public class ReturnsAggregate<T extends ReturnsData> {
     return notification.getExceptions();
   }
 
-  public List<Warning> getErrorsAsWarnings() {
-    return notification.getExceptions().stream()
-        .map(error -> new Warning(error.getId(), error.getMessage(), error.getErrorCode().getCode()))
-        .toList();
+  public List<Notification> getErrorsAsWarnings() {
+    List<Notification> result = new ArrayList<>(warnings);
+    notification.getExceptions().stream()
+        .map(error -> error.getErrorCode().toNotification(error.getId(), error.getFieldName(), error.getMessage(),
+            error.getMetadata()))
+        .forEach(result::add);
+    return result;
   }
 }

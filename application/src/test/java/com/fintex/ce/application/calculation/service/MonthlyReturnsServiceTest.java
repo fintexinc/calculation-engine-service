@@ -14,7 +14,6 @@ import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
@@ -36,7 +35,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static com.fintex.ce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
+import static com.fintex.ce.model.error.ErrorCode.Codes.FX_RATES_UNAVAILABLE;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static com.fintex.wm.commons.domain.currency.Currency.CAD;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -333,9 +332,8 @@ class MonthlyReturnsServiceTest {
 
     assertEquals(originalReturns, aggregate.returnsMap.get(holding));
     assertEquals(Currency.USD, aggregate.holdingCurrencyMap.get(holding));
-    List<BasePceException> exceptions = aggregate.notification.getExceptions();
-    assertEquals(1, exceptions.size());
-    assertEquals(FX_RATES_UNAVAILABLE, exceptions.getFirst().getErrorCode());
+    assertEquals(1, aggregate.warnings.size());
+    assertEquals(FX_RATES_UNAVAILABLE, aggregate.warnings.getFirst().getCode());
   }
 
   @Test
@@ -378,9 +376,8 @@ class MonthlyReturnsServiceTest {
 
     assertEquals(originalReturns, aggregate.returnsMap.get(holding));
     assertEquals(Currency.USD, aggregate.holdingCurrencyMap.get(holding));
-    List<BasePceException> exceptions = aggregate.notification.getExceptions();
-    assertEquals(1, exceptions.size());
-    assertEquals(FX_RATES_UNAVAILABLE, exceptions.getFirst().getErrorCode());
+    assertEquals(1, aggregate.warnings.size());
+    assertEquals(FX_RATES_UNAVAILABLE, aggregate.warnings.getFirst().getCode());
   }
 
   @Test
@@ -426,7 +423,7 @@ class MonthlyReturnsServiceTest {
 
     assertNotEquals(originalReturns, aggregate.returnsMap.get(holding));
     assertEquals(CAD, aggregate.holdingCurrencyMap.get(holding));
-    assertTrue(aggregate.notification.getExceptions().isEmpty());
+    assertTrue(aggregate.warnings.isEmpty());
   }
 
   @Test

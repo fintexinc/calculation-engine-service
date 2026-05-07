@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.result.holding;
 
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -27,7 +27,7 @@ public class NumberOfUniqueHoldingsResult extends BaseCalculationResult {
       + "Null when the count could not be determined; check the warnings list for the reason.")
   private Long numberOfUniqueHoldings;
 
-  public NumberOfUniqueHoldingsResult(Long count, List<Warning> warnings) {
+  public NumberOfUniqueHoldingsResult(Long count, List<Notification> warnings) {
     this.numberOfUniqueHoldings = count;
     this.warnings = warnings;
   }

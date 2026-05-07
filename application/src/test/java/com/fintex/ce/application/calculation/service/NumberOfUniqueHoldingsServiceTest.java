@@ -5,12 +5,12 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.holding.NumberOfUniqueHoldingsResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.holding.HoldingIdentifiers;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -96,7 +96,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
     assertEquals(1L, result.getNumberOfUniqueHoldings());
     assertEquals(1, result.getWarnings().size());
-    Warning warning = result.getWarnings().get(0);
+    Notification warning = result.getWarnings().get(0);
     assertEquals(ErrorCode.Codes.MISSING_HOLDING_IDENTIFIERS, warning.getCode());
     assertTrue(warning.getMessage().contains("2"), "warning message must report count of 2 securities");
   }
@@ -118,7 +118,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
     assertEquals(2L, result.getNumberOfUniqueHoldings());
     assertEquals(1, result.getWarnings().size());
-    Warning warning = result.getWarnings().get(0);
+    Notification warning = result.getWarnings().get(0);
     assertEquals(ErrorCode.Codes.MISSING_UNDERLYING_HOLDING_ID_VALUE, warning.getCode());
     assertTrue(warning.getMessage().contains("3"), "warning message must report count of 3 underlying holdings");
   }

@@ -3,23 +3,25 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.error.PceExceptionCollector;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static com.fintex.ce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
+import static com.fintex.ce.model.error.ErrorCode.Codes.FX_RATES_UNAVAILABLE;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,15 +50,15 @@ class FxRateServiceTest {
         FiIdentifierType.TICKER));
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.USD);
-    PceExceptionCollector notification = new PceExceptionCollector();
+    List<Notification> warnings = new ArrayList<>();
 
-    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.CAD, notification);
+    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.CAD, warnings);
 
     assertEquals(0, BigDecimal.valueOf(102).compareTo(
         actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(1)))));
     assertEquals(0, BigDecimal.valueOf(308).compareTo(
         actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(2)))));
-    assertTrue(notification.getExceptions().isEmpty());
+    assertTrue(warnings.isEmpty());
   }
 
   @Test
@@ -69,15 +71,15 @@ class FxRateServiceTest {
         FiIdentifierType.TICKER));
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
-    PceExceptionCollector notification = new PceExceptionCollector();
+    List<Notification> warnings = new ArrayList<>();
 
-    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, notification);
+    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
     assertEquals(0, BigDecimal.valueOf(102).compareTo(
         actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(1)))));
     assertEquals(0, BigDecimal.valueOf(410).compareTo(
         actual.get(etfHolding).get(toLastDayOfMonth(LocalDate.now().plusMonths(2)))));
-    assertTrue(notification.getExceptions().isEmpty());
+    assertTrue(warnings.isEmpty());
   }
 
   @Test
@@ -90,13 +92,20 @@ class FxRateServiceTest {
         FiIdentifierType.TICKER));
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
-    PceExceptionCollector notification = new PceExceptionCollector();
+    List<Notification> warnings = new ArrayList<>();
 
-    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, notification);
+    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
     assertEquals(returns.get(etfHolding), actual.get(etfHolding));
-    assertEquals(1, notification.getExceptions().size());
-    assertEquals(FX_RATES_UNAVAILABLE, notification.getExceptions().getFirst().getErrorCode());
+    assertEquals(1, warnings.size());
+    Notification warning = warnings.getFirst();
+    assertEquals(FX_RATES_UNAVAILABLE, warning.getCode());
+    assertEquals(etfHolding.getIdsString(), warning.getUuid());
+    assertEquals("FX rates unavailable for holding " + etfHolding.getIdsString()
+        + ": CAD -> USD; values returned in the original currency", warning.getMessage());
+    assertEquals(etfHolding.getIdsString(), warning.getMetadata().get("param-1"));
+    assertEquals(Currency.CAD, warning.getMetadata().get("param-2"));
+    assertEquals(Currency.USD, warning.getMetadata().get("param-3"));
   }
 
   @Test
@@ -109,13 +118,13 @@ class FxRateServiceTest {
         FiIdentifierType.TICKER));
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
-    PceExceptionCollector notification = new PceExceptionCollector();
+    List<Notification> warnings = new ArrayList<>();
 
-    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, notification);
+    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
     assertEquals(returns.get(etfHolding), actual.get(etfHolding));
-    assertEquals(1, notification.getExceptions().size());
-    assertEquals(FX_RATES_UNAVAILABLE, notification.getExceptions().getFirst().getErrorCode());
+    assertEquals(1, warnings.size());
+    assertEquals(FX_RATES_UNAVAILABLE, warnings.getFirst().getCode());
   }
 
   @Test
@@ -126,13 +135,13 @@ class FxRateServiceTest {
         FiIdentifierType.TICKER));
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
-    PceExceptionCollector notification = new PceExceptionCollector();
+    List<Notification> warnings = new ArrayList<>();
 
-    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, notification);
+    var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
     assertEquals(returns.get(etfHolding), actual.get(etfHolding));
-    assertEquals(1, notification.getExceptions().size());
-    assertEquals(FX_RATES_UNAVAILABLE, notification.getExceptions().getFirst().getErrorCode());
+    assertEquals(1, warnings.size());
+    assertEquals(FX_RATES_UNAVAILABLE, warnings.getFirst().getCode());
   }
 
   @Test

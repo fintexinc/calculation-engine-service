@@ -4,8 +4,8 @@ import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.rating.StyleBoxType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -48,7 +48,7 @@ public class EquityStyleboxExposureResponseMapper
 
   @Override
   public EquityStyleboxExposureResult toResponse(Map<PortfolioHolding, EquityStyleboxExposure> domainMap,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     // This method requires complex aggregation with holding weights
     // Delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for EquityStyleboxExposure");
@@ -64,7 +64,7 @@ public class EquityStyleboxExposureResponseMapper
    * @return the result with scaled values
    */
   public EquityStyleboxExposureResult fromNetProducts(Map<StyleBoxType, BigDecimal> netProducts,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
       return EquityStyleboxExposureResult.builder()
           .equityStyleboxExposure(DEFAULT_MAP)
@@ -84,7 +84,7 @@ public class EquityStyleboxExposureResponseMapper
    *          list of warnings to include in response
    * @return response with default (null) values for all stylebox types
    */
-  public EquityStyleboxExposureResult toEmptyResponse(List<Warning> warnings) {
+  public EquityStyleboxExposureResult toEmptyResponse(List<Notification> warnings) {
     return EquityStyleboxExposureResult.builder()
         .equityStyleboxExposure(DEFAULT_MAP)
         .warnings(warnings)

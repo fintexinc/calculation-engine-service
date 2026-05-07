@@ -2,8 +2,8 @@ package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +48,7 @@ class FixedIncomeStyleboxExposureResponseMapperTest {
 
   @Test
   void shouldReturnDefaultMapAndPassWarnings_whenNetProductsAreEmpty() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
 
     FixedIncomeStyleboxExposureResult result = mapper.fromNetProducts(Map.of(), warnings);
 
@@ -59,7 +59,7 @@ class FixedIncomeStyleboxExposureResponseMapperTest {
 
   @Test
   void shouldMapAndScaleValues_whenUsingFromNetProducts() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
     Map<FixedIncomeStyleBoxType, BigDecimal> netProducts = Map.of(
         FixedIncomeStyleBoxType.HIGH_LIMITED, new BigDecimal("0.1"),
         FixedIncomeStyleBoxType.LOW_EXTENSIVE, new BigDecimal("0.2"));

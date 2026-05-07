@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ public class CreditQualityResponseMapper implements ResponseMapper<CreditQuality
   }
 
   @Override
-  public CreditQualityResult toResponse(Map<PortfolioHolding, CreditQuality> domainMap, List<Warning> warnings) {
+  public CreditQualityResult toResponse(Map<PortfolioHolding, CreditQuality> domainMap, List<Notification> warnings) {
     // This method requires complex aggregation with asset allocation data
     // Delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for CreditQuality");
@@ -49,7 +49,7 @@ public class CreditQualityResponseMapper implements ResponseMapper<CreditQuality
    * Creates response from pre-calculated fixed income credit quality values.
    */
   public CreditQualityResult fromCalculatedValues(Map<FixedIncomeCreditQuality, BigDecimal> creditQuality,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     return CreditQualityResult.builder()
         .creditQuality(toUserScale(creditQuality))
         .warnings(warnings)
@@ -59,7 +59,7 @@ public class CreditQualityResponseMapper implements ResponseMapper<CreditQuality
   /**
    * Creates empty/default response with warnings.
    */
-  public CreditQualityResult toEmptyResponse(List<Warning> warnings) {
+  public CreditQualityResult toEmptyResponse(List<Notification> warnings) {
     return CreditQualityResult.builder()
         .creditQuality(DEFAULT_MAP)
         .warnings(warnings)

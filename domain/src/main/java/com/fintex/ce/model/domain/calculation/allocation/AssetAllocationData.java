@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.calculation.allocation;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,5 +24,5 @@ public class AssetAllocationData {
 
   List<? extends PortfolioHolding> holdings;
 
-  List<Warning> warnings = new ArrayList<>();
+  List<Notification> warnings = new ArrayList<>();
 }

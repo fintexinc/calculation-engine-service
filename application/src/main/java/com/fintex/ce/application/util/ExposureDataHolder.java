@@ -1,7 +1,7 @@
 package com.fintex.ce.application.util;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,5 +17,5 @@ import java.util.Map;
  */
 public record ExposureDataHolder<E>(
     Map<PortfolioHolding, Map<E, BigDecimal>> allocations,
-    List<Warning> warnings) {
+    List<Notification> warnings) {
 }

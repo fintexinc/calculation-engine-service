@@ -6,7 +6,7 @@ import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionTy
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -52,7 +52,7 @@ public class AssetAllocationResponseMapper implements ResponseMapper<HoldingAsse
 
   @Override
   public AssetAllocationResult toResponse(Map<PortfolioHolding, HoldingAssetAllocation> domainMap,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     // This method would need aggregation logic - delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for HoldingAssetAllocation");
   }
@@ -75,7 +75,7 @@ public class AssetAllocationResponseMapper implements ResponseMapper<HoldingAsse
    * Creates response from pre-calculated net products.
    */
   public AssetAllocationResult fromNetProducts(Map<AssetAllocationRegion, BigDecimal> netProducts,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     Map<AssetAllocationRegionType, BigDecimal> result = calculateAssetAllocationResponse(netProducts);
     return AssetAllocationResult.builder()
         .assetAllocation(toUserScale(result))

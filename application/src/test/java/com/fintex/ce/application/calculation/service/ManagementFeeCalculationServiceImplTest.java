@@ -5,12 +5,12 @@ import com.fintex.ce.model.domain.enumeration.ParameterType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -341,7 +341,7 @@ class ManagementFeeCalculationServiceImplTest {
     doCallRealMethod().when(service).validateManagementFee(any(), any());
     doCallRealMethod().when(service).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    List<Warning> warnings = service.setInitialFeeAndModifiedFeeValues(map);
+    List<Notification> warnings = service.setInitialFeeAndModifiedFeeValues(map);
 
     // VERIFY
     assertTrue(warnings.isEmpty());
@@ -359,7 +359,7 @@ class ManagementFeeCalculationServiceImplTest {
     doCallRealMethod().when(service).validateManagementFee(any(), any());
     doCallRealMethod().when(service).setInitialFeeAndModifiedFeeValues(any());
     // ACT
-    List<Warning> warnings = service.setInitialFeeAndModifiedFeeValues(map);
+    List<Notification> warnings = service.setInitialFeeAndModifiedFeeValues(map);
 
     // VERIFY
     assertTrue(warnings.isEmpty());

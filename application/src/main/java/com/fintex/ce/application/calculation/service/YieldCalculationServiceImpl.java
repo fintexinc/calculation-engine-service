@@ -7,8 +7,8 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
 import com.fintex.ce.model.dto.command.YieldCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -35,7 +35,7 @@ public class YieldCalculationServiceImpl implements CalculationService<YieldComm
 
   @Override
   public YieldResult perform(final YieldCommand command) {
-    final ArrayList<Warning> warnings = new ArrayList<>();
+    final ArrayList<Notification> warnings = new ArrayList<>();
     final Map<PortfolioHolding, Yield> yieldData = yieldSecurityDataFetcher.fetch(command.getHoldings(), List.of());
     return responseMapper.toResponse(yieldData, warnings);
   }

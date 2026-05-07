@@ -11,11 +11,11 @@ import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEm
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -709,7 +709,7 @@ class AssetAllocationEMServiceImplTest {
           assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
       final var req = mock(PortfolioHoldingsCommand.class);
-      final List<Warning> warnings = List.of();
+      final List<Notification> warnings = List.of();
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of());
 
@@ -736,7 +736,7 @@ class AssetAllocationEMServiceImplTest {
           assetAllocationDataMapper, countryAllocationMappingService, DEFAULT_DATA_PROPERTIES));
 
       final var req = mock(PortfolioHoldingsCommand.class);
-      final List<Warning> warnings = List.of();
+      final List<Notification> warnings = List.of();
       when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
       when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of());
 
@@ -782,7 +782,7 @@ class AssetAllocationEMServiceImplTest {
     final var assetAllocationFetcher = mock(SecurityDataFetcher.class);
     final var assetAllocationDataMapper = mock(AssetAllocationDataMapper.class);
     final var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
-    final var warnings = new ArrayList<Warning>();
+    final var warnings = new ArrayList<Notification>();
 
     final var service = mock(AssetAllocationEMServiceImpl.class, withSettings().useConstructor(
         countryAllocationFetcher, assetAllocationFetcher,
