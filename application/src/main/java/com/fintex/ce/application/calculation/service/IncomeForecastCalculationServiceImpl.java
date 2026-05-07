@@ -13,9 +13,9 @@ import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -66,7 +66,7 @@ public class IncomeForecastCalculationServiceImpl
 
   @Override
   public IncomeForecastResult perform(final IncomeForecastCommand command) {
-    final ArrayList<Warning> warnings = new ArrayList<>();
+    final ArrayList<Notification> warnings = new ArrayList<>();
     final Map<PortfolioHolding, IncomeForecast> holdingIncomeForecast = incomeForecastSecurityDataFetcher.fetch(
         command.getHoldings(), List.of());
 

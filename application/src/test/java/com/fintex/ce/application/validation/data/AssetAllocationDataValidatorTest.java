@@ -3,7 +3,7 @@ package com.fintex.ce.application.validation.data;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -114,7 +114,7 @@ class AssetAllocationDataValidatorTest {
     final var assetAllocation = new HashMap<String, BigDecimal>();
     assetAllocation.put("AssetAllocationRegionThatDoesn'tExists", BigDecimal.TEN);
     assetAllocation.put("AssetAllocationRegionThatDoesn'tExists Either", BigDecimal.ONE);
-    final var warnings = new ArrayList<Warning>();
+    final var warnings = new ArrayList<Notification>();
 
     doCallRealMethod().when(validator).validate(any(), anyMap(), anyList());
     // ACT
@@ -131,7 +131,7 @@ class AssetAllocationDataValidatorTest {
     final var validator = mock(AssetAllocationDataValidator.class);
 
     final var holding = mock(PortfolioHolding.class);
-    final var warnings = new ArrayList<Warning>();
+    final var warnings = new ArrayList<Notification>();
 
     when(holding.getIdsString()).thenReturn("generateUserIdentifier");
 

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,6 +161,7 @@ class MonthlyReturnsTest {
     final var monthlyReturns = mock(Map.class);
     final var holdingCurrency = mock(Map.class);
     returns.notification = new PceExceptionCollector();
+    returns.warnings = new ArrayList<>();
 
     returns.returnsMap = monthlyReturns;
     returns.holdingCurrencyMap = holdingCurrency;

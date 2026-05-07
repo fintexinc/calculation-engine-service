@@ -12,9 +12,9 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -53,7 +53,7 @@ public class CreditQualityServiceImpl implements CalculationService<PortfolioHol
 
   @Override
   public CreditQualityResult perform(final PortfolioHoldingsCommand command) {
-    final ArrayList<Warning> warnings = new ArrayList<>();
+    final ArrayList<Notification> warnings = new ArrayList<>();
     final Map<PortfolioHolding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
         command.getHoldings(), List.of());
     final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(
@@ -69,7 +69,7 @@ public class CreditQualityServiceImpl implements CalculationService<PortfolioHol
   }
 
   public Map<PortfolioHolding, BigDecimal> getFixedIncomeCreditQuality(final PortfolioHoldingsCommand command,
-      final List<Warning> warnings) {
+      final List<Notification> warnings) {
     final Map<PortfolioHolding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
         command.getHoldings(),
         getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
@@ -133,16 +133,16 @@ public class CreditQualityServiceImpl implements CalculationService<PortfolioHol
 
   private Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> extractRatings(
       final Map<PortfolioHolding, CreditQuality> rawData,
-      final List<Warning> warnings) {
+      final List<Notification> warnings) {
     return rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> extractRatings(e.getKey(), e.getValue(), warnings)));
   }
 
   private Map<CreditQualityRatingType, BigDecimal> extractRatings(final PortfolioHolding holding,
       final CreditQuality creditQuality,
-      final List<Warning> warnings) {
+      final List<Notification> warnings) {
     if (CollectionUtils.isEmpty(creditQuality.getRatings())) {
-      warnings.add(MISSING_CREDIT_QUALITY.warning(holding));
+      warnings.add(MISSING_CREDIT_QUALITY.toNotificationForHolding(holding));
       return Map.of();
     }
     return creditQuality.getRatings();

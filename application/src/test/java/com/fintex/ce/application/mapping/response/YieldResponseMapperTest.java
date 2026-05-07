@@ -3,8 +3,8 @@ package com.fintex.ce.application.mapping.response;
 import com.fintex.ce.model.domain.calculation.yield.Yield;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +48,7 @@ class YieldResponseMapperTest {
         stock, yieldOf(new BigDecimal("0.1")),
         gic, yieldOf(new BigDecimal("5")),
         skipped, yieldOf(null));
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
 
     YieldResult result = mapper.toResponse(domainMap, warnings);
 

@@ -10,12 +10,12 @@ import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQualit
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -229,7 +229,7 @@ class CreditQualityServiceImplTest {
         assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Notification> warnings = List.of(mock(Notification.class));
     final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
     final List<PortfolioHolding> holdings = List.of(h);
     final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
@@ -257,7 +257,7 @@ class CreditQualityServiceImplTest {
           creditQualityFetcher, assetAllocationFetcher,
           assetAllocationDataMapper, responseMapper, DEFAULT_DATA_PROPERTIES));
 
-      final var warnings = List.of(mock(Warning.class));
+      final var warnings = List.of(mock(Notification.class));
       final var command = mock(PortfolioHoldingsCommand.class);
       final var providers = List.of(DataProvider.MORNINGSTAR);
       final List<DataProvider> defaultProviders = List.of(DataProvider.MORNINGSTAR);
@@ -293,7 +293,7 @@ class CreditQualityServiceImplTest {
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(assetAllocationDataMapper.toRegionExposures(any())).thenReturn(Map.of(h, asset));
 
-    final List<Warning> warnings = List.of(mock(Warning.class));
+    final List<Notification> warnings = List.of(mock(Notification.class));
     final PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
     final List<PortfolioHolding> holdings = List.of(h);
     when(command.getHoldings()).thenReturn(holdings);

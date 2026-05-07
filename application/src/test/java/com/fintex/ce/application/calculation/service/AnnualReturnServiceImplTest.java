@@ -6,8 +6,8 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -201,7 +201,7 @@ class AnnualReturnServiceImplTest {
     final var holdings = List.of(mock(PortfolioHolding.class));
     final NavigableMap map = new TreeMap<>();
     final var monthlyReturns = mock(ReturnsAggregate.class);
-    final var warnings = List.of(mock(Warning.class));
+    final var warnings = List.of(mock(Notification.class));
 
     when(monthlyReturnsService.getWeightedAverageWithCpsdAndCpedValidation(any(), any(), any())).thenReturn(map);
     when(monthlyReturnsService.getPortfolioMonthlyReturns(any(), any(), any())).thenReturn(monthlyReturns);

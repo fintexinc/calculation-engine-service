@@ -2,8 +2,8 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -22,13 +22,13 @@ public class FixedIncomeBondSectorCalculation {
 
   private final Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures;
   private final List<PortfolioHolding> holdings;
-  private final List<Warning> warnings;
+  private final List<Notification> warnings;
   private final Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash;
 
   public FixedIncomeBondSectorCalculation(
       final Map<PortfolioHolding, Map<FixedIncomeSecuritiesAllocationType, BigDecimal>> exposures,
       final List<PortfolioHolding> holdings,
-      final List<Warning> warnings,
+      final List<Notification> warnings,
       final Map<PortfolioHolding, BigDecimal> fixedIncomePlusCash) {
     this.exposures = exposures;
     this.holdings = holdings;

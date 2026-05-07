@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.allocation.GeographicAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -44,7 +44,7 @@ public class GeographicAllocationMappingService {
    */
   public Map<PortfolioHolding, Map<GeographicRegionType, BigDecimal>> mapToGeographicRegions(
       final Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations,
-      final List<Warning> warnings, final ErrorCode errorCode) {
+      final List<Notification> warnings, final ErrorCode errorCode) {
     return holdingAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> mapToRegions(e.getKey(), e
         .getValue(), warnings, errorCode)));
   }
@@ -62,16 +62,17 @@ public class GeographicAllocationMappingService {
    */
   private Map<GeographicRegionType, BigDecimal> mapToRegions(final PortfolioHolding holding,
       final Map<String, BigDecimal> allocations,
-      final List<Warning> warnings, final ErrorCode errorCode) {
+      final List<Notification> warnings, final ErrorCode errorCode) {
     final Map<GeographicRegionType, BigDecimal> map = new HashMap<>();
     if (CollectionUtils.isEmpty(allocations)) {
-      warnings.add(errorCode.warning(holding));
+      warnings.add(errorCode.toNotificationForHolding(holding));
       return map;
     }
     allocations.forEach((countryId, value) -> {
       final GeographicAllocation allocation = geographicAllocationMap.get(countryId);
       if (allocation == null || allocation.getRegion() == null) {
-        warnings.add(UNKNOWN_TYPE_FROM_DATA_POINT.warning(holding, countryId, "Geographic Allocation Mapping Table"));
+        warnings.add(UNKNOWN_TYPE_FROM_DATA_POINT.toNotificationForHolding(holding, countryId,
+            "Geographic Allocation Mapping Table"));
       } else {
         sumAllocations(map, value, allocation.getRegion());
       }

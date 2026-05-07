@@ -10,11 +10,11 @@ import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -66,7 +66,7 @@ public class CommonHoldingsServiceImpl
   @Override
   public TopCommonHoldingsResult perform(final TopCommonHoldingsCommand command) {
 
-    final List<Warning> warnings = new ArrayList<>();
+    final List<Notification> warnings = new ArrayList<>();
     final Map<PortfolioHolding, BigDecimal> allocations = calculateInitialPortfolioWeight(command.getHoldings());
 
     final Map<PortfolioHolding, CommonTopHoldings> rawHoldings = commonHoldingsSecurityDataFetcher.fetch(

@@ -9,8 +9,8 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -76,7 +76,7 @@ public class EquityCountryExposureCalculationServiceImpl
 
   @Override
   public ExposureDataHolder<CountryRegionType> fetchExposures(final PortfolioHoldingsCommand command) {
-    List<Warning> warnings = new ArrayList<>();
+    List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, EquityCountryAllocation> rawData = equityCountryAllocationSecurityDataFetcher.fetch(
         command.getHoldings(), List.of());
     Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = rawData.entrySet().stream()

@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.util.CollectionUtils;
 
@@ -268,14 +268,14 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    */
   public void addInsufficientDataWarnings(T result, Set<Pair<String, V>> periodsResult) {
     int availableMonths = availableMonths();
-    List<Warning> warnings = new ArrayList<>(result.getWarnings());
+    List<Notification> warnings = new ArrayList<>(result.getWarnings());
     periodsResult.stream()
         .filter(pair -> pair.getValue() == null)
         // Period keys may carry whitespace from `application.yml` SpEL splits (e.g. "12, 36, 60, 120" → " 36").
         // calculateForPeriod trims before resolving but stores the original in the pair, so trim again here.
         .filter(pair -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(pair.getKey().trim()))
         .filter(pair -> getNumberOfMonthsFor(portfolioTotalReturns, pair.getKey().trim()) > availableMonths)
-        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.warning(null, pair.getKey().trim(),
+        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey().trim(),
             availableMonths))
         .forEach(warnings::add);
     result.setWarnings(warnings);

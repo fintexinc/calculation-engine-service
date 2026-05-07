@@ -10,8 +10,8 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -152,7 +152,7 @@ class GrowthOf10KCalculationServiceImplTest {
         .useConstructor(monthlyReturnsService));
     final var holdings = List.of(mock(PortfolioHolding.class));
     final ReturnsAggregate monthlyReturnsAggregate = mock(ReturnsAggregate.class);
-    final var warnings = List.of(mock(Warning.class));
+    final var warnings = List.of(mock(Notification.class));
 
     final NavigableMap portfolioTotalReturns = mock(NavigableMap.class);
     final var expected = PeriodCalculationInput.builder()

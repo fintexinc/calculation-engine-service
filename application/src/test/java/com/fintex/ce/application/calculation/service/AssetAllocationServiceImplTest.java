@@ -10,8 +10,8 @@ import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -119,7 +119,7 @@ class AssetAllocationServiceImplTest {
     final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
     final Map netProducts = mock(Map.class);
-    final List<Warning> warnings = List.of();
+    final List<Notification> warnings = List.of();
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegion.OTHER, TEN));
     when(service.calculateNetProducts(any(), any(), any())).thenReturn(netProducts);
     doCallRealMethod().when(service).calculate(any(), any());
@@ -146,7 +146,7 @@ class AssetAllocationServiceImplTest {
     final var exposures = Map.of(holding, Map.of(AssetAllocationRegion.FIXED_INCOME, TEN));
     final var netProducts = mock(Map.class);
     final var expected = mock(AssetAllocationResult.class);
-    final List<Warning> warnings = List.of();
+    final List<Notification> warnings = List.of();
 
     when(service.calculateNetProducts(exposures, holdings, AssetAllocationRegion.values())).thenReturn(netProducts);
     when(responseMapper.fromNetProducts(any(), any())).thenReturn(expected);

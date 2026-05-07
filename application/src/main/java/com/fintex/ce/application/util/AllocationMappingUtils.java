@@ -2,7 +2,7 @@ package com.fintex.ce.application.util;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public final class AllocationMappingUtils {
       ErrorCode emptyWarningCode,
       String fdsServiceName,
       BiConsumer<Map<E, BigDecimal>, Map.Entry<E, BigDecimal>> accumulator) {
-    List<Warning> warnings = new ArrayList<>();
+    List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, Map<E, BigDecimal>> allocations = rawData.entrySet().stream()
         .collect(toMap(
             Map.Entry::getKey,
@@ -89,14 +89,14 @@ public final class AllocationMappingUtils {
       Function<D, Map<E, BigDecimal>> valueExtractor,
       Map<E, BigDecimal> defaultMap,
       ErrorCode emptyWarningCode) {
-    List<Warning> warnings = new ArrayList<>();
+    List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, Map<E, BigDecimal>> allocations = rawData.entrySet().stream()
         .collect(toMap(
             Map.Entry::getKey,
             entry -> {
               Map<E, BigDecimal> rawValues = valueExtractor.apply(entry.getValue());
               if (rawValues == null || rawValues.isEmpty()) {
-                warnings.add(emptyWarningCode.warning(entry.getKey()));
+                warnings.add(emptyWarningCode.toNotificationForHolding(entry.getKey()));
                 return new HashMap<>(defaultMap);
               }
               Map<E, BigDecimal> mapped = new HashMap<>(defaultMap);
@@ -114,16 +114,17 @@ public final class AllocationMappingUtils {
       ErrorCode emptyWarningCode,
       String fdsServiceName,
       BiConsumer<Map<E, BigDecimal>, Map.Entry<E, BigDecimal>> accumulator,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     if (rawValues == null || rawValues.isEmpty()) {
-      warnings.add(emptyWarningCode.warning(holding));
+      warnings.add(emptyWarningCode.toNotificationForHolding(holding));
       return new HashMap<>(defaultMap);
     }
     Map<E, BigDecimal> resolved = rawValues.entrySet().stream()
         .map(entry -> {
           E type = typeResolver.apply(entry.getKey());
           if (type == null) {
-            warnings.add(UNKNOWN_TYPE_FROM_DATA_POINT.warning(holding, entry.getKey(), fdsServiceName));
+            warnings.add(UNKNOWN_TYPE_FROM_DATA_POINT.toNotificationForHolding(holding, entry.getKey(),
+                fdsServiceName));
           }
           return type != null ? Map.entry(type, entry.getValue()) : null;
         })

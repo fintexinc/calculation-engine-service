@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -47,7 +47,8 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
   }
 
   @Override
-  public CountryExposureResult toResponse(Map<PortfolioHolding, CountryExposure> domainMap, List<Warning> warnings) {
+  public CountryExposureResult toResponse(Map<PortfolioHolding, CountryExposure> domainMap,
+      List<Notification> warnings) {
     // This method requires complex aggregation with holding weights
     // Delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for CountryExposure");
@@ -62,7 +63,8 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
    *          list of warnings to include in response
    * @return the result with scaled values
    */
-  public CountryExposureResult fromNetProducts(Map<CountryRegionType, BigDecimal> netProducts, List<Warning> warnings) {
+  public CountryExposureResult fromNetProducts(Map<CountryRegionType, BigDecimal> netProducts,
+      List<Notification> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
       return CountryExposureResult.builder()
           .countryExposure(DEFAULT_MAP)
@@ -82,7 +84,7 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
    *          list of warnings to include in response
    * @return response with default (null) values for all country region types
    */
-  public CountryExposureResult toEmptyResponse(List<Warning> warnings) {
+  public CountryExposureResult toEmptyResponse(List<Notification> warnings) {
     return CountryExposureResult.builder()
         .countryExposure(DEFAULT_MAP)
         .warnings(warnings)

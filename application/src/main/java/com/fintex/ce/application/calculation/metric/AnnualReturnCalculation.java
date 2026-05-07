@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,10 +23,10 @@ import static java.math.BigDecimal.ONE;
 public class AnnualReturnCalculation {
 
   private final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns;
-  private final List<Warning> warnings;
+  private final List<Notification> warnings;
 
   public AnnualReturnCalculation(final NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns,
-      final List<Warning> warnings) {
+      final List<Notification> warnings) {
     this.portfolioTotalReturns = weightedAveragePortfolioReturns;
     this.warnings = warnings;
   }

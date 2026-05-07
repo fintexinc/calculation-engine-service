@@ -4,8 +4,8 @@ import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -48,7 +48,7 @@ public class FixedIncomeStyleboxExposureResponseMapper
 
   @Override
   public FixedIncomeStyleboxExposureResult toResponse(Map<PortfolioHolding, FixedIncomeStyleboxExposure> domainMap,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     // This method requires complex aggregation with holding weights
     // Delegate to service for now
     throw new UnsupportedOperationException("Use service-level aggregation for FixedIncomeStyleboxExposure");
@@ -64,7 +64,7 @@ public class FixedIncomeStyleboxExposureResponseMapper
    * @return the result with scaled values
    */
   public FixedIncomeStyleboxExposureResult fromNetProducts(Map<FixedIncomeStyleBoxType, BigDecimal> netProducts,
-      List<Warning> warnings) {
+      List<Notification> warnings) {
     if (netProducts == null || netProducts.isEmpty()) {
       return FixedIncomeStyleboxExposureResult.builder()
           .fixedIncomeStyleboxExposure(DEFAULT_MAP)
@@ -84,7 +84,7 @@ public class FixedIncomeStyleboxExposureResponseMapper
    *          list of warnings to include in response
    * @return response with default (null) values for all stylebox types
    */
-  public FixedIncomeStyleboxExposureResult toEmptyResponse(List<Warning> warnings) {
+  public FixedIncomeStyleboxExposureResult toEmptyResponse(List<Notification> warnings) {
     return FixedIncomeStyleboxExposureResult.builder()
         .fixedIncomeStyleboxExposure(DEFAULT_MAP)
         .warnings(warnings)

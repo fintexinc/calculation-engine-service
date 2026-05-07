@@ -3,7 +3,7 @@ package com.fintex.ce.application.mapping.response;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +49,7 @@ class MaturityAllocationResponseMapperTest {
 
   @Test
   void shouldReturnDefaultMapAndPassWarnings_whenNetProductsAreEmpty() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
 
     MaturityAllocationResult result = mapper.fromNetProducts(Map.of(), warnings);
 
@@ -60,7 +60,7 @@ class MaturityAllocationResponseMapperTest {
 
   @Test
   void shouldMapAndScaleValues_whenUsingFromNetProducts() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
     Map<MaturityAllocationType, BigDecimal> netProducts = Map.of(
         MaturityAllocationType.UNDER_ONE_YEAR, new BigDecimal("0.1"),
         MaturityAllocationType.ONE_TO_THREE_YEARS, new BigDecimal("0.2"));

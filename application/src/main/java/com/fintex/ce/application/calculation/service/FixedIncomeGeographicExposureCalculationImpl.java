@@ -9,8 +9,8 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeGeographicExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -76,7 +76,7 @@ public class FixedIncomeGeographicExposureCalculationImpl
 
   @Override
   public ExposureDataHolder<GeographicRegionType> fetchExposures(PortfolioHoldingsCommand command) {
-    List<Warning> warnings = new ArrayList<>();
+    List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, CountryExposure> rawData = fiCountryExposureSecurityDataFetcher.fetch(command.getHoldings(),
         List.of());
     Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()

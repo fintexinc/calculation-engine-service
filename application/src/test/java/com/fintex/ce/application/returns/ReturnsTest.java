@@ -7,10 +7,10 @@ import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.DailyPerformanceCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -223,7 +223,7 @@ class ReturnsTest {
   @Test
   void shouldGetErrorsAsWarnings_whenReturnsEmptyListWhenNoErrors() {
     ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = new ReturnsAggregate<>();
-    List<Warning> warnings = returnsAggregate.getErrorsAsWarnings();
+    List<Notification> warnings = returnsAggregate.getErrorsAsWarnings();
     assertTrue(warnings.isEmpty());
   }
 
@@ -232,9 +232,9 @@ class ReturnsTest {
     ReturnsAggregate<HoldingMonthlyReturns> returnsAggregate = new ReturnsAggregate<>();
     CalculationException error = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("id");
     returnsAggregate.notification.add(error);
-    List<Warning> warnings = returnsAggregate.getErrorsAsWarnings();
+    List<Notification> warnings = returnsAggregate.getErrorsAsWarnings();
     assertEquals(1, warnings.size());
-    assertEquals(error.getId(), warnings.get(0).getId());
+    assertEquals(error.getId(), warnings.get(0).getUuid());
     assertEquals(error.getMessage(), warnings.get(0).getMessage());
     assertEquals(error.getErrorCode().getCode(), warnings.get(0).getCode());
   }

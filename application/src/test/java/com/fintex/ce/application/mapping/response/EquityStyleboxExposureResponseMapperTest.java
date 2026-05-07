@@ -2,8 +2,8 @@ package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
 import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.rating.StyleBoxType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +48,7 @@ class EquityStyleboxExposureResponseMapperTest {
 
   @Test
   void shouldReturnDefaultMapAndPassWarnings_whenNetProductsAreEmpty() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
 
     EquityStyleboxExposureResult result = mapper.fromNetProducts(Map.of(), warnings);
 
@@ -59,7 +59,7 @@ class EquityStyleboxExposureResponseMapperTest {
 
   @Test
   void shouldMapAndScaleValues_whenUsingFromNetProducts() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
     Map<StyleBoxType, BigDecimal> netProducts = Map.of(
         StyleBoxType.LARGE_CORE, new BigDecimal("0.1"),
         StyleBoxType.SMALL_VALUE, new BigDecimal("0.2"));

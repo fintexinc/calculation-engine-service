@@ -4,7 +4,7 @@ import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +54,7 @@ class AssetAllocationResponseMapperTest {
 
   @Test
   void shouldMapNetProductsAndPreserveWarnings_whenBuildingResponse() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
     Map<AssetAllocationRegion, BigDecimal> netProducts = Map.of(
         AssetAllocationRegion.CANADIAN_EQUITIES, new BigDecimal("0.1"),
         AssetAllocationRegion.US_EQUITIES, new BigDecimal("0.2"),

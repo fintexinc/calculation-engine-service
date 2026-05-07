@@ -2,8 +2,8 @@ package com.fintex.ce.application.mapping.response;
 
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +43,7 @@ class EquitySectorResponseMapperTest {
 
   @Test
   void shouldReturnDefaultMapAndPassWarnings_whenNetProductsAreEmpty() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
 
     EquitySectorResult result = mapper.fromNetProducts(Map.of(), warnings);
 
@@ -54,7 +54,7 @@ class EquitySectorResponseMapperTest {
 
   @Test
   void shouldMapAndScaleValues_whenUsingFromNetProducts() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
     Map<EquitySectorAllocationType, BigDecimal> netProducts = Map.of(
         EquitySectorAllocationType.ENERGY, new BigDecimal("0.1"),
         EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2"));

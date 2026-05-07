@@ -3,8 +3,8 @@ package com.fintex.ce.application.mapping.response;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +46,7 @@ class CreditQualityResponseMapperTest {
 
   @Test
   void shouldApplyUserScaleAndSetWarnings_whenUsingCalculatedValues() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
     Map<FixedIncomeCreditQuality, BigDecimal> calculated = Map.of(
         FixedIncomeCreditQuality.AAA, new BigDecimal("0.12345678901"),
         FixedIncomeCreditQuality.HIGH_YIELD, new BigDecimal("0.2"));
@@ -62,7 +62,7 @@ class CreditQualityResponseMapperTest {
 
   @Test
   void shouldReturnDefaultMapAndPassWarnings_whenUsingEmptyResponse() {
-    List<Warning> warnings = List.of(new Warning("w1", "warning"));
+    List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
 
     CreditQualityResult result = mapper.toEmptyResponse(warnings);
 

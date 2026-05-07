@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 public class AssetAllocationDataValidator {
 
-  public void validate(final AssetAllocationData assetAllocationData, final List<Warning> warnings) {
+  public void validate(final AssetAllocationData assetAllocationData, final List<Notification> warnings) {
     validateNonStock(assetAllocationData.getEtfUsFdsResponse(), warnings);
     validateNonStock(assetAllocationData.getEtfCanadaFdsResponse(), warnings);
     validateNonStock(assetAllocationData.getMutualFundFdsResponse(), warnings);
@@ -29,13 +29,13 @@ public class AssetAllocationDataValidator {
   }
 
   <H extends PortfolioHolding> void validateNonStock(final Map<H, HoldingAssetAllocation> holdings,
-      final List<Warning> warnings) {
+      final List<Notification> warnings) {
     holdings.forEach((holding, assetAllocation) -> validate(holding, assetAllocation.getAllocations(), warnings));
   }
 
   void validate(final PortfolioHolding holding,
       final Map<String, BigDecimal> assetAllocations,
-      final List<Warning> warnings) {
+      final List<Notification> warnings) {
     if (assetAllocations == null || assetAllocations.isEmpty()) {
       validateWhenAssetAllocationIsEmpty(holding, warnings);
       return;
@@ -43,13 +43,14 @@ public class AssetAllocationDataValidator {
     assetAllocations.keySet().forEach(region -> {
       final var assetAllocationRegion = AssetAllocationRegion.fromValue(region);
       if (assetAllocationRegion == null || assetAllocationRegion.getName() == null) {
-        warnings.add(ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT.warning(holding, region, "Asset Allocation"));
+        warnings.add(ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT.toNotificationForHolding(holding, region,
+            "Asset Allocation"));
       }
     });
   }
 
-  public void validateWhenAssetAllocationIsEmpty(final PortfolioHolding holding, final List<Warning> warnings) {
-    warnings.add(ErrorCode.MISSING_ASSET_ALLOCATION.warning(holding));
+  public void validateWhenAssetAllocationIsEmpty(final PortfolioHolding holding, final List<Notification> warnings) {
+    warnings.add(ErrorCode.MISSING_ASSET_ALLOCATION.toNotificationForHolding(holding));
   }
 
 }

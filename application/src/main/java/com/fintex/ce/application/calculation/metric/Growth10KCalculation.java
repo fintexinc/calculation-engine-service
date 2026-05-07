@@ -3,7 +3,7 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
-import com.fintex.ce.model.error.Warning;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.util.CollectionUtils;
 
@@ -26,7 +26,7 @@ public class Growth10KCalculation {
   private final NavigableMap<LocalDate, BigDecimal> portfolioReturns;
   private final DateRange dateRange;
   private final boolean calculateForNAV;
-  private final List<Warning> warnings;
+  private final List<Notification> warnings;
 
   public Growth10KCalculation(final NavigableMap<LocalDate, BigDecimal> portfolioReturns,
       final DateRange dateRange,
@@ -40,7 +40,7 @@ public class Growth10KCalculation {
   public Growth10KCalculation(final NavigableMap<LocalDate, BigDecimal> portfolioReturns,
       final DateRange dateRange,
       final boolean calculateForNAV,
-      final List<Warning> warnings) {
+      final List<Notification> warnings) {
     this.portfolioReturns = portfolioReturns;
     this.dateRange = dateRange;
     this.calculateForNAV = calculateForNAV;

@@ -7,8 +7,8 @@ import com.fintex.ce.model.domain.enumeration.ParameterType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.util.AbstractMap;
@@ -82,7 +82,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends BaseC
         .build();
   }
 
-  protected abstract List<Warning> setInitialFeeAndModifiedFeeValues(
+  protected abstract List<Notification> setInitialFeeAndModifiedFeeValues(
       final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupOfMers);
 
   protected abstract R calculateAverageValue(final List<ParameterType> parameterTypes,
@@ -96,7 +96,7 @@ public abstract class AverageManagementExpenseCalculationService<R extends BaseC
     final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> averageMerCalculationDtos = fetchData(
         command);
 
-    final List<Warning> warnings = setInitialFeeAndModifiedFeeValues(averageMerCalculationDtos);
+    final List<Notification> warnings = setInitialFeeAndModifiedFeeValues(averageMerCalculationDtos);
     final var result = calculateAverageValue(getSpecifiedIfEmpty(command.getParameterTypes(), SCALED, ABSOLUTE),
         averageMerCalculationDtos);
 

@@ -9,9 +9,9 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.PceExceptionCollector;
-import com.fintex.ce.model.error.Warning;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -73,7 +73,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
   }
 
   @Override
-  public List<Warning> setInitialFeeAndModifiedFeeValues(
+  public List<Notification> setInitialFeeAndModifiedFeeValues(
       final Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupOfMers) {
     // TODO TMI-369: refactor this logic. Many types are/were simply not handled in the initial impl.
     // Therefore we must investigate:
@@ -81,7 +81,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
     // What processing logic must happen for each type?
     // This requires more detailed info on calculation logic.
     PceExceptionCollector collector = new PceExceptionCollector();
-    List<Warning> warnings = groupOfMers.entrySet().stream()
+    List<Notification> warnings = groupOfMers.entrySet().stream()
         .flatMap(entry -> {
           FinancialInstrumentType holdingType = entry.getKey();
           if (FinancialInstrumentType.ETF_CANADA.equals(holdingType)
@@ -109,7 +109,7 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
     return warnings;
   }
 
-  public Optional<List<Warning>> handleFeeDataForCanadaMutualHedgeFundsAndEtf(
+  public Optional<List<Notification>> handleFeeDataForCanadaMutualHedgeFundsAndEtf(
       AverageManagementExpenseCalculation averageManagementExpenseCalculation,
       PortfolioHolding holding) {
     if (Objects.isNull(averageManagementExpenseCalculation.getManagementExpenseRatio()) &&
@@ -117,25 +117,25 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
       if (FinancialInstrumentType.HEDGE_FUND_CANADA.equals(holding.getHoldingType())) {
         setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
             .getManagementExpenseRatio());
-        return Optional.of(List.of(MISSING_MANAGEMENT_EXPENSE_RATIO.warning(holding),
-            MISSING_ACTUAL_MANAGEMENT_FEE.warning(holding)));
+        return Optional.of(List.of(MISSING_MANAGEMENT_EXPENSE_RATIO.toNotificationForHolding(holding),
+            MISSING_ACTUAL_MANAGEMENT_FEE.toNotificationForHolding(holding)));
       }
       throw MISSING_MER_AND_MANAGEMENT_FEE.toExceptionForHolding(holding);
     } else if (Objects.isNull(averageManagementExpenseCalculation.getManagementExpenseRatio())) {
       setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
           .getActualManagementFee());
-      return Optional.of(List.of(MISSING_MANAGEMENT_EXPENSE_RATIO.warning(holding)));
+      return Optional.of(List.of(MISSING_MANAGEMENT_EXPENSE_RATIO.toNotificationForHolding(holding)));
     } else if (Objects.isNull(averageManagementExpenseCalculation.getActualManagementFee())) {
       setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
           .getManagementExpenseRatio());
-      return Optional.of(List.of(MISSING_ACTUAL_MANAGEMENT_FEE.warning(holding)));
+      return Optional.of(List.of(MISSING_ACTUAL_MANAGEMENT_FEE.toNotificationForHolding(holding)));
     }
     setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
         .getManagementExpenseRatio());
     return Optional.empty();
   }
 
-  public Optional<Warning> handleFeeDataForUsEtfAndMutualFund(
+  public Optional<Notification> handleFeeDataForUsEtfAndMutualFund(
       AverageManagementExpenseCalculation averageManagementExpenseCalculation,
       PortfolioHolding holding) {
     if (Objects.isNull(averageManagementExpenseCalculation.getNetExpenseRatio()) &&
@@ -144,10 +144,10 @@ public class MERCalculationServiceImpl extends AverageManagementExpenseCalculati
     } else if (Objects.isNull(averageManagementExpenseCalculation.getNetExpenseRatio())) {
       setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation
           .getGrossExpenseRatio());
-      return Optional.of(MISSING_NET_EXPENSE_RATIO.warning(holding));
+      return Optional.of(MISSING_NET_EXPENSE_RATIO.toNotificationForHolding(holding));
     } else if (Objects.isNull(averageManagementExpenseCalculation.getGrossExpenseRatio())) {
       setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation.getNetExpenseRatio());
-      return Optional.of(MISSING_GROSS_EXPENSE_RATIO.warning(holding));
+      return Optional.of(MISSING_GROSS_EXPENSE_RATIO.toNotificationForHolding(holding));
     }
     setFeeValues(averageManagementExpenseCalculation, averageManagementExpenseCalculation.getNetExpenseRatio());
     return Optional.empty();
