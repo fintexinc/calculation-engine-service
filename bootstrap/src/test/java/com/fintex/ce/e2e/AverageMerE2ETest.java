@@ -1,7 +1,7 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.enumeration.ParameterType;
+import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
@@ -36,7 +36,7 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   protected String requestBodyForSmsUnavailableScenario() {
     var command = new AverageMerCommand();
     command.setMetric(CalculationMetric.MER);
-    command.setParameterTypes(List.of(ParameterType.SCALED, ParameterType.ABSOLUTE));
+    command.setParameterTypes(List.of(FeeAggregationMode.FUNDS_ONLY, FeeAggregationMode.WHOLE_PORTFOLIO));
     command.setHoldings(List.of(
         holding("XBAL"),
         holding("VCNS")));
@@ -48,7 +48,7 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   protected String requestBodyForPositiveSmsScenario() {
     var command = new AverageMerCommand();
     command.setMetric(CalculationMetric.MER);
-    command.setParameterTypes(List.of(ParameterType.SCALED, ParameterType.ABSOLUTE));
+    command.setParameterTypes(List.of(FeeAggregationMode.FUNDS_ONLY, FeeAggregationMode.WHOLE_PORTFOLIO));
     command.setHoldings(List.of(holding("XBAL")));
     command.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return toJson(command);
@@ -56,14 +56,18 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String smsPositiveResponseBody() {
+    // SMS returns fee fields in percentage form (e.g. 2.25 meaning 2.25%). FeesMapper converts to ratio form
+    // (0.0225) for the rest of the engine — the expected output below is in ratio form. The currency datapoint is
+    // required for MER-bearing holdings — without it, the FX-conversion step hard-fails with CUR-003.
     var responseBody = List.of(
         new SmsSecurityDataResponse(
             new SecurityIdentifier("XBAL", FiIdentifierType.TICKER),
             new SmsFeeData(
-                new SmsDatapoint(new BigDecimal("0.0125"), DataProvider.MORNINGSTAR),
-                new SmsDatapoint(new BigDecimal("0.0225"), DataProvider.MORNINGSTAR),
-                new SmsDatapoint(new BigDecimal("0.0210"), DataProvider.MORNINGSTAR),
-                new SmsDatapoint(new BigDecimal("0.0250"), DataProvider.MORNINGSTAR))));
+                new SmsDatapoint(new BigDecimal("1.25"), DataProvider.MORNINGSTAR),
+                new SmsDatapoint(new BigDecimal("2.25"), DataProvider.MORNINGSTAR),
+                new SmsDatapoint(new BigDecimal("2.10"), DataProvider.MORNINGSTAR),
+                new SmsDatapoint(new BigDecimal("2.50"), DataProvider.MORNINGSTAR),
+                new SmsCurrencyDatapoint(Currency.CAD, DataProvider.MORNINGSTAR))));
     return toJson(responseBody);
   }
 
@@ -80,9 +84,8 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   protected void assertPositiveResponseBody(String responseBody) {
     AverageMerResult result = fromJson(responseBody, AverageMerResult.class);
     assertThat(result.getManagementExpenseRatio())
-        .containsEntry(ParameterType.ABSOLUTE, new BigDecimal("0.0225000000"))
-        .containsKey(ParameterType.SCALED);
-    assertThat(result.getManagementExpenseRatio().get(ParameterType.SCALED)).isNull();
+        .containsEntry(FeeAggregationMode.WHOLE_PORTFOLIO, new BigDecimal("0.0225000000"))
+        .containsEntry(FeeAggregationMode.FUNDS_ONLY, new BigDecimal("0.0225000000"));
     assertThat(result.getWarnings()).isEmpty();
   }
 
@@ -116,9 +119,16 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
       SmsDatapoint managementFee,
       SmsDatapoint managementExpenseRatio,
       SmsDatapoint netExpenseRatio,
-      SmsDatapoint grossExpenseRatio) {
+      SmsDatapoint grossExpenseRatio,
+      SmsCurrencyDatapoint currency) {
   }
 
   private record SmsDatapoint(BigDecimal value, DataProvider dataProvider) {
+  }
+
+  // wm-commons CurrencyDatapoint stores the value in a field literally named "type" (not "value" as for
+  // FloatDatapoint).
+  // Jackson deserialization is property-name driven, so the JSON must say {"type": "CAD"} for the engine to receive it.
+  private record SmsCurrencyDatapoint(Currency type, DataProvider dataProvider) {
   }
 }

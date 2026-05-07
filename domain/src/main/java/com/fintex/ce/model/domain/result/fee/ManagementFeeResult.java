@@ -1,6 +1,6 @@
 package com.fintex.ce.model.domain.result.fee;
 
-import com.fintex.ce.model.domain.enumeration.ParameterType;
+import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,5 +26,5 @@ public class ManagementFeeResult extends BaseCalculationResult {
 
   @Schema(description = "Management fee by parameter type (scaled/absolute)")
   @Builder.Default
-  private Map<ParameterType, BigDecimal> managementFee = new HashMap<>();
+  private Map<FeeAggregationMode, BigDecimal> managementFee = new HashMap<>();
 }

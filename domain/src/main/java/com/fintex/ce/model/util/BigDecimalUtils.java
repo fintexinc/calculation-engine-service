@@ -3,7 +3,9 @@ package com.fintex.ce.model.util;
 import java.math.BigDecimal;
 import lombok.experimental.UtilityClass;
 
+import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.model.util.BigDecimalConstants.INVERSE_SCALE;
+import static com.fintex.ce.model.util.BigDecimalConstants.MATH_CONTEXT;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.ROUNDING_MODE;
 
@@ -27,6 +29,15 @@ public final class BigDecimalUtils {
    */
   public static BigDecimal invert(BigDecimal rate) {
     return ONE.divide(rate, INVERSE_SCALE, ROUNDING_MODE);
+  }
+
+  /**
+   * Converts a percentage-form value (e.g. {@code 1.51} meaning 1.51%) to ratio form ({@code 0.0151}). Returns
+   * {@code null} when the input is {@code null}. Used at adapter boundaries where upstream data providers report fees
+   * or rates as percentages and the engine needs them as ratios.
+   */
+  public static BigDecimal percentageToRatio(BigDecimal percentage) {
+    return percentage == null ? null : percentage.divide(HUNDRED, MATH_CONTEXT);
   }
 
 }

@@ -37,7 +37,7 @@ import lombok.experimental.SuperBuilder;
         "number-of-unique-holdings"
     }),
     @Type(value = ReturnCommand.class, names = {"annual-returns", "growth-of-10k"}),
-    @Type(value = AverageMerCommand.class, names = {"mer", "management-fee"}),
+    @Type(value = AverageMerCommand.class, names = {"mer", "management-fee", "fees"}),
     @Type(value = LeadingTotalReturnCommand.class, name = "leading-total-returns"),
     @Type(value = BestWorstPeriodsCommand.class, name = "best-worst-periods"),
     @Type(value = DistributionOfReturnsCommand.class, name = "distribution-of-monthly-returns"),

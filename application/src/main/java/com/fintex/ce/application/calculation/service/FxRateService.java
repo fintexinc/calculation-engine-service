@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,10 @@ import static java.math.BigDecimal.ONE;
 @Service
 @RequiredArgsConstructor
 public class FxRateService {
+
+  // lookback period to ensure we don't have empty map in case of long holidays or other data misses
+  // we will take the most recent rate we have from that range anyway
+  private static final int SPOT_LOOKBACK_DAYS = 365;
 
   private final FxRatesFetcher fxRatesFetcher;
 
@@ -87,6 +93,34 @@ public class FxRateService {
       }
       return converted;
     }));
+  }
+
+  /**
+   * Returns a single FX rate from each {@code sourceCurrencies} entry into {@code targetCurrency} as of {@code asOf},
+   * picking the latest published rate at or before {@code asOf}. Used by snapshot money-value conversions like the Fees
+   * (annual / monthly) metric. Self-currency pairs are mapped to {@code 1}. If a pair has no rate within
+   * {@link #SPOT_LOOKBACK_DAYS} days of {@code asOf} (provider outage, missing pair, or holiday cluster), the value for
+   * that source currency is {@code null} — callers are expected to fall back to the original currency and emit an
+   * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} warning, matching the behaviour of
+   * {@link #convertReturns}.
+   */
+  public Map<Currency, BigDecimal> spotRates(Set<Currency> sourceCurrencies, Currency targetCurrency, LocalDate asOf) {
+    Map<Currency, BigDecimal> result = new EnumMap<>(Currency.class);
+    DateRange lookback = new DateRange(asOf.minusDays(SPOT_LOOKBACK_DAYS), asOf);
+    for (Currency from : sourceCurrencies) {
+      if (from == null) {
+        continue;
+      }
+      if (from.equals(targetCurrency)) {
+        result.put(from, BigDecimal.ONE);
+        continue;
+      }
+      NavigableMap<LocalDate, BigDecimal> rates = fetchOrEmpty(new CurrencyExchangePair(from, targetCurrency),
+          lookback);
+      Map.Entry<LocalDate, BigDecimal> latest = rates.isEmpty() ? null : rates.floorEntry(asOf);
+      result.put(from, latest != null ? latest.getValue() : null);
+    }
+    return result;
   }
 
   private NavigableMap<LocalDate, BigDecimal> fetchOrEmpty(CurrencyExchangePair pair, DateRange range) {
