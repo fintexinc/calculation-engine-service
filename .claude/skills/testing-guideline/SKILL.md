@@ -64,6 +64,13 @@ When mocking external HTTP services (REST APIs):
 
 ## 1) Global rules (apply to all tests)
 
+### 1.0 PR gate (mandatory)
+
+Before creating any PR, ALWAYS:
+
+- Run this `testing-guideline` skill and ensure the relevant test suites pass locally.
+- Run the `code-reviewer` skill against the change set (especially for adapters, pipelines, and validators).
+
 ### 1.1 Naming convention (mandatory)
 
 Don't write stupid useless comments like "when" "then" "assert" "helper method" etc. They do not bring any value.
@@ -96,6 +103,12 @@ Use clear separation:
 - **Unit tests:** MUST have **many assertions** validating the resulting data thoroughly (fields, invariants, boundary
   values).
 - **Integration/e2e tests:** focus on key outcomes; many assertions are **nice-to-have**, not required.
+
+Additional requirement for calculation metrics:
+
+- **Assertions must cover all important fields** in the calculation response with **specific expected values** (not only
+  “exists” / “not null”). Example: PSD/PED, warnings codes, key numeric outputs, and any normalization invariants (sums,
+  weights, map keys).
 
 ### 1.4 Avoid duplicate near-identical tests and boilerplate tests
 
@@ -326,6 +339,22 @@ E2E tests should validate:
 - basic resilience (idempotency where relevant)
 
 Keep e2e suite smaller than integration suite; keep integration suite smaller than unit suite.
+
+### 6.4 E2E construction rules for calculation endpoints (mandatory)
+
+When writing E2E tests for portfolio calculations:
+
+- **Prefer complex cases**: design 1 request to execute as many relevant code branches/lines as possible.
+- **Holdings + SMS responses must be diverse**:
+  - multiple security types (ETF/FUND/STOCK/CASH/GIC/FIXED_INCOME where relevant)
+  - different identifier types (TICKER / FUNDSERV / MORNINGSTAR_ID / TICKER_MIC, etc.)
+  - mixed currencies (CAD/USD at minimum)
+  - periods/windows (PSD/PED/CPSD/CPED) that cover trimming, normalization, and edge conditions
+- **Build requests and SMS responses using DTOs/domain classes. Never use strings** for JSON bodies.
+  - Construct DTOs, serialize with the repository’s `ObjectMapper`.
+- **Always parse responses to DTOs** (typed) — **never use `JsonNode`** for assertions.
+- **Assert important fields with specific expected values** (status, notifications/warnings codes, numeric outputs,
+  normalized sums, map keys).
 
 ---
 

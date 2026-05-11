@@ -377,8 +377,7 @@ class CalculationTestDataProvider {
 
   private static Growth10KResult growth10kResult() {
     return Growth10KResult.builder()
-        .performanceEndDate(PED)
-        .performanceStartDate(PSD)
+        .growth10k(List.of())
         .build();
   }
 

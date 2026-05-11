@@ -40,6 +40,6 @@ public class CutByCpedOrPedProcessor implements ReturnsProcessor {
 
   @Override
   public boolean isApplicable(ProcessingCase processingCase) {
-    return true;
+    return processingCase != ProcessingCase.PORTFOLIO_PER_FUND_FX_ONLY;
   }
 }

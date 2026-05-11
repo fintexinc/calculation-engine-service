@@ -158,7 +158,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
                 allocationValue(AssetAllocationRegionType.CASH, "0.1"),
                 allocationValue(AssetAllocationRegionType.INTERNATIONAL_EQUITIES, "0.1")))));
 
-    var response = postCalculation(metricPath(), writeJson(mixedPortfolioCommand()));
+    var response = postCalculation(writeJson(mixedPortfolioCommand()));
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     AssetAllocationResult result = readJson(response.responseBody(), AssetAllocationResult.class);
@@ -177,7 +177,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
         List.of(allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
             allocationValue(AssetAllocationRegionType.US_EQUITIES, "1.0")))));
 
-    var response = postCalculation(metricPath(), writeJson(warningsPortfolioCommand()));
+    var response = postCalculation(writeJson(warningsPortfolioCommand()));
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     AssetAllocationResult result = readJson(response.responseBody(), AssetAllocationResult.class);
@@ -197,7 +197,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
         List.of(geographyRow("AAPL", FiIdentifierType.TICKER_MIC, SecurityRegion.USA, Currency.USD)),
         List.of()));
 
-    var response = postCalculation(metricPath(), writeJson(singleUsdStockCommand()));
+    var response = postCalculation(writeJson(singleUsdStockCommand()));
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     AssetAllocationResult result = readJson(response.responseBody(), AssetAllocationResult.class);

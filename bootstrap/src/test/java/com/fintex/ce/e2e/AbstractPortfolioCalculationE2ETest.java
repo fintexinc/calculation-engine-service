@@ -1,6 +1,8 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.PortfolioCalculationEngineApplication;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -14,7 +16,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ import okhttp3.mockwebserver.SocketPolicy;
 @SpringBootTest(classes = PortfolioCalculationEngineApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class AbstractPortfolioCalculationE2ETest {
 
-  protected static final String basePath = "/api/v1/portfolio/calculations";
+  private static final String basePath = "/api/v1/portfolio/calculations";
 
   protected static MockWebServer smsMockServer;
 
@@ -57,6 +58,16 @@ abstract class AbstractPortfolioCalculationE2ETest {
   protected abstract String requestBodyForMismatchedMetricScenario();
 
   protected abstract void assertPositiveResponseBody(String responseBody);
+
+  protected record HttpResponse(HttpStatusCode status, String responseBody) {
+  }
+
+  protected void enqueueSmsMockResponse(String body) {
+    smsMockServer.enqueue(
+        new MockResponse()
+            .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .setBody(body));
+  }
 
   protected static String writeJson(Object value) {
     try {
@@ -82,6 +93,13 @@ abstract class AbstractPortfolioCalculationE2ETest {
     }
   }
 
+  protected static <T> SecurityAttributeResult<T> securityAttributeResult(SecurityIdentifier identifier, T data) {
+    return SecurityAttributeResult.<T>builder()
+        .identifier(identifier)
+        .data(data)
+        .build();
+  }
+
   private static void ensureSmsMockServerStarted() throws IOException {
     if (smsMockServer == null) {
       smsMockServer = new MockWebServer();
@@ -94,14 +112,11 @@ abstract class AbstractPortfolioCalculationE2ETest {
     ensureSmsMockServerStarted();
   }
 
-  @AfterAll
-  static void shutdownSmsMockServer() throws IOException {
-    if (smsMockServer != null) {
-      smsMockServer.shutdown();
-      smsMockServer = null;
-    }
-  }
-
+  /**
+   * Do not shut down {@link #smsMockServer} in {@code @AfterAll}: several e2e classes share this static server in the
+   * same Surefire fork ({@code reuseForks=true}), and shutting down after the first class breaks later classes with
+   * HTTP 500.
+   */
   private static String smsMockBaseUrl() {
     try {
       ensureSmsMockServerStarted();
@@ -178,12 +193,8 @@ abstract class AbstractPortfolioCalculationE2ETest {
   }
 
   protected HttpResponse postCalculation(String body) {
-    return postCalculation(metricPath(), body);
-  }
-
-  protected HttpResponse postCalculation(String metric, String body) {
     BodySpec<String, ?> result = webTestClient.post()
-        .uri(basePath + "/" + metric)
+        .uri(basePath + "/" + metricPath())
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(body)
         .exchange()
@@ -191,8 +202,5 @@ abstract class AbstractPortfolioCalculationE2ETest {
 
     var exchangeResult = result.returnResult();
     return new HttpResponse(exchangeResult.getStatus(), exchangeResult.getResponseBody());
-  }
-
-  protected record HttpResponse(HttpStatusCode status, String responseBody) {
   }
 }

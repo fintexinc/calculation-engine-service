@@ -42,7 +42,10 @@ class BankOfCanadaHealthIndicatorTest {
 
   @Test
   void shouldReportUp_whenBocReturns200() {
-    server.enqueue(new MockResponse().setResponseCode(200).setBody("{}"));
+    server.enqueue(new MockResponse()
+        .setResponseCode(200)
+        .setHeader("Content-Type", "application/json")
+        .setBody("{}"));
 
     Health health = indicator.health();
 
@@ -52,7 +55,10 @@ class BankOfCanadaHealthIndicatorTest {
 
   @Test
   void shouldReportDown_whenBocReturnsErrorStatus() {
-    server.enqueue(new MockResponse().setResponseCode(500));
+    server.enqueue(new MockResponse()
+        .setResponseCode(500)
+        .setHeader("Content-Type", "application/json")
+        .setBody("{\"error\":\"upstream\"}"));
 
     Health health = indicator.health();
 
