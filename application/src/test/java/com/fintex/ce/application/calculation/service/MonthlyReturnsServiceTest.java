@@ -39,12 +39,11 @@ class MonthlyReturnsServiceTest {
   private final SecurityDataFetcher<HoldingMonthlyReturns> fetcher = mock(SecurityDataFetcher.class);
   private final MonthlyReturnsGenerator generator = mock(MonthlyReturnsGenerator.class);
 
-  private final MonthlyReturnsService service = new MonthlyReturnsService(fetcher, generator);
-
   @Test
-  void shouldThrowSmsNoDataForHolding_whenHoldingMissingFromSecurityMasterResponse() {
+  void shouldThrowNoSecurityDataForHolding_whenHoldingMissingFromSecurityMasterResponse() {
     when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
+    MonthlyReturnsService service = service();
 
     assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF)))
         .isInstanceOf(BasePceException.class)
@@ -59,6 +58,7 @@ class MonthlyReturnsServiceTest {
     empty.setReturns(new TreeMap<>());
     when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of(ETF, empty));
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
+    MonthlyReturnsService service = service();
 
     assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF)))
         .isInstanceOf(BasePceException.class)
@@ -70,6 +70,7 @@ class MonthlyReturnsServiceTest {
   void shouldSkipCashAndGicTypes_whenValidatingMonthlyReturnsPresence() {
     when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
+    MonthlyReturnsService service = service();
 
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = service.getMonthlyReturns(List.of(CASH));
 
@@ -85,10 +86,15 @@ class MonthlyReturnsServiceTest {
         Map.entry(LocalDate.parse("2020-01-31"), BigDecimal.valueOf(0.02)));
     when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of(ETF, etfReturns));
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of(STOCK, stockReturns));
+    MonthlyReturnsService service = service();
 
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = service.getMonthlyReturns(List.of(ETF, STOCK));
 
     assertThat(snapshot.returnsMap()).containsOnlyKeys(ETF, STOCK);
+  }
+
+  private MonthlyReturnsService service() {
+    return new MonthlyReturnsService(fetcher, generator);
   }
 
   @SafeVarargs

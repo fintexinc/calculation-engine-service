@@ -64,9 +64,12 @@ class CutByCpedOrPedProcessorTest {
   }
 
   @Test
-  void shouldApplyToEveryProcessingCase_whenIsApplicable() {
+  void shouldApplyToEveryProcessingCaseExceptPerFundFxOnly_whenIsApplicable() {
+    // Per-fund metrics handle CPED themselves on each holding's series; the global cut would erase the per-fund nature
+    // because the fallback PED is the common-range (earliest-ending holding) intersection.
     for (ProcessingCase processingCase : ProcessingCase.values()) {
-      assertThat(processor.isApplicable(processingCase)).isTrue();
+      boolean expected = processingCase != ProcessingCase.PORTFOLIO_PER_FUND_FX_ONLY;
+      assertThat(processor.isApplicable(processingCase)).as("isApplicable(%s)", processingCase).isEqualTo(expected);
     }
   }
 

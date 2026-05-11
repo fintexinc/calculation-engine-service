@@ -41,6 +41,7 @@ public class CutByCpsdOrPsdProcessor implements ReturnsProcessor {
   @Override
   public boolean isApplicable(ProcessingCase processingCase) {
     return processingCase != ProcessingCase.PORTFOLIO_PRE_PSD_TRIM
-        && processingCase != ProcessingCase.BENCHMARK_PRE_PSD_TRIM;
+        && processingCase != ProcessingCase.BENCHMARK_PRE_PSD_TRIM
+        && processingCase != ProcessingCase.PORTFOLIO_PER_FUND_FX_ONLY;
   }
 }

@@ -21,5 +21,12 @@ public enum ProcessingCase {
   PORTFOLIO_WEIGHTED_AVERAGE_WITH_CPED_ONLY,
   BENCHMARK_WEIGHTED_AVERAGE_WITH_CPED_ONLY,
   PORTFOLIO_PRE_PSD_TRIM,
-  BENCHMARK_PRE_PSD_TRIM
+  BENCHMARK_PRE_PSD_TRIM,
+  /**
+   * Per-fund metrics (e.g. Growth of $10K) that need each holding's full history. Runs only FX conversion — neither cut
+   * processor applies, because their default fallback ({@code snapshot.performanceStartDate} /
+   * {@code performanceEndDate}) is the common-range intersection, which would erase the per-fund nature. Callers trim
+   * by CPSD/CPED per-fund themselves on the returned snapshot.
+   */
+  PORTFOLIO_PER_FUND_FX_ONLY
 }

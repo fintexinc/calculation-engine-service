@@ -160,6 +160,22 @@ External service calls without fallback method for when SM is unavailable.
 
 ---
 
+## Testability + E2E Coverage Checks (mandatory for PR readiness)
+
+When reviewing PRs that touch calculations/endpoints/tests, you MUST verify:
+
+- **E2E tests are complex-case first**: prefer fewer requests that cover more branches/lines in one scenario.
+- **Holdings + SMS fixtures are diverse**: multiple security types, identifier types, currencies, and periods.
+- **Build requests and SMS responses using DTOs/domain classes** — never string-build JSON bodies.
+- **Parse responses to DTOs** — never use `JsonNode` for assertions.
+- **Use normal imports** — do not use fully qualified class names in test or production code when a simple import suffices.
+- **Assert important fields with specific expected values**: PSD/PED, warnings/notifications codes, numeric outputs
+  (exact/close-to), normalization invariants (e.g. sums), and key map contents.
+
+If any of these are violated, treat as at least **High** severity (block merge) for PRs adding/modifying tests.
+
+---
+
 ## Review Output Format
 
 ```

@@ -42,7 +42,10 @@ class SmsHealthIndicatorTest {
 
   @Test
   void shouldReportUp_whenSmsReturns200() {
-    server.enqueue(new MockResponse().setResponseCode(200).setBody("{\"status\":\"UP\"}"));
+    server.enqueue(new MockResponse()
+        .setResponseCode(200)
+        .setHeader("Content-Type", "application/json")
+        .setBody("{\"status\":\"UP\"}"));
 
     Health health = indicator.health();
 
@@ -52,7 +55,10 @@ class SmsHealthIndicatorTest {
 
   @Test
   void shouldReportDown_whenSmsReturns503() {
-    server.enqueue(new MockResponse().setResponseCode(503));
+    server.enqueue(new MockResponse()
+        .setResponseCode(503)
+        .setHeader("Content-Type", "application/json")
+        .setBody("{\"status\":\"DOWN\"}"));
 
     Health health = indicator.health();
 
