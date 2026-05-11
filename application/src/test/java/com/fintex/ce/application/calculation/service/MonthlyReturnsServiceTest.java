@@ -11,6 +11,7 @@ import com.fintex.ce.application.returns.WeightedAverageComponent;
 import com.fintex.ce.application.returns.WeightedAverageResult;
 import com.fintex.ce.application.returns.processor.ReturnsProcessor;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
@@ -23,6 +24,7 @@ import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -108,6 +111,30 @@ class MonthlyReturnsServiceTest {
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = service.getMonthlyReturns(List.of(ETF, STOCK));
 
     assertThat(snapshot.returnsMap()).containsOnlyKeys(ETF, STOCK);
+  }
+
+  @Test
+  void shouldQueryFxRatesWithLowerBoundExtendedToFirstOfMonthBeforePsd_whenBuildingPortfolioContext() {
+    // Regression: the FX query lower bound must reach back further than PSD - 1 month-end so that
+    // floorEntry(PSD - 1 month) succeeds even when PSD - 1 month-end falls on a weekend or holiday.
+    // FX_RATES_UNAVAILABLE is now a hard HTTP 400 error, so a spurious missing-rate on the first
+    // month would abort the calculation instead of warning.
+    LocalDate psd = LocalDate.parse("2020-01-31");
+    LocalDate ped = LocalDate.parse("2020-03-31");
+    HoldingMonthlyReturns etfReturns = holdingMonthlyReturns(Currency.USD,
+        Map.entry(psd, BigDecimal.ONE),
+        Map.entry(ped, BigDecimal.ONE));
+    when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of(ETF, etfReturns));
+    when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
+    when(fxRateService.rates(any(), any(), any())).thenReturn(Map.of());
+    MonthlyReturnsService service = service(List.of());
+
+    service.getPortfolioMonthlyReturns(List.of(ETF), Currency.CAD);
+
+    ArgumentCaptor<DateRange> rangeCaptor = ArgumentCaptor.forClass(DateRange.class);
+    verify(fxRateService).rates(any(), eq(Currency.CAD), rangeCaptor.capture());
+    assertThat(rangeCaptor.getValue().start()).isEqualTo(LocalDate.parse("2019-12-01"));
+    assertThat(rangeCaptor.getValue().end()).isEqualTo(ped);
   }
 
   @Test

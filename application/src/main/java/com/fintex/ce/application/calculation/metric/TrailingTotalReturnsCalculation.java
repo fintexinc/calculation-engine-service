@@ -18,31 +18,47 @@ import static java.math.BigDecimal.ONE;
 
 public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<TrailingTotalReturnsResult, BigDecimal> {
 
-  public TrailingTotalReturnsCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods) {
+  private final NavigableMap<LocalDate, BigDecimal> tBills;
+
+  /**
+   * Internal-composition constructor used by metrics (Information Ratio, Rolling Total Returns) that reuse the TTR
+   * product math but do not themselves carry the spec's T-Bill precondition.
+   */
+  public TrailingTotalReturnsCalculation(PeriodCalculationInput input, Set<String> defaultPeriods) {
+    this(input, defaultPeriods, null);
+  }
+
+  public TrailingTotalReturnsCalculation(PeriodCalculationInput input,
+      Set<String> defaultPeriods,
+      NavigableMap<LocalDate, BigDecimal> tBills) {
     super(input, defaultPeriods);
+    this.tBills = tBills;
   }
 
   @Override
-  public BigDecimal calculatePeriodForNumberOfMonths(final int numberOfMonths) {
+  public BigDecimal calculatePeriodForNumberOfMonths(int numberOfMonths) {
     return calculatePeriodForNumberOfMonths(numberOfMonths, getPortfolioTotalReturns());
   }
 
-  public BigDecimal calculatePeriodForNumberOfMonths(final int numberOfMonths,
-      final NavigableMap<LocalDate, BigDecimal> totalReturns) {
+  public BigDecimal calculatePeriodForNumberOfMonths(int numberOfMonths,
+      NavigableMap<LocalDate, BigDecimal> totalReturns) {
     if (numberOfMonths > totalReturns.size()) {
       return null;
     }
-    final BigDecimal product = calculateProductForPeriod(numberOfMonths, totalReturns);
+    if (tBills != null) {
+      LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, totalReturns);
+      validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, totalReturns), tBills);
+    }
+    BigDecimal product = calculateProductForPeriod(numberOfMonths, totalReturns);
     if (numberOfMonths < 12) {
       return product.subtract(ONE);
     }
-    final BigDecimal annualizedP = divide(TWELVE, BigDecimal.valueOf(numberOfMonths));
+    BigDecimal annualizedP = divide(TWELVE, BigDecimal.valueOf(numberOfMonths));
     return pow(product, annualizedP).subtract(ONE);
   }
 
   @Override
-  public TrailingTotalReturnsResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+  public TrailingTotalReturnsResult defineResponseType(Set<Pair<String, BigDecimal>> periodValues) {
     return new TrailingTotalReturnsResult(formTimeIntervalResult(periodValues));
   }
 

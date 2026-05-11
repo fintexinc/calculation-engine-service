@@ -20,15 +20,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GicMonthlyReturnsGeneratorTest {
 
-  static final BigDecimal RETURN_OF_2_PERCENT_ANNUAL = BigDecimal.valueOf(0.0016515813019202);
-  static final BigDecimal RETURN_OF_10_PERCENT_ANNUAL = BigDecimal.valueOf(0.0079741404289038);
-  static final BigDecimal RETURN_OF_5_PERCENT_SEMI_ANNUAL = BigDecimal.valueOf(0.0041239154651442);
-  static final BigDecimal RETURN_OF_5_PERCENT_QUARTERLY = BigDecimal.valueOf(0.0041494251232543);
-  static final BigDecimal RETURN_OF_5_PERCENT_MONTHLY = BigDecimal.valueOf(0.004166666666667);
-  static final BigDecimal RETURN_OF_5_PERCENT_BI_MONTHLY = BigDecimal.valueOf(0.0041580220928044);
-  static final BigDecimal RETURN_OF_5_PERCENT_WEEKLY = BigDecimal.valueOf(0.0041733490124376);
-  static final BigDecimal RETURN_OF_5_PERCENT_BI_WEEKLY = BigDecimal.valueOf(0.0041713413111404);
-  static final BigDecimal RETURN_OF_5_PERCENT_DAILY = BigDecimal.valueOf(0.0041750727376082);
+  // Constants are in percent form (e.g. 0.165 means 0.165% monthly), matching the generator's output contract
+  // post-normalization. Each value is exactly 100× the equivalent decimal-form monthly return. The trailing zeros
+  // are intentional — BigDecimal.multiply preserves scale, so multiplying a scale-16 decimal value by 100 yields
+  // a scale-16 percent value, and BigDecimal equality (used by the map comparison) is scale-sensitive.
+  static final BigDecimal RETURN_OF_2_PERCENT_ANNUAL = new BigDecimal("0.1651581301920200");
+  static final BigDecimal RETURN_OF_10_PERCENT_ANNUAL = new BigDecimal("0.7974140428903800");
+  static final BigDecimal RETURN_OF_5_PERCENT_SEMI_ANNUAL = new BigDecimal("0.4123915465144200");
+  static final BigDecimal RETURN_OF_5_PERCENT_QUARTERLY = new BigDecimal("0.4149425123254300");
+  static final BigDecimal RETURN_OF_5_PERCENT_MONTHLY = new BigDecimal("0.416666666666700");
+  static final BigDecimal RETURN_OF_5_PERCENT_BI_MONTHLY = new BigDecimal("0.4158022092804400");
+  static final BigDecimal RETURN_OF_5_PERCENT_WEEKLY = new BigDecimal("0.4173349012437600");
+  static final BigDecimal RETURN_OF_5_PERCENT_BI_WEEKLY = new BigDecimal("0.4171341311140400");
+  static final BigDecimal RETURN_OF_5_PERCENT_DAILY = new BigDecimal("0.4175072737608200");
 
   @Test
   void shouldGenerateGicMonthlyReturns_when2PercentAnnualFrequency() {

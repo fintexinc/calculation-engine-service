@@ -202,8 +202,7 @@ public class MonthlyReturnsService {
     if (targetCurrency == null) {
       return FxContext.empty();
     }
-    log.debug("PortfolioHolding currencies: {}, target: {}", snapshot.holdingCurrencyMap().values(), targetCurrency);
-    Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> rates = fxRateService.rates(
+    Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> rates = fetchFxRates(
         snapshot.holdingCurrencyMap(), targetCurrency,
         new DateRange(snapshot.performanceStartDate(), snapshot.performanceEndDate()));
     return new FxContext(rates, targetCurrency);
@@ -250,6 +249,18 @@ public class MonthlyReturnsService {
       return first;
     }
     return first.isBefore(second) ? first : second;
+  }
+
+  private Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fetchFxRates(
+      Map<PortfolioHolding, Currency> holdingCurrencies, Currency toCurrency, DateRange range) {
+    log.debug("PortfolioHolding currencies: {}, target: {}", holdingCurrencies.values(), toCurrency);
+    // Extend the lower bound to the first day of the month before PSD: the per-month conversion formula
+    // in FxRateService looks up floorEntry(date.minusMonths(1)) for every monthly return, so the very
+    // first month needs a rate at PSD - 1 month. Shifting only to the last-day of that month is unsafe
+    // because that day may be a weekend or holiday with no published rate; widening to the first of the
+    // month guarantees the floor lookup hits at least the last business day of the prior month.
+    LocalDate extendedFrom = range.start() == null ? null : range.start().minusMonths(1).withDayOfMonth(1);
+    return fxRateService.rates(holdingCurrencies, toCurrency, new DateRange(extendedFrom, range.end()));
   }
 
   private static Map<ProcessingCase, List<ReturnsProcessor>> buildPipelines(List<ReturnsProcessor> processors) {

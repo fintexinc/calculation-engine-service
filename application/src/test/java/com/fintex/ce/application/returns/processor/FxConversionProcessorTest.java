@@ -8,7 +8,6 @@ import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -87,16 +86,17 @@ class FxConversionProcessorTest {
   }
 
   @Test
-  void shouldKeepFailedHoldingInOriginalCurrency_whenConversionEmitsFxWarning() {
+  void shouldFoldWarningsAndReturnPartialConversion_whenSomeHoldingDatesUnavailable() {
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = snapshot(Map.of(
         HOLDING_USD, Currency.USD,
         HOLDING_EUR, Currency.EUR));
     when(fxRateService.convertReturns(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
       List<Notification> warnings = invocation.getArgument(4);
-      warnings.add(ErrorCode.FX_RATES_UNAVAILABLE.toNotificationForHolding(HOLDING_EUR, Currency.EUR, Currency.CAD));
+      warnings.add(ErrorCode.FX_RATES_UNAVAILABLE.toNotificationForHolding(HOLDING_EUR,
+          Currency.EUR, Currency.CAD));
       return Map.of(
           HOLDING_USD, treeMap(Map.entry(JAN, BigDecimal.valueOf(1.5))),
-          HOLDING_EUR, treeMap(Map.entry(JAN, BigDecimal.valueOf(1.0))));
+          HOLDING_EUR, new TreeMap<LocalDate, BigDecimal>());
     });
 
     ProcessingContext context = ProcessingContext.of(null, null,
@@ -104,14 +104,12 @@ class FxConversionProcessorTest {
 
     ReturnsSnapshot<HoldingMonthlyReturns> result = processor.process(snapshot, context);
 
-    assertThat(result.holdingCurrencyMap()).containsEntry(HOLDING_USD, Currency.CAD);
-    assertThat(result.holdingCurrencyMap()).containsEntry(HOLDING_EUR, Currency.EUR);
     assertThat(result.errors()).isEmpty();
-    assertThat(result.warnings())
-        .extracting(Notification::getCode)
-        .containsExactly(ErrorCode.Codes.FX_RATES_UNAVAILABLE);
-    assertThat(result.warnings().getFirst().getMetadata())
-        .containsEntry(ErrorParams.HOLDING_ID, HOLDING_EUR.getIdsString());
+    assertThat(result.warnings()).hasSize(1);
+    assertThat(result.warnings().getFirst().getCode())
+        .isEqualTo(ErrorCode.FX_RATES_UNAVAILABLE.getCode());
+    assertThat(result.returnsMap().get(HOLDING_USD)).containsOnlyKeys(JAN);
+    assertThat(result.returnsMap().get(HOLDING_EUR)).isEmpty();
   }
 
   @Test

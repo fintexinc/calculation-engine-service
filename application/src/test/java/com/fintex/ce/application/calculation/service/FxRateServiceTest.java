@@ -9,6 +9,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.error.Severity;
 
 import org.junit.jupiter.api.Test;
 
@@ -83,10 +84,12 @@ class FxRateServiceTest {
   }
 
   @Test
-  void shouldReturnOriginalReturnsAndAddWarning_whenAnyMonthlyRateIsMissing() {
+  void shouldReturnPartialSeriesAndEmitWarning_whenSomeMonthlyRatesAreMissing() {
+    // Rates available at month+1 only; via floorEntry, month+2's lookup resolves but month+1's previous-month
+    // lookup does not — month+1 is dropped, month+2 survives, one warning is emitted.
     var fxRates = Map.of(
         new CurrencyExchangePair(Currency.CAD, Currency.USD),
-        (NavigableMap<LocalDate, BigDecimal>) getIncompleteRates());
+        (NavigableMap<LocalDate, BigDecimal>) getSparseRates());
 
     PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
         FiIdentifierType.TICKER));
@@ -96,20 +99,21 @@ class FxRateServiceTest {
 
     var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
-    assertEquals(returns.get(etfHolding), actual.get(etfHolding));
+    assertThat(actual.get(etfHolding)).containsOnlyKeys(toLastDayOfMonth(LocalDate.now().plusMonths(2)));
     assertEquals(1, warnings.size());
     Notification warning = warnings.getFirst();
     assertEquals(FX_RATES_UNAVAILABLE, warning.getCode());
+    assertEquals(Severity.WARNING, warning.getSeverity());
     assertEquals(etfHolding.getIdsString(), warning.getUuid());
     assertEquals("FX rates unavailable for holding " + etfHolding.getIdsString()
-        + ": CAD -> USD; values returned in the original currency", warning.getMessage());
+        + ": CAD -> USD", warning.getMessage());
     assertEquals(etfHolding.getIdsString(), warning.getMetadata().get("param-1"));
     assertEquals(Currency.CAD, warning.getMetadata().get("param-2"));
     assertEquals(Currency.USD, warning.getMetadata().get("param-3"));
   }
 
   @Test
-  void shouldReturnOriginalReturnsAndAddWarning_whenRatesMapIsEmpty() {
+  void shouldReturnEmptySeriesAndEmitWarning_whenRatesMapIsEmpty() {
     var fxRates = Map.of(
         new CurrencyExchangePair(Currency.CAD, Currency.USD),
         (NavigableMap<LocalDate, BigDecimal>) new TreeMap<LocalDate, BigDecimal>());
@@ -122,13 +126,13 @@ class FxRateServiceTest {
 
     var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
-    assertEquals(returns.get(etfHolding), actual.get(etfHolding));
+    assertThat(actual.get(etfHolding)).isEmpty();
     assertEquals(1, warnings.size());
     assertEquals(FX_RATES_UNAVAILABLE, warnings.getFirst().getCode());
   }
 
   @Test
-  void shouldReturnOriginalReturnsAndAddWarning_whenPairIsNotInRatesMap() {
+  void shouldReturnEmptySeriesAndEmitWarning_whenPairIsNotInRatesMap() {
     Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates = Map.of();
 
     PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
@@ -139,7 +143,7 @@ class FxRateServiceTest {
 
     var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
-    assertEquals(returns.get(etfHolding), actual.get(etfHolding));
+    assertThat(actual.get(etfHolding)).isEmpty();
     assertEquals(1, warnings.size());
     assertEquals(FX_RATES_UNAVAILABLE, warnings.getFirst().getCode());
   }
@@ -227,10 +231,12 @@ class FxRateServiceTest {
   }
 
   private Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> getReturns(PortfolioHolding etfHolding) {
+    // Returns are in percent form (1 = 1%, 2 = 2%) — same convention as Security Master's monthly returns
+    // payload (`MonthlyReturnsMapper` stores values verbatim).
     HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = new HashMap<>();
     TreeMap<LocalDate, BigDecimal> returnsPerHolding = new TreeMap<>();
-    returnsPerHolding.put(toLastDayOfMonth(LocalDate.now().plusMonths(1)), BigDecimal.valueOf(0.01));
-    returnsPerHolding.put(toLastDayOfMonth(LocalDate.now().plusMonths(2)), BigDecimal.valueOf(0.02));
+    returnsPerHolding.put(toLastDayOfMonth(LocalDate.now().plusMonths(1)), BigDecimal.valueOf(1));
+    returnsPerHolding.put(toLastDayOfMonth(LocalDate.now().plusMonths(2)), BigDecimal.valueOf(2));
     returns.put(etfHolding, returnsPerHolding);
     return returns;
   }
@@ -251,9 +257,9 @@ class FxRateServiceTest {
     return rates;
   }
 
-  private TreeMap<LocalDate, BigDecimal> getIncompleteRates() {
+  private TreeMap<LocalDate, BigDecimal> getSparseRates() {
     TreeMap<LocalDate, BigDecimal> rates = new TreeMap<>();
-    rates.put(toLastDayOfMonth(LocalDate.now().plusMonths(2)), BigDecimal.valueOf(10));
+    rates.put(toLastDayOfMonth(LocalDate.now().plusMonths(1)), BigDecimal.valueOf(10));
     return rates;
   }
 }

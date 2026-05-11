@@ -712,10 +712,84 @@ class PeriodCalculationAbstractTest {
         // Symbolic YEAR_TO_DATE: with 13 entries the resolved YTD month count is always ≤ 12 ≤ 13, so it fits.
         // Confirms symbolic periods are resolved (would warn if the resolution returned 0 default from the mock).
         Arguments.of("symbolic YEAR_TO_DATE fits available months", 13, YEAR_TO_DATE.name(), null, 0, null),
-        // SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE is gated by CIPSD position, not month count, so it's
-        // explicitly skipped by addInsufficientDataWarnings — no warning fires regardless of returns size.
-        Arguments.of("SINCE_CUSTOM_INTERVAL is skipped", 1,
+        // SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE is gated by CIPSD position, not month count, so the
+        // count-based path skips it. With no CIPSD set, the dedicated CIPSD-out-of-range path is also a no-op.
+        Arguments.of("SINCE_CUSTOM_INTERVAL with no CIPSD is skipped", 1,
             SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null, 0, null));
+  }
+
+  @Test
+  void shouldEmitCipsdOutsideDataRangeWarning_whenCipsdIsBeforeFirstAvailableMonth() {
+    var calculation = mock(PeriodCalculationAbstract.class);
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    returns.put(LOCAL_DATE_NOW.minusMonths(2), ONE);
+    returns.put(LOCAL_DATE_NOW.minusMonths(1), ONE);
+    returns.put(LOCAL_DATE_NOW, ONE);
+    calculation.portfolioTotalReturns = returns;
+    calculation.cipsd = LOCAL_DATE_NOW.minusMonths(24);
+    TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
+    Set<Pair<String, BigDecimal>> periodValues = Set.of(
+        Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+
+    doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
+    doCallRealMethod().when(calculation).availableMonths();
+    doCallRealMethod().when(calculation).getNumberOfMonthsFor(any(), any());
+    // Drive the warning gate from the real cipsd-position logic instead of Mockito's default false — otherwise
+    // the assertion would pass for any non-null cipsd, including in-range values, defeating the test's premise.
+    doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
+    calculation.addInsufficientDataWarnings(result, periodValues);
+
+    assertEquals(1, result.getWarnings().size());
+    assertEquals("RET-009", result.getWarnings().get(0).getCode());
+  }
+
+  @Test
+  void shouldEmitCipsdOutsideDataRangeWarning_whenCipsdIsAfterLastAvailableMonth() {
+    var calculation = mock(PeriodCalculationAbstract.class);
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    returns.put(LOCAL_DATE_NOW.minusMonths(2), ONE);
+    returns.put(LOCAL_DATE_NOW.minusMonths(1), ONE);
+    returns.put(LOCAL_DATE_NOW, ONE);
+    calculation.portfolioTotalReturns = returns;
+    calculation.cipsd = LOCAL_DATE_NOW.plusMonths(6);
+    TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
+    Set<Pair<String, BigDecimal>> periodValues = Set.of(
+        Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+
+    doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
+    doCallRealMethod().when(calculation).availableMonths();
+    doCallRealMethod().when(calculation).getNumberOfMonthsFor(any(), any());
+    // Drive the warning gate from the real cipsd-position logic instead of Mockito's default false — otherwise
+    // the assertion would pass for any non-null cipsd, including in-range values, defeating the test's premise.
+    doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
+    calculation.addInsufficientDataWarnings(result, periodValues);
+
+    assertEquals(1, result.getWarnings().size());
+    assertEquals("RET-009", result.getWarnings().get(0).getCode());
+  }
+
+  @Test
+  void shouldNotEmitCipsdOutsideDataRangeWarning_whenCipsdIsValidWithinDataRange() {
+    var calculation = mock(PeriodCalculationAbstract.class);
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    returns.put(LOCAL_DATE_NOW.minusMonths(2), ONE);
+    returns.put(LOCAL_DATE_NOW.minusMonths(1), ONE);
+    returns.put(LOCAL_DATE_NOW, ONE);
+    calculation.portfolioTotalReturns = returns;
+    calculation.cipsd = LOCAL_DATE_NOW.minusMonths(1);
+    TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
+    Set<Pair<String, BigDecimal>> periodValues = Set.of(
+        Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+
+    doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
+    doCallRealMethod().when(calculation).availableMonths();
+    doCallRealMethod().when(calculation).getNumberOfMonthsFor(any(), any());
+    // Real cipsd-position logic should return true here (cipsd is between first and last keys),
+    // so the warning gate stays closed without an explicit thenReturn(true) stub.
+    doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
+    calculation.addInsufficientDataWarnings(result, periodValues);
+
+    assertEquals(0, result.getWarnings().size());
   }
 
   private TreeMap<LocalDate, BigDecimal> getPortfolioReturns() {

@@ -1,20 +1,27 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anySet;
@@ -114,6 +121,39 @@ class TrailingTotalReturnsCalculationTest {
     final BigDecimal actual = t.calculatePeriodForNumberOfMonths(24);
 
     assertEquals(0, new BigDecimal("2.1622776601683795").compareTo(actual));
+  }
+
+  @Test
+  void shouldThrowMissingTBillRate_whenTBillsHaveGapWithinPeriodWindow() {
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    NavigableMap<LocalDate, BigDecimal> tBills = new TreeMap<>();
+    for (int i = 0; i < 12; i++) {
+      LocalDate month = LocalDate.of(2025, 1, 31).plusMonths(i);
+      portfolioReturns.put(month, BigDecimal.valueOf(1.01));
+      if (i != 5) {
+        tBills.put(month, BigDecimal.valueOf(0.001));
+      }
+    }
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(portfolioReturns);
+    var calculation = new TrailingTotalReturnsCalculation(input, Set.of(), tBills);
+
+    CalculationException ex = assertThrows(CalculationException.class,
+        () -> calculation.calculatePeriodForNumberOfMonths(12));
+    assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+  }
+
+  @Test
+  void shouldNotValidateTBills_whenInternalCompositionConstructorUsedWithoutTBills() {
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    for (int i = 0; i < 12; i++) {
+      portfolioReturns.put(LocalDate.of(2025, 1, 31).plusMonths(i), BigDecimal.valueOf(1.01));
+    }
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(portfolioReturns);
+    var calculation = new TrailingTotalReturnsCalculation(input, Set.of());
+
+    assertDoesNotThrow(() -> calculation.calculatePeriodForNumberOfMonths(12));
   }
 
   @Test

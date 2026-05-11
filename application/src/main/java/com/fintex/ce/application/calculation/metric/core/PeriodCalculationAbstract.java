@@ -262,9 +262,10 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * Appends a {@link ErrorCode#INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD} warning for every period whose value is
    * {@code null} because the requested number of months exceeds the available monthly returns. Symbolic periods (e.g.
    * YEAR_TO_DATE, SINCE_PERFORMANCE_START_DATE) are resolved via {@link #getNumberOfMonthsFor} so they get the same
-   * treatment as numeric ones. {@code SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE} is skipped — its validity is gated
-   * by CIPSD position, not by month count. Lets API consumers distinguish "no result, not enough data" from a generic
-   * null without overriding the spec's null contract.
+   * treatment as numeric ones. {@code SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE} is handled separately — its
+   * validity is gated by CIPSD position rather than month count, and it gets a dedicated
+   * {@link ErrorCode#CIPSD_OUTSIDE_DATA_RANGE} warning so callers can tell why the value is null. Lets API consumers
+   * distinguish "no result, not enough data" from a generic null without overriding the spec's null contract.
    */
   public void addInsufficientDataWarnings(T result, Set<Pair<String, V>> periodsResult) {
     int availableMonths = availableMonths();
@@ -278,6 +279,19 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
         .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey().trim(),
             availableMonths))
         .forEach(warnings::add);
+
+    // CIPSD lies outside [firstKey, lastKey] → SINCE_CIPSD is silently null. Without this warning the caller
+    // has no signal whether the cause was an out-of-range CIPSD vs missing data vs anything else.
+    boolean sinceCipsdRequestedAndNull = periodsResult.stream().anyMatch(
+        pair -> SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE
+            .name().equalsIgnoreCase(pair.getKey().trim()) && pair.getValue() == null);
+    if (cipsd != null && !portfolioTotalReturns.isEmpty()
+        && !isSinceCustomIntervalPerformanceStartDateValid()
+        && sinceCipsdRequestedAndNull) {
+      warnings.add(ErrorCode.CIPSD_OUTSIDE_DATA_RANGE.asNotification(
+          cipsd, portfolioTotalReturns.firstKey(), portfolioTotalReturns.lastKey()));
+    }
+
     result.setWarnings(warnings);
   }
 
