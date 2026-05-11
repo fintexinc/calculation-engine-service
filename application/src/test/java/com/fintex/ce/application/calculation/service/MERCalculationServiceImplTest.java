@@ -248,7 +248,7 @@ class MERCalculationServiceImplTest {
   void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForCanadaEtfAndCanadaMutualFundsWithCanadaEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation a = new AverageManagementExpenseCalculation();
@@ -266,7 +266,7 @@ class MERCalculationServiceImplTest {
   void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForCanadaEtfAndCanadaMutualFundsWithUsEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation a = new AverageManagementExpenseCalculation();
@@ -284,7 +284,7 @@ class MERCalculationServiceImplTest {
   void shouldSetInitialFeeAndModifiedFeeValues_whenCallsSetForUsEtfType() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final PortfolioHolding h = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation averageMer = new AverageManagementExpenseCalculation();
@@ -302,7 +302,7 @@ class MERCalculationServiceImplTest {
   void shouldSetInitialFeeAndModifiedFeeValues_whenCheckResult() {
     // SETUP
     final MERCalculationServiceImpl m = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
     final AverageManagementExpenseCalculation aDto1 = mock(AverageManagementExpenseCalculation.class);
@@ -332,7 +332,7 @@ class MERCalculationServiceImplTest {
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenCallsFillFeeValuesWithManagementExpenseRation() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final BigDecimal mockManagementExpenseRatio = mock(BigDecimal.class);
     final AverageManagementExpenseCalculation etfHolding = AverageManagementExpenseCalculation.builder()
@@ -383,7 +383,7 @@ class MERCalculationServiceImplTest {
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenMerIsPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
     final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
@@ -404,7 +404,7 @@ class MERCalculationServiceImplTest {
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenMerIsNotPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
     final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
@@ -429,7 +429,7 @@ class MERCalculationServiceImplTest {
   void shouldSetForUsEtfType_whenNetIsPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
     final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
@@ -448,7 +448,7 @@ class MERCalculationServiceImplTest {
   void shouldSetForUsEtfType_whenNetIsNotPresent() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
     final PortfolioHolding h = mock(PortfolioHolding.class);
 
     final AverageManagementExpenseCalculation a = mock(AverageManagementExpenseCalculation.class);
@@ -470,7 +470,7 @@ class MERCalculationServiceImplTest {
   void shouldSetForCanadaEtfAndCanadaMutualFundTypes_whenCallsFillFeeValuesWithActualManagementFee() {
     // SETUP
     final MERCalculationServiceImpl merCalculationServiceMock = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
     final BigDecimal mockActualManagementFee = mock(BigDecimal.class);
     final AverageManagementExpenseCalculation etfHolding = AverageManagementExpenseCalculation.builder()
         .holdingType(FinancialInstrumentType.ETF_CANADA)
@@ -489,7 +489,7 @@ class MERCalculationServiceImplTest {
   void shouldCalculateAverageMER_whenVerifyGetScaledAverageMer() {
     // SETUP
     final var service = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final var parameterTypes = mock(List.class);
     final var averageMerCalculationDtos = mock(Map.class);
@@ -619,7 +619,7 @@ class MERCalculationServiceImplTest {
   void shouldHandleFeesForUsEtf_whenVerifySetFeeValues() {
     // SETUP
     final var service = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final var holding = mock(PortfolioHolding.class);
     final var input = mock(AverageManagementExpenseCalculation.class);
@@ -641,7 +641,7 @@ class MERCalculationServiceImplTest {
   void shouldHandleFeesForUsEtf_whenCheckResult() {
     // SETUP
     final var service = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final var holding = mock(PortfolioHolding.class);
     final var input = mock(AverageManagementExpenseCalculation.class);
@@ -663,7 +663,7 @@ class MERCalculationServiceImplTest {
   void shouldHandleFeesForCanadaMutualHedgeFundsAndEtf_whenReturnsTwoWarningsInCaseOfAbsentDataForCanadaHedgeFund() {
     // SETUP
     final var service = mock(MERCalculationServiceImpl.class);
-    final PceExceptionCollector notification = new PceExceptionCollector();
+    final PceExceptionCollector collector = new PceExceptionCollector();
 
     final var holding = new PortfolioHolding(null, FinancialInstrumentType.HEDGE_FUND_CANADA, null);
     final var input = mock(AverageManagementExpenseCalculation.class);

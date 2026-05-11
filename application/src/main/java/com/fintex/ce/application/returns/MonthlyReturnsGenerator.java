@@ -51,7 +51,11 @@ public class MonthlyReturnsGenerator {
     BigDecimal oneDividedByTwelve = divide(BigDecimal.ONE, BigDecimal.valueOf(12));
     BigDecimal interestRateDividedByCompoundingFrequency = divide(interestRate, compoundingFrequency);
     BigDecimal yearlyReturn = pow(convert(interestRateDividedByCompoundingFrequency), compoundingFrequency);
-    return pow(yearlyReturn, oneDividedByTwelve).subtract(BigDecimal.ONE);
+    // Normalize to percent form so the output is unit-compatible with SM-supplied monthly returns. Every
+    // downstream consumer in this pipeline (FxConversionProcessor's per-month formula, ReturnFactorScale.SCALE_OF_TWO,
+    // weighted-average compounding) assumes percent-form input — emitting decimal-form here under-weights GIC
+    // contributions by ~100× in compounded results.
+    return pow(yearlyReturn, oneDividedByTwelve).subtract(BigDecimal.ONE).multiply(BigDecimal.valueOf(100));
   }
 
   private BigDecimal convert(BigDecimal interestRate) {

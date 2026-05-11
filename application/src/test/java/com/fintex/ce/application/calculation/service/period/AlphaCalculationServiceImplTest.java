@@ -108,7 +108,7 @@ class AlphaCalculationServiceImplTest {
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.EUR);
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
-    // EUR is outside the SELECTORS map; TreasuryBillsFetcher pre-populates it as an empty TreeMap.
+    // EUR is not supported by the SMS producer → fetch returns an empty series → TBillsValidator throws.
     when(tBillsFetcher.fetch(Currency.EUR)).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(service).defineCalculationMethod(req);

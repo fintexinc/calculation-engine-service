@@ -32,11 +32,10 @@ import static java.math.BigDecimal.ONE;
  * that calling code (returns, money values, MER) does not have to coordinate transport calls and conversion separately.
  * <p>
  * Also owns return-conversion: per-holding monthly returns are converted into a common target currency using
- * end-of-month FX rates. When the rates required to convert a holding are unavailable — the upstream provider was
- * unreachable, the pair is not configured, or one of the lookup dates has no rate — the holding's returns are passed
- * through unchanged in the original currency and a {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE}
- * warning is appended to the supplied warnings list. Conversion is therefore best-effort and never throws on missing FX
- * data.
+ * end-of-month FX rates. Missing rates are non-fatal — any month-end the formula cannot resolve is dropped from that
+ * holding's series, and a single {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} {@link Notification}
+ * is appended to the warnings list per affected holding. The caller surfaces those warnings on the response; the
+ * calculation continues with the partial converted series.
  */
 @Slf4j
 @Service
@@ -61,9 +60,11 @@ public class FxRateService {
   }
 
   /**
-   * Converts per-holding monthly returns from each holding's source currency into {@code toCurrency}, falling back to
-   * the original currency for any holding whose required rates are unavailable and appending an
-   * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} warning to {@code warnings}.
+   * Converts per-holding monthly returns from each holding's source currency into {@code toCurrency}. Month-ends with
+   * no resolvable FX rate are dropped from that holding's series, and a single
+   * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} {@link Notification} is appended to
+   * {@code warnings} per affected holding (regardless of how many month-ends were dropped). Holdings already in
+   * {@code toCurrency} pass through unchanged.
    */
   public Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> convertReturns(
       Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns,
@@ -72,17 +73,17 @@ public class FxRateService {
       Currency toCurrency,
       List<Notification> warnings) {
     return returns.entrySet().stream().collect(toMap(Map.Entry::getKey, entry -> {
-      Currency fromCurrency = holdingCurrencies.get(entry.getKey());
+      PortfolioHolding holding = entry.getKey();
+      Currency fromCurrency = holdingCurrencies.get(holding);
       if (fromCurrency == null || fromCurrency.equals(toCurrency)) {
         return entry.getValue();
       }
       NavigableMap<LocalDate, BigDecimal> rates = fxRates.get(new CurrencyExchangePair(fromCurrency, toCurrency));
-      TreeMap<LocalDate, BigDecimal> converted = (rates == null || rates.isEmpty())
-          ? null
-          : tryConvert(rates, entry.getValue());
-      if (converted == null) {
-        warnings.add(FX_RATES_UNAVAILABLE.toNotificationForHolding(entry.getKey(), fromCurrency, toCurrency));
-        return entry.getValue();
+      TreeMap<LocalDate, BigDecimal> converted = convertAvailable(rates, entry.getValue());
+      if (converted.size() < entry.getValue().size()) {
+        // toNotificationForHolding auto-prepends the holding id as the first format arg (filling the leading %s
+        // in "FX rates unavailable for holding %s"); we only supply the trailing currency pair.
+        warnings.add(FX_RATES_UNAVAILABLE.toNotificationForHolding(holding, fromCurrency, toCurrency));
       }
       return converted;
     }));
@@ -98,16 +99,18 @@ public class FxRateService {
     }
   }
 
-  private static TreeMap<LocalDate, BigDecimal> tryConvert(
+  private static TreeMap<LocalDate, BigDecimal> convertAvailable(
       NavigableMap<LocalDate, BigDecimal> fxRates,
       Map<LocalDate, BigDecimal> returns) {
     TreeMap<LocalDate, BigDecimal> converted = new TreeMap<>();
+    if (fxRates == null || fxRates.isEmpty()) {
+      return converted;
+    }
     for (Map.Entry<LocalDate, BigDecimal> entry : returns.entrySet()) {
       BigDecimal value = holdingPortfolioBaseTotalReturnFormula(entry.getKey(), entry.getValue(), fxRates);
-      if (value == null) {
-        return null;
+      if (value != null) {
+        converted.put(entry.getKey(), value);
       }
-      converted.put(entry.getKey(), value);
     }
     return converted;
   }
@@ -120,7 +123,11 @@ public class FxRateService {
     if (fxRateValue == null || previousFxValue == null) {
       return null;
     }
-    return ONE.add(value).multiply(divide(fxRateValue, previousFxValue)).subtract(ONE).multiply(HUNDRED);
+    // value is the SM-supplied monthly return in percent form (e.g. 4.988 for 4.988%); convert to a
+    // decimal (1 + r) factor, apply the FX growth ratio, then multiply by 100 to return a percent
+    // value that matches the unconverted USD path's units.
+    return ONE.add(divide(value, HUNDRED)).multiply(divide(fxRateValue, previousFxValue))
+        .subtract(ONE).multiply(HUNDRED);
   }
 
   private static BigDecimal lookupRate(NavigableMap<LocalDate, BigDecimal> rates, LocalDate date) {

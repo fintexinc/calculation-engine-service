@@ -278,10 +278,10 @@ public enum ErrorCode {
   // ============================================
   FX_RATES_UNAVAILABLE(
       Codes.FX_RATES_UNAVAILABLE,
-      "FX rates unavailable for holding %s: %s -> %s; values returned in the original currency",
-      "FX rates could not be obtained — the upstream provider was unreachable, returned no data, or the cache held no entries for the requested range — so the affected holding's amounts are not converted to the target currency",
+      "FX rates unavailable for holding %s: %s -> %s",
+      "FX rates could not be obtained for some month-ends in the requested range; the holding's contribution is computed from the available months only",
       "Verify Bank of Canada availability and that the currency pair is configured; ensure rates exist for the requested date range",
-      HttpStatus.OK,
+      HttpStatus.BAD_REQUEST,
       Severity.WARNING),
 
   // ============================================
@@ -332,6 +332,14 @@ public enum ErrorCode {
       "Insufficient monthly returns to calculate period %s months (only %s available)",
       "The requested period exceeds the number of monthly returns available, so the metric cannot be computed",
       "Request a smaller period or extend the available monthly returns history",
+      HttpStatus.OK,
+      Severity.WARNING),
+
+  CIPSD_OUTSIDE_DATA_RANGE(
+      Codes.CIPSD_OUTSIDE_DATA_RANGE,
+      "CIPSD %s is outside the available monthly returns range [%s, %s]",
+      "The custom interval performance start date falls outside the available monthly returns window, so no months are available for the requested interval and the since-custom-interval period cannot be computed",
+      "Pick a CIPSD on or after the earliest month-end and on or before the latest month-end of the available returns, or extend the returns history",
       HttpStatus.OK,
       Severity.WARNING),
 
@@ -1071,6 +1079,7 @@ public enum ErrorCode {
     public static final String HOLDING_PSD_OUT_OF_RANGE = "RET-006";
     public static final String NAV_PARAM_MISSING = "RET-007";
     public static final String INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD = "RET-008";
+    public static final String CIPSD_OUTSIDE_DATA_RANGE = "RET-009";
 
     // Performance Dates
     public static final String CPSD_AFTER_CPED = "PFD-001";
