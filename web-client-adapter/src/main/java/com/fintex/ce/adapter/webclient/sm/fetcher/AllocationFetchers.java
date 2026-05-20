@@ -24,7 +24,7 @@ import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.allocation.AssetAllocation;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
@@ -56,7 +56,7 @@ public class AllocationFetchers {
       SecurityMasterWebClient client, AssetAllocationSecurityMasterMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.asset}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<AssetAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<AssetAllocationWithCurrency>>>() {}) {};
   }
 
   @Bean

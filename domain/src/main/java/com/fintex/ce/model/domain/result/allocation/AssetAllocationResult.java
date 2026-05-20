@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.result.allocation;
 
-import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -22,6 +22,6 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "Response for asset-allocations metric. Contains portfolio asset allocation breakdown by region.")
 public class AssetAllocationResult extends BaseCalculationResult {
 
-  @Schema(description = "Asset allocation percentages by region")
+  @Schema(description = "Asset allocation percentages by type")
   private Map<AssetAllocationRegionType, BigDecimal> assetAllocation;
 }

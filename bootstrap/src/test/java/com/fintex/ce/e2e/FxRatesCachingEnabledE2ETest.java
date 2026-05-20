@@ -36,8 +36,7 @@ import okhttp3.mockwebserver.MockWebServer;
 @Tag("e2e")
 @ActiveProfiles("test")
 @SpringBootTest(classes = PortfolioCalculationEngineApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = {
-    "cache.data.fx-rates.enabled=true",
-    "cache.data.fx-rates.recency-cutoff-days=0"
+    "cache.data.fx-rates.enabled=true"
 })
 class FxRatesCachingEnabledE2ETest {
 

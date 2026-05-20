@@ -151,7 +151,6 @@ class CachingFxRatesFetcherTest {
     FxRatesCacheProperties properties = new FxRatesCacheProperties();
     properties.setEnabled(true);
     properties.setMaxEntries(4096);
-    properties.setRecencyCutoffDays(0);
     CaffeineFxRatesCache realCache = new CaffeineFxRatesCache(properties);
     CachingFxRatesFetcher realFetcher = new CachingFxRatesFetcher(delegate, realCache);
 

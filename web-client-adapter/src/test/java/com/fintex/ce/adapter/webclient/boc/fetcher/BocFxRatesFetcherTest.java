@@ -62,7 +62,8 @@ class BocFxRatesFetcherTest {
     Map<LocalDate, BigDecimal> expectedRates = Map.of(
         LocalDate.of(2024, 1, 31), new BigDecimal("1.3450"));
 
-    when(client.get("/observations/FXUSDCAD/json?start_date=2017-01-01", BankOfCanadaFxRateResponse.class))
+    when(client.get("/observations/FXUSDCAD/json?start_date=2020-01-01&end_date=2024-12-31",
+        BankOfCanadaFxRateResponse.class))
         .thenReturn(response);
     when(mapper.map(eq(response), eq(List.of("FXUSDCAD")), any())).thenReturn(expectedRates);
 
@@ -77,7 +78,8 @@ class BocFxRatesFetcherTest {
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), "2017-01-01", null));
 
     var response = new BankOfCanadaFxRateResponse();
-    when(client.get("/observations/FXUSDCAD/json?start_date=2017-01-01", BankOfCanadaFxRateResponse.class))
+    when(client.get("/observations/FXUSDCAD/json?start_date=2020-01-01&end_date=2024-12-31",
+        BankOfCanadaFxRateResponse.class))
         .thenReturn(response);
     when(mapper.map(eq(response), eq(List.of("FXUSDCAD")), any())).thenReturn(Map.of(
         LocalDate.of(2024, 1, 31), new BigDecimal("2.0000")));
@@ -112,9 +114,11 @@ class BocFxRatesFetcherTest {
     var currentResponse = new BankOfCanadaFxRateResponse();
     var legacyResponse = new BankOfCanadaFxRateResponse();
 
-    when(client.get("/observations/FXUSDCAD/json?start_date=2017-01-01", BankOfCanadaFxRateResponse.class))
+    when(client.get("/observations/FXUSDCAD/json?start_date=2017-01-01&end_date=2024-12-31",
+        BankOfCanadaFxRateResponse.class))
         .thenReturn(currentResponse);
-    when(client.get("/observations/IEXM0101/json?end_date=2016-12-31", BankOfCanadaFxRateResponse.class))
+    when(client.get("/observations/IEXM0101/json?start_date=2010-01-01&end_date=2016-12-31",
+        BankOfCanadaFxRateResponse.class))
         .thenReturn(legacyResponse);
     when(mapper.map(eq(currentResponse), eq(List.of("FXUSDCAD")), any())).thenReturn(Map.of(
         LocalDate.of(2024, 1, 31), new BigDecimal("1.3450")));
@@ -136,13 +140,15 @@ class BocFxRatesFetcherTest {
         source("/observations/IEXM0101/json", List.of("IEXM0101"), null, "2016-12-31"));
 
     var response = new BankOfCanadaFxRateResponse();
-    when(client.get("/observations/FXUSDCAD/json?start_date=2017-01-01", BankOfCanadaFxRateResponse.class))
+    when(client.get("/observations/FXUSDCAD/json?start_date=2020-01-01&end_date=2024-12-31",
+        BankOfCanadaFxRateResponse.class))
         .thenReturn(response);
     when(mapper.map(eq(response), eq(List.of("FXUSDCAD")), any())).thenReturn(Map.of());
 
     fetcher.fetch(USD_CAD, DATE_RANGE);
 
-    verify(client).get("/observations/FXUSDCAD/json?start_date=2017-01-01", BankOfCanadaFxRateResponse.class);
+    verify(client).get("/observations/FXUSDCAD/json?start_date=2020-01-01&end_date=2024-12-31",
+        BankOfCanadaFxRateResponse.class);
   }
 
   @Test
@@ -200,6 +206,42 @@ class BocFxRatesFetcherTest {
     assertThatThrownBy(() -> fetcher.fetch(USD_CAD, DATE_RANGE))
         .isInstanceOf(RuntimeException.class)
         .hasMessage("Connection refused");
+  }
+
+  @Test
+  void shouldUseRequestDatesInUrl_ratherThanSourceConfig() {
+    configureCurrencyPair("USD_CAD",
+        source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), "2017-01-01", null));
+
+    var narrowRange = new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 5));
+    var response = new BankOfCanadaFxRateResponse();
+    when(client.get("/observations/FXUSDCAD/json?start_date=2024-01-01&end_date=2024-01-05",
+        BankOfCanadaFxRateResponse.class))
+        .thenReturn(response);
+    when(mapper.map(eq(response), eq(List.of("FXUSDCAD")), any())).thenReturn(Map.of());
+
+    fetcher.fetch(USD_CAD, narrowRange);
+
+    verify(client).get("/observations/FXUSDCAD/json?start_date=2024-01-01&end_date=2024-01-05",
+        BankOfCanadaFxRateResponse.class);
+  }
+
+  @Test
+  void shouldClampRequestDatesToSourceWindow() {
+    configureCurrencyPair("USD_CAD",
+        source("/observations/IEXM0101/json", List.of("IEXM0101"), "2010-01-01", "2016-12-31"));
+
+    var rangeBeyondSource = new DateRange(LocalDate.of(2005, 1, 1), LocalDate.of(2024, 12, 31));
+    var response = new BankOfCanadaFxRateResponse();
+    when(client.get("/observations/IEXM0101/json?start_date=2010-01-01&end_date=2016-12-31",
+        BankOfCanadaFxRateResponse.class))
+        .thenReturn(response);
+    when(mapper.map(eq(response), eq(List.of("IEXM0101")), any())).thenReturn(Map.of());
+
+    fetcher.fetch(USD_CAD, rangeBeyondSource);
+
+    verify(client).get("/observations/IEXM0101/json?start_date=2010-01-01&end_date=2016-12-31",
+        BankOfCanadaFxRateResponse.class);
   }
 
   private void configureCurrencyPair(String pair, FxRateSource... sources) {

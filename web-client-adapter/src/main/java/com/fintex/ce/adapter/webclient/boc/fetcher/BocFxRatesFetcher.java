@@ -101,7 +101,7 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
 
     NavigableMap<LocalDate, BigDecimal> mergedRates = new TreeMap<>();
     for (FxRateSource source : sources) {
-      String url = buildUrl(source);
+      String url = buildUrl(source, startDate, endDate);
       log.debug("Fetching FX rates from Bank of Canada: {} (series: {})", url, source.getSeriesNames());
 
       BankOfCanadaFxRateResponse response = client.get(url, BankOfCanadaFxRateResponse.class);
@@ -135,18 +135,42 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
         .orElse(defaultValue);
   }
 
-  private String buildUrl(FxRateSource source) {
+  private String buildUrl(FxRateSource source, LocalDate requestStart, LocalDate requestEnd) {
     StringBuilder url = new StringBuilder(source.getPath());
     StringJoiner params = new StringJoiner("&", "?", "");
     params.setEmptyValue("");
 
-    if (source.getStartDate() != null && !source.getStartDate().isBlank()) {
-      params.add("start_date=" + source.getStartDate());
+    LocalDate effectiveStart = pickStart(requestStart, source.getStartDate());
+    if (effectiveStart != null) {
+      params.add("start_date=" + effectiveStart);
     }
-    if (source.getEndDate() != null && !source.getEndDate().isBlank()) {
-      params.add("end_date=" + source.getEndDate());
+    LocalDate effectiveEnd = pickEnd(requestEnd, source.getEndDate());
+    if (effectiveEnd != null) {
+      params.add("end_date=" + effectiveEnd);
     }
 
     return url.append(params).toString();
+  }
+
+  private LocalDate pickStart(LocalDate requestStart, String sourceStartDate) {
+    LocalDate sourceStart = parseDate(sourceStartDate, null);
+    if (requestStart == null) {
+      return sourceStart;
+    }
+    if (sourceStart == null || requestStart.isAfter(sourceStart)) {
+      return requestStart;
+    }
+    return sourceStart;
+  }
+
+  private LocalDate pickEnd(LocalDate requestEnd, String sourceEndDate) {
+    LocalDate sourceEnd = parseDate(sourceEndDate, null);
+    if (requestEnd == null) {
+      return sourceEnd;
+    }
+    if (sourceEnd == null || requestEnd.isBefore(sourceEnd)) {
+      return requestEnd;
+    }
+    return sourceEnd;
   }
 }

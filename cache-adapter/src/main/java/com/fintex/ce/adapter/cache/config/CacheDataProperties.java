@@ -22,7 +22,6 @@ public class CacheDataProperties {
   public static class FxRatesCacheProperties {
     private boolean enabled = false;
     private int maxEntries = 4096;
-    private int recencyCutoffDays = 1;
   }
 
   @Data

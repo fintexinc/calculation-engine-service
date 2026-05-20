@@ -39,9 +39,9 @@ abstract class AbstractPortfolioCalculationE2ETest {
 
   private static final String basePath = "/api/v1/portfolio/calculations";
 
-  private static MockWebServer smsMockServer;
+  protected static MockWebServer smsMockServer;
 
-  protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
 
   @Autowired
   protected WebTestClient webTestClient;
@@ -57,9 +57,6 @@ abstract class AbstractPortfolioCalculationE2ETest {
   protected abstract String requestBodyForMismatchedMetricScenario();
 
   protected abstract void assertPositiveResponseBody(String responseBody);
-
-  private record HttpResponse(HttpStatusCode status, String responseBody) {
-  }
 
   protected static String writeJson(Object value) {
     try {
@@ -181,8 +178,12 @@ abstract class AbstractPortfolioCalculationE2ETest {
   }
 
   private HttpResponse postCalculation(String body) {
+    return postCalculation(metricPath(), body);
+  }
+
+  protected HttpResponse postCalculation(String metric, String body) {
     BodySpec<String, ?> result = webTestClient.post()
-        .uri(basePath + "/" + metricPath())
+        .uri(basePath + "/" + metric)
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue(body)
         .exchange()
@@ -190,5 +191,8 @@ abstract class AbstractPortfolioCalculationE2ETest {
 
     var exchangeResult = result.returnResult();
     return new HttpResponse(exchangeResult.getStatus(), exchangeResult.getResponseBody());
+  }
+
+  protected record HttpResponse(HttpStatusCode status, String responseBody) {
   }
 }

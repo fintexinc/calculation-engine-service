@@ -19,6 +19,7 @@ external-services:
           maturities: /api/v1/wealth/securities/allocations/maturities
           credit-quality: /api/v1/wealth/securities/allocations/credit-quality
           classification: /api/v1/wealth/securities/allocations/classification
+        geography: /api/v1/wealth/securities/geography
         income: /api/v1/wealth/securities/income
         fees: /api/v1/wealth/securities/fees
         sales-charge: /api/v1/wealth/securities/sales-charge

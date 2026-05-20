@@ -23,9 +23,8 @@ public class FilterUtils {
       .equals(h
           .getHoldingType()) || FinancialInstrumentType.SEGREGATED_FUND_CANADA.equals(h.getHoldingType());
 
-  public static final Predicate<PortfolioHolding> STOCK_PREDICATE = h -> FinancialInstrumentType.STOCK_CANADA.equals(h
-      .getHoldingType())
-      || FinancialInstrumentType.STOCK_US.equals(h.getHoldingType());
+  public static final Predicate<PortfolioHolding> STOCK_PREDICATE = h -> isOfType(h.getHoldingType(),
+      FinancialInstrumentType.STOCK);
 
   public static final Predicate<PortfolioHolding> US_STOCKS_PREDICATE = h -> FinancialInstrumentType.STOCK_US.equals(h
       .getHoldingType());
@@ -45,15 +44,14 @@ public class FilterUtils {
       .equals(h
           .getHoldingType());
 
-  public static final Predicate<PortfolioHolding> ETF_PREDICATE = h -> FinancialInstrumentType.ETF_CANADA.equals(h
-      .getHoldingType())
-      || FinancialInstrumentType.ETF_US.equals(h.getHoldingType());
+  public static final Predicate<PortfolioHolding> ETF_PREDICATE = h -> isOfType(h.getHoldingType(),
+      FinancialInstrumentType.ETF);
 
   public static final Predicate<PortfolioHolding> CASH_PREDICATE = h -> FinancialInstrumentType.CASH.equals(h
       .getHoldingType());
 
-  public static final Predicate<PortfolioHolding> GIC_PREDICATE = h -> FinancialInstrumentType.GIC.equals(h
-      .getHoldingType());
+  public static final Predicate<PortfolioHolding> GIC_PREDICATE = h -> isOfType(h.getHoldingType(),
+      FinancialInstrumentType.GIC);
 
   public static final Predicate<PortfolioHolding> FIXED_INCOME_PREDICATE = h -> FinancialInstrumentType.FIXED_INCOME
       .equals(h
@@ -66,6 +64,23 @@ public class FilterUtils {
   // public static final Predicate<PortfolioHolding> PAG_GUIDED_PORTFOLIO_PREDICATE = ...
 
   private FilterUtils() {
+  }
+
+  /**
+   * Returns true when {@code type} is either {@code target} or any descendant of {@code target} reachable through the
+   * {@link FinancialInstrumentType#getParent()} chain. Used by the family predicates ({@code STOCK_PREDICATE},
+   * {@code ETF_PREDICATE}, {@code GIC_PREDICATE}) so a generic parent type (e.g. {@code STOCK} for a non-NA stock)
+   * routes through the same branch as its country-specific variants ({@code STOCK_US}, {@code STOCK_CANADA}).
+   */
+  public static boolean isOfType(FinancialInstrumentType type, FinancialInstrumentType target) {
+    FinancialInstrumentType current = type;
+    while (current != null) {
+      if (current == target) {
+        return true;
+      }
+      current = current.getParent();
+    }
+    return false;
   }
 
   @SuppressWarnings("unchecked")
