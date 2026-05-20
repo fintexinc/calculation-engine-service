@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.holding;
 
-import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegion;
 import com.fintex.ce.model.domain.enumeration.InterestFreq;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import java.math.BigDecimal;
@@ -55,11 +55,11 @@ public class GicHolding extends PortfolioHolding implements MonthlyReturnGenerat
     return interestFreq;
   }
 
-  public AssetAllocationRegion getAssetAllocation() {
+  public AssetAllocationRegionType getAssetAllocationRegionType() {
     if (isLessThanOneYearOld()) {
-      return AssetAllocationRegion.CASH;
+      return AssetAllocationRegionType.CASH;
     }
-    return AssetAllocationRegion.FIXED_INCOME;
+    return AssetAllocationRegionType.FIXED_INCOME;
   }
 
   public boolean isLessThanOneYearOld() {

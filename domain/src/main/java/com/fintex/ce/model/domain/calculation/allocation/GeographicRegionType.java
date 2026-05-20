@@ -1,5 +1,10 @@
 package com.fintex.ce.model.domain.calculation.allocation;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public enum GeographicRegionType {
 
   OTHER("Other"),
@@ -12,10 +17,6 @@ public enum GeographicRegionType {
 
   private final String region;
 
-  GeographicRegionType(String region) {
-    this.region = region;
-  }
-
   public static GeographicRegionType fromValue(final String region) {
     for (GeographicRegionType value : values()) {
       if (value.name().equalsIgnoreCase(region) || value.region.equalsIgnoreCase(region)) {
@@ -23,10 +24,6 @@ public enum GeographicRegionType {
       }
     }
     return null;
-  }
-
-  public String getRegion() {
-    return region;
   }
 
 }

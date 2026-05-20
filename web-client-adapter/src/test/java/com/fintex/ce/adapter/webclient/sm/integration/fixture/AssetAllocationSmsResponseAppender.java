@@ -1,10 +1,11 @@
 package com.fintex.ce.adapter.webclient.sm.integration.fixture;
 
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationValue;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationWithCurrency;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
-import com.fintex.wm.commons.domain.value.NameValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,26 +14,31 @@ import java.util.List;
  * Builds a list of SMS-style {@link SecurityAttributeResult} rows for asset-allocation integration tests. Append one
  * security at a time (catalog can be broader than the holdings passed to {@code fetch}).
  */
-public final class AssetAllocationSmsResponseAppender implements SmsResponseAppender<AssetAllocation, List<NameValue>> {
+public final class AssetAllocationSmsResponseAppender
+    implements
+      SmsResponseAppender<AssetAllocationWithCurrency, List<AssetAllocationValue>> {
 
-  private final List<SecurityAttributeResult<AssetAllocation>> rows = new ArrayList<>();
+  private final List<SecurityAttributeResult<AssetAllocationWithCurrency>> rows = new ArrayList<>();
 
   @Override
   public AssetAllocationSmsResponseAppender append(
-      String id, FiIdentifierType idType, List<NameValue> allocationRows) {
+      String id, FiIdentifierType idType, List<AssetAllocationValue> allocationRows) {
     SecurityIdentifier identifier = new SecurityIdentifier();
     identifier.setId(id);
     identifier.setIdType(idType);
 
     AssetAllocation allocation = new AssetAllocation();
-    allocation.setAllocation(allocationRows);
+    allocation.setAllocations(allocationRows);
 
-    rows.add(securityAttributeResult(identifier, allocation));
+    AssetAllocationWithCurrency wrapper = new AssetAllocationWithCurrency();
+    wrapper.setAssetAllocation(allocation);
+
+    rows.add(securityAttributeResult(identifier, wrapper));
     return this;
   }
 
   @Override
-  public List<SecurityAttributeResult<AssetAllocation>> build() {
+  public List<SecurityAttributeResult<AssetAllocationWithCurrency>> build() {
     return List.copyOf(rows);
   }
 

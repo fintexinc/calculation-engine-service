@@ -105,6 +105,64 @@ class FilterUtilsTest {
   }
 
   @Test
+  void stockPredicate_matchesGenericStockType() {
+    PortfolioHolding genericStock = mock(PortfolioHolding.class);
+    when(genericStock.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
+
+    PortfolioHolding etf = mock(PortfolioHolding.class);
+    when(etf.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+
+    List<PortfolioHolding> result = FilterUtils.filterHoldings(List.of(genericStock, etf),
+        FilterUtils.STOCK_PREDICATE);
+
+    assertEquals(List.of(genericStock), result);
+  }
+
+  @Test
+  void etfPredicate_matchesGenericEtfType() {
+    PortfolioHolding genericEtf = mock(PortfolioHolding.class);
+    when(genericEtf.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
+
+    PortfolioHolding usEtf = mock(PortfolioHolding.class);
+    when(usEtf.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+
+    PortfolioHolding stock = mock(PortfolioHolding.class);
+    when(stock.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+
+    List<PortfolioHolding> result = FilterUtils.filterHoldings(List.of(genericEtf, usEtf, stock),
+        FilterUtils.ETF_PREDICATE);
+
+    assertEquals(List.of(genericEtf, usEtf), result);
+  }
+
+  @Test
+  void gicPredicate_matchesGenericAndCountrySpecific() {
+    PortfolioHolding genericGic = mock(PortfolioHolding.class);
+    when(genericGic.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
+
+    PortfolioHolding canadaGic = mock(PortfolioHolding.class);
+    when(canadaGic.getHoldingType()).thenReturn(FinancialInstrumentType.GIC_CANADA);
+
+    PortfolioHolding cash = mock(PortfolioHolding.class);
+    when(cash.getHoldingType()).thenReturn(FinancialInstrumentType.CASH);
+
+    List<PortfolioHolding> result = FilterUtils.filterHoldings(List.of(genericGic, canadaGic, cash),
+        FilterUtils.GIC_PREDICATE);
+
+    assertEquals(List.of(genericGic, canadaGic), result);
+  }
+
+  @Test
+  void isOfType_walksParentChain() {
+    Assertions.assertTrue(FilterUtils.isOfType(FinancialInstrumentType.STOCK_US, FinancialInstrumentType.STOCK));
+    Assertions.assertTrue(FilterUtils.isOfType(FinancialInstrumentType.STOCK, FinancialInstrumentType.STOCK));
+    Assertions.assertTrue(FilterUtils.isOfType(FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        FinancialInstrumentType.FUND));
+    Assertions.assertFalse(FilterUtils.isOfType(FinancialInstrumentType.ETF_US, FinancialInstrumentType.STOCK));
+    Assertions.assertFalse(FilterUtils.isOfType(null, FinancialInstrumentType.STOCK));
+  }
+
+  @Test
   void filterHoldings_canadaMutualFundCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);

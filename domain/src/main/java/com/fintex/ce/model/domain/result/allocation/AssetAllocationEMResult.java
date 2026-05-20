@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.result.allocation;
 
-import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+
 @SuperBuilder
 @Data
 @ToString(callSuper = true)
@@ -23,5 +24,5 @@ import lombok.experimental.SuperBuilder;
 public class AssetAllocationEMResult extends BaseCalculationResult {
 
   @Schema(description = "Asset allocation percentages by emerging markets region")
-  private Map<AssetAllocationRegionEmType, BigDecimal> assetAllocationEmergingMarkets;
+  private Map<AssetAllocationRegionType, BigDecimal> assetAllocationEmergingMarkets;
 }

@@ -28,7 +28,6 @@ class CaffeineFxRatesCacheTest {
     FxRatesCacheProperties properties = new FxRatesCacheProperties();
     properties.setEnabled(true);
     properties.setMaxEntries(4096);
-    properties.setRecencyCutoffDays(0);
     cache = new CaffeineFxRatesCache(properties);
   }
 
@@ -165,22 +164,39 @@ class CaffeineFxRatesCacheTest {
   }
 
   @Test
-  void shouldRefetchRecentDays_whenRecencyCutoffExcludesRequestEnd() {
-    FxRatesCacheProperties properties = new FxRatesCacheProperties();
-    properties.setEnabled(true);
-    properties.setMaxEntries(4096);
-    properties.setRecencyCutoffDays(2);
-    CaffeineFxRatesCache recencyCache = new CaffeineFxRatesCache(properties);
-
+  void shouldCacheTodayAndAvoidRefetch_whenRangeIncludesToday() {
     LocalDate today = LocalDate.now();
     DateRange range = new DateRange(today.minusDays(1), today);
+
     CountingLoader first = new CountingLoader(ratesFor(range));
-    recencyCache.getOrLoad(USD_CAD, range, first);
+    cache.getOrLoad(USD_CAD, range, first);
     assertThat(first.invocations()).isEqualTo(1);
 
     CountingLoader second = new CountingLoader(ratesFor(range));
-    recencyCache.getOrLoad(USD_CAD, range, second);
+    cache.getOrLoad(USD_CAD, range, second);
+    assertThat(second.invocations()).isZero();
+  }
+
+  @Test
+  void shouldRefetchToday_whenLoaderInitiallyReturnedNoRateForToday() {
+    LocalDate today = LocalDate.now();
+    LocalDate yesterday = today.minusDays(1);
+    DateRange range = new DateRange(yesterday, today);
+
+    NavigableMap<LocalDate, BigDecimal> beforeBocPublishes = new TreeMap<>();
+    beforeBocPublishes.put(yesterday, new BigDecimal("1.350"));
+    CountingLoader first = new CountingLoader(beforeBocPublishes);
+    cache.getOrLoad(USD_CAD, range, first);
+    assertThat(first.invocations()).isEqualTo(1);
+
+    NavigableMap<LocalDate, BigDecimal> afterBocPublishes = new TreeMap<>(beforeBocPublishes);
+    afterBocPublishes.put(today, new BigDecimal("1.355"));
+    CountingLoader second = new CountingLoader(afterBocPublishes);
+    NavigableMap<LocalDate, BigDecimal> result = cache.getOrLoad(USD_CAD, range, second);
+
     assertThat(second.invocations()).isEqualTo(1);
+    assertThat(second.lastRange()).isEqualTo(new DateRange(today, today));
+    assertThat(result).containsEntry(today, new BigDecimal("1.355"));
   }
 
   private static DateRange range(String from, String to) {

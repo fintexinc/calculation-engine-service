@@ -4,71 +4,108 @@ import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationValue;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationWithCurrency;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
-import com.fintex.wm.commons.domain.value.NameValue;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.TreeSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AssetAllocationSecurityMasterMapperTest {
 
   private final AssetAllocationSecurityMasterMapper mapper = new AssetAllocationSecurityMasterMapper();
 
   @Test
-  void shouldMapAllocationsAndProvider_whenResponseHasValues() {
-    var smsResponse = new AssetAllocation();
-    smsResponse.setAllocation(List.of(
-        new NameValue("EQUITY", new BigDecimal("60.5")),
-        new NameValue("FIXED_INCOME", new BigDecimal("30.0")),
-        new NameValue("CASH", new BigDecimal("9.5"))));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+  void shouldMapAllocationsCurrencyAndProvider_whenResponseHasValues() {
+    AssetAllocationWithCurrency smsResponse = withCurrency(List.of(
+        new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("60.5"), new TreeSet<>()),
+        new AssetAllocationValue(AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("30.0"), new TreeSet<>()),
+        new AssetAllocationValue(AssetAllocationRegionType.CASH, new BigDecimal("9.5"), new TreeSet<>())),
+        Currency.USD, DataProvider.MORNINGSTAR);
 
     HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
     assertThat(result.getAllocations()).hasSize(3);
-    assertThat(result.getAllocations()).containsEntry("EQUITY", new BigDecimal("60.5"));
-    assertThat(result.getAllocations()).containsEntry("FIXED_INCOME", new BigDecimal("30.0"));
-    assertThat(result.getAllocations()).containsEntry("CASH", new BigDecimal("9.5"));
+    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("60.5"));
+    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("30.0"));
+    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.CASH, new BigDecimal("9.5"));
+    assertThat(result.getCurrency()).isEqualTo(Currency.USD);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
   @Test
-  void shouldReturnEmptyAllocationsAndProviders_whenResponseIsNull() {
+  void shouldReturnEmptyAllocationsAndProvidersAndNullCurrency_whenResponseIsNull() {
     HoldingAssetAllocation result = mapper.map(null, createHolding("SEC-002"));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
+    assertThat(result.getCurrency()).isNull();
   }
 
   @Test
   void shouldKeepProvidersEmpty_whenDataProviderIsNull() {
-    var smsResponse = new AssetAllocation();
-    smsResponse.setAllocation(List.of(new NameValue("EQUITY", BigDecimal.ONE)));
-    smsResponse.setDataProvider(null);
+    AssetAllocationWithCurrency smsResponse = withCurrency(
+        List.of(new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE, new TreeSet<>())),
+        null, null);
 
     HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
 
-    assertThat(result.getAllocations()).containsEntry("EQUITY", BigDecimal.ONE);
+    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE);
     assertThat(result.getProviders()).isEmpty();
+    assertThat(result.getCurrency()).isNull();
   }
 
   @Test
-  void shouldThrowException_whenResponseContainsDuplicateAllocationKeys() {
-    var smsResponse = new AssetAllocation();
-    smsResponse.setAllocation(List.of(
-        new NameValue("EQUITY", new BigDecimal("10.0")),
-        new NameValue("EQUITY", new BigDecimal("20.0"))));
+  void shouldSumDuplicateAllocationKeys() {
+    AssetAllocationWithCurrency smsResponse = withCurrency(List.of(
+        new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("10.0"), new TreeSet<>()),
+        new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("20.0"), new TreeSet<>())),
+        Currency.CAD, null);
 
-    assertThatThrownBy(() -> mapper.map(smsResponse, createHolding("SEC-004")))
-        .isInstanceOf(IllegalStateException.class);
+    HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
+
+    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("30.0"));
+    assertThat(result.getCurrency()).isEqualTo(Currency.CAD);
+  }
+
+  @Test
+  void shouldSkipNullValuesAndTypes() {
+    AssetAllocationWithCurrency smsResponse = withCurrency(List.of(
+        new AssetAllocationValue(null, BigDecimal.ONE, new TreeSet<>()),
+        new AssetAllocationValue(AssetAllocationRegionType.CASH, null, new TreeSet<>()),
+        new AssetAllocationValue(AssetAllocationRegionType.FIXED_INCOME, BigDecimal.TEN, new TreeSet<>())),
+        null, null);
+
+    HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-005"));
+
+    assertThat(result.getAllocations()).containsOnly(
+        org.assertj.core.api.Assertions.entry(AssetAllocationRegionType.FIXED_INCOME, BigDecimal.TEN));
+  }
+
+  private static AssetAllocationWithCurrency withCurrency(List<AssetAllocationValue> values, Currency currency,
+      DataProvider provider) {
+    AssetAllocation allocation = new AssetAllocation();
+    allocation.setAllocations(values);
+    allocation.setDataProvider(provider);
+
+    AssetAllocationWithCurrency wrapper = new AssetAllocationWithCurrency();
+    wrapper.setAssetAllocation(allocation);
+    if (currency != null) {
+      CurrencyDatapoint dp = new CurrencyDatapoint();
+      dp.setValue(currency);
+      wrapper.setCurrency(dp);
+    }
+    return wrapper;
   }
 
   private PortfolioHolding createHolding(String securityId) {

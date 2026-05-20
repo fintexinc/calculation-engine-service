@@ -14,7 +14,6 @@ cache:
     fx-rates:
       enabled: true
       max-entries: 4096
-      recency-cutoff-days: 1
     t-bills:
       enabled: true
       refresh-after: 24h
@@ -105,6 +104,7 @@ external-services:
           maturities: /api/v1/wealth/securities/allocations/maturities
           credit-quality: /api/v1/wealth/securities/allocations/credit-quality
           classification: /api/v1/wealth/securities/allocations/classification
+        geography: /api/v1/wealth/securities/geography
         income: /api/v1/wealth/securities/income
         fees: /api/v1/wealth/securities/fees
         sales-charge: /api/v1/wealth/securities/sales-charge
@@ -136,7 +136,7 @@ calculation:
     default-target-currency: CAD
 
 default:
-  data-providers: MORNINGSTAR
+  data-providers: MORNINGSTAR, FMP
   # by which type of ids to count the unique number of holdings in a portfolio
   # MORNINGSTAR_ID is chosen due to the best availability of the data
   holdings-identifier-type: MORNINGSTAR_ID

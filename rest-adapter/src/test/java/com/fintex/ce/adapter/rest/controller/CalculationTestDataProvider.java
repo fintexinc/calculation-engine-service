@@ -1,7 +1,5 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionEmType;
-import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
@@ -77,6 +75,7 @@ import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.model.dto.command.RollingCorrelationCommand;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.model.dto.command.YieldCommand;
+import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
@@ -185,7 +184,7 @@ class CalculationTestDataProvider {
             .of(
                 AssetAllocationRegionType.CASH, BigDecimal.valueOf(45.5)))), AssetAllocationResult.class),
         breakdown(CalculationMetric.ASSET_ALLOCATIONS_EM, init(new AssetAllocationEMResult(), r -> r
-            .setAssetAllocationEmergingMarkets(Map.of(AssetAllocationRegionEmType.CASH, BigDecimal.valueOf(12.3)))),
+            .setAssetAllocationEmergingMarkets(Map.of(AssetAllocationRegionType.CASH, BigDecimal.valueOf(12.3)))),
             AssetAllocationEMResult.class),
         breakdown(CalculationMetric.EQUITY_SECTOR, init(new EquitySectorResult(), r -> r.setEquitySector(Map.of(
             EquitySectorAllocationType.TECHNOLOGY, BigDecimal.valueOf(30.0)))), EquitySectorResult.class),

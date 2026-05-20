@@ -31,17 +31,16 @@ import lombok.extern.slf4j.Slf4j;
  * double-inversion precision loss when the loader itself produces inverted values. See {@link CachingFxRatesFetcher}
  * for the canonicalization done above this layer.
  * <p>
- * Days returned empty by the upstream provider — weekends, holidays — are remembered with {@link CachedRate#ABSENT} so
- * they are not refetched on every subsequent call.
- * <p>
- * Recency window: dates within {@code recencyCutoffDays} of today are never written to the cache, so the very latest
- * rates (which the upstream provider may still be publishing) are always refetched on subsequent calls.
+ * Past days returned empty by the upstream provider — weekends, holidays — are remembered with
+ * {@link CachedRate#ABSENT} so they are not refetched on every subsequent call. Today's date is intentionally not
+ * cached as ABSENT: Bank of Canada publishes the day's rate around 16:30 ET, so a request earlier in the day would
+ * otherwise lock today as "no data" for the rest of the session and keep returning yesterday's rate even after BoC
+ * publishes.
  */
 @Slf4j
 public class CaffeineFxRatesCache implements FxRatesCache {
 
   private final Cache<RateKey, CachedRate> rates;
-  private final int recencyCutoffDays;
 
   /**
    * Builds a cache capped at {@link FxRatesCacheProperties#getMaxEntries()} {@code (pair, date)} rows. Each row counts
@@ -52,49 +51,35 @@ public class CaffeineFxRatesCache implements FxRatesCache {
         .maximumSize(properties.getMaxEntries())
         .recordStats()
         .build();
-    this.recencyCutoffDays = properties.getRecencyCutoffDays();
   }
 
-  /**
-   * Returns rates for {@code pair} covering the inclusive {@code range}, calling {@code loader} only for date
-   * sub-ranges that have not previously been seen. Cached dates are served without invoking the loader; uncached dates
-   * are grouped into contiguous gaps and loaded in one delegate call per gap. Values are stored verbatim from the
-   * loader — no transformation is applied.
-   */
   @Override
   public NavigableMap<LocalDate, BigDecimal> getOrLoad(
       CurrencyExchangePair pair,
       DateRange range,
       Function<DateRange, NavigableMap<LocalDate, BigDecimal>> loader) {
-    LocalDate cacheableUntil = LocalDate.now().minusDays(recencyCutoffDays);
     NavigableMap<LocalDate, BigDecimal> result = new TreeMap<>();
-    List<LocalDate> missingDates = collectCachedAndMissing(pair, range, cacheableUntil, result);
+    List<LocalDate> missingDates = collectCachedAndMissing(pair, range, result);
 
     for (DateRange gap : contiguousRanges(missingDates)) {
       NavigableMap<LocalDate, BigDecimal> loaded = loader.apply(gap);
       log.debug("Loaded {} FX rates for {} from delegate - missing range {}", loaded.size(), pair, gap);
       if (MapUtils.isNotEmpty(loaded)) {
-        cacheGap(pair, gap, loaded, cacheableUntil);
+        cacheGap(pair, gap, loaded);
       }
       result.putAll(loaded.subMap(gap.start(), true, gap.end(), true));
     }
     return result;
   }
 
-  /**
-   * Walks every date in {@code range} once. Cached dates are added to {@code result}; uncached dates are collected and
-   * returned for the loader to fill. Dates within the recency window are treated as uncached because those rows are
-   * never written.
-   */
   private List<LocalDate> collectCachedAndMissing(
       CurrencyExchangePair pair,
       DateRange range,
-      LocalDate cacheableUntil,
       NavigableMap<LocalDate, BigDecimal> result) {
     List<LocalDate> missing = new ArrayList<>();
     LocalDate cursor = range.start();
     while (!cursor.isAfter(range.end())) {
-      CachedRate cached = cursor.isAfter(cacheableUntil) ? null : rates.getIfPresent(new RateKey(pair, cursor));
+      CachedRate cached = rates.getIfPresent(new RateKey(pair, cursor));
       if (cached == null) {
         missing.add(cursor);
       } else if (cached.isPresent()) {
@@ -105,33 +90,25 @@ public class CaffeineFxRatesCache implements FxRatesCache {
     return missing;
   }
 
-  /**
-   * Persists every date in {@code gap} to the cache. Dates returned by the loader are stored under {@code pair}; dates
-   * the loader did not return are stored as {@link CachedRate#ABSENT} so non-trading days are not refetched on
-   * subsequent calls. Dates within the recency window ({@code cacheableUntil}) are skipped entirely.
-   */
   private void cacheGap(
       CurrencyExchangePair pair,
       DateRange gap,
-      NavigableMap<LocalDate, BigDecimal> loaded,
-      LocalDate cacheableUntil) {
+      NavigableMap<LocalDate, BigDecimal> loaded) {
+    LocalDate today = LocalDate.now();
     LocalDate cursor = gap.start();
     while (!cursor.isAfter(gap.end())) {
-      if (!cursor.isAfter(cacheableUntil)) {
-        BigDecimal raw = loaded.get(cursor);
-        rates.put(
-            new RateKey(pair, cursor),
-            raw == null ? CachedRate.ABSENT : new CachedRate(raw));
+      BigDecimal raw = loaded.get(cursor);
+      if (raw == null && !cursor.isBefore(today)) {
+        cursor = cursor.plusDays(1);
+        continue;
       }
+      rates.put(
+          new RateKey(pair, cursor),
+          raw == null ? CachedRate.ABSENT : new CachedRate(raw));
       cursor = cursor.plusDays(1);
     }
   }
 
-  /**
-   * Collapses a chronologically ordered list of missing dates into the minimal set of contiguous inclusive
-   * {@link DateRange}s. Each maximal run of consecutive days becomes one range so the loader is invoked once per gap
-   * instead of once per missing date.
-   */
   private static List<DateRange> contiguousRanges(List<LocalDate> dates) {
     if (dates.isEmpty()) {
       return List.of();
@@ -151,24 +128,13 @@ public class CaffeineFxRatesCache implements FxRatesCache {
     return ranges;
   }
 
-  /**
-   * Composite cache key. Equality follows record semantics on both fields, so {@code (USD→CAD, 2025-01-01)} and
-   * {@code (CAD→USD, 2025-01-01)} occupy distinct rows.
-   */
   private record RateKey(CurrencyExchangePair pair, LocalDate date) {
   }
 
-  /**
-   * Cache value wrapper that distinguishes "no rate exists for this date" ({@link #ABSENT}) from an actual rate.
-   * Required because Caffeine forbids null values, and we need negative caching so non-trading days are not refetched.
-   */
   private record CachedRate(BigDecimal value) {
 
     static final CachedRate ABSENT = new CachedRate(null);
 
-    /**
-     * Returns {@code true} if this entry holds a real rate, {@code false} if it is the negative-cache sentinel.
-     */
     boolean isPresent() {
       return value != null;
     }
