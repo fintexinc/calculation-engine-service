@@ -171,12 +171,17 @@ abstract class AbstractPortfolioCalculationE2ETest {
     assertThat(response.responseBody()).contains("Security Master");
   }
 
+  /**
+   * Subclasses that trigger extra Security Master calls (e.g. treasury rates for trailing returns) override this to
+   * enqueue all required mock responses in order.
+   */
+  protected void enqueueForPositiveSmsScenario() {
+    enqueueSmsMockResponse(smsPositiveResponseBody());
+  }
+
   @Test
   void shouldReturnOk_whenSmsReturnsAvailableResponse() {
-    smsMockServer.enqueue(
-        new MockResponse()
-            .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .setBody(smsPositiveResponseBody()));
+    enqueueForPositiveSmsScenario();
 
     var response = postCalculation(requestBodyForPositiveSmsScenario());
 

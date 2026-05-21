@@ -101,7 +101,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String metricPath() {
-    return "asset-allocations";
+    return CalculationMetric.ASSET_ALLOCATIONS.getValue();
   }
 
   @Override
@@ -183,11 +183,8 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     AssetAllocationResult result = readJson(response.responseBody(), AssetAllocationResult.class);
     assertThat(result.getWarnings()).extracting(Notification::getCode)
         .containsExactlyInAnyOrder("FDS-026", "FDS-018");
-    assertThat(result.getAssetAllocation())
-        .containsKeys(
-            AssetAllocationRegionType.UNCLASSIFIED,
-            AssetAllocationRegionType.CANADIAN_EQUITIES,
-            AssetAllocationRegionType.US_EQUITIES);
+    assertThat(result.getAssetAllocation().keySet().stream().map(Object::toString).toList())
+        .contains("UNCLASSIFIED", "CANADIAN_EQUITIES", "US_EQUITIES");
   }
 
   @Test
