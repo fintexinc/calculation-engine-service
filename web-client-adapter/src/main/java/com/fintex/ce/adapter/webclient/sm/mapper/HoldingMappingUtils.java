@@ -21,10 +21,10 @@ public final class HoldingMappingUtils {
 
   /**
    * Checks if the instrument type should be skipped (not sent to SMS API). Backed by the shared
-   * {@link FilterUtils#NOT_SENT_TO_SM_TYPES} so the application-side validators that must not flag these as "not found"
-   * stay in lockstep with this filter.
+   * {@link FilterUtils#LOCALLY_SOURCED_TYPES} so the application-side validators that must not flag these as "not
+   * found" stay in lockstep with this filter.
    */
   public static boolean isSkipped(FinancialInstrumentType instrumentType) {
-    return instrumentType == null || FilterUtils.NOT_SENT_TO_SM_TYPES.contains(instrumentType);
+    return instrumentType == null || FilterUtils.LOCALLY_SOURCED_TYPES.contains(instrumentType);
   }
 }

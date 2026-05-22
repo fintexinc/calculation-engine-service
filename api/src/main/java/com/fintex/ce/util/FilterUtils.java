@@ -10,12 +10,12 @@ import java.util.function.Predicate;
 public class FilterUtils {
 
   /**
-   * Instrument types that are NOT sent to Security Master (and are NOT looked up there). Single source of truth shared
-   * by the SM-side request filter ({@code HoldingMappingUtils.isSkipped}) and the application-side validators that must
-   * not flag these as "not found" — for these types the calculation either uses internally-generated returns (GIC, via
-   * {@code MonthlyReturnsGenerator}) or is allocated zero weight (CASH).
+   * Instrument types whose data is sourced locally rather than fetched from the external security-data provider. Single
+   * source of truth shared by the adapter-side request filter ({@code HoldingMappingUtils.isSkipped}) and the
+   * application-side validators that must not flag these as "not found" — for these types the calculation either uses
+   * internally-generated returns (GIC, via {@code MonthlyReturnsGenerator}) or is allocated zero weight (CASH).
    */
-  public static final Set<FinancialInstrumentType> NOT_SENT_TO_SM_TYPES = Set.of(
+  public static final Set<FinancialInstrumentType> LOCALLY_SOURCED_TYPES = Set.of(
       FinancialInstrumentType.CASH,
       FinancialInstrumentType.GIC);
 

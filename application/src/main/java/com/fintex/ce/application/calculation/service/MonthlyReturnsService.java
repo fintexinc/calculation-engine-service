@@ -13,6 +13,7 @@ import com.fintex.ce.application.returns.WeightedAverageComponent;
 import com.fintex.ce.application.returns.WeightedAverageResult;
 import com.fintex.ce.application.returns.processor.ReturnsProcessor;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.application.util.SecurityDataValidator;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.fintex.ce.application.returns.ProcessingCase.BENCHMARK_PRE_PSD_TRIM;
@@ -153,37 +155,31 @@ public class MonthlyReturnsService {
   }
 
   /**
-   * Per spec, every holding must have monthly returns for the calculation to proceed. Distinguishes two failure modes:
+   * Per spec, every holding must have monthly returns for the calculation to proceed. Two failure modes:
    * <ul>
-   * <li>holding entirely absent from the Security Master response → {@link ErrorCode#SECURITY_NOT_FOUND_IN_SM} (the
-   * security identifier is unknown to the data provider)</li>
-   * <li>holding present but with no monthly returns → {@link ErrorCode#MISSING_MONTHLY_RETURNS} (security exists but
-   * its return history is empty)</li>
+   * <li>The data source returned no row at all for a holding the caller asked about → delegated to
+   * {@link SecurityDataValidator#requireDataForEveryHolding}, which throws
+   * {@link ErrorCode#NO_SECURITY_DATA_FOR_HOLDING}. Identifier-based, so a portfolio with two holdings sharing the same
+   * ticker (e.g. same fund in two accounts) passes when the source returns the single deduped row.</li>
+   * <li>The data source returned a row but its monthly-returns list is empty →
+   * {@link ErrorCode#MISSING_MONTHLY_RETURNS}.</li>
    * </ul>
-   * Holdings of types in {@link FilterUtils#NOT_SENT_TO_SM_TYPES} (CASH, GIC) are excluded from both checks: they are
-   * intentionally never sent to Security Master, so finding them missing from the response is expected. GIC entries
-   * arrive via {@code MonthlyReturnsGenerator}; CASH carries no returns and gets zero weight downstream. Throws on the
-   * first offending holding so the response carries its identifier.
+   * Holdings of types in {@link FilterUtils#LOCALLY_SOURCED_TYPES} (CASH, GIC) are excluded from both checks: GIC
+   * returns are synthesized locally by {@code MonthlyReturnsGenerator}; CASH carries no returns and gets zero weight
+   * downstream.
    */
   private void validateMonthlyReturnsPresent(List<PortfolioHolding> holdings,
       Map<PortfolioHolding, HoldingMonthlyReturns> sourceData) {
-    List<PortfolioHolding> sentToSm = holdings.stream()
-        .filter(holding -> {
-          FinancialInstrumentType type = holding.getHoldingType();
-          return type == null || !FilterUtils.NOT_SENT_TO_SM_TYPES.contains(type);
-        })
-        .toList();
-    sentToSm.stream()
-        .filter(holding -> !sourceData.containsKey(holding))
+    Predicate<PortfolioHolding> mandatoryForExternalSource = holding -> {
+      FinancialInstrumentType type = holding.getHoldingType();
+      return type == null || !FilterUtils.LOCALLY_SOURCED_TYPES.contains(type);
+    };
+    SecurityDataValidator.requireDataForEveryHolding(sourceData, holdings, mandatoryForExternalSource);
+    sourceData.entrySet().stream()
+        .filter(entry -> mandatoryForExternalSource.test(entry.getKey()) && isReturnsEmpty(entry.getValue()))
         .findFirst()
-        .ifPresent(holding -> {
-          throw ErrorCode.SECURITY_NOT_FOUND_IN_SM.toExceptionForHolding(holding, holding.getIdsString());
-        });
-    sentToSm.stream()
-        .filter(holding -> isReturnsEmpty(sourceData.get(holding)))
-        .findFirst()
-        .ifPresent(holding -> {
-          throw ErrorCode.MISSING_MONTHLY_RETURNS.toExceptionForHolding(holding);
+        .ifPresent(entry -> {
+          throw ErrorCode.MISSING_MONTHLY_RETURNS.toExceptionForHolding(entry.getKey());
         });
   }
 

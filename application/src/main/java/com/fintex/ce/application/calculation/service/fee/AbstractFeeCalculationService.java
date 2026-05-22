@@ -29,7 +29,7 @@ import static com.fintex.ce.application.constant.HoldingTypeGroup.MER_BEARING_TY
 import static com.fintex.ce.application.constant.HoldingTypeGroup.ZERO_MER_TYPES;
 import static com.fintex.ce.application.util.DecimalUtils.divide;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
-import static com.fintex.ce.application.util.SmsResponseValidator.requireDataForEveryHolding;
+import static com.fintex.ce.application.util.SecurityDataValidator.requireDataForEveryHolding;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
@@ -40,7 +40,7 @@ import static java.math.BigDecimal.ZERO;
 
 /**
  * Shared template for portfolio fee calculations. Owns the pipeline that the three concrete metrics — Average MER,
- * Annual / Monthly Fees, and Average Management Fee — agree on: validate holding types, fetch SMS fee data, resolve
+ * Annual / Monthly Fees, and Average Management Fee — agree on: validate holding types, fetch fee data, resolve
  * per-holding fees, FX-convert market values into the default target currency, and aggregate. Subclasses fill in only
  * the per-metric pieces (which fee fields to read, how to aggregate, and which response shape to populate).
  *
@@ -71,14 +71,14 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
    * Groups raw fee data by holding type and maps to calculation entries.
    *
    * <p>
-   * Every MER-bearing holding in the request must have a corresponding row in {@code rawData}. If SMS did not return a
-   * row for some fund holding (security unknown to SMS, or the configured data provider doesn't cover it), throw
-   * {@link com.fintex.ce.model.error.ErrorCode#SMS_NO_DATA_FOR_HOLDING} immediately — we won't silently treat an
+   * Every MER-bearing holding in the request must have a corresponding row in {@code rawData}. If the data source did
+   * not return a row for some fund holding (security unknown, or the configured data provider doesn't cover it), throw
+   * {@link com.fintex.ce.model.error.ErrorCode#NO_SECURITY_DATA_FOR_HOLDING} immediately — we won't silently treat an
    * unknown fund as 0% fee, because that would under-report the MER and Fees results without the caller noticing.
    *
    * <p>
-   * Zero-MER holdings (stocks, cash, GIC, fixed income) are exempt from this check — SMS isn't expected to return fee
-   * rows for them, and the resolver treats them as 0% by definition.
+   * Zero-MER holdings (stocks, cash, GIC, fixed income) are exempt from this check — the source isn't expected to
+   * return fee rows for them, and the resolver treats them as 0% by definition.
    */
   protected Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupAndMap(
       Map<PortfolioHolding, FeeData> rawData, List<? extends PortfolioHolding> holdings) {

@@ -22,7 +22,7 @@ public interface FeeResolver {
 
   /**
    * Maps a raw {@link FeeData} response into the per-holding calculation carrier — copies the fee fields and the
-   * SMS-reported currency for MER-bearing holdings; leaves the carrier empty otherwise.
+   * source-reported currency for MER-bearing holdings; leaves the carrier empty otherwise.
    */
   AverageManagementExpenseCalculation mapFeeDataToCalculation(PortfolioHolding holding, FeeData fees);
 

@@ -112,7 +112,7 @@ class MERCalculationServiceImplTest {
 
     assertThatThrownBy(() -> service.perform(commandFor(List.of(present, missing), FUNDS_ONLY, WHOLE_PORTFOLIO)))
         .isInstanceOf(CalculationException.class)
-        .hasMessageContaining("Security Master returned no data for holding")
+        .hasMessageContaining("No data returned for holding")
         .hasMessageContaining("US-MISSING");
   }
 

@@ -29,7 +29,7 @@ import static com.fintex.ce.model.error.ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT;
  * {@code Map.put} as the default accumulator (e.g., for equity market cap where each raw key maps 1:1 to an enum
  * value).</li>
  * <li>{@link #mapTypedAllocations(Map, Function, Map, ErrorCode)} — for domain models where values are already
- * enum-keyed and need no string resolution (e.g., for fixed income sector allocations mapped by the SM REST
+ * enum-keyed and need no string resolution (e.g., for fixed income sector allocations mapped by the upstream
  * fetcher).</li>
  * </ul>
  *
@@ -82,7 +82,7 @@ public final class AllocationMappingUtils {
 
   /**
    * Maps already enum-keyed values to allocations with no string resolution needed. Use when the domain model already
-   * contains typed enum keys (e.g., from SM REST fetcher mappers).
+   * contains typed enum keys (e.g., from upstream fetcher mappers).
    */
   public static <E extends Enum<E>, D> ExposureDataHolder<E> mapTypedAllocations(
       Map<PortfolioHolding, D> rawData,
