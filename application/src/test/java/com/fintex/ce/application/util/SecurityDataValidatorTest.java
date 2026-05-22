@@ -15,14 +15,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class SmsResponseValidatorTest {
+class SecurityDataValidatorTest {
 
   @Test
   void passes_whenAllMandatoryHoldingsHaveRawDataEntry() {
     final var fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
     final var rawData = Map.of(fund, "fee-data");
 
-    assertThatCode(() -> SmsResponseValidator.requireDataForEveryHolding(rawData, List.of(fund), h -> true))
+    assertThatCode(() -> SecurityDataValidator.requireDataForEveryHolding(rawData, List.of(fund), h -> true))
         .doesNotThrowAnyException();
   }
 
@@ -33,9 +33,9 @@ class SmsResponseValidatorTest {
     final var rawData = Map.of(present, "fee-data");
 
     assertThatThrownBy(
-        () -> SmsResponseValidator.requireDataForEveryHolding(rawData, List.of(present, missing), h -> true))
+        () -> SecurityDataValidator.requireDataForEveryHolding(rawData, List.of(present, missing), h -> true))
         .isInstanceOf(CalculationException.class)
-        .hasMessageContaining("Security Master returned no data for holding")
+        .hasMessageContaining("No data returned for holding")
         .hasMessageContaining("US-MISSING");
   }
 
@@ -46,7 +46,7 @@ class SmsResponseValidatorTest {
     final var rawData = Map.of(fund, "fee-data");
 
     // Only fund holdings are mandatory — the stock is exempt and its absence from rawData is fine.
-    assertThatCode(() -> SmsResponseValidator.requireDataForEveryHolding(
+    assertThatCode(() -> SecurityDataValidator.requireDataForEveryHolding(
         rawData,
         List.of(fund, stock),
         h -> h.getHoldingType() == FinancialInstrumentType.MUTUAL_FUND_CANADA))
@@ -56,8 +56,8 @@ class SmsResponseValidatorTest {
   @Test
   void duplicateIds_passCheck_whenRawDataHasOnlyOneEntryForTheSharedId() {
     // The same fund held twice with different market values — equals() distinguishes them, but they share an
-    // identifier. SMS dedupes by identifier so the rawData map might only carry one entry for the shared id. The
-    // validator must still accept both because the identifier IS represented in the response.
+    // identifier. The data source dedupes by identifier so the rawData map might only carry one entry for the shared
+    // id. The validator must still accept both because the identifier IS represented in the response.
     final var sharedId = new SecurityIdentifier("CIG-DUP", FiIdentifierType.MORNINGSTAR_ID);
     final var fundA = PortfolioHolding.builder()
         .value(new BigDecimal("100"))
@@ -71,7 +71,7 @@ class SmsResponseValidatorTest {
         .build();
     final var rawData = Map.of(fundA, "fee-data"); // only one entry, despite two holdings requested
 
-    assertThatCode(() -> SmsResponseValidator.requireDataForEveryHolding(
+    assertThatCode(() -> SecurityDataValidator.requireDataForEveryHolding(
         rawData, List.of(fundA, fundB), h -> true))
         .doesNotThrowAnyException();
   }
@@ -84,7 +84,7 @@ class SmsResponseValidatorTest {
         .securityIdentifier(null)
         .build();
 
-    assertThatThrownBy(() -> SmsResponseValidator.requireDataForEveryHolding(Map.of(), List.of(noId), h -> true))
+    assertThatThrownBy(() -> SecurityDataValidator.requireDataForEveryHolding(Map.of(), List.of(noId), h -> true))
         .isInstanceOf(CalculationException.class);
   }
 

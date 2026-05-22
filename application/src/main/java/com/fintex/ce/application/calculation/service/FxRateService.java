@@ -157,7 +157,7 @@ public class FxRateService {
     if (fxRateValue == null || previousFxValue == null) {
       return null;
     }
-    // value is the SM-supplied monthly return in percent form (e.g. 4.988 for 4.988%); convert to a
+    // value is the source-supplied monthly return in percent form (e.g. 4.988 for 4.988%); convert to a
     // decimal (1 + r) factor, apply the FX growth ratio, then multiply by 100 to return a percent
     // value that matches the unconverted USD path's units.
     return ONE.add(divide(value, HUNDRED)).multiply(divide(fxRateValue, previousFxValue))

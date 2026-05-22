@@ -359,14 +359,32 @@ public enum ErrorCode {
       HttpStatus.INTERNAL_SERVER_ERROR,
       Severity.ERROR),
 
+  NO_COMPLETE_CALENDAR_YEAR(
+      Codes.NO_COMPLETE_CALENDAR_YEAR,
+      "No complete calendar year (Jan-Dec) found in monthly returns range [%s, %s]; annual returns cannot be computed",
+      "Annual returns require at least one calendar year with all 12 monthly returns present, but the available data window does not cover any full year",
+      "Extend the holding's monthly returns history so that at least one calendar year (Jan-Dec) is fully covered",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  INCOMPLETE_YEAR_SKIPPED(
+      Codes.INCOMPLETE_YEAR_SKIPPED,
+      "Annual return for year %s cannot be computed: only %s of 12 monthly returns available",
+      "The calendar year cannot be computed because some monthly returns within January–December are missing",
+      "Populate the missing monthly returns for the affected year",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
   // ============================================
   // SEC-xxx — Security catalog (existence) errors
   // ============================================
-  SECURITY_NOT_FOUND_IN_SM(
-      Codes.SECURITY_NOT_FOUND_IN_SM,
-      "Security not found in Security Master: %s",
-      "The requested security identifier is not present in Security Master, so no data can be retrieved",
-      "Verify the security identifier and that the security has been imported into Security Master",
+  NO_SECURITY_DATA_FOR_HOLDING(
+      Codes.NO_SECURITY_DATA_FOR_HOLDING,
+      "No data returned for holding %s",
+      "The data source did not include this holding in its response — the security is unknown or the configured "
+          + "data provider has no record for it on the requested attribute",
+      "Verify the security identifier is valid, switch to a data provider that covers it, or remove the holding "
+          + "from the request",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -650,16 +668,6 @@ public enum ErrorCode {
           + "or Management Fee is required",
       "All four fee fields (MER, NER, GER, Management Fee) are null for this fund holding",
       "Populate at least one of MER, NER, GER, or Management Fee for this security",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
-  SMS_NO_DATA_FOR_HOLDING(
-      Codes.SMS_NO_DATA_FOR_HOLDING,
-      "Security Master returned no data for holding %s",
-      "Security Master did not include this fund holding in its /fees response — the security is unknown to SMS "
-          + "or its data provider has no fee record for it",
-      "Verify the security identifier exists in Security Master, switch to a data provider that covers it, or "
-          + "remove the holding from the request",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -1097,7 +1105,7 @@ public enum ErrorCode {
     public static final String TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY = "TBL-002";
 
     // Security catalog (existence)
-    public static final String SECURITY_NOT_FOUND_IN_SM = "SEC-001";
+    public static final String NO_SECURITY_DATA_FOR_HOLDING = "SEC-001";
 
     // Returns / NAV
     public static final String MISSING_MONTHLY_RETURNS = "RET-001";
@@ -1109,6 +1117,8 @@ public enum ErrorCode {
     public static final String NAV_PARAM_MISSING = "RET-007";
     public static final String INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD = "RET-008";
     public static final String CIPSD_OUTSIDE_DATA_RANGE = "RET-009";
+    public static final String NO_COMPLETE_CALENDAR_YEAR = "RET-010";
+    public static final String INCOMPLETE_YEAR_SKIPPED = "RET-011";
 
     // Performance Dates
     public static final String CPSD_AFTER_CPED = "PFD-001";
@@ -1153,7 +1163,6 @@ public enum ErrorCode {
     public static final String MISSING_MANAGEMENT_FEE = "MER-003";
     public static final String MISSING_SALES_CHARGE_TYPE = "MER-004";
     public static final String MISSING_FUND_FEE_DATA = "MER-005";
-    public static final String SMS_NO_DATA_FOR_HOLDING = "MER-006";
 
     // Best / Worst Periods
     public static final String BEST_WORST_TIME_INTERVAL_NOT_POSITIVE = "BWP-001";

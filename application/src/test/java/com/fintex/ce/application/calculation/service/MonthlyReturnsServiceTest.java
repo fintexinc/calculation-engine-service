@@ -60,7 +60,7 @@ class MonthlyReturnsServiceTest {
   private final WeightedAverageComponent weightedAverageComponent = mock(WeightedAverageComponent.class);
 
   @Test
-  void shouldThrowSecurityNotFound_whenHoldingMissingFromSecurityMasterResponse() {
+  void shouldThrowSmsNoDataForHolding_whenHoldingMissingFromSecurityMasterResponse() {
     when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
     MonthlyReturnsService service = service(List.of());
@@ -68,7 +68,7 @@ class MonthlyReturnsServiceTest {
     assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF)))
         .isInstanceOf(BasePceException.class)
         .satisfies(thrown -> assertThat(((BasePceException) thrown).getErrorCode())
-            .isEqualTo(ErrorCode.SECURITY_NOT_FOUND_IN_SM));
+            .isEqualTo(ErrorCode.NO_SECURITY_DATA_FOR_HOLDING));
   }
 
   @Test

@@ -76,7 +76,7 @@ public class ManagementFeeCalculationServiceImpl
   /**
    * Sets {@code modifiedFee} per holding type:
    * <ul>
-   * <li>MER-bearing: validate and use the SMS-reported management fee, throwing if missing.</li>
+   * <li>MER-bearing: validate and use the source-reported management fee, throwing if missing.</li>
    * <li>Zero-MER (stocks, cash, GIC, fixed income): set {@code modifiedFee = 0} so the holding stays in the
    * {@link FeeAggregationMode#WHOLE_PORTFOLIO} denominator at 0%. Skipping this step leaves {@code modifiedFee = null}
    * and {@link #getWholePortfolioAverage} silently drops the holding, collapsing WHOLE_PORTFOLIO into FUNDS_ONLY.</li>
