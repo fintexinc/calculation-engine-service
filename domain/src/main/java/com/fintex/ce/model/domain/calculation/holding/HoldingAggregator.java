@@ -1,37 +1,27 @@
 package com.fintex.ce.model.domain.calculation.holding;
 
 import java.util.Objects;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 
-@Data
-@Builder
-@AllArgsConstructor
-public class HoldingAggregator {
+/**
+ * Aggregation key for grouping leaves that represent the same underlying entity. Equality is decided by the "display"
+ * identity returned by {@link #nameOrCompanyName()} so equity leaves with the same companyName and non-equity leaves
+ * with the same name group together.
+ */
+public record HoldingAggregator(String name, String companyName) {
 
-  private final String name;
-  private final String companyName;
-
-  // This field is using only for identifying GIC holdings, as it is possible that all parameters of GIC are equals but
-  // them aren't same
-  private UUID uuid;
-
-  public String getNameOrCompanyName() {
+  public String nameOrCompanyName() {
     return (name == null || name.isEmpty()) ? companyName : name;
   }
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    HoldingAggregator that = (HoldingAggregator) o;
-    return this.getNameOrCompanyName().equals(that.getNameOrCompanyName()) && Objects.equals(uuid, that.uuid);
+    if (!(o instanceof HoldingAggregator that)) return false;
+    return Objects.equals(this.nameOrCompanyName(), that.nameOrCompanyName());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.getNameOrCompanyName());
+    return Objects.hashCode(nameOrCompanyName());
   }
 }

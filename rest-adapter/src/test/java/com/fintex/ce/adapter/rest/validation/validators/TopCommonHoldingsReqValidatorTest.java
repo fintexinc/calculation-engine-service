@@ -25,34 +25,6 @@ class TopCommonHoldingsReqValidatorTest {
   private final TopCommonHoldingsReqValidator validator = new TopCommonHoldingsReqValidator();
 
   @Test
-  void shouldThrow_whenNumOfFundsMinIsLessThanOne() {
-    TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
-    command.setHoldings(List.of(createHolding("ID1"), createHolding("ID2")));
-    command.setNumOfFundsMin(0);
-
-    assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ValidationException.class)
-        .satisfies(ex -> {
-          ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("NUM_OF_FUNDS_MIN_NOT_POSITIVE");
-        });
-  }
-
-  @Test
-  void shouldThrow_whenNumOfFundsMinExceedsHoldingsSize() {
-    TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
-    command.setHoldings(List.of(createHolding("ID1")));
-    command.setNumOfFundsMin(5);
-
-    assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ValidationException.class)
-        .satisfies(ex -> {
-          ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("NUM_OF_FUNDS_EXCEEDS_PORTFOLIO");
-        });
-  }
-
-  @Test
   void shouldThrow_whenAccumulateHoldingTypesExceedsTwelve() {
     Set<String> thirteenTypes = IntStream.rangeClosed(1, 13)
         .mapToObj(i -> "TYPE_" + i)
@@ -60,7 +32,6 @@ class TopCommonHoldingsReqValidatorTest {
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
     command.setHoldings(List.of(createHolding("ID1")));
-    command.setNumOfFundsMin(1);
     command.setAccumulateHoldingTypes(thirteenTypes);
 
     assertThatThrownBy(() -> validator.validate(command))
@@ -80,13 +51,30 @@ class TopCommonHoldingsReqValidatorTest {
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
     command.setHoldings(List.of(gicHolding));
-    command.setNumOfFundsMin(1);
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode().name()).isEqualTo("GIC_HOLDING_NAME_EMPTY");
+        });
+  }
+
+  @Test
+  void shouldThrow_whenAnyHoldingHasNullValue() {
+    PortfolioHolding nullValueHolding = new PortfolioHolding(
+        null,
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+
+    TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
+    command.setHoldings(List.of(nullValueHolding));
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_VALUE_NEGATIVE_OR_NULL");
         });
   }
 
@@ -100,7 +88,6 @@ class TopCommonHoldingsReqValidatorTest {
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
     command.setHoldings(List.of(createHolding("ID1"), createHolding("ID2"), gicHolding));
-    command.setNumOfFundsMin(2);
     command.setAccumulateHoldingTypes(Set.of("TYPE_1", "TYPE_2"));
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();

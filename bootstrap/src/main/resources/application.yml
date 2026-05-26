@@ -148,8 +148,16 @@ default:
     risk-calculations: "12,36,60,120"
     best-worst-periods: 12,36,60,120
   top-common-holdings:
-    accumulate-types: "E,ER,B,BC,BD,BT"
-    recursion-types: "FO,FE,FS,EX"
+    accumulate-types:
+      - E
+      - ER
+      - B
+      - BC
+      - BD
+      - BT
+    default-num-of-top-common-holdings: 10
+    max-recursion-depth: 5
+    max-leaves-per-holding: 10000
 
 management:
   tracing:
