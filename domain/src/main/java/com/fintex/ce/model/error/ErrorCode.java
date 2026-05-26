@@ -725,11 +725,12 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
-  NUM_OF_FUNDS_MIN_NOT_POSITIVE(
-      Codes.NUM_OF_FUNDS_MIN_NOT_POSITIVE,
-      "numOfFundsMin must be greater than 0",
-      "numOfFundsMin parameter must be a positive integer",
-      "Use a positive integer for numOfFundsMin",
+  HOLDING_MISSING_WEIGHTING_FROM_FDS(
+      Codes.HOLDING_MISSING_WEIGHTING_FROM_FDS,
+      "Underlying holding %s is missing weighting in the data provider response",
+      "Weighting is required to decompose a fund into its underlying holdings; defaulting it would silently drop "
+          + "the affected branch from the result",
+      "Populate the weighting field in the source data for this underlying holding",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -738,14 +739,6 @@ public enum ErrorCode {
       "AccumulateHoldingTypes can contain a maximum of 12 holding types",
       "Too many holding types were requested for accumulation",
       "Reduce the number of accumulate holding types to 12 or fewer",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
-  NUM_OF_FUNDS_EXCEEDS_PORTFOLIO(
-      Codes.NUM_OF_FUNDS_EXCEEDS_PORTFOLIO,
-      "Num Of Funds cannot be greater than number of funds in the portfolio",
-      "The requested numOfFunds is higher than the number of funds in the portfolio",
-      "Use a numOfFunds value less than or equal to the number of funds in the portfolio",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -1170,10 +1163,9 @@ public enum ErrorCode {
 
     // Top Common Holdings
     public static final String HOLDING_MISSING_UNDERLYING_HOLDINGS = "TCH-001";
-    public static final String NUM_OF_FUNDS_MIN_NOT_POSITIVE = "TCH-002";
     public static final String ACCUMULATE_HOLDING_TYPES_EXCEED_MAX = "TCH-003";
-    public static final String NUM_OF_FUNDS_EXCEEDS_PORTFOLIO = "TCH-004";
     public static final String GIC_HOLDING_NAME_EMPTY = "TCH-005";
+    public static final String HOLDING_MISSING_WEIGHTING_FROM_FDS = "TCH-006";
 
     // Distribution of Returns
     public static final String CUSTOM_NUMBER_OF_BINS_LESS_THAN_MIN = "DIS-001";

@@ -364,7 +364,6 @@ class CalculationTestDataProvider {
   private static TopCommonHoldingsCommand topCommonHoldingsCommand() {
     TopCommonHoldingsCommand cmd = new TopCommonHoldingsCommand();
     cmd.setHoldings(List.of(DUMMY_HOLDING));
-    cmd.setNumOfFundsMin(2);
     cmd.setNumOfTopCommonHoldings(10);
     return cmd;
   }

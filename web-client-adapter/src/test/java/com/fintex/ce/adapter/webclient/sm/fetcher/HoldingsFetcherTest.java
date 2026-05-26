@@ -2,8 +2,8 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.TopHoldingsMapper;
+import com.fintex.ce.model.domain.calculation.holding.CommonHolding;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
-import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings.CommonTopHolding;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.holding.TopHolding;
 import com.fintex.wm.commons.domain.holding.TopHoldings;
@@ -59,7 +59,7 @@ class HoldingsFetcherTest extends AbstractSecurityMasterFetcherTest<CommonTopHol
 
   @Override
   protected CommonTopHoldings createExpectedDomainModel() {
-    var ch = new CommonTopHolding();
+    var ch = new CommonHolding();
     ch.setCompanyName("NVIDIA Corp");
     ch.setType("E");
     ch.setWeight(new BigDecimal("10.5"));

@@ -25,6 +25,18 @@ public class PortfolioUtils {
     return holdings.stream().collect(toMap(e -> e, e -> DecimalUtils.divide(e.getValue(), sum)));
   }
 
+  /**
+   * Variant for pipelines that have already normalised each holding's value into a single common currency. The map's
+   * values are summed directly without re-reading {@code PortfolioHolding.value}, so callers can pass FX-converted
+   * amounts produced by {@code DefaultTargetCurrencyConverter}.
+   */
+  public static Map<PortfolioHolding, BigDecimal> calculateInitialPortfolioWeightFromValues(
+      Map<PortfolioHolding, BigDecimal> convertedValues) {
+    BigDecimal sum = convertedValues.values().stream().reduce(ZERO, BigDecimal::add);
+    return convertedValues.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, e -> DecimalUtils.divide(e.getValue(), sum)));
+  }
+
   public static void setHoldingResponseDetails(final PortfolioHolding holding,
       final HoldingIncomeForecast holdingIncomeForecast) {
     SecurityIdentifier secId = holding.getSecurityIdentifier();

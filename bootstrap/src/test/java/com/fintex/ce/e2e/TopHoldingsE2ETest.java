@@ -16,7 +16,6 @@ import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.value.MultilingualString;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 
 import java.math.BigDecimal;
@@ -28,8 +27,6 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("e2e")
-@Disabled("Temporarily disabled until Top Holdings document-aligned behavior is implemented. " +
-    "JIRA: https://fintexinc.atlassian.net/browse/TMI-398")
 class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
@@ -56,27 +53,30 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String smsPositiveResponseBody() {
+    // SM returns the weighting datapoint on a percent (0-100) scale; TopHoldingsMapper normalises to ratio before
+    // it reaches the calculation. Stubs must use the same scale SM uses or the FX/aggregation math diverges from
+    // production behaviour.
     var response = List.of(
         new SmsSecurityAttributeResult<>(
             new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER),
             topHoldings(
-                allocation("Alpha Corp", "E", "0.20", "50000"),
-                allocation("Bravo Corp", "E", "0.18", "45000"),
-                allocation("Charlie Corp", "E", "0.16", "40000"),
-                allocation("Delta Corp", "E", "0.14", "35000"),
-                allocation("Echo Corp", "E", "0.12", "30000"),
-                allocation("Foxtrot Corp", "E", "0.10", "25000"))),
+                allocation("Alpha Corp", "E", "20", "50000"),
+                allocation("Bravo Corp", "E", "18", "45000"),
+                allocation("Charlie Corp", "E", "16", "40000"),
+                allocation("Delta Corp", "E", "14", "35000"),
+                allocation("Echo Corp", "E", "12", "30000"),
+                allocation("Foxtrot Corp", "E", "10", "25000"))),
         new SmsSecurityAttributeResult<>(
             new SecurityIdentifier("BBB_PARENT", FiIdentifierType.FUNDSERV),
             topHoldings(
-                allocation("Alpha Corp", "E", "0.25", "60000"),
-                allocation("Bravo Corp", "E", "0.20", "48000"),
-                allocation("Golf Corp", "E", "0.15", "36000"),
-                allocation("Hotel Corp", "E", "0.12", "28800"),
-                allocation("India Corp", "E", "0.10", "24000"),
-                allocation("Juliet Corp", "E", "0.08", "19200"),
-                allocation("Kilo Corp", "E", "0.06", "14400"),
-                allocation("Lima Corp", "E", "0.04", "9600"))));
+                allocation("Alpha Corp", "E", "25", "60000"),
+                allocation("Bravo Corp", "E", "20", "48000"),
+                allocation("Golf Corp", "E", "15", "36000"),
+                allocation("Hotel Corp", "E", "12", "28800"),
+                allocation("India Corp", "E", "10", "24000"),
+                allocation("Juliet Corp", "E", "8", "19200"),
+                allocation("Kilo Corp", "E", "6", "14400"),
+                allocation("Lima Corp", "E", "4", "9600"))));
 
     return writeJson(response);
   }
@@ -133,6 +133,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
     var th = new TopHoldings();
     th.setAllocation(List.of(allocations));
     th.setDataProviders(List.of(DataProvider.MORNINGSTAR));
+    th.setCurrency(Currency.CAD);
     return th;
   }
 

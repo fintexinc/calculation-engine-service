@@ -14,7 +14,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
@@ -37,18 +36,13 @@ public class TopCommonHoldingsReqValidator implements RequestValidator {
     int sizeOfAccumulateHoldingTypes = CollectionUtils.isEmpty(tch.getAccumulateHoldingTypes())
         ? 0
         : tch.getAccumulateHoldingTypes().size();
-    if (Optional.ofNullable(tch.getNumOfFundsMin()).orElse(1) < 1) {
-      throw ErrorCode.NUM_OF_FUNDS_MIN_NOT_POSITIVE.toValidationException();
-    }
-    if (Objects.nonNull(tch.getNumOfFundsMin()) && tch.getNumOfFundsMin() > tch.getHoldings().size()) {
-      throw ErrorCode.NUM_OF_FUNDS_EXCEEDS_PORTFOLIO.toValidationException();
-    }
     if (sizeOfAccumulateHoldingTypes > 12) {
       throw ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX.toValidationException();
     }
     if (checkGicHoldingName(tch.getHoldings())) {
       throw ErrorCode.GIC_HOLDING_NAME_EMPTY.toValidationException();
     }
+    HoldingsValidationHelper.validateHoldingValues(tch.getHoldings());
   }
 
   private boolean checkGicHoldingName(List<PortfolioHolding> holdings) {
