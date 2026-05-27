@@ -12,6 +12,7 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,23 +28,23 @@ class FeesMapperTest {
   void mapsPercentageValuesToRatioForm() {
     var managementFee = new ManagementFeeDatapoint();
     managementFee.setValue(new BigDecimal("1.25"));
-    managementFee.setDataProvider(DataProvider.MORNINGSTAR);
+    managementFee.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     var mer = new FloatDatapoint();
     mer.setValue(new BigDecimal("2.25"));
-    mer.setDataProvider(DataProvider.MORNINGSTAR);
+    mer.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     var netExpenseRatio = new FloatDatapoint();
     netExpenseRatio.setValue(new BigDecimal("2.10"));
-    netExpenseRatio.setDataProvider(DataProvider.MORNINGSTAR);
+    netExpenseRatio.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     var grossExpenseRatio = new FloatDatapoint();
     grossExpenseRatio.setValue(new BigDecimal("2.50"));
-    grossExpenseRatio.setDataProvider(DataProvider.MORNINGSTAR);
+    grossExpenseRatio.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     var actual12B1Fee = new FloatDatapoint();
     actual12B1Fee.setValue(new BigDecimal("0.25"));
-    actual12B1Fee.setDataProvider(DataProvider.MORNINGSTAR);
+    actual12B1Fee.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     var smsResponse = new Fees();
     smsResponse.setManagementFee(managementFee);
@@ -91,7 +92,7 @@ class FeesMapperTest {
   void mapsPartialFields_keepingNullFieldsNull() {
     var mer = new FloatDatapoint();
     mer.setValue(new BigDecimal("1.90"));
-    mer.setDataProvider(DataProvider.MORNINGSTAR);
+    mer.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     var smsResponse = new Fees();
     smsResponse.setManagementExpenseRatio(mer);

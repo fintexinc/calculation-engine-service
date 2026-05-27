@@ -59,15 +59,16 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
     // SMS returns fee fields in percentage form (e.g. 2.25 meaning 2.25%). FeesMapper converts to ratio form
     // (0.0225) for the rest of the engine — the expected output below is in ratio form. The currency datapoint is
     // required for MER-bearing holdings — without it, the FX-conversion step hard-fails with CUR-003.
+    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
     var responseBody = List.of(
         new SmsSecurityDataResponse(
             new SecurityIdentifier("XBAL", FiIdentifierType.TICKER),
             new SmsFeeData(
-                new SmsDatapoint(new BigDecimal("1.25"), DataProvider.MORNINGSTAR),
-                new SmsDatapoint(new BigDecimal("2.25"), DataProvider.MORNINGSTAR),
-                new SmsDatapoint(new BigDecimal("2.10"), DataProvider.MORNINGSTAR),
-                new SmsDatapoint(new BigDecimal("2.50"), DataProvider.MORNINGSTAR),
-                new SmsCurrencyDatapoint(Currency.CAD, DataProvider.MORNINGSTAR))));
+                new SmsDatapoint(new BigDecimal("1.25"), providers),
+                new SmsDatapoint(new BigDecimal("2.25"), providers),
+                new SmsDatapoint(new BigDecimal("2.10"), providers),
+                new SmsDatapoint(new BigDecimal("2.50"), providers),
+                new SmsCurrencyDatapoint(Currency.CAD, providers))));
     return toJson(responseBody);
   }
 
@@ -123,12 +124,12 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
       SmsCurrencyDatapoint currency) {
   }
 
-  private record SmsDatapoint(BigDecimal value, DataProvider dataProvider) {
+  private record SmsDatapoint(BigDecimal value, List<DataProvider> dataProviders) {
   }
 
   // wm-commons CurrencyDatapoint stores the value in a field literally named "type" (not "value" as for
   // FloatDatapoint).
   // Jackson deserialization is property-name driven, so the JSON must say {"type": "CAD"} for the engine to receive it.
-  private record SmsCurrencyDatapoint(Currency type, DataProvider dataProvider) {
+  private record SmsCurrencyDatapoint(Currency type, List<DataProvider> dataProviders) {
   }
 }

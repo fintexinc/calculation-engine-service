@@ -31,8 +31,7 @@ public class EquityCountryAllocationMapper
         .collect(Collectors.toMap(CountryValue::getIsoCode, CountryValue::getValue));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(CountryAllocation::getDataProvider)
-        .map(List::of)
+        .map(CountryAllocation::getDataProviders)
         .orElseGet(List::of);
 
     return EquityCountryAllocation.builder()

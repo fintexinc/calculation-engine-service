@@ -46,8 +46,7 @@ public class CreditQualityMapper
             () -> new EnumMap<>(CreditQualityRatingType.class)));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(CreditQualityRatings::getDataProvider)
-        .map(List::of)
+        .map(CreditQualityRatings::getDataProviders)
         .orElseGet(List::of);
 
     return CreditQuality.builder()

@@ -64,9 +64,9 @@ public class AssetAllocationSecurityMasterMapper
     if (smsResponse == null) {
       return List.of();
     }
-    DataProvider provider = Optional.ofNullable(smsResponse.getAssetAllocation())
-        .map(AssetAllocation::getDataProvider)
-        .orElseGet(smsResponse::getDataProvider);
-    return provider == null ? List.of() : List.of(provider);
+    List<DataProvider> providers = Optional.ofNullable(smsResponse.getAssetAllocation())
+        .map(AssetAllocation::getDataProviders)
+        .orElseGet(smsResponse::getDataProviders);
+    return providers == null ? List.of() : providers;
   }
 }

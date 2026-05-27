@@ -35,8 +35,7 @@ public class CountryExposureMapper
             BigDecimal::add));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(CountryAllocation::getDataProvider)
-        .map(List::of)
+        .map(CountryAllocation::getDataProviders)
         .orElseGet(List::of);
 
     return CountryExposure.builder()

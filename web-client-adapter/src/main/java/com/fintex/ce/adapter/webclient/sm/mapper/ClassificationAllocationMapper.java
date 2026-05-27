@@ -40,8 +40,7 @@ public class ClassificationAllocationMapper
             () -> new EnumMap<>(ClassificationAllocationType.class)));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(SecurityClassificationAllocation::getDataProvider)
-        .map(List::of)
+        .map(SecurityClassificationAllocation::getDataProviders)
         .orElseGet(List::of);
 
     return ClassificationAllocation.builder()

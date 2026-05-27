@@ -32,7 +32,7 @@ class FixedIncomeStyleboxExposureMapperTest {
 
     var smsResponse = new FixedIncomeStyleBoxes();
     smsResponse.setBoxValues(List.of(highLimited, highModerate, mediumExtensive));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     PortfolioHolding holding = createHolding("AGG", FinancialInstrumentType.ETF);
 

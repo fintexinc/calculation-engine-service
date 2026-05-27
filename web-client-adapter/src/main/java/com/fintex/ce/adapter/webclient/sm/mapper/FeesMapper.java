@@ -12,6 +12,7 @@ import com.fintex.wm.commons.domain.financial.Fees;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static com.fintex.ce.model.util.BigDecimalUtils.percentageToRatio;
 
@@ -51,7 +52,11 @@ public class FeesMapper implements SecurityMasterResponseMapper<FeeData, Fees> {
   }
 
   private static DataProvider provider(DatapointMetadata dp) {
-    return dp == null ? null : dp.getDataProvider();
+    if (dp == null) {
+      return null;
+    }
+    List<DataProvider> providers = dp.getDataProviders();
+    return providers == null || providers.isEmpty() ? null : providers.get(0);
   }
 
   private static Currency currency(CurrencyDatapoint dp) {

@@ -32,8 +32,7 @@ public class TopHoldingsMapper implements SecurityMasterResponseMapper<CommonTop
         .toList();
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(TopHoldings::getDataProvider)
-        .map(List::of)
+        .map(TopHoldings::getDataProviders)
         .orElseGet(List::of);
 
     return CommonTopHoldings.builder()

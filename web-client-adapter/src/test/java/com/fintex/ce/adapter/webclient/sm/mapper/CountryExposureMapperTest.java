@@ -26,7 +26,7 @@ class CountryExposureMapperTest {
 
     var smsResponse = new CountryAllocation();
     smsResponse.setAllocation(List.of(canada, usa));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     CountryExposure result = mapper.map(smsResponse, createHolding("SEC-001"));
 
@@ -60,7 +60,7 @@ class CountryExposureMapperTest {
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new CountryAllocation();
     smsResponse.setAllocation(List.of());
-    smsResponse.setDataProvider(null);
+    smsResponse.setDataProviders(null);
 
     CountryExposure result = mapper.map(smsResponse, createHolding("SEC-004"));
 

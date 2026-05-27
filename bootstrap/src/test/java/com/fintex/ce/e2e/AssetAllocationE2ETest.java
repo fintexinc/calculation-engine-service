@@ -331,7 +331,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     Geography geography = new Geography();
     geography.setRegion(regionDp);
     geography.setCurrency(currencyDp);
-    geography.setDataProvider(DataProvider.MORNINGSTAR);
+    geography.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return attributeResult(id, idType, geography);
   }
 
@@ -339,11 +339,11 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
       Currency currency, AssetAllocationValue... values) {
     AssetAllocation allocation = new AssetAllocation();
     allocation.setAllocations(new ArrayList<>(List.of(values)));
-    allocation.setDataProvider(DataProvider.MORNINGSTAR);
+    allocation.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     AssetAllocationWithCurrency wrapper = new AssetAllocationWithCurrency();
     wrapper.setAssetAllocation(allocation);
-    wrapper.setDataProvider(DataProvider.MORNINGSTAR);
+    wrapper.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     if (currency != null) {
       CurrencyDatapoint currencyDp = new CurrencyDatapoint();
       currencyDp.setValue(currency);

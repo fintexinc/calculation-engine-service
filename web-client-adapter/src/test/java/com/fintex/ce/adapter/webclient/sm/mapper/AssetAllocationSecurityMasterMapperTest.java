@@ -96,7 +96,7 @@ class AssetAllocationSecurityMasterMapperTest {
       DataProvider provider) {
     AssetAllocation allocation = new AssetAllocation();
     allocation.setAllocations(values);
-    allocation.setDataProvider(provider);
+    allocation.setDataProviders(provider == null ? null : List.of(provider));
 
     AssetAllocationWithCurrency wrapper = new AssetAllocationWithCurrency();
     wrapper.setAssetAllocation(allocation);

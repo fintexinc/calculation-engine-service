@@ -37,8 +37,7 @@ public class EquityStyleboxExposureMapper
             BigDecimal::add));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(StyleBoxes::getDataProvider)
-        .map(List::of)
+        .map(StyleBoxes::getDataProviders)
         .orElseGet(List::of);
 
     return EquityStyleboxExposure.builder()

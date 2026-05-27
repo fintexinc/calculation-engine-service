@@ -56,8 +56,7 @@ public class FixedIncomeSectorAllocationMapper
             BigDecimal::add));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(FixedIncomeSectorAllocation::getDataProvider)
-        .map(List::of)
+        .map(FixedIncomeSectorAllocation::getDataProviders)
         .orElseGet(List::of);
 
     return FixedIncomeBondSecurities.builder()

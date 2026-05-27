@@ -32,7 +32,7 @@ class EquitySectorAllocationMapperTest {
 
     var smsResponse = new EquitySectorAllocation();
     smsResponse.setAllocation(List.of(techEntry, healthEntry, energyEntry));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     PortfolioHolding holding = createHolding("XIU.TO");
 
