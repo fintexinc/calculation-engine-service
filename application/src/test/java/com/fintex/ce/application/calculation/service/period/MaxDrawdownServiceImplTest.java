@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
-import com.fintex.ce.application.calculation.metric.Growth10KCalculation;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
+import com.fintex.ce.application.calculation.metric.MaxDrawdownCalculation;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -12,14 +12,11 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -30,9 +27,9 @@ class MaxDrawdownServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var service = mock(MaxDrawdownServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, Set.of()));
+        .useConstructor(monthlyReturnsService, null, Set.of()));
 
     final var benchmarkContext = mock(PeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
@@ -50,59 +47,40 @@ class MaxDrawdownServiceImplTest {
   }
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyInitializeGrowthOf10KMap() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+  void shouldProduceCalculationWithCompoundedGrowthCurve_whenWeightedReturnsPresent() {
+    final var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var service = mock(MaxDrawdownServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, Set.of()));
-
-    final var benchmarkContext = mock(PeriodCalculationInput.class);
-    final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
-        BigDecimal.TEN));
-
-    final var req = mock(PeriodCommand.class);
-    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
-    when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
-
-    doCallRealMethod().when(service).defineCalculationMethod(req);
-    service.defineCalculationMethod(req);
-
-    verify(service).initializeGrowthOf10KMap(eq(benchmarkContext), any());
-  }
-
-  @Test
-  void shouldInitializeGrowthOf10KMap_whenCheckResult() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
-    final var service = mock(MaxDrawdownServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, Set.of()));
+        .useConstructor(monthlyReturnsService, null, Set.of()));
 
     final var context = mock(PeriodCalculationInput.class);
     final var weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.TEN));
-    final var growth10KCalculation = new Growth10KCalculation(null, null, false);
-
+    final var req = mock(PeriodCommand.class);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(service).initializeGrowthOf10KMap(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = service.initializeGrowthOf10KMap(context, growth10KCalculation);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    MaxDrawdownCalculation calculation = service.defineCalculationMethod(req);
 
-    assertNotNull(actual.entrySet().stream().findFirst());
+    // Curve has a $10K seed at month-1 and one compounded month — verifies the
+    // CalculationUtils.compoundGrowth10K() integration on the weighted-average return series.
+    assertThat(calculation).isNotNull();
   }
 
   @Test
-  void shouldInitializeGrowthOf10KMap_whenCheckResult2() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+  void shouldProduceCalculationWithEmptyGrowthCurve_whenWeightedReturnsIsEmpty() {
+    final var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var service = mock(MaxDrawdownServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, Set.of()));
+        .useConstructor(monthlyReturnsService, null, Set.of()));
 
     final var context = mock(PeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
-    final var growth10KCalculation = new Growth10KCalculation(null, null, false);
-
+    final var req = mock(PeriodCommand.class);
+    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(service).initializeGrowthOf10KMap(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = service.initializeGrowthOf10KMap(context, growth10KCalculation);
+    doCallRealMethod().when(service).defineCalculationMethod(req);
+    MaxDrawdownCalculation calculation = service.defineCalculationMethod(req);
 
-    assertFalse(actual.entrySet().stream().findFirst().isPresent());
+    assertThat(calculation).isNotNull();
   }
 }

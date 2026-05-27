@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service.period;
 
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -30,10 +30,10 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     var treasuryBillsFetcher = mock(TreasuryBillsFetcher.class);
     var service = mock(TrailingTotalReturnsCalculationServiceImpl.class,
-        withSettings().useConstructor(monthlyReturnsService, treasuryBillsFetcher, Set.of()));
+        withSettings().useConstructor(monthlyReturnsService, null, treasuryBillsFetcher, Set.of()));
 
     PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
@@ -52,7 +52,7 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
   void shouldFetchTBills_whenDefiningCalculationMethod() {
     var treasuryBillsFetcher = mock(TreasuryBillsFetcher.class);
     var service = mock(TrailingTotalReturnsCalculationServiceImpl.class,
-        withSettings().useConstructor(null, treasuryBillsFetcher, Set.of()));
+        withSettings().useConstructor(null, null, treasuryBillsFetcher, Set.of()));
 
     PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
@@ -70,7 +70,7 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
   void shouldThrowTBillSeriesNotAvailable_whenTBillSeriesEmptyForRequestedCurrency() {
     var treasuryBillsFetcher = mock(TreasuryBillsFetcher.class);
     var service = mock(TrailingTotalReturnsCalculationServiceImpl.class,
-        withSettings().useConstructor(null, treasuryBillsFetcher, Set.of()));
+        withSettings().useConstructor(null, null, treasuryBillsFetcher, Set.of()));
 
     PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.EUR);

@@ -1,8 +1,9 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
+import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
@@ -19,15 +20,16 @@ import java.util.Set;
 @Service
 public class TrailingTotalReturnsCalculationServiceImpl
     extends
-      PeriodAbstractService<TrailingTotalReturnsResult, PeriodCommand> {
+      WeightedAverageWithCpedAbstractService<PeriodCommand, TrailingTotalReturnsResult> {
 
   private final TreasuryBillsFetcher treasuryBillsFetcher;
 
   public TrailingTotalReturnsCalculationServiceImpl(
-      MonthlyReturnsService monthlyReturnsService,
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
       TreasuryBillsFetcher treasuryBillsFetcher,
       @Value("#{'${default.periods.trailing-total-returns}'.split(',')}") final Set<String> defaultPeriods) {
-    super(monthlyReturnsService, defaultPeriods);
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, defaultPeriods);
     this.treasuryBillsFetcher = treasuryBillsFetcher;
   }
 

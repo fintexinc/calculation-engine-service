@@ -1,9 +1,10 @@
 package com.fintex.ce.application.calculation.service.period;
 
-import com.fintex.ce.application.calculation.metric.Growth10KCalculation;
 import com.fintex.ce.application.calculation.metric.MaxDrawdownCalculation;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
+import com.fintex.ce.application.calculation.service.GrowthOf10KCalculationServiceImpl;
+import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
@@ -13,21 +14,17 @@ import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.NavigableMap;
 import java.util.Set;
-import java.util.TreeMap;
 
 @Service
-public class MaxDrawdownServiceImpl extends PeriodAbstractService<MaxDrawdownResult, PeriodCommand> {
+public class MaxDrawdownServiceImpl extends WeightedAverageWithCpedAbstractService<PeriodCommand, MaxDrawdownResult> {
 
   public MaxDrawdownServiceImpl(
-      MonthlyReturnsService monthlyReturnsService,
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
-    super(monthlyReturnsService, defaultPeriods);
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, defaultPeriods);
   }
 
   @Override
@@ -37,19 +34,10 @@ public class MaxDrawdownServiceImpl extends PeriodAbstractService<MaxDrawdownRes
 
   public MaxDrawdownCalculation defineCalculationMethod(PeriodCommand command) {
     PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    var growth10KCalculation = new Growth10KCalculation(context.getWeightedAveragePortfolioReturns(), null,
-        false);
-    NavigableMap<LocalDate, BigDecimal> growth10K = initializeGrowthOf10KMap(context, growth10KCalculation);
+    // weightedAveragePortfolioReturns is already in factor form (WeightedAverageComponent applied SCALE_OF_TWO
+    // above), so we pass AS_IS to avoid double-scaling 1.05 into 1.0105 and flattening every drawdown.
+    var growth10K = GrowthOf10KCalculationServiceImpl.compoundGrowth10K(context.getWeightedAveragePortfolioReturns(),
+        ReturnFactorScale.AS_IS);
     return new MaxDrawdownCalculation(context, defaultPeriods, growth10K, DecimalUtils::toUserScale);
-  }
-
-  public NavigableMap<LocalDate, BigDecimal> initializeGrowthOf10KMap(PeriodCalculationInput context,
-      Growth10KCalculation growth10KCalculation) {
-    NavigableMap<LocalDate, BigDecimal> growth10K = new TreeMap<>();
-    if (!CollectionUtils.isEmpty(context.getWeightedAveragePortfolioReturns())) {
-      growth10KCalculation.setFirstGrowth10KValue(context.getWeightedAveragePortfolioReturns(), growth10K);
-      growth10KCalculation.calculateGrowth10K(context.getWeightedAveragePortfolioReturns(), growth10K);
-    }
-    return growth10K;
   }
 }

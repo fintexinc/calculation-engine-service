@@ -37,7 +37,7 @@ import okhttp3.mockwebserver.SocketPolicy;
 @SpringBootTest(classes = PortfolioCalculationEngineApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class AbstractPortfolioCalculationE2ETest {
 
-  private static final String basePath = "/api/v1/portfolio/calculations";
+  protected static final String basePath = "/api/v1/portfolio/calculations";
 
   protected static MockWebServer smsMockServer;
 
@@ -177,7 +177,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
     assertThat(response.responseBody()).contains("Metric mismatch");
   }
 
-  private HttpResponse postCalculation(String body) {
+  protected HttpResponse postCalculation(String body) {
     return postCalculation(metricPath(), body);
   }
 

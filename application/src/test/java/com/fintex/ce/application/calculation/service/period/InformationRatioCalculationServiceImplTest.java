@@ -1,7 +1,8 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
+import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
@@ -25,13 +26,14 @@ class InformationRatioCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     // SETUP
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+    final var benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
     final var defaultPeriod = mock(Set.class);
     final var command = mock(PeriodCommand.class);
     final var context = mock(BenchmarkPeriodCalculationInput.class);
 
     final var service = mock(InformationRatioCalculationServiceImpl.class,
-        withSettings().useConstructor(monthlyReturnsService, defaultPeriod));
+        withSettings().useConstructor(portfolioProvider, benchmarkProvider, null, null, defaultPeriod));
 
     when(context.getCipsd()).thenReturn(LocalDate.MIN);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap());

@@ -24,7 +24,7 @@ class DownsideCaptureCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
     final var service = mock(DownsideCaptureCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, Set.of()));
+        .useConstructor(null, null, null, null, Set.of()));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();

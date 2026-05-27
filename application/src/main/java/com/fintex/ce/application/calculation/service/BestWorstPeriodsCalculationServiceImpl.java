@@ -1,16 +1,14 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.metric.BestWorstPeriodCalculation;
-import com.fintex.ce.application.returns.MonthlyReturnsContext;
-import com.fintex.ce.application.returns.WeightedAverageResult;
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpsdAndCpedAbstractService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +19,16 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 public class BestWorstPeriodsCalculationServiceImpl
-    implements
-      CalculationService<BestWorstPeriodsCommand, BestWorstPeriodsResult> {
-
-  private final MonthlyReturnsService monthlyReturnsService;
+    extends
+      WeightedAverageWithCpsdAndCpedAbstractService<BestWorstPeriodsCommand, BestWorstPeriodsResult> {
 
   @Value("#{'${default.periods.best-worst-periods}'.split(',')}")
   public Set<Long> defaultPeriods;
 
-  @Autowired
-  public BestWorstPeriodsCalculationServiceImpl(MonthlyReturnsService monthlyReturnsService) {
-    this.monthlyReturnsService = monthlyReturnsService;
+  public BestWorstPeriodsCalculationServiceImpl(
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped) {
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCpsdAndCped);
   }
 
   @Override
@@ -41,22 +38,9 @@ public class BestWorstPeriodsCalculationServiceImpl
 
   @Override
   public BestWorstPeriodsResult perform(BestWorstPeriodsCommand command) {
-    PeriodCalculationInput context = buildWeightedAverageInput(command);
-    return buildBestWorstPeriodCalculation(command, context).calculate();
-  }
-
-  public BestWorstPeriodCalculation buildBestWorstPeriodCalculation(BestWorstPeriodsCommand command,
-      PeriodCalculationInput context) {
-    return new BestWorstPeriodCalculation(context.getWeightedAveragePortfolioReturns(), getPeriods(command));
-  }
-
-  public PeriodCalculationInput buildWeightedAverageInput(BestWorstPeriodsCommand command) {
-    MonthlyReturnsContext<HoldingMonthlyReturns> monthlyReturnsContext = monthlyReturnsService
-        .getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency());
-    WeightedAverageResult<HoldingMonthlyReturns> result = monthlyReturnsService
-        .calculateWeightedAverageWithCpsdAndCped(monthlyReturnsContext, command.getCustomPsd(), command.getCustomPed(),
-            SCALE_OF_TWO);
-    return new PeriodCalculationInput(result.weightedAverage());
+    PeriodCalculationInput context = buildPeriodCalculationInput(command, SCALE_OF_TWO);
+    return new BestWorstPeriodCalculation(context.getWeightedAveragePortfolioReturns(), getPeriods(command))
+        .calculate();
   }
 
   public Set<Long> getPeriods(BestWorstPeriodsCommand command) {

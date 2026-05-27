@@ -30,7 +30,7 @@ class SharpeRatioCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsFetcher, null));
+        .useConstructor(null, null, tBillsFetcher, null));
 
     final var weightedAverageInput = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
@@ -49,7 +49,7 @@ class SharpeRatioCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsFetcher, null));
+        .useConstructor(null, null, tBillsFetcher, null));
 
     final var context = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
@@ -68,7 +68,7 @@ class SharpeRatioCalculationServiceImplTest {
   void shouldThrowTBillSeriesNotAvailable_whenTBillSeriesEmptyForRequestedCurrency() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsFetcher, null));
+        .useConstructor(null, null, tBillsFetcher, null));
 
     final var context = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);

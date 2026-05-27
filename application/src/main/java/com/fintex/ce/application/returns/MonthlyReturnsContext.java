@@ -2,6 +2,8 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.model.domain.calculation.returns.ReturnsData;
 
+import java.time.LocalDate;
+
 /**
  * Bundle of the snapshot, FX inputs, and role produced by the build phase of {@code MonthlyReturnsService}. Passed into
  * pipeline-execution methods (weighted-average, alignment) so the orchestrator can pick the correct
@@ -14,5 +16,29 @@ public record MonthlyReturnsContext<T extends ReturnsData>(
 
   public MonthlyReturnsContext<T> withSnapshot(ReturnsSnapshot<T> updatedSnapshot) {
     return new MonthlyReturnsContext<>(updatedSnapshot, fxContext, role);
+  }
+
+  /**
+   * Returns this context with its snapshot trimmed at {@code endDate}. No-op when {@code endDate} is null or already
+   * matches the current PED.
+   */
+  public MonthlyReturnsContext<T> trimToEnd(LocalDate endDate) {
+    return withSnapshot(snapshot.trimToEnd(endDate));
+  }
+
+  /**
+   * Earlier-of the two contexts' performance-end dates. Used to align portfolio and benchmark series before weighting.
+   * Null-tolerant: if one side has no PED, returns the other.
+   */
+  public LocalDate commonPerformanceEndDate(MonthlyReturnsContext<T> other) {
+    LocalDate first = snapshot.performanceEndDate();
+    LocalDate second = other.snapshot().performanceEndDate();
+    if (first == null) {
+      return second;
+    }
+    if (second == null) {
+      return first;
+    }
+    return first.isBefore(second) ? first : second;
   }
 }

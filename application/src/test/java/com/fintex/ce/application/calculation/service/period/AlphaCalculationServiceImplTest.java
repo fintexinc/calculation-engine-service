@@ -33,7 +33,7 @@ class AlphaCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(AlphaCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsFetcher, null));
+        .useConstructor(null, null, null, null, tBillsFetcher, null));
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
@@ -55,7 +55,7 @@ class AlphaCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(AlphaCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsFetcher, null));
+        .useConstructor(null, null, null, null, tBillsFetcher, null));
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
 
@@ -78,7 +78,7 @@ class AlphaCalculationServiceImplTest {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
       final var service = mock(AlphaCalculationServiceImpl.class, withSettings()
-          .useConstructor(null, tBillsFetcher, null));
+          .useConstructor(null, null, null, null, tBillsFetcher, null));
 
       final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
       final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE));
@@ -102,7 +102,7 @@ class AlphaCalculationServiceImplTest {
   void shouldThrowMissingTBillRate_whenTBillSeriesEmptyForRequestedCurrency() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(AlphaCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsFetcher, null));
+        .useConstructor(null, null, null, null, tBillsFetcher, null));
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
 
     final var req = mock(PeriodCommand.class);
