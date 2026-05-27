@@ -26,7 +26,7 @@ class DownsideDeviationCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(DownsideDeviationCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsFetcher, Set.of()));
+        .useConstructor(null, null, tBillsFetcher, Set.of()));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),

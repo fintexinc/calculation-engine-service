@@ -1,10 +1,10 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.returns.MonthlyReturnsContext;
-import com.fintex.ce.application.returns.WeightedAverageResult;
+import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpsdAndCpedAbstractService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.application.util.DecimalUtils;
-import com.fintex.ce.calculation.CalculationService;
-import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
@@ -12,7 +12,6 @@ import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.error.Notification;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -30,13 +29,14 @@ import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
 
 @Service
-public class AnnualReturnServiceImpl implements CalculationService<ReturnCommand, AnnualReturnResult<Integer>> {
+public class AnnualReturnServiceImpl
+    extends
+      WeightedAverageWithCpsdAndCpedAbstractService<ReturnCommand, AnnualReturnResult<Integer>> {
 
-  private final MonthlyReturnsService monthlyReturnsService;
-
-  @Autowired
-  public AnnualReturnServiceImpl(MonthlyReturnsService monthlyReturnsService) {
-    this.monthlyReturnsService = monthlyReturnsService;
+  public AnnualReturnServiceImpl(
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped) {
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCpsdAndCped);
   }
 
   @Override
@@ -46,11 +46,8 @@ public class AnnualReturnServiceImpl implements CalculationService<ReturnCommand
 
   @Override
   public AnnualReturnResult<Integer> perform(ReturnCommand command) {
-    MonthlyReturnsContext<HoldingMonthlyReturns> context = monthlyReturnsService
-        .getPortfolioMonthlyReturns(command.getHoldings(), command.getCurrency());
-    WeightedAverageResult<HoldingMonthlyReturns> weightedAverage = monthlyReturnsService
-        .calculateWeightedAverageWithCpsdAndCped(context, command.getCustomPsd(), command.getCustomPed(), SCALE_OF_TWO);
-    return buildAnnualReturnResult(weightedAverage.weightedAverage(), weightedAverage.getErrorsAsWarnings());
+    PeriodCalculationInput context = buildPeriodCalculationInput(command, SCALE_OF_TWO);
+    return buildAnnualReturnResult(context.getWeightedAveragePortfolioReturns(), context.getWarnings());
   }
 
   static AnnualReturnResult<Integer> buildAnnualReturnResult(NavigableMap<LocalDate, BigDecimal> portfolioReturns,

@@ -29,7 +29,8 @@ class RSquaredCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
-    final var service = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
+    final var service = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, null, null, null,
+        tBillsFetcher,
         null));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
@@ -53,7 +54,7 @@ class RSquaredCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(RSquaredCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, tBillsFetcher, null));
+        .useConstructor(null, null, null, null, tBillsFetcher, null));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>();
@@ -76,7 +77,8 @@ class RSquaredCalculationServiceImplTest {
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
       final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
-      final var service = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, tBillsFetcher,
+      final var service = mock(RSquaredCalculationServiceImpl.class, withSettings().useConstructor(null, null, null,
+          null, tBillsFetcher,
           null));
 
       final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);

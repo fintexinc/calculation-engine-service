@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.MarRatioCalculation;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -28,10 +28,10 @@ class MarRatioCalculationServiceImplTest {
 
   @Test
   void shouldPerform_whenVerifyValidateMarRatio() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var defaultPeriods = Set.of();
     final var service = mock(MarRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, defaultPeriods));
+        .useConstructor(monthlyReturnsService, null, defaultPeriods));
     final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
@@ -46,10 +46,10 @@ class MarRatioCalculationServiceImplTest {
 
   @Test
   void shouldPerform_whenVerifyDefineCalculationMethod() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var defaultPeriods = Set.of();
     final var service = mock(MarRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, defaultPeriods));
+        .useConstructor(monthlyReturnsService, null, defaultPeriods));
     final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
@@ -64,10 +64,10 @@ class MarRatioCalculationServiceImplTest {
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var defaultPeriods = Set.of();
     final var service = mock(MarRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, defaultPeriods));
+        .useConstructor(monthlyReturnsService, null, defaultPeriods));
     final var command = mock(PeriodCommand.class);
     final var holdings = List.of(mock(PortfolioHolding.class));
 
@@ -84,10 +84,10 @@ class MarRatioCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var defaultPeriods = Set.of();
     final var service = mock(MarRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, defaultPeriods));
+        .useConstructor(monthlyReturnsService, null, defaultPeriods));
     final var benchmarkContext = mock(PeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
         BigDecimal.TEN));

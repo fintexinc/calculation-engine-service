@@ -2,13 +2,11 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.RollingStandardDeviationCalculation;
 import com.fintex.ce.application.calculation.metric.StandardDeviationCalculation;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
-import com.fintex.ce.application.returns.MonthlyReturnsContext;
-import com.fintex.ce.application.returns.WeightedAverageResult;
+import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpsdAndCpedAbstractService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
@@ -24,12 +22,16 @@ import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 @Service
 public class RollingStandardDeviationCalculationServiceImpl
     extends
-      PeriodAbstractService<RollingStandardDeviationResult, RollingCalculationCommand> {
+      WeightedAverageWithCpsdAndCpedAbstractService<RollingCalculationCommand, RollingStandardDeviationResult> {
+
+  private final Set<String> defaultPeriods;
 
   public RollingStandardDeviationCalculationServiceImpl(
-      MonthlyReturnsService monthlyReturnsService,
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped,
       @Value("#{'${default.periods.rolling-calculations}'.split(',')}") Set<String> defaultPeriods) {
-    super(monthlyReturnsService, defaultPeriods);
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCpsdAndCped);
+    this.defaultPeriods = defaultPeriods;
   }
 
   @Override
@@ -39,12 +41,6 @@ public class RollingStandardDeviationCalculationServiceImpl
 
   @Override
   public RollingStandardDeviationResult perform(RollingCalculationCommand command) {
-    RollingStandardDeviationCalculation rollingStandardDeviationCalculation = defineCalculationMethod(command);
-    return rollingStandardDeviationCalculation.calculate(command.getRollingPeriods());
-  }
-
-  @Override
-  public RollingStandardDeviationCalculation defineCalculationMethod(RollingCalculationCommand command) {
     PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
     StandardDeviationCalculation<PeriodResult> standardDeviationCalculation = StandardDeviationCalculation
         .<PeriodResult>builder()
@@ -52,17 +48,7 @@ public class RollingStandardDeviationCalculationServiceImpl
         .defaultPeriods(defaultPeriods)
         .scale(OUTPUT_SCALE)
         .build();
-    return new RollingStandardDeviationCalculation(input, defaultPeriods, standardDeviationCalculation);
-  }
-
-  @Override
-  public PeriodCalculationInput buildPeriodCalculationInput(RollingCalculationCommand command,
-      ReturnFactorScale returnFactorScale) {
-    MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = monthlyReturnsService.getPortfolioMonthlyReturns(
-        command.getHoldings(), command.getCurrency());
-    WeightedAverageResult<HoldingMonthlyReturns> result = monthlyReturnsService
-        .calculateWeightedAverageWithCpsdAndCped(portfolioContext, command.getCustomPsd(), command.getCustomPed(),
-            returnFactorScale);
-    return new PeriodCalculationInput(result.weightedAverage());
+    return new RollingStandardDeviationCalculation(input, defaultPeriods, standardDeviationCalculation)
+        .calculate(command.getRollingPeriods());
   }
 }

@@ -1,81 +1,49 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.returns.FxContext;
-import com.fintex.ce.application.returns.MonthlyReturnsContext;
 import com.fintex.ce.application.returns.MonthlyReturnsGenerator;
-import com.fintex.ce.application.returns.PerformancePeriodCalculator;
-import com.fintex.ce.application.returns.ProcessingCase;
-import com.fintex.ce.application.returns.ProcessingContext;
-import com.fintex.ce.application.returns.ReturnsErrorPolicy;
-import com.fintex.ce.application.returns.ReturnsRole;
 import com.fintex.ce.application.returns.ReturnsSnapshot;
-import com.fintex.ce.application.returns.WeightedAverageComponent;
-import com.fintex.ce.application.returns.WeightedAverageResult;
-import com.fintex.ce.application.returns.processor.ReturnsProcessor;
-import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.SecurityDataValidator;
-import com.fintex.ce.model.domain.CurrencyExchangePair;
-import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import com.fintex.ce.model.domain.calculation.returns.ReturnsData;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
-import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.fintex.ce.application.returns.ProcessingCase.BENCHMARK_PRE_PSD_TRIM;
-import static com.fintex.ce.application.returns.ProcessingCase.BENCHMARK_WEIGHTED_AVERAGE_WITH_CPED_ONLY;
-import static com.fintex.ce.application.returns.ProcessingCase.BENCHMARK_WEIGHTED_AVERAGE_WITH_CPSD_AND_CPED;
-import static com.fintex.ce.application.returns.ProcessingCase.PORTFOLIO_PRE_PSD_TRIM;
-import static com.fintex.ce.application.returns.ProcessingCase.PORTFOLIO_WEIGHTED_AVERAGE_WITH_CPED_ONLY;
-import static com.fintex.ce.application.returns.ProcessingCase.PORTFOLIO_WEIGHTED_AVERAGE_WITH_CPSD_AND_CPED;
-
 /**
- * Application-layer entry point for monthly-returns retrieval and weighted-average calculation.
+ * Application-layer entry point for monthly-returns data sourcing. Fetches per-holding monthly returns from Security
+ * Master, merges in locally-synthesized GIC returns, validates the result, and wraps it in a {@link ReturnsSnapshot}.
  *
  * <p>
- * Delegates construction to {@link ReturnsSnapshot}'s static factories, applies per-case processor pipelines composed
- * from the injected {@code List<ReturnsProcessor>}, and emits a {@link WeightedAverageResult} bundling the time-series
- * output with the post-pipeline snapshot. Stateless helpers ({@link PerformancePeriodCalculator},
- * {@link ReturnsErrorPolicy}) are used as utility classes — no extra beans.
- * </p>
+ * Role-tagged context construction (snapshot + FX + role) is delegated to
+ * {@link com.fintex.ce.application.returns.MonthlyReturnsContextProvider} subclasses
+ * ({@link com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider},
+ * {@link com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider}). Callers inject the specific
+ * provider for the side they need. Per-case pipeline execution lives in
+ * {@link com.fintex.ce.application.returns.pipeline.MonthlyReturnsPipeline} subclasses; context manipulation
+ * (trim-to-end, common-end-date) lives on {@link com.fintex.ce.application.returns.MonthlyReturnsContext} and
+ * {@link ReturnsSnapshot} themselves.
  */
 @Slf4j
 @Service
 public class MonthlyReturnsService {
 
   private final SecurityDataFetcher<HoldingMonthlyReturns> monthlyReturnsSecurityDataFetcher;
-  private final FxRateService fxRateService;
   private final MonthlyReturnsGenerator monthlyReturnsGenerator;
-  private final WeightedAverageComponent weightedAverageComponent;
-  private final Map<ProcessingCase, List<ReturnsProcessor>> pipelinesByCase;
 
   public MonthlyReturnsService(SecurityDataFetcher<HoldingMonthlyReturns> monthlyReturnsSecurityDataFetcher,
-      FxRateService fxRateService,
-      MonthlyReturnsGenerator monthlyReturnsGenerator,
-      WeightedAverageComponent weightedAverageComponent,
-      List<ReturnsProcessor> processors) {
+      MonthlyReturnsGenerator monthlyReturnsGenerator) {
     this.monthlyReturnsSecurityDataFetcher = monthlyReturnsSecurityDataFetcher;
-    this.fxRateService = fxRateService;
     this.monthlyReturnsGenerator = monthlyReturnsGenerator;
-    this.weightedAverageComponent = weightedAverageComponent;
-    this.pipelinesByCase = buildPipelines(processors);
   }
 
   public ReturnsSnapshot<HoldingMonthlyReturns> getMonthlyReturns(List<PortfolioHolding> holdings) {
@@ -86,72 +54,11 @@ public class MonthlyReturnsService {
     return ReturnsSnapshot.forMonthlyReturns(sourceData);
   }
 
-  public ReturnsSnapshot<HoldingMonthlyReturns> getMonthlyReturns(
-      Map<PortfolioHolding, HoldingMonthlyReturns> sourceData) {
-    return ReturnsSnapshot.forMonthlyReturns(sourceData);
-  }
-
   public ReturnsSnapshot<HoldingMonthlyReturns> getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(
       List<PortfolioHolding> holdings) {
     Map<PortfolioHolding, HoldingMonthlyReturns> sourceData = monthlyReturnsSecurityDataFetcher.fetch(holdings,
         List.of());
     return ReturnsSnapshot.validateOnly(sourceData);
-  }
-
-  public MonthlyReturnsContext<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<PortfolioHolding> holdings,
-      Currency currency) {
-    return buildContext(holdings, currency, ReturnsRole.PORTFOLIO);
-  }
-
-  public MonthlyReturnsContext<HoldingMonthlyReturns> getBenchmarkMonthlyReturns(List<PortfolioHolding> holdings,
-      Currency currency) {
-    return buildContext(holdings, currency, ReturnsRole.BENCHMARK);
-  }
-
-  public WeightedAverageResult<HoldingMonthlyReturns> calculateWeightedAverageWithCpsdAndCped(
-      MonthlyReturnsContext<HoldingMonthlyReturns> context, LocalDate cpsd, LocalDate cped,
-      ReturnFactorScale returnFactorScale) {
-    ProcessingCase processingCase = context.role() == ReturnsRole.PORTFOLIO
-        ? PORTFOLIO_WEIGHTED_AVERAGE_WITH_CPSD_AND_CPED
-        : BENCHMARK_WEIGHTED_AVERAGE_WITH_CPSD_AND_CPED;
-    return runWeightedAveragePipeline(context, ProcessingContext.of(cpsd, cped, context.fxContext()),
-        processingCase, returnFactorScale);
-  }
-
-  public WeightedAverageResult<HoldingMonthlyReturns> calculateWeightedAverageWithCped(
-      MonthlyReturnsContext<HoldingMonthlyReturns> context, LocalDate cped, ReturnFactorScale returnFactorScale) {
-    ProcessingCase processingCase = context.role() == ReturnsRole.PORTFOLIO
-        ? PORTFOLIO_WEIGHTED_AVERAGE_WITH_CPED_ONLY
-        : BENCHMARK_WEIGHTED_AVERAGE_WITH_CPED_ONLY;
-    return runWeightedAveragePipeline(context, ProcessingContext.of(null, cped, context.fxContext()),
-        processingCase, returnFactorScale);
-  }
-
-  public <T extends ReturnsData> ReturnsSnapshot<T> applyValidateCutAndFx(MonthlyReturnsContext<T> context,
-      LocalDate cped) {
-    ProcessingCase processingCase = context.role() == ReturnsRole.PORTFOLIO
-        ? PORTFOLIO_PRE_PSD_TRIM
-        : BENCHMARK_PRE_PSD_TRIM;
-    ReturnsSnapshot<T> processed = applyPipeline(context.snapshot(),
-        ProcessingContext.of(null, cped, context.fxContext()), processingCase);
-    return ReturnsErrorPolicy.throwIfFatal(processed);
-  }
-
-  public <T extends ReturnsData> NavigableMap<LocalDate, BigDecimal> calculateWeightedAverageAfterPsdTrim(
-      ReturnsSnapshot<T> snapshot, ReturnFactorScale returnFactorScale) {
-    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> trimmed = PerformancePeriodCalculator.trimByStartDate(
-        snapshot.returnsMap(), snapshot.performanceStartDate());
-    return weightedAverageComponent.calculateWeightedAverage(trimmed, returnFactorScale);
-  }
-
-  public <T extends ReturnsData> LocalDate commonPerformanceEndDate(MonthlyReturnsContext<T> first,
-      MonthlyReturnsContext<T> second) {
-    return earlierOf(first.snapshot().performanceEndDate(), second.snapshot().performanceEndDate());
-  }
-
-  public <T extends ReturnsData> MonthlyReturnsContext<T> trimContextToEnd(MonthlyReturnsContext<T> context,
-      LocalDate endDate) {
-    return context.withSnapshot(trimSnapshotToEnd(context.snapshot(), endDate));
   }
 
   /**
@@ -185,87 +92,5 @@ public class MonthlyReturnsService {
 
   private boolean isReturnsEmpty(HoldingMonthlyReturns holdingReturns) {
     return CollectionUtils.isEmpty(holdingReturns.getReturns());
-  }
-
-  private MonthlyReturnsContext<HoldingMonthlyReturns> buildContext(List<PortfolioHolding> holdings, Currency currency,
-      ReturnsRole role) {
-    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = getMonthlyReturns(holdings);
-    FxContext fxContext = buildFxContext(snapshot, currency);
-    return new MonthlyReturnsContext<>(snapshot, fxContext, role);
-  }
-
-  private FxContext buildFxContext(ReturnsSnapshot<HoldingMonthlyReturns> snapshot, Currency targetCurrency) {
-    if (targetCurrency == null) {
-      return FxContext.empty();
-    }
-    Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> rates = fetchFxRates(
-        snapshot.holdingCurrencyMap(), targetCurrency,
-        new DateRange(snapshot.performanceStartDate(), snapshot.performanceEndDate()));
-    return new FxContext(rates, targetCurrency);
-  }
-
-  private <T extends ReturnsData> WeightedAverageResult<T> runWeightedAveragePipeline(
-      MonthlyReturnsContext<T> context, ProcessingContext processingContext, ProcessingCase processingCase,
-      ReturnFactorScale returnFactorScale) {
-    ReturnsSnapshot<T> processed = applyPipeline(context.snapshot(), processingContext, processingCase);
-    ReturnsErrorPolicy.throwIfFatal(processed);
-    NavigableMap<LocalDate, BigDecimal> weightedAverage = weightedAverageComponent.calculateWeightedAverage(
-        processed.returnsMap(), returnFactorScale);
-    return new WeightedAverageResult<>(weightedAverage, processed);
-  }
-
-  private <T extends ReturnsData> ReturnsSnapshot<T> applyPipeline(ReturnsSnapshot<T> initial,
-      ProcessingContext processingContext, ProcessingCase processingCase) {
-    List<ReturnsProcessor> pipeline = pipelinesByCase.get(processingCase);
-    ReturnsSnapshot<T> current = initial;
-    for (ReturnsProcessor processor : pipeline) {
-      current = processor.process(current, processingContext);
-    }
-    return current;
-  }
-
-  private <T extends ReturnsData> ReturnsSnapshot<T> trimSnapshotToEnd(ReturnsSnapshot<T> snapshot,
-      LocalDate endDate) {
-    if (endDate == null || endDate.equals(snapshot.performanceEndDate())) {
-      return snapshot;
-    }
-    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> trimmed = PerformancePeriodCalculator.trimByEndDate(
-        snapshot.returnsMap(), endDate);
-    return snapshot
-        .withReturnsMap(trimmed)
-        .withPeriod(PerformancePeriodCalculator.findPerformanceStartDate(trimmed),
-            PerformancePeriodCalculator.findPerformanceEndDate(trimmed));
-  }
-
-  private static LocalDate earlierOf(LocalDate first, LocalDate second) {
-    if (first == null) {
-      return second;
-    }
-    if (second == null) {
-      return first;
-    }
-    return first.isBefore(second) ? first : second;
-  }
-
-  private Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fetchFxRates(
-      Map<PortfolioHolding, Currency> holdingCurrencies, Currency toCurrency, DateRange range) {
-    log.debug("PortfolioHolding currencies: {}, target: {}", holdingCurrencies.values(), toCurrency);
-    // Extend the lower bound to the first day of the month before PSD: the per-month conversion formula
-    // in FxRateService looks up floorEntry(date.minusMonths(1)) for every monthly return, so the very
-    // first month needs a rate at PSD - 1 month. Shifting only to the last-day of that month is unsafe
-    // because that day may be a weekend or holiday with no published rate; widening to the first of the
-    // month guarantees the floor lookup hits at least the last business day of the prior month.
-    LocalDate extendedFrom = range.start() == null ? null : range.start().minusMonths(1).withDayOfMonth(1);
-    return fxRateService.rates(holdingCurrencies, toCurrency, new DateRange(extendedFrom, range.end()));
-  }
-
-  private static Map<ProcessingCase, List<ReturnsProcessor>> buildPipelines(List<ReturnsProcessor> processors) {
-    Map<ProcessingCase, List<ReturnsProcessor>> byCase = new EnumMap<>(ProcessingCase.class);
-    for (ProcessingCase processingCase : ProcessingCase.values()) {
-      byCase.put(processingCase, processors.stream()
-          .filter(processor -> processor.isApplicable(processingCase))
-          .toList());
-    }
-    return Map.copyOf(byCase);
   }
 }

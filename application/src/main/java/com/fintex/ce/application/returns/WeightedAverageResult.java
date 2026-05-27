@@ -14,7 +14,7 @@ import java.util.NavigableMap;
  */
 public record WeightedAverageResult<T extends ReturnsData>(
     NavigableMap<LocalDate, BigDecimal> weightedAverage,
-    ReturnsSnapshot<T> snapshot) {
+    ReturnsSnapshot<T> snapshot) implements PipelineResult<T> {
 
   public List<Notification> getErrorsAsWarnings() {
     return snapshot.getErrorsAsWarnings();

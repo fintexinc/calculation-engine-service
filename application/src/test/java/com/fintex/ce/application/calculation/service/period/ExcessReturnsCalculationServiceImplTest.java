@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
+import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -25,9 +26,10 @@ class ExcessReturnsCalculationServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+    final var benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
     final var service = mock(ExcessReturnsCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, Set.of()));
+        .useConstructor(portfolioProvider, benchmarkProvider, null, null, Set.of()));
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
         BigDecimal.TEN));

@@ -21,7 +21,7 @@ class MeanCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenCheckResult() {
     var service = mock(MeanCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, Set.of("12", "36", "60", "120")));
+        .useConstructor(null, null, Set.of("12", "36", "60", "120")));
     var req = mock(PeriodCommand.class);
     var context = mock(PeriodCalculationInput.class);
     var expected = MeanCalculation.builder()

@@ -54,7 +54,7 @@ public record ReturnsSnapshot<T extends ReturnsData>(
     LocalDate performanceStartDate,
     LocalDate performanceEndDate,
     List<BasePceException> errors,
-    List<Notification> warnings) {
+    List<Notification> warnings) implements PipelineResult<T> {
 
   public ReturnsSnapshot {
     holdingCurrencyMap = holdingCurrencyMap == null
@@ -127,6 +127,21 @@ public record ReturnsSnapshot<T extends ReturnsData>(
     combined.addAll(additionalWarnings);
     return new ReturnsSnapshot<>(holdingCurrencyMap, returnsMap, performanceStartDate, performanceEndDate, errors,
         combined);
+  }
+
+  /**
+   * Returns a snapshot whose returns map is trimmed at {@code endDate} and whose performance window has been recomputed
+   * accordingly. Returns this snapshot unchanged when {@code endDate} is null or already matches the current PED.
+   */
+  public ReturnsSnapshot<T> trimToEnd(LocalDate endDate) {
+    if (endDate == null || endDate.equals(performanceEndDate)) {
+      return this;
+    }
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> trimmed = PerformancePeriodCalculator.trimByEndDate(
+        returnsMap, endDate);
+    return withReturnsMap(trimmed)
+        .withPeriod(PerformancePeriodCalculator.findPerformanceStartDate(trimmed),
+            PerformancePeriodCalculator.findPerformanceEndDate(trimmed));
   }
 
   public List<Notification> getErrorsAsWarnings() {

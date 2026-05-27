@@ -1,8 +1,9 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.MeanCalculation;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
+import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -17,12 +18,13 @@ import java.util.Set;
 import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 
 @Service
-public class MeanCalculationServiceImpl extends PeriodAbstractService<MeanResult, PeriodCommand> {
+public class MeanCalculationServiceImpl extends WeightedAverageWithCpedAbstractService<PeriodCommand, MeanResult> {
 
   public MeanCalculationServiceImpl(
-      final MonthlyReturnsService monthlyReturnsService,
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
-    super(monthlyReturnsService, defaultPeriods);
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, defaultPeriods);
   }
 
   @Override

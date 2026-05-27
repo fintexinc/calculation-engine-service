@@ -2,8 +2,11 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.BetaCalculation;
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.calculation.service.period.core.PeriodBenchmarkAbstractService;
+import com.fintex.ce.application.calculation.service.period.core.BenchmarkWeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.pipeline.BenchmarkWeightedAverageWithCpedPipeline;
+import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
@@ -12,7 +15,6 @@ import com.fintex.ce.model.domain.result.risk.BetaResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +26,21 @@ import java.util.Set;
 import static com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract.calculateExcessReturn;
 
 @Service
-public class BetaCalculationServiceImpl extends PeriodBenchmarkAbstractService<BetaResult, PeriodCommand> {
+public class BetaCalculationServiceImpl
+    extends
+      BenchmarkWeightedAverageWithCpedAbstractService<PeriodCommand, BetaResult> {
 
   private final TreasuryBillsFetcher treasuryBillsFetcher;
 
   public BetaCalculationServiceImpl(
-      @Autowired final MonthlyReturnsService monthlyReturnsService,
-      @Autowired final TreasuryBillsFetcher treasuryBillsFetcher,
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      BenchmarkMonthlyReturnsContextProvider benchmarkMonthlyReturnsContextProvider,
+      PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
+      BenchmarkWeightedAverageWithCpedPipeline benchmarkWeightedAverageWithCped,
+      TreasuryBillsFetcher treasuryBillsFetcher,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
-    super(monthlyReturnsService, defaultPeriods);
+    super(portfolioMonthlyReturnsContextProvider, benchmarkMonthlyReturnsContextProvider,
+        portfolioWeightedAverageWithCped, benchmarkWeightedAverageWithCped, defaultPeriods);
     this.treasuryBillsFetcher = treasuryBillsFetcher;
   }
 

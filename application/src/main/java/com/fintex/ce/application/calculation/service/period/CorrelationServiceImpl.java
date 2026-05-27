@@ -1,11 +1,11 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.CorrelationCalculation;
-import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
-import com.fintex.ce.application.returns.MonthlyReturnsContext;
+import com.fintex.ce.application.calculation.service.period.core.ValidateCutAndFxAbstractService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.ReturnsSnapshot;
+import com.fintex.ce.application.returns.WeightedAverageComponent;
+import com.fintex.ce.application.returns.pipeline.PortfolioValidateCutAndFxPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
@@ -25,12 +25,17 @@ import java.util.NavigableMap;
 import java.util.Set;
 
 @Service
-public class CorrelationServiceImpl extends PeriodAbstractService<CorrelationResult, PeriodCommand> {
+public class CorrelationServiceImpl extends ValidateCutAndFxAbstractService<PeriodCommand, CorrelationResult> {
+
+  private final Set<String> defaultPeriods;
 
   public CorrelationServiceImpl(
-      @Value("#{'${default.periods.risk-calculations}'.split(',')}") Set<String> defaultPeriods,
-      MonthlyReturnsService monthlyReturnsService) {
-    super(monthlyReturnsService, defaultPeriods);
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      PortfolioValidateCutAndFxPipeline portfolioValidateCutAndFx,
+      WeightedAverageComponent weightedAverageComponent,
+      @Value("#{'${default.periods.risk-calculations}'.split(',')}") Set<String> defaultPeriods) {
+    super(portfolioMonthlyReturnsContextProvider, portfolioValidateCutAndFx, weightedAverageComponent);
+    this.defaultPeriods = defaultPeriods;
   }
 
   @Override
@@ -40,24 +45,15 @@ public class CorrelationServiceImpl extends PeriodAbstractService<CorrelationRes
 
   @Override
   public CorrelationResult perform(PeriodCommand command) {
-    PeriodCalculationAbstract<CorrelationResult, ?> calculationMethod = defineCalculationMethod(command);
-    return calculationMethod.calculate(command.getPeriods());
-  }
-
-  public CorrelationCalculation defineCalculationMethod(PeriodCommand command) {
     command.setReqCurrencyToCashHolding();
-    MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = monthlyReturnsService.getPortfolioMonthlyReturns(
-        command.getHoldings(), command.getCurrency());
-
-    ReturnsSnapshot<HoldingMonthlyReturns> postFx = monthlyReturnsService.applyValidateCutAndFx(portfolioContext,
-        command.getCustomPed());
+    ReturnsSnapshot<HoldingMonthlyReturns> postFx = runValidateCutAndFx(command);
     Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturns = new HashMap<>(postFx.returnsMap());
 
-    NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = monthlyReturnsService
-        .calculateWeightedAverageAfterPsdTrim(postFx, ReturnFactorScale.SCALE_OF_TWO);
+    NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = weightedAverageAfterPsdTrim(postFx,
+        ReturnFactorScale.SCALE_OF_TWO);
 
     PeriodCalculationInput context = new PeriodCalculationInput(command.getCustomIntervalPsd(),
         weightedAveragePortfolioReturns);
-    return new CorrelationCalculation(context, baseTotalReturns, defaultPeriods);
+    return new CorrelationCalculation(context, baseTotalReturns, defaultPeriods).calculate(command.getPeriods());
   }
 }

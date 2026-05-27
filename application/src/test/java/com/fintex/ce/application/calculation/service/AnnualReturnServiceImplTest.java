@@ -1,15 +1,8 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.returns.MonthlyReturnsContext;
-import com.fintex.ce.application.returns.ReturnsSnapshot;
-import com.fintex.ce.application.returns.WeightedAverageResult;
-import com.fintex.ce.application.util.ReturnFactorScale;
-import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
-import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
-import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
@@ -19,7 +12,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -29,10 +21,7 @@ import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.TEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class AnnualReturnServiceImplTest {
 
@@ -137,36 +126,5 @@ class AnnualReturnServiceImplTest {
     AnnualReturnResult<Integer> result = buildAnnualReturnResult(portfolioReturns, List.of(warning));
 
     assertThat(result.getWarnings()).containsExactly(warning);
-  }
-
-  @Test
-  void shouldOrchestrateWeightedAverageAndYearMath_whenPerformIsCalled() {
-    MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
-    AnnualReturnServiceImpl service = new AnnualReturnServiceImpl(monthlyReturnsService);
-
-    NavigableMap<LocalDate, BigDecimal> weightedAverage = new TreeMap<>();
-    for (int month = 1; month <= 12; month++) {
-      weightedAverage.put(toLastDayOfMonth(LocalDate.of(2020, month, 1)), TEN);
-    }
-    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = ReturnsSnapshot.empty();
-    @SuppressWarnings("unchecked")
-    MonthlyReturnsContext<HoldingMonthlyReturns> context = mock(MonthlyReturnsContext.class);
-    WeightedAverageResult<HoldingMonthlyReturns> weightedResult = new WeightedAverageResult<>(weightedAverage,
-        snapshot);
-
-    ReturnCommand command = new ReturnCommand();
-    command.setHoldings(List.of());
-    command.setCurrency(Currency.CAD);
-    command.setCustomPsd(LocalDate.of(2020, 1, 1));
-    command.setCustomPed(LocalDate.of(2020, 12, 31));
-
-    when(monthlyReturnsService.getPortfolioMonthlyReturns(command.getHoldings(), Currency.CAD)).thenReturn(context);
-    when(monthlyReturnsService.calculateWeightedAverageWithCpsdAndCped(eq(context), eq(command.getCustomPsd()),
-        eq(command.getCustomPed()), any(ReturnFactorScale.class))).thenReturn(weightedResult);
-
-    AnnualReturnResult<Integer> result = service.perform(command);
-
-    assertThat(result.getAnnualReturns()).hasSize(1);
-    assertThat(result.getAnnualReturns().get(0).key()).isEqualTo(2020);
   }
 }

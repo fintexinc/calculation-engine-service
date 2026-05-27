@@ -1,7 +1,8 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
+import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
@@ -31,10 +32,11 @@ class TreynorRatioServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+    final var benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(TreynorRatioServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
+        .useConstructor(portfolioProvider, benchmarkProvider, null, null, tBillsFetcher, Set.of()));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
@@ -55,10 +57,11 @@ class TreynorRatioServiceImplTest {
 
   @Test
   void shouldDefineCalculationMethod_whenVerifyLoadTBillsFor() {
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+    final var benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(TreynorRatioServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
+        .useConstructor(portfolioProvider, benchmarkProvider, null, null, tBillsFetcher, Set.of()));
 
     final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(Map.of(LocalDate.now(),
@@ -80,10 +83,11 @@ class TreynorRatioServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyCalculateExcessReturn() {
     try (var mockedPeriodCalculationAbstract = Mockito.mockStatic(PeriodCalculationAbstract.class)) {
-      final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+      final var portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+      final var benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
       final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
       final var service = mock(TreynorRatioServiceImpl.class, withSettings()
-          .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
+          .useConstructor(portfolioProvider, benchmarkProvider, null, null, tBillsFetcher, Set.of()));
 
       final var benchmarkContext = mock(BenchmarkPeriodCalculationInput.class);
       final TreeMap<LocalDate, BigDecimal> treeMap = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE));

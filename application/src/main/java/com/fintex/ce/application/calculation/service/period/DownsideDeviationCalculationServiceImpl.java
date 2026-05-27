@@ -1,8 +1,9 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.DownsideDeviationCalculation;
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
-import com.fintex.ce.application.calculation.service.period.core.PeriodAbstractService;
+import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
@@ -20,15 +21,16 @@ import java.util.Set;
 @Service
 public class DownsideDeviationCalculationServiceImpl
     extends
-      PeriodAbstractService<DownsideDeviationResult, PeriodCommand> {
+      WeightedAverageWithCpedAbstractService<PeriodCommand, DownsideDeviationResult> {
 
   private final TreasuryBillsFetcher treasuryBillsFetcher;
 
   public DownsideDeviationCalculationServiceImpl(
-      @Autowired final MonthlyReturnsService monthlyReturnsService,
+      PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
+      PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
       @Autowired final TreasuryBillsFetcher treasuryBillsFetcher,
       @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods) {
-    super(monthlyReturnsService, defaultPeriods);
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, defaultPeriods);
     this.treasuryBillsFetcher = treasuryBillsFetcher;
   }
 

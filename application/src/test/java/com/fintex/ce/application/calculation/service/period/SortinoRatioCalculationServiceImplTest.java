@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service.period;
 
-import com.fintex.ce.application.calculation.service.MonthlyReturnsService;
+import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -26,9 +26,9 @@ class SortinoRatioCalculationServiceImplTest {
   @Test
   void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
-    final var monthlyReturnsService = mock(MonthlyReturnsService.class);
+    final var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var service = mock(SortinoRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(monthlyReturnsService, tBillsFetcher, Set.of()));
+        .useConstructor(monthlyReturnsService, null, tBillsFetcher, Set.of()));
 
     final var command = mock(PeriodCommand.class);
     final var input = mock(BenchmarkPeriodCalculationInput.class);
