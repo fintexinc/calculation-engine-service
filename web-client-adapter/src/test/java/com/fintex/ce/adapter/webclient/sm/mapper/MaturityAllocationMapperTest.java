@@ -27,7 +27,7 @@ class MaturityAllocationMapperTest {
         createPeriod(TimeDuration.ONE_TO_SEVEN_DAYS, "10.5"),
         createPeriod(TimeDuration.THREE_TO_FIVE_YEARS, "35.0"),
         createPeriod(TimeDuration.SEVEN_TO_TEN_YEARS, "54.5")));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
@@ -65,7 +65,7 @@ class MaturityAllocationMapperTest {
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new Maturities();
     smsResponse.setPeriods(List.of());
-    smsResponse.setDataProvider(null);
+    smsResponse.setDataProviders(null);
 
     MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
 

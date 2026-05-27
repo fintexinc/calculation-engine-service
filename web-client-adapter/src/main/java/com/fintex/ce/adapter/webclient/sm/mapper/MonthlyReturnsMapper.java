@@ -43,8 +43,7 @@ public class MonthlyReturnsMapper
             TreeMap::new));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(MonthlyReturns::getDataProvider)
-        .map(List::of)
+        .map(MonthlyReturns::getDataProviders)
         .orElseGet(List::of);
 
     return HoldingMonthlyReturns.builder()

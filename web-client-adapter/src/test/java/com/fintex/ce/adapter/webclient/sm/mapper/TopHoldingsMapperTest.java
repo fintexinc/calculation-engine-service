@@ -35,7 +35,7 @@ class TopHoldingsMapperTest {
 
     var smsResponse = new TopHoldings();
     smsResponse.setAllocation(List.of(sh));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     CommonTopHoldings result = mapper.map(smsResponse, createHolding("SEC-001"));
 
@@ -96,7 +96,7 @@ class TopHoldingsMapperTest {
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new TopHoldings();
     smsResponse.setAllocation(List.of());
-    smsResponse.setDataProvider(null);
+    smsResponse.setDataProviders(null);
 
     CommonTopHoldings result = mapper.map(smsResponse, createHolding("SEC-005"));
 

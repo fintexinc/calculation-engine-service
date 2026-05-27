@@ -26,7 +26,7 @@ class MonthlyReturnsMapperTest {
     smsResponse.setReturns(List.of(
         createDateValue("2025-01-31", "0.0125"),
         createDateValue("2025-02-28", "-0.0080")));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-001"));
 
@@ -62,7 +62,7 @@ class MonthlyReturnsMapperTest {
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new MonthlyReturns();
     smsResponse.setReturns(List.of());
-    smsResponse.setDataProvider(null);
+    smsResponse.setDataProviders(null);
 
     HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-004"));
 

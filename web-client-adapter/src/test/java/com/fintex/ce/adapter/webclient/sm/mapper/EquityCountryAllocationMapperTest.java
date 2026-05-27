@@ -31,7 +31,7 @@ class EquityCountryAllocationMapperTest {
 
     var smsResponse = new CountryAllocation();
     smsResponse.setAllocation(List.of(canada, usa));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     EquityCountryAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
@@ -64,7 +64,7 @@ class EquityCountryAllocationMapperTest {
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new CountryAllocation();
     smsResponse.setAllocation(List.of());
-    smsResponse.setDataProvider(null);
+    smsResponse.setDataProviders(null);
 
     EquityCountryAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
 

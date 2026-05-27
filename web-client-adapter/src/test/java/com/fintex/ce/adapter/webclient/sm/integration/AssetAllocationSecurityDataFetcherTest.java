@@ -135,7 +135,7 @@ class AssetAllocationSecurityDataFetcherTest
         FinancialInstrumentType.ETF_CANADA);
     AssetAllocation allocation = new AssetAllocation();
     allocation.setAllocations(List.of(value(AssetAllocationRegionType.US_EQUITIES, "100.0")));
-    allocation.setDataProvider(DataProvider.MORNINGSTAR);
+    allocation.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     CurrencyDatapoint currencyDp = new CurrencyDatapoint();
     currencyDp.setValue(Currency.USD);

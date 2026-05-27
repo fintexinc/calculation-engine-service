@@ -35,8 +35,7 @@ public class MaturityAllocationMapper
             BigDecimal::add));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(Maturities::getDataProvider)
-        .map(List::of)
+        .map(Maturities::getDataProviders)
         .orElseGet(List::of);
 
     return MaturityAllocation.builder()

@@ -11,6 +11,7 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +23,7 @@ class YieldMapperTest {
   void shouldMapDividendYieldAndProvider_whenResponseHasValues() {
     var dividendYield = new FloatDatapoint();
     dividendYield.setValue(BigDecimal.valueOf(0.035));
-    dividendYield.setDataProvider(DataProvider.MORNINGSTAR);
+    dividendYield.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     var smsResponse = new Income();
     smsResponse.setDividendYield(dividendYield);
@@ -56,7 +57,7 @@ class YieldMapperTest {
   void shouldMapDifferentProviders() {
     var dividendYield = new FloatDatapoint();
     dividendYield.setValue(BigDecimal.valueOf(0.025));
-    dividendYield.setDataProvider(DataProvider.MORNINGSTAR);
+    dividendYield.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     var smsResponse = new Income();
     smsResponse.setDividendYield(dividendYield);

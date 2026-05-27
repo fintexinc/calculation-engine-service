@@ -132,7 +132,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
   private static TopHoldings topHoldings(TopHolding... allocations) {
     var th = new TopHoldings();
     th.setAllocation(List.of(allocations));
-    th.setDataProvider(DataProvider.MORNINGSTAR);
+    th.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return th;
   }
 

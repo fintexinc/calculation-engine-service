@@ -33,7 +33,7 @@ class EquityMarketCapitalizationMapperTest {
         createEntry(EquityMarketCapitalizationType.MEDIUM, "12.33"),
         createEntry(EquityMarketCapitalizationType.SMALL, "8.50"),
         createEntry(EquityMarketCapitalizationType.MICRO, "3.50")));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("VTI"));
 
@@ -95,7 +95,7 @@ class EquityMarketCapitalizationMapperTest {
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new EquityMarketCapitalization();
     smsResponse.setValues(List.of());
-    smsResponse.setDataProvider(null);
+    smsResponse.setDataProviders(null);
 
     HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("SEC-001"));
 

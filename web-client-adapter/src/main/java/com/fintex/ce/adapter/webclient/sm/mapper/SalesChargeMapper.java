@@ -22,8 +22,7 @@ public class SalesChargeMapper
   public SalesCharge map(SalesChargeData smsResponse, PortfolioHolding holding) {
     final var datapoint = Optional.ofNullable(smsResponse).map(SalesChargeData::getSalesCharge);
     final List<DataProvider> providers = datapoint
-        .map(d -> d.getDataProvider())
-        .map(List::of)
+        .map(d -> d.getDataProviders())
         .orElseGet(List::of);
 
     return SalesCharge.builder()

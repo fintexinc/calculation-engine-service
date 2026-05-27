@@ -20,8 +20,7 @@ public class YieldMapper implements SecurityMasterResponseMapper<Yield, Income> 
   public Yield map(Income smsResponse, PortfolioHolding holding) {
     final var dividendYieldDp = Optional.ofNullable(smsResponse).map(Income::getDividendYield);
     final List<DataProvider> providers = dividendYieldDp
-        .map(d -> d.getDataProvider())
-        .map(List::of)
+        .map(d -> d.getDataProviders())
         .orElseGet(List::of);
 
     return Yield.builder()

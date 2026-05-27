@@ -44,7 +44,7 @@ class CreditQualityMapperTest {
         createRating(B, "4.2"),
         createRating(BELOW_B, "2.4")));
     smsResponse.setAverageCreditQualityRating("A");
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     PortfolioHolding holding = createHolding("AGG.US");
 

@@ -10,6 +10,8 @@ import com.fintex.wm.commons.domain.sales.SalesChargeType;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,7 +26,7 @@ class SalesChargeTypeMapperTest {
     var salesCharge = mock(com.fintex.wm.commons.domain.sales.SalesCharge.class);
     when(smsResponse.getSalesCharge()).thenReturn(salesCharge);
     when(salesCharge.getValue()).thenReturn(SalesChargeType.DEFERRED_SALES_CHARGE);
-    when(salesCharge.getDataProvider()).thenReturn(DataProvider.MORNINGSTAR);
+    when(salesCharge.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
 
     SalesCharge result = mapper.map(smsResponse, createHolding("SEC-001"));
 
@@ -57,7 +59,7 @@ class SalesChargeTypeMapperTest {
     var salesCharge = mock(com.fintex.wm.commons.domain.sales.SalesCharge.class);
     when(smsResponse.getSalesCharge()).thenReturn(salesCharge);
     when(salesCharge.getValue()).thenReturn(SalesChargeType.FRONT_END_CHARGE);
-    when(salesCharge.getDataProvider()).thenReturn(DataProvider.MORNINGSTAR);
+    when(salesCharge.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
 
     SalesCharge result = mapper.map(smsResponse, createHolding("SEC-004"));
 

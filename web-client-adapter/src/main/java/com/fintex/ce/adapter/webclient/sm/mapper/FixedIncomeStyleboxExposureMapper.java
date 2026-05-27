@@ -35,8 +35,7 @@ public class FixedIncomeStyleboxExposureMapper
             () -> new EnumMap<>(FixedIncomeStyleBoxType.class)));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(FixedIncomeStyleBoxes::getDataProvider)
-        .map(List::of)
+        .map(FixedIncomeStyleBoxes::getDataProviders)
         .orElseGet(List::of);
 
     return FixedIncomeStyleboxExposure.builder()

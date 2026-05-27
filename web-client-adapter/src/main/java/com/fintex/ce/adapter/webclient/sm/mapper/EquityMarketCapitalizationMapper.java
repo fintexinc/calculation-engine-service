@@ -35,8 +35,7 @@ public class EquityMarketCapitalizationMapper
             () -> new EnumMap<>(EquityMarketCapitalizationType.class)));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(EquityMarketCapitalization::getDataProvider)
-        .map(List::of)
+        .map(EquityMarketCapitalization::getDataProviders)
         .orElseGet(List::of);
 
     return HoldingEquityMarketCap.builder()

@@ -35,8 +35,7 @@ public class EquitySectorAllocationMapper
             () -> new EnumMap<>(EquitySectorAllocationType.class)));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(EquitySectorAllocation::getDataProvider)
-        .map(List::of)
+        .map(EquitySectorAllocation::getDataProviders)
         .orElseGet(List::of);
 
     return EquitySector.builder()

@@ -31,7 +31,7 @@ class EquityStyleboxExposureMapperTest {
         new StyleBoxValue(StyleBoxType.LARGE_VALUE, new BigDecimal("18.5")),
         new StyleBoxValue(StyleBoxType.LARGE_CORE, new BigDecimal("42.3")),
         new StyleBoxValue(StyleBoxType.MID_GROWTH, new BigDecimal("3.8"))));
-    styleBoxes.setDataProvider(DataProvider.MORNINGSTAR);
+    styleBoxes.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     PortfolioHolding holding = createHolding("XIU.TO", FinancialInstrumentType.ETF_CANADA);
 

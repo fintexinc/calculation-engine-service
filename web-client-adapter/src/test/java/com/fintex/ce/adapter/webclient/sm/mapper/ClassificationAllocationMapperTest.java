@@ -37,7 +37,7 @@ class ClassificationAllocationMapperTest {
 
     var smsResponse = new SecurityClassificationAllocation();
     smsResponse.setValues(List.of(equityCanada, fixedIncomeUs));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
@@ -72,7 +72,7 @@ class ClassificationAllocationMapperTest {
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new SecurityClassificationAllocation();
     smsResponse.setValues(List.of());
-    smsResponse.setDataProvider(null);
+    smsResponse.setDataProviders(null);
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
 

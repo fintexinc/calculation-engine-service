@@ -52,14 +52,14 @@ public final class FeesSmsResponseAppender implements SmsResponseAppender<Fees, 
   private static ManagementFeeDatapoint managementFeeDatapoint(String value) {
     ManagementFeeDatapoint dp = new ManagementFeeDatapoint();
     dp.setValue(new BigDecimal(value));
-    dp.setDataProvider(DataProvider.MORNINGSTAR);
+    dp.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return dp;
   }
 
   private static FloatDatapoint floatDatapoint(String value) {
     FloatDatapoint dp = new FloatDatapoint();
     dp.setValue(new BigDecimal(value));
-    dp.setDataProvider(DataProvider.MORNINGSTAR);
+    dp.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return dp;
   }
 

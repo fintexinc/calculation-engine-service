@@ -33,7 +33,7 @@ class FixedIncomeSectorAllocationMapperTest {
 
     var smsResponse = new FixedIncomeSectorAllocation();
     smsResponse.setAllocation(List.of(governmentEntry, corporateEntry, securitizedEntry));
-    smsResponse.setDataProvider(DataProvider.MORNINGSTAR);
+    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     PortfolioHolding holding = createHolding("AGG", FinancialInstrumentType.ETF);
 
