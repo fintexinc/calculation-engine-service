@@ -101,6 +101,9 @@ external-services:
           equity-market-cap: /api/v1/wealth/securities/allocations/equity-market-cap
           country: /api/v1/wealth/securities/allocations/country
           equity-country: /api/v1/wealth/securities/allocations/equity-country
+          fixed-income-country: /api/v1/wealth/securities/allocations/fixed-income-country
+          equity-geographic: /api/v1/wealth/securities/allocations/equity-geographic
+          fixed-income-geographic: /api/v1/wealth/securities/allocations/fixed-income-geographic
           maturities: /api/v1/wealth/securities/allocations/maturities
           credit-quality: /api/v1/wealth/securities/allocations/credit-quality
           classification: /api/v1/wealth/securities/allocations/classification

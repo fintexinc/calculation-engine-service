@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.result.exposure;
 
-import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+
 @SuperBuilder
 @Data
 @ToString(callSuper = true)
@@ -23,5 +24,5 @@ import lombok.experimental.SuperBuilder;
 public class GeographicExposureResult extends BaseCalculationResult {
 
   @Schema(description = "Geographic exposure percentages by region")
-  private Map<GeographicRegionType, BigDecimal> equityGeographicExposure;
+  private Map<GeographicRegionType, BigDecimal> geographicExposure;
 }

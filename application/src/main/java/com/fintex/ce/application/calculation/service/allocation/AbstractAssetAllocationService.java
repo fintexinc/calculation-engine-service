@@ -1,8 +1,7 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.Conversion;
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.CurrencyValue;
+import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.application.util.DecimalUtils;
@@ -37,7 +36,6 @@ import static com.fintex.ce.util.FilterUtils.CASH_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
-import static java.math.BigDecimal.ZERO;
 
 /**
  * Shared implementation for asset-allocation breakdown services. Resolves each holding's region — stocks via
@@ -61,15 +59,15 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
 
   protected final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher;
   protected final SecurityDataFetcher<Geography> geographyFetcher;
-  protected final DefaultTargetCurrencyConverter currencyConverter;
+  protected final PortfolioWeightCalculator portfolioWeightCalculator;
   protected final DefaultDataProperties defaultDataProperties;
 
   protected AbstractAssetAllocationService(SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher,
-      SecurityDataFetcher<Geography> geographyFetcher, DefaultTargetCurrencyConverter currencyConverter,
+      SecurityDataFetcher<Geography> geographyFetcher, PortfolioWeightCalculator portfolioWeightCalculator,
       DefaultDataProperties defaultDataProperties) {
     this.assetAllocationFetcher = assetAllocationFetcher;
     this.geographyFetcher = geographyFetcher;
-    this.currencyConverter = currencyConverter;
+    this.portfolioWeightCalculator = portfolioWeightCalculator;
     this.defaultDataProperties = defaultDataProperties;
   }
 
@@ -96,8 +94,9 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
       }
     }
 
-    Map<PortfolioHolding, BigDecimal> weights = currencyAdjustedWeights(holdings, currencies, warnings);
-    Map<AssetAllocationRegionType, BigDecimal> netProducts = aggregateWith(exposures, weights);
+    PortfolioWeightCalculator.Result weightResult = portfolioWeightCalculator.compute(holdings, currencies);
+    warnings.addAll(weightResult.warnings());
+    Map<AssetAllocationRegionType, BigDecimal> netProducts = aggregateWith(exposures, weightResult.weights());
     postProcess(netProducts);
     return buildResult(netProducts, warnings);
   }
@@ -244,35 +243,4 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
     return result;
   }
 
-  private Map<PortfolioHolding, BigDecimal> currencyAdjustedWeights(List<PortfolioHolding> holdings,
-      Map<PortfolioHolding, Currency> currencies, List<Notification> warnings) {
-    Map<PortfolioHolding, CurrencyValue> input = new HashMap<>(holdings.size());
-    for (PortfolioHolding holding : holdings) {
-      BigDecimal value = holding.getValue() == null ? ZERO : holding.getValue();
-      input.put(holding, new CurrencyValue(currencies.get(holding), value));
-    }
-    Conversion conversion = currencyConverter.convert(input);
-    warnings.addAll(conversion.warnings());
-
-    Map<PortfolioHolding, BigDecimal> normalizedValues = new HashMap<>(holdings.size());
-    BigDecimal totalNormalized = ZERO;
-    for (PortfolioHolding holding : holdings) {
-      BigDecimal converted = conversion.converted().get(holding);
-      if (converted == null) {
-        BigDecimal raw = holding.getValue();
-        converted = raw == null ? ZERO : raw;
-      }
-      normalizedValues.put(holding, converted);
-      totalNormalized = totalNormalized.add(converted);
-    }
-
-    if (totalNormalized.signum() == 0) {
-      return calculateInitialPortfolioWeight(holdings);
-    }
-    Map<PortfolioHolding, BigDecimal> weights = new HashMap<>(holdings.size());
-    for (PortfolioHolding holding : holdings) {
-      weights.put(holding, DecimalUtils.divide(normalizedValues.get(holding), totalNormalized));
-    }
-    return weights;
-  }
 }

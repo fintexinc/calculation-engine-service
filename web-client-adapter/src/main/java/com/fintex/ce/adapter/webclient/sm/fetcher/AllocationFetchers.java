@@ -11,6 +11,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.EquitySectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquityStyleboxExposureMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeSectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeStyleboxExposureMapper;
+import com.fintex.ce.adapter.webclient.sm.mapper.GeographicAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.MaturityAllocationMapper;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
@@ -19,6 +20,7 @@ import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
@@ -29,6 +31,7 @@ import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
+import com.fintex.wm.commons.domain.allocation.GeographicAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.Maturities;
 import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
@@ -73,6 +76,22 @@ public class AllocationFetchers {
       @Value("${external-services.security-master.rest.endpoints.allocations.equity-country}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
         new ParameterizedTypeReference<List<SecurityAttributeResult<CountryAllocation>>>() {}) {};
+  }
+
+  @Bean("equityGeographicAllocationFetcher")
+  SecurityDataFetcher<HoldingGeographicAllocation> equityGeographicAllocationFetcher(
+      SecurityMasterWebClient client, GeographicAllocationMapper mapper,
+      @Value("${external-services.security-master.rest.endpoints.allocations.equity-geographic}") String endpointPath) {
+    return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
+        new ParameterizedTypeReference<List<SecurityAttributeResult<GeographicAllocationWithCurrency>>>() {}) {};
+  }
+
+  @Bean("fixedIncomeGeographicAllocationFetcher")
+  SecurityDataFetcher<HoldingGeographicAllocation> fixedIncomeGeographicAllocationFetcher(
+      SecurityMasterWebClient client, GeographicAllocationMapper mapper,
+      @Value("${external-services.security-master.rest.endpoints.allocations.fixed-income-geographic}") String endpointPath) {
+    return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
+        new ParameterizedTypeReference<List<SecurityAttributeResult<GeographicAllocationWithCurrency>>>() {}) {};
   }
 
   @Bean
