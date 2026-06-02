@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
 import com.fintex.ce.application.calculation.service.FxRateService;
+import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
@@ -61,6 +62,8 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   protected final FxRateService fxRateService = mock(FxRateService.class);
   protected final DefaultTargetCurrencyConverter currencyConverter = new DefaultTargetCurrencyConverter(
       fxRateService, new FxProperties());
+  protected final PortfolioWeightCalculator portfolioWeightCalculator = new PortfolioWeightCalculator(
+      currencyConverter);
 
   protected AbstractAssetAllocationService<R> service;
 

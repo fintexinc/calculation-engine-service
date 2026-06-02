@@ -3,7 +3,6 @@ package com.fintex.ce.adapter.rest.controller;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
-import com.fintex.ce.model.domain.calculation.allocation.GeographicRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
@@ -79,6 +78,7 @@ import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -195,7 +195,7 @@ class CalculationTestDataProvider {
             .setEquityStyleboxExposure(Map.of(StyleBoxType.LARGE_CORE, BigDecimal.valueOf(40.0)))),
             EquityStyleboxExposureResult.class),
         breakdown(CalculationMetric.EQUITY_GEOGRAPHIC_EXPOSURE, init(new EquityGeographicExposureResult(), r -> r
-            .setEquityGeographicExposure(Map.of(GeographicRegionType.OTHER, BigDecimal.valueOf(70.0)))),
+            .setGeographicExposure(Map.of(GeographicRegionType.OTHER, BigDecimal.valueOf(70.0)))),
             GeographicExposureResult.class),
         breakdown(CalculationMetric.EQUITY_MARKET_CAPITALIZATION, init(new EquityMarketCapResult(), r -> r
             .setEquityMarketCapitalization(Map.of(EquityMarketCapitalizationType.GIANT, BigDecimal.valueOf(55.0)))),
@@ -204,7 +204,7 @@ class CalculationTestDataProvider {
             .setCountryExposure(Map
                 .of(CountryRegionType.CANADA, BigDecimal.valueOf(80.0)))), CountryExposureResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_GEOGRAPHIC_EXPOSURE, init(new FixedIncomeGeographicExposureResult(),
-            r -> r.setEquityGeographicExposure(Map.of(GeographicRegionType.OTHER, BigDecimal.valueOf(25.0)))),
+            r -> r.setGeographicExposure(Map.of(GeographicRegionType.OTHER, BigDecimal.valueOf(25.0)))),
             GeographicExposureResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_BOND_SECTOR, init(new FixedIncomeSectorResult(), r -> r
             .setFixedIncomeSector(Map.of(
