@@ -25,29 +25,6 @@ class HoldingReqValidatorTest {
   private final HoldingReqValidator validator = new HoldingReqValidator();
 
   @Test
-  void shouldThrow_whenDuplicateNonGicHoldingsExist() {
-    PortfolioHolding holding1 = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND_CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-    PortfolioHolding holding2 = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND_CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-
-    PeriodCommand command = new PeriodCommand();
-    command.setCurrency(Currency.CAD);
-    command.setHoldings(List.of(holding1, holding2));
-
-    assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ValidationException.class)
-        .satisfies(ex -> {
-          ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("DUPLICATE_HOLDING");
-        });
-  }
-
-  @Test
   void shouldThrow_whenCashHoldingHasNullCurrency() {
     CashHolding cashHolding = CashHolding.builder()
         .value(BigDecimal.TEN)

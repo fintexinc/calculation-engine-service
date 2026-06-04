@@ -6,18 +6,18 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 
-import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalEquals;
-
 @Getter
 @ToString(callSuper = true)
 @SuperBuilder(toBuilder = true)
 @Jacksonized
-public class CashHolding extends PortfolioHolding implements MonthlyReturnGeneratableHolding {
+@EqualsAndHashCode(callSuper = true)
+public final class CashHolding extends PortfolioHolding implements MonthlyReturnGeneratableHolding {
 
   private final Currency currency;
   private final LocalDate investmentDate;
@@ -40,23 +40,6 @@ public class CashHolding extends PortfolioHolding implements MonthlyReturnGenera
 
   public boolean hasClientIntRate() {
     return clientIntRate != null;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    CashHolding that = (CashHolding) o;
-    return Objects.equals(currency, that.currency)
-        && Objects.equals(getInvestmentDate(), that.getInvestmentDate())
-        && bigDecimalEquals(clientIntRate, that.clientIntRate)
-        && Objects.equals(getInterestFreq(), that.getInterestFreq());
-  }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
   }
 
 }

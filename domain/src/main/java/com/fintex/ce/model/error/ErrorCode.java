@@ -798,9 +798,25 @@ public enum ErrorCode {
 
   DUPLICATE_HOLDING(
       Codes.DUPLICATE_HOLDING,
-      "Duplicate holding found in request",
+      "Duplicate holding with id %s found in request",
       "The request contains two or more identical holdings",
       "Remove duplicate holdings from the request",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  DUPLICATE_CASH_HOLDING(
+      Codes.DUPLICATE_CASH_HOLDING,
+      "Duplicate cash holding with currency %s found in request",
+      "The request contains two or more cash holdings with the same currency",
+      "Provide at most one cash holding per currency",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  DUPLICATE_GIC_HOLDING(
+      Codes.DUPLICATE_GIC_HOLDING,
+      "Duplicate gic holding with currency %s, term %s and interest rate %s found in request",
+      "The request contains two or more gic holdings with the same currency, term and interest rate",
+      "Provide at most one gic holding per currency, term and interest rate combination",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -1185,6 +1201,8 @@ public enum ErrorCode {
     public static final String DUPLICATE_HOLDING = "HLD-002";
     public static final String HOLDING_VALUES_SUM_NOT_POSITIVE = "HLD-003";
     public static final String HOLDING_TYPE_NOT_LEAF = "HLD-004";
+    public static final String DUPLICATE_CASH_HOLDING = "HLD-005";
+    public static final String DUPLICATE_GIC_HOLDING = "HLD-006";
 
     // Mutual Fund classification
     public static final String INVALID_SHARE_CLASS = "MF-001";

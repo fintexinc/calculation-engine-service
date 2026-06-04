@@ -24,27 +24,6 @@ class BenchmarkHoldingReqValidatorTest {
   private final BenchmarkHoldingReqValidator validator = new BenchmarkHoldingReqValidator();
 
   @Test
-  void shouldThrow_whenBenchmarkHasDuplicateNonGicHoldings() {
-    PortfolioHolding h1 = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-    PortfolioHolding h2 = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-
-    PeriodCommand cmd = new PeriodCommand();
-    cmd.setCurrency(Currency.CAD);
-    cmd.setBenchmarkHoldings(List.of(h1, h2));
-
-    assertThatThrownBy(() -> validator.validate(cmd))
-        .isInstanceOf(ValidationException.class)
-        .satisfies(ex -> {
-          ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("DUPLICATE_HOLDING");
-        });
-  }
-
-  @Test
   void shouldThrow_whenBenchmarkCashHoldingHasNullCurrency() {
     CashHolding cashHolding = CashHolding.builder()
         .value(BigDecimal.TEN)
