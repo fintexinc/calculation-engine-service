@@ -13,14 +13,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import static com.fintex.ce.model.error.ErrorCode.Codes.FIELD_NOT_NULL;
-import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalEquals;
-import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalHashCode;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "holdingType", visible = true, defaultImpl = PortfolioHolding.class)
 @JsonSubTypes({
@@ -29,8 +27,9 @@ import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalHashCode;
 })
 @Getter
 @ToString
+@EqualsAndHashCode
 @SuperBuilder(toBuilder = true)
-public class PortfolioHolding {
+public sealed class PortfolioHolding permits CashHolding, GicHolding {
 
   public static final String DELIMITER = "-";
 
@@ -61,24 +60,6 @@ public class PortfolioHolding {
       return holdingType + DELIMITER + securityIdentifier.getId() + DELIMITER + eq.getExchangeId();
     }
     return holdingType + DELIMITER + securityIdentifier.getId();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    PortfolioHolding holding = (PortfolioHolding) o;
-    return bigDecimalEquals(value, holding.value)
-        && Objects.equals(holdingType, holding.holdingType)
-        && Objects.equals(securityIdentifier, holding.securityIdentifier);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = Objects.hashCode(holdingType);
-    result = 31 * result + Objects.hashCode(securityIdentifier);
-    result = 31 * result + bigDecimalHashCode(value);
-    return result;
   }
 
 }

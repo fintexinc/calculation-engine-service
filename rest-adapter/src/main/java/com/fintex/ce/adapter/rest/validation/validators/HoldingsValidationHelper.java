@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.MonthlyReturnGeneratableHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
@@ -13,7 +12,6 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,7 +28,6 @@ public class HoldingsValidationHelper {
     if (CollectionUtils.isEmpty(holdings)) {
       return;
     }
-    validateNoDuplicateHoldings(holdings);
     validateGicInvestmentDates(holdings);
     validateCashHoldingCurrencies(holdings);
   }
@@ -52,15 +49,6 @@ public class HoldingsValidationHelper {
     }
     if (sum.compareTo(BigDecimal.ZERO) <= 0) {
       throw ErrorCode.HOLDING_VALUES_SUM_NOT_POSITIVE.toValidationException();
-    }
-  }
-
-  private static void validateNoDuplicateHoldings(List<PortfolioHolding> holdings) {
-    List<PortfolioHolding> nonGicHoldings = holdings.stream()
-        .filter(h -> !(h instanceof GicHolding))
-        .toList();
-    if (new HashSet<>(nonGicHoldings).size() != nonGicHoldings.size()) {
-      throw ErrorCode.DUPLICATE_HOLDING.toValidationException();
     }
   }
 

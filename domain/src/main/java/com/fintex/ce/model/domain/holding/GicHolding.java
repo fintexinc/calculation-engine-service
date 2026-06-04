@@ -9,19 +9,20 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 
-import static com.fintex.ce.model.util.BigDecimalUtils.bigDecimalEquals;
 import static com.fintex.wm.commons.domain.currency.Currency.CAD;
 
 @Getter
 @ToString(callSuper = true)
 @SuperBuilder(toBuilder = true)
 @Jacksonized
-public class GicHolding extends PortfolioHolding implements MonthlyReturnGeneratableHolding {
+@EqualsAndHashCode(callSuper = true)
+public final class GicHolding extends PortfolioHolding implements MonthlyReturnGeneratableHolding {
 
   public static final LocalDate DEFAULT_START_DATE = LocalDate.of(1954, 1, 31);
 
@@ -69,26 +70,6 @@ public class GicHolding extends PortfolioHolding implements MonthlyReturnGenerat
   @Override
   public String getIdsString() {
     return getHoldingType() + PortfolioHolding.DELIMITER + getCurrency() + PortfolioHolding.DELIMITER + getValue();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    if (!super.equals(o)) return false;
-    GicHolding that = (GicHolding) o;
-    return Objects.equals(uuid, that.uuid)
-        && Objects.equals(getCurrency(), that.getCurrency())
-        && Objects.equals(getInvestmentDate(), that.getInvestmentDate())
-        && bigDecimalEquals(clientIntRate, that.clientIntRate)
-        && Objects.equals(getInterestFreq(), that.getInterestFreq())
-        && bigDecimalEquals(term, that.term)
-        && Objects.equals(name, that.name);
-  }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
   }
 
 }
