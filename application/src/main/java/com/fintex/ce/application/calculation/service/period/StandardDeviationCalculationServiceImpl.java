@@ -9,12 +9,15 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+import static com.fintex.ce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
 import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 
 @Service
@@ -34,13 +37,20 @@ public class StandardDeviationCalculationServiceImpl
     return CalculationMetric.STANDARD_DEVIATION;
   }
 
+  @Override
   public StandardDeviationCalculation defineCalculationMethod(final PeriodCommand command) {
-    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    var result = buildWeightedAverageResult(command, ReturnFactorScale.SCALE_OF_TWO);
+    result.snapshot().warnings().stream()
+        .filter(w -> FX_RATES_UNAVAILABLE.getCode().equals(w.getCode()))
+        .findFirst()
+        .ifPresent(w -> {
+          throw new CalculationException(ErrorCode.FX_RATES_UNAVAILABLE, w.getMetadata());
+        });
+    var context = new PeriodCalculationInput(command.getCustomIntervalPsd(), result.weightedAverage());
     return StandardDeviationCalculation.builder()
         .input(context)
         .defaultPeriods(defaultPeriods)
         .scale(OUTPUT_SCALE)
         .build();
   }
-
 }
