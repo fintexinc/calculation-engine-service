@@ -120,18 +120,6 @@ external-services:
           # SMS exposes combined US + CAD T-Bill monthly returns at this endpoint; PCE selects the side it needs.
           treasury-rates: /api/v1/wealth/reference/treasury-rates
 
-rest-template:
-  rest-template-pool:
-    size-per-route: 50
-    size: 100
-  rest-template:
-    read-timeout: 90000 # time in millis
-    connection-request-timeout: 90000 # time in millis, 1 * 60 * 1000
-    connect-timeout: 90000 # time in millis
-
-application:
-  rest-template-enabled: true
-
 calculation:
   fx:
     # Reporting currency that money-value calculations (fees, MER, management fee, AUM, allocations) convert into

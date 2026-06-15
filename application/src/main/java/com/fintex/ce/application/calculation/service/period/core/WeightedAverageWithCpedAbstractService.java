@@ -48,11 +48,15 @@ public abstract class WeightedAverageWithCpedAbstractService<C extends PeriodCom
     return calculationMethod.calculate(command.getPeriods());
   }
 
-  public PeriodCalculationInput buildPeriodCalculationInput(C command, ReturnFactorScale returnFactorScale) {
+  public WeightedAverageResult<HoldingMonthlyReturns> buildWeightedAverageResult(C command,
+      ReturnFactorScale scale) {
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
         command.getHoldings(), command.getCurrency());
-    WeightedAverageResult<HoldingMonthlyReturns> result = portfolioWeightedAverageWithCped.run(portfolioContext,
-        new CpedScaleParams(command.getCustomPed(), returnFactorScale));
+    return portfolioWeightedAverageWithCped.run(portfolioContext, new CpedScaleParams(command.getCustomPed(), scale));
+  }
+
+  public PeriodCalculationInput buildPeriodCalculationInput(C command, ReturnFactorScale returnFactorScale) {
+    WeightedAverageResult<HoldingMonthlyReturns> result = buildWeightedAverageResult(command, returnFactorScale);
     return new PeriodCalculationInput(command.getCustomIntervalPsd(), result.weightedAverage());
   }
 }
