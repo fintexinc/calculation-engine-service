@@ -9,6 +9,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Assertions;
@@ -37,17 +38,21 @@ class MaturityAllocationServiceTest {
         .useConstructor(fetcher, responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     final var maturityAllocation = new MaturityAllocation();
     maturityAllocation.setMaturityDurationValues(Map.of("FIVE_TO_SEVEN_YEARS", BigDecimal.TEN));
     final var rawData = Map.of(holding, maturityAllocation);
 
     when(fetcher.fetch(any(), any())).thenReturn(rawData);
     doCallRealMethod().when(service).fetchExposures(any());
-    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var result = service.fetchExposures(command);
     final var actual = result.allocations();
 
     Assertions.assertEquals(1, actual.size());
     Assertions.assertTrue(actual.containsKey(holding));
+    verify(fetcher).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test

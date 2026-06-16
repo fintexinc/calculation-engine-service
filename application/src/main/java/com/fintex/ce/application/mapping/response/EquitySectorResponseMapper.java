@@ -10,6 +10,7 @@ import com.fintex.wm.commons.error.Notification;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +21,12 @@ import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 @Component
 public class EquitySectorResponseMapper implements ResponseMapper<EquitySector, EquitySectorResult> {
 
-  public static final Map<EquitySectorAllocationType, BigDecimal> DEFAULT_MAP = new HashMap<>();
+  public static final Map<EquitySectorAllocationType, BigDecimal> DEFAULT_MAP;
 
   static {
-    Stream.of(EquitySectorAllocationType.values()).forEach(f -> DEFAULT_MAP.put(f, BigDecimal.ZERO));
+    Map<EquitySectorAllocationType, BigDecimal> tmp = new HashMap<>();
+    Stream.of(EquitySectorAllocationType.values()).forEach(f -> tmp.put(f, null));
+    DEFAULT_MAP = Collections.unmodifiableMap(tmp);
   }
 
   @Override

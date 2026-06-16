@@ -9,6 +9,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 
 import org.junit.jupiter.api.Assertions;
@@ -76,11 +77,12 @@ class EquityMarketCapitalizationServiceTest {
     final var req = mock(PortfolioHoldingsCommand.class);
 
     when(req.getHoldings()).thenReturn(holdings);
+    when(req.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
 
     doCallRealMethod().when(service).fetchExposures(any());
     service.fetchExposures(req);
 
-    verify(marketCapFetcher).fetch(any(), any());
+    verify(marketCapFetcher).fetch(holdings, List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test

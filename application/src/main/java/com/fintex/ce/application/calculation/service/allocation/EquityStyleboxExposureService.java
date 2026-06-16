@@ -68,9 +68,8 @@ public class EquityStyleboxExposureService
 
   @Override
   public ExposureDataHolder<StyleBoxType> fetchExposures(PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, EquityStyleboxExposure> rawData = equityStyleboxSecurityDataFetcher.fetch(command
-        .getHoldings(),
-        List.of());
+    Map<PortfolioHolding, EquityStyleboxExposure> rawData = equityStyleboxSecurityDataFetcher.fetch(
+        command.getHoldings(), command.getDataProviders());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         EquityStyleboxExposure::getBoxValues,
         DEFAULT_MAP, MISSING_EQUITY_STYLEBOX_EXPOSURE);

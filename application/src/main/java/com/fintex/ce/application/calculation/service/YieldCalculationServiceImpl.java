@@ -13,7 +13,6 @@ import com.fintex.wm.commons.error.Notification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -36,7 +35,8 @@ public class YieldCalculationServiceImpl implements CalculationService<YieldComm
   @Override
   public YieldResult perform(final YieldCommand command) {
     final ArrayList<Notification> warnings = new ArrayList<>();
-    final Map<PortfolioHolding, Yield> yieldData = yieldSecurityDataFetcher.fetch(command.getHoldings(), List.of());
+    final Map<PortfolioHolding, Yield> yieldData = yieldSecurityDataFetcher.fetch(command.getHoldings(),
+        command.getDataProviders());
     return responseMapper.toResponse(yieldData, warnings);
   }
 }

@@ -10,6 +10,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -80,6 +81,9 @@ class FixedIncomeCountryExposureServiceTest {
         withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
 
     final var holding = mock(PortfolioHolding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     final var countryExposure = new CountryExposure();
     countryExposure.setAllocations(Map.of("CA", TEN));
     final var rawData = Map.of(holding, countryExposure);
@@ -88,10 +92,11 @@ class FixedIncomeCountryExposureServiceTest {
     when(storage.fetch(any(), any())).thenReturn(rawData);
     when(countryAllocationMappingService.mapToCountryRegions(any(), any(), any())).thenReturn(mappedResult);
     doCallRealMethod().when(service).fetchExposures(any());
-    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var result = service.fetchExposures(command);
     final var actual = result.allocations();
 
     assertEquals(mappedResult, actual);
+    verify(storage).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test

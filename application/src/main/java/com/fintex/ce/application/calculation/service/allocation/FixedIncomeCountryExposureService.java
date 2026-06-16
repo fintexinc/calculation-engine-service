@@ -67,8 +67,7 @@ public class FixedIncomeCountryExposureService
   public ExposureDataHolder<CountryRegionType> fetchExposures(PortfolioHoldingsCommand command) {
     List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, CountryExposure> rawData = countryExposureSecurityDataFetcher.fetch(command.getHoldings(),
-        List
-            .of());
+        command.getDataProviders());
     Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
     Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService

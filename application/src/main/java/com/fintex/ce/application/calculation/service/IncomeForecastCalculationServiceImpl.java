@@ -68,7 +68,7 @@ public class IncomeForecastCalculationServiceImpl
   public IncomeForecastResult perform(final IncomeForecastCommand command) {
     final ArrayList<Notification> warnings = new ArrayList<>();
     final Map<PortfolioHolding, IncomeForecast> holdingIncomeForecast = incomeForecastSecurityDataFetcher.fetch(
-        command.getHoldings(), List.of());
+        command.getHoldings(), command.getDataProviders());
 
     final Integer period = Optional.ofNullable(command.getTimeIntervalPeriods()).orElse(TWELVE_MONTH);
     final IncomeForecastResult result = calculate(holdingIncomeForecast, period);

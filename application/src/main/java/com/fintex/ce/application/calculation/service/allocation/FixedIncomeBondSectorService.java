@@ -64,7 +64,7 @@ public class FixedIncomeBondSectorService
   @Override
   public ExposureDataHolder<FixedIncomeSecuritiesAllocationType> fetchExposures(PortfolioHoldingsCommand command) {
     Map<PortfolioHolding, FixedIncomeBondSecurities> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
-        command.getHoldings(), List.of());
+        command.getHoldings(), command.getDataProviders());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         FixedIncomeBondSecurities::getFixedIncomeBondSectors,
         ALLOCATION_DEFAULT_MAP, MISSING_FIXED_INCOME_BOND_SECTOR);

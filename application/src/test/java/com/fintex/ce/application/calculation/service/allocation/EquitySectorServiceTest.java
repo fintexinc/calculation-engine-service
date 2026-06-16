@@ -8,16 +8,23 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_SECTOR_ALLOCATION;
 import static java.math.BigDecimal.TEN;
+import static java.math.BigDecimal.ZERO;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -36,15 +43,73 @@ class EquitySectorServiceTest {
         .useConstructor(fetcher, responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
     final var equitySector = new EquitySector(Map.of(EquitySectorAllocationType.TECHNOLOGY, TEN));
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     when(fetcher.fetch(any(), any())).thenReturn(Map.of(holding, equitySector));
 
     doCallRealMethod().when(service).fetchExposures(any());
-    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var result = service.fetchExposures(command);
     final var actual = result.allocations();
 
-    Assertions.assertTrue(actual.containsKey(holding));
-    Assertions.assertEquals(TEN, actual.get(holding).get(EquitySectorAllocationType.TECHNOLOGY));
+    assertTrue(actual.containsKey(holding));
+    assertEquals(TEN, actual.get(holding).get(EquitySectorAllocationType.TECHNOLOGY));
+    assertTrue(result.warnings().isEmpty());
+    verify(fetcher).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
+  }
+
+  @Test
+  void shouldEmitWarning_whenSecurityDataIsMissing() {
+    final var fetcher = mock(SecurityDataFetcher.class);
+    final var responseMapper = mock(EquitySectorResponseMapper.class);
+    final var service = mock(EquitySectorService.class, withSettings()
+        .useConstructor(fetcher, responseMapper));
+
+    final var holding = mock(PortfolioHolding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(fetcher.fetch(any(), any())).thenReturn(Map.of());
+
+    doCallRealMethod().when(service).fetchExposures(any());
+    final var result = service.fetchExposures(command);
+
+    assertEquals(1, result.warnings().size());
+    assertEquals(MISSING_EQUITY_SECTOR_ALLOCATION.getCode(), result.warnings().get(0).getCode());
+    assertTrue(result.allocations().containsKey(holding));
+    assertEquals(0,
+        result.allocations().get(holding).get(EquitySectorAllocationType.TECHNOLOGY).compareTo(ZERO));
+  }
+
+  @ParameterizedTest
+  @MethodSource("filteredInstrumentTypes")
+  void shouldExcludeHoldingFromExposures_whenHoldingIsCashOrGic(FinancialInstrumentType filteredType) {
+    final var fetcher = mock(SecurityDataFetcher.class);
+    final var responseMapper = mock(EquitySectorResponseMapper.class);
+    final var service = mock(EquitySectorService.class, withSettings()
+        .useConstructor(fetcher, responseMapper));
+
+    final var filteredHolding = mock(PortfolioHolding.class);
+    when(filteredHolding.getHoldingType()).thenReturn(filteredType);
+    final var equityHolding = mock(PortfolioHolding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
+    final var equitySector = new EquitySector(Map.of(EquitySectorAllocationType.TECHNOLOGY, TEN));
+    when(command.getHoldings()).thenReturn(List.of(filteredHolding, equityHolding));
+    when(fetcher.fetch(any(), any())).thenReturn(Map.of(equityHolding, equitySector));
+
+    doCallRealMethod().when(service).fetchExposures(any());
+    final var result = service.fetchExposures(command);
+    final var actual = result.allocations();
+
+    assertEquals(1, actual.size());
+    assertFalse(actual.containsKey(filteredHolding));
+    assertTrue(actual.containsKey(equityHolding));
+    assertEquals(TEN, actual.get(equityHolding).get(EquitySectorAllocationType.TECHNOLOGY));
+    assertTrue(result.warnings().isEmpty());
+  }
+
+  static Stream<FinancialInstrumentType> filteredInstrumentTypes() {
+    return Stream.of(FinancialInstrumentType.CASH, FinancialInstrumentType.GIC, FinancialInstrumentType.GIC_CANADA);
   }
 
   @Test
@@ -130,7 +195,7 @@ class EquitySectorServiceTest {
       doCallRealMethod().when(service).calculate(any(), any());
       final var actual = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
 
-      Assertions.assertEquals(expected, actual);
+      assertEquals(expected, actual);
       verify(responseMapper).toEmptyResponse(any());
     }
   }
