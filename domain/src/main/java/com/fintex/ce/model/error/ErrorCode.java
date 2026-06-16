@@ -624,6 +624,14 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  METRIC_NOT_SUPPORTED_IN_BATCH(
+      Codes.METRIC_NOT_SUPPORTED_IN_BATCH,
+      "Metric '%s' is not supported in batch mode",
+      "This metric requires a request structure that is incompatible with the shared batch context",
+      "Use the single-metric endpoint for this metric or remove it from the batch request",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
   // ============================================
   // CUR-xxx — Currency errors
   // ============================================
@@ -1168,6 +1176,7 @@ public enum ErrorCode {
     // Calculation metric request
     public static final String UNSUPPORTED_METRIC = "MET-001";
     public static final String METRIC_MISMATCH = "MET-002";
+    public static final String METRIC_NOT_SUPPORTED_IN_BATCH = "MET-003";
 
     // Currency
     public static final String PORTFOLIO_MISSING_CURRENCY = "CUR-001";

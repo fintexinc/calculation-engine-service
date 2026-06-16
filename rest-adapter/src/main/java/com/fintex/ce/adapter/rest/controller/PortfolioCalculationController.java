@@ -1,9 +1,11 @@
 package com.fintex.ce.adapter.rest.controller;
 
+import com.fintex.ce.adapter.rest.batch.BatchCommandFactory;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.ce.model.domain.result.BatchCalculationResult;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
@@ -52,8 +54,13 @@ import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
 import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
+import com.fintex.ce.model.dto.command.BatchCalculationCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.BasePceException;
+import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
+import com.fintex.ce.util.BatchContext;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,6 +78,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -87,16 +95,19 @@ public class PortfolioCalculationController {
 
   private final Map<CalculationMetric, CalculationService<?, ?>> serviceMap;
   private final RequestValidationFacade validationFacade;
+  private final BatchCommandFactory batchCommandFactory;
 
   public PortfolioCalculationController(
       List<CalculationService<?, ?>> calculationServices,
-      RequestValidationFacade validationFacade) {
+      RequestValidationFacade validationFacade,
+      BatchCommandFactory batchCommandFactory) {
     this.serviceMap = calculationServices.stream()
         .collect(Collectors.toMap(CalculationService::getMetric, Function.identity(),
             (existing, duplicate) -> {
               throw ErrorCode.INTERNAL_SERVER_ERROR.toException();
             }));
     this.validationFacade = validationFacade;
+    this.batchCommandFactory = batchCommandFactory;
   }
 
   @Operation(summary = "Execute a portfolio calculation", description = "Performs the specified calculation metric on the provided portfolio holdings. "
@@ -147,5 +158,53 @@ public class PortfolioCalculationController {
 
     CalculationService<?, ?> service = serviceMap.get(metric);
     return ((CalculationService<CalculationCommand, ?>) service).perform(command);
+  }
+
+  @Operation(summary = "Execute multiple portfolio calculations in one request", description = "Computes a set of metrics for a single shared portfolio context. "
+      + "Security Master data required by multiple metrics is fetched only once per distinct dataset, "
+      + "significantly reducing external calls compared to N individual metric requests. "
+      + "Results and per-metric errors are returned together: one failing metric does not suppress others. "
+      + "The common-performance-dates metric is not supported in batch mode.")
+  @ApiResponse(responseCode = "200", description = "Batch result containing per-metric results and errors")
+  @PostMapping("/batch")
+  @SuppressWarnings("unchecked")
+  public BatchCalculationResult calculateBatch(@RequestBody @Valid BatchCalculationCommand command) {
+    Map<String, BaseCalculationResult> results = new LinkedHashMap<>();
+    Map<String, List<Notification>> errors = new LinkedHashMap<>();
+
+    BatchContext.begin();
+    try {
+      for (CalculationMetric metric : command.getMetrics()) {
+        String metricKey = metric.getValue();
+        try {
+          CalculationCommand specificCommand = batchCommandFactory.buildCommand(metric, command);
+          validationFacade.validate(specificCommand, metric);
+          CalculationService<?, ?> service = serviceMap.get(metric);
+          if (service == null) {
+            throw ErrorCode.UNSUPPORTED_METRIC.toException(metricKey);
+          }
+          results.put(metricKey, ((CalculationService<CalculationCommand, ?>) service).perform(specificCommand));
+        } catch (CalculationsFailedException e) {
+          errors.put(metricKey, toNotifications(e));
+        } catch (BasePceException e) {
+          errors.put(metricKey, List.of(toNotification(e)));
+        }
+      }
+    } finally {
+      BatchContext.end();
+    }
+
+    return BatchCalculationResult.builder()
+        .results(results)
+        .errors(errors)
+        .build();
+  }
+
+  private static List<Notification> toNotifications(CalculationsFailedException e) {
+    return e.getExceptions().stream().map(PortfolioCalculationController::toNotification).toList();
+  }
+
+  private static Notification toNotification(BasePceException e) {
+    return e.getErrorCode().toNotification(e.getId(), e.getFieldName(), e.getMessage(), e.getMetadata());
   }
 }

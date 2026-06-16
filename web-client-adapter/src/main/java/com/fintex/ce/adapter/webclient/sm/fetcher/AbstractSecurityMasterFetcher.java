@@ -5,6 +5,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.HoldingMappingUtils;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.BatchContext;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,7 +60,26 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
     if (CollectionUtils.isEmpty(holdings)) {
       return Collections.emptyMap();
     }
+    if (!BatchContext.isActive()) {
+      return doFetch(holdings, providers);
+    }
+    String cacheKey = buildBatchCacheKey(holdings, providers);
+    Optional<Map<PortfolioHolding, D>> cached = BatchContext.get(cacheKey);
+    if (cached.isPresent()) {
+      log.debug("Batch SM cache hit for endpoint {} ({} holdings)", endpointPath, holdings.size());
+      return cached.get();
+    }
+    Map<PortfolioHolding, D> result = doFetch(holdings, providers);
+    BatchContext.put(cacheKey, result);
+    return result;
+  }
 
+  private String buildBatchCacheKey(List<? extends PortfolioHolding> holdings, List<DataProvider> providers) {
+    int providersHash = CollectionUtils.isEmpty(providers) ? 0 : providers.hashCode();
+    return endpointPath + ":" + holdings.hashCode() + ":" + providersHash;
+  }
+
+  private Map<PortfolioHolding, D> doFetch(List<? extends PortfolioHolding> holdings, List<DataProvider> providers) {
     Map<FinancialInstrumentType, List<PortfolioHolding>> groupedHoldings = groupHoldingsByType(holdings);
     if (groupedHoldings.isEmpty()) {
       return Collections.emptyMap();
