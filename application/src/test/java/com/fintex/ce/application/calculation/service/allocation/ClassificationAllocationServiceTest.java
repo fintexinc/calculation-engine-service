@@ -9,6 +9,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,9 @@ class ClassificationAllocationServiceTest {
         .useConstructor(fetcher));
 
     final var holding = mock(PortfolioHolding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     final var classificationAllocation = new ClassificationAllocation();
     classificationAllocation.setSecurityClassificationValues(Map.of(
         ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL, BigDecimal.TEN));
@@ -43,7 +47,7 @@ class ClassificationAllocationServiceTest {
     when(fetcher.fetch(any(), any())).thenReturn(rawData);
     doCallRealMethod().when(service).fetchExposures(any());
     // ACT
-    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var result = service.fetchExposures(command);
     final var actual = result.allocations();
 
     // VERIFY
@@ -51,6 +55,7 @@ class ClassificationAllocationServiceTest {
     Assertions.assertTrue(actual.containsKey(holding));
     Assertions.assertEquals(BigDecimal.TEN, actual.get(holding).get(
         ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL));
+    verify(fetcher).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test

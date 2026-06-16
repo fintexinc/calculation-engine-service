@@ -69,7 +69,7 @@ public class FixedIncomeStyleboxExposureService
   @Override
   public ExposureDataHolder<FixedIncomeStyleBoxType> fetchExposures(PortfolioHoldingsCommand command) {
     Map<PortfolioHolding, FixedIncomeStyleboxExposure> rawData = fixedIncomeStyleboxSecurityDataFetcher.fetch(
-        command.getHoldings(), List.of());
+        command.getHoldings(), command.getDataProviders());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         FixedIncomeStyleboxExposure::getBoxValues,
         DEFAULT_MAP, MISSING_FIXED_INCOME_STYLEBOX_EXPOSURE);

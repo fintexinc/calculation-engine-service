@@ -8,6 +8,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
 
 import org.junit.jupiter.api.Assertions;
@@ -36,17 +37,21 @@ class FixedIncomeStyleboxExposureServiceTest {
         .useConstructor(fetcher, responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
+    final var command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     final var exposure = new FixedIncomeStyleboxExposure();
     exposure.setBoxValues(Map.of(FixedIncomeStyleBoxType.HIGH_EXTENSIVE, BigDecimal.TEN));
     final var rawData = Map.of(holding, exposure);
 
     when(fetcher.fetch(any(), any())).thenReturn(rawData);
     doCallRealMethod().when(service).fetchExposures(any());
-    final var result = service.fetchExposures(mock(PortfolioHoldingsCommand.class));
+    final var result = service.fetchExposures(command);
     final var actual = result.allocations();
 
     Assertions.assertEquals(1, actual.size());
     Assertions.assertTrue(actual.containsKey(holding));
+    verify(fetcher).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test

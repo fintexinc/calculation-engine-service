@@ -9,6 +9,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -33,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class IncomeForecastCalculationServiceImplTest {
@@ -55,6 +58,24 @@ class IncomeForecastCalculationServiceImplTest {
     IncomeForecastResult response = service.perform(command);
     assertNotNull(response);
   }
+  @Test
+  void shouldFetchWithRequestedProviders_whenCommandSpecifiesDataProviders() {
+    // SETUP
+    final IncomeForecastCommand command = Mockito.mock(IncomeForecastCommand.class);
+    final PortfolioHolding holding = Mockito.mock(PortfolioHolding.class);
+    final List<PortfolioHolding> holdings = List.of(holding);
+    final List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
+    when(command.getHoldings()).thenReturn(holdings);
+    when(command.getDataProviders()).thenReturn(providers);
+    when(incomeForecastFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
+
+    // ACT
+    service.perform(command);
+
+    // VERIFY
+    verify(incomeForecastFetcher).fetch(eq(holdings), eq(providers));
+  }
+
   @Test
   void shouldTestCalculate_whenIncome() {
     BigDecimal dividendYield = new BigDecimal("0.05");

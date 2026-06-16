@@ -71,9 +71,8 @@ public class EquityMarketCapitalizationService
 
   @Override
   public ExposureDataHolder<EquityMarketCapitalizationType> fetchExposures(final PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, HoldingEquityMarketCap> rawData = equityMarketCapSecurityDataFetcher.fetch(command
-        .getHoldings(),
-        List.of());
+    Map<PortfolioHolding, HoldingEquityMarketCap> rawData = equityMarketCapSecurityDataFetcher.fetch(
+        command.getHoldings(), command.getDataProviders());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         HoldingEquityMarketCap::getRatings,
         ALLOCATION_DEFAULT_MAP, MISSING_EQUITY_MARKET_CAPITALIZATION);

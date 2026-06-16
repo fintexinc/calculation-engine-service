@@ -55,7 +55,7 @@ public class FixedIncomeCreditQualityService
   public CreditQualityResult perform(final PortfolioHoldingsCommand command) {
     final ArrayList<Notification> warnings = new ArrayList<>();
     final Map<PortfolioHolding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
-        command.getHoldings(), List.of());
+        command.getHoldings(), command.getDataProviders());
     final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(
         rawCreditQuality,
         warnings);

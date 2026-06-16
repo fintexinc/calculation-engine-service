@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,12 +21,12 @@ class EquitySectorResponseMapperTest {
   private final EquitySectorResponseMapper mapper = new EquitySectorResponseMapper();
 
   @Test
-  void shouldReturnDefaultMapWithZeros_whenDomainIsNull() {
+  void shouldReturnDefaultMapWithNulls_whenDomainIsNull() {
     EquitySectorResult result = mapper.toResponse(null);
 
     assertEquals(EquitySectorAllocationType.values().length, result.getEquitySector().size());
     assertTrue(result.getWarnings().isEmpty());
-    assertEquals(0, result.getEquitySector().get(EquitySectorAllocationType.ENERGY).compareTo(BigDecimal.ZERO));
+    assertNull(result.getEquitySector().get(EquitySectorAllocationType.ENERGY));
   }
 
   @Test
@@ -42,14 +43,14 @@ class EquitySectorResponseMapperTest {
   }
 
   @Test
-  void shouldReturnDefaultMapAndPassWarnings_whenNetProductsAreEmpty() {
+  void shouldReturnDefaultMapWithNullsAndPassWarnings_whenNetProductsAreEmpty() {
     List<Notification> warnings = List.of(Notification.builder().uuid("w1").message("warning").build());
 
     EquitySectorResult result = mapper.fromNetProducts(Map.of(), warnings);
 
     assertEquals(warnings, result.getWarnings());
     assertEquals(EquitySectorAllocationType.values().length, result.getEquitySector().size());
-    assertEquals(0, result.getEquitySector().get(EquitySectorAllocationType.HEALTHCARE).compareTo(BigDecimal.ZERO));
+    assertNull(result.getEquitySector().get(EquitySectorAllocationType.HEALTHCARE));
   }
 
   @Test

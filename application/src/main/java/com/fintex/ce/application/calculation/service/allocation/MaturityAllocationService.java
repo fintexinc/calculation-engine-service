@@ -64,9 +64,8 @@ public class MaturityAllocationService
 
   @Override
   public ExposureDataHolder<MaturityAllocationType> fetchExposures(PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, MaturityAllocation> rawData = maturityAllocationSecurityDataFetcher.fetch(command
-        .getHoldings(),
-        List.of());
+    Map<PortfolioHolding, MaturityAllocation> rawData = maturityAllocationSecurityDataFetcher.fetch(
+        command.getHoldings(), command.getDataProviders());
     return AllocationMappingUtils.mapToAllocations(rawData,
         MaturityAllocation::getMaturityDurationValues,
         MaturityAllocationType::fromValue,

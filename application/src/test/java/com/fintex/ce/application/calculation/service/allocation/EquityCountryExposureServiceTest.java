@@ -11,6 +11,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.Test;
@@ -136,7 +137,7 @@ class EquityCountryExposureServiceTest {
     final var holding = mock(PortfolioHolding.class);
     final var command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holding));
-    when(command.getDataProviders()).thenReturn(List.of());
+    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
 
     final var allocation = new EquityCountryAllocation();
     allocation.setAllocations(Map.of("CAN", BigDecimal.valueOf(0.65)));
@@ -151,6 +152,7 @@ class EquityCountryExposureServiceTest {
 
     assertEquals(expected, actual);
     assertTrue(actual.containsKey(holding));
+    verify(securityDataPort).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test

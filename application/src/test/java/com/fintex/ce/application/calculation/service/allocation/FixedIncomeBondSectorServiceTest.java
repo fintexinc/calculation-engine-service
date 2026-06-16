@@ -8,6 +8,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
@@ -79,15 +81,18 @@ class FixedIncomeBondSectorServiceTest {
     FixedIncomeBondSectorService service = mockService(fixedIncomeFetcher, assetAllocationFetcher);
 
     PortfolioHolding holding = mock(PortfolioHolding.class);
+    PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     FixedIncomeBondSecurities rawData = new FixedIncomeBondSecurities();
     rawData.setFixedIncomeBondSectors(Map.of(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS, TEN));
     when(fixedIncomeFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawData));
 
     doCallRealMethod().when(service).fetchExposures(any());
-    ExposureDataHolder<FixedIncomeSecuritiesAllocationType> result = service.fetchExposures(
-        mock(PortfolioHoldingsCommand.class));
+    ExposureDataHolder<FixedIncomeSecuritiesAllocationType> result = service.fetchExposures(command);
 
     assertEquals(1, result.allocations().size());
+    verify(fixedIncomeFetcher).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test

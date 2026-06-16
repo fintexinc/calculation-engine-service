@@ -71,13 +71,15 @@ class FixedIncomeCreditQualityServiceTest {
     PortfolioHolding holding = mock(PortfolioHolding.class);
     List<PortfolioHolding> holdings = List.of(holding);
     PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
+    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
     when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
     when(command.getHoldings()).thenReturn(holdings);
+    when(command.getDataProviders()).thenReturn(providers);
 
     doCallRealMethod().when(service).perform(any());
     service.perform(command);
 
-    verify(creditQualityFetcher).fetch(eq(holdings), any());
+    verify(creditQualityFetcher).fetch(eq(holdings), eq(providers));
   }
 
   @Test
