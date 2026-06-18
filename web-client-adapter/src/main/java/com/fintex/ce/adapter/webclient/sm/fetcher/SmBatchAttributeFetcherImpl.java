@@ -78,7 +78,7 @@ public class SmBatchAttributeFetcherImpl implements SmBatchAttributeFetcher {
       return;
     }
 
-    batchResponse.forEach((bundle, rawResults) -> warmUpFetcher(bundle, rawResults, holdings, providers));
+    batchResponse.getResults().forEach((bundle, rawResults) -> warmUpFetcher(bundle, rawResults, holdings, providers));
   }
 
   @SuppressWarnings("unchecked")
