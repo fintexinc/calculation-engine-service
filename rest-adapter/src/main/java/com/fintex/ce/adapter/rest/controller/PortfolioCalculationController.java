@@ -194,6 +194,9 @@ public class PortfolioCalculationController {
           errors.put(metricKey, toNotifications(e));
         } catch (BasePceException e) {
           errors.put(metricKey, List.of(toNotification(e)));
+        } catch (Exception e) {
+          log.error("Unexpected error calculating metric '{}': {}", metricKey, e.getMessage(), e);
+          errors.put(metricKey, List.of(ErrorCode.INTERNAL_SERVER_ERROR.asNotification()));
         }
       }
     } finally {

@@ -90,7 +90,7 @@ class PortfolioCalculationControllerTest {
 
     mockServices = new EnumMap<>(CalculationMetric.class);
     List<CalculationService<?, ?>> serviceList = Arrays.stream(CalculationMetric.values())
-        .map(this::createMockService)
+        .<CalculationService<?, ?>>map(this::createMockService)
         .toList();
 
     var controller = new PortfolioCalculationController(
@@ -269,6 +269,36 @@ class PortfolioCalculationControllerTest {
           mvcResult.getResponse().getContentAsString(), BatchResultView.class);
       assertThat(view.results).isNullOrEmpty();
       assertThat(view.errors).containsKey(unsupported.getValue());
+    }
+
+    @Test
+    void shouldIsolateUnexpectedRuntimeException_andContinueRemainingMetrics() throws Exception {
+      CalculationMetric crashingMetric = CalculationMetric.EQUITY_SECTOR;
+      CalculationMetric successMetric = CalculationMetric.ASSET_ALLOCATIONS;
+
+      PortfolioHoldingsCommand successCommand = new PortfolioHoldingsCommand();
+      successCommand.setMetric(successMetric);
+      AssetAllocationResult successResult = new AssetAllocationResult();
+
+      when(batchCommandFactory.buildCommand(eq(crashingMetric), any()))
+          .thenThrow(new NullPointerException("simulated unexpected failure"));
+      when(batchCommandFactory.buildCommand(eq(successMetric), any())).thenReturn(successCommand);
+      when(mockServices.get(successMetric).perform(eq(successCommand))).thenReturn(successResult);
+
+      BatchCalculationCommand batchCommand = new BatchCalculationCommand();
+      batchCommand.setMetrics(List.of(crashingMetric, successMetric));
+
+      MvcResult mvcResult = mockMvc.perform(
+          post(BASE_PATH + "/batch")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(batchCommand)))
+          .andExpect(status().isOk())
+          .andReturn();
+
+      BatchResultView view = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(), BatchResultView.class);
+      assertThat(view.errors).containsKey(crashingMetric.getValue());
+      assertThat(view.results).containsKey(successMetric.getValue());
     }
 
     private static class BatchResultView {

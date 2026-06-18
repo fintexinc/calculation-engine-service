@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(HandlerMethodValidationException.class)
   public ResponseEntity<ErrorResponse> handleHandlerMethodValidation(HandlerMethodValidationException e) {
     log.error(e.getMessage());
-    List<Notification> notifications = e.getAllValidationResults().stream()
+    List<Notification> notifications = e.getValueResults().stream()
         .flatMap(result -> result.getResolvableErrors().stream())
         .map(error -> error instanceof ObjectError oe
             ? toNotification(oe)
