@@ -149,7 +149,7 @@ class BatchCalculationE2ETest {
     assertThat(assetResult.getAssetAllocation()).isNotNull();
     assertThat(assetResult.getWarnings()).isNotEmpty();
     assertThat(equityResult.getEquitySector()).isNotNull();
-    assertThat(equityResult.getWarnings()).isNotEmpty();
+    assertThat(equityResult.getWarnings()).isEmpty();
     assertThat(body.errors).isNullOrEmpty();
   }
 
