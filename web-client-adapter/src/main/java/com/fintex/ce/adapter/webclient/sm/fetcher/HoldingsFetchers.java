@@ -4,7 +4,7 @@ import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.TopHoldingsMapper;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeBundle;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.holding.HoldingIdentifiers;
 import com.fintex.wm.commons.domain.holding.TopHoldings;
@@ -25,19 +25,21 @@ import java.util.List;
 public class HoldingsFetchers {
 
   @Bean
-  SecurityDataFetcher<CommonTopHoldings> topHoldingsFetcher(
+  AbstractSecurityMasterFetcher<CommonTopHoldings, TopHoldings> topHoldingsFetcher(
       SecurityMasterWebClient client, TopHoldingsMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.holdings.top}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<TopHoldings>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<TopHoldings>>>() {},
+        SecurityAttributeBundle.TOP_HOLDINGS, TopHoldings.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<HoldingIdentifiers> holdingIdentifiersFetcher(
+  AbstractSecurityMasterFetcher<HoldingIdentifiers, HoldingIdentifiers> holdingIdentifiersFetcher(
       SecurityMasterWebClient client,
       @Value("${external-services.security-master.rest.endpoints.holdings.identifiers}") String endpointPath) {
     SecurityMasterResponseMapper<HoldingIdentifiers, HoldingIdentifiers> mapper = (response, holding) -> response;
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<HoldingIdentifiers>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<HoldingIdentifiers>>>() {},
+        SecurityAttributeBundle.HOLDING_IDENTIFIERS, HoldingIdentifiers.class) {};
   }
 }

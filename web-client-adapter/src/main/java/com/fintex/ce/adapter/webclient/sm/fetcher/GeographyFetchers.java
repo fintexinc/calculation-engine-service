@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.fetcher;
 
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeBundle;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.financial.Geography;
 
@@ -18,10 +18,11 @@ import java.util.List;
 public class GeographyFetchers {
 
   @Bean
-  SecurityDataFetcher<Geography> geographyFetcher(
+  AbstractSecurityMasterFetcher<Geography, Geography> geographyFetcher(
       SecurityMasterWebClient client,
       @Value("${external-services.security-master.rest.endpoints.geography}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, (response, holding) -> response,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<Geography>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<Geography>>>() {},
+        SecurityAttributeBundle.GEOGRAPHY, Geography.class) {};
   }
 }

@@ -7,6 +7,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.BatchContext;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeBundle;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -14,6 +15,7 @@ import com.fintex.wm.commons.dto.request.IdsAndDataProvidersRequest;
 import com.fintex.wm.commons.dto.search.TypedIdentifiers;
 
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -46,13 +48,60 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
   protected final SecurityMasterResponseMapper<D, R> mapper;
   protected final ParameterizedTypeReference<List<SecurityAttributeResult<R>>> responseType;
 
+  @Nullable
+  private final SecurityAttributeBundle bundle;
+  @Nullable
+  private final Class<R> smResponseClass;
+
   protected AbstractSecurityMasterFetcher(SecurityMasterWebClient client, String endpointPath,
       SecurityMasterResponseMapper<D, R> mapper,
-      ParameterizedTypeReference<List<SecurityAttributeResult<R>>> responseType) {
+      ParameterizedTypeReference<List<SecurityAttributeResult<R>>> responseType,
+      @Nullable SecurityAttributeBundle bundle,
+      @Nullable Class<R> smResponseClass) {
     this.client = client;
     this.endpointPath = endpointPath;
     this.mapper = mapper;
     this.responseType = responseType;
+    this.bundle = bundle;
+    this.smResponseClass = smResponseClass;
+  }
+
+  protected AbstractSecurityMasterFetcher(SecurityMasterWebClient client, String endpointPath,
+      SecurityMasterResponseMapper<D, R> mapper,
+      ParameterizedTypeReference<List<SecurityAttributeResult<R>>> responseType) {
+    this(client, endpointPath, mapper, responseType, null, null);
+  }
+
+  @Nullable
+  public SecurityAttributeBundle getBundle() {
+    return bundle;
+  }
+
+  @Nullable
+  public Class<R> getSmResponseClass() {
+    return smResponseClass;
+  }
+
+  /**
+   * Warms up {@link BatchContext} for this fetcher using results already fetched by the SM batch attribute endpoint.
+   * Skips if BatchContext is inactive, bundle is null, or the entry is already cached. Must be called before the metric
+   * calculation loop.
+   */
+  public void warmUp(List<SecurityAttributeResult<R>> smResults,
+      List<? extends PortfolioHolding> holdings,
+      List<DataProvider> providers) {
+    if (!BatchContext.isActive() || CollectionUtils.isEmpty(smResults)) {
+      return;
+    }
+    String cacheKey = buildBatchCacheKey(holdings, providers);
+    if (BatchContext.get(cacheKey).isPresent()) {
+      return;
+    }
+    Map<String, List<PortfolioHolding>> identifierMap = buildIdentifierMap(holdings);
+    Map<PortfolioHolding, D> result = mapResponsesToHoldings(smResults, identifierMap);
+    BatchContext.put(cacheKey, result);
+    log.debug("Batch SM pre-warm for bundle {} ({} results, {} holdings)", bundle, smResults.size(),
+        holdings.size());
   }
 
   @Override
@@ -74,9 +123,32 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
     return result;
   }
 
-  private String buildBatchCacheKey(List<? extends PortfolioHolding> holdings, List<DataProvider> providers) {
-    int providersHash = CollectionUtils.isEmpty(providers) ? 0 : providers.hashCode();
-    return endpointPath + ":" + holdings.hashCode() + ":" + providersHash;
+  String buildBatchCacheKey(List<? extends PortfolioHolding> holdings, List<DataProvider> providers) {
+    String holdingsKey = holdings.stream()
+        .filter(h -> h.getSecurityIdentifier() != null)
+        .map(h -> (h.getHoldingType() != null ? h.getHoldingType().name() : "")
+            + ":" + Objects.toString(h.getSecurityIdentifier().getIdType(), "")
+            + ":" + Objects.toString(h.getSecurityIdentifier().getId(), ""))
+        .sorted()
+        .collect(Collectors.joining(","));
+    String providersKey = CollectionUtils.isEmpty(providers)
+        ? ""
+        : providers.stream().map(Object::toString).sorted().collect(Collectors.joining(","));
+    return endpointPath + "|" + holdingsKey + "|" + providersKey;
+  }
+
+  /**
+   * Builds the identifier → holdings map used to match SM responses back to portfolio holdings. Package-visible for use
+   * by {@link SmBatchAttributeFetcherImpl}.
+   */
+  Map<String, List<PortfolioHolding>> buildIdentifierMap(List<? extends PortfolioHolding> holdings) {
+    Map<String, List<PortfolioHolding>> result = new HashMap<>();
+    holdings.stream()
+        .filter(h -> h.getSecurityIdentifier() != null && hasValidHoldingType(h))
+        .forEach(h -> result
+            .computeIfAbsent(buildKey(h.getSecurityIdentifier()), k -> new ArrayList<>())
+            .add(h));
+    return result;
   }
 
   private Map<PortfolioHolding, D> doFetch(List<? extends PortfolioHolding> holdings, List<DataProvider> providers) {

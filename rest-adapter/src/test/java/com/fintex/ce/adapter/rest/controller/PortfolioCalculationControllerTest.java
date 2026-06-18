@@ -1,21 +1,27 @@
 package com.fintex.ce.adapter.rest.controller;
 
+import com.fintex.ce.adapter.rest.batch.BatchCommandFactory;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.HoldingReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.PeriodReqValidator;
+import com.fintex.ce.application.calculation.batch.SmBatchPrefetcher;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
+import com.fintex.ce.model.dto.command.BatchCalculationCommand;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -36,6 +42,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -54,9 +61,11 @@ import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationControll
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,6 +76,11 @@ class PortfolioCalculationControllerTest {
   private MockMvc mockMvc;
   private ObjectMapper objectMapper;
   private EnumMap<CalculationMetric, CalculationService> mockServices;
+
+  @Mock
+  private BatchCommandFactory batchCommandFactory;
+  @Mock
+  private SmBatchPrefetcher smBatchPrefetcher;
 
   @BeforeEach
   void setUp() {
@@ -81,7 +95,9 @@ class PortfolioCalculationControllerTest {
 
     var controller = new PortfolioCalculationController(
         serviceList,
-        new com.fintex.ce.adapter.rest.validation.RequestValidationFacade(java.util.List.of()));
+        new com.fintex.ce.adapter.rest.validation.RequestValidationFacade(java.util.List.of()),
+        batchCommandFactory,
+        smBatchPrefetcher);
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -171,6 +187,96 @@ class PortfolioCalculationControllerTest {
         .andExpect(status().isUnsupportedMediaType());
   }
 
+  @Nested
+  @SuppressWarnings("unchecked")
+  class BatchEndpoint {
+
+    @Test
+    void shouldReturnResults_whenAllMetricsSucceed() throws Exception {
+      CalculationMetric metric = CalculationMetric.ASSET_ALLOCATIONS;
+      PortfolioHoldingsCommand specificCommand = new PortfolioHoldingsCommand();
+      specificCommand.setMetric(metric);
+      AssetAllocationResult expectedResult = new AssetAllocationResult();
+
+      when(batchCommandFactory.buildCommand(eq(metric), any(BatchCalculationCommand.class)))
+          .thenReturn(specificCommand);
+      when(mockServices.get(metric).perform(eq(specificCommand)))
+          .thenReturn(expectedResult);
+
+      BatchCalculationCommand batchCommand = new BatchCalculationCommand();
+      batchCommand.setMetrics(List.of(metric));
+
+      MvcResult mvcResult = mockMvc.perform(
+          post(BASE_PATH + "/batch")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(batchCommand)))
+          .andExpect(status().isOk())
+          .andReturn();
+
+      BatchResultView view = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(), BatchResultView.class);
+      assertThat(view.results).containsKey(metric.getValue());
+      assertThat(view.errors).isNull();
+    }
+
+    @Test
+    void shouldIsolateMetricError_whenOneMetricThrowsBasePceException() throws Exception {
+      CalculationMetric successMetric = CalculationMetric.ASSET_ALLOCATIONS;
+      CalculationMetric failingMetric = CalculationMetric.EQUITY_SECTOR;
+
+      PortfolioHoldingsCommand successCommand = new PortfolioHoldingsCommand();
+      successCommand.setMetric(successMetric);
+      AssetAllocationResult successResult = new AssetAllocationResult();
+
+      when(batchCommandFactory.buildCommand(eq(successMetric), any())).thenReturn(successCommand);
+      when(batchCommandFactory.buildCommand(eq(failingMetric), any()))
+          .thenThrow(ErrorCode.INTERNAL_SERVER_ERROR.toException());
+      when(mockServices.get(successMetric).perform(eq(successCommand))).thenReturn(successResult);
+
+      BatchCalculationCommand batchCommand = new BatchCalculationCommand();
+      batchCommand.setMetrics(List.of(successMetric, failingMetric));
+
+      MvcResult mvcResult = mockMvc.perform(
+          post(BASE_PATH + "/batch")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(batchCommand)))
+          .andExpect(status().isOk())
+          .andReturn();
+
+      BatchResultView view = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(), BatchResultView.class);
+      assertThat(view.results).containsKey(successMetric.getValue());
+      assertThat(view.errors).containsKey(failingMetric.getValue());
+    }
+
+    @Test
+    void shouldIsolateErrorForUnsupportedMetric_whenCommonPerformanceDatesIncluded() throws Exception {
+      CalculationMetric unsupported = CalculationMetric.COMMON_PERFORMANCE_DATES;
+      when(batchCommandFactory.buildCommand(eq(unsupported), any()))
+          .thenThrow(ErrorCode.METRIC_NOT_SUPPORTED_IN_BATCH.toException(unsupported.getValue()));
+
+      BatchCalculationCommand batchCommand = new BatchCalculationCommand();
+      batchCommand.setMetrics(List.of(unsupported));
+
+      MvcResult mvcResult = mockMvc.perform(
+          post(BASE_PATH + "/batch")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(objectMapper.writeValueAsString(batchCommand)))
+          .andExpect(status().isOk())
+          .andReturn();
+
+      BatchResultView view = objectMapper.readValue(
+          mvcResult.getResponse().getContentAsString(), BatchResultView.class);
+      assertThat(view.results).isNullOrEmpty();
+      assertThat(view.errors).containsKey(unsupported.getValue());
+    }
+
+    private static class BatchResultView {
+      public java.util.Map<String, Object> results;
+      public java.util.Map<String, Object> errors;
+    }
+  }
+
   @SuppressWarnings("unchecked")
   private CalculationService<?, ?> createMockService(CalculationMetric metric) {
     CalculationService mock = mock(CalculationService.class);
@@ -216,7 +322,7 @@ class PortfolioCalculationControllerTest {
         services.add(svc);
       }
 
-      var controller = new PortfolioCalculationController(services, facade);
+      var controller = new PortfolioCalculationController(services, facade, batchCommandFactory, smBatchPrefetcher);
       LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
       validator.afterPropertiesSet();
       validatingMockMvc = MockMvcBuilders.standaloneSetup(controller)

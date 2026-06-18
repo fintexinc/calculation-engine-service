@@ -25,7 +25,6 @@ import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
@@ -34,6 +33,7 @@ import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.GeographicAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.Maturities;
 import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeBundle;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatings;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxes;
@@ -55,106 +55,119 @@ import java.util.List;
 public class AllocationFetchers {
 
   @Bean
-  SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher(
+  AbstractSecurityMasterFetcher<HoldingAssetAllocation, AssetAllocationWithCurrency> assetAllocationFetcher(
       SecurityMasterWebClient client, AssetAllocationSecurityMasterMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.asset}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<AssetAllocationWithCurrency>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<AssetAllocationWithCurrency>>>() {},
+        SecurityAttributeBundle.ASSET_ALLOCATION, AssetAllocationWithCurrency.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<CreditQuality> creditQualityFetcher(
+  AbstractSecurityMasterFetcher<CreditQuality, CreditQualityRatings> creditQualityFetcher(
       SecurityMasterWebClient client, CreditQualityMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.credit-quality}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<CreditQualityRatings>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<CreditQualityRatings>>>() {},
+        SecurityAttributeBundle.CREDIT_QUALITY_RATINGS, CreditQualityRatings.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<EquityCountryAllocation> equityCountryAllocationFetcher(
+  AbstractSecurityMasterFetcher<EquityCountryAllocation, CountryAllocation> equityCountryAllocationFetcher(
       SecurityMasterWebClient client, EquityCountryAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.equity-country}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<CountryAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<CountryAllocation>>>() {},
+        SecurityAttributeBundle.EQUITY_COUNTRY_ALLOCATION, CountryAllocation.class) {};
   }
 
   @Bean("equityGeographicAllocationFetcher")
-  SecurityDataFetcher<HoldingGeographicAllocation> equityGeographicAllocationFetcher(
+  AbstractSecurityMasterFetcher<HoldingGeographicAllocation, GeographicAllocationWithCurrency> equityGeographicAllocationFetcher(
       SecurityMasterWebClient client, GeographicAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.equity-geographic}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<GeographicAllocationWithCurrency>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<GeographicAllocationWithCurrency>>>() {},
+        SecurityAttributeBundle.EQUITY_GEOGRAPHIC_ALLOCATION, GeographicAllocationWithCurrency.class) {};
   }
 
   @Bean("fixedIncomeGeographicAllocationFetcher")
-  SecurityDataFetcher<HoldingGeographicAllocation> fixedIncomeGeographicAllocationFetcher(
+  AbstractSecurityMasterFetcher<HoldingGeographicAllocation, GeographicAllocationWithCurrency> fixedIncomeGeographicAllocationFetcher(
       SecurityMasterWebClient client, GeographicAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.fixed-income-geographic}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<GeographicAllocationWithCurrency>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<GeographicAllocationWithCurrency>>>() {},
+        SecurityAttributeBundle.FIXED_INCOME_GEOGRAPHIC_ALLOCATION, GeographicAllocationWithCurrency.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<HoldingEquityMarketCap> equityMarketCapitalizationFetcher(
+  AbstractSecurityMasterFetcher<HoldingEquityMarketCap, EquityMarketCapitalization> equityMarketCapitalizationFetcher(
       SecurityMasterWebClient client, EquityMarketCapitalizationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.equity-market-cap}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<EquityMarketCapitalization>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<EquityMarketCapitalization>>>() {},
+        SecurityAttributeBundle.EQUITY_MARKET_CAPITALIZATION, EquityMarketCapitalization.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<EquitySector> equitySectorAllocationFetcher(
+  AbstractSecurityMasterFetcher<EquitySector, EquitySectorAllocation> equitySectorAllocationFetcher(
       SecurityMasterWebClient client, EquitySectorAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.equity-sector}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<EquitySectorAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<EquitySectorAllocation>>>() {},
+        SecurityAttributeBundle.EQUITY_SECTOR_ALLOCATION, EquitySectorAllocation.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<EquityStyleboxExposure> equityStyleboxExposureFetcher(
+  AbstractSecurityMasterFetcher<EquityStyleboxExposure, StyleBoxes> equityStyleboxExposureFetcher(
       SecurityMasterWebClient client, EquityStyleboxExposureMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.equity-stylebox}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<StyleBoxes>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<StyleBoxes>>>() {},
+        SecurityAttributeBundle.EQUITY_STYLE_BOXES, StyleBoxes.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSecuritiesFetcher(
+  AbstractSecurityMasterFetcher<FixedIncomeBondSecurities, FixedIncomeSectorAllocation> fixedIncomeBondSecuritiesFetcher(
       SecurityMasterWebClient client, FixedIncomeSectorAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.fixed-income-sector}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeSectorAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeSectorAllocation>>>() {},
+        SecurityAttributeBundle.FIXED_INCOME_SECTOR_ALLOCATION, FixedIncomeSectorAllocation.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<FixedIncomeStyleboxExposure> fixedIncomeStyleboxExposureFetcher(
+  AbstractSecurityMasterFetcher<FixedIncomeStyleboxExposure, FixedIncomeStyleBoxes> fixedIncomeStyleboxExposureFetcher(
       SecurityMasterWebClient client, FixedIncomeStyleboxExposureMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.fixed-income-stylebox}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeStyleBoxes>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeStyleBoxes>>>() {},
+        SecurityAttributeBundle.FIXED_INCOME_STYLE_BOXES, FixedIncomeStyleBoxes.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<MaturityAllocation> maturityAllocationFetcher(
+  AbstractSecurityMasterFetcher<MaturityAllocation, Maturities> maturityAllocationFetcher(
       SecurityMasterWebClient client, MaturityAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.maturities}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<Maturities>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<Maturities>>>() {},
+        SecurityAttributeBundle.MATURITIES, Maturities.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<CountryExposure> countryExposureFetcher(
+  AbstractSecurityMasterFetcher<CountryExposure, CountryAllocation> countryExposureFetcher(
       SecurityMasterWebClient client, CountryExposureMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.country}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<CountryAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<CountryAllocation>>>() {},
+        SecurityAttributeBundle.COUNTRY_ALLOCATION, CountryAllocation.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<ClassificationAllocation> classificationAllocationFetcher(
+  AbstractSecurityMasterFetcher<ClassificationAllocation, SecurityClassificationAllocation> classificationAllocationFetcher(
       SecurityMasterWebClient client, ClassificationAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.classification}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<SecurityClassificationAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<SecurityClassificationAllocation>>>() {},
+        SecurityAttributeBundle.SECURITY_CLASSIFICATION_ALLOCATION, SecurityClassificationAllocation.class) {};
   }
 }

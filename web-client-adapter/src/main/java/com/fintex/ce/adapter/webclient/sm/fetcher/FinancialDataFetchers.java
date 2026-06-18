@@ -7,7 +7,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.YieldMapper;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
 import com.fintex.ce.model.domain.calculation.yield.Yield;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeBundle;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.financial.Fees;
 import com.fintex.wm.commons.domain.financial.Income;
@@ -29,26 +29,29 @@ import java.util.List;
 public class FinancialDataFetchers {
 
   @Bean
-  SecurityDataFetcher<FeeData> feesFetcher(
+  AbstractSecurityMasterFetcher<FeeData, Fees> feesFetcher(
       SecurityMasterWebClient client, FeesMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.fees}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<Fees>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<Fees>>>() {},
+        SecurityAttributeBundle.FEES, Fees.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<SalesCharge> salesChargeFetcher(
+  AbstractSecurityMasterFetcher<SalesCharge, SalesChargeData> salesChargeFetcher(
       SecurityMasterWebClient client, SalesChargeMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.sales-charge}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<SalesChargeData>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<SalesChargeData>>>() {},
+        SecurityAttributeBundle.SALES_CHARGE, SalesChargeData.class) {};
   }
 
   @Bean
-  SecurityDataFetcher<Yield> yieldFetcher(
+  AbstractSecurityMasterFetcher<Yield, Income> yieldFetcher(
       SecurityMasterWebClient client, YieldMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.income}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<Income>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<Income>>>() {},
+        SecurityAttributeBundle.INCOME, Income.class) {};
   }
 }

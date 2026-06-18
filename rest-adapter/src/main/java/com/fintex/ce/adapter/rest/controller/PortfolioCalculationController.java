@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.rest.controller;
 
 import com.fintex.ce.adapter.rest.batch.BatchCommandFactory;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
+import com.fintex.ce.application.calculation.batch.SmBatchPrefetcher;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
@@ -96,11 +97,13 @@ public class PortfolioCalculationController {
   private final Map<CalculationMetric, CalculationService<?, ?>> serviceMap;
   private final RequestValidationFacade validationFacade;
   private final BatchCommandFactory batchCommandFactory;
+  private final SmBatchPrefetcher smBatchPrefetcher;
 
   public PortfolioCalculationController(
       List<CalculationService<?, ?>> calculationServices,
       RequestValidationFacade validationFacade,
-      BatchCommandFactory batchCommandFactory) {
+      BatchCommandFactory batchCommandFactory,
+      SmBatchPrefetcher smBatchPrefetcher) {
     this.serviceMap = calculationServices.stream()
         .collect(Collectors.toMap(CalculationService::getMetric, Function.identity(),
             (existing, duplicate) -> {
@@ -108,6 +111,7 @@ public class PortfolioCalculationController {
             }));
     this.validationFacade = validationFacade;
     this.batchCommandFactory = batchCommandFactory;
+    this.smBatchPrefetcher = smBatchPrefetcher;
   }
 
   @Operation(summary = "Execute a portfolio calculation", description = "Performs the specified calculation metric on the provided portfolio holdings. "
@@ -174,6 +178,8 @@ public class PortfolioCalculationController {
 
     BatchContext.begin();
     try {
+      smBatchPrefetcher.prefetch(command.getMetrics(), command.getHoldings(), command.getBenchmarkHoldings(), command
+          .getDataProviders());
       for (CalculationMetric metric : command.getMetrics()) {
         String metricKey = metric.getValue();
         try {

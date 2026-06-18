@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.util.BatchContext;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -21,6 +22,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -172,6 +174,108 @@ abstract class AbstractSecurityMasterFetcherTest<D, R> {
     assertThat(result).hasSize(2);
     assertThat(result.get(holding1)).isSameAs(expected1);
     assertThat(result.get(holding2)).isSameAs(expected2);
+  }
+
+  @Test
+  void shouldBuildDeterministicCacheKey_regardlessOfHoldingOrder() {
+    PortfolioHolding h1 = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding h2 = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
+
+    String key1 = fetcher().buildBatchCacheKey(List.of(h1, h2), providers);
+    String key2 = fetcher().buildBatchCacheKey(List.of(h2, h1), providers);
+
+    assertThat(key1).isEqualTo(key2);
+    assertThat(key1).contains("XIU.TO").contains("VFV.TO").contains("MORNINGSTAR");
+  }
+
+  @Test
+  void shouldBuildDistinctCacheKeys_whenHoldingsDiffer() {
+    PortfolioHolding h1 = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding h2 = createHolding("VFV.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
+
+    String key1 = fetcher().buildBatchCacheKey(List.of(h1), providers);
+    String key2 = fetcher().buildBatchCacheKey(List.of(h2), providers);
+
+    assertThat(key1).isNotEqualTo(key2);
+  }
+
+  @Test
+  void shouldReturnCachedResult_whenBatchContextIsActive_andCacheIsPrePopulated() {
+    PortfolioHolding holding = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    D expectedResult = createExpectedDomainModel();
+    Map<PortfolioHolding, D> cachedMap = Map.of(holding, expectedResult);
+    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
+
+    BatchContext.begin();
+    try {
+      String cacheKey = fetcher().buildBatchCacheKey(List.of(holding), providers);
+      BatchContext.put(cacheKey, cachedMap);
+
+      Map<PortfolioHolding, D> result = fetcher().fetch(List.of(holding), providers);
+
+      assertThat(result).isSameAs(cachedMap);
+      verifyNoInteractions(securityMasterWebClient);
+    } finally {
+      BatchContext.end();
+    }
+  }
+
+  @Test
+  void shouldCallSmOnce_whenBatchContextIsActive_andSecondFetchHitsCache() {
+    PortfolioHolding holding = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    R smsResponse = createSmsResponse();
+    D expected = createExpectedDomainModel();
+
+    var identifier = new SecurityIdentifier();
+    identifier.setId("XIU.TO");
+    identifier.setIdType(FiIdentifierType.TICKER);
+
+    when(securityMasterWebClient.post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class)))
+        .thenReturn(List.of(securityAttributeResult(identifier, smsResponse)));
+    when(mapper().map(smsResponse, holding)).thenReturn(expected);
+
+    BatchContext.begin();
+    try {
+      Map<PortfolioHolding, D> firstResult = fetcher().fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
+      Map<PortfolioHolding, D> secondResult = fetcher().fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
+
+      assertThat(firstResult).containsEntry(holding, expected);
+      assertThat(secondResult).isSameAs(firstResult);
+      verify(securityMasterWebClient, times(1))
+          .post(eq(expectedEndpointPath()), any(), any(ParameterizedTypeReference.class));
+    } finally {
+      BatchContext.end();
+    }
+  }
+
+  @Test
+  void warmUp_shouldPopulateBatchContext_andSubsequentFetchBypassesSm() {
+    PortfolioHolding holding = createHolding("XIU.TO", FiIdentifierType.TICKER, FinancialInstrumentType.ETF_CANADA);
+    R smsResponse = createSmsResponse();
+    D expected = createExpectedDomainModel();
+
+    var identifier = new SecurityIdentifier();
+    identifier.setId("XIU.TO");
+    identifier.setIdType(FiIdentifierType.TICKER);
+
+    when(mapper().map(smsResponse, holding)).thenReturn(expected);
+
+    BatchContext.begin();
+    try {
+      fetcher().warmUp(
+          List.of(securityAttributeResult(identifier, smsResponse)),
+          List.of(holding),
+          List.of(DataProvider.MORNINGSTAR));
+
+      Map<PortfolioHolding, D> result = fetcher().fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
+
+      assertThat(result).containsEntry(holding, expected);
+      verifyNoInteractions(securityMasterWebClient);
+    } finally {
+      BatchContext.end();
+    }
   }
 
   protected PortfolioHolding createHolding(String id, FiIdentifierType idType, FinancialInstrumentType holdingType) {

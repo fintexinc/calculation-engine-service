@@ -3,7 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.fetcher;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClient;
 import com.fintex.ce.adapter.webclient.sm.mapper.MonthlyReturnsMapper;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.attribute.SecurityAttributeBundle;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
 
@@ -23,10 +23,11 @@ import java.util.List;
 public class ReturnsFetchers {
 
   @Bean
-  SecurityDataFetcher<HoldingMonthlyReturns> monthlyReturnsFetcher(
+  AbstractSecurityMasterFetcher<HoldingMonthlyReturns, MonthlyReturns> monthlyReturnsFetcher(
       SecurityMasterWebClient client, MonthlyReturnsMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.returns.monthly}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<MonthlyReturns>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<MonthlyReturns>>>() {},
+        SecurityAttributeBundle.MONTHLY_RETURNS, MonthlyReturns.class) {};
   }
 }
