@@ -275,7 +275,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
         // Period keys may carry whitespace from `application.yml` SpEL splits (e.g. "12, 36, 60, 120" → " 36").
         // calculateForPeriod trims before resolving but stores the original in the pair, so trim again here.
         .filter(pair -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(pair.getKey().trim()))
-        .filter(pair -> getNumberOfMonthsFor(portfolioTotalReturns, pair.getKey().trim()) > availableMonths)
+        .filter(pair -> requiresInsufficientDataWarning(pair.getKey().trim(), availableMonths))
         .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey().trim(),
             availableMonths))
         .forEach(warnings::add);
@@ -386,7 +386,8 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * overrides total return values. (newValue = ((oldValue*100)-100)/100)
    *
    * @param totalReturns
-   * @return
+   *          map of total return values to transform
+   * @return new map with transformed values
    */
   public NavigableMap<LocalDate, BigDecimal> overrideTotalReturns(
       NavigableMap<LocalDate, BigDecimal> totalReturns) {
@@ -446,6 +447,15 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
         .ifPresent(date -> {
           throw ErrorCode.MISSING_TBILL_RATE.toException(date);
         });
+  }
+
+  /**
+   * Returns true when a null period value should trigger an {@link ErrorCode#INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD}
+   * warning. The default checks whether the requested month count exceeds available months. Subclasses that have
+   * additional null-return paths (e.g. degenerate input data) should override and call {@code super} first.
+   */
+  protected boolean requiresInsufficientDataWarning(final String period, final int availableMonths) {
+    return getNumberOfMonthsFor(portfolioTotalReturns, period) > availableMonths;
   }
 
   @Override

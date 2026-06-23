@@ -25,7 +25,9 @@ import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anySet;
@@ -100,6 +102,7 @@ class MaxDrawdownCalculationTest {
 
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(mock(SortedMap.class));
+    when(calculation.calculateMaxDrawdownValues(any())).thenReturn(treeMap);
     when(calculation.getMaxDrawdownValue(any())).thenReturn(entry);
     when(calculation.getPeakValue(any(), any())).thenReturn(entry);
     when(treeMap.size()).thenReturn(TWELVE);
@@ -127,6 +130,7 @@ class MaxDrawdownCalculationTest {
     when(calculation.getPeriodStartDateWithOneMonthOffset(anyInt())).thenReturn(date);
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(mock(SortedMap.class));
+    when(calculation.calculateMaxDrawdownValues(any())).thenReturn(treeMap);
     when(calculation.getMaxDrawdownValue(any())).thenReturn(entry);
     when(calculation.getPeakValue(any(), any())).thenReturn(entry);
     when(treeMap.size()).thenReturn(TWELVE);
@@ -153,6 +157,7 @@ class MaxDrawdownCalculationTest {
     when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(sortedMap);
+    when(calculation.calculateMaxDrawdownValues(any())).thenReturn(treeMap);
     when(calculation.getMaxDrawdownValue(any())).thenReturn(entry);
     when(calculation.getPeakValue(any(), any())).thenReturn(entry);
     when(treeMap.size()).thenReturn(TWELVE);
@@ -249,38 +254,23 @@ class MaxDrawdownCalculationTest {
   }
 
   @Test
-  void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhenPortfolioTotalReturnsSizeLessThanPeriod() {
+  void shouldCalculatePeriodForNumberOfMonths_whenReturnsNullWhenPortfolioTotalReturnsSizeLessThanPeriod() {
     final var growth10K = mock(TreeMap.class);
     final var input = mock(PeriodCalculationInput.class);
     final var calculation = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
         null));
 
     final var treeMap = mock(TreeMap.class);
-    final var sortedMap = mock(SortedMap.class);
-    final var entry = mock(Map.Entry.class);
-    final var date = LocalDate.now();
 
-    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
-    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(sortedMap);
-    when(calculation.getMaxDrawdownValue(any())).thenReturn(entry);
-    when(calculation.calculateMaxDrawdownValues(any())).thenReturn(treeMap);
-    when(calculation.getPeakValue(any(), any())).thenReturn(entry);
     when(treeMap.size()).thenReturn(ONE.intValue());
-    when(entry.getValue()).thenReturn(ONE);
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
 
-    final MaxDrawdownEntry maxDrawDown = calculation.calculatePeriodForNumberOfMonths(TWELVE);
-
-    assertEquals(String.valueOf(TWELVE), maxDrawDown.period());
-    assertNull(maxDrawDown.drawdownTroughDate());
-    assertNull(maxDrawDown.drawdownStartDate());
-    assertNull(maxDrawDown.recoveryTime());
-    assertNull(maxDrawDown.value());
+    assertNull(calculation.calculatePeriodForNumberOfMonths(TWELVE));
   }
 
   @Test
-  void shouldCalculatePeriodForNumberOfMonths_whenCheckResultWhengetMaxDrawdownValueReturnsZero() {
+  void shouldCalculatePeriodForNumberOfMonths_whenReturnsNullWhenMaximumDrawdownMapIsEmpty() {
     final var growth10K = mock(TreeMap.class);
     final var input = mock(PeriodCalculationInput.class);
     final var calculation = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
@@ -288,26 +278,46 @@ class MaxDrawdownCalculationTest {
 
     final var treeMap = mock(TreeMap.class);
     final var sortedMap = mock(SortedMap.class);
-    final var entry = mock(Map.Entry.class);
     final var date = LocalDate.now();
 
-    when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPeriodStartDateWithOneMonthOffset(anyInt())).thenReturn(date);
     when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(sortedMap);
-    when(calculation.getMaxDrawdownValue(any()))
-        .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.valueOf(0, 00000000000))).firstEntry());
+    when(calculation.calculateMaxDrawdownValues(any())).thenReturn(new TreeMap<>());
+    when(treeMap.size()).thenReturn(TWELVE);
+    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
+
+    assertNull(calculation.calculatePeriodForNumberOfMonths(TWELVE));
+  }
+
+  @Test
+  void shouldCalculatePeriodForNumberOfMonths_whenReturnsZeroEntryWhenMaxDrawdownValueIsZero() {
+    final var growth10K = mock(TreeMap.class);
+    final var input = mock(PeriodCalculationInput.class);
+    final var calculation = mock(MaxDrawdownCalculation.class, withSettings().useConstructor(input, Set.of(), growth10K,
+        null));
+
+    final var treeMap = mock(TreeMap.class);
+    final var sortedMap = mock(SortedMap.class);
+    final var date = LocalDate.now();
+
+    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
+    when(calculation.getPeriodStartDateWithOneMonthOffset(anyInt())).thenReturn(date);
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(sortedMap);
     when(calculation.calculateMaxDrawdownValues(any())).thenReturn(treeMap);
-    when(calculation.getPeakValue(any(), any())).thenReturn(entry);
-    when(treeMap.size()).thenReturn(ONE.intValue());
+    when(calculation.getMaxDrawdownValue(any()))
+        .thenReturn(new TreeMap<>(Map.of(date, BigDecimal.ZERO)).firstEntry());
+    when(treeMap.isEmpty()).thenReturn(false);
+    when(treeMap.size()).thenReturn(TWELVE);
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
 
     final MaxDrawdownEntry maxDrawDown = calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
     assertEquals(String.valueOf(TWELVE), maxDrawDown.period());
+    assertEquals(0, BigDecimal.ZERO.compareTo(maxDrawDown.value()));
     assertNull(maxDrawDown.drawdownTroughDate());
     assertNull(maxDrawDown.drawdownStartDate());
     assertNull(maxDrawDown.recoveryTime());
-    assertNull(maxDrawDown.value());
   }
 
   @Test
@@ -355,6 +365,43 @@ class MaxDrawdownCalculationTest {
     assertEquals(toUserScale(BigDecimal.valueOf(0)), toUserScale(results.firstEntry().getValue()));
     assertEquals(date, results.lastKey());
     assertEquals(toUserScale(BigDecimal.valueOf(-0.916666666666667)), toUserScale(results.lastEntry().getValue()));
+  }
+
+  @Test
+  void shouldCalculateMaxDrawdownValues_whenSkipsPointsWithZeroPeak() {
+    final var calculation = mock(MaxDrawdownCalculation.class);
+    final var date = LocalDate.now();
+    final var growth10KByPeriod = new TreeMap<>(Map.of(date, BigDecimal.ZERO, date.minusMonths(1), BigDecimal.ZERO,
+        date.minusMonths(2), BigDecimal.ZERO));
+    when(calculation.getSubMapFromFirstKeyToCustomDate(any(), any())).thenReturn(growth10KByPeriod);
+
+    doCallRealMethod().when(calculation).calculateMaxDrawdownValues(any());
+    final NavigableMap<LocalDate, BigDecimal> results = calculation.calculateMaxDrawdownValues(growth10KByPeriod);
+
+    assertTrue(results.isEmpty());
+  }
+
+  @Test
+  void shouldCalculateMaxDrawdownValues_whenSkipsOnlyZeroPeakMonths_andKeepsRecoveredMonths() {
+    final var calculation = mock(MaxDrawdownCalculation.class);
+    final var date = LocalDate.now();
+    final var growth10KByPeriod = new TreeMap<>(Map.of(
+        date.minusMonths(3), BigDecimal.ZERO,
+        date.minusMonths(2), BigDecimal.ZERO,
+        date.minusMonths(1), BigDecimal.valueOf(100),
+        date, BigDecimal.valueOf(50)));
+    doCallRealMethod().when(calculation).getSubMapFromFirstKeyToCustomDate(any(), any());
+    doCallRealMethod().when(calculation).calculateMaxDrawdownValues(any());
+
+    final NavigableMap<LocalDate, BigDecimal> results = calculation.calculateMaxDrawdownValues(growth10KByPeriod);
+
+    assertEquals(2, results.size());
+    assertFalse(results.containsKey(date.minusMonths(3)));
+    assertFalse(results.containsKey(date.minusMonths(2)));
+    assertEquals(date.minusMonths(1), results.firstKey());
+    assertEquals(toUserScale(BigDecimal.valueOf(0)), toUserScale(results.firstEntry().getValue()));
+    assertEquals(date, results.lastKey());
+    assertEquals(toUserScale(BigDecimal.valueOf(-0.5)), toUserScale(results.lastEntry().getValue()));
   }
 
   @Test

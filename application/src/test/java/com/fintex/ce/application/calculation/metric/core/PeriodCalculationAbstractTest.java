@@ -692,6 +692,7 @@ class PeriodCalculationAbstractTest {
     doCallRealMethod().when(calculation).getNumberOfMonthsFor(any(), any());
     doCallRealMethod().when(calculation).getNumberOfMonthsForYearToDate(any());
     doCallRealMethod().when(calculation).getNumberOfMonthsForSinceInception(any());
+    doCallRealMethod().when(calculation).requiresInsufficientDataWarning(any(), anyInt());
     calculation.addInsufficientDataWarnings(result, periodValues);
 
     assertEquals(expectedWarningCount, result.getWarnings().size());
