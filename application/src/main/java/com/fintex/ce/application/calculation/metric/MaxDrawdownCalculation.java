@@ -42,11 +42,15 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
   @Override
   public MaxDrawdownEntry calculatePeriodForNumberOfMonths(final int numberOfMonths) {
     if (numberOfMonths > getPortfolioTotalReturns().size()) {
-      return new MaxDrawdownEntry(String.valueOf(numberOfMonths), null, null, null, null);
+      return null;
     }
     final NavigableMap<LocalDate, BigDecimal> growth10KByPeriod = new TreeMap<>(
         getSubMapByPeriodStartDate(getPeriodStartDateWithOneMonthOffset(numberOfMonths), growth10K));
     final NavigableMap<LocalDate, BigDecimal> maximumDrawdownMap = calculateMaxDrawdownValues(growth10KByPeriod);
+
+    if (maximumDrawdownMap.isEmpty()) {
+      return null;
+    }
     final Map.Entry<LocalDate, BigDecimal> maxDrawdownEntry = getMaxDrawdownValue(maximumDrawdownMap);
     if (maxDrawdownEntry.getValue().compareTo(BigDecimal.ZERO) == 0) {
       return new MaxDrawdownEntry(String.valueOf(numberOfMonths), BigDecimal.ZERO, null, null, null);
@@ -59,6 +63,17 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
         getDrawDownStartDateWithOneMonthOffset(peak),
         maxDrawdownEntry.getKey(),
         recoveryTime);
+  }
+
+  @Override
+  protected boolean requiresInsufficientDataWarning(final String period, final int availableMonths) {
+    if (super.requiresInsufficientDataWarning(period, availableMonths)) {
+      return true;
+    }
+    final int months = getNumberOfMonthsFor(getPortfolioTotalReturns(), period);
+    final NavigableMap<LocalDate, BigDecimal> periodGrowth10K = new TreeMap<>(
+        getSubMapByPeriodStartDate(getPeriodStartDateWithOneMonthOffset(months), growth10K));
+    return calculateMaxDrawdownValues(periodGrowth10K).isEmpty();
   }
 
   public LocalDate getDrawDownStartDateWithOneMonthOffset(final Map.Entry<LocalDate, BigDecimal> peak) {
@@ -101,6 +116,12 @@ public class MaxDrawdownCalculation extends PeriodCalculationAbstract<MaxDrawdow
           growth10KByPeriod, key);
       final BigDecimal maxValue = subMapFromFirstKeyToCustomDate.values().stream().max(Comparator.naturalOrder())
           .orElse(null);
+      // Guard the divisor (running peak) before dividing, mirroring the zero-divisor checks in Sharpe/Sortino. A peak
+      // of 0 means compounded growth collapsed to 0 (e.g. a -100% month) so the drawdown ratio is undefined; skip the
+      // point instead of dividing by zero, which previously surfaced as HTTP 500 (SYS-002).
+      if (maxValue == null || maxValue.compareTo(BigDecimal.ZERO) == 0) {
+        return;
+      }
       final BigDecimal maxDrawdownValue = DecimalUtils.divide(value.subtract(maxValue), maxValue);
       maximumDrawdownMap.put(key, maxDrawdownValue.compareTo(BigDecimal.ZERO) <= 0
           ? maxDrawdownValue
