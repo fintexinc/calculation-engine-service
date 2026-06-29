@@ -84,3 +84,6 @@ Issue types:
 
 Keep each entry to a few lines, generic, and reusable — no ticket numbers or incident/session
 references. Prefer concrete API/edge-case rules over vague advice.
+
+## Related
+- **`clean-code`** — the general principles (SOLID, GoF, DRY/KISS/YAGNI, code smells & antipatterns) these concrete lessons are instances of
