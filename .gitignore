@@ -40,5 +40,4 @@ allure-results/
 nul
 /.claude/settings.local.json
 /.claude/worktrees/
-/.claude/commands/
 /CLAUDE.md

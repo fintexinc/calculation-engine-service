@@ -11,7 +11,7 @@ description: >
 # Code Review Guidelines
 
 Portfolio calculation engine: fetches data from Security Master (SM) via REST, performs financial
-calculations. **No database, no cache, no GraphQL.**
+calculations. **No database, no GraphQL.** (Caching goes through the `cache-adapter` module.)
 
 **Cross-check findings against the `review-lessons` skill** — recurring defect patterns caught in
 past reviews. When this review surfaces a genuinely new class of problem, add a distilled entry there.
@@ -208,3 +208,6 @@ If any of these are violated, treat as at least **High** severity (block merge) 
 5. **Layer violations?** → Domain must be pure, adapters must not call each other
 6. **Magic strings?** → Should be constants or enums
 7. **Repeated code?** → Should be extracted to utility methods
+
+## Related
+- **`clean-code`** — the general principles (SOLID, GoF, DRY/KISS/YAGNI, code smells & antipatterns) behind these review checks

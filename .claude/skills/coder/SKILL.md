@@ -12,7 +12,7 @@ description: >
 
 Portfolio calculation microservice: Java 21, Spring Boot 3.4.6, multi-module Maven, Hexagonal Architecture.
 Fetches data from Security Master (SM) via REST, performs financial calculations.
-**No database, no cache, no GraphQL.**
+**No database, no GraphQL.** (Caching goes through the `cache-adapter` module.)
 
 **Before finishing a change, scan the `review-lessons` skill** — a checklist of concrete defects
 previously caught in review (e.g. edge-case regressions from moving logic, empty-collection
@@ -147,3 +147,6 @@ void shouldFetchFromSM_whenSecurityIdIsValid() { ... }
 4. Batch SM calls? -> No loops
 5. Resilience configured? -> CircuitBreaker, Retry, Bulkhead
 6. Config in YAML? -> No hardcoded values
+
+## Related
+- **`clean-code`** — during implementation, check the `clean-code` skill and follow its rules (SOLID, GoF, DRY/KISS/YAGNI, code smells & antipatterns) that these implementation rules build on
