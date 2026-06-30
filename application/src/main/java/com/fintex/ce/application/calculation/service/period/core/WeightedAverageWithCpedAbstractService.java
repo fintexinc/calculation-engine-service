@@ -40,12 +40,14 @@ public abstract class WeightedAverageWithCpedAbstractService<C extends PeriodCom
     this.defaultPeriods = defaultPeriods;
   }
 
-  public abstract PeriodCalculationAbstract<R, ?> defineCalculationMethod(C command);
+  protected <V> PeriodCalculationAbstract<R, V> defineCalculationMethod(C command) {
+    throw new UnsupportedOperationException(
+        "subclasses must either implement defineCalculationMethod or override perform()");
+  }
 
   @Override
   public R perform(C command) {
-    PeriodCalculationAbstract<R, ?> calculationMethod = defineCalculationMethod(command);
-    return calculationMethod.calculate(command.getPeriods());
+    return defineCalculationMethod(command).calculate(command.getPeriods());
   }
 
   public WeightedAverageResult<HoldingMonthlyReturns> buildWeightedAverageResult(C command,

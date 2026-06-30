@@ -383,6 +383,14 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  DEGENERATE_GROWTH_DATA(
+      Codes.DEGENERATE_GROWTH_DATA,
+      "Growth-of-10K series collapsed to zero for period %s; max drawdown cannot be computed",
+      "All peak values in the growth-of-10K window are zero, typically caused by a −100% monthly return, making the drawdown ratio undefined",
+      "Review monthly returns for extreme negative values; if a −100% return is expected, the result will remain null",
+      HttpStatus.OK,
+      Severity.WARNING),
+
   // ============================================
   // SEC-xxx — Security catalog (existence) errors
   // ============================================
@@ -1137,6 +1145,7 @@ public enum ErrorCode {
     public static final String CIPSD_OUTSIDE_DATA_RANGE = "RET-009";
     public static final String NO_COMPLETE_CALENDAR_YEAR = "RET-010";
     public static final String INCOMPLETE_YEAR_SKIPPED = "RET-011";
+    public static final String DEGENERATE_GROWTH_DATA = "RET-012";
 
     // Performance Dates
     public static final String CPSD_AFTER_CPED = "PFD-001";

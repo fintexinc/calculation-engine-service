@@ -28,5 +28,5 @@ public class Growth10KResult extends BaseCalculationResult {
   @Schema(description = "Performance start date")
   private LocalDate performanceStartDate;
   @Schema(description = "Growth of $10K data points over time")
-  private List<KeyValueResult> growth10k;
+  private List<KeyValueResult<LocalDate>> growth10k;
 }
