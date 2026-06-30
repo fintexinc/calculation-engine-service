@@ -111,7 +111,7 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractPortfolioCalculationE2
   }
 
   protected static void assertGrowthPoint(KeyValueResult<?> point, String expectedDate, String expectedValue) {
-    assertThat(point.key()).isEqualTo(expectedDate);
+    assertThat(point.key()).isEqualTo(LocalDate.parse(expectedDate));
     assertThat(point.value()).isEqualByComparingTo(new BigDecimal(expectedValue));
   }
 

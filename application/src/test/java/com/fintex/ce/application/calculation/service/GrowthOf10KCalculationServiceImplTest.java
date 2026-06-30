@@ -6,6 +6,7 @@ import com.fintex.ce.application.returns.ReturnsSnapshot;
 import com.fintex.ce.application.returns.WeightedAverageResult;
 import com.fintex.ce.application.returns.pipeline.CpsdCpedScaleParams;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
+import com.fintex.ce.application.util.Growth10KHelper;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
@@ -71,7 +72,7 @@ class GrowthOf10KCalculationServiceImplTest {
 
   @Test
   void shouldReturnEmptyMap_whenInputIsNull() {
-    TreeMap<LocalDate, BigDecimal> growth = GrowthOf10KCalculationServiceImpl.compoundGrowth10K(
+    NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(
         null, ReturnFactorScale.SCALE_OF_TWO);
 
     assertThat(growth).isEmpty();
@@ -79,7 +80,7 @@ class GrowthOf10KCalculationServiceImplTest {
 
   @Test
   void shouldReturnEmptyMap_whenInputIsEmpty() {
-    TreeMap<LocalDate, BigDecimal> growth = GrowthOf10KCalculationServiceImpl.compoundGrowth10K(
+    NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(
         new TreeMap<>(), ReturnFactorScale.SCALE_OF_TWO);
 
     assertThat(growth).isEmpty();
@@ -88,7 +89,7 @@ class GrowthOf10KCalculationServiceImplTest {
   @Test
   void shouldSeedTenThousandOneMonthBeforeFirstReturn_whenCompounding() {
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(JAN_2020, new BigDecimal("5.0")));
-    TreeMap<LocalDate, BigDecimal> growth = GrowthOf10KCalculationServiceImpl.compoundGrowth10K(
+    NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(
         returns, ReturnFactorScale.SCALE_OF_TWO);
 
     assertThat(growth).containsKey(DEC_2019);
@@ -100,7 +101,7 @@ class GrowthOf10KCalculationServiceImplTest {
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(
         JAN_2020, new BigDecimal("5.0"),
         FEB_2020, new BigDecimal("-2.0")));
-    TreeMap<LocalDate, BigDecimal> growth = GrowthOf10KCalculationServiceImpl.compoundGrowth10K(
+    NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(
         returns, ReturnFactorScale.SCALE_OF_TWO);
 
     assertThat(growth.get(JAN_2020)).isEqualByComparingTo("10500");
@@ -112,7 +113,7 @@ class GrowthOf10KCalculationServiceImplTest {
     NavigableMap<LocalDate, BigDecimal> factorReturns = new TreeMap<>(Map.of(
         JAN_2020, new BigDecimal("1.05"),
         FEB_2020, new BigDecimal("0.98")));
-    TreeMap<LocalDate, BigDecimal> growth = GrowthOf10KCalculationServiceImpl.compoundGrowth10K(
+    NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(
         factorReturns, ReturnFactorScale.AS_IS);
 
     assertThat(growth.get(JAN_2020)).isEqualByComparingTo("10500");
@@ -124,7 +125,7 @@ class GrowthOf10KCalculationServiceImplTest {
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(
         JAN_2020, new BigDecimal("5.0"),
         FEB_2020, new BigDecimal("0.0")));
-    TreeMap<LocalDate, BigDecimal> growth = GrowthOf10KCalculationServiceImpl.compoundGrowth10K(
+    NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(
         returns, ReturnFactorScale.SCALE_OF_TWO);
 
     assertThat(growth).hasSize(3);
@@ -139,7 +140,7 @@ class GrowthOf10KCalculationServiceImplTest {
         FEB_2020, new BigDecimal("-2.0"),
         MAR_2020, new BigDecimal("1.0")));
 
-    TreeMap<LocalDate, BigDecimal> growth = GrowthOf10KCalculationServiceImpl.compoundGrowth10K(
+    NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(
         returns, ReturnFactorScale.SCALE_OF_TWO);
 
     assertThat(growth).hasSize(4);
