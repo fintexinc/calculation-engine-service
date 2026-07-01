@@ -1,10 +1,12 @@
 package com.fintex.ce.adapter.webclient.sm.client;
 
+import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability;
 import com.fintex.ce.model.error.exceptions.ExternalServiceBadResponseException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -34,24 +36,30 @@ import reactor.core.publisher.Mono;
 public class SecurityMasterWebClient {
 
   private static final String SERVICE_NAME = "Security Master";
+  private static final String SERVICE_TAG_VALUE = "security-master";
+  private static final String GET = HttpMethod.GET.name();
+  private static final String POST = HttpMethod.POST.name();
 
   private final WebClient smWebClient;
+  private final ExternalServiceObservability observability;
 
   /**
    * Performs a POST request and returns the response body.
    */
   public <T, R> R post(String path, T request, ParameterizedTypeReference<R> responseType) {
-    log.debug("POST request to: {}", path);
-    R result = smWebClient.post()
-        .uri(path)
-        .bodyValue(request)
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
-        .bodyToMono(responseType)
-        .onErrorMap(SecurityMasterWebClient::handleError)
-        .block();
-    log.debug("POST response from: {} - status OK", path);
-    return result;
+    return observability.observe(SERVICE_TAG_VALUE, POST, path, () -> {
+      log.debug("POST request to: {}", path);
+      R result = smWebClient.post()
+          .uri(path)
+          .bodyValue(request)
+          .retrieve()
+          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
+          .bodyToMono(responseType)
+          .onErrorMap(SecurityMasterWebClient::handleError)
+          .block();
+      log.debug("POST response from: {} - status OK", path);
+      return result;
+    });
   }
 
   /**
@@ -67,32 +75,36 @@ public class SecurityMasterWebClient {
    * values. Pass {@link Map#of()} for no params.
    */
   public <R> R get(String path, Map<String, ?> queryParams, Class<R> responseType) {
-    log.debug("GET request to: {} params={}", path, queryParams);
-    R result = smWebClient.get()
-        .uri(uriBuilder -> buildUri(uriBuilder, path, queryParams))
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
-        .bodyToMono(responseType)
-        .onErrorMap(SecurityMasterWebClient::handleError)
-        .block();
-    log.debug("GET response from: {} - status OK", path);
-    return result;
+    return observability.observe(SERVICE_TAG_VALUE, GET, path, () -> {
+      log.debug("GET request to: {} params={}", path, queryParams);
+      R result = smWebClient.get()
+          .uri(uriBuilder -> buildUri(uriBuilder, path, queryParams))
+          .retrieve()
+          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
+          .bodyToMono(responseType)
+          .onErrorMap(SecurityMasterWebClient::handleError)
+          .block();
+      log.debug("GET response from: {} - status OK", path);
+      return result;
+    });
   }
 
   /**
    * Performs a GET request and returns the response body with parameterized type.
    */
   public <R> R get(String path, ParameterizedTypeReference<R> responseType) {
-    log.debug("GET request to: {}", path);
-    R result = smWebClient.get()
-        .uri(path)
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
-        .bodyToMono(responseType)
-        .onErrorMap(SecurityMasterWebClient::handleError)
-        .block();
-    log.debug("GET response from: {} - status OK", path);
-    return result;
+    return observability.observe(SERVICE_TAG_VALUE, GET, path, () -> {
+      log.debug("GET request to: {}", path);
+      R result = smWebClient.get()
+          .uri(path)
+          .retrieve()
+          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
+          .bodyToMono(responseType)
+          .onErrorMap(SecurityMasterWebClient::handleError)
+          .block();
+      log.debug("GET response from: {} - status OK", path);
+      return result;
+    });
   }
 
   private static URI buildUri(UriBuilder uriBuilder, String path, Map<String, ?> queryParams) {

@@ -24,10 +24,10 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Micrometer Tracing API -->
+        <!-- Micrometer Observation API -->
         <dependency>
             <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-tracing</artifactId>
+            <artifactId>micrometer-observation</artifactId>
         </dependency>
 
         <!-- Spring Web MVC -->

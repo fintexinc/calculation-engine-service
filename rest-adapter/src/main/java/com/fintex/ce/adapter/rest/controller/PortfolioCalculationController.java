@@ -62,6 +62,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.micrometer.observation.Observation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -87,16 +88,19 @@ public class PortfolioCalculationController {
 
   private final Map<CalculationMetric, CalculationService<?, ?>> serviceMap;
   private final RequestValidationFacade validationFacade;
+  private final CalculationObservability calculationObservability;
 
   public PortfolioCalculationController(
       List<CalculationService<?, ?>> calculationServices,
-      RequestValidationFacade validationFacade) {
+      RequestValidationFacade validationFacade,
+      CalculationObservability calculationObservability) {
     this.serviceMap = calculationServices.stream()
         .collect(Collectors.toMap(CalculationService::getMetric, Function.identity(),
             (existing, duplicate) -> {
               throw ErrorCode.INTERNAL_SERVER_ERROR.toException();
             }));
     this.validationFacade = validationFacade;
+    this.calculationObservability = calculationObservability;
   }
 
   @Operation(summary = "Execute a portfolio calculation", description = "Performs the specified calculation metric on the provided portfolio holdings. "
@@ -134,18 +138,25 @@ public class PortfolioCalculationController {
   public BaseCalculationResult calculate(
       @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable String metricName,
       @RequestBody @Valid CalculationCommand command) {
-    CalculationMetric metric = CalculationMetric.from(metricName);
-    if (!serviceMap.containsKey(metric)) {
-      throw ErrorCode.UNSUPPORTED_METRIC.toException(metricName);
-    }
+    return calculationObservability.observe(metricName, command, observation -> {
+      CalculationMetric metric = CalculationMetric.from(metricName);
+      if (!serviceMap.containsKey(metric)) {
+        throw ErrorCode.UNSUPPORTED_METRIC.toException(metricName);
+      }
 
-    if (command.getMetric() != null && command.getMetric() != metric) {
-      throw ErrorCode.METRIC_MISMATCH.toException(metricName, command.getMetric().getValue());
-    }
+      if (command.getMetric() != null && command.getMetric() != metric) {
+        throw ErrorCode.METRIC_MISMATCH.toException(metricName, command.getMetric().getValue());
+      }
 
-    validationFacade.validate(command, metric);
+      observation.event(Observation.Event.of(CalculationObservability.VALIDATION_STARTED_EVENT));
+      validationFacade.validate(command, metric);
+      observation.event(Observation.Event.of(CalculationObservability.VALIDATION_COMPLETED_EVENT));
 
-    CalculationService<?, ?> service = serviceMap.get(metric);
-    return ((CalculationService<CalculationCommand, ?>) service).perform(command);
+      CalculationService<?, ?> service = serviceMap.get(metric);
+      observation.event(Observation.Event.of(CalculationObservability.SERVICE_STARTED_EVENT));
+      BaseCalculationResult result = ((CalculationService<CalculationCommand, ?>) service).perform(command);
+      observation.event(Observation.Event.of(CalculationObservability.SERVICE_COMPLETED_EVENT));
+      return result;
+    });
   }
 }

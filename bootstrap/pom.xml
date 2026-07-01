@@ -47,13 +47,17 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Micrometer Tracing with Brave bridge -->
+        <!-- Micrometer Tracing with OpenTelemetry bridge -->
         <dependency>
             <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+            <artifactId>micrometer-tracing-bridge-otel</artifactId>
         </dependency>
 
-
+        <!-- Azure Monitor / Application Insights OpenTelemetry autoconfiguration -->
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-monitor-opentelemetry-autoconfigure</artifactId>
+        </dependency>
 
 
         <!-- Test dependencies -->

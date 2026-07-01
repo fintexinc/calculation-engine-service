@@ -9,6 +9,9 @@ spring:
         composite-indicator:
           enabled: false
 
+otel:
+  propagators: tracecontext,baggage,b3
+
 cache:
   data:
     fx-rates:
@@ -17,6 +20,13 @@ cache:
     t-bills:
       enabled: true
       refresh-after: 24h
+
+observability:
+  azure-monitor:
+    enabled: ${AZURE_MONITOR_ENABLED:true}
+    connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:}
+    live-metrics:
+      enabled: ${AZURE_MONITOR_LIVE_METRICS_ENABLED:true}
 
 external-services:
   bank-of-canada:
@@ -152,11 +162,12 @@ default:
 
 management:
   tracing:
+    enabled: true
     sampling:
       probability: 1.0
-    propagation:
-      type: b3
   observations:
+    key-values:
+      application: ${spring.application.name}
     http:
       server:
         requests:
@@ -183,6 +194,8 @@ management:
       enabled: false
 
 logging:
+  pattern:
+    level: "%5p [traceId=%X{traceId:-}, spanId=%X{spanId:-}, requestId=%X{requestId:-}]"
   level:
     root: INFO
     com.fintex.ce: DEBUG
