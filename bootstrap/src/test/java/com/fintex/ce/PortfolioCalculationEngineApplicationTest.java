@@ -11,6 +11,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.tracing.Tracer;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("integration")
@@ -20,11 +24,20 @@ class PortfolioCalculationEngineApplicationTest {
 
   @Autowired
   private ApplicationContext applicationContext;
+  @Autowired
+  private MeterRegistry meterRegistry;
+  @Autowired
+  private ObservationRegistry observationRegistry;
+  @Autowired
+  private Tracer tracer;
 
   @Test
   void shouldStartApplication_whenApplicationContextIsBuilt() {
     assertThat(applicationContext).isNotNull();
     assertThat(applicationContext.getBeansOfType(SecurityDataFetcher.class)).isNotEmpty();
     assertThat(applicationContext.getBeansWithAnnotation(Service.class)).isNotEmpty();
+    assertThat(meterRegistry).isNotNull();
+    assertThat(observationRegistry).isNotNull();
+    assertThat(tracer).isNotNull();
   }
 }

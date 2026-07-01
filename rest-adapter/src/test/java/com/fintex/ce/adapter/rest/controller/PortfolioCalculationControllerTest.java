@@ -42,6 +42,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import io.micrometer.observation.ObservationRegistry;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -81,7 +83,8 @@ class PortfolioCalculationControllerTest {
 
     var controller = new PortfolioCalculationController(
         serviceList,
-        new com.fintex.ce.adapter.rest.validation.RequestValidationFacade(java.util.List.of()));
+        new com.fintex.ce.adapter.rest.validation.RequestValidationFacade(java.util.List.of()),
+        calculationObservability());
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -184,6 +187,10 @@ class PortfolioCalculationControllerTest {
     return CalculationTestDataProvider.calculationMetricArguments();
   }
 
+  private static CalculationObservability calculationObservability() {
+    return new CalculationObservability(ObservationRegistry.create());
+  }
+
   @Nested
   class ValidationIntegration {
 
@@ -216,7 +223,7 @@ class PortfolioCalculationControllerTest {
         services.add(svc);
       }
 
-      var controller = new PortfolioCalculationController(services, facade);
+      var controller = new PortfolioCalculationController(services, facade, calculationObservability());
       LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
       validator.afterPropertiesSet();
       validatingMockMvc = MockMvcBuilders.standaloneSetup(controller)

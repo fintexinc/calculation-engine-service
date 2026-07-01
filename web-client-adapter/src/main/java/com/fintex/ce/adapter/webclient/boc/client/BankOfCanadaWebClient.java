@@ -1,8 +1,10 @@
 package com.fintex.ce.adapter.webclient.boc.client;
 
+import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability;
 import com.fintex.ce.model.error.exceptions.ExternalServiceBadResponseException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -27,20 +29,25 @@ import reactor.core.publisher.Mono;
 public class BankOfCanadaWebClient {
 
   private static final String SERVICE_NAME = "Bank of Canada";
+  private static final String SERVICE_TAG_VALUE = "bank-of-canada";
+  private static final String GET = HttpMethod.GET.name();
 
   private final WebClient bocWebClient;
+  private final ExternalServiceObservability observability;
 
   public <R> R get(String path, Class<R> responseType) {
-    log.debug("GET request to Bank of Canada: {}", path);
-    R result = bocWebClient.get()
-        .uri(path)
-        .retrieve()
-        .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
-        .bodyToMono(responseType)
-        .onErrorMap(BankOfCanadaWebClient::handleError)
-        .block();
-    log.debug("GET response from Bank of Canada: {} - status OK", path);
-    return result;
+    return observability.observe(SERVICE_TAG_VALUE, GET, path, () -> {
+      log.debug("GET request to Bank of Canada: {}", path);
+      R result = bocWebClient.get()
+          .uri(path)
+          .retrieve()
+          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
+          .bodyToMono(responseType)
+          .onErrorMap(BankOfCanadaWebClient::handleError)
+          .block();
+      log.debug("GET response from Bank of Canada: {} - status OK", path);
+      return result;
+    });
   }
 
   private Mono<Throwable> handleErrorResponse(String path, ClientResponse response) {
