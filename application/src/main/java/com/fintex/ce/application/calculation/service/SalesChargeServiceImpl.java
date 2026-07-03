@@ -9,11 +9,12 @@ import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 
-import org.springframework.stereotype.Service;
-
 import java.util.Map;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class SalesChargeServiceImpl implements CalculationService<PortfolioHoldingsCommand, SalesChargeResult> {
 
   private final SecurityDataFetcher<SalesCharge> salesChargeSecurityDataFetcher;

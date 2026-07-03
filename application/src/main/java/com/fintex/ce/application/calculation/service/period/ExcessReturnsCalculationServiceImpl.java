@@ -14,11 +14,13 @@ import com.fintex.ce.model.domain.result.returns.ExcessReturnsResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class ExcessReturnsCalculationServiceImpl
     extends
       BenchmarkWeightedAverageWithCpedAbstractService<PeriodCommand, ExcessReturnsResult> {

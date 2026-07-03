@@ -10,14 +10,16 @@ import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 import static com.fintex.ce.application.util.ReturnFactorScale.SCALE_OF_TWO;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class BestWorstPeriodsCalculationServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<BestWorstPeriodsCommand, BestWorstPeriodsResult> {

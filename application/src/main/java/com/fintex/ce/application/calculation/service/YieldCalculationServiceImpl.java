@@ -10,12 +10,13 @@ import com.fintex.ce.model.dto.command.YieldCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.error.Notification;
 
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Map;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class YieldCalculationServiceImpl implements CalculationService<YieldCommand, YieldResult> {
 
   private final SecurityDataFetcher<Yield> yieldSecurityDataFetcher;

@@ -12,11 +12,12 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 
-import org.springframework.stereotype.Service;
-
 import java.util.Set;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class DistributionOfReturnsServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<DistributionOfReturnsCommand, DistributionOfReturnsResult> {

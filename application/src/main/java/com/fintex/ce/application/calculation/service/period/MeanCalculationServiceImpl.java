@@ -11,13 +11,15 @@ import com.fintex.ce.model.domain.result.returns.MeanResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class MeanCalculationServiceImpl extends WeightedAverageWithCpedAbstractService<PeriodCommand, MeanResult> {
 
   public MeanCalculationServiceImpl(

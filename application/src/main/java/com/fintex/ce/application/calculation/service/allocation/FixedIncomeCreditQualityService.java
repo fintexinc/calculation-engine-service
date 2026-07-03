@@ -15,7 +15,6 @@ import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
 import com.fintex.wm.commons.error.Notification;
 
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -35,7 +34,10 @@ import static com.fintex.ce.model.error.ErrorCode.MISSING_CREDIT_QUALITY;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 @RequiredArgsConstructor
 public class FixedIncomeCreditQualityService
     implements

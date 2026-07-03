@@ -13,13 +13,15 @@ import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class RollingStandardDeviationCalculationServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<RollingCalculationCommand, RollingStandardDeviationResult> {

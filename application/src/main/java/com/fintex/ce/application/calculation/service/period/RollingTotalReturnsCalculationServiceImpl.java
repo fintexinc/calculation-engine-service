@@ -12,11 +12,13 @@ import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class RollingTotalReturnsCalculationServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<RollingCalculationCommand, RollingTotalReturnsResult> {
