@@ -94,24 +94,26 @@ class FixedIncomeGeographicExposureServiceTest
   void shouldIncludeFixedIncomeAndEtf_inGeographicAllocationFetch() {
     PortfolioHolding bond = fixedIncome("BOND", 200);
     PortfolioHolding usEtf = usEtf("BND", 100);
+    PortfolioHolding canadaEtf = canadaEtf("ZCN", 100);
     PortfolioHolding fund = canadaMutualFund("RBF605", 100);
 
     when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
         bond, allocation(Map.of(GeographicRegionType.EUROPE, ONE), Currency.EUR),
         usEtf, allocation(Map.of(GeographicRegionType.US, ONE), Currency.USD),
+        canadaEtf, allocation(Map.of(GeographicRegionType.CANADA, ONE), Currency.CAD),
         fund, allocation(Map.of(GeographicRegionType.CANADA, ONE), Currency.CAD)));
 
-    FixedIncomeGeographicExposureResult result = service.perform(command(bond, usEtf, fund));
+    FixedIncomeGeographicExposureResult result = service.perform(command(bond, usEtf, canadaEtf, fund));
 
     @SuppressWarnings("unchecked")
     ArgumentCaptor<List<PortfolioHolding>> fundCaptor = ArgumentCaptor.forClass(List.class);
     verify(geographicFetcher).fetch(fundCaptor.capture(), anyList());
-    assertThat(fundCaptor.getValue()).contains(bond, usEtf, fund);
+    assertThat(fundCaptor.getValue()).contains(bond, usEtf, canadaEtf, fund);
 
     Map<GeographicRegionType, BigDecimal> expected = distribution(Map.of(
-        GeographicRegionType.EUROPE, new BigDecimal("0.5"),
-        GeographicRegionType.US, new BigDecimal("0.25"),
-        GeographicRegionType.CANADA, new BigDecimal("0.25")));
+        GeographicRegionType.EUROPE, new BigDecimal("0.4"),
+        GeographicRegionType.US, new BigDecimal("0.2"),
+        GeographicRegionType.CANADA, new BigDecimal("0.4")));
     assertExposureEquals(result, expected);
   }
 }

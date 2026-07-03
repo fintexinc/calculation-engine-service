@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.DefaultDataProperties;
-import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -23,6 +22,7 @@ import com.fintex.wm.commons.error.Notification;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -215,29 +215,10 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
   }
 
   protected Map<GeographicRegionType, BigDecimal> emptyRegionMap() {
-    Map<GeographicRegionType, BigDecimal> map = new EnumMap<>(GeographicRegionType.class);
-    for (GeographicRegionType type : GeographicRegionType.values()) {
-      map.put(type, BigDecimal.ZERO);
-    }
-    return map;
+    return Arrays.stream(GeographicRegionType.values())
+        .collect(() -> new EnumMap<>(GeographicRegionType.class),
+            (map, type) -> map.put(type, null),
+            EnumMap::putAll);
   }
 
-  protected ExposureDataHolder<GeographicRegionType> fetchExposuresInternal(PortfolioHoldingsCommand command) {
-    List<PortfolioHolding> allHoldings = command.getHoldings();
-    List<DataProvider> providers = getSpecifiedIfEmpty(command.getDataProviders(),
-        defaultDataProperties.getDataProviders());
-    List<PortfolioHolding> relevant = allHoldings.stream().filter(relevantHoldingPredicate()).toList();
-    List<PortfolioHolding> stocks = relevant.stream().filter(STOCK_PREDICATE).toList();
-    List<PortfolioHolding> nonStocks = relevant.stream().filter(STOCK_PREDICATE.negate()).toList();
-
-    Map<PortfolioHolding, Geography> stockGeographies = geographyFetcher.fetch(stocks, providers);
-    Map<PortfolioHolding, HoldingGeographicAllocation> fundExposures = geographicAllocationFetcher.fetch(nonStocks,
-        providers);
-    List<Notification> warnings = new ArrayList<>();
-    Map<PortfolioHolding, Map<GeographicRegionType, BigDecimal>> exposures = new HashMap<>();
-    for (PortfolioHolding holding : relevant) {
-      exposures.put(holding, allocationFor(holding, stockGeographies, fundExposures, warnings));
-    }
-    return new ExposureDataHolder<>(exposures, warnings);
-  }
 }

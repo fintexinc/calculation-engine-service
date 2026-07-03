@@ -9,13 +9,12 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -34,7 +33,7 @@ public class EquityCountryExposureService
   private final SecurityDataFetcher<EquityCountryAllocation> equityCountryAllocationSecurityDataFetcher;
   private final CountryAllocationMappingService countryAllocationMappingService;
 
-  public static final Map<CountryRegionType, BigDecimal> DEFAULT_MAP = new HashMap<>();
+  protected static final Map<CountryRegionType, BigDecimal> DEFAULT_MAP = new EnumMap<>(CountryRegionType.class);
 
   static {
     Stream.of(CountryRegionType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
@@ -75,14 +74,11 @@ public class EquityCountryExposureService
 
   @Override
   public ExposureDataHolder<CountryRegionType> fetchExposures(final PortfolioHoldingsCommand command) {
-    List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, EquityCountryAllocation> rawData = equityCountryAllocationSecurityDataFetcher.fetch(
         command.getHoldings(), command.getDataProviders());
     Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
-    Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService
-        .mapToCountryRegions(holdingAllocations, warnings, MISSING_EQUITY_COUNTRY_EXPOSURE);
-    return new ExposureDataHolder<>(allocations, warnings);
+    return countryAllocationMappingService.mapToCountryRegions(holdingAllocations, MISSING_EQUITY_COUNTRY_EXPOSURE);
   }
 
 }

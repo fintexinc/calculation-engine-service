@@ -10,7 +10,6 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 
@@ -33,7 +32,7 @@ public class FixedIncomeCountryExposureService
   private final CountryExposureResponseMapper responseMapper;
   private final CountryAllocationMappingService countryAllocationMappingService;
 
-  public static final Map<CountryRegionType, BigDecimal> DEFAULT_MAP = new EnumMap<>(CountryRegionType.class);
+  protected static final Map<CountryRegionType, BigDecimal> DEFAULT_MAP = new EnumMap<>(CountryRegionType.class);
 
   public FixedIncomeCountryExposureService(
       final SecurityDataFetcher<CountryExposure> countryExposureSecurityDataFetcher,
@@ -65,13 +64,10 @@ public class FixedIncomeCountryExposureService
 
   @Override
   public ExposureDataHolder<CountryRegionType> fetchExposures(PortfolioHoldingsCommand command) {
-    List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, CountryExposure> rawData = countryExposureSecurityDataFetcher.fetch(command.getHoldings(),
         command.getDataProviders());
     Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
-    Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> allocations = countryAllocationMappingService
-        .mapToCountryRegions(mappedHoldings, warnings, MISSING_BOND_COUNTRY_EXPOSURE);
-    return new ExposureDataHolder<>(allocations, warnings);
+    return countryAllocationMappingService.mapToCountryRegions(mappedHoldings, MISSING_BOND_COUNTRY_EXPOSURE);
   }
 }

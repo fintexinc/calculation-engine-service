@@ -7,6 +7,7 @@ import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.financial.Geography;
+import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
+import static com.fintex.ce.model.error.ErrorCode.MISSING_BUSINESS_COUNTRY_CODE;
 import static java.math.BigDecimal.ONE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -135,6 +137,10 @@ class EquityGeographicExposureServiceTest
 
     assertExposureEquals(result, distribution(Map.of(GeographicRegionType.US, ONE)));
     assertThat(result.getWarnings()).hasSize(1);
-    assertThat(result.getWarnings().get(0).getCode()).isEqualTo("FDS-026");
+    Notification warning = result.getWarnings().getFirst();
+    assertThat(warning.getCode()).isEqualTo(MISSING_BUSINESS_COUNTRY_CODE.getCode());
+    assertThat(warning.getMessage())
+        .isEqualTo(MISSING_BUSINESS_COUNTRY_CODE.getFormattedMessage(unmappedStock.getIdsString()));
+    assertThat(warning.getMetadata()).containsEntry("holdingId", unmappedStock.getIdsString());
   }
 }

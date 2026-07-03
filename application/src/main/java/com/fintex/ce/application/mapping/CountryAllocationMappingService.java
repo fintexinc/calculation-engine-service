@@ -1,5 +1,6 @@
 package com.fintex.ce.application.mapping;
 
+import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.application.util.JacksonUtil;
 import com.fintex.ce.model.domain.calculation.allocation.CountryAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
@@ -14,6 +15,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +29,7 @@ public class CountryAllocationMappingService {
   private static final String COUNTRY_ALLOCATION_MAPPING_PATH = "/jsons/country-allocation-mapping.json";
 
   // pre-loaded country allocations mapping: country id or country name - rest fields
-  public Map<String, CountryAllocation> countryAllocationMap;
+  Map<String, CountryAllocation> countryAllocationMap;
 
   public CountryAllocationMappingService() {
     this.countryAllocationMap = initCountryAllocationMapping();
@@ -37,17 +40,18 @@ public class CountryAllocationMappingService {
    *
    * @param holdingAllocations
    *          map of holdings and their responses from FDS
-   * @param warnings
-   *          warning messages
    * @param errorCode
    *          error code when response is empty
-   * @return holdings that are grouped by regions
+   * @return holdings grouped by region, paired with any warnings produced during mapping
    */
-  public Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> mapToCountryRegions(
+  public ExposureDataHolder<CountryRegionType> mapToCountryRegions(
       final Map<PortfolioHolding, Map<String, BigDecimal>> holdingAllocations,
-      final List<Notification> warnings, final ErrorCode errorCode) {
-    return holdingAllocations.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> mapToRegions(e.getKey(), e
-        .getValue(), warnings, errorCode)));
+      final ErrorCode errorCode) {
+    final List<Notification> warnings = new ArrayList<>();
+    final Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> allocations = holdingAllocations.entrySet()
+        .stream()
+        .collect(toMap(Map.Entry::getKey, e -> mapToRegions(e.getKey(), e.getValue(), warnings, errorCode)));
+    return new ExposureDataHolder<>(allocations, warnings);
   }
 
   /**
@@ -64,7 +68,7 @@ public class CountryAllocationMappingService {
   public Map<CountryRegionType, BigDecimal> mapToRegions(final PortfolioHolding holding,
       final Map<String, BigDecimal> allocations,
       final List<Notification> warnings, final ErrorCode errorCode) {
-    final Map<CountryRegionType, BigDecimal> map = new HashMap<>();
+    final Map<CountryRegionType, BigDecimal> map = new EnumMap<>(CountryRegionType.class);
     if (CollectionUtils.isEmpty(allocations)) {
       warnings.add(errorCode.toNotificationForHolding(holding));
       return map;
