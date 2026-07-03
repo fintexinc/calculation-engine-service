@@ -11,8 +11,6 @@ import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +31,10 @@ import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization
 import static com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType.SMALL;
 import static java.math.BigDecimal.ZERO;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class EquityMarketCapitalizationService
     extends
       BreakdownAbstractService<EquityMarketCapResult, EquityMarketCapitalizationType> {

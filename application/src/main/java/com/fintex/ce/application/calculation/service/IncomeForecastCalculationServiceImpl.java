@@ -17,7 +17,6 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.Notification;
 
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -39,7 +38,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class IncomeForecastCalculationServiceImpl
     implements
       CalculationService<IncomeForecastCommand, IncomeForecastResult> {

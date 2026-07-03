@@ -16,11 +16,13 @@ import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class RollingSharpeRatioCalculationServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<RollingCalculationCommand, RollingSharpeRatioResult> {

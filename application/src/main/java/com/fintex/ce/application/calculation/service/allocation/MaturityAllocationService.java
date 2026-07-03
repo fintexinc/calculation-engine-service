@@ -12,8 +12,6 @@ import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +23,10 @@ import static com.fintex.ce.model.error.ErrorCode.MISSING_MATURITY_ALLOCATION;
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class MaturityAllocationService
     extends
       BreakdownAbstractService<MaturityAllocationResult, MaturityAllocationType> {

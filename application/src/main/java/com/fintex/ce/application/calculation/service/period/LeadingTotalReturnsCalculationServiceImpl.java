@@ -15,11 +15,13 @@ import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.LeadingTotalReturnCommand;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class LeadingTotalReturnsCalculationServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<LeadingTotalReturnCommand, LeadingTotalReturnsResult> {

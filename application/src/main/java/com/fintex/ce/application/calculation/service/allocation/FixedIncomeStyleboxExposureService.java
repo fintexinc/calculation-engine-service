@@ -12,8 +12,6 @@ import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
 
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +23,10 @@ import static com.fintex.ce.model.error.ErrorCode.MISSING_FIXED_INCOME_STYLEBOX_
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class FixedIncomeStyleboxExposureService
     extends
       BreakdownAbstractService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleBoxType> {

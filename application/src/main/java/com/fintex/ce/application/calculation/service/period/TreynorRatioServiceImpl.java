@@ -17,7 +17,6 @@ import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,7 +25,10 @@ import java.util.Set;
 
 import static com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract.calculateExcessReturn;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class TreynorRatioServiceImpl
     extends
       BenchmarkWeightedAverageWithCpedAbstractService<PeriodCommand, TreynorRatioResult> {

@@ -17,7 +17,6 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,7 +41,10 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
 import static org.apache.commons.lang3.StringUtils.isNumeric;
 
-@Service
+/**
+ * @deprecated metric is broken and not supported for now
+ */
+@Deprecated
 public class MarRatioCalculationService
     extends
       WeightedAverageWithCpedAbstractService<PeriodCommand, MarRatioResult> {
