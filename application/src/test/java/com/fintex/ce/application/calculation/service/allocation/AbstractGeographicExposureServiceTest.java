@@ -73,7 +73,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   void setUp() {
     when(fxRateService.spotRates(anySet(), any(), any())).thenAnswer(invocation -> {
       Set<Currency> sources = invocation.getArgument(0);
-      Map<Currency, BigDecimal> identity = new HashMap<>();
+      Map<Currency, BigDecimal> identity = new EnumMap<>(Currency.class);
       for (Currency c : sources) {
         identity.put(c, ONE);
       }
@@ -121,39 +121,45 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
         .isCloseTo(expectedValue, within(TOLERANCE)));
   }
 
+  protected void assertNullExposure(R result) {
+    Map<GeographicRegionType, BigDecimal> actual = result.getGeographicExposure();
+    assertThat(actual).containsOnlyKeys(GeographicRegionType.values());
+    assertThat(actual.values()).allSatisfy(v -> assertThat(v).isNull());
+  }
+
   @Test
-  void shouldReturnZeroMap_whenHoldingsListIsEmpty() {
+  void shouldReturnNullBuckets_whenHoldingsListIsEmpty() {
     R result = service.perform(command());
 
-    assertExposureEquals(result, zeroes());
+    assertNullExposure(result);
     assertThat(result.getWarnings()).isEmpty();
   }
 
   @Test
-  void shouldReturnZeroMap_whenOnlyCashAndGicHoldings() {
+  void shouldReturnNullBuckets_whenOnlyCashAndGicHoldings() {
     CashHolding cashCad = cash(Currency.CAD, 1000);
     CashHolding cashUsd = cash(Currency.USD, 500);
     GicHolding gic = gic(Currency.CAD, 500);
 
     R result = service.perform(command(cashCad, cashUsd, gic));
 
-    assertExposureEquals(result, zeroes());
+    assertNullExposure(result);
     assertThat(result.getWarnings()).isEmpty();
   }
 
   @Test
-  void shouldReturnZeroMapAndWarn_whenFetcherReturnsNoAllocations() {
+  void shouldReturnNullBucketsAndWarn_whenFetcherReturnsNoAllocations() {
     PortfolioHolding fund = canadaMutualFund("RBF605", 1000);
 
     R result = service.perform(command(fund));
 
-    assertExposureEquals(result, zeroes());
+    assertNullExposure(result);
     assertThat(result.getWarnings()).hasSize(1);
-    assertThat(result.getWarnings().get(0).getCode()).isEqualTo(expectedMissingFundAllocationCode());
+    assertThat(result.getWarnings().getFirst().getCode()).isEqualTo(expectedMissingFundAllocationCode());
   }
 
   @Test
-  void shouldReturnZeroMapAndWarnPerHolding_whenAllAllocationMapsAreEmpty() {
+  void shouldReturnNullBucketsAndWarnPerHolding_whenAllAllocationMapsAreEmpty() {
     PortfolioHolding fundA = canadaMutualFund("A", 100);
     PortfolioHolding fundB = canadaMutualFund("B", 200);
     when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
@@ -162,23 +168,23 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
     R result = service.perform(command(fundA, fundB));
 
-    assertExposureEquals(result, zeroes());
+    assertNullExposure(result);
     assertThat(result.getWarnings()).hasSize(2);
     assertThat(result.getWarnings()).allSatisfy(w -> assertThat(w.getCode())
         .isEqualTo(expectedMissingFundAllocationCode()));
   }
 
   @Test
-  void shouldReturnZeroMapAndWarn_whenAllocationMapIsNull() {
+  void shouldReturnNullBucketsAndWarn_whenAllocationMapIsNull() {
     PortfolioHolding fund = canadaMutualFund("RBF605", 1000);
     when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(fund,
         HoldingGeographicAllocation.builder().allocations(null).currency(Currency.CAD).build()));
 
     R result = service.perform(command(fund));
 
-    assertExposureEquals(result, zeroes());
+    assertNullExposure(result);
     assertThat(result.getWarnings()).hasSize(1);
-    assertThat(result.getWarnings().get(0).getCode()).isEqualTo(expectedMissingFundAllocationCode());
+    assertThat(result.getWarnings().getFirst().getCode()).isEqualTo(expectedMissingFundAllocationCode());
   }
 
   @Test
@@ -235,7 +241,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
     when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
         cadFund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD),
         usdEtf, allocation(Map.of(GeographicRegionType.EUROPE, ONE), Currency.USD)));
-    Map<Currency, BigDecimal> noRate = new HashMap<>();
+    Map<Currency, BigDecimal> noRate = new EnumMap<>(Currency.class);
     noRate.put(Currency.USD, null);
     when(fxRateService.spotRates(anySet(), any(), any())).thenReturn(noRate);
 
@@ -309,6 +315,30 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
     assertThat(stockCaptor.getValue()).doesNotContain(excluded);
 
     assertExposureEquals(result, distribution(Map.of(GeographicRegionType.US, ONE)));
+  }
+
+  @Test
+  void shouldIncludeCanadaEtf_inFundAllocationFetch_notStockGeographyFetch() {
+    PortfolioHolding canadaEtf = canadaEtf("XIU", 100);
+    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+
+    when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
+        canadaEtf, allocation(Map.of(GeographicRegionType.CANADA, ONE), Currency.CAD),
+        fund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD)));
+
+    R result = service.perform(command(canadaEtf, fund));
+
+    ArgumentCaptor<List<PortfolioHolding>> fundCaptor = ArgumentCaptor.forClass(List.class);
+    verify(geographicFetcher).fetch(fundCaptor.capture(), anyList());
+    assertThat(fundCaptor.getValue()).contains(canadaEtf, fund);
+
+    ArgumentCaptor<List<PortfolioHolding>> stockCaptor = ArgumentCaptor.forClass(List.class);
+    verify(geographyFetcher).fetch(stockCaptor.capture(), anyList());
+    assertThat(stockCaptor.getValue()).doesNotContain(canadaEtf);
+
+    assertExposureEquals(result, distribution(Map.of(
+        GeographicRegionType.CANADA, new BigDecimal("0.5"),
+        GeographicRegionType.US, new BigDecimal("0.5"))));
   }
 
   @Test

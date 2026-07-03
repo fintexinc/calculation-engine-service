@@ -63,11 +63,37 @@ class FixedIncomeBondSectorServiceTest {
   }
 
   @Test
+  void shouldEmitWarning_whenSecurityIsUnknown() {
+    var fixedIncomeFetcher = mock(SecurityDataFetcher.class);
+    var service = mockService(fixedIncomeFetcher, mock(FixedIncomeSectorResponseMapper.class));
+
+    var holding = mock(PortfolioHolding.class);
+    when(holding.getIdsString()).thenReturn("HOLDING-1");
+    var command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
+    when(fixedIncomeFetcher.fetch(any(), any())).thenReturn(Map.of());
+
+    doCallRealMethod().when(service).fetchExposures(any());
+    var result = service.fetchExposures(command);
+
+    assertEquals(1, result.warnings().size());
+    var warning = result.warnings().getFirst();
+    assertEquals(MISSING_FIXED_INCOME_BOND_SECTOR.getCode(), warning.getCode());
+    assertEquals(MISSING_FIXED_INCOME_BOND_SECTOR.getFormattedMessage("HOLDING-1"), warning.getMessage());
+    assertEquals("HOLDING-1", warning.getMetadata().get("holdingId"));
+    assertTrue(result.allocations().containsKey(holding));
+    assertEquals(0, result.allocations().get(holding).get(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS)
+        .compareTo(ZERO));
+  }
+
+  @Test
   void shouldEmitWarning_whenSecurityDataIsMissing() {
     var fixedIncomeFetcher = mock(SecurityDataFetcher.class);
     var service = mockService(fixedIncomeFetcher, mock(FixedIncomeSectorResponseMapper.class));
 
     var holding = mock(PortfolioHolding.class);
+    when(holding.getIdsString()).thenReturn("HOLDING-1");
     var command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holding));
     when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
@@ -77,7 +103,10 @@ class FixedIncomeBondSectorServiceTest {
     var result = service.fetchExposures(command);
 
     assertEquals(1, result.warnings().size());
-    assertEquals(MISSING_FIXED_INCOME_BOND_SECTOR.getCode(), result.warnings().getFirst().getCode());
+    var warning = result.warnings().getFirst();
+    assertEquals(MISSING_FIXED_INCOME_BOND_SECTOR.getCode(), warning.getCode());
+    assertEquals(MISSING_FIXED_INCOME_BOND_SECTOR.getFormattedMessage("HOLDING-1"), warning.getMessage());
+    assertEquals("HOLDING-1", warning.getMetadata().get("holdingId"));
     assertTrue(result.allocations().containsKey(holding));
     assertEquals(0, result.allocations().get(holding).get(FixedIncomeSecuritiesAllocationType.CORPORATE_BONDS)
         .compareTo(ZERO));

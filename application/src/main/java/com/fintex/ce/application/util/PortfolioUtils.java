@@ -64,7 +64,8 @@ public class PortfolioUtils {
   }
 
   public static <T> boolean areAllValuesZerosInMap(final Map<PortfolioHolding, Map<T, BigDecimal>> map) {
-    return map.values().stream().flatMap(e -> e.values().stream()).allMatch(v -> v.compareTo(ZERO) == 0);
+    return map.values().stream().flatMap(e -> e.values().stream())
+        .allMatch(v -> v == null || v.compareTo(ZERO) == 0);
   }
 
   public static String createKey(final PortfolioHolding holding) {
