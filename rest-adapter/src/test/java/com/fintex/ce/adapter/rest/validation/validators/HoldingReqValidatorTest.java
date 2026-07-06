@@ -68,6 +68,97 @@ class HoldingReqValidatorTest {
   }
 
   @Test
+  void shouldThrow_whenSecurityIdentifierIdIsEmpty() {
+    PortfolioHolding holding = new PortfolioHolding(
+        BigDecimal.TEN,
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("", FiIdentifierType.FUNDSERV));
+
+    ReturnCommand command = new ReturnCommand();
+    command.setCurrency(Currency.CAD);
+    command.setHoldings(List.of(holding));
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_BLANK");
+          assertThat(rve.getFieldName()).isEqualTo("securityIdentifier.id");
+        });
+  }
+
+  @Test
+  void shouldThrow_whenSecurityIdentifierIdIsBlank() {
+    PortfolioHolding holding = new PortfolioHolding(
+        BigDecimal.TEN,
+        FinancialInstrumentType.STOCK_US,
+        new SecurityIdentifier("   ", FiIdentifierType.TICKER));
+
+    ReturnCommand command = new ReturnCommand();
+    command.setCurrency(Currency.CAD);
+    command.setHoldings(List.of(holding));
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> assertThat(((ValidationException) ex).getErrorCode().name()).isEqualTo("FIELD_NOT_BLANK"));
+  }
+
+  @Test
+  void shouldThrow_whenSecurityIdentifierIdTypeIsNull() {
+    PortfolioHolding holding = new PortfolioHolding(
+        BigDecimal.TEN,
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("ID1", null));
+
+    ReturnCommand command = new ReturnCommand();
+    command.setCurrency(Currency.CAD);
+    command.setHoldings(List.of(holding));
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_NULL");
+          assertThat(rve.getFieldName()).isEqualTo("securityIdentifier.idType");
+        });
+  }
+
+  @Test
+  void shouldThrow_whenSecurityIdentifierIsNull_forSecurityHolding() {
+    PortfolioHolding holding = new PortfolioHolding(
+        BigDecimal.TEN,
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        null);
+
+    ReturnCommand command = new ReturnCommand();
+    command.setCurrency(Currency.CAD);
+    command.setHoldings(List.of(holding));
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_NULL");
+          assertThat(rve.getFieldName()).isEqualTo("securityIdentifier");
+        });
+  }
+
+  @Test
+  void shouldNotThrow_whenCashHoldingHasNoSecurityIdentifier() {
+    CashHolding cashHolding = CashHolding.builder()
+        .value(BigDecimal.TEN)
+        .holdingType(FinancialInstrumentType.CASH)
+        .currency(Currency.CAD)
+        .build();
+
+    ReturnCommand command = new ReturnCommand();
+    command.setCurrency(Currency.CAD);
+    command.setHoldings(List.of(cashHolding));
+
+    assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
+  }
+
+  @Test
   void shouldNotThrow_whenHoldingsAreEmpty() {
     PeriodCommand command = new PeriodCommand();
     command.setCurrency(Currency.CAD);

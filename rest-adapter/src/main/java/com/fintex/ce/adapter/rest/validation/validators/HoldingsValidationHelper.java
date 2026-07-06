@@ -11,6 +11,8 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.util.CollectionUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
@@ -24,10 +26,18 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class HoldingsValidationHelper {
 
+  private static final String SECURITY_IDENTIFIER_FIELD = "securityIdentifier";
+  private static final String USER_FORMATTED_SECURITY_IDENTIFIER_FIELD = "Security Identifier";
+  private static final String SECURITY_IDENTIFIER_ID_FIELD = "securityIdentifier.id";
+  private static final String USER_FORMATTED_SECURITY_IDENTIFIER_ID_FIELD = "Security Identifier ID";
+  private static final String SECURITY_IDENTIFIER_ID_TYPE_FIELD = "securityIdentifier.idType";
+  private static final String USER_FORMATTED_SECURITY_IDENTIFIER_ID_TYPE_FIELD = "Security Identifier ID Type";
+
   public static void validate(List<PortfolioHolding> holdings) {
     if (CollectionUtils.isEmpty(holdings)) {
       return;
     }
+    validateSecurityIdentifiers(holdings);
     validateGicInvestmentDates(holdings);
     validateCashHoldingCurrencies(holdings);
   }
@@ -49,6 +59,33 @@ public class HoldingsValidationHelper {
     }
     if (sum.compareTo(BigDecimal.ZERO) <= 0) {
       throw ErrorCode.HOLDING_VALUES_SUM_NOT_POSITIVE.toValidationException();
+    }
+  }
+
+  private static void validateSecurityIdentifiers(List<PortfolioHolding> holdings) {
+    for (PortfolioHolding holding : holdings) {
+      if (requiresSecurityIdentifier(holding)) {
+        validateSecurityIdentifier(holding.getSecurityIdentifier());
+      }
+    }
+  }
+
+  private static boolean requiresSecurityIdentifier(PortfolioHolding holding) {
+    return holding.getHoldingType() == null || !FilterUtils.LOCALLY_SOURCED_TYPES.contains(holding.getHoldingType());
+  }
+
+  private static void validateSecurityIdentifier(SecurityIdentifier identifier) {
+    if (identifier == null) {
+      throw ErrorCode.FIELD_NOT_NULL.toValidationExceptionForField(SECURITY_IDENTIFIER_FIELD,
+          USER_FORMATTED_SECURITY_IDENTIFIER_FIELD);
+    }
+    if (identifier.getIdType() == null) {
+      throw ErrorCode.FIELD_NOT_NULL.toValidationExceptionForField(SECURITY_IDENTIFIER_ID_TYPE_FIELD,
+          USER_FORMATTED_SECURITY_IDENTIFIER_ID_TYPE_FIELD);
+    }
+    if (StringUtils.isBlank(identifier.getId())) {
+      throw ErrorCode.FIELD_NOT_BLANK.toValidationExceptionForField(SECURITY_IDENTIFIER_ID_FIELD,
+          USER_FORMATTED_SECURITY_IDENTIFIER_ID_FIELD);
     }
   }
 
