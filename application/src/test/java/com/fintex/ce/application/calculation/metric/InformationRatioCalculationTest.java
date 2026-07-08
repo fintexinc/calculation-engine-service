@@ -231,5 +231,4 @@ class InformationRatioCalculationTest {
         Arguments.of(null, BigDecimal.ONE, BigDecimal.TEN),
         Arguments.of(BigDecimal.TEN, null, BigDecimal.TEN));
   }
-
 }
