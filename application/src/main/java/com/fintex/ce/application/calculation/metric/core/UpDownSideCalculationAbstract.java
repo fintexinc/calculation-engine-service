@@ -1,12 +1,11 @@
 package com.fintex.ce.application.calculation.metric.core;
 
-import com.fintex.ce.application.util.DecimalUtils;
+import com.fintex.ce.application.calculation.metric.formula.CaptureRatioBasis;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
@@ -27,6 +26,8 @@ import static java.math.BigDecimal.ZERO;
 public abstract class UpDownSideCalculationAbstract<T extends PeriodResult>
     extends
       BenchmarkWeightedAverageCalculation<T, BigDecimal> {
+
+  static final CaptureRatioBasis CAPTURE_RATIO_BASIS = CaptureRatioBasis.CUMULATIVE_COMPOUNDED;
 
   public NavigableMap<LocalDate, BigDecimal> portfolioDetermination;
   public NavigableMap<LocalDate, BigDecimal> benchmarkDetermination;
@@ -64,23 +65,17 @@ public abstract class UpDownSideCalculationAbstract<T extends PeriodResult>
       return null;
     }
     validatePortfolioBenchmarkCoverage(numberOfMonths);
-    final BigDecimal portfolioDeviation = calculateDeviationFor(numberOfMonths, portfolioDetermination);
-    final BigDecimal benchmarkDeviation = calculateDeviationFor(numberOfMonths, benchmarkDetermination);
-    if (ZERO.compareTo(benchmarkDeviation) == 0) {
+    final BigDecimal portfolioCaptureReturn = calculateCaptureReturnFor(numberOfMonths, portfolioDetermination);
+    final BigDecimal benchmarkCaptureReturn = calculateCaptureReturnFor(numberOfMonths, benchmarkDetermination);
+    if (ZERO.compareTo(benchmarkCaptureReturn) == 0) {
       return ZERO;
     }
-    return divide(portfolioDeviation, benchmarkDeviation).multiply(HUNDRED);
+    return divide(portfolioCaptureReturn, benchmarkCaptureReturn).multiply(HUNDRED);
   }
 
-  public BigDecimal calculateDeviationFor(int numberOfMonths,
+  public BigDecimal calculateCaptureReturnFor(int numberOfMonths,
       final NavigableMap<LocalDate, BigDecimal> determinations) {
-    final List<BigDecimal> portfolioProduct = getBenchmarkValues(numberOfMonths, determinations);
-    if (portfolioProduct.isEmpty()) {
-      return ZERO;
-    }
-    final BigDecimal division = divide(ONE, portfolioProduct.size());
-    final BigDecimal product = portfolioProduct.stream().reduce(ONE, BigDecimal::multiply);
-    return DecimalUtils.pow(product, division).subtract(ONE);
+    return CAPTURE_RATIO_BASIS.calculate(getBenchmarkValues(numberOfMonths, determinations));
   }
 
 }

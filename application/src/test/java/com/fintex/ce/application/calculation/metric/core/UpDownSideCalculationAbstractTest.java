@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.metric.core;
 
 import com.fintex.ce.application.calculation.metric.DownsideCaptureCalculation;
 import com.fintex.ce.application.calculation.metric.UpsideCaptureCalculation;
+import com.fintex.ce.application.calculation.metric.formula.CaptureRatioBasis;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.application.util.DecimalUtils.pow;
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
@@ -100,7 +100,7 @@ class UpDownSideCalculationAbstractTest {
   }
 
   @Test
-  void shouldReturnCaptureRatio_whenDeviationsAreCalculated() {
+  void shouldReturnCaptureRatio_whenCaptureReturnsAreCalculated() {
     final var calculation = mock(UpDownSideCalculationAbstract.class);
 
     calculation.portfolioDetermination = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE));
@@ -112,8 +112,8 @@ class UpDownSideCalculationAbstractTest {
     when(calculation.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
 
-    when(calculation.calculateDeviationFor(12, calculation.portfolioDetermination)).thenReturn(ONE);
-    when(calculation.calculateDeviationFor(12, calculation.benchmarkDetermination)).thenReturn(TEN);
+    when(calculation.calculateCaptureReturnFor(12, calculation.portfolioDetermination)).thenReturn(ONE);
+    when(calculation.calculateCaptureReturnFor(12, calculation.benchmarkDetermination)).thenReturn(TEN);
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(12);
     final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(12);
@@ -135,8 +135,8 @@ class UpDownSideCalculationAbstractTest {
     when(calculation.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
 
-    when(calculation.calculateDeviationFor(months, calculation.portfolioDetermination)).thenReturn(ONE);
-    when(calculation.calculateDeviationFor(months, calculation.benchmarkDetermination)).thenReturn(TEN);
+    when(calculation.calculateCaptureReturnFor(months, calculation.portfolioDetermination)).thenReturn(ONE);
+    when(calculation.calculateCaptureReturnFor(months, calculation.benchmarkDetermination)).thenReturn(TEN);
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(months);
     final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(months);
@@ -161,7 +161,7 @@ class UpDownSideCalculationAbstractTest {
   }
 
   @Test
-  void shouldReturnZero_whenBenchmarkDeviationIsZero() {
+  void shouldReturnZero_whenBenchmarkCaptureReturnIsZero() {
     final var calculation = mock(UpDownSideCalculationAbstract.class);
 
     calculation.portfolioDetermination = new TreeMap<>(Map.of(LOCAL_DATE_NOW.minusMonths(1), ONE));
@@ -174,8 +174,8 @@ class UpDownSideCalculationAbstractTest {
     when(calculation.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
 
-    when(calculation.calculateDeviationFor(months, calculation.portfolioDetermination)).thenReturn(ONE);
-    when(calculation.calculateDeviationFor(months, calculation.benchmarkDetermination)).thenReturn(ZERO);
+    when(calculation.calculateCaptureReturnFor(months, calculation.portfolioDetermination)).thenReturn(ONE);
+    when(calculation.calculateCaptureReturnFor(months, calculation.benchmarkDetermination)).thenReturn(ZERO);
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(months);
     final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(months);
@@ -184,7 +184,7 @@ class UpDownSideCalculationAbstractTest {
   }
 
   @Test
-  void shouldCalculateDeviation_whenRequiredMonthsExist() {
+  void shouldCalculateCumulativeCompoundedReturn_whenRequiredMonthsExist() {
     final var calculation = mock(UpDownSideCalculationAbstract.class);
 
     final int numberOfMonths = 2;
@@ -197,24 +197,42 @@ class UpDownSideCalculationAbstractTest {
     doCallRealMethod().when(calculation).getBenchmarkValues(numberOfMonths, determination);
     doCallRealMethod().when(calculation).filterRequiredMonthsForPeriod(numberOfMonths, determination);
 
-    doCallRealMethod().when(calculation).calculateDeviationFor(eq(numberOfMonths), any());
-    final BigDecimal actual = calculation.calculateDeviationFor(numberOfMonths, determination);
+    doCallRealMethod().when(calculation).calculateCaptureReturnFor(eq(numberOfMonths), any());
+    final BigDecimal actual = calculation.calculateCaptureReturnFor(numberOfMonths, determination);
 
-    assertEquals(pow(TEN, BigDecimal.valueOf(0.5)).subtract(ONE), actual);
+    assertThat(UpDownSideCalculationAbstract.CAPTURE_RATIO_BASIS).isEqualTo(CaptureRatioBasis.CUMULATIVE_COMPOUNDED);
+    assertThat(actual).isEqualByComparingTo(new BigDecimal("9"));
   }
 
   @Test
-  void shouldReturnZeroDeviation_whenBenchmarkValuesAreMissing() {
+  void shouldCalculateCaptureRatioUsingCumulativeCompoundedBasis_whenMultipleQualifyingMonthsExist() {
+    LocalDate startDate = LocalDate.parse("2024-01-31");
+    LocalDate secondDate = toLastDayOfMonth(startDate.plusMonths(1));
+    TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(startDate, 12, ZERO);
+    TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(startDate, 12, ZERO);
+    portfolioReturns.put(startDate, BigDecimal.valueOf(2));
+    portfolioReturns.put(secondDate, BigDecimal.valueOf(3));
+    benchmarkReturns.put(startDate, ONE);
+    benchmarkReturns.put(secondDate, ONE);
+    UpDownSideCalculationAbstract<?> calculation = new UpsideCaptureCalculation(benchmarkInput(portfolioReturns,
+        benchmarkReturns), Set.of("12"));
+
+    BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(12);
+
+    assertThat(actual).isEqualByComparingTo(new BigDecimal("251.741293532338300"));
+  }
+
+  @Test
+  void shouldReturnZeroCaptureReturn_whenBenchmarkValuesAreMissing() {
     final var calculation = mock(UpDownSideCalculationAbstract.class);
-    final var periodCalculationAbstract = mock(PeriodCalculationAbstract.class);
 
     final TreeMap<LocalDate, BigDecimal> determination = new TreeMap<>(
         Map.of(toLastDayOfMonth(LOCAL_DATE_NOW.minusMonths(1)), TEN, toLastDayOfMonth(LOCAL_DATE_NOW), ONE));
 
-    when(periodCalculationAbstract.getBenchmarkValues(60, determination)).thenReturn(List.of());
+    when(calculation.getBenchmarkValues(60, determination)).thenReturn(List.of());
 
-    doCallRealMethod().when(calculation).calculateDeviationFor(eq(60), any());
-    final BigDecimal actual = calculation.calculateDeviationFor(60, determination);
+    doCallRealMethod().when(calculation).calculateCaptureReturnFor(eq(60), any());
+    final BigDecimal actual = calculation.calculateCaptureReturnFor(60, determination);
 
     assertEquals(ZERO, actual);
   }
