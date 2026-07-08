@@ -17,7 +17,6 @@ import static com.fintex.ce.application.util.DecimalUtils.divide;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
-import static java.util.Optional.ofNullable;
 
 /**
  * This abstraction is applicable for Upside and Downside calculations.
@@ -40,29 +39,21 @@ public abstract class UpDownSideCalculationAbstract<T extends PeriodResult>
 
   public abstract boolean filterCaptureExpression(final Map.Entry<LocalDate, BigDecimal> e);
 
-  /**
-   * Because size of getBenchmarkTotalReturns() and getPortfolioTotalReturns() could be different We handle that with
-   * dummy values in returned result of this method. For example when getBenchmarkTotalReturns() consists of 180 entries
-   * and getPortfolioTotalReturns() of 100 entries Then result of this method would contain 1..100 correct values and
-   * 101-180 incorrect values. That is done by purpose to increase performance instead of calling this method each time
-   * for each period. In this method calculatePeriodForNumberOfMonths(), exists validation that would not allow using
-   * incorrect values (101-180)
-   */
   public TreeMap<LocalDate, BigDecimal> getPortfolioDetermination() {
+    final NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns = getPortfolioTotalReturns();
     return getBenchmarkTotalReturns().entrySet().stream().filter(this::filterCaptureExpression)
+        .filter(e -> portfolioTotalReturns.containsKey(e.getKey()))
         .collect(toTreeMap(Map.Entry::getKey,
-            e -> divide(ofNullable(getPortfolioTotalReturns().get(e.getKey())).orElse(HUNDRED), HUNDRED).add(ONE)));
+            e -> divide(portfolioTotalReturns.get(e.getKey()), HUNDRED).add(ONE)));
   }
 
-  /**
-   * see comment of getPortfolioDetermination()
-   */
   public NavigableMap<LocalDate, BigDecimal> getBenchmarkDetermination(
       final NavigableMap<LocalDate, BigDecimal> portfolioDownsideDetermination) {
     final NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = getBenchmarkTotalReturns();
     return portfolioDownsideDetermination.entrySet().stream()
+        .filter(e -> benchmarkTotalReturns.containsKey(e.getKey()))
         .collect(toTreeMap(Map.Entry::getKey,
-            e -> divide(ofNullable(benchmarkTotalReturns.get(e.getKey())).orElse(HUNDRED), HUNDRED).add(ONE)));
+            e -> divide(benchmarkTotalReturns.get(e.getKey()), HUNDRED).add(ONE)));
   }
 
   @Override
@@ -72,6 +63,7 @@ public abstract class UpDownSideCalculationAbstract<T extends PeriodResult>
         || numberOfMonths < 12) {
       return null;
     }
+    validatePortfolioBenchmarkCoverage(numberOfMonths);
     final BigDecimal portfolioDeviation = calculateDeviationFor(numberOfMonths, portfolioDetermination);
     final BigDecimal benchmarkDeviation = calculateDeviationFor(numberOfMonths, benchmarkDetermination);
     if (ZERO.compareTo(benchmarkDeviation) == 0) {

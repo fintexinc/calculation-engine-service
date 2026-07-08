@@ -1,5 +1,6 @@
 package com.fintex.ce.application.calculation.metric.core;
 
+import com.fintex.ce.application.util.ReturnSeriesAlignmentValidator;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 
@@ -27,6 +28,11 @@ public abstract class BenchmarkWeightedAverageCalculation<T extends PeriodResult
   @Override
   public int availableMonths() {
     return Math.min(super.availableMonths(), benchmarkTotalReturns.size());
+  }
+
+  protected void validatePortfolioBenchmarkCoverage(int numberOfMonths) {
+    ReturnSeriesAlignmentValidator.requirePortfolioBenchmarkCoverage(portfolioTotalReturns, benchmarkTotalReturns,
+        numberOfMonths);
   }
 
 }
