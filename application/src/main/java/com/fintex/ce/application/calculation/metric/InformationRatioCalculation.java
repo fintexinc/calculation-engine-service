@@ -35,6 +35,7 @@ public class InformationRatioCalculation
         || numberOfMonths < BigDecimalConstants.TWELVE.intValue()) {
       return null;
     }
+    validatePortfolioBenchmarkCoverage(numberOfMonths);
 
     final BigDecimal portfolioReturn = trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(numberOfMonths,
         getPortfolioTotalReturns());
