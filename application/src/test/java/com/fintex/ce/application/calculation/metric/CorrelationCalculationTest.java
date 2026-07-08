@@ -329,6 +329,19 @@ class CorrelationCalculationTest {
   }
 
   @Test
+  void shouldReturnNull_whenCorrelationDenominatorIsZero() {
+    final var calculation = mock(CorrelationCalculation.class);
+    final var map = mock(Map.class);
+
+    when(calculation.calculateDenominator(any(), any())).thenReturn(BigDecimal.ZERO);
+
+    doCallRealMethod().when(calculation).calculateCorrelation(any(), any());
+    final BigDecimal result = calculation.calculateCorrelation(map, map);
+
+    assertNull(result);
+  }
+
+  @Test
   void shouldCalculateNumerator_whenCheckResult() {
     final var calculation = mock(CorrelationCalculation.class);
     final var date = LocalDate.now();

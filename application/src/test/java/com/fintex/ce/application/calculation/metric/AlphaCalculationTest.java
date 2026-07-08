@@ -207,6 +207,18 @@ class AlphaCalculationTest {
   }
 
   @Test
+  void shouldReturnNull_whenBetaIsNull() {
+    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+
+    when(alpha.calculateBeta(anyInt())).thenReturn(null);
+
+    doCallRealMethod().when(alpha).calculateAlpha(anyInt(), any(), any());
+    final BigDecimal actual = alpha.calculateAlpha(10, TEN, BigDecimalConstants.TWELVE);
+
+    assertNull(actual);
+  }
+
+  @Test
   void shouldReturnExpectedAlphaValue_whenCalculatingAlphaWithBetaOne() {
     final AlphaCalculation alpha = mock(AlphaCalculation.class);
 

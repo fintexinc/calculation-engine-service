@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -62,6 +63,9 @@ public class AlphaCalculation extends AlphaBetaCalculationAbstract<AlphaResult> 
       final BigDecimal portfolioExcessAverage,
       final BigDecimal benchmarkExcessAverage) {
     final BigDecimal beta = calculateBeta(numberOfMonth);
+    if (Objects.isNull(beta)) {
+      return null;
+    }
     final BigDecimal alpha = portfolioExcessAverage.subtract(beta.multiply(benchmarkExcessAverage));
     return alpha.multiply(TWELVE);
   }

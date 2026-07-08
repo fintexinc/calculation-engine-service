@@ -189,6 +189,16 @@ class TreynorRatioCalculationTest {
   }
 
   @Test
+  void shouldReturnNull_whenBetaIsZero() {
+    final var calculation = mock(TreynorRatioCalculation.class);
+
+    doCallRealMethod().when(calculation).calculateTreynorRatio(any(), any(), any());
+    final BigDecimal actual = calculation.calculateTreynorRatio(TEN, TWO, ZERO);
+
+    assertNull(actual);
+  }
+
+  @Test
   void shouldReturnNull_whenTBillsDoNotOverlapPortfolioRange() {
     // Portfolio runs over the last 12 months; T-Bills are pre-2000, no overlap. restrictTBillsRange yields an empty
     // submap, so the count gate (numberOfMonths > tBills.size()) short-circuits to null before any subMap call.
