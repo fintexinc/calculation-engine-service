@@ -57,6 +57,9 @@ public abstract class RSquaredCalculationAbstract<T extends PeriodResult>
         benchmarkExcessReturnByPeriod);
     final BigDecimal totalSumOfSquares = calculateTotalSumOfSquares(portfolioExcessReturnByPeriod,
         portfolioExcessAverage);
+    if (ZERO.compareTo(totalSumOfSquares) == 0) {
+      return null;
+    }
     return toUserScale(BigDecimalConstants.ONE.subtract(DecimalUtils.divide(sumSquaredRegression, totalSumOfSquares)));
   }
 

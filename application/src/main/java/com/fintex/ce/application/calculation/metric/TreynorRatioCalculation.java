@@ -69,6 +69,9 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
       final BigDecimal beta) {
     log.info("annualizedPortfolioReturn: {}, annualizedRiskFreeRate: {}, beta: {}",
         annualizedPortfolioReturn, annualizedRiskFreeRate, beta);
+    if (Objects.isNull(beta) || BigDecimal.ZERO.compareTo(beta) == 0) {
+      return null;
+    }
     return divide(annualizedPortfolioReturn.subtract(annualizedRiskFreeRate), beta);
   }
 

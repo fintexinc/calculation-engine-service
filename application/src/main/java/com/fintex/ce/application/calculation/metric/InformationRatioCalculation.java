@@ -10,6 +10,7 @@ import com.fintex.ce.model.util.BigDecimalConstants;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Set;
 
 public class InformationRatioCalculation
@@ -43,6 +44,12 @@ public class InformationRatioCalculation
         getBenchmarkTotalReturns());
     final BigDecimal trackingError = trackingErrorCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
 
+    if (Objects.isNull(portfolioReturn)
+        || Objects.isNull(benchmarkReturn)
+        || Objects.isNull(trackingError)
+        || BigDecimal.ZERO.compareTo(trackingError) == 0) {
+      return null;
+    }
     return DecimalUtils.divide(portfolioReturn.subtract(benchmarkReturn), trackingError);
   }
 

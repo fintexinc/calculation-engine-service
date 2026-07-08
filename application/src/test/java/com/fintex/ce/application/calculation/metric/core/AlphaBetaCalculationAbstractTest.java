@@ -242,6 +242,21 @@ class AlphaBetaCalculationAbstractTest {
   }
 
   @Test
+  void shouldReturnNull_whenBetaDenominatorIsZero() {
+    final var calculation = mock(AlphaBetaCalculationAbstract.class);
+    final var treeMap = mock(TreeMap.class);
+    final var bigDecimal = mock(BigDecimal.class);
+
+    when(calculation.calculateNumerator(any(), any(), any(), any())).thenReturn(ONE);
+    when(calculation.calculateDenominator(any(), any())).thenReturn(BigDecimal.ZERO);
+
+    doCallRealMethod().when(calculation).calculateBeta(any(), any(), any(), any());
+    final BigDecimal result = calculation.calculateBeta(treeMap, treeMap, bigDecimal, bigDecimal);
+
+    assertNull(result);
+  }
+
+  @Test
   void shouldCalculateNumeratorValue_whenExcessReturnsProvided() {
     final var calculation = mock(AlphaBetaCalculationAbstract.class);
 

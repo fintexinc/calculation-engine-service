@@ -242,6 +242,21 @@ class RSquaredCalculationAbstractTest {
   }
 
   @Test
+  void shouldReturnNull_whenTotalSumOfSquaresIsZero() {
+    final var calculation = mock(RSquaredCalculationAbstract.class);
+    final var treeMap = mock(TreeMap.class);
+    final var bigDecimal = mock(BigDecimal.class);
+
+    when(calculation.calculateSumSquaredRegression(any(), any())).thenReturn(ONE);
+    when(calculation.calculateTotalSumOfSquares(any(), any())).thenReturn(BigDecimal.ZERO);
+
+    doCallRealMethod().when(calculation).calculateRSquared(any(), any(), any());
+    final BigDecimal result = calculation.calculateRSquared(treeMap, treeMap, bigDecimal);
+
+    assertNull(result);
+  }
+
+  @Test
   void shouldCalculateSumSquaredRegression_whenReturnsProvided() {
     final var calculation = mock(RSquaredCalculationAbstract.class);
 

@@ -64,6 +64,9 @@ public abstract class AlphaBetaCalculationAbstract<T extends PeriodResult>
     final BigDecimal numerator = calculateNumerator(portfolioExcessReturnByPeriod, benchmarkExcessReturnByPeriod,
         portfolioExcessAverage, benchmarkExcessAverage);
     final BigDecimal denominator = calculateDenominator(benchmarkExcessReturnByPeriod, benchmarkExcessAverage);
+    if (ZERO.compareTo(denominator) == 0) {
+      return null;
+    }
     return toUserScale(DecimalUtils.divide(numerator, denominator));
   }
 

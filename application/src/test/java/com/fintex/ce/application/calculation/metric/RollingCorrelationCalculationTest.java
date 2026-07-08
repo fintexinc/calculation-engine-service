@@ -149,6 +149,26 @@ class RollingCorrelationCalculationTest {
   }
 
   @Test
+  void shouldReturnNull_whenCorrelationCannotBeCalculated() {
+    final var correlationCalculation = mock(CorrelationCalculation.class);
+    final var benchmarkTotalReturns = portfolioReturns;
+    final var context = mock(PeriodCalculationInput.class);
+    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+        correlationCalculation, benchmarkTotalReturns));
+    final int numberOfMonths = TWELVE;
+    final var benchmarkReturns = portfolioReturns;
+
+    when(calculation.initializePortfolioReturns(any())).thenReturn(portfolioReturns);
+    when(calculation.initializeBenchmarkReturns(any())).thenReturn(benchmarkReturns);
+    when(correlationCalculation.calculateCorrelation(anyMap(), anyMap())).thenReturn(null);
+
+    doCallRealMethod().when(calculation).calculateRollingValue(anyInt(), any());
+    final BigDecimal actual = calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
+
+    assertNull(actual);
+  }
+
+  @Test
   void shouldGetAdjustedPortfolioReturns_whenBenchmarkStartsLater() {
     final var correlationCalculation = mock(CorrelationCalculation.class);
     final var benchmarkTotalReturns = portfolioReturns;

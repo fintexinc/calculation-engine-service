@@ -184,8 +184,11 @@ public class CorrelationCalculation
    */
   public BigDecimal calculateCorrelation(final Map<LocalDate, BigDecimal> keyHoldingValues,
       final Map<LocalDate, BigDecimal> holdingValues) {
-    return divide(calculateNumerator(keyHoldingValues, holdingValues), calculateDenominator(keyHoldingValues,
-        holdingValues));
+    final BigDecimal denominator = calculateDenominator(keyHoldingValues, holdingValues);
+    if (BigDecimal.ZERO.compareTo(denominator) == 0) {
+      return null;
+    }
+    return divide(calculateNumerator(keyHoldingValues, holdingValues), denominator);
   }
 
   /**
