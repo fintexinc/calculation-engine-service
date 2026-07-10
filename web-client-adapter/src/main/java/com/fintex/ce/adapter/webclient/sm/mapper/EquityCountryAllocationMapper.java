@@ -4,7 +4,8 @@ import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
-import com.fintex.wm.commons.domain.value.CountryValue;
+import com.fintex.wm.commons.domain.allocation.CountryAllocationValue;
+import com.fintex.wm.commons.domain.enumeration.Country;
 
 import org.springframework.stereotype.Component;
 
@@ -24,11 +25,12 @@ public class EquityCountryAllocationMapper
 
   @Override
   public EquityCountryAllocation map(CountryAllocation smsResponse, PortfolioHolding holding) {
-    Map<String, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
-        .map(CountryAllocation::getAllocation)
+    Map<Country, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
+        .map(CountryAllocation::getAllocations)
         .orElse(List.of())
         .stream()
-        .collect(Collectors.toMap(CountryValue::getIsoCode, CountryValue::getValue));
+        .filter(entry -> entry.getType() != null && entry.getValue() != null)
+        .collect(Collectors.toMap(CountryAllocationValue::getType, CountryAllocationValue::getValue));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
         .map(CountryAllocation::getDataProviders)

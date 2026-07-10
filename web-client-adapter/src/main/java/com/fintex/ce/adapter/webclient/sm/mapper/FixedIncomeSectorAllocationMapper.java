@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
-import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeNameValue;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 
 import org.springframework.stereotype.Component;
@@ -45,14 +45,14 @@ public class FixedIncomeSectorAllocationMapper
   @Override
   public FixedIncomeBondSecurities map(FixedIncomeSectorAllocation smsResponse, PortfolioHolding holding) {
     Map<FixedIncomeSecuritiesAllocationType, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
-        .map(FixedIncomeSectorAllocation::getAllocation)
+        .map(FixedIncomeSectorAllocation::getAllocations)
         .orElse(List.of())
         .stream()
         .filter(entry -> entry.getType() != null && entry.getValue() != null)
         .filter(entry -> SECTOR_TYPE_MAPPING.containsKey(entry.getType()))
         .collect(Collectors.toMap(
             entry -> SECTOR_TYPE_MAPPING.get(entry.getType()),
-            FixedIncomeSectorAllocationTypeNameValue::getValue,
+            FixedIncomeSectorAllocationTypeValue::getValue,
             BigDecimal::add));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)

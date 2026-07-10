@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
-import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeNameValue;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -31,7 +31,7 @@ class EquitySectorAllocationMapperTest {
     var energyEntry = createEntry(EquitySectorAllocationType.ENERGY, "8.7");
 
     var smsResponse = new EquitySectorAllocation();
-    smsResponse.setAllocation(List.of(techEntry, healthEntry, energyEntry));
+    smsResponse.setAllocations(List.of(techEntry, healthEntry, energyEntry));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     PortfolioHolding holding = createHolding("XIU.TO");
@@ -59,10 +59,10 @@ class EquitySectorAllocationMapperTest {
 
   static Stream<Arguments> nullAndEmptyResponses() {
     var nullAllocationResponse = new EquitySectorAllocation();
-    nullAllocationResponse.setAllocation(null);
+    nullAllocationResponse.setAllocations(null);
 
     var emptyAllocationResponse = new EquitySectorAllocation();
-    emptyAllocationResponse.setAllocation(List.of());
+    emptyAllocationResponse.setAllocations(List.of());
 
     return Stream.of(
         Arguments.of((EquitySectorAllocation) null),
@@ -73,12 +73,12 @@ class EquitySectorAllocationMapperTest {
   @Test
   void shouldFilterOutEntriesWithNullType() {
     var validEntry = createEntry(EquitySectorAllocationType.INDUSTRIALS, "12.0");
-    var nullTypeEntry = new EquitySectorAllocationTypeNameValue();
+    var nullTypeEntry = new EquitySectorAllocationTypeValue();
     nullTypeEntry.setType(null);
     nullTypeEntry.setValue(BigDecimal.valueOf(5.0));
 
     var smsResponse = new EquitySectorAllocation();
-    smsResponse.setAllocation(List.of(validEntry, nullTypeEntry));
+    smsResponse.setAllocations(List.of(validEntry, nullTypeEntry));
 
     EquitySector result = mapper.map(smsResponse, createHolding("TEST.ID"));
 
@@ -89,7 +89,7 @@ class EquitySectorAllocationMapperTest {
 
   @Test
   void shouldMapAllSectorTypes() {
-    List<EquitySectorAllocationTypeNameValue> entries = List.of(
+    List<EquitySectorAllocationTypeValue> entries = List.of(
         createEntry(EquitySectorAllocationType.BASIC_MATERIALS, "5.0"),
         createEntry(EquitySectorAllocationType.COMMUNICATION_SERVICES, "8.0"),
         createEntry(EquitySectorAllocationType.CONSUMER_CYCLICAL, "10.0"),
@@ -103,7 +103,7 @@ class EquitySectorAllocationMapperTest {
         createEntry(EquitySectorAllocationType.UTILITIES, "4.0"));
 
     var smsResponse = new EquitySectorAllocation();
-    smsResponse.setAllocation(entries);
+    smsResponse.setAllocations(entries);
 
     EquitySector result = mapper.map(smsResponse, createHolding("FULL.TEST"));
 
@@ -122,9 +122,9 @@ class EquitySectorAllocationMapperTest {
     assertThat(result.getAllocations().get(EquitySectorAllocationType.UTILITIES)).isEqualByComparingTo("4.0");
   }
 
-  private EquitySectorAllocationTypeNameValue createEntry(
+  private EquitySectorAllocationTypeValue createEntry(
       EquitySectorAllocationType type, String value) {
-    var entry = new EquitySectorAllocationTypeNameValue();
+    var entry = new EquitySectorAllocationTypeValue();
     entry.setType(type);
     entry.setValue(new BigDecimal(value));
     return entry;

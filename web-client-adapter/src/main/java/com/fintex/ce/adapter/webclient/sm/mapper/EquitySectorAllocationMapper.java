@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
-import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeNameValue;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
 
 import org.springframework.stereotype.Component;
 
@@ -24,13 +24,13 @@ public class EquitySectorAllocationMapper
   @Override
   public EquitySector map(EquitySectorAllocation smsResponse, PortfolioHolding holding) {
     Map<EquitySectorAllocationType, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
-        .map(EquitySectorAllocation::getAllocation)
+        .map(EquitySectorAllocation::getAllocations)
         .orElse(List.of())
         .stream()
         .filter(entry -> entry.getType() != null && entry.getValue() != null)
         .collect(Collectors.toMap(
-            EquitySectorAllocationTypeNameValue::getType,
-            EquitySectorAllocationTypeNameValue::getValue,
+            EquitySectorAllocationTypeValue::getType,
+            EquitySectorAllocationTypeValue::getValue,
             (existing, replacement) -> existing,
             () -> new EnumMap<>(EquitySectorAllocationType.class)));
 

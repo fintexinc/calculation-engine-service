@@ -1,6 +1,7 @@
 package com.fintex.ce.model.domain.calculation.allocation;
 
 import com.fintex.ce.model.domain.calculation.BaseCalculationData;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.math.BigDecimal;
@@ -20,6 +21,6 @@ import lombok.experimental.SuperBuilder;
 public class EquityCountryAllocation extends BaseCalculationData {
 
   private FinancialInstrumentType holdingType;
-  private Map<String, BigDecimal> allocations;
+  private Map<Country, BigDecimal> allocations;
 
 }

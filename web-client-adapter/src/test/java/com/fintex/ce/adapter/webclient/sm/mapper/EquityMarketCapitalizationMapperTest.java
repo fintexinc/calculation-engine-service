@@ -27,7 +27,7 @@ class EquityMarketCapitalizationMapperTest {
   @Test
   void shouldMapAllFieldsCorrectly_whenResponseHasAllCapTypesAndProvider() {
     var smsResponse = new EquityMarketCapitalization();
-    smsResponse.setValues(List.of(
+    smsResponse.setAllocations(List.of(
         createEntry(EquityMarketCapitalizationType.GIANT, "45.67"),
         createEntry(EquityMarketCapitalizationType.LARGE, "30.00"),
         createEntry(EquityMarketCapitalizationType.MEDIUM, "12.33"),
@@ -58,10 +58,10 @@ class EquityMarketCapitalizationMapperTest {
 
   static Stream<Arguments> nullAndEmptyResponses() {
     var nullValuesResponse = new EquityMarketCapitalization();
-    nullValuesResponse.setValues(null);
+    nullValuesResponse.setAllocations(null);
 
     var emptyValuesResponse = new EquityMarketCapitalization();
-    emptyValuesResponse.setValues(List.of());
+    emptyValuesResponse.setAllocations(List.of());
 
     return Stream.of(
         Arguments.of((EquityMarketCapitalization) null),
@@ -82,7 +82,7 @@ class EquityMarketCapitalizationMapperTest {
     nullValueEntry.setValue(null);
 
     var smsResponse = new EquityMarketCapitalization();
-    smsResponse.setValues(List.of(validEntry, nullTypeEntry, nullValueEntry));
+    smsResponse.setAllocations(List.of(validEntry, nullTypeEntry, nullValueEntry));
 
     HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("TEST.ID"));
 
@@ -94,7 +94,7 @@ class EquityMarketCapitalizationMapperTest {
   @Test
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new EquityMarketCapitalization();
-    smsResponse.setValues(List.of());
+    smsResponse.setAllocations(List.of());
     smsResponse.setDataProviders(null);
 
     HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("SEC-001"));

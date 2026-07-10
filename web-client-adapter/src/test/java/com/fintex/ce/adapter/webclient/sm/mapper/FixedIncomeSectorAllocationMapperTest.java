@@ -5,7 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
-import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeNameValue;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -32,7 +32,7 @@ class FixedIncomeSectorAllocationMapperTest {
     var securitizedEntry = createEntry(FixedIncomeSectorAllocationType.SECURITIZED, "19.30");
 
     var smsResponse = new FixedIncomeSectorAllocation();
-    smsResponse.setAllocation(List.of(governmentEntry, corporateEntry, securitizedEntry));
+    smsResponse.setAllocations(List.of(governmentEntry, corporateEntry, securitizedEntry));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     PortfolioHolding holding = createHolding("AGG", FinancialInstrumentType.ETF);
@@ -65,10 +65,10 @@ class FixedIncomeSectorAllocationMapperTest {
 
   static Stream<Arguments> nullAndEmptyResponses() {
     var nullAllocationResponse = new FixedIncomeSectorAllocation();
-    nullAllocationResponse.setAllocation(null);
+    nullAllocationResponse.setAllocations(null);
 
     var emptyAllocationResponse = new FixedIncomeSectorAllocation();
-    emptyAllocationResponse.setAllocation(List.of());
+    emptyAllocationResponse.setAllocations(List.of());
 
     return Stream.of(
         Arguments.of((FixedIncomeSectorAllocation) null),
@@ -79,15 +79,15 @@ class FixedIncomeSectorAllocationMapperTest {
   @Test
   void shouldFilterOutEntriesWithNullTypeOrValue() {
     var validEntry = createEntry(FixedIncomeSectorAllocationType.MUNICIPAL, "12.0");
-    var nullTypeEntry = new FixedIncomeSectorAllocationTypeNameValue();
+    var nullTypeEntry = new FixedIncomeSectorAllocationTypeValue();
     nullTypeEntry.setType(null);
     nullTypeEntry.setValue(BigDecimal.valueOf(5.0));
-    var nullValueEntry = new FixedIncomeSectorAllocationTypeNameValue();
+    var nullValueEntry = new FixedIncomeSectorAllocationTypeValue();
     nullValueEntry.setType(FixedIncomeSectorAllocationType.CASH);
     nullValueEntry.setValue(null);
 
     var smsResponse = new FixedIncomeSectorAllocation();
-    smsResponse.setAllocation(List.of(validEntry, nullTypeEntry, nullValueEntry));
+    smsResponse.setAllocations(List.of(validEntry, nullTypeEntry, nullValueEntry));
 
     FixedIncomeBondSecurities result = mapper.map(smsResponse, createHolding("TEST.ID",
         FinancialInstrumentType.ETF_CANADA));
@@ -98,7 +98,7 @@ class FixedIncomeSectorAllocationMapperTest {
 
   @Test
   void shouldMapAllSectorTypesToCeEquivalents() {
-    List<FixedIncomeSectorAllocationTypeNameValue> entries = List.of(
+    List<FixedIncomeSectorAllocationTypeValue> entries = List.of(
         createEntry(FixedIncomeSectorAllocationType.GOVERNMENT, "25.0"),
         createEntry(FixedIncomeSectorAllocationType.CORPORATE, "30.0"),
         createEntry(FixedIncomeSectorAllocationType.CASH, "10.0"),
@@ -107,7 +107,7 @@ class FixedIncomeSectorAllocationMapperTest {
         createEntry(FixedIncomeSectorAllocationType.DERIVATIVE, "5.0"));
 
     var smsResponse = new FixedIncomeSectorAllocation();
-    smsResponse.setAllocation(entries);
+    smsResponse.setAllocations(entries);
 
     FixedIncomeBondSecurities result = mapper.map(smsResponse, createHolding("FULL.TEST", FinancialInstrumentType.ETF));
 
@@ -126,9 +126,9 @@ class FixedIncomeSectorAllocationMapperTest {
         .isEqualByComparingTo("5.0");
   }
 
-  private FixedIncomeSectorAllocationTypeNameValue createEntry(
+  private FixedIncomeSectorAllocationTypeValue createEntry(
       FixedIncomeSectorAllocationType type, String value) {
-    var entry = new FixedIncomeSectorAllocationTypeNameValue();
+    var entry = new FixedIncomeSectorAllocationTypeValue();
     entry.setType(type);
     entry.setValue(new BigDecimal(value));
     return entry;

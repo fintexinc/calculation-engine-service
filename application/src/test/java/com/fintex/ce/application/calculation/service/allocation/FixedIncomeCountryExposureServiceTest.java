@@ -11,6 +11,7 @@ import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
@@ -86,7 +87,7 @@ class FixedIncomeCountryExposureServiceTest {
     when(command.getHoldings()).thenReturn(List.of(holding));
     when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     var countryExposure = new CountryExposure();
-    countryExposure.setAllocations(Map.of("CA", TEN));
+    countryExposure.setAllocations(Map.of(Country.CANADA, TEN));
     var rawData = Map.of(holding, countryExposure);
     var mappedAllocations = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
     var mappedResult = new ExposureDataHolder<>(mappedAllocations, List.<Notification>of());

@@ -5,7 +5,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
-import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeNameValue;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -49,16 +49,16 @@ class EquitySectorAllocationFetcherTest
 
   @Override
   protected EquitySectorAllocation createSmsResponse() {
-    var techEntry = new EquitySectorAllocationTypeNameValue();
+    var techEntry = new EquitySectorAllocationTypeValue();
     techEntry.setType(EquitySectorAllocationType.TECHNOLOGY);
     techEntry.setValue(BigDecimal.valueOf(28.5));
 
-    var healthEntry = new EquitySectorAllocationTypeNameValue();
+    var healthEntry = new EquitySectorAllocationTypeValue();
     healthEntry.setType(EquitySectorAllocationType.HEALTHCARE);
     healthEntry.setValue(BigDecimal.valueOf(15.3));
 
     var smsAllocation = new EquitySectorAllocation();
-    smsAllocation.setAllocation(List.of(techEntry, healthEntry));
+    smsAllocation.setAllocations(List.of(techEntry, healthEntry));
     return smsAllocation;
   }
 

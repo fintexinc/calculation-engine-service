@@ -58,7 +58,7 @@ class EquityMarketCapitalizationFetcherTest
     large.setValue(BigDecimal.valueOf(30.0));
 
     var smsResponse = new EquityMarketCapitalization();
-    smsResponse.setValues(List.of(giant, large));
+    smsResponse.setAllocations(List.of(giant, large));
     return smsResponse;
   }
 

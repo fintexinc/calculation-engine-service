@@ -24,7 +24,7 @@ public class EquityMarketCapitalizationMapper
   @Override
   public HoldingEquityMarketCap map(EquityMarketCapitalization smsResponse, PortfolioHolding holding) {
     Map<EquityMarketCapitalizationType, BigDecimal> ratingsMap = Optional.ofNullable(smsResponse)
-        .map(EquityMarketCapitalization::getValues)
+        .map(EquityMarketCapitalization::getAllocations)
         .orElse(List.of())
         .stream()
         .filter(entry -> entry.getEquityMarketCapitalization() != null && entry.getValue() != null)
