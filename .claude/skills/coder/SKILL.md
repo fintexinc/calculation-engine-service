@@ -14,6 +14,10 @@ Portfolio calculation microservice: Java 21, Spring Boot 3.4.6, multi-module Mav
 Fetches data from Security Master (SM) via REST, performs financial calculations.
 **No database, no cache, no GraphQL.**
 
+**Before finishing a change, scan the `review-lessons` skill** — a checklist of concrete defects
+previously caught in review (e.g. edge-case regressions from moving logic, empty-collection
+foot-guns). Add to it whenever a reviewer finds a new problem.
+
 ---
 
 ## Build & Test
