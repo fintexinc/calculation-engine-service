@@ -140,6 +140,7 @@ public class PortfolioCalculationController {
       @RequestBody @Valid CalculationCommand command) {
     return calculationObservability.observe(metricName, command, observation -> {
       CalculationMetric metric = CalculationMetric.from(metricName);
+
       if (!serviceMap.containsKey(metric)) {
         throw ErrorCode.UNSUPPORTED_METRIC.toException(metricName);
       }

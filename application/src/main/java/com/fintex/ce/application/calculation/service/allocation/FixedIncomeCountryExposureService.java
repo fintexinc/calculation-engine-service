@@ -10,6 +10,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.wm.commons.domain.enumeration.Country;
 
 import org.springframework.stereotype.Service;
 
@@ -66,7 +67,7 @@ public class FixedIncomeCountryExposureService
   public ExposureDataHolder<CountryRegionType> fetchExposures(PortfolioHoldingsCommand command) {
     Map<PortfolioHolding, CountryExposure> rawData = countryExposureSecurityDataFetcher.fetch(command.getHoldings(),
         command.getDataProviders());
-    Map<PortfolioHolding, Map<String, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
+    Map<PortfolioHolding, Map<Country, BigDecimal>> mappedHoldings = rawData.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> e.getValue().getAllocations()));
     return countryAllocationMappingService.mapToCountryRegions(mappedHoldings, MISSING_BOND_COUNTRY_EXPOSURE);
   }

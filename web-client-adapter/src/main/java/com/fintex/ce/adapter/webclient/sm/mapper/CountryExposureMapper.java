@@ -4,7 +4,8 @@ import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
-import com.fintex.wm.commons.domain.value.CountryValue;
+import com.fintex.wm.commons.domain.allocation.CountryAllocationValue;
+import com.fintex.wm.commons.domain.enumeration.Country;
 
 import org.springframework.stereotype.Component;
 
@@ -24,14 +25,14 @@ public class CountryExposureMapper
 
   @Override
   public CountryExposure map(CountryAllocation smsResponse, PortfolioHolding holding) {
-    final Map<String, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
-        .map(CountryAllocation::getAllocation)
+    final Map<Country, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
+        .map(CountryAllocation::getAllocations)
         .orElse(List.of())
         .stream()
-        .filter(entry -> entry.getIsoCode() != null && entry.getValue() != null)
+        .filter(entry -> entry.getType() != null && entry.getValue() != null)
         .collect(Collectors.toMap(
-            CountryValue::getIsoCode,
-            CountryValue::getValue,
+            CountryAllocationValue::getType,
+            CountryAllocationValue::getValue,
             BigDecimal::add));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)

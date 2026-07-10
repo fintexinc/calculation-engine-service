@@ -1,15 +1,18 @@
 package com.fintex.ce.application.mapping.response;
 
+import com.fintex.ce.application.mapping.CountryRegionResolver;
 import com.fintex.ce.mapping.ResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,12 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
     Stream.of(CountryRegionType.values()).forEach(f -> DEFAULT_MAP.put(f, null));
   }
 
+  private final CountryRegionResolver countryRegionResolver;
+
+  public CountryExposureResponseMapper(CountryRegionResolver countryRegionResolver) {
+    this.countryRegionResolver = countryRegionResolver;
+  }
+
   @Override
   public CountryExposureResult toResponse(CountryExposure domain) {
     if (domain == null || domain.getAllocations() == null) {
@@ -38,7 +47,7 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
           .warnings(List.of())
           .build();
     }
-    // Domain model uses String keys - convert to enum
+    // Domain model uses Country keys - resolve each to its CountryRegionType bucket via the mapping table
     Map<CountryRegionType, BigDecimal> enumMap = convertToEnumMap(domain.getAllocations());
     return CountryExposureResult.builder()
         .countryExposure(toUserScale(enumMap))
@@ -92,16 +101,15 @@ public class CountryExposureResponseMapper implements ResponseMapper<CountryExpo
   }
 
   /**
-   * Converts String-keyed map from domain model to enum-keyed map.
+   * Converts a Country-keyed allocation map from the domain model into a CountryRegionType-keyed map, summing values
+   * that resolve to the same region and skipping countries with no mapped region.
    */
-  private Map<CountryRegionType, BigDecimal> convertToEnumMap(Map<String, BigDecimal> stringMap) {
-    Map<CountryRegionType, BigDecimal> result = new HashMap<>();
-    for (Map.Entry<String, BigDecimal> entry : stringMap.entrySet()) {
-      try {
-        CountryRegionType type = CountryRegionType.valueOf(entry.getKey());
-        result.put(type, entry.getValue());
-      } catch (IllegalArgumentException ignored) {
-        // Skip unknown type keys
+  private Map<CountryRegionType, BigDecimal> convertToEnumMap(Map<Country, BigDecimal> allocations) {
+    Map<CountryRegionType, BigDecimal> result = new EnumMap<>(CountryRegionType.class);
+    for (Map.Entry<Country, BigDecimal> entry : allocations.entrySet()) {
+      CountryRegionType region = countryRegionResolver.regionOf(entry.getKey());
+      if (region != null && entry.getValue() != null) {
+        result.merge(region, entry.getValue(), BigDecimal::add);
       }
     }
     return result;

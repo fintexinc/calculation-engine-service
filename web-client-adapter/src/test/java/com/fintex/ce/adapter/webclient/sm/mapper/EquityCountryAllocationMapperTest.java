@@ -4,9 +4,10 @@ import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
+import com.fintex.wm.commons.domain.allocation.CountryAllocationValue;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
-import com.fintex.wm.commons.domain.value.CountryValue;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,25 +21,25 @@ class EquityCountryAllocationMapperTest {
   private final EquityCountryAllocationMapper mapper = new EquityCountryAllocationMapper();
 
   @Test
-  void shouldMapAllocationsAndProvider_whenResponseHasCountryValues() {
-    var canada = new CountryValue();
-    canada.setIsoCode("CAN");
+  void shouldMapAllocationsAndProvider_whenResponseHasCountryAllocationValues() {
+    var canada = new CountryAllocationValue();
+    canada.setType(Country.CANADA);
     canada.setValue(BigDecimal.valueOf(0.65));
 
-    var usa = new CountryValue();
-    usa.setIsoCode("USA");
+    var usa = new CountryAllocationValue();
+    usa.setType(Country.USA);
     usa.setValue(BigDecimal.valueOf(0.35));
 
     var smsResponse = new CountryAllocation();
-    smsResponse.setAllocation(List.of(canada, usa));
+    smsResponse.setAllocations(List.of(canada, usa));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     EquityCountryAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getAllocations()).hasSize(2);
-    assertThat(result.getAllocations()).containsEntry("CAN", BigDecimal.valueOf(0.65));
-    assertThat(result.getAllocations()).containsEntry("USA", BigDecimal.valueOf(0.35));
+    assertThat(result.getAllocations()).containsEntry(Country.CANADA, BigDecimal.valueOf(0.65));
+    assertThat(result.getAllocations()).containsEntry(Country.USA, BigDecimal.valueOf(0.35));
   }
 
   @Test
@@ -52,7 +53,7 @@ class EquityCountryAllocationMapperTest {
   @Test
   void shouldReturnEmptyAllocations_whenAllocationListIsNull() {
     var smsResponse = new CountryAllocation();
-    smsResponse.setAllocation(null);
+    smsResponse.setAllocations(null);
 
     EquityCountryAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
 
@@ -63,7 +64,7 @@ class EquityCountryAllocationMapperTest {
   @Test
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new CountryAllocation();
-    smsResponse.setAllocation(List.of());
+    smsResponse.setAllocations(List.of());
     smsResponse.setDataProviders(null);
 
     EquityCountryAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));

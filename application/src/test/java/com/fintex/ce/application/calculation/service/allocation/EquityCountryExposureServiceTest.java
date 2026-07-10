@@ -12,6 +12,7 @@ import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.Notification;
 
@@ -144,7 +145,7 @@ class EquityCountryExposureServiceTest {
     when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
 
     var allocation = new EquityCountryAllocation();
-    allocation.setAllocations(Map.of("CAN", BigDecimal.valueOf(0.65)));
+    allocation.setAllocations(Map.of(Country.CANADA, BigDecimal.valueOf(0.65)));
     when(securityDataPort.fetch(any(), any())).thenReturn(Map.of(holding, allocation));
 
     var expectedAllocations = Map.of(holding, Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(0.65)));

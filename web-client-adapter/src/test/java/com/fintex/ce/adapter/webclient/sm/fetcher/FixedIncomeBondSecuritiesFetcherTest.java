@@ -5,7 +5,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.SecurityMasterResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
-import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeNameValue;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -51,16 +51,16 @@ class FixedIncomeBondSecuritiesFetcherTest
 
   @Override
   protected FixedIncomeSectorAllocation createSmsResponse() {
-    var governmentEntry = new FixedIncomeSectorAllocationTypeNameValue();
+    var governmentEntry = new FixedIncomeSectorAllocationTypeValue();
     governmentEntry.setType(FixedIncomeSectorAllocationType.GOVERNMENT);
     governmentEntry.setValue(BigDecimal.valueOf(45.2));
 
-    var corporateEntry = new FixedIncomeSectorAllocationTypeNameValue();
+    var corporateEntry = new FixedIncomeSectorAllocationTypeValue();
     corporateEntry.setType(FixedIncomeSectorAllocationType.CORPORATE);
     corporateEntry.setValue(BigDecimal.valueOf(35.5));
 
     var smsAllocation = new FixedIncomeSectorAllocation();
-    smsAllocation.setAllocation(List.of(governmentEntry, corporateEntry));
+    smsAllocation.setAllocations(List.of(governmentEntry, corporateEntry));
     return smsAllocation;
   }
 
