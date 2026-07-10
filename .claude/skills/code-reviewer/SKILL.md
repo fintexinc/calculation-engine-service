@@ -13,6 +13,9 @@ description: >
 Portfolio calculation engine: fetches data from Security Master (SM) via REST, performs financial
 calculations. **No database, no cache, no GraphQL.**
 
+**Cross-check findings against the `review-lessons` skill** — recurring defect patterns caught in
+past reviews. When this review surfaces a genuinely new class of problem, add a distilled entry there.
+
 ---
 
 ## Severity Levels
