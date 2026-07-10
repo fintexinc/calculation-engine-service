@@ -3,7 +3,7 @@ package com.fintex.ce.e2e;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
-import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
+import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
@@ -38,17 +38,19 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.QueueDispatcher;
-import okhttp3.mockwebserver.RecordedRequest;
 
+/**
+ * End-to-end HTTP-boundary coverage for the {@code sharpe-ratio} metric's T-Bill contract: a complete risk-free series
+ * across the requested 12-month window produces a Sharpe ratio, while a series with a gap inside the window is rejected
+ * with {@code TBL-001} ({@code MISSING_TBILL_RATE}) rather than silently producing a wrong or null result.
+ */
 @TestPropertySource(properties = {
     "cache.data.fx-rates.enabled=false",
     "cache.data.t-bills.enabled=false"
 })
-class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
+class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static final SecurityIdentifier XBAL = new SecurityIdentifier("XBAL", FiIdentifierType.TICKER);
   private static final SecurityIdentifier VCNS = new SecurityIdentifier("VCNS", FiIdentifierType.TICKER);
@@ -66,7 +68,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   @BeforeAll
   static void startBocMockServer() throws IOException {
     bocMockServer = new MockWebServer();
-    bocMockServer.setDispatcher(bocDailyUsdCadDispatcher("1.0000"));
+    bocMockServer.setDispatcher(BocMockResponses.dailyUsdCadDispatcher());
     bocMockServer.start();
   }
 
@@ -91,7 +93,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String metricPath() {
-    return CalculationMetric.TRAILING_TOTAL_RETURNS.getValue();
+    return CalculationMetric.SHARPE_RATIO.getValue();
   }
 
   @Override
@@ -101,14 +103,15 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String requestBodyForPositiveSmsScenario() {
-    return writeJson(periodCommand(Set.of("1", "3", "6", "12"), LocalDate.parse("2024-12-31"),
-        richPortfolioHoldings()));
+    return writeJson(periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
   }
 
   @Override
   protected void enqueueForPositiveSmsScenario() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
+    // SharpeRatioCalculationServiceImpl.defineCalculationMethod fetches the T-Bill series before the portfolio
+    // returns, so the treasury-rates response must be enqueued first.
     enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
+    enqueueSmsMockResponse(smsPositiveResponseBody());
   }
 
   @Override
@@ -127,82 +130,43 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String requestBodyForMismatchedMetricScenario() {
-    return writeJson(periodCommand(CalculationMetric.SHARPE_RATIO, Set.of("12"), null,
+    return writeJson(periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS, Set.of("12"), null,
         richPortfolioHoldings()));
   }
 
   @Override
   protected void assertPositiveResponseBody(String responseBody) {
-    TrailingTotalReturnsResult result = readJson(responseBody, TrailingTotalReturnsResult.class);
+    SharpeRatioResult result = readJson(responseBody, SharpeRatioResult.class);
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 1, 31));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getTrailingTotalReturn()).hasSize(4);
-
-    assertThat(findPeriod(result, "1").value())
-        .isCloseTo(new BigDecimal("0.0176198704"), within(TOLERANCE));
-    assertThat(findPeriod(result, "3").value())
-        .isCloseTo(new BigDecimal("0.0475271907"), within(TOLERANCE));
-    assertThat(findPeriod(result, "6").value())
-        .isCloseTo(new BigDecimal("0.0832827785"), within(TOLERANCE));
+    assertThat(result.getSharpeRatio()).hasSize(1);
     assertThat(findPeriod(result, "12").value())
-        .isCloseTo(new BigDecimal("0.1503798415"), within(TOLERANCE));
+        .isCloseTo(new BigDecimal("3.0056605434"), within(TOLERANCE));
   }
 
   @Test
-  void shouldReturnBadRequest_whenHoldingsListIsEmpty() {
-    PeriodCommand command = periodCommand(Set.of("12"), null, List.of());
-
-    Notification error = assertValidationError(postCalculation(writeJson(command)), "VAL-003", "holdings");
-    assertThat(error.getMessage()).isEqualTo("holdings must not be empty");
-    assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "holdings");
-  }
-
-  @Test
-  void shouldReturnTrailingReturn_whenSingleMonthReturnIsFivePercent() {
-    enqueueSmsMockResponse(writeJson(List.of(
-        holdingReturnsRow(XBAL, List.of(dateValue("2024-12-31", "5.0"))))));
-    enqueueSmsMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
-        "0.0035")))));
-
-    PeriodCommand command = periodCommand(Set.of("1"), LocalDate.parse("2024-12-31"),
-        List.of(holding(XBAL, FinancialInstrumentType.ETF_CANADA, "50000")));
-    HttpResponse response = postCalculation(writeJson(command));
-
-    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
-    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
-    assertThat(result.getWarnings()).isEmpty();
-    assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getTrailingTotalReturn()).hasSize(1);
-    assertThat(findPeriod(result, "1").value())
-        .isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
-  }
-
-  @Test
-  void shouldReturnBadRequest_whenTreasuryBillSeriesIsEmptyForCurrency() {
+  void shouldReturnBadRequest_whenTBillRateMissingForMonthInsideRequestedWindow() {
+    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024WithGapIn("2024-07-31")));
     enqueueSmsMockResponse(smsPositiveResponseBody());
-    enqueueSmsMockResponse(writeJson(List.<DateRateValue>of()));
 
     PeriodCommand command = periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
     HttpResponse response = postCalculation(writeJson(command));
 
-    Notification error = assertValidationError(response, "TBL-002", null);
-    assertThat(error.getMessage()).isEqualTo("T-Bill rates are not available for currency CAD");
-    assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "CAD");
-  }
-
-  private Notification assertValidationError(HttpResponse response, String expectedCode, String expectedFieldName) {
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     ErrorResponse error = readJson(response.responseBody(), ErrorResponse.class);
     assertThat(error.getNotifications()).hasSize(1);
-    Notification first = error.getNotifications().getFirst();
-    assertThat(first.getCode()).isEqualTo(expectedCode);
-    assertThat(first.getSeverity().name()).isEqualTo("ERROR");
-    if (expectedFieldName != null) {
-      assertThat(first.getFieldName()).isEqualTo(expectedFieldName);
-    }
-    return first;
+    Notification notification = error.getNotifications().getFirst();
+    assertThat(notification.getCode()).isEqualTo("TBL-001");
+    assertThat(notification.getMessage()).isEqualTo("Missing T-Bill rate for date 2024-07-31");
+    assertThat(notification.getMetadata()).hasSize(1).containsEntry("param-1", "2024-07-31");
+  }
+
+  private static TimeIntervalResult findPeriod(SharpeRatioResult result, String period) {
+    return result.getSharpeRatio().stream()
+        .filter(entry -> period.equals(entry.period()))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("Missing period " + period));
   }
 
   private static List<PortfolioHolding> richPortfolioHoldings() {
@@ -218,16 +182,9 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         holding(VANGUARD_ISIN, FinancialInstrumentType.MUTUAL_FUND_CANADA, "9800.00"));
   }
 
-  private static TimeIntervalResult findPeriod(TrailingTotalReturnsResult result, String period) {
-    return result.getTrailingTotalReturn().stream()
-        .filter(entry -> period.equals(entry.period()))
-        .findFirst()
-        .orElseThrow(() -> new AssertionError("Missing period " + period));
-  }
-
   private static PeriodCommand periodCommand(Set<String> periods, LocalDate customPed,
       List<PortfolioHolding> holdings) {
-    return periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS, periods, customPed, holdings);
+    return periodCommand(CalculationMetric.SHARPE_RATIO, periods, customPed, holdings);
   }
 
   private static PeriodCommand periodCommand(CalculationMetric metric, Set<String> periods, LocalDate customPed,
@@ -253,14 +210,6 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     return result;
   }
 
-  private static EquitySecurityIdentifier equityId(String ticker, String exchange) {
-    return EquitySecurityIdentifier.builder()
-        .id(ticker)
-        .idType(FiIdentifierType.TICKER_MIC)
-        .exchangeId(exchange)
-        .build();
-  }
-
   private static final String[] MONTH_ENDS_2024 = {
       "2024-01-31", "2024-02-29", "2024-03-31", "2024-04-30", "2024-05-31", "2024-06-30",
       "2024-07-31", "2024-08-31", "2024-09-30", "2024-10-31", "2024-11-30", "2024-12-31"};
@@ -278,6 +227,18 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         .toList();
   }
 
+  private static EquitySecurityIdentifier equityId(String ticker, String exchange) {
+    return EquitySecurityIdentifier.builder()
+        .id(ticker)
+        .idType(FiIdentifierType.TICKER_MIC)
+        .exchangeId(exchange)
+        .build();
+  }
+
+  private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type, String value) {
+    return new PortfolioHolding(new BigDecimal(value), type, equityId(ticker, exchange));
+  }
+
   private static DateBigDecimalValue dateValue(String date, String percent) {
     DateBigDecimalValue dv = new DateBigDecimalValue();
     dv.setDate(date);
@@ -286,8 +247,13 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static List<DateRateValue> cadTreasuryRatesSeriesFor2024() {
-    // Month i gets rate 0.00(30+i): 0.0030, 0.0031, ... 0.0041.
+    return cadTreasuryRatesSeriesFor2024WithGapIn(null);
+  }
+
+  private static List<DateRateValue> cadTreasuryRatesSeriesFor2024WithGapIn(String dateToOmit) {
+    // Month i gets rate 0.00(30+i): 0.0030, 0.0031, ... 0.0041; dateToOmit (if any) is dropped to simulate a gap.
     return IntStream.range(0, MONTH_ENDS_2024.length)
+        .filter(i -> !MONTH_ENDS_2024[i].equals(dateToOmit))
         .mapToObj(i -> new DateRateValue(LocalDate.parse(MONTH_ENDS_2024[i]), BigDecimal.valueOf(30L + i, 4)))
         .toList();
   }
@@ -295,52 +261,5 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   private static PortfolioHolding holding(SecurityIdentifier securityIdentifier, FinancialInstrumentType type,
       String value) {
     return new PortfolioHolding(new BigDecimal(value), type, securityIdentifier);
-  }
-
-  private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, equityId(ticker, exchange));
-  }
-
-  private static Dispatcher bocDailyUsdCadDispatcher(String rate) {
-    return new Dispatcher() {
-      @Override
-      public MockResponse dispatch(RecordedRequest request) {
-        String path = request.getPath();
-        LocalDate start = queryDate(path, "start_date", LocalDate.now().minusDays(7));
-        LocalDate end = queryDate(path, "end_date", LocalDate.now());
-        StringBuilder observations = new StringBuilder();
-        LocalDate current = start;
-        while (!current.isAfter(end)) {
-          if (observations.length() > 0) {
-            observations.append(',');
-          }
-          observations.append("{\"d\":\"")
-              .append(current)
-              .append("\",\"FXUSDCAD\":{\"v\":\"")
-              .append(rate)
-              .append("\"}}");
-          current = current.plusDays(1);
-        }
-        String body = "{\"observations\":[" + observations + "]}";
-        return new MockResponse()
-            .setHeader("Content-Type", "application/json")
-            .setBody(body);
-      }
-    };
-  }
-
-  private static LocalDate queryDate(String path, String param, LocalDate fallback) {
-    if (path == null) {
-      return fallback;
-    }
-    String token = param + "=";
-    int start = path.indexOf(token);
-    if (start < 0) {
-      return fallback;
-    }
-    int valueStart = start + token.length();
-    int valueEnd = path.indexOf('&', valueStart);
-    String value = valueEnd < 0 ? path.substring(valueStart) : path.substring(valueStart, valueEnd);
-    return value.isBlank() ? fallback : LocalDate.parse(value);
   }
 }

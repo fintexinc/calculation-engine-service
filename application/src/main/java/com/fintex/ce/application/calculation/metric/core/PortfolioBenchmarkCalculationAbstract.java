@@ -1,5 +1,6 @@
 package com.fintex.ce.application.calculation.metric.core;
 
+import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
@@ -37,8 +38,8 @@ abstract class PortfolioBenchmarkCalculationAbstract<T extends PeriodResult>
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
     final SortedMap<LocalDate, BigDecimal> portfolioWindow = getSubMapByPeriodStartDate(periodStartDate,
         getPortfolioTotalReturns());
-    validateTBillsCoverage(portfolioWindow, portfolioExcessReturn);
-    validateTBillsCoverage(portfolioWindow, benchmarkExcessReturn);
+    RiskFreeWindowValidator.requireCoverage(portfolioWindow, portfolioExcessReturn);
+    RiskFreeWindowValidator.requireCoverage(portfolioWindow, benchmarkExcessReturn);
     final SortedMap<LocalDate, BigDecimal> portfolioExcessReturnByPeriod = getSubMapByPeriodStartDate(periodStartDate,
         portfolioExcessReturn);
     final SortedMap<LocalDate, BigDecimal> benchmarkExcessReturnByPeriod = getSubMapByPeriodStartDate(periodStartDate,
@@ -55,14 +56,11 @@ abstract class PortfolioBenchmarkCalculationAbstract<T extends PeriodResult>
   private boolean isNumberOfMonthsInvalid(final int numberOfMonths) {
     return numberOfMonths > getBenchmarkTotalReturns().size()
         || numberOfMonths > getPortfolioTotalReturns().size()
-        || numberOfMonths > portfolioExcessReturn.size()
-        || numberOfMonths > benchmarkExcessReturn.size()
         || numberOfMonths < BigDecimalConstants.TWELVE.intValue();
   }
 
   @Override
   public int availableMonths() {
-    return Math.min(super.availableMonths(),
-        Math.min(portfolioExcessReturn.size(), benchmarkExcessReturn.size()));
+    return Math.min(super.availableMonths(), getBenchmarkTotalReturns().size());
   }
 }

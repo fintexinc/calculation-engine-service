@@ -3,6 +3,8 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -20,6 +23,7 @@ import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anySet;
@@ -36,21 +40,26 @@ class SortinoRatioCalculationTest {
   final int TWELVE = 12;
 
   @Test
-  void shouldCalculatePeriodForNumberOfMonths_whenNumberOfMonthGreaterThanTBillsResultNull() {
-    final var calculation = mock(SortinoRatioCalculation.class);
-    final var treeMap = mock(TreeMap.class);
-    final var tBills = mock(TreeMap.class);
-    calculation.tBills = tBills;
+  void shouldThrowMissingTBillRate_whenTBillsDoNotCoverPortfolioWindow() {
+    final NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    for (int i = 0; i < 12; i++) {
+      portfolioReturns.put(LocalDate.now().minusMonths(i), ONE);
+    }
+    final PeriodCalculationInput input = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(portfolioReturns)
+        .build();
+    final NavigableMap<LocalDate, BigDecimal> shortTBills = new TreeMap<>();
+    for (int i = 2; i <= 12; i++) { // missing the most recent month inside the window
+      shortTBills.put(LocalDate.now().minusMonths(i), ONE);
+    }
+    final var downsideDeviationCalculation = mock(DownsideDeviationCalculation.class);
+    final var calculation = new SortinoRatioCalculation(input, Set.of(), shortTBills, downsideDeviationCalculation);
 
-    when(tBills.size()).thenReturn(20);
-    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
-    when(treeMap.size()).thenReturn(100);
-    when(calculation.calculateSortinoRatio(any(), any(), any())).thenReturn(TEN);
-
-    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(100);
-
-    assertNull(actual);
+    final CalculationException ex = assertThrows(CalculationException.class,
+        () -> calculation.calculatePeriodForNumberOfMonths(12));
+    assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals("Missing T-Bill rate for date " + LocalDate.now().minusMonths(1), ex.getMessage());
+    assertEquals(Map.of("param-1", LocalDate.now().minusMonths(1)), ex.getMetadata());
   }
 
   @Test

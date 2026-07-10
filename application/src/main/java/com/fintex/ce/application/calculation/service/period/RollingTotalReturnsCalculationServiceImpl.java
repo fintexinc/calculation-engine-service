@@ -41,7 +41,7 @@ public class RollingTotalReturnsCalculationServiceImpl
   @Override
   public RollingTotalReturnsResult perform(RollingCalculationCommand command) {
     PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    TrailingTotalReturnsCalculation trailingTotalReturnsCalculation = new TrailingTotalReturnsCalculation(input,
+    TrailingTotalReturnsCalculation trailingTotalReturnsCalculation = TrailingTotalReturnsCalculation.mathOnly(input,
         defaultPeriods);
     return new RollingTotalReturnsCalculation(input, defaultPeriods, trailingTotalReturnsCalculation)
         .calculate(command.getRollingPeriods());

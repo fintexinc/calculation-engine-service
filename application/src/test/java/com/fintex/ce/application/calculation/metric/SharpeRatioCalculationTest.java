@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.error.ErrorCode;
@@ -13,9 +14,9 @@ import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
@@ -25,13 +26,14 @@ import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -42,37 +44,89 @@ class SharpeRatioCalculationTest {
   int TWELVE = 12;
 
   @Test
-  void shouldThrowMissingTBillRate_whenTBillsDoNotCoverPeriod() {
-    var calculation = mock(SharpeRatioCalculation.class);
-    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+  void shouldThrowMissingTBillRate_whenTBillWindowHasGap() {
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
     NavigableMap<LocalDate, BigDecimal> tBills = new TreeMap<>();
-    LocalDate missing = LocalDate.of(2025, 1, 31);
-    returns.put(missing, ONE);
-    calculation.tBills = tBills;
+    for (int i = 0; i < 12; i++) {
+      LocalDate month = LocalDate.of(2025, 1, 31).plusMonths(i);
+      portfolioReturns.put(month, ONE);
+      if (i != 4) {
+        tBills.put(month, valueOf(0.001));
+      }
+    }
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(portfolioReturns);
+    var calculation = new SharpeRatioCalculation(input, Set.of(), tBills,
+        new StandardDeviationCalculation<>(input, Set.of()));
 
-    doCallRealMethod().when(calculation).validateTBillsCoverage(any());
-    doCallRealMethod().when(calculation).validateTBillsCoverage(any(), any());
-
-    CalculationException exception = assertThrows(CalculationException.class,
-        () -> calculation.validateTBillsCoverage(returns));
-
-    assertEquals(ErrorCode.MISSING_TBILL_RATE.getCode(), exception.getErrorCode().getCode());
+    CalculationException ex = assertThrows(CalculationException.class,
+        () -> calculation.calculatePeriodForNumberOfMonths(12));
+    assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals("Missing T-Bill rate for date " + LocalDate.of(2025, 1, 31).plusMonths(4), ex.getMessage());
+    assertEquals(Map.of("param-1", LocalDate.of(2025, 1, 31).plusMonths(4)), ex.getMetadata());
   }
 
+  /**
+   * Regression: restricting T-Bills to the portfolio range at construction must not call {@code firstKey()/lastKey()}
+   * on an empty portfolio series (which throws {@link java.util.NoSuchElementException} -> HTTP 500). An empty return
+   * series must degrade to the insufficient-data {@code null} path, not fail during object construction.
+   */
   @Test
-  void shouldNotThrow_whenTBillsCoverEveryMonthInPeriod() {
-    var calculation = mock(SharpeRatioCalculation.class);
-    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+  void shouldReturnNull_whenConstructedWithEmptyPortfolioReturns() {
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(new TreeMap<>());
     NavigableMap<LocalDate, BigDecimal> tBills = new TreeMap<>();
-    LocalDate date = LocalDate.of(2025, 1, 31);
-    returns.put(date, ONE);
-    tBills.put(date, ONE);
-    calculation.tBills = tBills;
+    tBills.put(LocalDate.of(2025, 1, 31), valueOf(0.001));
 
-    doCallRealMethod().when(calculation).validateTBillsCoverage(any());
-    doCallRealMethod().when(calculation).validateTBillsCoverage(any(), any());
+    var calculation = new SharpeRatioCalculation(input, Set.of(), tBills,
+        new StandardDeviationCalculation<>(input, Set.of()));
 
-    calculation.validateTBillsCoverage(returns);
+    assertNull(calculation.calculatePeriodForNumberOfMonths(12));
+  }
+
+  /**
+   * Regression test for a bug where {@code calculatePeriodForNumberOfMonths(numberOfMonths, returns)} annualized the
+   * risk-free rate off the constructor-restricted {@code tBills} field (bounded to the full portfolio range) instead of
+   * bounding it to the passed rolling {@code returns} window. For a historical window (one that ends before the
+   * portfolio's last date), that let the risk-free sum spill past the window end while still dividing by
+   * {@code numberOfMonths}, overstating the annualized risk-free rate.
+   */
+  @Test
+  void shouldUseWindowBoundedRiskFreeRate_whenComputingHistoricalWindow() {
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    NavigableMap<LocalDate, BigDecimal> tBillsFull = new TreeMap<>();
+    LocalDate start = LocalDate.of(2023, 1, 31);
+    for (int i = 0; i < 24; i++) {
+      LocalDate month = start.plusMonths(i);
+      portfolioReturns.put(month, valueOf(1.01 + (i % 2 == 0 ? 0.002 : -0.001)));
+      tBillsFull.put(month, valueOf(0.001));
+    }
+
+    NavigableMap<LocalDate, BigDecimal> tBillsWindowOnly = new TreeMap<>();
+    NavigableMap<LocalDate, BigDecimal> windowReturns = new TreeMap<>();
+    for (int i = 0; i < 12; i++) {
+      LocalDate month = start.plusMonths(i);
+      tBillsWindowOnly.put(month, valueOf(0.001));
+      windowReturns.put(month, portfolioReturns.get(month));
+    }
+    assertTrue(windowReturns.lastKey().isBefore(portfolioReturns.lastKey()));
+
+    PeriodCalculationInput input = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(portfolioReturns)
+        .build();
+    var calculationWithFullTBills = new SharpeRatioCalculation(input, Set.of(), tBillsFull,
+        new StandardDeviationCalculation<>(input, Set.of()));
+    var calculationWithWindowTBills = new SharpeRatioCalculation(input, Set.of(), tBillsWindowOnly,
+        new StandardDeviationCalculation<>(input, Set.of()));
+
+    BigDecimal resultWithFullTBills = calculationWithFullTBills.calculatePeriodForNumberOfMonths(TWELVE,
+        windowReturns);
+    BigDecimal resultWithWindowTBills = calculationWithWindowTBills.calculatePeriodForNumberOfMonths(TWELVE,
+        windowReturns);
+
+    assertNotNull(resultWithFullTBills);
+    assertNotNull(resultWithWindowTBills);
+    assertEquals(0, resultWithFullTBills.compareTo(resultWithWindowTBills));
   }
 
   @Test
@@ -81,7 +135,7 @@ class SharpeRatioCalculationTest {
     var returns = mock(TreeMap.class);
 
     when(returns.size()).thenReturn(TWELVE);
-    doNothing().when(calculation).validateTBillsCoverage(any());
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
     calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
@@ -90,21 +144,21 @@ class SharpeRatioCalculationTest {
   }
 
   @Test
-  void shouldCalculatePeriodForNumberOfMonths_whenVerifyValidateTBillsCoverage() {
+  void shouldCalculatePeriodForNumberOfMonths_whenWindowCoveredComputesWithoutThrowing() {
     var calculation = mock(SharpeRatioCalculation.class);
     var returns = mock(TreeMap.class);
     var date = LocalDate.now();
-    SortedMap<LocalDate, BigDecimal> windowed = new TreeMap<>();
 
     when(returns.size()).thenReturn(TWELVE);
     when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
-    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(windowed);
-    doNothing().when(calculation).validateTBillsCoverage(any());
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(new TreeMap<>());
+    when(calculation.calculateAverageArithmeticAnnualizedReturn(any(), any(), anyInt())).thenReturn(ONE);
+    when(calculation.getStandardDeviation(anyInt(), any())).thenReturn(ONE);
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
     calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
 
-    verify(calculation).validateTBillsCoverage(windowed);
+    verify(calculation).calculateSharpeRatio(ONE, ONE, ONE);
   }
 
   @Test
@@ -115,7 +169,7 @@ class SharpeRatioCalculationTest {
 
     when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(returns.size()).thenReturn(TWELVE);
-    doNothing().when(calculation).validateTBillsCoverage(any());
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
     calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
@@ -132,8 +186,8 @@ class SharpeRatioCalculationTest {
 
     when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(returns.size()).thenReturn(TWELVE);
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(new TreeMap<>());
     when(calculation.restrictTBillsRange(any(), any())).thenReturn(restrictedTBills);
-    doNothing().when(calculation).validateTBillsCoverage(any());
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
     calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
@@ -149,7 +203,7 @@ class SharpeRatioCalculationTest {
 
     when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(date);
     when(returns.size()).thenReturn(TWELVE);
-    doNothing().when(calculation).validateTBillsCoverage(any());
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
     calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);
@@ -168,7 +222,7 @@ class SharpeRatioCalculationTest {
     when(calculation.calculateAverageArithmeticAnnualizedReturn(any(), any(), anyInt())).thenReturn(one);
     when(calculation.getStandardDeviation(anyInt(), any())).thenReturn(one);
     when(returns.size()).thenReturn(TWELVE);
-    doNothing().when(calculation).validateTBillsCoverage(any());
+    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
     calculation.calculatePeriodForNumberOfMonths(TWELVE, returns);

@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
 
@@ -32,12 +33,12 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
   @Override
   public BigDecimal calculatePeriodForNumberOfMonths(final int numberOfMonths) {
     if (numberOfMonths > getPortfolioTotalReturns().size()
-        || numberOfMonths > this.tBills.size()
         || numberOfMonths < TWELVE.intValue()) {
       return null;
     }
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
-    validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, getPortfolioTotalReturns()), tBills);
+    RiskFreeWindowValidator.requireCoverage(
+        getSubMapByPeriodStartDate(periodStartDate, getPortfolioTotalReturns()), tBills);
     final BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(getPortfolioTotalReturns(),
         periodStartDate, numberOfMonths);
     final BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(tBills, periodStartDate,
@@ -83,11 +84,6 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
       return null;
     }
     return divide(diff, downsideDeviation);
-  }
-
-  @Override
-  public int availableMonths() {
-    return Math.min(super.availableMonths(), tBills.size());
   }
 
 }

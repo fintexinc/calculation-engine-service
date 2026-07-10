@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
@@ -39,12 +40,12 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
   @Override
   public BigDecimal calculatePeriodForNumberOfMonths(int numberOfMonths) {
     if (numberOfMonths > getPortfolioTotalReturns().size()
-        || numberOfMonths > tBills.size()
         || numberOfMonths < TWELVE.intValue()) {
       return null;
     }
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
-    validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, getPortfolioTotalReturns()), tBills);
+    RiskFreeWindowValidator.requireCoverage(
+        getSubMapByPeriodStartDate(periodStartDate, getPortfolioTotalReturns()), tBills);
     final BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(getPortfolioTotalReturns(),
         periodStartDate, numberOfMonths);
     final BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(tBills,
@@ -74,15 +75,15 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
 
   /**
    * Treynor returns null whenever its composed {@link BetaCalculation} returns null (benchmark or excess-return series
-   * shorter than the period) or when the T-Bill series is shorter than the period. Without this override
-   * {@code availableMonths()} would fall back to {@code portfolioTotalReturns.size()} and {@code RET-008} would be
-   * silently skipped for those cases. Treynor sits outside the {@code BenchmarkWeightedAverageCalculation} chain, so
-   * the inherited overrides don't reach it — delegate to the composed Beta and fold in {@code tBills} explicitly.
+   * shorter than the period). Without this override {@code availableMonths()} would fall back to
+   * {@code portfolioTotalReturns.size()} and {@code RET-008} would be silently skipped for that case. Treynor sits
+   * outside the {@code BenchmarkWeightedAverageCalculation} chain, so the inherited overrides don't reach it — delegate
+   * to the composed Beta explicitly. T-Bill coverage is enforced separately by
+   * {@link RiskFreeWindowValidator#requireCoverage} inside {@link #calculatePeriodForNumberOfMonths}.
    */
   @Override
   public int availableMonths() {
-    return Math.min(super.availableMonths(),
-        Math.min(betaCalculation.availableMonths(), tBills.size()));
+    return Math.min(super.availableMonths(), betaCalculation.availableMonths());
   }
 
 }

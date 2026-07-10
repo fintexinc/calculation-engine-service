@@ -1,5 +1,10 @@
 package com.fintex.ce.application.calculation.metric.core;
 
+import com.fintex.ce.application.returns.ReturnsRole;
+import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -7,6 +12,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
@@ -15,6 +21,7 @@ import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -23,57 +30,73 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 class AlphaBetaCalculationAbstractTest {
 
   final int TWELVE = 12;
+  private final LocalDate today = LocalDate.now();
 
   @Test
-  void shouldReturnNull_whenPeriodExceedsPortfolioExcessReturnsSize() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
-    final var portfolioExcessReturns = mock(TreeMap.class);
-    final var benchmarkExcessReturns = mock(TreeMap.class);
-    calculation.portfolioExcessReturn = portfolioExcessReturns;
-    calculation.benchmarkExcessReturn = benchmarkExcessReturns;
+  void shouldThrowMissingTBillRate_whenPortfolioExcessReturnDoesNotCoverPortfolioWindow() {
+    final var calculation = buildCalculationMissingCoverageOn(ReturnsRole.PORTFOLIO);
 
-    when(portfolioExcessReturns.size()).thenReturn(20);
-    when(benchmarkExcessReturns.size()).thenReturn(100);
-    when(calculation.getBenchmarkTotalReturns()).thenReturn(treeMap);
-    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
-
-    when(treeMap.size()).thenReturn(100);
-    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
-    when(calculation.calculateBeta(any(), any(), any(), any())).thenReturn(TEN);
-
-    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(100);
-
-    assertNull(actual);
+    final CalculationException ex = assertThrows(CalculationException.class,
+        () -> calculation.calculatePeriodForNumberOfMonths(TWELVE));
+    assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals("Missing T-Bill rate for date " + today, ex.getMessage());
+    assertEquals(Map.of("param-1", today), ex.getMetadata());
   }
 
   @Test
-  void shouldReturnNull_whenPeriodExceedsBenchmarkExcessReturnsSize() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
-    final var portfolioExcessReturns = mock(TreeMap.class);
-    final var benchmarkExcessReturns = mock(TreeMap.class);
-    calculation.portfolioExcessReturn = portfolioExcessReturns;
-    calculation.benchmarkExcessReturn = benchmarkExcessReturns;
+  void shouldThrowMissingTBillRate_whenBenchmarkExcessReturnDoesNotCoverPortfolioWindow() {
+    final var calculation = buildCalculationMissingCoverageOn(ReturnsRole.BENCHMARK);
 
-    when(portfolioExcessReturns.size()).thenReturn(100);
-    when(benchmarkExcessReturns.size()).thenReturn(20);
-    when(calculation.getBenchmarkTotalReturns()).thenReturn(treeMap);
-    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
+    final CalculationException ex = assertThrows(CalculationException.class,
+        () -> calculation.calculatePeriodForNumberOfMonths(TWELVE));
+    assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals("Missing T-Bill rate for date " + today, ex.getMessage());
+    assertEquals(Map.of("param-1", today), ex.getMetadata());
+  }
 
-    when(treeMap.size()).thenReturn(100);
-    when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
-    when(calculation.calculateBeta(any(), any(), any(), any())).thenReturn(TEN);
+  /**
+   * Builds a real (non-mocked-construction) {@link AlphaBetaCalculationAbstract} whose portfolio and benchmark total
+   * return series both fully cover a 12-month window, but whose excess-return series on the given dimension is missing
+   * the most recent month inside that window — the per-date coverage precondition enforced by
+   * {@link com.fintex.ce.application.util.RiskFreeWindowValidator} must throw {@code MISSING_TBILL_RATE}.
+   */
+  private AlphaBetaCalculationAbstract buildCalculationMissingCoverageOn(final ReturnsRole dimension) {
+    final NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    final NavigableMap<LocalDate, BigDecimal> benchmarkReturns = new TreeMap<>();
+    for (int i = 0; i < TWELVE; i++) {
+      portfolioReturns.put(today.minusMonths(i), ONE);
+      benchmarkReturns.put(today.minusMonths(i), ONE);
+    }
+    final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = new TreeMap<>();
+    final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn = new TreeMap<>();
+    for (int i = 1; i < TWELVE; i++) {
+      portfolioExcessReturn.put(today.minusMonths(i), ONE);
+      benchmarkExcessReturn.put(today.minusMonths(i), ONE);
+    }
+    if (dimension == ReturnsRole.PORTFOLIO) {
+      benchmarkExcessReturn.put(today, ONE);
+    } else {
+      portfolioExcessReturn.put(today, ONE);
+    }
 
+    final var input = mock(BenchmarkPeriodCalculationInput.class);
+    when(input.getWeightedAveragePortfolioReturns()).thenReturn(portfolioReturns);
+    when(input.getWeightedAverageBenchmarkReturns()).thenReturn(benchmarkReturns);
+
+    final var calculation = mock(AlphaBetaCalculationAbstract.class,
+        withSettings().useConstructor(input, Set.of(), portfolioExcessReturn, benchmarkExcessReturn));
+
+    doCallRealMethod().when(calculation).getPortfolioTotalReturns();
+    doCallRealMethod().when(calculation).getBenchmarkTotalReturns();
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(100);
-
-    assertNull(actual);
+    doCallRealMethod().when(calculation).getPeriodStartDate(anyInt(), any());
+    doCallRealMethod().when(calculation).getSubMapByPeriodStartDate(any(), any());
+    return calculation;
   }
 
   @Test
@@ -99,7 +122,7 @@ class AlphaBetaCalculationAbstractTest {
   void shouldGetExcessReturnSubMaps_whenCalculatingPeriod() {
     final var calculation = mock(AlphaBetaCalculationAbstract.class);
     final var treeMap = mock(TreeMap.class);
-    final var periodStartDate = LocalDate.now();
+    final var periodStartDate = today;
 
     calculation.benchmarkExcessReturn = treeMap;
     calculation.portfolioExcessReturn = treeMap;
@@ -245,9 +268,9 @@ class AlphaBetaCalculationAbstractTest {
   void shouldCalculateNumeratorValue_whenExcessReturnsProvided() {
     final var calculation = mock(AlphaBetaCalculationAbstract.class);
 
-    final var portfolioExcessReturnByPeriod = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.valueOf(
+    final var portfolioExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
         1.01222986673534)));
-    final var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.valueOf(
+    final var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
         0.994895485347306)));
 
     final var portfolioExcessAverage = BigDecimal.valueOf(0.004475946208333);
@@ -265,7 +288,7 @@ class AlphaBetaCalculationAbstractTest {
   void shouldCalculateDenominatorValue_whenExcessReturnsProvided() {
     final var calculation = mock(AlphaBetaCalculationAbstract.class);
 
-    final var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.valueOf(
+    final var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
         0.994895485347306)));
     final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 

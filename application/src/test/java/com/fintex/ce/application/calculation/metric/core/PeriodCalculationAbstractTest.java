@@ -65,7 +65,7 @@ class PeriodCalculationAbstractTest {
   void shouldAddSinceCustomIntervalPeriod_whenSinceCustomIntervalStartDateIsValid() {
     PeriodCalculationInput w = mock(PeriodCalculationInput.class);
     when(w.getCipsd()).thenReturn(null);
-    PeriodCalculationAbstract p = new TrailingTotalReturnsCalculation(w, Set.of());
+    PeriodCalculationAbstract p = TrailingTotalReturnsCalculation.mathOnly(w, Set.of());
 
     Set<Pair<String, BigDecimal>> results = new HashSet<>();
     p.addSinceCustomIntervalPerformanceStartDate(results, Set.of());

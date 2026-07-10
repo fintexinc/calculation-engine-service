@@ -37,7 +37,7 @@ public class DistributionOfReturnsServiceImpl
   public DistributionOfReturnsResult perform(DistributionOfReturnsCommand command) {
     PeriodCalculationInput inputWithScaleOfOne = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
     PeriodCalculationInput inputWithScaleOfTwo = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    TrailingTotalReturnsCalculation trailingTotalReturnsCalculation = new TrailingTotalReturnsCalculation(
+    TrailingTotalReturnsCalculation trailingTotalReturnsCalculation = TrailingTotalReturnsCalculation.mathOnly(
         inputWithScaleOfTwo, Set.of());
     RollingTotalReturnsCalculation rollingTotalReturnsCalculation = new RollingTotalReturnsCalculation(
         inputWithScaleOfTwo, Set.of(), trailingTotalReturnsCalculation);

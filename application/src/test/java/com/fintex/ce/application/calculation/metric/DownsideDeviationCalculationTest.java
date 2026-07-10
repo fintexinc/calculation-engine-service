@@ -1,7 +1,10 @@
 package com.fintex.ce.application.calculation.metric;
 
+import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -9,16 +12,17 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TEN_THOUSAND;
-import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anySet;
@@ -32,21 +36,26 @@ class DownsideDeviationCalculationTest {
   final int TWELVE = 12;
 
   @Test
-  void shouldReturnNull_whenPeriodExceedsExcessReturnsSize() {
-    final var calculation = mock(DownsideDeviationCalculation.class);
-    final var treeMap = mock(TreeMap.class);
-    final var excessReturns = mock(TreeMap.class);
-    calculation.portfolioExcessReturn = excessReturns;
+  void shouldThrowMissingTBillRate_whenExcessReturnsDoNotCoverPortfolioWindow() {
+    final NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    for (int i = 0; i < 12; i++) {
+      portfolioReturns.put(LocalDate.now().minusMonths(i), ONE);
+    }
+    final PeriodCalculationInput input = PeriodCalculationInput.builder()
+        .weightedAveragePortfolioReturns(portfolioReturns)
+        .build();
+    final NavigableMap<LocalDate, BigDecimal> shortTBills = new TreeMap<>();
+    for (int i = 2; i <= 12; i++) { // missing the most recent month inside the window
+      shortTBills.put(LocalDate.now().minusMonths(i), ONE);
+    }
+    final DownsideDeviationCalculation<DownsideDeviationResult> calculation = new DownsideDeviationCalculation<>(input,
+        Set.of(), shortTBills);
 
-    when(treeMap.size()).thenReturn(100);
-    when(excessReturns.size()).thenReturn(20);
-    when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
-    when(calculation.calculateDownsideDeviation(anyInt(), any())).thenReturn(TEN);
-
-    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(100);
-
-    assertNull(actual);
+    final CalculationException ex = assertThrows(CalculationException.class,
+        () -> calculation.calculatePeriodForNumberOfMonths(12));
+    assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals("Missing T-Bill rate for date " + LocalDate.now().minusMonths(1), ex.getMessage());
+    assertEquals(Map.of("param-1", LocalDate.now().minusMonths(1)), ex.getMetadata());
   }
 
   @Test

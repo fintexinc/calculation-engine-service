@@ -3,6 +3,8 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anySet;
@@ -189,36 +192,34 @@ class TreynorRatioCalculationTest {
   }
 
   @Test
-  void shouldReturnNull_whenTBillsDoNotOverlapPortfolioRange() {
-    // Portfolio runs over the last 12 months; T-Bills are pre-2000, no overlap. restrictTBillsRange yields an empty
-    // submap, so the count gate (numberOfMonths > tBills.size()) short-circuits to null before any subMap call.
-    NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+  void shouldThrowMissingTBillRate_whenTBillsDoNotCoverPortfolioWindow() {
+    final NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
     for (int i = 0; i < 12; i++) {
       portfolioReturns.put(LocalDate.now().minusMonths(i), ONE);
     }
-    PeriodCalculationInput input = PeriodCalculationInput.builder()
+    final PeriodCalculationInput input = PeriodCalculationInput.builder()
         .weightedAveragePortfolioReturns(portfolioReturns)
         .build();
-    NavigableMap<LocalDate, BigDecimal> nonOverlappingTBills = new TreeMap<>(Map.of(
-        LocalDate.of(1999, 1, 31), ONE));
-
+    final NavigableMap<LocalDate, BigDecimal> shortTBills = new TreeMap<>();
+    for (int i = 2; i <= 12; i++) { // missing the most recent month inside the window
+      shortTBills.put(LocalDate.now().minusMonths(i), ONE);
+    }
     final var beta = mock(BetaCalculation.class);
-    final var calculation = mock(TreynorRatioCalculation.class,
-        withSettings().useConstructor(input, Set.of(), nonOverlappingTBills, beta));
+    final var calculation = new TreynorRatioCalculation(input, Set.of(), shortTBills, beta);
 
-    doCallRealMethod().when(calculation).getPortfolioTotalReturns();
-    doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(TWELVE);
-
-    assertNull(actual);
+    final CalculationException ex = assertThrows(CalculationException.class,
+        () -> calculation.calculatePeriodForNumberOfMonths(12));
+    assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals("Missing T-Bill rate for date " + LocalDate.now().minusMonths(1), ex.getMessage());
+    assertEquals(Map.of("param-1", LocalDate.now().minusMonths(1)), ex.getMetadata());
   }
 
   @Test
   void shouldThrowMissingTBillRate_whenTBillsHavePublicationLag() {
     // Publication-lag scenario: portfolio covers the last 13 months but T-Bills only the prior 12 (lagging by 1
     // month). Count gate passes (tBills.size() == 12 == numberOfMonths) but the period window starts AFTER the last
-    // T-Bill date — the per-date validateTBillsCoverage check must throw MISSING_TBILL_RATE instead of letting
-    // calculateAverageArithmeticAnnualizedReturn silently divide an undersized window by numberOfMonths.
+    // T-Bill date — the per-date RiskFreeWindowValidator.requireCoverage check must throw MISSING_TBILL_RATE instead
+    // of letting calculateAverageArithmeticAnnualizedReturn silently divide an undersized window by numberOfMonths.
     NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
     for (int i = 0; i < 13; i++) {
       portfolioReturns.put(LocalDate.now().minusMonths(i), ONE);
@@ -239,13 +240,12 @@ class TreynorRatioCalculationTest {
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
     doCallRealMethod().when(calculation).getPeriodStartDate(anyInt(), any());
     doCallRealMethod().when(calculation).getSubMapByPeriodStartDate(any(), any());
-    doCallRealMethod().when(calculation).validateTBillsCoverage(any(), any());
 
-    com.fintex.ce.model.error.exceptions.CalculationException ex = org.junit.jupiter.api.Assertions.assertThrows(
-        com.fintex.ce.model.error.exceptions.CalculationException.class,
+    CalculationException ex = assertThrows(CalculationException.class,
         () -> calculation.calculatePeriodForNumberOfMonths(TWELVE));
-    org.junit.jupiter.api.Assertions.assertEquals(
-        com.fintex.ce.model.error.ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals("Missing T-Bill rate for date " + LocalDate.now(), ex.getMessage());
+    assertEquals(Map.of("param-1", LocalDate.now()), ex.getMetadata());
   }
 
 }
