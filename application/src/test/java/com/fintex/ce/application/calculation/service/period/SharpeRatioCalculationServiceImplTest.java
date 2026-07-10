@@ -37,6 +37,8 @@ class SharpeRatioCalculationServiceImplTest {
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(tBillsFetcher.fetch(Currency.CAD))
         .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
+    when(weightedAverageInput.getWeightedAveragePortfolioReturns())
+        .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(weightedAverageInput);
 
     doCallRealMethod().when(service).defineCalculationMethod(any());
@@ -56,6 +58,8 @@ class SharpeRatioCalculationServiceImplTest {
     when(tBillsFetcher.fetch(Currency.CAD))
         .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
     when(req.getCurrency()).thenReturn(Currency.CAD);
+    when(context.getWeightedAveragePortfolioReturns())
+        .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
     when(service.buildPeriodCalculationInput(any(), any())).thenReturn(context);
 
     doCallRealMethod().when(service).defineCalculationMethod(any());
@@ -82,5 +86,7 @@ class SharpeRatioCalculationServiceImplTest {
     CalculationException ex = assertThrows(CalculationException.class,
         () -> service.defineCalculationMethod(req));
     assertEquals(ErrorCode.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, ex.getErrorCode());
+    assertEquals("T-Bill rates are not available for currency " + Currency.EUR, ex.getMessage());
+    assertEquals(Map.of("param-1", Currency.EUR), ex.getMetadata());
   }
 }

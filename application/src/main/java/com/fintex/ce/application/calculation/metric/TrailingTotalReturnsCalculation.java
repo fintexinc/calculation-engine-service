@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 
@@ -20,19 +21,28 @@ public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<T
 
   private final NavigableMap<LocalDate, BigDecimal> tBills;
 
-  /**
-   * Internal-composition constructor used by metrics (Information Ratio, Rolling Total Returns) that reuse the TTR
-   * product math but do not themselves carry the spec's T-Bill precondition.
-   */
-  public TrailingTotalReturnsCalculation(PeriodCalculationInput input, Set<String> defaultPeriods) {
-    this(input, defaultPeriods, null);
-  }
-
-  public TrailingTotalReturnsCalculation(PeriodCalculationInput input,
+  private TrailingTotalReturnsCalculation(PeriodCalculationInput input,
       Set<String> defaultPeriods,
       NavigableMap<LocalDate, BigDecimal> tBills) {
     super(input, defaultPeriods);
     this.tBills = tBills;
+  }
+
+  /**
+   * Product-math-only variant for internal composition (Information Ratio, Rolling Total Returns, Distribution, MAR)
+   * that reuse the TTR geometric product but do not carry the spec's T-Bill precondition.
+   */
+  public static TrailingTotalReturnsCalculation mathOnly(PeriodCalculationInput input, Set<String> defaultPeriods) {
+    return new TrailingTotalReturnsCalculation(input, defaultPeriods, null);
+  }
+
+  /**
+   * Standalone Trailing Total Returns variant that enforces per-date T-Bill coverage over the requested window.
+   */
+  public static TrailingTotalReturnsCalculation withTBillPrecondition(PeriodCalculationInput input,
+      Set<String> defaultPeriods,
+      NavigableMap<LocalDate, BigDecimal> tBills) {
+    return new TrailingTotalReturnsCalculation(input, defaultPeriods, tBills);
   }
 
   @Override
@@ -47,7 +57,7 @@ public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<T
     }
     if (tBills != null) {
       LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, totalReturns);
-      validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, totalReturns), tBills);
+      RiskFreeWindowValidator.requireCoverage(getSubMapByPeriodStartDate(periodStartDate, totalReturns), tBills);
     }
     BigDecimal product = calculateProductForPeriod(numberOfMonths, totalReturns);
     if (numberOfMonths < 12) {

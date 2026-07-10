@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -18,7 +19,6 @@ import java.util.TreeMap;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -136,24 +136,29 @@ class TrailingTotalReturnsCalculationTest {
     }
     PeriodCalculationInput input = new PeriodCalculationInput();
     input.setWeightedAveragePortfolioReturns(portfolioReturns);
-    var calculation = new TrailingTotalReturnsCalculation(input, Set.of(), tBills);
+    var calculation = TrailingTotalReturnsCalculation.withTBillPrecondition(input, Set.of(), tBills);
 
     CalculationException ex = assertThrows(CalculationException.class,
         () -> calculation.calculatePeriodForNumberOfMonths(12));
     assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
+    assertEquals("Missing T-Bill rate for date " + LocalDate.of(2025, 1, 31).plusMonths(5), ex.getMessage());
+    assertEquals(Map.of("param-1", LocalDate.of(2025, 1, 31).plusMonths(5)), ex.getMetadata());
   }
 
   @Test
-  void shouldNotValidateTBills_whenInternalCompositionConstructorUsedWithoutTBills() {
+  void shouldNotValidateTBills_whenMathOnlyFactoryUsed() {
     NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
     for (int i = 0; i < 12; i++) {
       portfolioReturns.put(LocalDate.of(2025, 1, 31).plusMonths(i), BigDecimal.valueOf(1.01));
     }
     PeriodCalculationInput input = new PeriodCalculationInput();
     input.setWeightedAveragePortfolioReturns(portfolioReturns);
-    var calculation = new TrailingTotalReturnsCalculation(input, Set.of());
+    var calculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
 
-    assertDoesNotThrow(() -> calculation.calculatePeriodForNumberOfMonths(12));
+    // mathOnly() applies no T-Bill precondition: the call must not throw, and 12 months of a 1.01 factor
+    // annualized over 12 months yields 1.01^12 - 1.
+    BigDecimal result = calculation.calculatePeriodForNumberOfMonths(12);
+    assertEquals(0, result.compareTo(new BigDecimal("0.1268250301319698")));
   }
 
   @Test

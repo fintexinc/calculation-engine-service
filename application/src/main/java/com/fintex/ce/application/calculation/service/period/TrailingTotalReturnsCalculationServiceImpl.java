@@ -42,7 +42,7 @@ public class TrailingTotalReturnsCalculationServiceImpl
     PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
     var tBills = TBillsValidator.requireNonEmpty(
         treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
-    return new TrailingTotalReturnsCalculation(input, defaultPeriods, tBills);
+    return TrailingTotalReturnsCalculation.withTBillPrecondition(input, defaultPeriods, tBills);
   }
 
 }

@@ -70,7 +70,7 @@ public class MarRatioCalculationService
     final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
     final NavigableMap<LocalDate, BigDecimal> portfolioReturns = context.getWeightedAveragePortfolioReturns();
     final LocalDate cipsd = context.getCipsd();
-    final var ttr = new TrailingTotalReturnsCalculation(context, defaultPeriods);
+    final var ttr = TrailingTotalReturnsCalculation.mathOnly(context, defaultPeriods);
     // portfolioReturns is already in factor form, pass AS_IS to avoid double-scaling
     final NavigableMap<LocalDate, BigDecimal> growth10K = Growth10KHelper.compoundGrowth10K(
         portfolioReturns, ReturnFactorScale.AS_IS);

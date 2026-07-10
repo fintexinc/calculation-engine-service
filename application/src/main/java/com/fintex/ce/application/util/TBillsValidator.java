@@ -17,8 +17,8 @@ import lombok.experimental.UtilityClass;
  * {@code availableMonths()} to 0 and surfaces a misleading {@code RET-008} ("only 0 monthly returns available") that
  * misattributes the cause to portfolio data. This helper fails fast with
  * {@link ErrorCode#TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY} (HTTP 400), which is distinct from the per-date
- * {@link ErrorCode#MISSING_TBILL_RATE} that {@code SharpeRatioCalculation.validateTBillsCoverage} uses for partial
- * coverage gaps.
+ * {@link ErrorCode#MISSING_TBILL_RATE} that {@code RiskFreeWindowValidator.requireCoverage} uses for partial coverage
+ * gaps.
  */
 @UtilityClass
 public final class TBillsValidator {

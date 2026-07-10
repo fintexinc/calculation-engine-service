@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -405,6 +406,9 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
 
   public NavigableMap<LocalDate, BigDecimal> restrictTBillsRange(NavigableMap<LocalDate, BigDecimal> tBills,
       NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns) {
+    if (CollectionUtils.isEmpty(portfolioTotalReturns)) {
+      return Collections.emptyNavigableMap();
+    }
     return tBills.subMap(portfolioTotalReturns.firstKey(), true, portfolioTotalReturns.lastKey(), true);
   }
 
@@ -424,29 +428,6 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
       int numberOfMonths) {
     SortedMap<LocalDate, BigDecimal> returnsInPeriod = getSubMapByPeriodStartDate(periodStartDate, returns);
     return divide(sum(returnsInPeriod), numberOfMonths).multiply(TWELVE);
-  }
-
-  /**
-   * Throws {@link ErrorCode#MISSING_TBILL_RATE} for the first date in {@code windowDates} that has no entry in
-   * {@code tBillsDerivedSeries}. Defends metrics whose count gate (numberOfMonths &gt; series.size()) doesn't catch
-   * date-alignment mismatches — e.g. T-Bills with a publication lag relative to portfolio returns, where
-   * {@link #calculateAverageArithmeticAnnualizedReturn} would otherwise silently divide by {@code numberOfMonths}
-   * against an undersized window, and {@link #getSubMapByPeriodStartDate} would crash with
-   * {@link IllegalArgumentException} when {@code series.lastKey() < periodStartDate}.
-   *
-   * <p>
-   * {@code tBillsDerivedSeries} is either tBills directly (Sharpe, Sortino, Treynor) or an excess-return series derived
-   * from tBills (DownsideDeviation, Alpha, Beta, R-Squared) — in either case the upstream cause of any gap is a missing
-   * T-Bill rate, so {@code MISSING_TBILL_RATE} is the appropriate diagnostic.
-   */
-  public void validateTBillsCoverage(SortedMap<LocalDate, BigDecimal> windowDates,
-      NavigableMap<LocalDate, BigDecimal> tBillsDerivedSeries) {
-    windowDates.keySet().stream()
-        .filter(date -> !tBillsDerivedSeries.containsKey(date))
-        .findFirst()
-        .ifPresent(date -> {
-          throw ErrorCode.MISSING_TBILL_RATE.toException(date);
-        });
   }
 
   /**

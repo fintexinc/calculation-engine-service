@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 
@@ -29,7 +30,7 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
       NavigableMap<LocalDate, BigDecimal> tBills,
       StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation) {
     super(input, defaultPeriods);
-    this.tBills = tBills;
+    this.tBills = restrictTBillsRange(tBills);
     this.standardDeviationCalculation = standardDeviationCalculation;
   }
 
@@ -44,22 +45,13 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
       return null;
     }
     LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, returns);
-    validateTBillsCoverage(getSubMapByPeriodStartDate(periodStartDate, returns));
+    RiskFreeWindowValidator.requireCoverage(getSubMapByPeriodStartDate(periodStartDate, returns), tBills);
     BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(returns, periodStartDate,
         numberOfMonths);
     BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(
         restrictTBillsRange(tBills, returns), periodStartDate, numberOfMonths);
     BigDecimal standardDeviation = getStandardDeviation(numberOfMonths, returns);
     return calculateSharpeRatio(annualizedPortfolioReturn, annualizedRiskFreeRate, standardDeviation);
-  }
-
-  /**
-   * Verifies that {@link #tBills} contains a rate for every month present in the period window. Delegates to the shared
-   * {@link PeriodCalculationAbstract#validateTBillsCoverage(SortedMap, NavigableMap)} so all T-Bill-dependent metrics
-   * use the same per-date check.
-   */
-  public void validateTBillsCoverage(SortedMap<LocalDate, BigDecimal> returnsInPeriod) {
-    validateTBillsCoverage(returnsInPeriod, tBills);
   }
 
   /**
