@@ -41,26 +41,26 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var pairs = Set.of(
+    var calculation = mock(TrackingErrorCalculation.class);
+    var pairs = Set.of(
         Pair.of("2010-01-01", ONE),
         Pair.of("2020-01-01", TEN));
 
-    final var interval1 = new TimeIntervalResult("2010-01-01", ONE);
-    final var interval2 = new TimeIntervalResult("2020-01-01", TEN);
-    final var expected = Set.of(interval2, interval1);
+    var interval1 = new TimeIntervalResult("2010-01-01", ONE);
+    var interval2 = new TimeIntervalResult("2020-01-01", TEN);
+    var expected = Set.of(interval2, interval1);
 
     doCallRealMethod().when(calculation).defineResponseType(anySet());
-    final TrackingErrorResult actual = calculation.defineResponseType(pairs);
+    TrackingErrorResult actual = calculation.defineResponseType(pairs);
 
     assertEquals(expected, actual.getTrackingError());
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResult() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var benchmarkTotalReturns = mock(TreeMap.class);
-    final var portfolioTotalReturns = mock(TreeMap.class);
+    var calculation = mock(TrackingErrorCalculation.class);
+    var benchmarkTotalReturns = mock(TreeMap.class);
+    var portfolioTotalReturns = mock(TreeMap.class);
 
     when(benchmarkTotalReturns.size()).thenReturn(1);
     when(portfolioTotalReturns.size()).thenReturn(1);
@@ -76,26 +76,26 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenCheckResult1() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var benchmarkTotalReturns = mock(TreeMap.class);
-    final var portfolioTotalReturns = mock(TreeMap.class);
+    var calculation = mock(TrackingErrorCalculation.class);
+    var benchmarkTotalReturns = mock(TreeMap.class);
+    var portfolioTotalReturns = mock(TreeMap.class);
     when(benchmarkTotalReturns.size()).thenReturn(25);
     when(portfolioTotalReturns.size()).thenReturn(25);
 
     when(calculation.getBenchmarkTotalReturns()).thenReturn(benchmarkTotalReturns);
     when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(-1);
+    BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(-1);
 
     assertNull(actual);
   }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetPeriodStartDate() {
-    final var calculation = mock(TrackingErrorCalculation.class);
+    var calculation = mock(TrackingErrorCalculation.class);
 
-    final var benchmarkTotalReturns = mock(TreeMap.class);
-    final var portfolioTotalReturns = mock(TreeMap.class);
+    var benchmarkTotalReturns = mock(TreeMap.class);
+    var portfolioTotalReturns = mock(TreeMap.class);
     when(benchmarkTotalReturns.size()).thenReturn(25);
     when(portfolioTotalReturns.size()).thenReturn(25);
 
@@ -113,10 +113,10 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyGetSubMap() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var benchmarkTotalReturns = mock(TreeMap.class);
-    final var portfolioTotalReturns = mock(TreeMap.class);
-    final var periodStartDate = LocalDate.of(2020, 4, 10);
+    var calculation = mock(TrackingErrorCalculation.class);
+    var benchmarkTotalReturns = mock(TreeMap.class);
+    var portfolioTotalReturns = mock(TreeMap.class);
+    var periodStartDate = LocalDate.of(2020, 4, 10);
 
     when(benchmarkTotalReturns.size()).thenReturn(25);
     when(portfolioTotalReturns.size()).thenReturn(25);
@@ -135,11 +135,11 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateAverageExcessPortfolioReturnsByPeriod() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var benchmarkTotalReturns = mock(TreeMap.class);
-    final var portfolioTotalReturns = mock(TreeMap.class);
-    final TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
-    final LocalDate periodStartDate = LocalDate.of(2020, 4, 10);
+    var calculation = mock(TrackingErrorCalculation.class);
+    var benchmarkTotalReturns = mock(TreeMap.class);
+    var portfolioTotalReturns = mock(TreeMap.class);
+    TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
+    LocalDate periodStartDate = LocalDate.of(2020, 4, 10);
 
     when(benchmarkTotalReturns.size()).thenReturn(25);
     when(portfolioTotalReturns.size()).thenReturn(25);
@@ -158,16 +158,16 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateDiffExcessPortfolioAndAVGExcessPortfolio() {
-    final var calculation = mock(TrackingErrorCalculation.class);
+    var calculation = mock(TrackingErrorCalculation.class);
 
-    final var benchmarkTotalReturns = mock(TreeMap.class);
-    final var portfolioTotalReturns = mock(TreeMap.class);
+    var benchmarkTotalReturns = mock(TreeMap.class);
+    var portfolioTotalReturns = mock(TreeMap.class);
     when(benchmarkTotalReturns.size()).thenReturn(25);
     when(portfolioTotalReturns.size()).thenReturn(25);
 
-    final TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
-    final var periodStartDate = LocalDate.of(2020, 4, 10);
-    final var averageExcessPortfolioReturns = mock(BigDecimal.class);
+    TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
+    var periodStartDate = LocalDate.of(2020, 4, 10);
+    var averageExcessPortfolioReturns = mock(BigDecimal.class);
 
     when(calculation.getBenchmarkTotalReturns()).thenReturn(benchmarkTotalReturns);
     when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
@@ -184,17 +184,17 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateTrackingError() {
-    final var var = mock(TrackingErrorCalculation.class);
+    var var = mock(TrackingErrorCalculation.class);
 
-    final var benchmarkTotalReturns = mock(TreeMap.class);
-    final var portfolioTotalReturns = mock(TreeMap.class);
+    var benchmarkTotalReturns = mock(TreeMap.class);
+    var portfolioTotalReturns = mock(TreeMap.class);
     when(benchmarkTotalReturns.size()).thenReturn(25);
     when(portfolioTotalReturns.size()).thenReturn(25);
 
-    final TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
-    final var periodStartDate = LocalDate.of(2020, 4, 10);
-    final var averageExcessPortfolioReturns = mock(BigDecimal.class);
-    final var diff = mock(TreeMap.class);
+    TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
+    var periodStartDate = LocalDate.of(2020, 4, 10);
+    var averageExcessPortfolioReturns = mock(BigDecimal.class);
+    var diff = mock(TreeMap.class);
 
     when(var.getBenchmarkTotalReturns()).thenReturn(benchmarkTotalReturns);
     when(var.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
@@ -212,29 +212,29 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculateAverageExcessPortfolioReturnsByPeriod_whenCheckResult() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var subMapByPeriodStartDate = new TreeMap();
+    var calculation = mock(TrackingErrorCalculation.class);
+    var subMapByPeriodStartDate = new TreeMap();
 
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(2), TWO);
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(3), TEN);
 
     doCallRealMethod().when(calculation).calculateAverageByPeriod(subMapByPeriodStartDate);
-    final BigDecimal actual = calculation.calculateAverageByPeriod(subMapByPeriodStartDate);
+    BigDecimal actual = calculation.calculateAverageByPeriod(subMapByPeriodStartDate);
 
     assertEquals(6.0, actual.doubleValue());
   }
 
   @Test
   void shouldCalculateAverageExcessPortfolioReturnsByPeriod_whenCheckResult1() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var subMapByPeriodStartDate = new TreeMap();
+    var calculation = mock(TrackingErrorCalculation.class);
+    var subMapByPeriodStartDate = new TreeMap();
 
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(10), TWELVE);
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(1), TEN);
 
     doCallRealMethod().when(calculation)
         .calculateAverageByPeriod(subMapByPeriodStartDate);
-    final BigDecimal actual = calculation
+    BigDecimal actual = calculation
         .calculateAverageByPeriod(subMapByPeriodStartDate);
 
     assertEquals(11.0, actual.doubleValue());
@@ -242,15 +242,15 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculateAverageExcessPortfolioReturnsByPeriod_whenCheckResult3() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var subMapByPeriodStartDate = new TreeMap();
+    var calculation = mock(TrackingErrorCalculation.class);
+    var subMapByPeriodStartDate = new TreeMap();
 
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(3), ZERO);
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(5), TWO);
 
     doCallRealMethod().when(calculation)
         .calculateAverageByPeriod(subMapByPeriodStartDate);
-    final BigDecimal actual = calculation
+    BigDecimal actual = calculation
         .calculateAverageByPeriod(subMapByPeriodStartDate);
 
     assertEquals(1.000000000000000, actual.doubleValue());
@@ -258,15 +258,15 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculateTrackingError_whenCheckResult() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
+    var calculation = mock(TrackingErrorCalculation.class);
+    TreeMap<LocalDate, BigDecimal> subMapByPeriodStartDate = new TreeMap<>();
 
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(3), ZERO);
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(4), TWELVE);
 
     doCallRealMethod().when(calculation)
         .calculateTrackingError(25, subMapByPeriodStartDate);
-    final BigDecimal actual = calculation
+    BigDecimal actual = calculation
         .calculateTrackingError(25, subMapByPeriodStartDate);
 
     assertEquals(BigDecimal.valueOf(2.4494897428), actual);
@@ -274,32 +274,32 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculateTrackingError_whenCheckResult1() {
-    final var calculation = mock(TrackingErrorCalculation.class);
-    final var subMapByPeriodStartDate = new TreeMap();
+    var calculation = mock(TrackingErrorCalculation.class);
+    var subMapByPeriodStartDate = new TreeMap();
 
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(11), TEN);
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(4), TWELVE);
 
     doCallRealMethod().when(calculation).calculateTrackingError(60, subMapByPeriodStartDate);
-    final BigDecimal actual = calculation.calculateTrackingError(60, subMapByPeriodStartDate);
+    BigDecimal actual = calculation.calculateTrackingError(60, subMapByPeriodStartDate);
 
     assertEquals(BigDecimal.valueOf(2.1153194253), actual);
   }
 
   @Test
   void shouldCalculateDiffExcessPortfolioAndAVGExcessPortfolio_whenCheckResult() {
-    final var calculation = mock(TrackingErrorCalculation.class);
+    var calculation = mock(TrackingErrorCalculation.class);
 
-    final var subMapByPeriodStartDate = new TreeMap();
+    var subMapByPeriodStartDate = new TreeMap();
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(5), TEN);
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(5), TWELVE);
 
-    final var expected = new TreeMap();
+    var expected = new TreeMap();
     expected.put(LocalDate.now().minusMonths(5), BigDecimal.valueOf(64.0));
     expected.put(LocalDate.now().minusMonths(5), BigDecimal.valueOf(100.0));
 
     doCallRealMethod().when(calculation).calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, TWO);
-    final TreeMap<LocalDate, BigDecimal> actual = calculation.calculateDiffPortfolioAndAVGPortfolio(
+    TreeMap<LocalDate, BigDecimal> actual = calculation.calculateDiffPortfolioAndAVGPortfolio(
         subMapByPeriodStartDate,
         TWO);
 
@@ -308,53 +308,53 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculateDiffExcessPortfolioAndAVGExcessPortfolio_whenCheckResult2() {
-    final var calculation = mock(TrackingErrorCalculation.class);
+    var calculation = mock(TrackingErrorCalculation.class);
 
-    final var subMapByPeriodStartDate = new TreeMap();
+    var subMapByPeriodStartDate = new TreeMap();
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(15), ZERO);
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(11), TEN);
 
-    final var expected = new TreeMap();
+    var expected = new TreeMap();
     expected.put(LocalDate.now().minusMonths(15), BigDecimal.valueOf(1.0));
     expected.put(LocalDate.now().minusMonths(11), BigDecimal.valueOf(81.0));
 
     doCallRealMethod().when(calculation).calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, ONE);
-    final var actual = calculation.calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, ONE);
+    var actual = calculation.calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, ONE);
 
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldCalculateDiffExcessPortfolioAndAVGExcessPortfolio_whenCheckResult3() {
-    final var calculation = mock(TrackingErrorCalculation.class);
+    var calculation = mock(TrackingErrorCalculation.class);
 
-    final var subMapByPeriodStartDate = new TreeMap();
+    var subMapByPeriodStartDate = new TreeMap();
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(1), TWO);
     subMapByPeriodStartDate.put(LocalDate.now().minusMonths(2), ZERO);
 
-    final var expected = new TreeMap();
+    var expected = new TreeMap();
     expected.put(LocalDate.now().minusMonths(1), BigDecimal.valueOf(64.0));
     expected.put(LocalDate.now().minusMonths(2), BigDecimal.valueOf(100.0));
 
     doCallRealMethod().when(calculation).calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, TEN);
-    final var actual = calculation.calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, TEN);
+    var actual = calculation.calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate, TEN);
 
     assertEquals(expected, actual);
   }
 
   @Test
   void shouldCalculateExcessPortfolioReturnOverBenchmark_whenCheckResult() {
-    final var calculation = mock(TrackingErrorCalculation.class);
+    var calculation = mock(TrackingErrorCalculation.class);
 
-    final TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>();
+    TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>();
     portfolioTotalReturns.put(LocalDate.now().minusMonths(2), TEN);
     portfolioTotalReturns.put(LocalDate.now().minusMonths(6), TEN);
 
-    final TreeMap<LocalDate, BigDecimal> benchmarkTotalReturns = new TreeMap<>();
+    TreeMap<LocalDate, BigDecimal> benchmarkTotalReturns = new TreeMap<>();
     benchmarkTotalReturns.put(LocalDate.now().minusMonths(2), ONE);
     benchmarkTotalReturns.put(LocalDate.now().minusMonths(6), ZERO);
 
-    final TreeMap<LocalDate, BigDecimal> expected = new TreeMap<>();
+    TreeMap<LocalDate, BigDecimal> expected = new TreeMap<>();
     expected.put(LocalDate.now().minusMonths(2), BigDecimal.valueOf(9));
     expected.put(LocalDate.now().minusMonths(6), TEN);
 
@@ -402,17 +402,17 @@ class TrackingErrorCalculationTest {
 
   @Test
   void shouldCalculateExcessPortfolioReturnOverBenchmark_whenCheckResult1() {
-    final var calculation = mock(TrackingErrorCalculation.class);
+    var calculation = mock(TrackingErrorCalculation.class);
 
-    final TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>();
+    TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>();
     portfolioTotalReturns.put(LocalDate.now().minusMonths(6), ZERO);
     portfolioTotalReturns.put(LocalDate.now().minusMonths(8), TWO);
 
-    final TreeMap<LocalDate, BigDecimal> benchmarkTotalReturns = new TreeMap<>();
+    TreeMap<LocalDate, BigDecimal> benchmarkTotalReturns = new TreeMap<>();
     benchmarkTotalReturns.put(LocalDate.now().minusMonths(6), TEN);
     benchmarkTotalReturns.put(LocalDate.now().minusMonths(8), ZERO);
 
-    final TreeMap<LocalDate, BigDecimal> expected = new TreeMap<>();
+    TreeMap<LocalDate, BigDecimal> expected = new TreeMap<>();
     expected.put(LocalDate.now().minusMonths(6), BigDecimal.valueOf(-10));
     expected.put(LocalDate.now().minusMonths(8), TWO);
 
@@ -420,7 +420,7 @@ class TrackingErrorCalculationTest {
     when(calculation.getBenchmarkTotalReturns()).thenReturn(benchmarkTotalReturns);
 
     doCallRealMethod().when(calculation).calculateExcessPortfolioReturnOverBenchmark();
-    final NavigableMap<LocalDate, BigDecimal> actual = calculation.calculateExcessPortfolioReturnOverBenchmark();
+    NavigableMap<LocalDate, BigDecimal> actual = calculation.calculateExcessPortfolioReturnOverBenchmark();
 
     assertEquals(expected, actual);
   }
