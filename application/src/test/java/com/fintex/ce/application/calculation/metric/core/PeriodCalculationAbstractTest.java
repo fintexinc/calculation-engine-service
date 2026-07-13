@@ -693,6 +693,8 @@ class PeriodCalculationAbstractTest {
     doCallRealMethod().when(calculation).getNumberOfMonthsForYearToDate(any());
     doCallRealMethod().when(calculation).getNumberOfMonthsForSinceInception(any());
     doCallRealMethod().when(calculation).requiresInsufficientDataWarning(any(), anyInt());
+    doCallRealMethod().when(calculation).requiresUnavailablePeriodWarning(any(), anyInt());
+    doCallRealMethod().when(calculation).unavailablePeriodWarning(any());
     calculation.addInsufficientDataWarnings(result, periodValues);
 
     assertEquals(expectedWarningCount, result.getWarnings().size());
@@ -705,14 +707,14 @@ class PeriodCalculationAbstractTest {
     return Stream.of(
         // Numeric periods.
         Arguments.of("numeric period exceeds available months", 1, "12", null, 1, "RET-008"),
-        Arguments.of("numeric period fits available months", 12, "12", null, 0, null),
+        Arguments.of("numeric period fits available months", 12, "12", null, 1, "RET-015"),
         Arguments.of("value is not null (period not exceeded)", 1, "12", ONE, 0, null),
         // Period keys carrying whitespace (e.g. SpEL split of "12, 36" yields " 36") must be trimmed before
         // getNumberOfMonthsFor — otherwise isNumeric() rejects them and the dispatch throws.
         Arguments.of("whitespace-padded numeric period exceeds available months", 1, " 36", null, 1, "RET-008"),
         // Symbolic YEAR_TO_DATE: with 13 entries the resolved YTD month count is always ≤ 12 ≤ 13, so it fits.
         // Confirms symbolic periods are resolved (would warn if the resolution returned 0 default from the mock).
-        Arguments.of("symbolic YEAR_TO_DATE fits available months", 13, YEAR_TO_DATE.name(), null, 0, null),
+        Arguments.of("symbolic YEAR_TO_DATE fits available months", 13, YEAR_TO_DATE.name(), null, 1, "RET-015"),
         // SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE is gated by CIPSD position, not month count, so the
         // count-based path skips it. With no CIPSD set, the dedicated CIPSD-out-of-range path is also a no-op.
         Arguments.of("SINCE_CUSTOM_INTERVAL with no CIPSD is skipped", 1,
@@ -735,6 +737,8 @@ class PeriodCalculationAbstractTest {
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();
     doCallRealMethod().when(calculation).getNumberOfMonthsFor(any(), any());
+    doCallRealMethod().when(calculation).requiresUnavailablePeriodWarning(any(), anyInt());
+    doCallRealMethod().when(calculation).unavailablePeriodWarning(any());
     // Drive the warning gate from the real cipsd-position logic instead of Mockito's default false — otherwise
     // the assertion would pass for any non-null cipsd, including in-range values, defeating the test's premise.
     doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
@@ -760,6 +764,8 @@ class PeriodCalculationAbstractTest {
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();
     doCallRealMethod().when(calculation).getNumberOfMonthsFor(any(), any());
+    doCallRealMethod().when(calculation).requiresUnavailablePeriodWarning(any(), anyInt());
+    doCallRealMethod().when(calculation).unavailablePeriodWarning(any());
     // Drive the warning gate from the real cipsd-position logic instead of Mockito's default false — otherwise
     // the assertion would pass for any non-null cipsd, including in-range values, defeating the test's premise.
     doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
@@ -785,12 +791,15 @@ class PeriodCalculationAbstractTest {
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();
     doCallRealMethod().when(calculation).getNumberOfMonthsFor(any(), any());
+    doCallRealMethod().when(calculation).requiresUnavailablePeriodWarning(any(), anyInt());
+    doCallRealMethod().when(calculation).unavailablePeriodWarning(any());
     // Real cipsd-position logic should return true here (cipsd is between first and last keys),
     // so the warning gate stays closed without an explicit thenReturn(true) stub.
     doCallRealMethod().when(calculation).isSinceCustomIntervalPerformanceStartDateValid();
     calculation.addInsufficientDataWarnings(result, periodValues);
 
-    assertEquals(0, result.getWarnings().size());
+    assertEquals(1, result.getWarnings().size());
+    assertEquals("RET-015", result.getWarnings().get(0).getCode());
   }
 
   private TreeMap<LocalDate, BigDecimal> getPortfolioReturns() {

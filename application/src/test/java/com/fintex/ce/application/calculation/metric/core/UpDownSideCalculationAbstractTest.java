@@ -67,9 +67,9 @@ class UpDownSideCalculationAbstractTest {
       BigDecimal benchmarkReturn) {
     LocalDate missingDate = LocalDate.parse("2024-01-31");
     TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(missingDate, 12, benchmarkReturn);
-    TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(LocalDate.parse("2024-02-29"), 11, ONE);
-    portfolioReturns.put(LocalDate.parse("2023-12-31"), ONE);
-
+    TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(LocalDate.parse("2024-02-29"), 11,
+        benchmarkReturn);
+    portfolioReturns.put(LocalDate.parse("2023-12-31"), benchmarkReturn);
     UpDownSideCalculationAbstract<?> calculation = calculationFactory.apply(benchmarkInput(portfolioReturns,
         benchmarkReturns));
 

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.fintex.ce.application.util.DecimalUtils.divide;
@@ -19,30 +20,26 @@ import static java.math.BigDecimal.ONE;
 
 public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<TrailingTotalReturnsResult, BigDecimal> {
 
+  private final boolean requireTBillsCoverage;
   private final NavigableMap<LocalDate, BigDecimal> tBills;
 
-  private TrailingTotalReturnsCalculation(PeriodCalculationInput input,
-      Set<String> defaultPeriods,
-      NavigableMap<LocalDate, BigDecimal> tBills) {
-    super(input, defaultPeriods);
-    this.tBills = tBills;
-  }
-
-  /**
-   * Product-math-only variant for internal composition (Information Ratio, Rolling Total Returns, Distribution, MAR)
-   * that reuse the TTR geometric product but do not carry the spec's T-Bill precondition.
-   */
   public static TrailingTotalReturnsCalculation mathOnly(PeriodCalculationInput input, Set<String> defaultPeriods) {
-    return new TrailingTotalReturnsCalculation(input, defaultPeriods, null);
+    return new TrailingTotalReturnsCalculation(input, defaultPeriods, null, false);
   }
 
-  /**
-   * Standalone Trailing Total Returns variant that enforces per-date T-Bill coverage over the requested window.
-   */
   public static TrailingTotalReturnsCalculation withTBillPrecondition(PeriodCalculationInput input,
       Set<String> defaultPeriods,
       NavigableMap<LocalDate, BigDecimal> tBills) {
-    return new TrailingTotalReturnsCalculation(input, defaultPeriods, tBills);
+    return new TrailingTotalReturnsCalculation(input, defaultPeriods, tBills, true);
+  }
+
+  private TrailingTotalReturnsCalculation(PeriodCalculationInput input,
+      Set<String> defaultPeriods,
+      NavigableMap<LocalDate, BigDecimal> tBills,
+      boolean requireTBillsCoverage) {
+    super(input, defaultPeriods);
+    this.requireTBillsCoverage = requireTBillsCoverage;
+    this.tBills = requireTBillsCoverage ? Objects.requireNonNull(tBills) : null;
   }
 
   @Override
@@ -55,7 +52,7 @@ public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<T
     if (numberOfMonths > totalReturns.size()) {
       return null;
     }
-    if (tBills != null) {
+    if (requireTBillsCoverage) {
       LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, totalReturns);
       RiskFreeWindowValidator.requireCoverage(getSubMapByPeriodStartDate(periodStartDate, totalReturns), tBills);
     }

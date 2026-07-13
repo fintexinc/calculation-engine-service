@@ -44,10 +44,10 @@ public class InformationRatioCalculationServiceImpl
 
   @Override
   public PeriodCalculationAbstract<InformationRatioResult, ?> defineCalculationMethod(PeriodCommand command) {
-    final BenchmarkPeriodCalculationInput input = buildPeriodCalculationInput(command,
+    BenchmarkPeriodCalculationInput input = buildPeriodCalculationInput(command,
         ReturnFactorScale.SCALE_OF_TWO);
-    final var trailingTotalReturnsCalculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
-    final var trackingErrorCalculation = new TrackingErrorCalculation(input, Set.of());
+    var trailingTotalReturnsCalculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
+    var trackingErrorCalculation = new TrackingErrorCalculation(input, Set.of());
     return new InformationRatioCalculation(input, defaultPeriods, trailingTotalReturnsCalculation,
         trackingErrorCalculation);
   }

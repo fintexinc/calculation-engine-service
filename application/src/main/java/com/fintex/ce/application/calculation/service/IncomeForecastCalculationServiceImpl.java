@@ -22,14 +22,17 @@ import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.Period;
 import java.time.YearMonth;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,10 +58,18 @@ public class IncomeForecastCalculationServiceImpl
       InterestFreq.BI_WEEKLY);
 
   private final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher;
+  private final Clock clock;
 
   public IncomeForecastCalculationServiceImpl(
       final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher) {
+    this(incomeForecastSecurityDataFetcher, Clock.systemDefaultZone());
+  }
+
+  public IncomeForecastCalculationServiceImpl(
+      final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher,
+      final Clock clock) {
     this.incomeForecastSecurityDataFetcher = incomeForecastSecurityDataFetcher;
+    this.clock = clock == null ? Clock.systemDefaultZone() : clock;
   }
 
   @Override
@@ -68,12 +79,12 @@ public class IncomeForecastCalculationServiceImpl
 
   @Override
   public IncomeForecastResult perform(final IncomeForecastCommand command) {
-    final ArrayList<Notification> warnings = new ArrayList<>();
-    final Map<PortfolioHolding, IncomeForecast> holdingIncomeForecast = incomeForecastSecurityDataFetcher.fetch(
+    ArrayList<Notification> warnings = new ArrayList<>();
+    Map<PortfolioHolding, IncomeForecast> holdingIncomeForecast = incomeForecastSecurityDataFetcher.fetch(
         command.getHoldings(), command.getDataProviders());
 
-    final Integer period = Optional.ofNullable(command.getTimeIntervalPeriods()).orElse(TWELVE_MONTH);
-    final IncomeForecastResult result = calculate(holdingIncomeForecast, period);
+    Integer period = Optional.ofNullable(command.getTimeIntervalPeriods()).orElse(TWELVE_MONTH);
+    IncomeForecastResult result = calculate(holdingIncomeForecast, period);
     result.setWarnings(warnings);
     return result;
   }
@@ -81,7 +92,7 @@ public class IncomeForecastCalculationServiceImpl
   private IncomeForecastResult calculate(final Map<PortfolioHolding, IncomeForecast> holdingIncomeForecastMap,
       final Integer terms) {
 
-    final List<HoldingIncomeForecast> incomeForecasts = holdingIncomeForecastMap.entrySet()
+    List<HoldingIncomeForecast> incomeForecasts = holdingIncomeForecastMap.entrySet()
         .stream()
         .map(entry -> getHoldingIncomeForecast(terms, entry))
         .filter(dto -> !CollectionUtils.isEmpty(dto.getIncome()))
@@ -93,7 +104,7 @@ public class IncomeForecastCalculationServiceImpl
 
   private HoldingIncomeForecast getHoldingIncomeForecast(final Integer terms,
       final Map.Entry<PortfolioHolding, IncomeForecast> entry) {
-    final PortfolioHolding holding = entry.getKey();
+    PortfolioHolding holding = entry.getKey();
     return Objects.equals(holding.getHoldingType(), FinancialInstrumentType.GIC)
         ? getGicIncomeForecast(holding)
         : getIncomeForecast(terms, entry.getValue(), holding);
@@ -102,20 +113,20 @@ public class IncomeForecastCalculationServiceImpl
   private HoldingIncomeForecast getIncomeForecast(final Integer terms,
       final IncomeForecast rIncomeForecast,
       final PortfolioHolding holding) {
-    final HoldingIncomeForecast holdingIncomeForecast = getHoldingIncomeForecast(holding);
+    HoldingIncomeForecast holdingIncomeForecast = getHoldingIncomeForecast(holding);
 
     if (isFixedIncomeAtMaturityType(rIncomeForecast, holding)) {
-      final LocalDate maturityDate = LocalDate.parse(rIncomeForecast.getMaturityDate());
-      final BigDecimal income = calculateAtMaturityIncome(holding.getValue(), rIncomeForecast);
+      LocalDate maturityDate = LocalDate.parse(rIncomeForecast.getMaturityDate());
+      BigDecimal income = calculateAtMaturityIncome(holding.getValue(), rIncomeForecast);
       holdingIncomeForecast.setIncome(List.of(
           getIncome(maturityDate, income)));
     } else if (ObjectUtils.allNotNull(rIncomeForecast.getSchedule(), rIncomeForecast.getDividendYield())) {
-      final List<Income> incomes = calculateIncome(
+      List<Income> incomes = calculateIncome(
           rIncomeForecast.getDividendYield(),
           rIncomeForecast.getSchedule(),
           holding.getValue(),
           terms,
-          Calendar.getInstance());
+          currentCalendar());
 
       holdingIncomeForecast.setIncome(incomes);
     }
@@ -125,17 +136,17 @@ public class IncomeForecastCalculationServiceImpl
 
   private Income getIncome(final LocalDate date,
       final BigDecimal amount) {
-    final String formattedDate = date.format(DateTimeFormatter.ofPattern(GeneralConstants.YEAR_MONTH_DATE_FORMAT));
+    String formattedDate = date.format(DateTimeFormatter.ofPattern(GeneralConstants.YEAR_MONTH_DATE_FORMAT));
     return new Income(formattedDate, DecimalUtils.toUserScale(amount));
   }
 
   private BigDecimal calculateAtMaturityIncome(final BigDecimal amount,
       final IncomeForecast rIncomeForecast) {
-    final LocalDate maturityDate = LocalDate.parse(rIncomeForecast.getMaturityDate());
-    final LocalDate issueDate = LocalDate.parse(rIncomeForecast.getIssueDate());
-    final Period period = Period.between(issueDate, maturityDate);
-    final int monthsBetween = (period.getYears() * TWELVE_MONTH) + period.getMonths();
-    final BigDecimal income = DecimalUtils.divide(amount.multiply(rIncomeForecast.getDividendYield()), new BigDecimal(
+    LocalDate maturityDate = LocalDate.parse(rIncomeForecast.getMaturityDate());
+    LocalDate issueDate = LocalDate.parse(rIncomeForecast.getIssueDate());
+    Period period = Period.between(issueDate, maturityDate);
+    int monthsBetween = (period.getYears() * TWELVE_MONTH) + period.getMonths();
+    BigDecimal income = DecimalUtils.divide(amount.multiply(rIncomeForecast.getDividendYield()), new BigDecimal(
         TWELVE_MONTH))
         .multiply(new BigDecimal(monthsBetween));
     return DecimalUtils.toUserScale(income);
@@ -151,10 +162,10 @@ public class IncomeForecastCalculationServiceImpl
   }
 
   private static HoldingIncomeForecast getHoldingIncomeForecast(final PortfolioHolding holding) {
-    final String holdingType = holding.getHoldingType().name();
-    final String securityIdentifierType = holding.getSecurityIdentifier().getIdType().name();
+    String holdingType = holding.getHoldingType().name();
+    String securityIdentifierType = holding.getSecurityIdentifier().getIdType().name();
 
-    final HoldingIncomeForecast holdingIncomeForecast = HoldingIncomeForecast.builder()
+    HoldingIncomeForecast holdingIncomeForecast = HoldingIncomeForecast.builder()
         .type(holdingType)
         .holdingIdentifier(securityIdentifierType)
         .build();
@@ -164,9 +175,9 @@ public class IncomeForecastCalculationServiceImpl
   }
 
   private HoldingIncomeForecast getGicIncomeForecast(final PortfolioHolding holding) {
-    final GicHolding gicHolding = (GicHolding) holding;
-    final LocalDate investmentDate = gicHolding.getInvestmentDate();
-    final List<Income> incomes = getGicIncomes(investmentDate, gicHolding);
+    GicHolding gicHolding = (GicHolding) holding;
+    LocalDate investmentDate = gicHolding.getInvestmentDate();
+    List<Income> incomes = getGicIncomes(investmentDate, gicHolding);
 
     return HoldingIncomeForecast.builder()
         .type(gicHolding.getHoldingType().toString())
@@ -177,12 +188,12 @@ public class IncomeForecastCalculationServiceImpl
 
   private List<Income> getGicIncomes(final LocalDate investmentDate,
       final GicHolding gicHolding) {
-    final Calendar investmentDateCalendar = getInvestmentDateCalendar(investmentDate);
-    final BigDecimal annualInterestRate = DecimalUtils.divide(gicHolding.getClientIntRate(), new BigDecimal(
+    Calendar investmentDateCalendar = getInvestmentDateCalendar(investmentDate);
+    BigDecimal annualInterestRate = DecimalUtils.divide(gicHolding.getClientIntRate(), new BigDecimal(
         ONE_HUNDRED));
-    final InterestFreq interestFreq = getFrequency(gicHolding.getInterestFreq());
+    InterestFreq interestFreq = getFrequency(gicHolding.getInterestFreq());
 
-    final List<String> distributionDates = getDistributionDates(interestFreq, investmentDate);
+    List<String> distributionDates = getDistributionDates(interestFreq, investmentDate);
 
     return calculateIncome(
         annualInterestRate,
@@ -200,7 +211,7 @@ public class IncomeForecastCalculationServiceImpl
   }
 
   private static Calendar getInvestmentDateCalendar(LocalDate investmentDate) {
-    final Calendar investmentDateCalendar = Calendar.getInstance();
+    Calendar investmentDateCalendar = Calendar.getInstance();
     investmentDateCalendar.clear();
     investmentDateCalendar.set(investmentDate.getYear(), investmentDate.getMonthValue() - 1, investmentDate
         .getDayOfMonth());
@@ -220,7 +231,7 @@ public class IncomeForecastCalculationServiceImpl
 
   private static MonthDay getDate(final int monthsToAdd,
       final LocalDate couponFirstDate) {
-    final LocalDate paymentDate = couponFirstDate
+    LocalDate paymentDate = couponFirstDate
         .plusMonths(monthsToAdd)
         .with(TemporalAdjusters.lastDayOfMonth());
 
@@ -234,7 +245,7 @@ public class IncomeForecastCalculationServiceImpl
       final BigDecimal amount,
       final int terms,
       final Calendar startingDate) {
-    final Map<Integer, BigDecimal> monthPayouts = getMonthPayouts(dividendYield, payoutDates, amount);
+    Map<Integer, BigDecimal> monthPayouts = getMonthPayouts(dividendYield, payoutDates, amount);
 
     getNextMonth(startingDate);
 
@@ -242,18 +253,22 @@ public class IncomeForecastCalculationServiceImpl
         .mapToObj(v -> getPayoutSchedule(startingDate, monthPayouts))
         .filter(Objects::nonNull)
         .filter(dto -> !(YearMonth.parse(dto.getDate(), DateTimeFormatter.ofPattern(
-            GeneralConstants.YEAR_MONTH_DATE_FORMAT)).atEndOfMonth()).isBefore(LocalDate.now()))
+            GeneralConstants.YEAR_MONTH_DATE_FORMAT)).atEndOfMonth()).isBefore(LocalDate.now(clock)))
         .toList();
+  }
+
+  private Calendar currentCalendar() {
+    return GregorianCalendar.from(ZonedDateTime.now(clock));
   }
 
   private Income getPayoutSchedule(final Calendar calendar,
       final Map<Integer, BigDecimal> monthPayouts) {
-    final int month = calendar.get(Calendar.MONTH) + ONE_MONTH;
-    final int year = calendar.get(Calendar.YEAR);
-    final String formattedDate = year + GeneralConstants.DELIMITER + String.format("%02d", month);
-    final BigDecimal payout = monthPayouts.get(month);
+    int month = calendar.get(Calendar.MONTH) + ONE_MONTH;
+    int year = calendar.get(Calendar.YEAR);
+    String formattedDate = year + GeneralConstants.DELIMITER + String.format("%02d", month);
+    BigDecimal payout = monthPayouts.get(month);
 
-    final Income income = Optional.ofNullable(payout)
+    Income income = Optional.ofNullable(payout)
         .map(value -> new Income(formattedDate, DecimalUtils.toUserScale(value)))
         .orElse(null);
 
@@ -269,7 +284,7 @@ public class IncomeForecastCalculationServiceImpl
       final List<String> payoutDates,
       final BigDecimal amount) {
 
-    final BigDecimal payoutAmount = !payoutDates.isEmpty()
+    BigDecimal payoutAmount = !payoutDates.isEmpty()
         ? calculatePayoutAmount(dividendYield, payoutDates, amount)
         : BigDecimal.ZERO;
 

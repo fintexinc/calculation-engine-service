@@ -407,6 +407,14 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  PERIOD_RESULT_NOT_AVAILABLE(
+      Codes.PERIOD_RESULT_NOT_AVAILABLE,
+      "Period %s for metric %s could not be calculated from the available input data",
+      "The requested period had enough monthly observations, but the calculation result is undefined or unavailable for the metric-specific input shape",
+      "Review the input data for zero denominators, zero variance, empty qualifying windows, or missing aligned dates",
+      HttpStatus.OK,
+      Severity.WARNING),
+
   // ============================================
   // SEC-xxx — Security catalog (existence) errors
   // ============================================
@@ -1164,6 +1172,7 @@ public enum ErrorCode {
     public static final String DEGENERATE_GROWTH_DATA = "RET-012";
     public static final String MISSING_PORTFOLIO_RETURN_FOR_DATE = "RET-013";
     public static final String MISSING_BENCHMARK_RETURN_FOR_DATE = "RET-014";
+    public static final String PERIOD_RESULT_NOT_AVAILABLE = "RET-015";
 
     // Performance Dates
     public static final String CPSD_AFTER_CPED = "PFD-001";

@@ -23,8 +23,8 @@ class DecimalUtilsTest {
   @Test
   void divide_bigDecimalDividedProperly() {
     // SETUP
-    final BigDecimal v1 = BigDecimal.valueOf(0.3);
-    final BigDecimal two = BigDecimal.valueOf(2);
+    BigDecimal v1 = BigDecimal.valueOf(0.3);
+    BigDecimal two = BigDecimal.valueOf(2);
 
     // ACT
     BigDecimal actual = DecimalUtils.divide(v1, two);
@@ -36,8 +36,8 @@ class DecimalUtilsTest {
   @Test
   void divide_doubleDividedProperly() {
     // SETUP
-    final double v1Double = 0.3;
-    final BigDecimal two = BigDecimal.valueOf(2);
+    double v1Double = 0.3;
+    BigDecimal two = BigDecimal.valueOf(2);
 
     // ACT
     BigDecimal actual = DecimalUtils.divide(v1Double, two);
@@ -49,8 +49,8 @@ class DecimalUtilsTest {
   @Test
   void divide_rightDoubleDividedProperly() {
     // SETUP
-    final double v1Double = 0.3;
-    final BigDecimal two = BigDecimal.valueOf(2);
+    double v1Double = 0.3;
+    BigDecimal two = BigDecimal.valueOf(2);
 
     // ACT
     BigDecimal actual = DecimalUtils.divide(two, v1Double);
@@ -62,8 +62,8 @@ class DecimalUtilsTest {
   @Test
   void divide_allDoublesDividedProperly() {
     // SETUP
-    final double v1Double = 0.3;
-    final double two = 2.;
+    double v1Double = 0.3;
+    double two = 2.;
 
     // ACT
     BigDecimal actual = DecimalUtils.divide(two, v1Double);
@@ -76,7 +76,7 @@ class DecimalUtilsTest {
   @Test
   void squareRoot_checkResult() {
     // SETUP
-    final BigDecimal v1 = new BigDecimal("0.012345");
+    BigDecimal v1 = new BigDecimal("0.012345");
 
     // ACT
     BigDecimal actual = DecimalUtils.squareRoot(v1);
@@ -88,7 +88,7 @@ class DecimalUtilsTest {
   @Test
   void squareRoot_checkResult1() {
     // SETUP
-    final BigDecimal v1 = new BigDecimal("0.05");
+    BigDecimal v1 = new BigDecimal("0.05");
 
     // ACT
     BigDecimal actual = DecimalUtils.squareRoot(v1);
@@ -100,7 +100,7 @@ class DecimalUtilsTest {
   @Test
   void squareRoot_checkResult2() {
     // SETUP
-    final BigDecimal value = BigDecimal.valueOf(3);
+    BigDecimal value = BigDecimal.valueOf(3);
 
     // ACT
     BigDecimal actual = DecimalUtils.squareRoot(value);
@@ -112,7 +112,7 @@ class DecimalUtilsTest {
   @Test
   void squareRoot_checkArithmeticException() {
     // SETUP
-    final BigDecimal v1 = new BigDecimal("-1");
+    BigDecimal v1 = new BigDecimal("-1");
 
     // VERIFY
     Assertions.assertThrows(ArithmeticException.class, () -> {
@@ -131,10 +131,10 @@ class DecimalUtilsTest {
   @Test
   void setInternalScale_checkResult() {
     // SETUP
-    final var v1 = new BigDecimal("0.1234567890123456789");
+    var v1 = new BigDecimal("0.1234567890123456789");
 
     // ACT
-    final BigDecimal actual = DecimalUtils.setInternalScale(v1, RoundingMode.FLOOR);
+    BigDecimal actual = DecimalUtils.setInternalScale(v1, RoundingMode.FLOOR);
 
     // VERIFY
     Assertions.assertEquals(BigDecimal.valueOf(0.123456789012345), actual);
@@ -151,7 +151,7 @@ class DecimalUtilsTest {
   @Test
   void getMinValue_checkResult() {
     // SETUP
-    final var map = Map.of(
+    var map = Map.of(
         LocalDate.now().minusMonths(5), BigDecimalConstants.HUNDRED,
         LocalDate.now().minusMonths(3), BigDecimalConstants.TWELVE,
         LocalDate.now().minusMonths(6), BigDecimalConstants.TEN_THOUSAND,
@@ -159,7 +159,7 @@ class DecimalUtilsTest {
         LocalDate.now().minusMonths(2), BigDecimalConstants.ONE);
 
     // ACT
-    final BigDecimal actual = DecimalUtils.getMinValue(map);
+    BigDecimal actual = DecimalUtils.getMinValue(map);
 
     // VERIFY
     Assertions.assertEquals(ZERO, actual);
@@ -176,7 +176,7 @@ class DecimalUtilsTest {
   @Test
   void getMaxValue_checkResult() {
     // SETUP
-    final var map = Map.of(
+    var map = Map.of(
         LocalDate.now().minusMonths(5), BigDecimalConstants.HUNDRED,
         LocalDate.now().minusMonths(3), BigDecimalConstants.TWELVE,
         LocalDate.now().minusMonths(6), BigDecimalConstants.TEN_THOUSAND,
@@ -184,7 +184,7 @@ class DecimalUtilsTest {
         LocalDate.now().minusMonths(2), BigDecimalConstants.ONE);
 
     // ACT
-    final BigDecimal actual = DecimalUtils.getMaxValue(map);
+    BigDecimal actual = DecimalUtils.getMaxValue(map);
 
     // VERIFY
     Assertions.assertEquals(BigDecimalConstants.TEN_THOUSAND, actual);
@@ -209,10 +209,10 @@ class DecimalUtilsTest {
   @Test
   void abs_checkResult() {
     // SETUP
-    final var v1 = new BigDecimal("-0.23123123132");
+    var v1 = new BigDecimal("-0.23123123132");
 
     // ACT
-    final BigDecimal actual = DecimalUtils.abs(v1);
+    BigDecimal actual = DecimalUtils.abs(v1);
 
     // VERIFY
     Assertions.assertEquals(new BigDecimal("0.23123123132"), actual);
@@ -221,24 +221,37 @@ class DecimalUtilsTest {
   @Test
   void pow_checkResult() {
     // SETUP
-    final double v1 = 15.23141;
-    final double v2 = 12.57681;
-    final double expectedPow = Math.pow(v1, v2);
+    double v1 = 15.23141;
+    double v2 = 12.57681;
+    double expectedPow = Math.pow(v1, v2);
 
     // ACT
-    final BigDecimal givenPow = pow(BigDecimal.valueOf(v1), BigDecimal.valueOf(v2));
+    BigDecimal givenPow = pow(BigDecimal.valueOf(v1), BigDecimal.valueOf(v2));
 
     // VERIFY
     Assertions.assertEquals(BigDecimal.valueOf(expectedPow), givenPow);
   }
 
   @Test
-  void toUserScale_checkResult() {
+  void annualizedReturn_usesCentralPowerPolicy() {
     // SETUP
-    final var v = Map.of("", new BigDecimal("0.1234567890123456789"));
+    BigDecimal returnFactorProduct = new BigDecimal("1.123456789012345");
+    BigDecimal exponent = new BigDecimal("0.5");
 
     // ACT
-    final Map<String, BigDecimal> givenWithUserScale = toUserScale(v);
+    BigDecimal actual = DecimalUtils.annualizedReturn(returnFactorProduct, exponent);
+
+    // VERIFY
+    Assertions.assertEquals(pow(returnFactorProduct, exponent).subtract(ONE), actual);
+  }
+
+  @Test
+  void toUserScale_checkResult() {
+    // SETUP
+    var v = Map.of("", new BigDecimal("0.1234567890123456789"));
+
+    // ACT
+    Map<String, BigDecimal> givenWithUserScale = toUserScale(v);
 
     // VERIFY
     Assertions.assertEquals(Map.of("", new BigDecimal("0.1234567890")), givenWithUserScale);
@@ -247,7 +260,7 @@ class DecimalUtilsTest {
   @Test
   void toUserScale_whenMapIsNull() {
     // ACT
-    final Map<String, BigDecimal> givenWithUserScale = toUserScale((Map<String, BigDecimal>) null);
+    Map<String, BigDecimal> givenWithUserScale = toUserScale((Map<String, BigDecimal>) null);
 
     // VERIFY
     Assertions.assertNull(givenWithUserScale);
@@ -256,10 +269,10 @@ class DecimalUtilsTest {
   @Test
   void toScale_checkResult() {
     // SETUP
-    final var v = new BigDecimal("0.1234567890123456789");
+    var v = new BigDecimal("0.1234567890123456789");
 
     // ACT
-    final BigDecimal givenWithScale = toScale(v, 5);
+    BigDecimal givenWithScale = toScale(v, 5);
 
     // VERIFY
     Assertions.assertEquals(new BigDecimal("0.12346"), givenWithScale);
@@ -268,7 +281,7 @@ class DecimalUtilsTest {
   @Test
   void toScale_whenValueIsNull() {
     // ACT
-    final BigDecimal givenWithScale = toScale(null, 5);
+    BigDecimal givenWithScale = toScale(null, 5);
 
     // VERIFY
     Assertions.assertNull(givenWithScale);
@@ -277,7 +290,7 @@ class DecimalUtilsTest {
   @Test
   void toScale_whenValueIsZero() {
     // ACT
-    final BigDecimal givenWithScale = toScale(ZERO, 5);
+    BigDecimal givenWithScale = toScale(ZERO, 5);
 
     // VERIFY
     Assertions.assertEquals(ZERO, givenWithScale);
@@ -286,7 +299,7 @@ class DecimalUtilsTest {
   @Test
   void toScale_whenValueIsOne() {
     // ACT
-    final BigDecimal givenWithScale = toScale(ONE, 5);
+    BigDecimal givenWithScale = toScale(ONE, 5);
 
     // VERIFY
     Assertions.assertEquals(ONE, givenWithScale);

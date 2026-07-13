@@ -30,9 +30,9 @@ public class ExcessReturnsCalculation extends BenchmarkWeightedAverageCalculatio
         || numberOfMonths > getPortfolioTotalReturns().size() || numberOfMonths < TWELVE.intValue()) {
       return null;
     }
-    final BigDecimal portfolioAnnualizedReturn = calculateAnnualizedReturnsByPeriod(numberOfMonths,
+    BigDecimal portfolioAnnualizedReturn = calculateAnnualizedReturnsByPeriod(numberOfMonths,
         getPortfolioTotalReturns());
-    final BigDecimal benchmarkAnnualizedReturn = calculateAnnualizedReturnsByPeriod(numberOfMonths,
+    BigDecimal benchmarkAnnualizedReturn = calculateAnnualizedReturnsByPeriod(numberOfMonths,
         getBenchmarkTotalReturns());
     return Objects.nonNull(portfolioAnnualizedReturn) && Objects.nonNull(benchmarkAnnualizedReturn)
         ? DecimalUtils.toUserScale(portfolioAnnualizedReturn.subtract(benchmarkAnnualizedReturn))
@@ -55,12 +55,11 @@ public class ExcessReturnsCalculation extends BenchmarkWeightedAverageCalculatio
    */
   public BigDecimal calculateAnnualizedReturnsByPeriod(final int numberOfMonths,
       final NavigableMap<LocalDate, BigDecimal> returnFactor) {
-    final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, returnFactor);
-    final SortedMap<LocalDate, BigDecimal> subMapByPeriodStartDate = getSubMapByPeriodStartDate(periodStartDate,
+    LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, returnFactor);
+    SortedMap<LocalDate, BigDecimal> subMapByPeriodStartDate = getSubMapByPeriodStartDate(periodStartDate,
         returnFactor);
-    final BigDecimal product = CalculationUtils.product(subMapByPeriodStartDate);
-    final BigDecimal pow = DecimalUtils.pow(DecimalUtils.toUserScale(product), getPower(numberOfMonths));
-    return pow.subtract(BigDecimal.ONE);
+    BigDecimal product = CalculationUtils.product(subMapByPeriodStartDate);
+    return DecimalUtils.annualizedReturn(product, getPower(numberOfMonths));
   }
 
   /**
