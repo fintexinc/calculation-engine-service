@@ -33,12 +33,13 @@ class BreakdownAbstractServiceTest {
   @Test
   void shouldCalculateNetProducts_whenVerifyCalculateInitialPortfolioWeight() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final var service = mock(BreakdownAbstractService.class);
+      var service = mock(BreakdownAbstractService.class);
 
-      final var holdings = mock(List.class);
-      final var exposures = mock(Map.class);
+      var holdings = mock(List.class);
+      var exposures = mock(Map.class);
 
       doCallRealMethod().when(service).calculateNetProducts(any(), any(), any());
+      doCallRealMethod().when(service).calculateRawHoldingValueWeights(any());
       // ACT
       service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values());
 
@@ -49,15 +50,16 @@ class BreakdownAbstractServiceTest {
   @Test
   void shouldCalculateNetProducts_whenVerifyCalculateNetProductForEachEquityMarketCapitalizationType() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final var service = mock(BreakdownAbstractService.class);
+      var service = mock(BreakdownAbstractService.class);
 
-      final var holdings = mock(List.class);
-      final var exposures = mock(Map.class);
-      final var weights = mock(Map.class);
+      var holdings = mock(List.class);
+      var exposures = mock(Map.class);
+      var weights = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(any())).thenReturn(weights);
 
       doCallRealMethod().when(service).calculateNetProducts(any(), any(), any());
+      doCallRealMethod().when(service).calculateRawHoldingValueWeights(any());
       // ACT
       service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values());
 
@@ -70,17 +72,17 @@ class BreakdownAbstractServiceTest {
 
   @Test
   void shouldCalculateNetProducts_whenCheckResult() {
-    final var service = mock(BreakdownAbstractService.class);
+    var service = mock(BreakdownAbstractService.class);
 
-    final var holdings = mock(List.class);
-    final var exposures = mock(Map.class);
-    final var expected = stream(EquityMarketCapitalizationType.values()).collect(toMap(identity(), e -> TEN));
+    var holdings = mock(List.class);
+    var exposures = mock(Map.class);
+    var expected = stream(EquityMarketCapitalizationType.values()).collect(toMap(identity(), e -> TEN));
 
     when(service.calculateNetProduct(any(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(service).calculateNetProducts(any(), any(), any());
     // ACT
-    final var actual = service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values());
+    var actual = service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values());
 
     Assertions.assertNotNull(actual);
     ComparisonUtils.compareMaps(expected, actual);
@@ -89,14 +91,14 @@ class BreakdownAbstractServiceTest {
   @Test
   void shouldCalculateNetProduct_whenVerifySumProduct() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
-      final var service = mock(BreakdownAbstractService.class);
+      var service = mock(BreakdownAbstractService.class);
 
-      final var holding = mock(PortfolioHolding.class);
-      final var exposures = Map.of(
+      var holding = mock(PortfolioHolding.class);
+      var exposures = Map.of(
           holding, Map.of(EquityMarketCapitalizationType.SMALL, TEN),
           mock(PortfolioHolding.class), Map.of(EquityMarketCapitalizationType.MEDIUM, BigDecimal.ONE));
-      final var weights = Map.of(holding, TEN);
-      final var typeExposures = Map.of(holding, TEN);
+      var weights = Map.of(holding, TEN);
+      var typeExposures = Map.of(holding, TEN);
 
       doCallRealMethod().when(service).calculateNetProduct(any(), any(), any());
       // ACT
@@ -109,17 +111,17 @@ class BreakdownAbstractServiceTest {
   @Test
   void shouldCalculateNetProduct_whenCheckResult() {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
-      final var service = mock(BreakdownAbstractService.class);
+      var service = mock(BreakdownAbstractService.class);
 
-      final var expectedResult = BigDecimal.TEN;
-      final var exposures = mock(Map.class);
-      final var weights = mock(Map.class);
+      var expectedResult = BigDecimal.TEN;
+      var exposures = mock(Map.class);
+      var weights = mock(Map.class);
 
       mockedCalculationUtils.when(() -> CalculationUtils.sumProduct(any(), any())).thenReturn(expectedResult);
 
       doCallRealMethod().when(service).calculateNetProduct(any(), any(), any());
       // ACT
-      final var actual = service.calculateNetProduct(EquityMarketCapitalizationType.MEDIUM, exposures, weights);
+      var actual = service.calculateNetProduct(EquityMarketCapitalizationType.MEDIUM, exposures, weights);
 
       assertSame(expectedResult, actual);
     }
@@ -127,10 +129,10 @@ class BreakdownAbstractServiceTest {
 
   @Test
   void shouldPerform_whenVerifyFetch() {
-    final var service = mock(BreakdownAbstractService.class, withSettings().useConstructor());
+    var service = mock(BreakdownAbstractService.class, withSettings().useConstructor());
 
-    final var holdings = List.of(mock(PortfolioHolding.class));
-    final var req = mock(PortfolioHoldingsCommand.class);
+    var holdings = List.of(mock(PortfolioHolding.class));
+    var req = mock(PortfolioHoldingsCommand.class);
 
     when(req.getHoldings()).thenReturn(holdings);
     when(service.fetchExposures(any())).thenReturn(new ExposureDataHolder<>(Map.of(), List.of()));
@@ -144,11 +146,11 @@ class BreakdownAbstractServiceTest {
 
   @Test
   void shouldPerform_whenVerifyCalculate() {
-    final var service = mock(BreakdownAbstractService.class, withSettings().useConstructor());
+    var service = mock(BreakdownAbstractService.class, withSettings().useConstructor());
 
-    final var holdings = List.of(mock(PortfolioHolding.class));
-    final var req = mock(PortfolioHoldingsCommand.class);
-    final Map exposures = mock(Map.class);
+    var holdings = List.of(mock(PortfolioHolding.class));
+    var req = mock(PortfolioHoldingsCommand.class);
+    Map exposures = mock(Map.class);
 
     when(req.getHoldings()).thenReturn(holdings);
     when(service.fetchExposures(any())).thenReturn(new ExposureDataHolder<>(exposures, List.of()));

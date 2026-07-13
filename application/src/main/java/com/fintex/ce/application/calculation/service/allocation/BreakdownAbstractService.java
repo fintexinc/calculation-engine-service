@@ -47,12 +47,16 @@ public abstract class BreakdownAbstractService<E extends BaseCalculationResult, 
 
   public Map<T, BigDecimal> calculateNetProducts(Map<PortfolioHolding, Map<T, BigDecimal>> values,
       List<PortfolioHolding> holdings, T[] types) {
-    Map<PortfolioHolding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
+    Map<PortfolioHolding, BigDecimal> weights = calculateRawHoldingValueWeights(holdings);
     Map<T, BigDecimal> products = new HashMap<>();
     for (T type : types) {
       products.put(type, calculateNetProduct(type, values, weights));
     }
     return products;
+  }
+
+  public Map<PortfolioHolding, BigDecimal> calculateRawHoldingValueWeights(List<PortfolioHolding> holdings) {
+    return calculateInitialPortfolioWeight(holdings);
   }
 
   public BigDecimal calculateNetProduct(T type, Map<PortfolioHolding, Map<T, BigDecimal>> values,

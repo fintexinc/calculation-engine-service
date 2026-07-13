@@ -26,6 +26,17 @@ public final class AllocationHelper {
    */
   public static <T> Map<T, BigDecimal> calculateNetProducts(Map<PortfolioHolding, Map<T, BigDecimal>> values,
       List<PortfolioHolding> holdings, T[] types) {
+    return calculateNetProductsWithRawHoldingValues(values, holdings, types);
+  }
+
+  /**
+   * Aggregates per-holding allocation maps into per-type net products using raw holding-value weights. Call this only
+   * for metric families whose currency policy intentionally does not normalize values before weighting.
+   */
+  public static <T> Map<T, BigDecimal> calculateNetProductsWithRawHoldingValues(
+      Map<PortfolioHolding, Map<T, BigDecimal>> values,
+      List<PortfolioHolding> holdings,
+      T[] types) {
     Map<PortfolioHolding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
     return calculateNetProducts(values, weights, types);
   }

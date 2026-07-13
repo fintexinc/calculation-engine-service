@@ -26,7 +26,6 @@ import static java.math.BigDecimal.ZERO;
 public abstract class UpDownSideCalculationAbstract<T extends PeriodResult>
     extends
       BenchmarkWeightedAverageCalculation<T, BigDecimal> {
-
   public NavigableMap<LocalDate, BigDecimal> portfolioDetermination;
   public NavigableMap<LocalDate, BigDecimal> benchmarkDetermination;
 

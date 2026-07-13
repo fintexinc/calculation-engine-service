@@ -23,8 +23,17 @@ public class DecimalUtils {
   }
 
   public static BigDecimal pow(final BigDecimal v1, final BigDecimal v2) {
-    final double pow = Math.pow(Objects.requireNonNull(v1).doubleValue(), Objects.requireNonNull(v2).doubleValue());
+    double pow = Math.pow(Objects.requireNonNull(v1).doubleValue(), Objects.requireNonNull(v2).doubleValue());
     return BigDecimal.valueOf(pow);
+  }
+
+  /**
+   * Project-wide power policy for fractional financial exponents. Keep the same double-backed precision as
+   * {@link #pow(BigDecimal, BigDecimal)} and round only at response boundaries unless a metric explicitly requires
+   * earlier user-scale rounding.
+   */
+  public static BigDecimal annualizedReturn(final BigDecimal returnFactorProduct, final BigDecimal exponent) {
+    return pow(returnFactorProduct, exponent).subtract(ONE);
   }
 
   public static BigDecimal divide(final double v1, final BigDecimal v2) {

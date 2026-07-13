@@ -293,6 +293,12 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
           cipsd, portfolioTotalReturns.firstKey(), portfolioTotalReturns.lastKey()));
     }
 
+    periodsResult.stream()
+        .filter(pair -> pair.getValue() == null)
+        .filter(pair -> requiresUnavailablePeriodWarning(pair.getKey().trim(), availableMonths))
+        .map(pair -> unavailablePeriodWarning(pair.getKey().trim()))
+        .forEach(warnings::add);
+
     result.setWarnings(warnings);
   }
 
@@ -437,6 +443,22 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    */
   protected boolean requiresInsufficientDataWarning(final String period, final int availableMonths) {
     return getNumberOfMonthsFor(portfolioTotalReturns, period) > availableMonths;
+  }
+
+  /**
+   * Returns true when a null period value is not explained by the standard insufficient-data or invalid-CIPSD warnings.
+   * This covers metric-specific undefined cases such as zero denominators, zero variance, empty qualifying windows, or
+   * alignment gaps handled internally by a metric.
+   */
+  protected boolean requiresUnavailablePeriodWarning(final String period, final int availableMonths) {
+    if (SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(period)) {
+      return cipsd != null && isSinceCustomIntervalPerformanceStartDateValid();
+    }
+    return !requiresInsufficientDataWarning(period, availableMonths);
+  }
+
+  protected Notification unavailablePeriodWarning(final String period) {
+    return ErrorCode.PERIOD_RESULT_NOT_AVAILABLE.asNotification(period, getClass().getSimpleName());
   }
 
   @Override

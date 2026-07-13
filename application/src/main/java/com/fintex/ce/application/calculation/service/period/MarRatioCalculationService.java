@@ -67,39 +67,39 @@ public class MarRatioCalculationService
 
   @Override
   public MarRatioResult perform(final PeriodCommand command) {
-    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    final NavigableMap<LocalDate, BigDecimal> portfolioReturns = context.getWeightedAveragePortfolioReturns();
-    final LocalDate cipsd = context.getCipsd();
-    final var ttr = TrailingTotalReturnsCalculation.mathOnly(context, defaultPeriods);
+    PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = context.getWeightedAveragePortfolioReturns();
+    LocalDate cipsd = context.getCipsd();
+    var ttr = TrailingTotalReturnsCalculation.mathOnly(context, defaultPeriods);
     // portfolioReturns is already in factor form, pass AS_IS to avoid double-scaling
-    final NavigableMap<LocalDate, BigDecimal> growth10K = Growth10KHelper.compoundGrowth10K(
+    NavigableMap<LocalDate, BigDecimal> growth10K = Growth10KHelper.compoundGrowth10K(
         portfolioReturns, ReturnFactorScale.AS_IS);
 
-    final Set<String> initialPeriods = CollectionUtils.isEmpty(command.getPeriods())
+    Set<String> initialPeriods = CollectionUtils.isEmpty(command.getPeriods())
         ? defaultPeriods
         : command.getPeriods();
-    final Set<Pair<String, BigDecimal>> rawResults = new HashSet<>();
+    Set<Pair<String, BigDecimal>> rawResults = new HashSet<>();
 
     initialPeriods.stream()
         .filter(p -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(p))
         .forEach(p -> {
-          final int months = getNumberOfMonthsFor(portfolioReturns, p.trim());
+          int months = getNumberOfMonthsFor(portfolioReturns, p.trim());
           rawResults.add(Pair.of(p, calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr)));
         });
 
     if (isCipsdValid(cipsd, portfolioReturns)) {
-      final int months = getMonthsBetweenDates(cipsd, portfolioReturns.lastKey(), firstDayOfMonth());
+      int months = getMonthsBetweenDates(cipsd, portfolioReturns.lastKey(), firstDayOfMonth());
       rawResults.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(),
           calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr)));
     } else if (cipsd != null || initialPeriods.contains(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name())) {
       rawResults.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
     }
 
-    final Set<Pair<String, BigDecimal>> periodsResult = rawResults.stream()
+    Set<Pair<String, BigDecimal>> periodsResult = rawResults.stream()
         .map(p -> Pair.of(p.getKey(), p.getValue() != null ? DecimalUtils.toUserScale(p.getValue()) : null))
         .collect(Collectors.toSet());
 
-    final MarRatioResult result = buildResult(periodsResult);
+    MarRatioResult result = buildResult(periodsResult);
     result.setCustomIntervalPerformanceStartDate(cipsd);
     result.setPerformanceEndDate(portfolioReturns.lastKey());
     result.setPerformanceStartDate(portfolioReturns.firstKey());
@@ -116,8 +116,8 @@ public class MarRatioCalculationService
     if (numberOfMonths < TWELVE.intValue()) {
       return null;
     }
-    final BigDecimal trailingTRValue = ttr.calculatePeriodForNumberOfMonths(numberOfMonths);
-    final MaxDrawdownEntry maxDrawdown = maxDrawdownService.calculateEntry(numberOfMonths, portfolioReturns, growth10K);
+    BigDecimal trailingTRValue = ttr.calculatePeriodForNumberOfMonths(numberOfMonths);
+    MaxDrawdownEntry maxDrawdown = maxDrawdownService.calculateEntry(numberOfMonths, portfolioReturns, growth10K);
     if (Objects.isNull(trailingTRValue) || Objects.isNull(maxDrawdown) || Objects.isNull(maxDrawdown.value())
         || maxDrawdown.value().compareTo(BigDecimal.ZERO) == 0) {
       return null;
@@ -126,8 +126,8 @@ public class MarRatioCalculationService
   }
 
   MarRatioResult buildResult(final Set<Pair<String, BigDecimal>> periodsResult) {
-    final MarRatioResult result = new MarRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = periodsResult.stream()
+    MarRatioResult result = new MarRatioResult();
+    Set<TimeIntervalResult> timeIntervals = periodsResult.stream()
         .map(e -> new TimeIntervalResult(e.getKey(), e.getValue()))
         .collect(Collectors.toSet());
     result.setMarRatio(timeIntervals);
@@ -140,8 +140,8 @@ public class MarRatioCalculationService
       final Set<Pair<String, BigDecimal>> periodsResult,
       final NavigableMap<LocalDate, BigDecimal> portfolioReturns,
       final LocalDate cipsd) {
-    final int availableMonths = portfolioReturns.size();
-    final List<Notification> warnings = new ArrayList<>(result.getWarnings());
+    int availableMonths = portfolioReturns.size();
+    List<Notification> warnings = new ArrayList<>(result.getWarnings());
 
     periodsResult.stream()
         .filter(pair -> pair.getValue() == null)
@@ -151,7 +151,7 @@ public class MarRatioCalculationService
             availableMonths))
         .forEach(warnings::add);
 
-    final boolean sinceCipsdRequestedAndNull = periodsResult.stream()
+    boolean sinceCipsdRequestedAndNull = periodsResult.stream()
         .anyMatch(pair -> SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name()
             .equalsIgnoreCase(pair.getKey().trim()) && pair.getValue() == null);
     if (cipsd != null && !portfolioReturns.isEmpty() && !isCipsdValid(cipsd, portfolioReturns)
@@ -167,7 +167,7 @@ public class MarRatioCalculationService
     if (isNumeric(period)) {
       return Integer.parseInt(period);
     } else if (YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
-      final LocalDate endDate = returns.keySet().stream().max(LocalDate::compareTo).orElseThrow();
+      LocalDate endDate = returns.keySet().stream().max(LocalDate::compareTo).orElseThrow();
       return getMonthsBetweenDates(endDate, endDate, firstDayOfYear());
     } else if (SINCE_PERFORMANCE_START_DATE.name().equalsIgnoreCase(period)) {
       return getMonthsBetweenDates(returns.firstKey(), returns.lastKey(), firstDayOfMonth());
