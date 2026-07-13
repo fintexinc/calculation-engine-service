@@ -43,14 +43,14 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
         || numberOfMonths < TWELVE.intValue()) {
       return null;
     }
-    final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
+    LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
     RiskFreeWindowValidator.requireCoverage(
         getSubMapByPeriodStartDate(periodStartDate, getPortfolioTotalReturns()), tBills);
-    final BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(getPortfolioTotalReturns(),
+    BigDecimal annualizedPortfolioReturn = calculateAverageArithmeticAnnualizedReturn(getPortfolioTotalReturns(),
         periodStartDate, numberOfMonths);
-    final BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(tBills,
+    BigDecimal annualizedRiskFreeRate = calculateAverageArithmeticAnnualizedReturn(tBills,
         periodStartDate, numberOfMonths);
-    final BigDecimal beta = betaCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
+    BigDecimal beta = betaCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
     if (Objects.isNull(beta)) {
       return null;
     }
@@ -59,8 +59,8 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
 
   @Override
   public TreynorRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final var result = new TreynorRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
+    var result = new TreynorRatioResult();
+    Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
     result.setTreynorRatio(timeIntervals);
     return result;
   }
@@ -70,6 +70,9 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
       final BigDecimal beta) {
     log.info("annualizedPortfolioReturn: {}, annualizedRiskFreeRate: {}, beta: {}",
         annualizedPortfolioReturn, annualizedRiskFreeRate, beta);
+    if (Objects.isNull(beta) || BigDecimal.ZERO.compareTo(beta) == 0) {
+      return null;
+    }
     return divide(annualizedPortfolioReturn.subtract(annualizedRiskFreeRate), beta);
   }
 

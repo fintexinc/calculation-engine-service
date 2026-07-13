@@ -53,10 +53,13 @@ public abstract class RSquaredCalculationAbstract<T extends PeriodResult>
   public BigDecimal calculateRSquared(final SortedMap<LocalDate, BigDecimal> portfolioExcessReturnByPeriod,
       final SortedMap<LocalDate, BigDecimal> benchmarkExcessReturnByPeriod,
       final BigDecimal portfolioExcessAverage) {
-    final BigDecimal sumSquaredRegression = calculateSumSquaredRegression(portfolioExcessReturnByPeriod,
+    BigDecimal sumSquaredRegression = calculateSumSquaredRegression(portfolioExcessReturnByPeriod,
         benchmarkExcessReturnByPeriod);
-    final BigDecimal totalSumOfSquares = calculateTotalSumOfSquares(portfolioExcessReturnByPeriod,
+    BigDecimal totalSumOfSquares = calculateTotalSumOfSquares(portfolioExcessReturnByPeriod,
         portfolioExcessAverage);
+    if (ZERO.compareTo(totalSumOfSquares) == 0) {
+      return null;
+    }
     return toUserScale(BigDecimalConstants.ONE.subtract(DecimalUtils.divide(sumSquaredRegression, totalSumOfSquares)));
   }
 

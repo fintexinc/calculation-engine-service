@@ -39,7 +39,7 @@ public abstract class AlphaBetaCalculationAbstract<T extends PeriodResult>
       final SortedMap<LocalDate, BigDecimal> portfolioExcessReturnByPeriod,
       final SortedMap<LocalDate, BigDecimal> benchmarkExcessReturnByPeriod,
       final BigDecimal portfolioExcessAverage) {
-    final BigDecimal benchmarkExcessAverage = average(benchmarkExcessReturnByPeriod);
+    BigDecimal benchmarkExcessAverage = average(benchmarkExcessReturnByPeriod);
     return calculateBeta(portfolioExcessReturnByPeriod, benchmarkExcessReturnByPeriod, portfolioExcessAverage,
         benchmarkExcessAverage);
   }
@@ -61,9 +61,12 @@ public abstract class AlphaBetaCalculationAbstract<T extends PeriodResult>
       final SortedMap<LocalDate, BigDecimal> benchmarkExcessReturnByPeriod,
       final BigDecimal portfolioExcessAverage,
       final BigDecimal benchmarkExcessAverage) {
-    final BigDecimal numerator = calculateNumerator(portfolioExcessReturnByPeriod, benchmarkExcessReturnByPeriod,
+    BigDecimal numerator = calculateNumerator(portfolioExcessReturnByPeriod, benchmarkExcessReturnByPeriod,
         portfolioExcessAverage, benchmarkExcessAverage);
-    final BigDecimal denominator = calculateDenominator(benchmarkExcessReturnByPeriod, benchmarkExcessAverage);
+    BigDecimal denominator = calculateDenominator(benchmarkExcessReturnByPeriod, benchmarkExcessAverage);
+    if (ZERO.compareTo(denominator) == 0) {
+      return null;
+    }
     return toUserScale(DecimalUtils.divide(numerator, denominator));
   }
 

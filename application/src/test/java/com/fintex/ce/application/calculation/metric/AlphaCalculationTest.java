@@ -34,12 +34,12 @@ class AlphaCalculationTest {
 
   @Test
   void shouldDelegateToFormTimeIntervalResult_whenDefiningResponseType() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
-    final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
+    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
         BigDecimal.ONE));
 
-    final Set<TimeIntervalResult> timeIntervals = Set.of(new TimeIntervalResult("2000-01-12", ONE));
+    Set<TimeIntervalResult> timeIntervals = Set.of(new TimeIntervalResult("2000-01-12", ONE));
     when(alpha.formTimeIntervalResult(anySet())).thenReturn(timeIntervals);
 
     doCallRealMethod().when(alpha).defineResponseType(anySet());
@@ -50,27 +50,27 @@ class AlphaCalculationTest {
 
   @Test
   void shouldReturnAlphaResultWithMappedIntervals_whenDefiningResponseType() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
-    final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2020-01-05", BigDecimal.ONE), Pair.of("2000-01-12",
+    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2020-01-05", BigDecimal.ONE), Pair.of("2000-01-12",
         ZERO));
 
-    final Set<TimeIntervalResult> expected = Set.of(
+    Set<TimeIntervalResult> expected = Set.of(
         new TimeIntervalResult("2000-01-12", ZERO),
         new TimeIntervalResult("2020-01-05", BigDecimal.ONE));
     when(alpha.formTimeIntervalResult(anySet())).thenReturn(expected);
 
     doCallRealMethod().when(alpha).defineResponseType(anySet());
-    final AlphaResult actual = alpha.defineResponseType(pairs);
+    AlphaResult actual = alpha.defineResponseType(pairs);
 
     assertEquals(expected, actual.getAlpha());
   }
 
   @Test
   void shouldResolvePeriodStartDate_whenCalculatingPeriodForNumberOfMonths() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
-    final TreeMap treeMap = mock(TreeMap.class);
+    TreeMap treeMap = mock(TreeMap.class);
 
     when(alpha.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(alpha.getPortfolioTotalReturns()).thenReturn(treeMap);
@@ -87,21 +87,21 @@ class AlphaCalculationTest {
   @SuppressWarnings("unchecked")
   @Test
   void shouldBuildSubMapsFromResolvedStartDate_whenCalculatingPeriodForNumberOfMonths() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
-    final TreeMap<LocalDate, BigDecimal> portfolioBenchmarkPortfolioReturns = mock(TreeMap.class);
+    TreeMap<LocalDate, BigDecimal> portfolioBenchmarkPortfolioReturns = mock(TreeMap.class);
     when(alpha.getPortfolioTotalReturns()).thenReturn(portfolioBenchmarkPortfolioReturns);
     when(alpha.getBenchmarkTotalReturns()).thenReturn(portfolioBenchmarkPortfolioReturns);
     when(portfolioBenchmarkPortfolioReturns.size()).thenReturn(100);
 
-    final TreeMap<LocalDate, BigDecimal> portfolioBenchmarkExcessReturns = mock(TreeMap.class);
+    TreeMap<LocalDate, BigDecimal> portfolioBenchmarkExcessReturns = mock(TreeMap.class);
     when(alpha.getPortfolioExcessReturn()).thenReturn(portfolioBenchmarkExcessReturns);
     when(alpha.getBenchmarkExcessReturn()).thenReturn(portfolioBenchmarkExcessReturns);
     when(portfolioBenchmarkExcessReturns.size()).thenReturn(100);
 
     when(alpha.getSubMapByPeriodStartDate(any(), any())).thenReturn(portfolioBenchmarkExcessReturns);
 
-    final LocalDate periodStartDate = LocalDate.now();
+    LocalDate periodStartDate = LocalDate.now();
     when(alpha.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
 
     when(alpha.getSubMapByPeriodStartDate(any(), any())).thenReturn(portfolioBenchmarkExcessReturns);
@@ -114,9 +114,9 @@ class AlphaCalculationTest {
 
   @Test
   void shouldCallCalculateAlpha_whenCalculatingPeriodForNumberOfMonths() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
-    final TreeMap treeMap = mock(TreeMap.class);
+    TreeMap treeMap = mock(TreeMap.class);
 
     when(alpha.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(alpha.getPortfolioTotalReturns()).thenReturn(treeMap);
@@ -132,8 +132,8 @@ class AlphaCalculationTest {
 
   @Test
   void shouldReturnCalculatedAlpha_whenPeriodAndDataSizeAreValid() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
-    final TreeMap treeMap = mock(TreeMap.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
+    TreeMap treeMap = mock(TreeMap.class);
     when(alpha.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(alpha.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
@@ -142,15 +142,15 @@ class AlphaCalculationTest {
     when(alpha.calculateAlpha(anyInt(), any(), any())).thenReturn(TEN);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal result = alpha.calculatePeriodForNumberOfMonths(TWELVE);
+    BigDecimal result = alpha.calculatePeriodForNumberOfMonths(TWELVE);
 
     assertEquals(TEN, result);
   }
 
   @Test
   void shouldReturnNull_whenBenchmarkSizeIsLessThanRequestedPeriod() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
-    final TreeMap treeMap = mock(TreeMap.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
+    TreeMap treeMap = mock(TreeMap.class);
 
     when(alpha.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(alpha.getPortfolioTotalReturns()).thenReturn(treeMap);
@@ -159,16 +159,16 @@ class AlphaCalculationTest {
     when(alpha.calculateAlpha(anyInt(), any(), any())).thenReturn(BigDecimal.TEN);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal result = alpha.calculatePeriodForNumberOfMonths(24);
+    BigDecimal result = alpha.calculatePeriodForNumberOfMonths(24);
 
     assertNull(result);
   }
 
   @Test
   void shouldReturnNull_whenRequestedPeriodIsLessThanTwelveMonths() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
-    final TreeMap treeMap = mock(TreeMap.class);
+    TreeMap treeMap = mock(TreeMap.class);
 
     when(alpha.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(alpha.getPortfolioTotalReturns()).thenReturn(treeMap);
@@ -177,14 +177,14 @@ class AlphaCalculationTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(alpha).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal result = alpha.calculatePeriodForNumberOfMonths(6);
+    BigDecimal result = alpha.calculatePeriodForNumberOfMonths(6);
 
     assertNull(result);
   }
 
   @Test
   void shouldCallCalculateBeta_whenCalculatingAlpha() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     when(alpha.calculateBeta(anyInt())).thenReturn(TEN);
 
@@ -196,24 +196,36 @@ class AlphaCalculationTest {
 
   @Test
   void shouldReturnExpectedAlphaValue_whenCalculatingAlphaWithBetaTen() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     when(alpha.calculateBeta(anyInt())).thenReturn(TEN);
 
     doCallRealMethod().when(alpha).calculateAlpha(anyInt(), any(), any());
-    final BigDecimal actual = alpha.calculateAlpha(10, TEN, BigDecimalConstants.TWELVE);
+    BigDecimal actual = alpha.calculateAlpha(10, TEN, BigDecimalConstants.TWELVE);
 
     assertEquals(BigDecimal.valueOf(-1320), actual);
   }
 
   @Test
+  void shouldReturnNull_whenBetaIsNull() {
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
+
+    when(alpha.calculateBeta(anyInt())).thenReturn(null);
+
+    doCallRealMethod().when(alpha).calculateAlpha(anyInt(), any(), any());
+    BigDecimal actual = alpha.calculateAlpha(10, TEN, BigDecimalConstants.TWELVE);
+
+    assertNull(actual);
+  }
+
+  @Test
   void shouldReturnExpectedAlphaValue_whenCalculatingAlphaWithBetaOne() {
-    final AlphaCalculation alpha = mock(AlphaCalculation.class);
+    AlphaCalculation alpha = mock(AlphaCalculation.class);
 
     when(alpha.calculateBeta(anyInt())).thenReturn(ONE);
 
     doCallRealMethod().when(alpha).calculateAlpha(anyInt(), any(), any());
-    final BigDecimal actual = alpha.calculateAlpha(10, HUNDRED, BigDecimalConstants.TWELVE);
+    BigDecimal actual = alpha.calculateAlpha(10, HUNDRED, BigDecimalConstants.TWELVE);
 
     assertEquals(BigDecimal.valueOf(1056), actual);
   }

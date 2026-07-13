@@ -39,9 +39,9 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldThrowMissingTBillRate_whenPortfolioExcessReturnDoesNotCoverPortfolioWindow() {
-    final var calculation = buildCalculationMissingCoverageOn(ReturnsRole.PORTFOLIO);
+    var calculation = buildCalculationMissingCoverageOn(ReturnsRole.PORTFOLIO);
 
-    final CalculationException ex = assertThrows(CalculationException.class,
+    CalculationException ex = assertThrows(CalculationException.class,
         () -> calculation.calculatePeriodForNumberOfMonths(TWELVE));
     assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
     assertEquals("Missing T-Bill rate for date " + today, ex.getMessage());
@@ -50,9 +50,9 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldThrowMissingTBillRate_whenBenchmarkExcessReturnDoesNotCoverPortfolioWindow() {
-    final var calculation = buildCalculationMissingCoverageOn(ReturnsRole.BENCHMARK);
+    var calculation = buildCalculationMissingCoverageOn(ReturnsRole.BENCHMARK);
 
-    final CalculationException ex = assertThrows(CalculationException.class,
+    CalculationException ex = assertThrows(CalculationException.class,
         () -> calculation.calculatePeriodForNumberOfMonths(TWELVE));
     assertEquals(ErrorCode.MISSING_TBILL_RATE, ex.getErrorCode());
     assertEquals("Missing T-Bill rate for date " + today, ex.getMessage());
@@ -66,14 +66,14 @@ class AlphaBetaCalculationAbstractTest {
    * {@link com.fintex.ce.application.util.RiskFreeWindowValidator} must throw {@code MISSING_TBILL_RATE}.
    */
   private AlphaBetaCalculationAbstract buildCalculationMissingCoverageOn(final ReturnsRole dimension) {
-    final NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
-    final NavigableMap<LocalDate, BigDecimal> benchmarkReturns = new TreeMap<>();
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+    NavigableMap<LocalDate, BigDecimal> benchmarkReturns = new TreeMap<>();
     for (int i = 0; i < TWELVE; i++) {
       portfolioReturns.put(today.minusMonths(i), ONE);
       benchmarkReturns.put(today.minusMonths(i), ONE);
     }
-    final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = new TreeMap<>();
-    final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn = new TreeMap<>();
+    NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = new TreeMap<>();
+    NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn = new TreeMap<>();
     for (int i = 1; i < TWELVE; i++) {
       portfolioExcessReturn.put(today.minusMonths(i), ONE);
       benchmarkExcessReturn.put(today.minusMonths(i), ONE);
@@ -84,11 +84,11 @@ class AlphaBetaCalculationAbstractTest {
       portfolioExcessReturn.put(today, ONE);
     }
 
-    final var input = mock(BenchmarkPeriodCalculationInput.class);
+    var input = mock(BenchmarkPeriodCalculationInput.class);
     when(input.getWeightedAveragePortfolioReturns()).thenReturn(portfolioReturns);
     when(input.getWeightedAverageBenchmarkReturns()).thenReturn(benchmarkReturns);
 
-    final var calculation = mock(AlphaBetaCalculationAbstract.class,
+    var calculation = mock(AlphaBetaCalculationAbstract.class,
         withSettings().useConstructor(input, Set.of(), portfolioExcessReturn, benchmarkExcessReturn));
 
     doCallRealMethod().when(calculation).getPortfolioTotalReturns();
@@ -101,8 +101,8 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldResolvePeriodStartDate_whenCalculatingPeriod() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
     calculation.portfolioExcessReturn = treeMap;
     calculation.benchmarkExcessReturn = treeMap;
 
@@ -120,9 +120,9 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldGetExcessReturnSubMaps_whenCalculatingPeriod() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
-    final var periodStartDate = today;
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
+    var periodStartDate = today;
 
     calculation.benchmarkExcessReturn = treeMap;
     calculation.portfolioExcessReturn = treeMap;
@@ -144,8 +144,8 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldCalculateBeta_whenCalculatingPeriod() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
     calculation.portfolioExcessReturn = treeMap;
     calculation.benchmarkExcessReturn = treeMap;
 
@@ -164,8 +164,8 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldReturnCalculatedBeta_whenInputDataIsValid() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
     calculation.portfolioExcessReturn = treeMap;
     calculation.benchmarkExcessReturn = treeMap;
 
@@ -178,15 +178,15 @@ class AlphaBetaCalculationAbstractTest {
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
     doCallRealMethod().when(calculation).calculatePeriod(any(), any(), any());
-    final BigDecimal result = calculation.calculatePeriodForNumberOfMonths(TWELVE);
+    BigDecimal result = calculation.calculatePeriodForNumberOfMonths(TWELVE);
 
     assertEquals(TEN, result);
   }
 
   @Test
   void shouldReturnNull_whenBenchmarkReturnsSizeIsLessThanPeriod() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
 
     when(calculation.getBenchmarkTotalReturns()).thenReturn(treeMap);
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
@@ -195,15 +195,15 @@ class AlphaBetaCalculationAbstractTest {
     when(calculation.calculateBeta(any(), any(), any(), any())).thenReturn(BigDecimal.TEN);
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal result = calculation.calculatePeriodForNumberOfMonths(24);
+    BigDecimal result = calculation.calculatePeriodForNumberOfMonths(24);
 
     assertNull(result);
   }
 
   @Test
   void shouldReturnNull_whenPeriodIsLessThanTwelve() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
     calculation.portfolioExcessReturn = treeMap;
     calculation.benchmarkExcessReturn = treeMap;
 
@@ -214,16 +214,16 @@ class AlphaBetaCalculationAbstractTest {
     when(treeMap.size()).thenReturn(TWELVE);
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt());
-    final BigDecimal result = calculation.calculatePeriodForNumberOfMonths(6);
+    BigDecimal result = calculation.calculatePeriodForNumberOfMonths(6);
 
     assertNull(result);
   }
 
   @Test
   void shouldUseNumerator_whenCalculatingBeta() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
-    final var bigDecimal = mock(BigDecimal.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
+    var bigDecimal = mock(BigDecimal.class);
 
     when(calculation.calculateNumerator(any(), any(), any(), any())).thenReturn(ONE);
     when(calculation.calculateDenominator(any(), any())).thenReturn(ONE);
@@ -236,9 +236,9 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldUseDenominator_whenCalculatingBeta() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
-    final var bigDecimal = mock(BigDecimal.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
+    var bigDecimal = mock(BigDecimal.class);
 
     when(calculation.calculateNumerator(any(), any(), any(), any())).thenReturn(ONE);
     when(calculation.calculateDenominator(any(), any())).thenReturn(ONE);
@@ -251,33 +251,48 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldReturnBetaValue_whenNumeratorAndDenominatorProvided() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var treeMap = mock(TreeMap.class);
-    final var bigDecimal = mock(BigDecimal.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
+    var bigDecimal = mock(BigDecimal.class);
 
     when(calculation.calculateNumerator(any(), any(), any(), any())).thenReturn(BigDecimal.valueOf(1.01094319080371));
     when(calculation.calculateDenominator(any(), any())).thenReturn(BigDecimal.valueOf(0.994895485347306));
 
     doCallRealMethod().when(calculation).calculateBeta(any(), any(), any(), any());
-    final BigDecimal result = calculation.calculateBeta(treeMap, treeMap, bigDecimal, bigDecimal);
+    BigDecimal result = calculation.calculateBeta(treeMap, treeMap, bigDecimal, bigDecimal);
 
     assertEquals(toUserScale(BigDecimal.valueOf(1.01613004148954)), result);
   }
 
   @Test
-  void shouldCalculateNumeratorValue_whenExcessReturnsProvided() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
+  void shouldReturnNull_whenBetaDenominatorIsZero() {
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var treeMap = mock(TreeMap.class);
+    var bigDecimal = mock(BigDecimal.class);
 
-    final var portfolioExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
+    when(calculation.calculateNumerator(any(), any(), any(), any())).thenReturn(ONE);
+    when(calculation.calculateDenominator(any(), any())).thenReturn(BigDecimal.ZERO);
+
+    doCallRealMethod().when(calculation).calculateBeta(any(), any(), any(), any());
+    BigDecimal result = calculation.calculateBeta(treeMap, treeMap, bigDecimal, bigDecimal);
+
+    assertNull(result);
+  }
+
+  @Test
+  void shouldCalculateNumeratorValue_whenExcessReturnsProvided() {
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+
+    var portfolioExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
         1.01222986673534)));
-    final var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
+    var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
         0.994895485347306)));
 
-    final var portfolioExcessAverage = BigDecimal.valueOf(0.004475946208333);
-    final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
+    var portfolioExcessAverage = BigDecimal.valueOf(0.004475946208333);
+    var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 
     doCallRealMethod().when(calculation).calculateNumerator(any(), any(), any(), any());
-    final BigDecimal result = calculation.calculateNumerator(portfolioExcessReturnByPeriod,
+    BigDecimal result = calculation.calculateNumerator(portfolioExcessReturnByPeriod,
         benchmarkExcessReturnByPeriod,
         portfolioExcessAverage, benchmarkExcessAverage);
 
@@ -286,29 +301,29 @@ class AlphaBetaCalculationAbstractTest {
 
   @Test
   void shouldCalculateDenominatorValue_whenExcessReturnsProvided() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
 
-    final var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
+    var benchmarkExcessReturnByPeriod = new TreeMap<>(Map.of(today, BigDecimal.valueOf(
         0.994895485347306)));
-    final var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
+    var benchmarkExcessAverage = BigDecimal.valueOf(0.007504533222917);
 
     doCallRealMethod().when(calculation).calculateDenominator(any(), any());
-    final BigDecimal result = calculation.calculateDenominator(benchmarkExcessReturnByPeriod, benchmarkExcessAverage);
+    BigDecimal result = calculation.calculateDenominator(benchmarkExcessReturnByPeriod, benchmarkExcessAverage);
 
     assertEquals(toUserScale(BigDecimal.valueOf(0.974940892337108)), toUserScale(result));
   }
 
   @Test
   void shouldOverrideTotalReturnsToMonthlyChange_whenTotalReturnsProvided() {
-    final var calculation = mock(AlphaBetaCalculationAbstract.class);
-    final var date = LocalDate.of(2020, 12, 1);
-    final var portfolioTotalReturns = new TreeMap<>(Map.of(toLastDayOfMonth(date), BigDecimal.valueOf(1.01094319080371),
+    var calculation = mock(AlphaBetaCalculationAbstract.class);
+    var date = LocalDate.of(2020, 12, 1);
+    var portfolioTotalReturns = new TreeMap<>(Map.of(toLastDayOfMonth(date), BigDecimal.valueOf(1.01094319080371),
         toLastDayOfMonth(date.minusMonths(1)), BigDecimal.valueOf(1.02297440154456)));
 
     when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
 
     doCallRealMethod().when(calculation).overrideTotalReturns(any());
-    final NavigableMap<LocalDate, BigDecimal> totalReturns = calculation.overrideTotalReturns(portfolioTotalReturns);
+    NavigableMap<LocalDate, BigDecimal> totalReturns = calculation.overrideTotalReturns(portfolioTotalReturns);
 
     assertEquals(2, totalReturns.size());
     assertEquals(toUserScale(BigDecimal.valueOf(0.02297440154456)), toUserScale(totalReturns.firstEntry().getValue()));
@@ -316,8 +331,8 @@ class AlphaBetaCalculationAbstractTest {
   }
 
   private TreeMap<LocalDate, BigDecimal> getReturns() {
-    final var date = LocalDate.of(2020, 12, 1);
-    final Map<LocalDate, BigDecimal> map = new HashMap<>();
+    var date = LocalDate.of(2020, 12, 1);
+    Map<LocalDate, BigDecimal> map = new HashMap<>();
     map.put(toLastDayOfMonth(date), new BigDecimal("1.01222986673534"));
     map.put(toLastDayOfMonth(date.minusMonths(12)), new BigDecimal("1.01094319080371"));
     map.put(toLastDayOfMonth(date.minusMonths(11)), new BigDecimal("0.994895485347306"));

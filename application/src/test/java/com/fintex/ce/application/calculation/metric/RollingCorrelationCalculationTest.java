@@ -61,99 +61,111 @@ class RollingCorrelationCalculationTest {
 
   @Test
   void shouldReturnNull_whenBenchmarkReturnsSizeIsLessThanWindow() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = mock(TreeMap.class);
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = mock(TreeMap.class);
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
-    final int numberOfMonths = TWELVE;
 
     when(benchmarkTotalReturns.size()).thenReturn(1);
 
     doCallRealMethod().when(calculation).calculateRollingValue(anyInt(), any());
-    final BigDecimal actual = calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
+    BigDecimal actual = calculation.calculateRollingValue(TWELVE, portfolioReturns);
 
     assertNull(actual);
   }
 
   @Test
   void shouldInitializePortfolioReturns_whenCalculatingRollingValue() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
-    final int numberOfMonths = TWELVE;
-
     doCallRealMethod().when(calculation).calculateRollingValue(anyInt(), any());
-    calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
+    calculation.calculateRollingValue(TWELVE, portfolioReturns);
 
     verify(calculation).initializePortfolioReturns(portfolioReturns);
   }
 
   @Test
   void shouldInitializeBenchmarkReturns_whenCalculatingRollingValue() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
-
-    final int numberOfMonths = TWELVE;
 
     when(calculation.initializePortfolioReturns(any())).thenReturn(portfolioReturns);
     doCallRealMethod().when(calculation).calculateRollingValue(anyInt(), any());
-    calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
+    calculation.calculateRollingValue(TWELVE, portfolioReturns);
 
     verify(calculation).initializeBenchmarkReturns(portfolioReturns);
   }
 
   @Test
   void shouldDelegateToCorrelationCalculation_whenCalculatingRollingValue() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
-    final int numberOfMonths = TWELVE;
-    final var benchmarkReturns = portfolioReturns;
+    var benchmarkReturns = portfolioReturns;
 
     when(calculation.initializePortfolioReturns(any())).thenReturn(portfolioReturns);
     when(calculation.initializeBenchmarkReturns(any())).thenReturn(benchmarkReturns);
 
     doCallRealMethod().when(calculation).calculateRollingValue(anyInt(), any());
-    calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
+    calculation.calculateRollingValue(TWELVE, portfolioReturns);
 
     verify(correlationCalculation).calculateCorrelation(portfolioReturns, benchmarkReturns);
   }
 
   @Test
   void shouldReturnCorrelationValue_whenInputsArePrepared() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
-    final int numberOfMonths = TWELVE;
-    final var benchmarkReturns = portfolioReturns;
+    var benchmarkReturns = portfolioReturns;
 
     when(calculation.initializePortfolioReturns(any())).thenReturn(portfolioReturns);
     when(calculation.initializeBenchmarkReturns(any())).thenReturn(benchmarkReturns);
     when(correlationCalculation.calculateCorrelation(anyMap(), anyMap())).thenReturn(TEN);
 
     doCallRealMethod().when(calculation).calculateRollingValue(anyInt(), any());
-    final BigDecimal actual = calculation.calculateRollingValue(numberOfMonths, portfolioReturns);
+    BigDecimal actual = calculation.calculateRollingValue(TWELVE, portfolioReturns);
 
     assertSame(TEN, actual);
   }
 
   @Test
+  void shouldReturnNull_whenCorrelationCannotBeCalculated() {
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+        correlationCalculation, benchmarkTotalReturns));
+    var benchmarkReturns = portfolioReturns;
+
+    when(calculation.initializePortfolioReturns(any())).thenReturn(portfolioReturns);
+    when(calculation.initializeBenchmarkReturns(any())).thenReturn(benchmarkReturns);
+    when(correlationCalculation.calculateCorrelation(anyMap(), anyMap())).thenReturn(null);
+
+    doCallRealMethod().when(calculation).calculateRollingValue(anyInt(), any());
+    BigDecimal actual = calculation.calculateRollingValue(TWELVE, portfolioReturns);
+
+    assertNull(actual);
+  }
+
+  @Test
   void shouldGetAdjustedPortfolioReturns_whenBenchmarkStartsLater() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
     when(calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(true);
@@ -166,10 +178,10 @@ class RollingCorrelationCalculationTest {
 
   @Test
   void shouldGetAdjustedBenchmarkReturns_whenBenchmarkStartsLater() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
     when(calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(true);
@@ -182,80 +194,80 @@ class RollingCorrelationCalculationTest {
 
   @Test
   void shouldReturnSamePortfolioReturns_whenBenchmarkDoesNotStartLater() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
     when(calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(false);
 
     doCallRealMethod().when(calculation).initializePortfolioReturns(any());
-    final NavigableMap<LocalDate, BigDecimal> actual = calculation.initializePortfolioReturns(portfolioReturns);
+    NavigableMap<LocalDate, BigDecimal> actual = calculation.initializePortfolioReturns(portfolioReturns);
 
     Assertions.assertEquals(portfolioReturns, actual);
   }
 
   @Test
   void shouldReturnAdjustedPortfolioReturns_whenBenchmarkStartsLater() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var result = mock(NavigableMap.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var result = mock(NavigableMap.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
     when(calculation.getReturns(any(), any())).thenReturn(result);
     when(calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(true);
 
     doCallRealMethod().when(calculation).initializePortfolioReturns(any());
-    final NavigableMap<LocalDate, BigDecimal> actual = calculation.initializePortfolioReturns(portfolioReturns);
+    NavigableMap<LocalDate, BigDecimal> actual = calculation.initializePortfolioReturns(portfolioReturns);
 
     Assertions.assertEquals(result, actual);
   }
 
   @Test
   void shouldReturnBenchmarkTail_whenBenchmarkDoesNotStartLater() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
     when(calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(false);
 
     doCallRealMethod().when(calculation).initializeBenchmarkReturns(any());
-    final NavigableMap<LocalDate, BigDecimal> actual = calculation.initializeBenchmarkReturns(portfolioReturns);
+    NavigableMap<LocalDate, BigDecimal> actual = calculation.initializeBenchmarkReturns(portfolioReturns);
 
     Assertions.assertEquals(TWELVE, actual.size());
   }
 
   @Test
   void shouldReturnAdjustedBenchmarkReturns_whenBenchmarkStartsLater() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var result = mock(NavigableMap.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var result = mock(NavigableMap.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
     when(calculation.getReturns(any(), any())).thenReturn(result);
     when(calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(any())).thenReturn(true);
 
     doCallRealMethod().when(calculation).initializeBenchmarkReturns(any());
-    final NavigableMap<LocalDate, BigDecimal> actual = calculation.initializeBenchmarkReturns(portfolioReturns);
+    NavigableMap<LocalDate, BigDecimal> actual = calculation.initializeBenchmarkReturns(portfolioReturns);
 
     Assertions.assertEquals(result, actual);
   }
 
   @Test
   void shouldReturnBenchmarkRangeMatchingPortfolioSize_whenGettingReturns() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = new TreeMap<>();
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = new TreeMap<>();
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
-    final var portfolioReturns = mock(NavigableMap.class);
+    var portfolioReturns = mock(NavigableMap.class);
 
     benchmarkTotalReturns.put(LocalDate.now().minusMonths(12), HUNDRED);
     benchmarkTotalReturns.put(LocalDate.now().minusMonths(11), HUNDRED);
@@ -264,7 +276,7 @@ class RollingCorrelationCalculationTest {
     when(portfolioReturns.size()).thenReturn(2);
 
     doCallRealMethod().when(calculation).getReturns(any(), any());
-    final NavigableMap<LocalDate, BigDecimal> actual = calculation.getReturns(portfolioReturns,
+    NavigableMap<LocalDate, BigDecimal> actual = calculation.getReturns(portfolioReturns,
         RollingCorrelationCalculationTest.portfolioReturns);
 
     Assertions.assertEquals(TWO.intValue(), actual.size());
@@ -272,41 +284,41 @@ class RollingCorrelationCalculationTest {
 
   @Test
   void shouldReturnFalse_whenBenchmarkStartsNotLaterThanPortfolio() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
     doCallRealMethod().when(calculation).isBenchmarkStartDateGreaterThanPortfolioStartDate(any());
-    final boolean actual = calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(portfolioReturns);
+    boolean actual = calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(portfolioReturns);
 
     assertFalse(actual);
   }
 
   @Test
   void shouldReturnTrue_whenBenchmarkStartsLaterThanPortfolio() {
-    final var correlationCalculation = mock(CorrelationCalculation.class);
-    final var benchmarkTotalReturns = portfolioReturns;
-    final NavigableMap<LocalDate, BigDecimal> portfolioReturns = mock(NavigableMap.class);
-    final var context = mock(PeriodCalculationInput.class);
-    final var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
+    var correlationCalculation = mock(CorrelationCalculation.class);
+    var benchmarkTotalReturns = portfolioReturns;
+    NavigableMap<LocalDate, BigDecimal> portfolioReturns = mock(NavigableMap.class);
+    var context = mock(PeriodCalculationInput.class);
+    var calculation = mock(RollingCorrelationCalculation.class, withSettings().useConstructor(context, Set.of(),
         correlationCalculation, benchmarkTotalReturns));
 
     when(portfolioReturns.firstKey()).thenReturn(LocalDate.now().minusMonths(13));
 
     doCallRealMethod().when(calculation).isBenchmarkStartDateGreaterThanPortfolioStartDate(any());
-    final boolean actual = calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(portfolioReturns);
+    boolean actual = calculation.isBenchmarkStartDateGreaterThanPortfolioStartDate(portfolioReturns);
 
     assertTrue(actual);
   }
 
   @Test
   void shouldDelegateToRollingIntervalResults_whenDefiningResponseType() {
-    final var calculation = mock(RollingCorrelationCalculation.class);
-    final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    var calculation = mock(RollingCorrelationCalculation.class);
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
     returns.put(LocalDate.now().minusMonths(3), TEN);
-    final var result = Set.of(Pair.of("12", returns));
+    var result = Set.of(Pair.of("12", returns));
 
     doCallRealMethod().when(calculation).defineResponseType(result);
     calculation.defineResponseType(result);
@@ -316,20 +328,20 @@ class RollingCorrelationCalculationTest {
 
   @Test
   void shouldMapRollingCorrelationResult_whenDefiningResponseType() {
-    final var calculation = mock(RollingCorrelationCalculation.class);
-    final NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    var calculation = mock(RollingCorrelationCalculation.class);
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
     returns.put(LocalDate.now().minusMonths(3), TEN);
-    final var periodValues = Set.of(Pair.of("12", returns));
+    var periodValues = Set.of(Pair.of("12", returns));
 
-    final LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
+    LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
     res.add(new IntervalResult(LocalDate.now().minusMonths(3), TEN));
-    final var intervalResult = new RollingIntervalResult("12", res);
-    final var expected = new RollingCorrelationResult(Set.of(intervalResult));
+    var intervalResult = new RollingIntervalResult("12", res);
+    var expected = new RollingCorrelationResult(Set.of(intervalResult));
 
     when(calculation.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
 
     doCallRealMethod().when(calculation).defineResponseType(periodValues);
-    final RollingCorrelationResult actual = calculation.defineResponseType(periodValues);
+    RollingCorrelationResult actual = calculation.defineResponseType(periodValues);
 
     Assertions.assertEquals(expected.getRollingCorrelation(), actual.getRollingCorrelation());
   }
