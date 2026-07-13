@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -36,13 +37,13 @@ public class AlphaCalculation extends AlphaBetaCalculationAbstract<AlphaResult> 
         || numberOfMonths < TWELVE.intValue()) {
       return null;
     }
-    final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
-    final SortedMap<LocalDate, BigDecimal> portfolioExcessReturnByPeriod = getSubMapByPeriodStartDate(periodStartDate,
+    LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
+    SortedMap<LocalDate, BigDecimal> portfolioExcessReturnByPeriod = getSubMapByPeriodStartDate(periodStartDate,
         getPortfolioExcessReturn());
-    final SortedMap<LocalDate, BigDecimal> benchmarkExcessReturnByPeriod = getSubMapByPeriodStartDate(periodStartDate,
+    SortedMap<LocalDate, BigDecimal> benchmarkExcessReturnByPeriod = getSubMapByPeriodStartDate(periodStartDate,
         getBenchmarkExcessReturn());
-    final BigDecimal portfolioExcessAverage = average(portfolioExcessReturnByPeriod);
-    final BigDecimal benchmarkExcessAverage = average(benchmarkExcessReturnByPeriod);
+    BigDecimal portfolioExcessAverage = average(portfolioExcessReturnByPeriod);
+    BigDecimal benchmarkExcessAverage = average(benchmarkExcessReturnByPeriod);
     return calculateAlpha(numberOfMonths, portfolioExcessAverage, benchmarkExcessAverage);
   }
 
@@ -61,8 +62,11 @@ public class AlphaCalculation extends AlphaBetaCalculationAbstract<AlphaResult> 
   public BigDecimal calculateAlpha(final int numberOfMonth,
       final BigDecimal portfolioExcessAverage,
       final BigDecimal benchmarkExcessAverage) {
-    final BigDecimal beta = calculateBeta(numberOfMonth);
-    final BigDecimal alpha = portfolioExcessAverage.subtract(beta.multiply(benchmarkExcessAverage));
+    BigDecimal beta = calculateBeta(numberOfMonth);
+    if (Objects.isNull(beta)) {
+      return null;
+    }
+    BigDecimal alpha = portfolioExcessAverage.subtract(beta.multiply(benchmarkExcessAverage));
     return alpha.multiply(TWELVE);
   }
 

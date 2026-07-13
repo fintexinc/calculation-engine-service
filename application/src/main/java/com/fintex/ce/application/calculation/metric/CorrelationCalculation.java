@@ -51,7 +51,7 @@ public class CorrelationCalculation
     if (numberOfMonths < TWELVE.intValue()) {
       return null;
     }
-    final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> returns = portfolioBaseTotalReturn.entrySet().stream()
+    Map<PortfolioHolding, Map<LocalDate, BigDecimal>> returns = portfolioBaseTotalReturn.entrySet().stream()
         .filter(holdingReturns -> hasEnoughReturns(numberOfMonths, holdingReturns))
         .collect(Collectors.toMap(Map.Entry::getKey, e -> calculatePortfolioBaseTotalReturnValuesByPeriod(
             numberOfMonths, e.getValue())));
@@ -83,11 +83,11 @@ public class CorrelationCalculation
 
   @Override
   public CorrelationResult defineResponseType(final Set<Pair<String, List<CorrelationPeriodResult>>> periodValues) {
-    final List<CorrelationPeriodResult> correlationPeriods = periodValues.stream()
+    List<CorrelationPeriodResult> correlationPeriods = periodValues.stream()
         .filter(v -> Objects.nonNull(v.getValue()))
         .flatMap(l -> setPeriod(l.getKey(), l.getValue()).stream())
         .toList();
-    final List<HoldingsKeyResult> holdingsKeys = portfolioBaseTotalReturn.keySet().stream()
+    List<HoldingsKeyResult> holdingsKeys = portfolioBaseTotalReturn.keySet().stream()
         .map(HoldingsKeyResult::buildHoldingsKeyResult)
         .toList();
     return CorrelationResult.builder()
@@ -124,11 +124,11 @@ public class CorrelationCalculation
    */
   public Map<LocalDate, BigDecimal> calculatePortfolioBaseTotalReturnValuesByPeriod(final int numberOfMonths,
       final Map<LocalDate, BigDecimal> portfolioTotalReturnValue) {
-    final TreeMap<LocalDate, BigDecimal> portfolioTotalReturnByHolding = new TreeMap<>(portfolioTotalReturnValue);
-    final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, portfolioTotalReturnByHolding);
-    final SortedMap<LocalDate, BigDecimal> portfolioBaseTotalReturnByPeriodStartDate = getSubMapByPeriodStartDate(
+    TreeMap<LocalDate, BigDecimal> portfolioTotalReturnByHolding = new TreeMap<>(portfolioTotalReturnValue);
+    LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, portfolioTotalReturnByHolding);
+    SortedMap<LocalDate, BigDecimal> portfolioBaseTotalReturnByPeriodStartDate = getSubMapByPeriodStartDate(
         periodStartDate, portfolioTotalReturnByHolding);
-    final BigDecimal average = CalculationUtils.average(portfolioBaseTotalReturnByPeriodStartDate);
+    BigDecimal average = CalculationUtils.average(portfolioBaseTotalReturnByPeriodStartDate);
     return portfolioBaseTotalReturnByPeriodStartDate.entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().subtract(average)));
   }
@@ -146,8 +146,8 @@ public class CorrelationCalculation
   public CorrelationPeriodResult getCorrelationPeriod(final PortfolioHolding keyHolding,
       final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> returns,
       final int numberOfMonths) {
-    final Map<LocalDate, BigDecimal> keyHoldingValues = returns.get(keyHolding);
-    final Map<PortfolioHolding, BigDecimal> correlations = returns.entrySet().stream()
+    Map<LocalDate, BigDecimal> keyHoldingValues = returns.get(keyHolding);
+    Map<PortfolioHolding, BigDecimal> correlations = returns.entrySet().stream()
         .filter(e -> !e.getKey().equals(keyHolding))
         .collect(Collectors.toMap(Map.Entry::getKey, e -> calculateCorrelation(keyHoldingValues, e.getValue())));
     return mapToCorrelationPeriodResult(keyHolding, numberOfMonths, correlations);
@@ -184,8 +184,11 @@ public class CorrelationCalculation
    */
   public BigDecimal calculateCorrelation(final Map<LocalDate, BigDecimal> keyHoldingValues,
       final Map<LocalDate, BigDecimal> holdingValues) {
-    return divide(calculateNumerator(keyHoldingValues, holdingValues), calculateDenominator(keyHoldingValues,
-        holdingValues));
+    BigDecimal denominator = calculateDenominator(keyHoldingValues, holdingValues);
+    if (BigDecimal.ZERO.compareTo(denominator) == 0) {
+      return null;
+    }
+    return divide(calculateNumerator(keyHoldingValues, holdingValues), denominator);
   }
 
   /**
@@ -215,8 +218,8 @@ public class CorrelationCalculation
    */
   public BigDecimal calculateDenominator(final Map<LocalDate, BigDecimal> keyHoldingValues,
       final Map<LocalDate, BigDecimal> holdingValues) {
-    final BigDecimal holdingX = getSumOfSquaredValues(keyHoldingValues);
-    final BigDecimal holdingY = getSumOfSquaredValues(holdingValues);
+    BigDecimal holdingX = getSumOfSquaredValues(keyHoldingValues);
+    BigDecimal holdingY = getSumOfSquaredValues(holdingValues);
     return squareRoot(holdingX.multiply(holdingY));
   }
 
