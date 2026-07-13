@@ -79,7 +79,7 @@ class AnnualReturnServiceImplTest {
         .isInstanceOf(CalculationException.class)
         .satisfies(thrown -> assertThat(((CalculationException) thrown).getErrorCode())
             .isEqualTo(ErrorCode.INCOMPLETE_YEAR_SKIPPED))
-        .hasMessageContaining("2020");
+        .hasMessage("Annual return for year 2020 cannot be computed: only 11 of 12 monthly returns available");
   }
 
   @Test
@@ -95,7 +95,9 @@ class AnnualReturnServiceImplTest {
     assertThatThrownBy(() -> buildAnnualReturnResult(portfolioReturns, List.of()))
         .isInstanceOf(CalculationException.class)
         .satisfies(thrown -> assertThat(((CalculationException) thrown).getErrorCode())
-            .isEqualTo(ErrorCode.NO_COMPLETE_CALENDAR_YEAR));
+            .isEqualTo(ErrorCode.NO_COMPLETE_CALENDAR_YEAR))
+        .hasMessage("No complete calendar year (Jan-Dec) found in monthly returns range [2024-10-31, 2025-09-30]; "
+            + "annual returns cannot be computed");
   }
 
   @Test
