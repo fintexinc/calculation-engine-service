@@ -10,6 +10,8 @@ import com.fintex.ce.model.util.BigDecimalConstants;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.NavigableMap;
 import java.util.Set;
 
 public class InformationRatioCalculation
@@ -35,20 +37,25 @@ public class InformationRatioCalculation
         || numberOfMonths < BigDecimalConstants.TWELVE.intValue()) {
       return null;
     }
+    validatePortfolioBenchmarkCoverage(numberOfMonths);
 
-    final BigDecimal portfolioReturn = trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(numberOfMonths,
+    BigDecimal portfolioReturn = trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(numberOfMonths,
         getPortfolioTotalReturns());
-    final BigDecimal benchmarkReturn = trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(numberOfMonths,
-        getBenchmarkTotalReturns());
-    final BigDecimal trackingError = trackingErrorCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
+    LocalDate portfolioPeriodStartDate = getPeriodStartDate(numberOfMonths, getPortfolioTotalReturns());
+    LocalDate portfolioPeriodEndDate = getPortfolioTotalReturns().lastKey();
+    NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturnsByPortfolioPeriod = getBenchmarkTotalReturns()
+        .subMap(portfolioPeriodStartDate, true, portfolioPeriodEndDate, true);
+    BigDecimal benchmarkReturn = trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(numberOfMonths,
+        benchmarkTotalReturnsByPortfolioPeriod);
+    BigDecimal trackingError = trackingErrorCalculation.calculatePeriodForNumberOfMonths(numberOfMonths);
 
     return DecimalUtils.divide(portfolioReturn.subtract(benchmarkReturn), trackingError);
   }
 
   @Override
   public InformationRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodAndInformationRatio) {
-    final var result = new InformationRatioResult();
-    final Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodAndInformationRatio);
+    var result = new InformationRatioResult();
+    Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodAndInformationRatio);
     result.setInformationRatio(timeIntervals);
     return result;
   }

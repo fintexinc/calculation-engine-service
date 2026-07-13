@@ -26,7 +26,6 @@ import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
-import static java.util.Optional.ofNullable;
 
 public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculation<TrackingErrorResult, BigDecimal> {
 
@@ -55,6 +54,7 @@ public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculatio
         || numberOfMonths < BigDecimalConstants.TWELVE.intValue()) {
       return null;
     }
+    validatePortfolioBenchmarkCoverage(numberOfMonths);
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, portfolioReturnOverBenchmark);
     final SortedMap<LocalDate, BigDecimal> subMapByPeriodStartDate = getSubMapByPeriodStartDate(periodStartDate,
         portfolioReturnOverBenchmark);
@@ -109,20 +109,17 @@ public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculatio
 
   /**
    * Calculates the Excess Portfolio Return Over the Benchmark for each month
-   *
-   * When getPortfolioTotalReturns() consists of 180 entries and getBenchmarkTotalReturns() of 100 entries Then this
-   * method would return 180 entries portfolioReturnOverBenchmark But 1..100 entries would ok and 101-180 entries would
-   * be incorrect. This was done by purpose. Previously we make benchmarkTotalReturn and portfolioTotalReturn the same
-   * size. But now they could be of different sizes. Later in execution in calculatePeriodForNumberOfMonths there is
-   * check with if statement which would not allow period greater than 100 to access 101-180 entries of
-   * portfolioReturnOverBenchmark
+   * <p>
+   * Only dates present in both series are included; requested-period coverage is enforced in
+   * {@link #calculatePeriodForNumberOfMonths(int)}.
    *
    * @return map of difference between PortfolioTotalReturns and Benchmark Total Return
    */
   public NavigableMap<LocalDate, BigDecimal> calculateExcessPortfolioReturnOverBenchmark() {
-    return getPortfolioTotalReturns().entrySet().stream().collect(toTreeMap(
-        Map.Entry::getKey, e -> e.getValue().subtract(ofNullable(getBenchmarkTotalReturns().get(e.getKey())).orElse(
-            BigDecimal.ZERO))));
+    final NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = getBenchmarkTotalReturns();
+    return getPortfolioTotalReturns().entrySet().stream()
+        .filter(e -> benchmarkTotalReturns.containsKey(e.getKey()))
+        .collect(toTreeMap(Map.Entry::getKey, e -> e.getValue().subtract(benchmarkTotalReturns.get(e.getKey()))));
   }
 
 }
