@@ -28,6 +28,8 @@ abstract class AbstractGicFieldReqValidatorTest {
 
   abstract String expectedErrorCode();
 
+  abstract String expectedMessage();
+
   @Test
   void shouldThrow_whenGicHoldingMissingRequiredField() {
     var cmd = new PortfolioHoldingsCommand();
@@ -38,6 +40,7 @@ abstract class AbstractGicFieldReqValidatorTest {
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode().name()).isEqualTo(expectedErrorCode());
+          assertThat(rve.getMessage()).isEqualTo(expectedMessage());
         });
   }
 

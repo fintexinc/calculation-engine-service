@@ -60,6 +60,14 @@ Red flags — STOP and investigate the production code instead of the test:
   values — every returned period/value, the result-set size, the performance window, and that
   warnings are empty — not just `isNotNull()` or a subset of periods. Derive expected values
   independently, or capture them once as golden from a trusted pipeline for e2e.
+- [ ] **[test-quality] Both positive AND negative scenarios present in the executed suite (unit *and* e2e)?** Every
+  test class must exercise at least one success path and at least one failure path for the behavior under test — never
+  negative-only or positive-only. With the Template-Method abstract-base pattern the shared positive/negative may live
+  in the base (e.g. `shouldReturnOk_whenSmsReturnsAvailableResponse` in `AbstractPortfolioCalculationE2ETest`) and be
+  inherited — that counts, *provided the concrete class actually runs it*. When you add a concrete class that only
+  introduces new negatives (or only a new positive), confirm the inherited suite still supplies the other side; if the
+  class extends `Abstract*` directly with no shared positive, add one. Check the executed method list
+  (surefire XML), not just the concrete `.java` file, since inherited tests are invisible in the source.
 
 ## Adding a new entry
 

@@ -1,9 +1,6 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.enumeration.InterestFreq;
-import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
@@ -11,47 +8,21 @@ import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
-import com.fintex.wm.commons.domain.value.DateBigDecimalValue;
-
-import org.junit.jupiter.api.BeforeEach;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import okhttp3.mockwebserver.QueueDispatcher;
-
 /**
  * Shared e2e infrastructure for the {@code growth-of-10k} metric. Named {@code AbstractGrowthOf10kE2ETest} because
- * {@code GrowthOf10KE2ETest} would collide on case-insensitive filesystems with {@link GrowthOf10kE2ETest}.
+ * {@code GrowthOf10KE2ETest} would collide on case-insensitive filesystems with {@link GrowthOf10kE2ETest}. Common
+ * {@link ReturnCommand} fixtures (holding factories, monthly-returns builders, identifiers) live in
+ * {@link AbstractReturnCommandE2ETest}.
  */
-abstract class AbstractGrowthOf10kE2ETest extends AbstractPortfolioCalculationE2ETest {
-
-  protected static final SecurityIdentifier XBAL = new SecurityIdentifier("XBAL", FiIdentifierType.TICKER);
-  protected static final SecurityIdentifier VCNS = new SecurityIdentifier("VCNS", FiIdentifierType.TICKER);
-  protected static final SecurityIdentifier VTI = new SecurityIdentifier("VTI", FiIdentifierType.TICKER);
-  protected static final SecurityIdentifier SPY = new SecurityIdentifier("SPY", FiIdentifierType.TICKER);
-  protected static final SecurityIdentifier F0CAN999 = new SecurityIdentifier("F0CAN999",
-      FiIdentifierType.MORNINGSTAR_ID);
-  protected static final SecurityIdentifier CCM4752 = new SecurityIdentifier("CCM4752", FiIdentifierType.FUNDSERV);
-  protected static final EquitySecurityIdentifier RY_TO = EquitySecurityIdentifier.builder()
-      .id("RY.TO")
-      .idType(FiIdentifierType.TICKER_MIC)
-      .exchangeId("TSX")
-      .build();
-
-  @BeforeEach
-  void resetSmsMockServerQueue() {
-    smsMockServer.setDispatcher(new QueueDispatcher());
-  }
+abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
 
   @Override
   protected String metricPath() {
@@ -110,69 +81,13 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractPortfolioCalculationE2
         cash(Currency.CAD, "10000.00")));
   }
 
+  protected static ReturnCommand commandFor(Currency currency, List<PortfolioHolding> holdings) {
+    return commandFor(CalculationMetric.GROWTH_OF_10K, currency, holdings);
+  }
+
   protected static void assertGrowthPoint(KeyValueResult<?> point, String expectedDate, String expectedValue) {
     assertThat(point.key()).isEqualTo(LocalDate.parse(expectedDate));
     assertThat(point.value()).isEqualByComparingTo(new BigDecimal(expectedValue));
-  }
-
-  protected static ReturnCommand commandFor(Currency currency, List<PortfolioHolding> holdings) {
-    ReturnCommand command = new ReturnCommand();
-    command.setMetric(CalculationMetric.GROWTH_OF_10K);
-    command.setCurrency(currency);
-    command.setHoldings(holdings);
-    return command;
-  }
-
-  protected static PortfolioHolding etfCanada(SecurityIdentifier securityIdentifier, String value) {
-    return new PortfolioHolding(
-        new BigDecimal(value),
-        FinancialInstrumentType.ETF_CANADA,
-        securityIdentifier);
-  }
-
-  protected static PortfolioHolding usEtf(SecurityIdentifier securityIdentifier, String value) {
-    return new PortfolioHolding(
-        new BigDecimal(value),
-        FinancialInstrumentType.ETF_US,
-        securityIdentifier);
-  }
-
-  protected static PortfolioHolding stockCanada(EquitySecurityIdentifier securityIdentifier, String value) {
-    return new PortfolioHolding(
-        new BigDecimal(value),
-        FinancialInstrumentType.STOCK_CANADA,
-        securityIdentifier);
-  }
-
-  protected static PortfolioHolding fund(SecurityIdentifier morningstarId, FinancialInstrumentType type, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, morningstarId);
-  }
-
-  protected static PortfolioHolding fundServ(SecurityIdentifier fundservId, String value) {
-    return new PortfolioHolding(
-        new BigDecimal(value),
-        FinancialInstrumentType.MUTUAL_FUND_CANADA,
-        fundservId);
-  }
-
-  protected static CashHolding cash(Currency currency, String value) {
-    return CashHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(currency)
-        .build();
-  }
-
-  protected static GicHolding gic(Currency currency, String value, String termDays, String clientIntRatePercent) {
-    return GicHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.GIC)
-        .currency(currency)
-        .investmentDate(LocalDate.of(2024, 1, 1))
-        .clientIntRate(new BigDecimal(clientIntRatePercent))
-        .interestFreq(InterestFreq.MONTHLY)
-        .term(new BigDecimal(termDays))
-        .build();
   }
 
   private static MonthlyReturns twoMonthReturns(String janPercent, String febPercent) {
@@ -180,25 +95,5 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractPortfolioCalculationE2
         returns("2024-01-31", janPercent, "2024-02-29", febPercent),
         DataProvider.MORNINGSTAR,
         "2024-02-29T00:00:00");
-  }
-
-  protected static MonthlyReturns monthlyReturns(List<DateBigDecimalValue> returns, DataProvider provider,
-      String asOf) {
-    MonthlyReturns monthlyReturns = new MonthlyReturns();
-    monthlyReturns.setReturns(returns);
-    monthlyReturns.setDataProviders(provider == null ? null : List.of(provider));
-    monthlyReturns.setAsOfDate(LocalDateTime.parse(asOf));
-    return monthlyReturns;
-  }
-
-  protected static List<DateBigDecimalValue> returns(String... dateValuePairs) {
-    if (dateValuePairs.length % 2 != 0) {
-      throw new IllegalArgumentException("expected even number of strings: date,value pairs");
-    }
-    var list = new ArrayList<DateBigDecimalValue>(dateValuePairs.length / 2);
-    for (int i = 0; i < dateValuePairs.length; i += 2) {
-      list.add(new DateBigDecimalValue(dateValuePairs[i], new BigDecimal(dateValuePairs[i + 1])));
-    }
-    return list;
   }
 }

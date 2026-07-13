@@ -22,6 +22,6 @@ public class NotEmptyGicInterestRateReqValidator extends AbstractGicFieldReqVali
 
   @Override
   public List<CalculationMetric> supportedMetrics() {
-    return List.of(TRAILING_TOTAL_RETURNS);
+    return List.of(TRAILING_TOTAL_RETURNS, ANNUAL_RETURNS, GROWTH_OF_10K);
   }
 }

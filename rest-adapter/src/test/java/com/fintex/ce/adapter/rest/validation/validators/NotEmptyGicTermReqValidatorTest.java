@@ -35,4 +35,9 @@ class NotEmptyGicTermReqValidatorTest extends AbstractGicFieldReqValidatorTest {
   String expectedErrorCode() {
     return "GIC_HOLDING_MISSING_TERM";
   }
+
+  @Override
+  String expectedMessage() {
+    return "The gic holding is missing term";
+  }
 }
