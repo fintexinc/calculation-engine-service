@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  * Benchmark-side counterpart of {@link WeightedAverageWithCpedAbstractService}: fetches both portfolio and benchmark
- * contexts, aligns them to a common performance-end date, and runs the CPED-only weighted-average pipeline for both
+ * contexts, aligns them to a common performance window, and runs the CPED-only weighted-average pipeline for both
  * roles.
  */
 public abstract class BenchmarkWeightedAverageWithCpedAbstractService<C extends PeriodCommand, R extends PeriodResult>
@@ -50,9 +50,12 @@ public abstract class BenchmarkWeightedAverageWithCpedAbstractService<C extends 
         () -> benchmarkMonthlyReturnsContextProvider.get(command.getBenchmarkHoldings(), command.getCurrency()));
     collector.throwIfAny();
 
+    LocalDate commonStart = portfolioContext.commonPerformanceStartDate(benchmarkContext);
     LocalDate commonEnd = portfolioContext.commonPerformanceEndDate(benchmarkContext);
-    MonthlyReturnsContext<HoldingMonthlyReturns> alignedPortfolio = portfolioContext.trimToEnd(commonEnd);
-    MonthlyReturnsContext<HoldingMonthlyReturns> alignedBenchmark = benchmarkContext.trimToEnd(commonEnd);
+    MonthlyReturnsContext<HoldingMonthlyReturns> alignedPortfolio = portfolioContext.trimToRange(commonStart,
+        commonEnd);
+    MonthlyReturnsContext<HoldingMonthlyReturns> alignedBenchmark = benchmarkContext.trimToRange(commonStart,
+        commonEnd);
 
     CpedScaleParams params = new CpedScaleParams(command.getCustomPed(), returnFactorScale);
     WeightedAverageResult<HoldingMonthlyReturns> portfolioResult = collector.tryCatch(

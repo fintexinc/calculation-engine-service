@@ -144,6 +144,25 @@ public record ReturnsSnapshot<T extends ReturnsData>(
             PerformancePeriodCalculator.findPerformanceEndDate(trimmed));
   }
 
+  /**
+   * Returns a snapshot whose returns map is trimmed at {@code startDate} and whose performance window has been
+   * recomputed accordingly. Returns this snapshot unchanged when {@code startDate} is null.
+   */
+  public ReturnsSnapshot<T> trimToStart(LocalDate startDate) {
+    if (startDate == null) {
+      return this;
+    }
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> trimmed = PerformancePeriodCalculator.trimByStartDate(
+        returnsMap, startDate);
+    return withReturnsMap(trimmed)
+        .withPeriod(PerformancePeriodCalculator.findPerformanceStartDate(trimmed),
+            PerformancePeriodCalculator.findPerformanceEndDate(trimmed));
+  }
+
+  public ReturnsSnapshot<T> trimToRange(LocalDate startDate, LocalDate endDate) {
+    return trimToEnd(endDate).trimToStart(startDate);
+  }
+
   public List<Notification> getErrorsAsWarnings() {
     Stream<Notification> errorsAsNotifications = errors.stream()
         .map(error -> error.getErrorCode()

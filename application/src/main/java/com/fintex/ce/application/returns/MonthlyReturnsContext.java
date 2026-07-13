@@ -26,6 +26,26 @@ public record MonthlyReturnsContext<T extends ReturnsData>(
     return withSnapshot(snapshot.trimToEnd(endDate));
   }
 
+  /** Returns this context with its snapshot trimmed to the supplied performance window. */
+  public MonthlyReturnsContext<T> trimToRange(LocalDate startDate, LocalDate endDate) {
+    return withSnapshot(snapshot.trimToRange(startDate, endDate));
+  }
+
+  /**
+   * Later-of the two contexts' performance-start dates. Null-tolerant: if one side has no PSD, returns the other.
+   */
+  public LocalDate commonPerformanceStartDate(MonthlyReturnsContext<T> other) {
+    LocalDate first = snapshot.performanceStartDate();
+    LocalDate second = other.snapshot().performanceStartDate();
+    if (first == null) {
+      return second;
+    }
+    if (second == null) {
+      return first;
+    }
+    return first.isAfter(second) ? first : second;
+  }
+
   /**
    * Earlier-of the two contexts' performance-end dates. Used to align portfolio and benchmark series before weighting.
    * Null-tolerant: if one side has no PED, returns the other.

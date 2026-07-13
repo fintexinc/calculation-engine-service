@@ -144,6 +144,44 @@ class ReturnsSnapshotTest {
   }
 
   @Test
+  void shouldTrimReturnsAndRecalculatePerformanceWindow_whenTrimToStart() {
+    LocalDate january = LocalDate.parse("2020-01-31");
+    LocalDate february = LocalDate.parse("2020-02-29");
+    LocalDate march = LocalDate.parse("2020-03-31");
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = new ReturnsSnapshot<>(Map.of(),
+        Map.of(HOLDING_USD, treeMap(entry(january, BigDecimal.ONE), entry(february, BigDecimal.TEN),
+            entry(march, BigDecimal.valueOf(100)))),
+        january, march, List.of());
+
+    ReturnsSnapshot<HoldingMonthlyReturns> result = snapshot.trimToStart(february);
+
+    assertThat(result.performanceStartDate()).isEqualTo(february);
+    assertThat(result.performanceEndDate()).isEqualTo(march);
+    assertThat(result.returnsMap().get(HOLDING_USD)).containsOnlyKeys(february, march);
+  }
+
+  @Test
+  void shouldTrimPreWindowReturns_whenTrimToStartMatchesPerformanceStartDate() {
+    LocalDate january = LocalDate.parse("2020-01-31");
+    LocalDate february = LocalDate.parse("2020-02-29");
+    LocalDate march = LocalDate.parse("2020-03-31");
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = new ReturnsSnapshot<>(Map.of(),
+        Map.of(HOLDING_USD, treeMap(entry(january, BigDecimal.ONE), entry(february, BigDecimal.TEN),
+            entry(march, BigDecimal.valueOf(100))),
+            HOLDING_CAD, treeMap(entry(february, BigDecimal.valueOf(2)), entry(march, BigDecimal.valueOf(3)))),
+        february, march, List.of());
+
+    ReturnsSnapshot<HoldingMonthlyReturns> result = snapshot.trimToStart(february);
+
+    assertThat(result.performanceStartDate()).isEqualTo(february);
+    assertThat(result.performanceEndDate()).isEqualTo(march);
+    assertThat(result.returnsMap().get(HOLDING_USD)).containsExactlyEntriesOf(treeMap(
+        entry(february, BigDecimal.TEN), entry(march, BigDecimal.valueOf(100))));
+    assertThat(result.returnsMap().get(HOLDING_CAD)).containsExactlyEntriesOf(treeMap(
+        entry(february, BigDecimal.valueOf(2)), entry(march, BigDecimal.valueOf(3))));
+  }
+
+  @Test
   void shouldReturnSameInstance_whenWithAddedErrorsCalledWithEmptyList() {
     ReturnsSnapshot<HoldingMonthlyReturns> base = baseSnapshot();
 
