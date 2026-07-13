@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MonthlyReturnsContextTest {
@@ -35,6 +36,18 @@ class MonthlyReturnsContextTest {
     assertThat(next.snapshot()).isSameAs(secondSnapshot);
     assertThat(next.fxContext()).isSameAs(fxContext);
     assertThat(next.role()).isEqualTo(ReturnsRole.PORTFOLIO);
+  }
+
+  @Test
+  void shouldReturnLaterStartDate_whenCommonPerformanceStartDate() {
+    MonthlyReturnsContext<HoldingMonthlyReturns> first = contextWithRange(LocalDate.parse("2020-01-31"),
+        LocalDate.parse("2024-12-31"));
+    MonthlyReturnsContext<HoldingMonthlyReturns> second = contextWithRange(LocalDate.parse("2021-06-30"),
+        LocalDate.parse("2023-06-30"));
+
+    LocalDate result = first.commonPerformanceStartDate(second);
+
+    assertThat(result).isEqualTo(LocalDate.parse("2021-06-30"));
   }
 
   @Test
@@ -66,6 +79,20 @@ class MonthlyReturnsContextTest {
     assertThat(result.snapshot()).isSameAs(context.snapshot());
   }
 
+  @Test
+  void shouldTrimSnapshot_whenTrimToRange() {
+    MonthlyReturnsContext<HoldingMonthlyReturns> context = contextWithRange(LocalDate.parse("2020-01-31"),
+        LocalDate.parse("2020-04-30"));
+
+    MonthlyReturnsContext<HoldingMonthlyReturns> result = context.trimToRange(LocalDate.parse("2020-02-29"),
+        LocalDate.parse("2020-03-31"));
+
+    assertThat(result.snapshot().performanceStartDate()).isEqualTo(LocalDate.parse("2020-02-29"));
+    assertThat(result.snapshot().performanceEndDate()).isEqualTo(LocalDate.parse("2020-03-31"));
+    assertThat(result.snapshot().returnsMap().get(SPY)).containsOnlyKeys(LocalDate.parse("2020-02-29"),
+        LocalDate.parse("2020-03-31"));
+  }
+
   private static MonthlyReturnsContext<HoldingMonthlyReturns> contextWithPed(LocalDate ped) {
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = new HashMap<>();
     if (ped != null) {
@@ -76,6 +103,17 @@ class MonthlyReturnsContextTest {
     }
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = new ReturnsSnapshot<>(Map.of(), returns,
         ped == null ? null : LocalDate.parse("2020-01-31"), ped, List.of());
+    return new MonthlyReturnsContext<>(snapshot, FxContext.empty(), ReturnsRole.PORTFOLIO);
+  }
+
+  private static MonthlyReturnsContext<HoldingMonthlyReturns> contextWithRange(LocalDate psd, LocalDate ped) {
+    TreeMap<LocalDate, BigDecimal> series = new TreeMap<>();
+    series.put(psd, BigDecimal.ONE);
+    series.put(psd.plusMonths(1).with(lastDayOfMonth()), BigDecimal.valueOf(2));
+    series.put(ped.minusMonths(1).with(lastDayOfMonth()), BigDecimal.valueOf(3));
+    series.put(ped, BigDecimal.TEN);
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(SPY, series);
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = new ReturnsSnapshot<>(Map.of(), returns, psd, ped, List.of());
     return new MonthlyReturnsContext<>(snapshot, FxContext.empty(), ReturnsRole.PORTFOLIO);
   }
 }

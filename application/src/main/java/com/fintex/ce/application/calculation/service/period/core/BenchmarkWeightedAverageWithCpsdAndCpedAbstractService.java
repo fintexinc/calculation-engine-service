@@ -19,8 +19,8 @@ import java.time.LocalDate;
 
 /**
  * Benchmark-side counterpart of {@link WeightedAverageWithCpsdAndCpedAbstractService}: fetches both portfolio and
- * benchmark contexts, aligns them to a common performance-end date, and runs the CPSD+CPED weighted-average pipeline
- * for both roles.
+ * benchmark contexts, aligns them to a common performance window, and runs the CPSD+CPED weighted-average pipeline for
+ * both roles.
  */
 public abstract class BenchmarkWeightedAverageWithCpsdAndCpedAbstractService<C extends PeriodCommand & CustomPsdProvider, R extends PeriodResult>
     extends
@@ -40,9 +40,9 @@ public abstract class BenchmarkWeightedAverageWithCpsdAndCpedAbstractService<C e
   }
 
   /**
-   * Fetches portfolio + benchmark contexts, aligns them to the common end date, and runs the CPSD+CPED pipeline on
-   * each. Errors from any of the four steps (two fetches + two pipeline runs) are collected so the caller sees the full
-   * picture rather than just the first failure.
+   * Fetches portfolio + benchmark contexts, aligns them to the common performance window, and runs the CPSD+CPED
+   * pipeline on each. Errors from any of the four steps (two fetches + two pipeline runs) are collected so the caller
+   * sees the full picture rather than just the first failure.
    */
   protected BenchmarkPeriodCalculationInput buildBenchmarkInput(C command, ReturnFactorScale scale) {
     PceExceptionCollector collector = new PceExceptionCollector();
@@ -53,9 +53,12 @@ public abstract class BenchmarkWeightedAverageWithCpsdAndCpedAbstractService<C e
         () -> benchmarkMonthlyReturnsContextProvider.get(command.getBenchmarkHoldings(), command.getCurrency()));
     collector.throwIfAny();
 
+    LocalDate commonStart = portfolioContext.commonPerformanceStartDate(benchmarkContext);
     LocalDate commonEnd = portfolioContext.commonPerformanceEndDate(benchmarkContext);
-    MonthlyReturnsContext<HoldingMonthlyReturns> alignedPortfolio = portfolioContext.trimToEnd(commonEnd);
-    MonthlyReturnsContext<HoldingMonthlyReturns> alignedBenchmark = benchmarkContext.trimToEnd(commonEnd);
+    MonthlyReturnsContext<HoldingMonthlyReturns> alignedPortfolio = portfolioContext.trimToRange(commonStart,
+        commonEnd);
+    MonthlyReturnsContext<HoldingMonthlyReturns> alignedBenchmark = benchmarkContext.trimToRange(commonStart,
+        commonEnd);
 
     CpsdCpedScaleParams params = new CpsdCpedScaleParams(command.getCustomPsd(), command.getCustomPed(), scale);
     WeightedAverageResult<HoldingMonthlyReturns> portfolioResult = collector.tryCatch(
