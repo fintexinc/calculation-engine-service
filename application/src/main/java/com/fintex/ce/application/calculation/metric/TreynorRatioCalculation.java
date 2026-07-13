@@ -80,8 +80,8 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
    * Treynor returns null whenever its composed {@link BetaCalculation} returns null (benchmark or excess-return series
    * shorter than the period). Without this override {@code availableMonths()} would fall back to
    * {@code portfolioTotalReturns.size()} and {@code RET-008} would be silently skipped for that case. Treynor sits
-   * outside the {@code BenchmarkWeightedAverageCalculation} chain, so the inherited overrides don't reach it — delegate
-   * to the composed Beta explicitly. T-Bill coverage is enforced separately by
+   * outside the {@code BenchmarkWeightedAverageCalculation} chain, so the inherited overrides don't reach it â€”
+   * delegate to the composed Beta explicitly. T-Bill coverage is enforced separately by
    * {@link RiskFreeWindowValidator#requireCoverage} inside {@link #calculatePeriodForNumberOfMonths}.
    */
   @Override

@@ -62,7 +62,7 @@ class RSquaredCalculationAbstractTest {
   /**
    * Builds a real (non-mocked-construction) {@link RSquaredCalculationAbstract} whose portfolio and benchmark total
    * return series both fully cover a 12-month window, but whose excess-return series on the given dimension is missing
-   * the most recent month inside that window — the per-date coverage precondition enforced by
+   * the most recent month inside that window â€” the per-date coverage precondition enforced by
    * {@link com.fintex.ce.application.util.RiskFreeWindowValidator} must throw {@code MISSING_TBILL_RATE}.
    */
   private RSquaredCalculationAbstract buildCalculationMissingCoverageOn(final ReturnsRole dimension) {

@@ -230,7 +230,7 @@ class TreynorRatioCalculationTest {
   void shouldThrowMissingTBillRate_whenTBillsHavePublicationLag() {
     // Publication-lag scenario: portfolio covers the last 13 months but T-Bills only the prior 12 (lagging by 1
     // month). Count gate passes (tBills.size() == 12 == numberOfMonths) but the period window starts AFTER the last
-    // T-Bill date — the per-date RiskFreeWindowValidator.requireCoverage check must throw MISSING_TBILL_RATE instead
+    // T-Bill date â€” the per-date RiskFreeWindowValidator.requireCoverage check must throw MISSING_TBILL_RATE instead
     // of letting calculateAverageArithmeticAnnualizedReturn silently divide an undersized window by numberOfMonths.
     NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
     for (int i = 0; i < 13; i++) {

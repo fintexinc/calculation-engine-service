@@ -39,8 +39,8 @@ public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculatio
 
   @Override
   public TrackingErrorResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    final TrackingErrorResult result = new TrackingErrorResult();
-    final Set<TimeIntervalResult> timeIntervals = periodValues.stream().map(e -> new TimeIntervalResult(e.getKey(), e
+    TrackingErrorResult result = new TrackingErrorResult();
+    Set<TimeIntervalResult> timeIntervals = periodValues.stream().map(e -> new TimeIntervalResult(e.getKey(), e
         .getValue()))
         .collect(Collectors.toSet());
     result.setTrackingError(timeIntervals);
@@ -55,11 +55,11 @@ public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculatio
       return null;
     }
     validatePortfolioBenchmarkCoverage(numberOfMonths);
-    final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, portfolioReturnOverBenchmark);
-    final SortedMap<LocalDate, BigDecimal> subMapByPeriodStartDate = getSubMapByPeriodStartDate(periodStartDate,
+    LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, portfolioReturnOverBenchmark);
+    SortedMap<LocalDate, BigDecimal> subMapByPeriodStartDate = getSubMapByPeriodStartDate(periodStartDate,
         portfolioReturnOverBenchmark);
-    final BigDecimal averageExcessPortfolioReturns = calculateAverageByPeriod(subMapByPeriodStartDate);
-    final TreeMap<LocalDate, BigDecimal> diff = calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate,
+    BigDecimal averageExcessPortfolioReturns = calculateAverageByPeriod(subMapByPeriodStartDate);
+    TreeMap<LocalDate, BigDecimal> diff = calculateDiffPortfolioAndAVGPortfolio(subMapByPeriodStartDate,
         averageExcessPortfolioReturns);
     return calculateTrackingError(numberOfMonths, diff);
   }
@@ -74,7 +74,7 @@ public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculatio
    */
   public BigDecimal calculateTrackingError(final int numberOfMonths,
       final TreeMap<LocalDate, BigDecimal> diffPortfolioAndAVGPortfolio) {
-    final BigDecimal result = divide(sum(diffPortfolioAndAVGPortfolio), BigDecimal.valueOf(numberOfMonths).subtract(
+    BigDecimal result = divide(sum(diffPortfolioAndAVGPortfolio), BigDecimal.valueOf(numberOfMonths).subtract(
         ONE));
     return toUserScale(DecimalUtils.squareRoot(result).multiply(DecimalUtils.squareRoot(TWELVE)));
   }
@@ -116,7 +116,7 @@ public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculatio
    * @return map of difference between PortfolioTotalReturns and Benchmark Total Return
    */
   public NavigableMap<LocalDate, BigDecimal> calculateExcessPortfolioReturnOverBenchmark() {
-    final NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = getBenchmarkTotalReturns();
+    NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns = getBenchmarkTotalReturns();
     return getPortfolioTotalReturns().entrySet().stream()
         .filter(e -> benchmarkTotalReturns.containsKey(e.getKey()))
         .collect(toTreeMap(Map.Entry::getKey, e -> e.getValue().subtract(benchmarkTotalReturns.get(e.getKey()))));
