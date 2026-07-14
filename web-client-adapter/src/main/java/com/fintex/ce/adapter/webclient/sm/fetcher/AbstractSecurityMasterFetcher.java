@@ -82,10 +82,9 @@ public abstract class AbstractSecurityMasterFetcher<D, R> implements SecurityDat
         endpointPath,
         request,
         responseType);
+    List<SecurityAttributeResult<R>> safeResponses = responses != null ? responses : List.of();
 
-    Map<PortfolioHolding, D> result = mapResponsesToHoldings(
-        responses != null ? responses : List.of(),
-        identifierToHoldings);
+    Map<PortfolioHolding, D> result = mapResponsesToHoldings(safeResponses, identifierToHoldings);
 
     log.debug("Fetched {} results for {} holdings from endpoint: {}",
         result.size(), holdings.size(), endpointPath);

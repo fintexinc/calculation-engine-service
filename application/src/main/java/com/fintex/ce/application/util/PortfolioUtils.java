@@ -10,6 +10,7 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
@@ -52,6 +53,18 @@ public class PortfolioUtils {
     } else {
       holdingIncomeForecast.setIdentifier(secId.getId());
     }
+  }
+
+  /**
+   * Sums the given holdings' weights out of a full portfolio weight map. Used to size the portion of a breakdown
+   * attributable to holdings excluded from every classification bucket (e.g. unresolved by the data source).
+   */
+  public static BigDecimal sumWeights(final Collection<PortfolioHolding> holdings,
+      final Map<PortfolioHolding, BigDecimal> weights) {
+    return holdings.stream()
+        .map(weights::get)
+        .filter(Objects::nonNull)
+        .reduce(ZERO, BigDecimal::add);
   }
 
   public static <T> boolean areAllValuesInMapEmpty(final Map<PortfolioHolding, Map<T, BigDecimal>> map) {

@@ -11,6 +11,7 @@ import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.allocation.RegionDatapoint;
@@ -29,7 +30,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +71,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   void setUp() {
     when(fxRateService.spotRates(anySet(), any(), any())).thenAnswer(invocation -> {
       Set<Currency> sources = invocation.getArgument(0);
-      Map<Currency, BigDecimal> identity = new HashMap<>();
+      Map<Currency, BigDecimal> identity = new EnumMap<>(Currency.class);
       for (Currency c : sources) {
         identity.put(c, ONE);
       }
@@ -224,7 +224,12 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
     assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.UNCLASSIFIED, ONE));
     assertThat(getWarnings(result)).hasSize(1);
-    assertThat(getWarnings(result)).first().extracting(Notification::getCode).isEqualTo("FDS-026");
+    assertThat(getWarnings(result)).first().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC);
+      assertThat(warning.getMessage()).isEqualTo(
+          "Security information not found by the data source for " + service.getMetric().getUserFriendlyName());
+      assertThat(warning.getMetadata()).containsEntry("holdingId", stock.getIdsString());
+    });
   }
 
   @Test
@@ -257,7 +262,30 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
     assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.UNCLASSIFIED, ONE));
     assertThat(getWarnings(result)).hasSize(1);
-    assertThat(getWarnings(result)).first().extracting(Notification::getCode).isEqualTo("FDS-018");
+    assertThat(getWarnings(result)).first().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.MISSING_ASSET_ALLOCATION);
+      assertThat(warning.getMessage()).isEqualTo(
+          "The holding " + fund.getIdsString() + " is missing values for Asset Allocation");
+      assertThat(warning.getMetadata()).containsEntry("holdingId", fund.getIdsString());
+    });
+  }
+
+  @Test
+  void fundHoldingNotFoundBySm_addsSecurityNotFoundWarningAndIsUnclassified() {
+    PortfolioHolding fund = mutualFund("RBF605");
+    when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
+    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
+
+    R result = service.perform(command(fund));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.UNCLASSIFIED, ONE));
+    assertThat(getWarnings(result)).hasSize(1);
+    assertThat(getWarnings(result)).first().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC);
+      assertThat(warning.getMessage()).isEqualTo(
+          "Security information not found by the data source for " + service.getMetric().getUserFriendlyName());
+      assertThat(warning.getMetadata()).containsEntry("holdingId", fund.getIdsString());
+    });
   }
 
   @Test
@@ -395,7 +423,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
         .build();
     when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(usStock, usGeography));
     when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
-    Map<Currency, BigDecimal> noRate = new HashMap<>();
+    Map<Currency, BigDecimal> noRate = new EnumMap<>(Currency.class);
     noRate.put(Currency.USD, null);
     when(fxRateService.spotRates(anySet(), any(), any())).thenReturn(noRate);
 
@@ -406,7 +434,11 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     expected.put(AssetAllocationRegionType.US_EQUITIES, HALF);
     assertAllocationEquals(result, expected);
     assertThat(getWarnings(result)).hasSize(1);
-    assertThat(getWarnings(result)).first().extracting(Notification::getCode).isEqualTo("FX-001");
+    assertThat(getWarnings(result)).first().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.FX_RATES_UNAVAILABLE);
+      assertThat(warning.getMessage()).contains("FX rates unavailable for holding " + usStock.getIdsString());
+      assertThat(warning.getMetadata()).containsEntry("holdingId", usStock.getIdsString());
+    });
   }
 
   @Test

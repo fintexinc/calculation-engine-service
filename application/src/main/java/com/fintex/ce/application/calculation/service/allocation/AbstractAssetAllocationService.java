@@ -208,8 +208,12 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
 
   private Map<AssetAllocationRegionType, BigDecimal> stockAllocation(PortfolioHolding holding, Geography geography,
       List<Notification> warnings) {
-    SecurityRegion region = Optional.ofNullable(geography)
-        .map(Geography::getRegion)
+    if (geography == null) {
+      warnings.add(ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC.toNotificationForHolding(holding,
+          getMetric().getUserFriendlyName()));
+      return singleRegion(AssetAllocationRegionType.UNCLASSIFIED);
+    }
+    SecurityRegion region = Optional.ofNullable(geography.getRegion())
         .map(RegionDatapoint::getValue)
         .orElse(null);
     if (region == null) {
@@ -230,7 +234,12 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
 
   private Map<AssetAllocationRegionType, BigDecimal> fundAllocation(PortfolioHolding holding,
       HoldingAssetAllocation allocation, List<Notification> warnings) {
-    if (allocation == null || allocation.getAllocations() == null || allocation.getAllocations().isEmpty()) {
+    if (allocation == null) {
+      warnings.add(ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC.toNotificationForHolding(holding,
+          getMetric().getUserFriendlyName()));
+      return singleRegion(AssetAllocationRegionType.UNCLASSIFIED);
+    }
+    if (allocation.getAllocations() == null || allocation.getAllocations().isEmpty()) {
       warnings.add(ErrorCode.MISSING_ASSET_ALLOCATION.toNotificationForHolding(holding));
       return singleRegion(AssetAllocationRegionType.UNCLASSIFIED);
     }

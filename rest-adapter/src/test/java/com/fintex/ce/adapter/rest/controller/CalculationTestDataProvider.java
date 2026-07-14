@@ -77,7 +77,7 @@ import com.fintex.ce.model.dto.command.YieldCommand;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
-import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -208,7 +208,7 @@ class CalculationTestDataProvider {
             GeographicExposureResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_BOND_SECTOR, init(new FixedIncomeSectorResult(), r -> r
             .setFixedIncomeSector(Map.of(
-                FixedIncomeSecuritiesAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(35.0)))),
+                FixedIncomeSectorAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(35.0)))),
             FixedIncomeSectorResult.class),
         breakdown(CalculationMetric.FIXED_INCOME_STYLEBOX_EXPOSURE, init(new FixedIncomeStyleboxExposureResult(), r -> r
             .setFixedIncomeStyleboxExposure(Map.of(FixedIncomeStyleBoxType.HIGH_LIMITED, BigDecimal.valueOf(20.0)))),

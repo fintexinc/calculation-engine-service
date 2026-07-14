@@ -229,4 +229,15 @@ public enum CalculationMetric {
     }
     return metric;
   }
+
+  /**
+   * Human-readable label derived from the kebab-case {@link #value}, e.g. {@code equity-sector} -> {@code Equity
+   * Sector}. Used wherever a metric needs to be named in user-facing messages so we do not scatter string literals.
+   */
+  public String getUserFriendlyName() {
+    return Arrays.stream(value.split("-"))
+        .filter(word -> !word.isEmpty())
+        .map(word -> Character.toUpperCase(word.charAt(0)) + word.substring(1))
+        .collect(Collectors.joining(" "));
+  }
 }

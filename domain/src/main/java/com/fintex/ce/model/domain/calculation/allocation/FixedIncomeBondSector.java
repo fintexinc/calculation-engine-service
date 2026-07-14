@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.calculation.allocation;
 
 import com.fintex.ce.model.domain.calculation.BaseCalculationData;
-import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.math.BigDecimal;
@@ -18,9 +18,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class FixedIncomeBondSecurities extends BaseCalculationData {
+public class FixedIncomeBondSector extends BaseCalculationData {
 
   private FinancialInstrumentType holdingType;
-  private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeBondSectors;
+  private Map<FixedIncomeSectorAllocationType, BigDecimal> fixedIncomeBondSectors;
 
 }

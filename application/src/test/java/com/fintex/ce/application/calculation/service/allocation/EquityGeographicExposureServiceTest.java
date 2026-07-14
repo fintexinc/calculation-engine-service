@@ -3,11 +3,11 @@ package com.fintex.ce.application.calculation.service.allocation;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityGeographicExposureResult;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.financial.Geography;
-import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
-import static com.fintex.ce.model.error.ErrorCode.MISSING_BUSINESS_COUNTRY_CODE;
 import static java.math.BigDecimal.ONE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -65,7 +64,7 @@ class EquityGeographicExposureServiceTest
 
   @Override
   protected String expectedMissingFundAllocationCode() {
-    return "FDS-016";
+    return ErrorCode.Codes.MISSING_EQUITY_GEOGRAPHIC_EXPOSURE;
   }
 
   @Test
@@ -135,12 +134,10 @@ class EquityGeographicExposureServiceTest
 
     EquityGeographicExposureResult result = service.perform(command(fund, unmappedStock));
 
-    assertExposureEquals(result, distribution(Map.of(GeographicRegionType.US, ONE)));
+    assertExposureEquals(result, distribution(Map.of(
+        GeographicRegionType.US, new BigDecimal("0.5"),
+        GeographicRegionType.UNKNOWN, new BigDecimal("0.5"))));
     assertThat(result.getWarnings()).hasSize(1);
-    Notification warning = result.getWarnings().getFirst();
-    assertThat(warning.getCode()).isEqualTo(MISSING_BUSINESS_COUNTRY_CODE.getCode());
-    assertThat(warning.getMessage())
-        .isEqualTo(MISSING_BUSINESS_COUNTRY_CODE.getFormattedMessage(unmappedStock.getIdsString()));
-    assertThat(warning.getMetadata()).containsEntry("holdingId", unmappedStock.getIdsString());
+    assertThat(result.getWarnings().getFirst().getCode()).isEqualTo(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC);
   }
 }

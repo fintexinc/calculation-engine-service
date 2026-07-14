@@ -6,6 +6,7 @@ import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,23 +23,23 @@ import java.util.Map;
 @ExtendWith(MockitoExtension.class)
 class EquitySectorAllocationFetcherTest
     extends
-      AbstractSecurityMasterFetcherTest<EquitySector, EquitySectorAllocation> {
+      AbstractSecurityMasterFetcherTest<EquitySector, EquitySectorAllocationWithCurrency> {
 
   private static final String ENDPOINT_PATH = "/api/v1/wealth/securities/allocations/equity-sector";
 
   @Mock
   private EquitySectorAllocationMapper mapper;
 
-  private AbstractSecurityMasterFetcher<EquitySector, EquitySectorAllocation> fetcher;
+  private AbstractSecurityMasterFetcher<EquitySector, EquitySectorAllocationWithCurrency> fetcher;
 
   @BeforeEach
   void setUp() {
     fetcher = new AbstractSecurityMasterFetcher<>(securityMasterWebClient, ENDPOINT_PATH, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<EquitySectorAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<EquitySectorAllocationWithCurrency>>>() {}) {};
   }
 
   @Override
-  protected AbstractSecurityMasterFetcher<EquitySector, EquitySectorAllocation> fetcher() {
+  protected AbstractSecurityMasterFetcher<EquitySector, EquitySectorAllocationWithCurrency> fetcher() {
     return fetcher;
   }
 
@@ -48,7 +49,7 @@ class EquitySectorAllocationFetcherTest
   }
 
   @Override
-  protected EquitySectorAllocation createSmsResponse() {
+  protected EquitySectorAllocationWithCurrency createSmsResponse() {
     var techEntry = new EquitySectorAllocationTypeValue();
     techEntry.setType(EquitySectorAllocationType.TECHNOLOGY);
     techEntry.setValue(BigDecimal.valueOf(28.5));
@@ -59,7 +60,9 @@ class EquitySectorAllocationFetcherTest
 
     var smsAllocation = new EquitySectorAllocation();
     smsAllocation.setAllocations(List.of(techEntry, healthEntry));
-    return smsAllocation;
+    var wrapper = new EquitySectorAllocationWithCurrency();
+    wrapper.setEquitySectorAllocation(smsAllocation);
+    return wrapper;
   }
 
   @Override
@@ -72,7 +75,7 @@ class EquitySectorAllocationFetcherTest
   }
 
   @Override
-  protected SecurityMasterResponseMapper<EquitySector, EquitySectorAllocation> mapper() {
+  protected SecurityMasterResponseMapper<EquitySector, EquitySectorAllocationWithCurrency> mapper() {
     return mapper;
   }
 }

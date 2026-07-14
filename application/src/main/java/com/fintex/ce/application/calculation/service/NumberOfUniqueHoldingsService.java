@@ -47,8 +47,11 @@ public class NumberOfUniqueHoldingsService
 
   @Override
   public NumberOfUniqueHoldingsResult perform(PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, HoldingIdentifiers> fetched = holdingIdentifiersFetcher.fetch(command.getHoldings(), command
-        .getDataProviders());
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = holdingIdentifiersFetcher.fetch(
+        command.getHoldings(), command.getDataProviders());
+    List<PortfolioHolding> unresolved = command.getHoldings().stream()
+        .filter(holding -> !fetched.containsKey(holding))
+        .toList();
 
     Set<String> uniqueIds = new HashSet<>();
     int securitiesWithoutIdentifiers = 0;
@@ -76,16 +79,15 @@ public class NumberOfUniqueHoldingsService
       }
     }
 
-    List<Notification> warnings = collectWarnings(securitiesWithoutIdentifiers, underlyingHoldingsWithNullIdValue);
+    List<Notification> warnings = collectWarnings(securitiesWithoutIdentifiers, underlyingHoldingsWithNullIdValue,
+        unresolved);
 
-    Long count = uniqueIds.isEmpty() && holdingsWithNullId == 0 && !warnings.isEmpty()
-        ? null
-        : (long) uniqueIds.size() + holdingsWithNullId;
+    long count = (long) uniqueIds.size() + holdingsWithNullId + securitiesWithoutIdentifiers + unresolved.size();
     return new NumberOfUniqueHoldingsResult(count, warnings);
   }
 
   private static @NonNull List<Notification> collectWarnings(int securitiesWithoutIdentifiers,
-      int underlyingHoldingsWithNullIdValue) {
+      int underlyingHoldingsWithNullIdValue, List<PortfolioHolding> unresolvedHoldings) {
     List<Notification> warnings = new ArrayList<>();
     if (securitiesWithoutIdentifiers > 0) {
       warnings.add(ErrorCode.MISSING_HOLDING_IDENTIFIERS.asNotification(securitiesWithoutIdentifiers));
@@ -93,6 +95,8 @@ public class NumberOfUniqueHoldingsService
     if (underlyingHoldingsWithNullIdValue > 0) {
       warnings.add(ErrorCode.MISSING_UNDERLYING_HOLDING_ID_VALUE.asNotification(underlyingHoldingsWithNullIdValue));
     }
+    unresolvedHoldings.forEach(holding -> warnings.add(ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC
+        .toNotificationForHolding(holding, CalculationMetric.NUMBER_OF_UNIQUE_HOLDINGS.getUserFriendlyName())));
     return warnings;
   }
 

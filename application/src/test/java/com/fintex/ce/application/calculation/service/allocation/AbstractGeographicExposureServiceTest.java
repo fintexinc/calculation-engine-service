@@ -10,6 +10,7 @@ import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -148,18 +149,35 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   }
 
   @Test
-  void shouldReturnNullBucketsAndWarn_whenFetcherReturnsNoAllocations() {
+  void shouldReturnUnknownBucketAndWarn_whenFetcherReturnsNoAllocations() {
     PortfolioHolding fund = canadaMutualFund("RBF605", 1000);
 
     R result = service.perform(command(fund));
 
-    assertNullExposure(result);
+    assertExposureEquals(result, distribution(Map.of(GeographicRegionType.UNKNOWN, ONE)));
     assertThat(result.getWarnings()).hasSize(1);
-    assertThat(result.getWarnings().getFirst().getCode()).isEqualTo(expectedMissingFundAllocationCode());
+    assertThat(result.getWarnings().getFirst().getCode()).isEqualTo(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC);
   }
 
   @Test
-  void shouldReturnNullBucketsAndWarnPerHolding_whenAllAllocationMapsAreEmpty() {
+  void shouldReturnUnknownBucketAndWarnPerHolding_whenAllocationMapsAreEmptyPresentAndSmHasNoRecord() {
+    PortfolioHolding presentButEmpty = canadaMutualFund("A", 100);
+    PortfolioHolding notFoundBySm = canadaMutualFund("B", 100);
+    when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
+        presentButEmpty, allocation(Map.of(), Currency.CAD)));
+
+    R result = service.perform(command(presentButEmpty, notFoundBySm));
+
+    assertExposureEquals(result, distribution(Map.of(GeographicRegionType.UNKNOWN, ONE)));
+    assertThat(result.getWarnings()).hasSize(2);
+    assertThat(result.getWarnings())
+        .filteredOn(w -> ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC.equals(w.getCode())).hasSize(1);
+    assertThat(result.getWarnings()).filteredOn(w -> expectedMissingFundAllocationCode().equals(w.getCode()))
+        .hasSize(1);
+  }
+
+  @Test
+  void shouldReturnUnknownBucketAndWarnPerHolding_whenAllAllocationMapsAreEmpty() {
     PortfolioHolding fundA = canadaMutualFund("A", 100);
     PortfolioHolding fundB = canadaMutualFund("B", 200);
     when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
@@ -168,21 +186,21 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
     R result = service.perform(command(fundA, fundB));
 
-    assertNullExposure(result);
+    assertExposureEquals(result, distribution(Map.of(GeographicRegionType.UNKNOWN, ONE)));
     assertThat(result.getWarnings()).hasSize(2);
     assertThat(result.getWarnings()).allSatisfy(w -> assertThat(w.getCode())
         .isEqualTo(expectedMissingFundAllocationCode()));
   }
 
   @Test
-  void shouldReturnNullBucketsAndWarn_whenAllocationMapIsNull() {
+  void shouldReturnUnknownBucketAndWarn_whenAllocationMapIsNull() {
     PortfolioHolding fund = canadaMutualFund("RBF605", 1000);
     when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(fund,
         HoldingGeographicAllocation.builder().allocations(null).currency(Currency.CAD).build()));
 
     R result = service.perform(command(fund));
 
-    assertNullExposure(result);
+    assertExposureEquals(result, distribution(Map.of(GeographicRegionType.UNKNOWN, ONE)));
     assertThat(result.getWarnings()).hasSize(1);
     assertThat(result.getWarnings().getFirst().getCode()).isEqualTo(expectedMissingFundAllocationCode());
   }
@@ -252,7 +270,8 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
         GeographicRegionType.EUROPE, new BigDecimal("0.5")));
     assertExposureEquals(result, expected);
     assertThat(result.getWarnings()).hasSize(1);
-    assertThat(result.getWarnings()).first().extracting(Notification::getCode).isEqualTo("FX-001");
+    assertThat(result.getWarnings()).first().extracting(Notification::getCode)
+        .isEqualTo(ErrorCode.Codes.FX_RATES_UNAVAILABLE);
   }
 
   @Test

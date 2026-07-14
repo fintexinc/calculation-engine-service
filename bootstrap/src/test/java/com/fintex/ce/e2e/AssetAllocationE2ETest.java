@@ -7,6 +7,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
@@ -182,7 +183,8 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     AssetAllocationResult result = readJson(response.responseBody(), AssetAllocationResult.class);
     assertThat(result.getWarnings()).extracting(Notification::getCode)
-        .containsExactlyInAnyOrder("FDS-026", "FDS-018");
+        .containsExactlyInAnyOrder(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC,
+            ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC);
     assertThat(result.getAssetAllocation().keySet().stream().map(Object::toString).toList())
         .contains("UNCLASSIFIED", "CANADIAN_EQUITIES", "US_EQUITIES");
   }
@@ -198,7 +200,8 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     AssetAllocationResult result = readJson(response.responseBody(), AssetAllocationResult.class);
-    assertThat(result.getWarnings()).extracting(Notification::getCode).containsExactly("FX-001");
+    assertThat(result.getWarnings()).extracting(Notification::getCode)
+        .containsExactly(ErrorCode.Codes.FX_RATES_UNAVAILABLE);
     assertCloseTo(result, AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE);
   }
 
