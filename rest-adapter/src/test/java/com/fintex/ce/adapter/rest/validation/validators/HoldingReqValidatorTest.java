@@ -25,6 +25,52 @@ class HoldingReqValidatorTest {
   private final HoldingReqValidator validator = new HoldingReqValidator();
 
   @Test
+  void shouldThrow_whenHoldingTypeIsNull() {
+    PortfolioHolding holding = new PortfolioHolding(
+        BigDecimal.TEN,
+        null,
+        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+
+    ReturnCommand command = new ReturnCommand();
+    command.setCurrency(Currency.CAD);
+    command.setHoldings(List.of(holding));
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_NULL");
+          assertThat(rve.getFieldName()).isEqualTo("holdingType");
+          assertThat(rve.getMessage()).isEqualTo("Holding Type must not be null");
+        });
+  }
+
+  @Test
+  void shouldThrow_whenOneHoldingIsMissingHoldingType() {
+    PortfolioHolding validHolding = new PortfolioHolding(
+        BigDecimal.TEN,
+        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding invalidHolding = new PortfolioHolding(
+        BigDecimal.TEN,
+        null,
+        new SecurityIdentifier("ID2", FiIdentifierType.TICKER));
+
+    PeriodCommand command = new PeriodCommand();
+    command.setCurrency(Currency.CAD);
+    command.setHoldings(List.of(validHolding, invalidHolding));
+
+    assertThatThrownBy(() -> validator.validate(command))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_NULL");
+          assertThat(rve.getFieldName()).isEqualTo("holdingType");
+          assertThat(rve.getMessage()).isEqualTo("Holding Type must not be null");
+        });
+  }
+
+  @Test
   void shouldThrow_whenCashHoldingHasNullCurrency() {
     CashHolding cashHolding = CashHolding.builder()
         .value(BigDecimal.TEN)
@@ -41,6 +87,7 @@ class HoldingReqValidatorTest {
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_MISSING_CURRENCY");
+          assertThat(rve.getMessage()).isEqualTo("The holding is missing Currency");
         });
   }
 
@@ -84,6 +131,7 @@ class HoldingReqValidatorTest {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_BLANK");
           assertThat(rve.getFieldName()).isEqualTo("securityIdentifier.id");
+          assertThat(rve.getMessage()).isEqualTo("Security Identifier ID must not be blank");
         });
   }
 
@@ -100,7 +148,11 @@ class HoldingReqValidatorTest {
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ValidationException.class)
-        .satisfies(ex -> assertThat(((ValidationException) ex).getErrorCode().name()).isEqualTo("FIELD_NOT_BLANK"));
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_BLANK");
+          assertThat(rve.getMessage()).isEqualTo("Security Identifier ID must not be blank");
+        });
   }
 
   @Test
@@ -120,6 +172,7 @@ class HoldingReqValidatorTest {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_NULL");
           assertThat(rve.getFieldName()).isEqualTo("securityIdentifier.idType");
+          assertThat(rve.getMessage()).isEqualTo("Security Identifier ID Type must not be null");
         });
   }
 
@@ -140,6 +193,7 @@ class HoldingReqValidatorTest {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_NULL");
           assertThat(rve.getFieldName()).isEqualTo("securityIdentifier");
+          assertThat(rve.getMessage()).isEqualTo("Security Identifier must not be null");
         });
   }
 

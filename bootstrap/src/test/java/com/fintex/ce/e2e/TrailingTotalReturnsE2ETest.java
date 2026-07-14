@@ -28,6 +28,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -156,6 +158,17 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     Notification error = assertValidationError(postCalculation(writeJson(command)), "VAL-003", "holdings");
     assertThat(error.getMessage()).isEqualTo("holdings must not be empty");
     assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "holdings");
+  }
+
+  @Test
+  void shouldReturnBadRequest_whenHoldingTypeIsMissing() {
+    PeriodCommand command = periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"),
+        List.of(holding(XBAL, FinancialInstrumentType.ETF_CANADA, "50000")));
+    ObjectNode body = (ObjectNode) parseJson(writeJson(command));
+    ((ObjectNode) body.get("holdings").get(0)).remove("holdingType");
+
+    Notification error = assertValidationError(postCalculation(body.toString()), "VAL-001", "holdingType");
+    assertThat(error.getMessage()).isEqualTo("Holding Type must not be null");
   }
 
   @Test
