@@ -17,7 +17,7 @@ import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocatio
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
-import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSecurities;
+import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSector;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
@@ -29,8 +29,8 @@ import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
-import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
-import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.GeographicAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.Maturities;
 import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
@@ -107,7 +107,7 @@ public class AllocationFetchers {
       SecurityMasterWebClient client, EquitySectorAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.equity-sector}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<EquitySectorAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<EquitySectorAllocationWithCurrency>>>() {}) {};
   }
 
   @Bean
@@ -119,11 +119,11 @@ public class AllocationFetchers {
   }
 
   @Bean
-  SecurityDataFetcher<FixedIncomeBondSecurities> fixedIncomeBondSecuritiesFetcher(
+  SecurityDataFetcher<FixedIncomeBondSector> fixedIncomeBondSectorFetcher(
       SecurityMasterWebClient client, FixedIncomeSectorAllocationMapper mapper,
       @Value("${external-services.security-master.rest.endpoints.allocations.fixed-income-sector}") String endpointPath) {
     return new AbstractSecurityMasterFetcher<>(client, endpointPath, mapper,
-        new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeSectorAllocation>>>() {}) {};
+        new ParameterizedTypeReference<List<SecurityAttributeResult<FixedIncomeSectorAllocationWithCurrency>>>() {}) {};
   }
 
   @Bean

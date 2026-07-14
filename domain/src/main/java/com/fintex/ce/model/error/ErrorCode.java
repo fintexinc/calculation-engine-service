@@ -428,6 +428,16 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  SECURITY_NOT_FOUND_FOR_METRIC(
+      Codes.SECURITY_NOT_FOUND_FOR_METRIC,
+      "Security information not found by the data source for %2$s",
+      "The data source has no record of this security at all (not merely missing a specific attribute). "
+          + "Depending on the metric, its value is either allocated to Unclassified so portfolio totals still "
+          + "sum to 100%, or counted as its own unresolved holding",
+      "Verify the security identifier is valid or switch to a data provider that covers it",
+      HttpStatus.OK,
+      Severity.WARNING),
+
   // ============================================
   // TBL-xxx — T-Bill (risk-free rate) errors
   // ============================================
@@ -1156,6 +1166,7 @@ public enum ErrorCode {
 
     // Security catalog (existence)
     public static final String NO_SECURITY_DATA_FOR_HOLDING = "SEC-001";
+    public static final String SECURITY_NOT_FOUND_FOR_METRIC = "SEC-002";
 
     // Returns / NAV
     public static final String MISSING_MONTHLY_RETURNS = "RET-001";

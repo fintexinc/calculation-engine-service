@@ -1,7 +1,7 @@
 package com.fintex.ce.model.domain.result.allocation;
 
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
-import com.fintex.wm.commons.domain.allocation.FixedIncomeSecuritiesAllocationType;
+import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -22,6 +22,8 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "Response for fixed-income-bond-sector metric. Contains fixed income bond sector allocation breakdown.")
 public class FixedIncomeSectorResult extends BaseCalculationResult {
 
-  @Schema(description = "Fixed income allocation percentages by bond sector")
-  private Map<FixedIncomeSecuritiesAllocationType, BigDecimal> fixedIncomeSector;
+  @Schema(description = "Fixed income allocation percentages by bond sector. Holdings the data source has no record "
+      + "of at all, or resolved but did not return a bond sector breakdown for, are counted under "
+      + "FixedIncomeSectorAllocationType.UNKNOWN.")
+  private Map<FixedIncomeSectorAllocationType, BigDecimal> fixedIncomeSector;
 }

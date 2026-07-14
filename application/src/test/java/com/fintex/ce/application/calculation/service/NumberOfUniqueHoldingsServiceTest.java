@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.holding.NumberOfUniqueHoldingsResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.holding.HoldingIdentifiers;
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -87,18 +89,21 @@ class NumberOfUniqueHoldingsServiceTest {
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
     PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(fetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
         h1, holdingIdentifiers((List<SecurityIdentifier>) null),
         h2, holdingIdentifiers(List.of()),
-        h3, holdingIdentifiers(id("A", FiIdentifierType.MORNINGSTAR_ID))));
+        h3, holdingIdentifiers(id("A", FiIdentifierType.MORNINGSTAR_ID)));
+    when(fetcher.fetch(any(), any())).thenReturn(fetched);
 
-    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithHoldings(fetched.keySet()));
 
-    assertEquals(1L, result.getNumberOfUniqueHoldings());
+    assertEquals(3L, result.getNumberOfUniqueHoldings());
     assertEquals(1, result.getWarnings().size());
     Notification warning = result.getWarnings().get(0);
     assertEquals(ErrorCode.Codes.MISSING_HOLDING_IDENTIFIERS, warning.getCode());
-    assertTrue(warning.getMessage().contains("2"), "warning message must report count of 2 securities");
+    assertEquals("2 portfolio securities are missing underlying holding identifiers of the configured comparison type",
+        warning.getMessage());
+    assertEquals(2, warning.getMetadata().get(ErrorParams.PARAM_KEY_PREFIX + 1));
   }
 
   @Test
@@ -106,21 +111,24 @@ class NumberOfUniqueHoldingsServiceTest {
     var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(fetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
         h1, holdingIdentifiers(
             id(null, FiIdentifierType.MORNINGSTAR_ID),
             id("A", FiIdentifierType.MORNINGSTAR_ID)),
         h2, holdingIdentifiers(
             id(null, FiIdentifierType.MORNINGSTAR_ID),
-            id(null, FiIdentifierType.MORNINGSTAR_ID))));
+            id(null, FiIdentifierType.MORNINGSTAR_ID)));
+    when(fetcher.fetch(any(), any())).thenReturn(fetched);
 
-    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithHoldings(fetched.keySet()));
 
     assertEquals(2L, result.getNumberOfUniqueHoldings());
     assertEquals(1, result.getWarnings().size());
     Notification warning = result.getWarnings().get(0);
     assertEquals(ErrorCode.Codes.MISSING_UNDERLYING_HOLDING_ID_VALUE, warning.getCode());
-    assertTrue(warning.getMessage().contains("3"), "warning message must report count of 3 underlying holdings");
+    assertEquals("3 underlying holdings have a null identifier value for the configured comparison type",
+        warning.getMessage());
+    assertEquals(3, warning.getMetadata().get(ErrorParams.PARAM_KEY_PREFIX + 1));
   }
 
   @Test
@@ -128,18 +136,39 @@ class NumberOfUniqueHoldingsServiceTest {
     var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(fetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
         h1, holdingIdentifiers(List.of()),
-        h2, holdingIdentifiers(id(null, FiIdentifierType.MORNINGSTAR_ID))));
+        h2, holdingIdentifiers(id(null, FiIdentifierType.MORNINGSTAR_ID)));
+    when(fetcher.fetch(any(), any())).thenReturn(fetched);
 
-    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithHoldings(fetched.keySet()));
 
-    assertEquals(1L, result.getNumberOfUniqueHoldings());
+    assertEquals(2L, result.getNumberOfUniqueHoldings());
     assertEquals(2, result.getWarnings().size());
     assertTrue(result.getWarnings().stream()
         .anyMatch(w -> ErrorCode.Codes.MISSING_HOLDING_IDENTIFIERS.equals(w.getCode())));
     assertTrue(result.getWarnings().stream()
         .anyMatch(w -> ErrorCode.Codes.MISSING_UNDERLYING_HOLDING_ID_VALUE.equals(w.getCode())));
+  }
+
+  @Test
+  void shouldCountUnresolvedHoldingIndividuallyAndEmitSecurityNotFoundWarning_whenSmHasNoRecordOfIdentifier() {
+    var service = new NumberOfUniqueHoldingsService(fetcher, FiIdentifierType.MORNINGSTAR_ID);
+    PortfolioHolding resolved = mock(PortfolioHolding.class);
+    PortfolioHolding unresolved = mock(PortfolioHolding.class);
+    when(unresolved.getIdsString()).thenReturn("ZZZ");
+    when(fetcher.fetch(any(), any())).thenReturn(
+        Map.of(resolved, holdingIdentifiers(id("A", FiIdentifierType.MORNINGSTAR_ID))));
+
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithHoldings(resolved, unresolved));
+
+    assertEquals(2L, result.getNumberOfUniqueHoldings());
+    assertEquals(1, result.getWarnings().size());
+    Notification warning = result.getWarnings().get(0);
+    assertEquals(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC, warning.getCode());
+    assertEquals("Security information not found by the data source for Number Of Unique Holdings",
+        warning.getMessage());
+    assertEquals("ZZZ", warning.getMetadata().get(ErrorParams.HOLDING_ID));
   }
 
   @ParameterizedTest(name = "[{index}] {0}")
@@ -153,7 +182,7 @@ class NumberOfUniqueHoldingsServiceTest {
     var service = new NumberOfUniqueHoldingsService(fetcher, configuredType);
     when(fetcher.fetch(any(), any())).thenReturn(fetched);
 
-    NumberOfUniqueHoldingsResult result = service.perform(commandWithoutData());
+    NumberOfUniqueHoldingsResult result = service.perform(commandWithHoldings(fetched.keySet()));
 
     assertEquals(expectedCount, result.getNumberOfUniqueHoldings());
     assertEquals(expectedWarnings, result.getWarnings().size());
@@ -166,16 +195,16 @@ class NumberOfUniqueHoldingsServiceTest {
 
     return Stream.of(
         Arguments.of(
-            "single holding with null holdingIds list → null, 1 warning",
+            "single holding with null holdingIds list → counted individually, 1 warning",
             FiIdentifierType.MORNINGSTAR_ID,
             Map.of(h1, holdingIdentifiers((List<SecurityIdentifier>) null)),
-            null,
+            1L,
             1),
         Arguments.of(
-            "single holding with empty holdingIds list → null, 1 warning",
+            "single holding with empty holdingIds list → counted individually, 1 warning",
             FiIdentifierType.MORNINGSTAR_ID,
             Map.of(h1, holdingIdentifiers(List.of())),
-            null,
+            1L,
             1),
         Arguments.of(
             "single holding with three distinct ids of configured type → 3, 0 warnings",
@@ -235,22 +264,22 @@ class NumberOfUniqueHoldingsServiceTest {
             3L,
             0),
         Arguments.of(
-            "no ids match configured type → null, 1 warning",
+            "no ids match configured type → counted individually, 1 warning",
             FiIdentifierType.MORNINGSTAR_ID,
             Map.of(h1, holdingIdentifiers(
                 id("TSLA", FiIdentifierType.TICKER),
                 id("NVDA", FiIdentifierType.TICKER))),
-            null,
+            1L,
             1),
         Arguments.of(
-            "mixed holdings: one with null list, one with ids → counts ids from non-null, 1 warning",
+            "mixed holdings: one with null list, one with ids → counts ids from non-null plus the null-list holding, 1 warning",
             FiIdentifierType.MORNINGSTAR_ID,
             Map.of(
                 h1, holdingIdentifiers((List<SecurityIdentifier>) null),
                 h2, holdingIdentifiers(
                     id("A", FiIdentifierType.MORNINGSTAR_ID),
                     id("B", FiIdentifierType.MORNINGSTAR_ID))),
-            2L,
+            3L,
             1),
         Arguments.of(
             "holding with null MstarId value on configured-type identifier → counted as unique, 1 warning",
@@ -291,22 +320,33 @@ class NumberOfUniqueHoldingsServiceTest {
             1L,
             1),
         Arguments.of(
-            "holding with null MstarId but configured type is TICKER → no configured-type id, 1 warning",
+            "holding with null MstarId but configured type is TICKER → no configured-type id, counted individually, 1 warning",
             FiIdentifierType.TICKER,
             Map.of(h1, holdingIdentifiers(id(null, FiIdentifierType.MORNINGSTAR_ID))),
-            null,
+            1L,
             1),
         Arguments.of(
-            "holding with a null SecurityIdentifier element in the list → null, 1 warning",
+            "holding with a null SecurityIdentifier element in the list → counted individually, 1 warning",
             FiIdentifierType.MORNINGSTAR_ID,
             Map.of(h1, holdingIdentifiers(Collections.singletonList(null))),
-            null,
+            1L,
             1));
   }
 
   private static PortfolioHoldingsCommand commandWithoutData() {
     return PortfolioHoldingsCommand.builder()
         .holdings(List.of())
+        .dataProviders(List.of())
+        .build();
+  }
+
+  private static PortfolioHoldingsCommand commandWithHoldings(PortfolioHolding... holdings) {
+    return commandWithHoldings(List.of(holdings));
+  }
+
+  private static PortfolioHoldingsCommand commandWithHoldings(Collection<PortfolioHolding> holdings) {
+    return PortfolioHoldingsCommand.builder()
+        .holdings(List.copyOf(holdings))
         .dataProviders(List.of())
         .build();
   }

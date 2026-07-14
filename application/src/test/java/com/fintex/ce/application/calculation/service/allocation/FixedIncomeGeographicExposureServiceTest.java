@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.service.allocation;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeGeographicExposureResult;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.financial.Geography;
@@ -63,7 +64,7 @@ class FixedIncomeGeographicExposureServiceTest
 
   @Override
   protected String expectedMissingFundAllocationCode() {
-    return "FDS-031";
+    return ErrorCode.Codes.MISSING_FIXED_INCOME_GEOGRAPHIC_EXPOSURE;
   }
 
   @Test

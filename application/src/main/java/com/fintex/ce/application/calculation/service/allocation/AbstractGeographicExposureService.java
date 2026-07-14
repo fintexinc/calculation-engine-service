@@ -99,16 +99,11 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
       }
     }
 
-    if (allEmpty(exposures)) {
-      return buildResult(emptyRegionMap(), warnings);
-    }
-
     PortfolioWeightCalculator.Result weightResult = portfolioWeightCalculator.compute(relevant, currencies);
     warnings.addAll(weightResult.warnings());
 
     Map<GeographicRegionType, BigDecimal> netProducts = aggregate(exposures, weightResult.weights());
-    Map<GeographicRegionType, BigDecimal> scaled = toUserScale(reScaleAbs(netProducts));
-    return buildResult(scaled, warnings);
+    return buildResult(toUserScale(reScaleAbs(netProducts)), warnings);
   }
 
   protected abstract Predicate<PortfolioHolding> relevantHoldingPredicate();
@@ -129,10 +124,15 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
 
   private Map<GeographicRegionType, BigDecimal> stockAllocation(PortfolioHolding holding, Geography geography,
       List<Notification> warnings) {
+    if (geography == null) {
+      warnings.add(ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC.toNotificationForHolding(holding,
+          getMetric().getUserFriendlyName()));
+      return unknownAllocation();
+    }
     GeographicRegionType region = resolveStockRegion(geography);
     if (region == null) {
       warnings.add(ErrorCode.MISSING_BUSINESS_COUNTRY_CODE.toNotificationForHolding(holding));
-      return new EnumMap<>(GeographicRegionType.class);
+      return unknownAllocation();
     }
     Map<GeographicRegionType, BigDecimal> result = new EnumMap<>(GeographicRegionType.class);
     result.put(region, BigDecimal.ONE);
@@ -168,11 +168,22 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
 
   private Map<GeographicRegionType, BigDecimal> fundAllocation(PortfolioHolding holding,
       HoldingGeographicAllocation allocation, List<Notification> warnings) {
-    if (allocation == null || allocation.getAllocations() == null || allocation.getAllocations().isEmpty()) {
+    if (allocation == null) {
+      warnings.add(ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC.toNotificationForHolding(holding,
+          getMetric().getUserFriendlyName()));
+      return unknownAllocation();
+    }
+    if (allocation.getAllocations() == null || allocation.getAllocations().isEmpty()) {
       warnings.add(missingFundAllocationErrorCode().toNotificationForHolding(holding));
-      return new EnumMap<>(GeographicRegionType.class);
+      return unknownAllocation();
     }
     return new EnumMap<>(allocation.getAllocations());
+  }
+
+  private Map<GeographicRegionType, BigDecimal> unknownAllocation() {
+    Map<GeographicRegionType, BigDecimal> result = new EnumMap<>(GeographicRegionType.class);
+    result.put(GeographicRegionType.UNKNOWN, BigDecimal.ONE);
+    return result;
   }
 
   private Currency currencyFor(PortfolioHolding holding,
@@ -187,15 +198,6 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
     return Optional.ofNullable(fundExposures.get(holding))
         .map(HoldingGeographicAllocation::getCurrency)
         .orElse(null);
-  }
-
-  private boolean allEmpty(Map<PortfolioHolding, Map<GeographicRegionType, BigDecimal>> exposures) {
-    for (Map<GeographicRegionType, BigDecimal> value : exposures.values()) {
-      if (value != null && !value.isEmpty()) {
-        return false;
-      }
-    }
-    return true;
   }
 
   private Map<GeographicRegionType, BigDecimal> aggregate(
@@ -220,5 +222,4 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
             (map, type) -> map.put(type, null),
             EnumMap::putAll);
   }
-
 }

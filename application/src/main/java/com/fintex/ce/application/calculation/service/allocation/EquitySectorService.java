@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.mapping.response.EquitySectorResponseMapper;
 import com.fintex.ce.application.util.ExposureDataHolder;
-import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -17,30 +16,20 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_SECTOR_ALLOCATION;
+import static com.fintex.ce.model.error.ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC;
 import static com.fintex.ce.util.FilterUtils.CASH_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
-import static java.math.BigDecimal.ZERO;
 
 @Service
 public class EquitySectorService
     extends
       BreakdownAbstractService<EquitySectorResult, EquitySectorAllocationType> {
-
-  static final Map<EquitySectorAllocationType, BigDecimal> ALLOCATION_DEFAULT_MAP;
-
-  static {
-    ALLOCATION_DEFAULT_MAP = Collections.unmodifiableMap(
-        Stream.of(EquitySectorAllocationType.values()).collect(toMap(type -> type, type -> ZERO)));
-  }
 
   private final SecurityDataFetcher<EquitySector> equitySectorSecurityDataFetcher;
   private final EquitySectorResponseMapper responseMapper;
@@ -62,7 +51,7 @@ public class EquitySectorService
       List<PortfolioHolding> holdings) {
     var sectors = exposureData.allocations();
     var warnings = new ArrayList<>(exposureData.warnings());
-    if (PortfolioUtils.areAllValuesZerosInMap(sectors)) {
+    if (sectors.isEmpty()) {
       return responseMapper.toEmptyResponse(warnings);
     }
     final Map<EquitySectorAllocationType, BigDecimal> netProducts = calculateNetProducts(sectors, holdings,
@@ -83,15 +72,22 @@ public class EquitySectorService
 
   private Map<EquitySectorAllocationType, BigDecimal> toSectorExposure(PortfolioHolding holding, EquitySector sector,
       List<Notification> warnings) {
-    Map<EquitySectorAllocationType, BigDecimal> allocations = Optional.ofNullable(sector)
-        .map(EquitySector::getAllocations)
-        .orElseGet(Map::of);
+    if (sector == null) {
+      warnings.add(SECURITY_NOT_FOUND_FOR_METRIC.toNotificationForHolding(holding,
+          getMetric().getUserFriendlyName()));
+      return unknownAllocation();
+    }
+    Map<EquitySectorAllocationType, BigDecimal> allocations = sector.getAllocations();
     if (CollectionUtils.isEmpty(allocations)) {
       warnings.add(MISSING_EQUITY_SECTOR_ALLOCATION.toNotificationForHolding(holding));
-      return new EnumMap<>(ALLOCATION_DEFAULT_MAP);
+      return unknownAllocation();
     }
-    Map<EquitySectorAllocationType, BigDecimal> result = new EnumMap<>(ALLOCATION_DEFAULT_MAP);
-    result.putAll(allocations);
+    return new EnumMap<>(allocations);
+  }
+
+  private static Map<EquitySectorAllocationType, BigDecimal> unknownAllocation() {
+    Map<EquitySectorAllocationType, BigDecimal> result = new EnumMap<>(EquitySectorAllocationType.class);
+    result.put(EquitySectorAllocationType.UNKNOWN, BigDecimal.ONE);
     return result;
   }
 }

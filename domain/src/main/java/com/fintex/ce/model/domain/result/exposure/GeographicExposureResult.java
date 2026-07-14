@@ -23,6 +23,8 @@ import lombok.experimental.SuperBuilder;
 @Schema(description = "Response for equity-geographic-exposure and fixed-income-geographic-exposure metrics. Contains geographic exposure breakdown by region.")
 public class GeographicExposureResult extends BaseCalculationResult {
 
-  @Schema(description = "Geographic exposure percentages by region")
+  @Schema(description = "Geographic exposure percentages by region. Holdings the data source has no record of at "
+      + "all, or resolved but did not return a geographic breakdown for, are counted under "
+      + "GeographicRegionType.UNKNOWN.")
   private Map<GeographicRegionType, BigDecimal> geographicExposure;
 }

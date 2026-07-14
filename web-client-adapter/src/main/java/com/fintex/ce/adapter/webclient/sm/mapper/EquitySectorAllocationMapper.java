@@ -6,6 +6,7 @@ import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
 
 import org.springframework.stereotype.Component;
 
@@ -19,13 +20,14 @@ import java.util.stream.Collectors;
 @Component
 public class EquitySectorAllocationMapper
     implements
-      SecurityMasterResponseMapper<EquitySector, EquitySectorAllocation> {
+      SecurityMasterResponseMapper<EquitySector, EquitySectorAllocationWithCurrency> {
 
   @Override
-  public EquitySector map(EquitySectorAllocation smsResponse, PortfolioHolding holding) {
+  public EquitySector map(EquitySectorAllocationWithCurrency smsResponse, PortfolioHolding holding) {
     Map<EquitySectorAllocationType, BigDecimal> allocationMap = Optional.ofNullable(smsResponse)
+        .map(EquitySectorAllocationWithCurrency::getEquitySectorAllocation)
         .map(EquitySectorAllocation::getAllocations)
-        .orElse(List.of())
+        .orElseGet(List::of)
         .stream()
         .filter(entry -> entry.getType() != null && entry.getValue() != null)
         .collect(Collectors.toMap(
@@ -35,6 +37,7 @@ public class EquitySectorAllocationMapper
             () -> new EnumMap<>(EquitySectorAllocationType.class)));
 
     final List<DataProvider> providers = Optional.ofNullable(smsResponse)
+        .map(EquitySectorAllocationWithCurrency::getEquitySectorAllocation)
         .map(EquitySectorAllocation::getDataProviders)
         .orElseGet(List::of);
 

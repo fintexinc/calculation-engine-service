@@ -6,6 +6,7 @@ import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -26,13 +27,11 @@ class EquitySectorAllocationMapperTest {
 
   @Test
   void shouldMapAllFieldsCorrectly_whenResponseHasMultipleSectorsAndProvider() {
-    var techEntry = createEntry(EquitySectorAllocationType.TECHNOLOGY, "28.5");
-    var healthEntry = createEntry(EquitySectorAllocationType.HEALTHCARE, "15.3");
-    var energyEntry = createEntry(EquitySectorAllocationType.ENERGY, "8.7");
-
-    var smsResponse = new EquitySectorAllocation();
-    smsResponse.setAllocations(List.of(techEntry, healthEntry, energyEntry));
-    smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
+    EquitySectorAllocationWithCurrency smsResponse = response(List.of(
+        createEntry(EquitySectorAllocationType.TECHNOLOGY, "28.5"),
+        createEntry(EquitySectorAllocationType.HEALTHCARE, "15.3"),
+        createEntry(EquitySectorAllocationType.ENERGY, "8.7")),
+        DataProvider.MORNINGSTAR);
 
     PortfolioHolding holding = createHolding("XIU.TO");
 
@@ -48,7 +47,7 @@ class EquitySectorAllocationMapperTest {
   @ParameterizedTest
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyAllocations_whenResponseIsNullOrHasNoAllocation(
-      EquitySectorAllocation smsResponse) {
+      EquitySectorAllocationWithCurrency smsResponse) {
     PortfolioHolding holding = createHolding("TEST.ID");
 
     EquitySector result = mapper.map(smsResponse, holding);
@@ -58,16 +57,14 @@ class EquitySectorAllocationMapperTest {
   }
 
   static Stream<Arguments> nullAndEmptyResponses() {
-    var nullAllocationResponse = new EquitySectorAllocation();
-    nullAllocationResponse.setAllocations(null);
-
-    var emptyAllocationResponse = new EquitySectorAllocation();
-    emptyAllocationResponse.setAllocations(List.of());
+    var nullInner = new EquitySectorAllocationWithCurrency();
+    nullInner.setEquitySectorAllocation(null);
 
     return Stream.of(
-        Arguments.of((EquitySectorAllocation) null),
-        Arguments.of(nullAllocationResponse),
-        Arguments.of(emptyAllocationResponse));
+        Arguments.of((EquitySectorAllocationWithCurrency) null),
+        Arguments.of(nullInner),
+        Arguments.of(response(null)),
+        Arguments.of(response(List.of())));
   }
 
   @Test
@@ -77,10 +74,7 @@ class EquitySectorAllocationMapperTest {
     nullTypeEntry.setType(null);
     nullTypeEntry.setValue(BigDecimal.valueOf(5.0));
 
-    var smsResponse = new EquitySectorAllocation();
-    smsResponse.setAllocations(List.of(validEntry, nullTypeEntry));
-
-    EquitySector result = mapper.map(smsResponse, createHolding("TEST.ID"));
+    EquitySector result = mapper.map(response(List.of(validEntry, nullTypeEntry)), createHolding("TEST.ID"));
 
     assertThat(result.getAllocations()).hasSize(1);
     assertThat(result.getAllocations()).containsKey(EquitySectorAllocationType.INDUSTRIALS);
@@ -102,10 +96,7 @@ class EquitySectorAllocationMapperTest {
         createEntry(EquitySectorAllocationType.TECHNOLOGY, "15.0"),
         createEntry(EquitySectorAllocationType.UTILITIES, "4.0"));
 
-    var smsResponse = new EquitySectorAllocation();
-    smsResponse.setAllocations(entries);
-
-    EquitySector result = mapper.map(smsResponse, createHolding("FULL.TEST"));
+    EquitySector result = mapper.map(response(entries), createHolding("FULL.TEST"));
 
     assertThat(result.getAllocations()).hasSize(11);
     assertThat(result.getAllocations().get(EquitySectorAllocationType.BASIC_MATERIALS)).isEqualByComparingTo("5.0");
@@ -120,6 +111,18 @@ class EquitySectorAllocationMapperTest {
     assertThat(result.getAllocations().get(EquitySectorAllocationType.REAL_ESTATE)).isEqualByComparingTo("4.0");
     assertThat(result.getAllocations().get(EquitySectorAllocationType.TECHNOLOGY)).isEqualByComparingTo("15.0");
     assertThat(result.getAllocations().get(EquitySectorAllocationType.UTILITIES)).isEqualByComparingTo("4.0");
+  }
+
+  private static EquitySectorAllocationWithCurrency response(List<EquitySectorAllocationTypeValue> values,
+      DataProvider... providers) {
+    var inner = new EquitySectorAllocation();
+    inner.setAllocations(values);
+    if (providers.length > 0) {
+      inner.setDataProviders(List.of(providers));
+    }
+    var wrapper = new EquitySectorAllocationWithCurrency();
+    wrapper.setEquitySectorAllocation(inner);
+    return wrapper;
   }
 
   private EquitySectorAllocationTypeValue createEntry(
