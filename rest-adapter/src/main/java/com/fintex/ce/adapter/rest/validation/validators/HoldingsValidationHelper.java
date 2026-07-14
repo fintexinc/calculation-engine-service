@@ -26,6 +26,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class HoldingsValidationHelper {
 
+  private static final String HOLDING_TYPE_FIELD = "holdingType";
+  private static final String USER_FORMATTED_HOLDING_TYPE_FIELD = "Holding Type";
   private static final String SECURITY_IDENTIFIER_FIELD = "securityIdentifier";
   private static final String USER_FORMATTED_SECURITY_IDENTIFIER_FIELD = "Security Identifier";
   private static final String SECURITY_IDENTIFIER_ID_FIELD = "securityIdentifier.id";
@@ -37,6 +39,7 @@ public class HoldingsValidationHelper {
     if (CollectionUtils.isEmpty(holdings)) {
       return;
     }
+    validateHoldingTypes(holdings);
     validateSecurityIdentifiers(holdings);
     validateGicInvestmentDates(holdings);
     validateCashHoldingCurrencies(holdings);
@@ -59,6 +62,15 @@ public class HoldingsValidationHelper {
     }
     if (sum.compareTo(BigDecimal.ZERO) <= 0) {
       throw ErrorCode.HOLDING_VALUES_SUM_NOT_POSITIVE.toValidationException();
+    }
+  }
+
+  private static void validateHoldingTypes(List<PortfolioHolding> holdings) {
+    for (PortfolioHolding holding : holdings) {
+      if (holding == null || holding.getHoldingType() == null) {
+        throw ErrorCode.FIELD_NOT_NULL.toValidationExceptionForField(HOLDING_TYPE_FIELD,
+            USER_FORMATTED_HOLDING_TYPE_FIELD);
+      }
     }
   }
 
