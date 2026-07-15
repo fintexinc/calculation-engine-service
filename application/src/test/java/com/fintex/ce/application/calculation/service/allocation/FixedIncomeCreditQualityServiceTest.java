@@ -202,7 +202,7 @@ class FixedIncomeCreditQualityServiceTest {
 
     PortfolioHolding holding = mock(PortfolioHolding.class);
     HoldingAssetAllocation allocation = HoldingAssetAllocation.builder()
-        .allocations(Map.of(AssetAllocationRegionType.US_EQUITIES, TEN,
+        .allocations(Map.of(AssetAllocationRegionType.EQUITY, TEN,
             AssetAllocationRegionType.FIXED_INCOME, HUNDRED))
         .build();
     when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of(holding, allocation));

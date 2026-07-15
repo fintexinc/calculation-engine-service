@@ -26,6 +26,8 @@ import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
@@ -45,11 +47,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Shared assertions for asset-allocation breakdown services. Mirrors the service hierarchy: every behaviour driven by
- * {@link AbstractAssetAllocationService} is exercised once here, and the concrete tests only declare the per-service
- * expected distributions (where the regular AA collapses {@code EM_EQUITIES} into {@code INTERNATIONAL_EQUITIES} and
- * the EM variant keeps them separate). Each test asserts the full per-region distribution via
- * {@link #assertAllocationEquals} — every emitted bucket is checked, not just the headline non-zero ones.
+ * Shared assertions for asset-allocation breakdown services. Every behaviour driven by
+ * {@link AbstractAssetAllocationService} is exercised once here; the concrete tests only wire the service under test
+ * and expose its result accessors. Regional equities are consolidated into a single
+ * {@link AssetAllocationRegionType#EQUITY} bucket in the commons model, so both the regular and emerging-markets
+ * services now produce the same distribution. Each test asserts the full distribution via
+ * {@link #assertAllocationEquals} — every emitted bucket is checked.
  */
 @SuppressWarnings("unchecked")
 abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResult> {
@@ -86,23 +89,11 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   protected abstract List<Notification> getWarnings(R result);
 
-  /**
-   * The set of region types this service emits. The regular AA omits {@code EM_EQUITIES} (collapsed into
-   * {@code INTERNATIONAL_EQUITIES}); the EM-aware variant emits the full enum.
-   */
-  protected abstract Set<AssetAllocationRegionType> emittedTypes();
-
-  protected abstract Map<AssetAllocationRegionType, BigDecimal> expectedForEmergingMarketStockAlone();
-
-  protected abstract Map<AssetAllocationRegionType, BigDecimal> expectedForCashHalfPlusEmStockHalf();
-
-  protected abstract Map<AssetAllocationRegionType, BigDecimal> expectedForSamsungPlusEmEtf();
-
-  protected abstract Map<AssetAllocationRegionType, BigDecimal> expectedForCalculateOnSingleEmEquity();
-
   protected Map<AssetAllocationRegionType, BigDecimal> baseline() {
     Map<AssetAllocationRegionType, BigDecimal> map = new EnumMap<>(AssetAllocationRegionType.class);
-    emittedTypes().forEach(type -> map.put(type, ZERO));
+    for (AssetAllocationRegionType type : AssetAllocationRegionType.values()) {
+      map.put(type, ZERO);
+    }
     return map;
   }
 
@@ -165,53 +156,18 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.CASH, ONE));
   }
 
-  @Test
-  void usStock_mappedToUsEquities() {
+  @ParameterizedTest
+  @EnumSource(value = SecurityRegion.class, names = {"USA", "CANADA", "OTHER", "EMERGING_MARKETS"})
+  void stockWithResolvableRegion_mappedToEquity(SecurityRegion region) {
     PortfolioHolding stock = stock("AAPL");
-    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.USA)).build();
+    Geography geography = Geography.builder().region(regionDatapoint(region)).build();
     when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(stock, geography));
     when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
 
     R result = service.perform(command(stock));
 
-    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.US_EQUITIES, ONE));
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.EQUITY, ONE));
     assertThat(getWarnings(result)).isEmpty();
-  }
-
-  @Test
-  void canadianStock_mappedToCanadianEquities() {
-    PortfolioHolding stock = stock("RY");
-    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.CANADA)).build();
-    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(stock, geography));
-    when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
-
-    R result = service.perform(command(stock));
-
-    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.CANADIAN_EQUITIES, ONE));
-  }
-
-  @Test
-  void developedNonNorthAmericanStock_mappedToInternationalEquities() {
-    PortfolioHolding stock = stock("SAP");
-    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.OTHER)).build();
-    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(stock, geography));
-    when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
-
-    R result = service.perform(command(stock));
-
-    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.INTERNATIONAL_EQUITIES, ONE));
-  }
-
-  @Test
-  void emergingMarketStock_classifiedPerServiceConvention() {
-    PortfolioHolding samsung = stock("005930");
-    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.EMERGING_MARKETS)).build();
-    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(samsung, geography));
-    when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
-
-    R result = service.perform(command(samsung));
-
-    assertAllocationEquals(result, expectedForEmergingMarketStockAlone());
   }
 
   @Test
@@ -232,7 +188,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     PortfolioHolding fund = mutualFund("RBF605");
     HoldingAssetAllocation allocation = HoldingAssetAllocation.builder()
         .allocations(Map.of(
-            AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.6"),
+            AssetAllocationRegionType.EQUITY, new BigDecimal("0.6"),
             AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("0.4")))
         .build();
     when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(fund, allocation));
@@ -241,7 +197,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     R result = service.perform(command(fund));
 
     Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
-    expected.put(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.6"));
+    expected.put(AssetAllocationRegionType.EQUITY, new BigDecimal("0.6"));
     expected.put(AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("0.4"));
     assertAllocationEquals(result, expected);
   }
@@ -261,7 +217,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   }
 
   @Test
-  void mixedPortfolio_cashAndUsStock_weightedAggregate() {
+  void mixedPortfolio_cashAndStock_weightedAggregate() {
     CashHolding cash = CashHolding.builder()
         .value(BigDecimal.valueOf(50))
         .holdingType(FinancialInstrumentType.CASH)
@@ -276,45 +232,32 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
     Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
     expected.put(AssetAllocationRegionType.CASH, HALF);
-    expected.put(AssetAllocationRegionType.US_EQUITIES, HALF);
+    expected.put(AssetAllocationRegionType.EQUITY, HALF);
     assertAllocationEquals(result, expected);
   }
 
   @Test
-  void mixedPortfolio_cashAndEmergingMarketStock_weightedAggregate() {
-    CashHolding cash = CashHolding.builder()
-        .value(BigDecimal.valueOf(50))
-        .holdingType(FinancialInstrumentType.CASH)
-        .build();
-    PortfolioHolding emStock = stock("BABA").toBuilder().value(BigDecimal.valueOf(50)).build();
+  void stockPlusEtf_aggregatesEquityAndCash() {
+    PortfolioHolding stock = stock("005930").toBuilder().value(BigDecimal.valueOf(50)).build();
+    PortfolioHolding etf = etf("CSEMAS").toBuilder().value(BigDecimal.valueOf(50)).build();
 
     Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.EMERGING_MARKETS)).build();
-    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(emStock, geography));
-    when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
+    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(stock, geography));
 
-    R result = service.perform(command(cash, emStock));
-
-    assertAllocationEquals(result, expectedForCashHalfPlusEmStockHalf());
-  }
-
-  @Test
-  void samsungPlusEmEtf_aggregatesPerServiceConvention() {
-    PortfolioHolding samsung = stock("005930").toBuilder().value(BigDecimal.valueOf(50)).build();
-    PortfolioHolding emEtf = etf("CSEMAS").toBuilder().value(BigDecimal.valueOf(50)).build();
-
-    Geography koreaGeography = Geography.builder().region(regionDatapoint(SecurityRegion.EMERGING_MARKETS)).build();
-    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(samsung, koreaGeography));
-
-    HoldingAssetAllocation emEtfAllocation = HoldingAssetAllocation.builder()
+    HoldingAssetAllocation etfAllocation = HoldingAssetAllocation.builder()
         .allocations(Map.of(
-            AssetAllocationRegionType.EM_EQUITIES, new BigDecimal("0.95"),
+            AssetAllocationRegionType.EQUITY, new BigDecimal("0.95"),
             AssetAllocationRegionType.CASH, new BigDecimal("0.05")))
         .build();
-    when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(emEtf, emEtfAllocation));
+    when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(etf, etfAllocation));
 
-    R result = service.perform(command(samsung, emEtf));
+    R result = service.perform(command(stock, etf));
 
-    assertAllocationEquals(result, expectedForSamsungPlusEmEtf());
+    // stock (50% weight) -> 100% EQUITY; etf (50% weight) -> 95% EQUITY + 5% CASH.
+    Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
+    expected.put(AssetAllocationRegionType.EQUITY, new BigDecimal("0.975"));
+    expected.put(AssetAllocationRegionType.CASH, new BigDecimal("0.025"));
+    assertAllocationEquals(result, expected);
   }
 
   @Test
@@ -322,7 +265,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     PortfolioHolding fund = mutualFund("RBF999");
     HoldingAssetAllocation noisyAllocation = HoldingAssetAllocation.builder()
         .allocations(Map.of(
-            AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.9999948939"),
+            AssetAllocationRegionType.EQUITY, new BigDecimal("0.9999948939"),
             AssetAllocationRegionType.OTHER, new BigDecimal("-0.0000051061")))
         .build();
     when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(fund, noisyAllocation));
@@ -331,7 +274,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     R result = service.perform(command(fund));
 
     Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
-    expected.put(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.9999948939"));
+    expected.put(AssetAllocationRegionType.EQUITY, new BigDecimal("0.9999948939"));
     assertAllocationEquals(result, expected);
   }
 
@@ -340,7 +283,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     PortfolioHolding fund = mutualFund("RBF999");
     HoldingAssetAllocation allocation = HoldingAssetAllocation.builder()
         .allocations(Map.of(
-            AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.95"),
+            AssetAllocationRegionType.EQUITY, new BigDecimal("0.95"),
             AssetAllocationRegionType.OTHER, new BigDecimal("0.0001")))
         .build();
     when(assetAllocationFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(fund, allocation));
@@ -349,7 +292,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     R result = service.perform(command(fund));
 
     Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
-    expected.put(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.95"));
+    expected.put(AssetAllocationRegionType.EQUITY, new BigDecimal("0.95"));
     expected.put(AssetAllocationRegionType.OTHER, new BigDecimal("0.0001"));
     assertAllocationEquals(result, expected);
   }
@@ -375,7 +318,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
     Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
     expected.put(AssetAllocationRegionType.CASH, new BigDecimal("0.4"));
-    expected.put(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.6"));
+    expected.put(AssetAllocationRegionType.EQUITY, new BigDecimal("0.6"));
     assertAllocationEquals(result, expected);
     assertThat(getWarnings(result)).isEmpty();
   }
@@ -403,22 +346,22 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
     Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
     expected.put(AssetAllocationRegionType.CASH, HALF);
-    expected.put(AssetAllocationRegionType.US_EQUITIES, HALF);
+    expected.put(AssetAllocationRegionType.EQUITY, HALF);
     assertAllocationEquals(result, expected);
     assertThat(getWarnings(result)).hasSize(1);
     assertThat(getWarnings(result)).first().extracting(Notification::getCode).isEqualTo("FX-001");
   }
 
   @Test
-  void calculate_directInvocationOnEmExposure_handlesPerServiceConvention() {
+  void calculate_directInvocationOnEquityExposure_aggregatesEquity() {
     PortfolioHolding holding = mock(PortfolioHolding.class);
     when(holding.getValue()).thenReturn(ONE);
     Map<PortfolioHolding, Map<AssetAllocationRegionType, BigDecimal>> exposures = Map.of(
-        holding, Map.of(AssetAllocationRegionType.EM_EQUITIES, ONE));
+        holding, Map.of(AssetAllocationRegionType.EQUITY, ONE));
 
     R result = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of(holding));
 
-    assertAllocationEquals(result, expectedForCalculateOnSingleEmEquity());
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.EQUITY, ONE));
   }
 
   protected static PortfolioHoldingsCommand command(PortfolioHolding... holdings) {

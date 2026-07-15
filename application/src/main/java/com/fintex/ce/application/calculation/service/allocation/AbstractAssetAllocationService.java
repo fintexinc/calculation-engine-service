@@ -38,10 +38,10 @@ import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 /**
- * Shared implementation for asset-allocation breakdown services. Resolves each holding's region — stocks via
- * {@link Geography#getRegion()} mapped directly to {@link AssetAllocationRegionType} through
- * {@link AssetAllocationRegionType#getSecurityRegion()}, funds via the typed allocations from SMS — and aggregates
- * region exposures using portfolio weights derived from holding market values normalized to the default target currency
+ * Shared implementation for asset-allocation breakdown services. Resolves each holding's bucket — a stock with a
+ * resolvable {@link Geography#getRegion()} maps to the consolidated {@link AssetAllocationRegionType#EQUITY} bucket
+ * (regional equities are merged in the commons model), funds via the typed allocations from SMS — and aggregates
+ * exposures using portfolio weights derived from holding market values normalized to the default target currency
  * configured in {@link FxProperties#getDefaultTargetCurrency()}. Currency conversion is delegated to
  * {@link DefaultTargetCurrencyConverter}, which fetches spot FX rates and reports FX-rate-unavailable warnings. When a
  * holding has no source currency, its raw value participates in the weight unchanged (no warning). Subclasses produce
@@ -216,16 +216,9 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
       warnings.add(ErrorCode.MISSING_BUSINESS_COUNTRY_CODE.toNotificationForHolding(holding));
       return singleRegion(AssetAllocationRegionType.UNCLASSIFIED);
     }
-    return singleRegion(equityTypeFor(region));
-  }
-
-  private AssetAllocationRegionType equityTypeFor(SecurityRegion region) {
-    for (AssetAllocationRegionType type : AssetAllocationRegionType.values()) {
-      if (region.equals(type.getSecurityRegion())) {
-        return type;
-      }
-    }
-    return AssetAllocationRegionType.INTERNATIONAL_EQUITIES;
+    // Regional equities are consolidated into a single EQUITY bucket in the commons model; a stock with a resolvable
+    // region maps to EQUITY regardless of which region it is.
+    return singleRegion(AssetAllocationRegionType.EQUITY);
   }
 
   private Map<AssetAllocationRegionType, BigDecimal> fundAllocation(PortfolioHolding holding,

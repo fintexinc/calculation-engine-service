@@ -17,9 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Emerging-markets-aware asset allocation breakdown service. Keeps the emerging-markets bucket separate from the
- * international-equities bucket; otherwise shares its allocation classification and currency-adjusted weighting with
- * {@link AssetAllocationService}.
+ * Asset allocation breakdown service for the {@code ASSET_ALLOCATIONS_EM} metric.
+ * <p>
+ * Historically this kept the emerging-markets equities bucket separate from international equities. Since the commons
+ * model now consolidates all regional equities into a single {@link AssetAllocationRegionType#EQUITY} bucket, there is
+ * no longer an emerging-markets bucket to separate, so this produces the same breakdown as
+ * {@link AssetAllocationService}. It is retained for API/metric compatibility; removing the redundant
+ * {@code ASSET_ALLOCATIONS_EM} metric is a product decision tracked separately (TMI-542 follow-up).
  */
 @Service
 public class AssetAllocationEmergingMarketsService extends AbstractAssetAllocationService<AssetAllocationEMResult> {

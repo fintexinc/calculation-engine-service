@@ -28,7 +28,7 @@ class AssetAllocationSecurityMasterMapperTest {
   @Test
   void shouldMapAllocationsCurrencyAndProvider_whenResponseHasValues() {
     AssetAllocationWithCurrency smsResponse = withCurrency(List.of(
-        new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("60.5"), new TreeSet<>()),
+        new AssetAllocationValue(AssetAllocationRegionType.EQUITY, new BigDecimal("60.5"), new TreeSet<>()),
         new AssetAllocationValue(AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("30.0"), new TreeSet<>()),
         new AssetAllocationValue(AssetAllocationRegionType.CASH, new BigDecimal("9.5"), new TreeSet<>())),
         Currency.USD, DataProvider.MORNINGSTAR);
@@ -36,7 +36,7 @@ class AssetAllocationSecurityMasterMapperTest {
     HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
     assertThat(result.getAllocations()).hasSize(3);
-    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("60.5"));
+    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.EQUITY, new BigDecimal("60.5"));
     assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("30.0"));
     assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.CASH, new BigDecimal("9.5"));
     assertThat(result.getCurrency()).isEqualTo(Currency.USD);
@@ -55,12 +55,12 @@ class AssetAllocationSecurityMasterMapperTest {
   @Test
   void shouldKeepProvidersEmpty_whenDataProviderIsNull() {
     AssetAllocationWithCurrency smsResponse = withCurrency(
-        List.of(new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE, new TreeSet<>())),
+        List.of(new AssetAllocationValue(AssetAllocationRegionType.EQUITY, BigDecimal.ONE, new TreeSet<>())),
         null, null);
 
     HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
 
-    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE);
+    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.EQUITY, BigDecimal.ONE);
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getCurrency()).isNull();
   }
@@ -68,13 +68,13 @@ class AssetAllocationSecurityMasterMapperTest {
   @Test
   void shouldSumDuplicateAllocationKeys() {
     AssetAllocationWithCurrency smsResponse = withCurrency(List.of(
-        new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("10.0"), new TreeSet<>()),
-        new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("20.0"), new TreeSet<>())),
+        new AssetAllocationValue(AssetAllocationRegionType.EQUITY, new BigDecimal("10.0"), new TreeSet<>()),
+        new AssetAllocationValue(AssetAllocationRegionType.EQUITY, new BigDecimal("20.0"), new TreeSet<>())),
         Currency.CAD, null);
 
     HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
 
-    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("30.0"));
+    assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.EQUITY, new BigDecimal("30.0"));
     assertThat(result.getCurrency()).isEqualTo(Currency.CAD);
   }
 

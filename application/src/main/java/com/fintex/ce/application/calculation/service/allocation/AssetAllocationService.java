@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Asset allocation breakdown service. Aggregates per-region exposures using currency-adjusted portfolio weights and
- * collapses the emerging-markets bucket into international equities for the regular AA view.
+ * Asset allocation breakdown service. Aggregates asset-class exposures (cash, fixed income, the consolidated equity
+ * bucket, etc.) using currency-adjusted portfolio weights.
  */
 @Service
 public class AssetAllocationService extends AbstractAssetAllocationService<AssetAllocationResult> {
@@ -32,15 +32,6 @@ public class AssetAllocationService extends AbstractAssetAllocationService<Asset
   @Override
   public CalculationMetric getMetric() {
     return CalculationMetric.ASSET_ALLOCATIONS;
-  }
-
-  @Override
-  protected void postProcess(Map<AssetAllocationRegionType, BigDecimal> netProducts) {
-    BigDecimal em = netProducts.remove(AssetAllocationRegionType.EM_EQUITIES);
-    if (em == null || em.signum() == 0) {
-      return;
-    }
-    netProducts.merge(AssetAllocationRegionType.INTERNATIONAL_EQUITIES, em, BigDecimal::add);
   }
 
   @Override

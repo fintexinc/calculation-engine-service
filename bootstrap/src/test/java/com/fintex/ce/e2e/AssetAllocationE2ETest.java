@@ -119,7 +119,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   @Override
   protected String smsPositiveResponseBody() {
     return writeJson(List.of(allocationRow("XBAL", FiIdentifierType.TICKER, Currency.CAD,
-        allocationValue(AssetAllocationRegionType.US_EQUITIES, "0.6"),
+        allocationValue(AssetAllocationRegionType.EQUITY, "0.6"),
         allocationValue(AssetAllocationRegionType.FIXED_INCOME, "0.3"),
         allocationValue(AssetAllocationRegionType.CASH, "0.1"))));
   }
@@ -137,7 +137,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   protected void assertPositiveResponseBody(String responseBody) {
     AssetAllocationResult result = readJson(responseBody, AssetAllocationResult.class);
     assertThat(result.getWarnings()).isEmpty();
-    assertCloseTo(result, AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.6"));
+    assertCloseTo(result, AssetAllocationRegionType.EQUITY, new BigDecimal("0.6"));
     assertCloseTo(result, AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("0.3"));
     assertCloseTo(result, AssetAllocationRegionType.CASH, new BigDecimal("0.1"));
   }
@@ -151,12 +151,11 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
             geographyRow("RY.TO", FiIdentifierType.TICKER_MIC, SecurityRegion.CANADA, Currency.CAD)),
         List.of(
             allocationRow("SPY", FiIdentifierType.TICKER, Currency.USD,
-                allocationValue(AssetAllocationRegionType.US_EQUITIES, "1.0")),
+                allocationValue(AssetAllocationRegionType.EQUITY, "1.0")),
             allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
-                allocationValue(AssetAllocationRegionType.US_EQUITIES, "0.5"),
+                allocationValue(AssetAllocationRegionType.EQUITY, "0.6"),
                 allocationValue(AssetAllocationRegionType.FIXED_INCOME, "0.3"),
-                allocationValue(AssetAllocationRegionType.CASH, "0.1"),
-                allocationValue(AssetAllocationRegionType.INTERNATIONAL_EQUITIES, "0.1")))));
+                allocationValue(AssetAllocationRegionType.CASH, "0.1")))));
 
     var response = postCalculation(writeJson(mixedPortfolioCommand()));
 
@@ -165,9 +164,8 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getWarnings()).isEmpty();
     assertCloseTo(result, AssetAllocationRegionType.CASH, new BigDecimal("0.14"));
     assertCloseTo(result, AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("0.32"));
-    assertCloseTo(result, AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.44"));
-    assertCloseTo(result, AssetAllocationRegionType.CANADIAN_EQUITIES, new BigDecimal("0.06"));
-    assertCloseTo(result, AssetAllocationRegionType.INTERNATIONAL_EQUITIES, new BigDecimal("0.04"));
+    // All equities (US, Canadian, international) consolidate into one EQUITY bucket: 0.44 + 0.06 + 0.04.
+    assertCloseTo(result, AssetAllocationRegionType.EQUITY, new BigDecimal("0.54"));
   }
 
   @Test
@@ -175,7 +173,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     smsMockServer.setDispatcher(routingDispatcher(
         List.of(geographyRow("RY.TO", FiIdentifierType.TICKER_MIC, SecurityRegion.CANADA, Currency.CAD)),
         List.of(allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
-            allocationValue(AssetAllocationRegionType.US_EQUITIES, "1.0")))));
+            allocationValue(AssetAllocationRegionType.EQUITY, "1.0")))));
 
     var response = postCalculation(writeJson(warningsPortfolioCommand()));
 
@@ -184,7 +182,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getWarnings()).extracting(Notification::getCode)
         .containsExactlyInAnyOrder("FDS-026", "FDS-018");
     assertThat(result.getAssetAllocation().keySet().stream().map(Object::toString).toList())
-        .contains("UNCLASSIFIED", "CANADIAN_EQUITIES", "US_EQUITIES");
+        .contains("UNCLASSIFIED", "EQUITY");
   }
 
   @Test
@@ -199,7 +197,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     AssetAllocationResult result = readJson(response.responseBody(), AssetAllocationResult.class);
     assertThat(result.getWarnings()).extracting(Notification::getCode).containsExactly("FX-001");
-    assertCloseTo(result, AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE);
+    assertCloseTo(result, AssetAllocationRegionType.EQUITY, BigDecimal.ONE);
   }
 
   private static PortfolioHoldingsCommand mixedPortfolioCommand() {
