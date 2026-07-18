@@ -9,6 +9,10 @@ import java.util.NavigableMap;
 
 public interface FxRatesFetcher {
 
+  /**
+   * Returns FX rates whose dates are within the inclusive bounds of {@code dateRange}. A {@code null} range or bound is
+   * open; implementations must not return dates outside any non-null bound.
+   */
   NavigableMap<LocalDate, BigDecimal> fetch(CurrencyExchangePair currencyPair, DateRange dateRange);
 
   /**

@@ -65,6 +65,7 @@ public abstract class WeightedAverageWithCpedAbstractService<C extends PeriodCom
       PortfolioBenchmarkReturns returnsData) {
     WeightedAverageResult<HoldingMonthlyReturns> result = buildWeightedAverageResult(command, returnFactorScale,
         returnsData);
-    return new PeriodCalculationInput(command.getCustomIntervalPsd(), result.weightedAverage());
+    return new PeriodCalculationInput(command.getCustomIntervalPsd(), result.weightedAverage(),
+        result.getErrorsAsWarnings());
   }
 }

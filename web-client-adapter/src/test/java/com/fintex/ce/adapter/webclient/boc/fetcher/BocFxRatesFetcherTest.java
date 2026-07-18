@@ -13,6 +13,9 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -20,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,11 +31,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BocFxRatesFetcherTest {
 
+  private static final String USD_CAD_KEY = "USD_CAD";
   private static final CurrencyExchangePair USD_CAD = new CurrencyExchangePair(Currency.USD, Currency.CAD);
   private static final CurrencyExchangePair CAD_USD = new CurrencyExchangePair(Currency.CAD, Currency.USD);
   private static final CurrencyExchangePair EUR_CAD = new CurrencyExchangePair(Currency.EUR, Currency.CAD);
@@ -55,7 +61,7 @@ class BocFxRatesFetcherTest {
 
   @Test
   void shouldFetchFromSingleSource() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), "2017-01-01", null));
 
     var response = new BankOfCanadaFxRateResponse();
@@ -74,7 +80,7 @@ class BocFxRatesFetcherTest {
 
   @Test
   void shouldInvertRatesWhenRequestingInversePair() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), "2017-01-01", null));
 
     var response = new BankOfCanadaFxRateResponse();
@@ -107,7 +113,7 @@ class BocFxRatesFetcherTest {
 
   @Test
   void shouldMergeMultipleSources() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), "2017-01-01", null),
         source("/observations/IEXM0101/json", List.of("IEXM0101"), null, "2016-12-31"));
 
@@ -135,7 +141,7 @@ class BocFxRatesFetcherTest {
 
   @Test
   void shouldSkipSourcesOutsideRequestedRange() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), "2017-01-01", null),
         source("/observations/IEXM0101/json", List.of("IEXM0101"), null, "2016-12-31"));
 
@@ -151,15 +157,41 @@ class BocFxRatesFetcherTest {
         BankOfCanadaFxRateResponse.class);
   }
 
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("singleBoundRanges")
+  void shouldFetchOnlyOverlappingSource_whenDateRangeHasSingleBound(
+      String scenario,
+      DateRange range,
+      String expectedUrl,
+      List<String> expectedSeriesNames,
+      LocalDate expectedRateDate,
+      String expectedRate) {
+    configureUsdCadPair(
+        source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), "2017-01-01", null),
+        source("/observations/IEXM0101/json", List.of("IEXM0101"), null, "2016-12-31"));
+
+    var response = new BankOfCanadaFxRateResponse();
+    BigDecimal expectedRateValue = new BigDecimal(expectedRate);
+    when(client.get(expectedUrl, BankOfCanadaFxRateResponse.class)).thenReturn(response);
+    when(mapper.map(eq(response), eq(expectedSeriesNames), any()))
+        .thenReturn(Map.of(expectedRateDate, expectedRateValue));
+
+    var result = fetcher.fetch(USD_CAD, range);
+
+    assertThat(result).containsExactly(Map.entry(expectedRateDate, expectedRateValue));
+    verify(client).get(expectedUrl, BankOfCanadaFxRateResponse.class);
+    verifyNoMoreInteractions(client);
+  }
+
   @Test
   void shouldPreferEarlierSourceOnDateConflict() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), null, null),
         source("/observations/IEXM0101/json", List.of("IEXM0101"), null, null));
 
     var primaryResponse = new BankOfCanadaFxRateResponse();
     var fallbackResponse = new BankOfCanadaFxRateResponse();
-    LocalDate overlapDate = LocalDate.of(2017, 3, 31);
+    LocalDate overlapDate = LocalDate.of(2024, 3, 31);
 
     when(client.get(any(), eq(BankOfCanadaFxRateResponse.class)))
         .thenReturn(primaryResponse)
@@ -176,7 +208,7 @@ class BocFxRatesFetcherTest {
 
   @Test
   void shouldReportPairAsCanonical_whenDirectPairConfigured() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), null, null));
 
     assertThat(fetcher.canonicalDirection(USD_CAD)).isEqualTo(USD_CAD);
@@ -184,7 +216,7 @@ class BocFxRatesFetcherTest {
 
   @Test
   void shouldReportInverseAsCanonical_whenOnlyInversePairConfigured() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), null, null));
 
     assertThat(fetcher.canonicalDirection(CAD_USD)).isEqualTo(USD_CAD);
@@ -197,7 +229,7 @@ class BocFxRatesFetcherTest {
 
   @Test
   void shouldPropagateClientException() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), null, null));
 
     when(client.get(any(), eq(BankOfCanadaFxRateResponse.class)))
@@ -210,7 +242,7 @@ class BocFxRatesFetcherTest {
 
   @Test
   void shouldUseRequestDatesInUrl_ratherThanSourceConfig() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), "2017-01-01", null));
 
     var narrowRange = new DateRange(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 5));
@@ -227,8 +259,34 @@ class BocFxRatesFetcherTest {
   }
 
   @Test
+  void shouldReturnOnlyRatesWithinRequestedRange_whenMapperReturnsWiderData() {
+    configureUsdCadPair(
+        source("/observations/FXUSDCAD/json", List.of("FXUSDCAD"), null, null));
+
+    LocalDate firstRequestedDate = LocalDate.of(2024, 1, 2);
+    LocalDate lastRequestedDate = LocalDate.of(2024, 1, 3);
+    DateRange range = new DateRange(firstRequestedDate, lastRequestedDate);
+    var response = new BankOfCanadaFxRateResponse();
+    Map<LocalDate, BigDecimal> mappedRates = Map.of(
+        firstRequestedDate.minusDays(1), new BigDecimal("1.3400"),
+        firstRequestedDate, new BigDecimal("1.3450"),
+        lastRequestedDate, new BigDecimal("1.3500"),
+        lastRequestedDate.plusDays(1), new BigDecimal("1.3550"));
+    when(client.get("/observations/FXUSDCAD/json?start_date=2024-01-02&end_date=2024-01-03",
+        BankOfCanadaFxRateResponse.class))
+        .thenReturn(response);
+    when(mapper.map(eq(response), eq(List.of("FXUSDCAD")), any())).thenReturn(mappedRates);
+
+    var result = fetcher.fetch(USD_CAD, range);
+
+    assertThat(result).containsExactly(
+        Map.entry(firstRequestedDate, new BigDecimal("1.3450")),
+        Map.entry(lastRequestedDate, new BigDecimal("1.3500")));
+  }
+
+  @Test
   void shouldClampRequestDatesToSourceWindow() {
-    configureCurrencyPair("USD_CAD",
+    configureUsdCadPair(
         source("/observations/IEXM0101/json", List.of("IEXM0101"), "2010-01-01", "2016-12-31"));
 
     var rangeBeyondSource = new DateRange(LocalDate.of(2005, 1, 1), LocalDate.of(2024, 12, 31));
@@ -244,10 +302,28 @@ class BocFxRatesFetcherTest {
         BankOfCanadaFxRateResponse.class);
   }
 
-  private void configureCurrencyPair(String pair, FxRateSource... sources) {
+  private static Stream<Arguments> singleBoundRanges() {
+    return Stream.of(
+        Arguments.of(
+            "start-only range",
+            new DateRange(LocalDate.of(2024, 1, 1), null),
+            "/observations/FXUSDCAD/json?start_date=2024-01-01",
+            List.of("FXUSDCAD"),
+            LocalDate.of(2024, 1, 2),
+            "1.3450"),
+        Arguments.of(
+            "end-only range",
+            new DateRange(null, LocalDate.of(2016, 12, 31)),
+            "/observations/IEXM0101/json?end_date=2016-12-31",
+            List.of("IEXM0101"),
+            LocalDate.of(2016, 12, 31),
+            "1.3400"));
+  }
+
+  private void configureUsdCadPair(FxRateSource... sources) {
     var config = new CurrencyPairConfig();
     config.setRateSources(List.of(sources));
-    properties.getCurrencyPairs().put(pair, config);
+    properties.getCurrencyPairs().put(USD_CAD_KEY, config);
   }
 
   private FxRateSource source(String path, List<String> seriesNames, String startDate, String endDate) {

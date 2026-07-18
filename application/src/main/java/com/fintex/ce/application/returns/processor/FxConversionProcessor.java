@@ -1,6 +1,7 @@
 package com.fintex.ce.application.returns.processor;
 
 import com.fintex.ce.application.calculation.service.FxRateService;
+import com.fintex.ce.application.returns.PerformancePeriodCalculator;
 import com.fintex.ce.application.returns.ProcessingCase;
 import com.fintex.ce.application.returns.ProcessingContext;
 import com.fintex.ce.application.returns.ReturnsErrorPolicy;
@@ -12,6 +13,7 @@ import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -56,11 +58,19 @@ public class FxConversionProcessor implements ReturnsProcessor {
         fxContext.rates(),
         fxContext.targetCurrency(),
         warnings);
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> aligned = CollectionUtils.isEmpty(warnings)
+        ? converted
+        : PerformancePeriodCalculator.trimToTrailingContiguousCommonMonths(converted);
 
-    return snapshot
-        .withReturnsMap(converted)
+    ReturnsSnapshot<T> convertedSnapshot = snapshot
+        .withReturnsMap(aligned)
         .withHoldingCurrencyMap(remappedToTarget(snapshot.holdingCurrencyMap(), fxContext.targetCurrency()))
         .withAddedWarnings(warnings);
+    return CollectionUtils.isEmpty(warnings)
+        ? convertedSnapshot
+        : convertedSnapshot.withPeriod(
+            PerformancePeriodCalculator.findPerformanceStartDate(aligned),
+            PerformancePeriodCalculator.findPerformanceEndDate(aligned));
   }
 
   @Override

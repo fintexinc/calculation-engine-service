@@ -8,6 +8,8 @@ import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -89,6 +92,18 @@ class CachingFxRatesFetcherTest {
 
     fetcher.fetch(USD_CAD, unbounded);
 
+    verify(cache, never()).getOrLoad(any(), any(), any());
+  }
+
+  @ParameterizedTest
+  @MethodSource("singleBoundRanges")
+  void shouldBypassCache_whenRangeHasSingleBound(DateRange range) {
+    NavigableMap<LocalDate, BigDecimal> delegateResult = new TreeMap<>();
+    when(delegate.fetch(USD_CAD, range)).thenReturn(delegateResult);
+
+    NavigableMap<LocalDate, BigDecimal> result = fetcher.fetch(USD_CAD, range);
+
+    assertThat(result).isSameAs(delegateResult);
     verify(cache, never()).getOrLoad(any(), any(), any());
   }
 
@@ -169,6 +184,12 @@ class CachingFxRatesFetcherTest {
 
     assertThat(canonicalResult.get(day)).isEqualByComparingTo(exactCanonicalRate);
     verify(delegate, never()).fetch(eq(CAD_USD), any());
+  }
+
+  private static Stream<DateRange> singleBoundRanges() {
+    return Stream.of(
+        new DateRange(RANGE.start(), null),
+        new DateRange(null, RANGE.end()));
   }
 
   @SuppressWarnings("unchecked")

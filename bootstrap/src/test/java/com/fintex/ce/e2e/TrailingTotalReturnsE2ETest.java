@@ -29,6 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -36,6 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -56,6 +58,7 @@ import okhttp3.mockwebserver.RecordedRequest;
     "cache.data.fx-rates.enabled=false",
     "cache.data.t-bills.enabled=false"
 })
+@Tag("e2e")
 class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static final SecurityIdentifier XBAL = new SecurityIdentifier("XBAL", FiIdentifierType.TICKER);
@@ -196,6 +199,43 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Test
+  void shouldReturnOnlyContiguousPeriodsAndFxWarning_whenFxRatesHaveInternalMonthGap() {
+    bocMockServer.setDispatcher(bocDailyUsdCadDispatcher("1.0000", Set.of(YearMonth.of(2024, 6))));
+    PortfolioHolding holding = holding(VTI, FinancialInstrumentType.ETF, Country.USA, "50000");
+    enqueueSmsMockResponse(writeJson(List.of(holdingReturnsRow(VTI, monthlyReturnsFor2024("1.0")))));
+    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
+
+    HttpResponse response = postCalculation(writeJson(
+        periodCommand(Set.of(THREE_MTH, SIX_MTH), LocalDate.parse("2024-12-31"), List.of(holding))));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
+    assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 8, 31));
+    assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
+    assertThat(result.getWarnings()).extracting(Notification::getCode)
+        .containsExactlyInAnyOrder(
+            ErrorCode.Codes.FX_RATES_UNAVAILABLE,
+            ErrorCode.Codes.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD);
+    Notification warning = result.getWarnings().stream()
+        .filter(notification -> ErrorCode.Codes.FX_RATES_UNAVAILABLE.equals(notification.getCode()))
+        .findFirst()
+        .orElseThrow();
+    assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.FX_RATES_UNAVAILABLE);
+    assertThat(warning.getSeverity()).isEqualTo(Severity.WARNING);
+    assertThat(warning.getMessage()).isEqualTo(
+        "FX rates unavailable for holding " + holding.getIdsString() + ": USD -> CAD");
+    assertThat(warning.getMetadata())
+        .containsEntry("holdingId", holding.getIdsString())
+        .containsEntry("param-1", holding.getIdsString())
+        .containsEntry("param-2", Currency.USD.name())
+        .containsEntry("param-3", Currency.CAD.name());
+    assertThat(result.getTrailingTotalReturn()).hasSize(2);
+    assertThat(findPeriod(result, THREE_MTH.name()).value())
+        .isCloseTo(new BigDecimal("0.04252268"), within(TOLERANCE));
+    assertThat(findPeriod(result, SIX_MTH.name()).value()).isNull();
+  }
+
+  @Test
   void shouldReturnBadRequest_whenTreasuryBillSeriesIsEmptyForCurrency() {
     enqueueSmsMockResponse(smsPositiveResponseBody());
     enqueueSmsMockResponse(writeJson(List.<DateRateValue>of()));
@@ -319,6 +359,10 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static Dispatcher bocDailyUsdCadDispatcher(String rate) {
+    return bocDailyUsdCadDispatcher(rate, Set.of());
+  }
+
+  private static Dispatcher bocDailyUsdCadDispatcher(String rate, Set<YearMonth> unavailableMonths) {
     return new Dispatcher() {
       @Override
       public MockResponse dispatch(RecordedRequest request) {
@@ -328,14 +372,16 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         StringBuilder observations = new StringBuilder();
         LocalDate current = start;
         while (!current.isAfter(end)) {
-          if (observations.length() > 0) {
-            observations.append(',');
+          if (!unavailableMonths.contains(YearMonth.from(current))) {
+            if (observations.length() > 0) {
+              observations.append(',');
+            }
+            observations.append("{\"d\":\"")
+                .append(current)
+                .append("\",\"FXUSDCAD\":{\"v\":\"")
+                .append(rate)
+                .append("\"}}");
           }
-          observations.append("{\"d\":\"")
-              .append(current)
-              .append("\",\"FXUSDCAD\":{\"v\":\"")
-              .append(rate)
-              .append("\"}}");
           current = current.plusDays(1);
         }
         String body = "{\"observations\":[" + observations + "]}";
