@@ -90,11 +90,10 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
 
   private NavigableMap<LocalDate, BigDecimal> fetchFromSources(List<FxRateSource> allSources,
       LocalDate startDate, LocalDate endDate) {
-    boolean hasDateRange = startDate != null && endDate != null;
-
-    List<FxRateSource> sources = hasDateRange
-        ? allSources.stream().filter(source -> overlaps(source, startDate, endDate)).toList()
-        : allSources;
+    DateRange requestedRange = new DateRange(startDate, endDate);
+    List<FxRateSource> sources = allSources.stream()
+        .filter(source -> overlaps(source, startDate, endDate))
+        .toList();
 
     log.debug("Selected {} of {} rate sources for range [{} — {}]",
         sources.size(), allSources.size(), startDate, endDate);
@@ -110,7 +109,13 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
       log.debug("Fetched {} FX rates ({}) from source: {}", rates.size(), source.getFrequency(), source.getPath());
       rates.forEach(mergedRates::putIfAbsent);
     }
-    return mergedRates;
+    return mergedRates.entrySet().stream()
+        .filter(entry -> requestedRange.contains(entry.getKey()))
+        .collect(Collectors.toMap(
+            Map.Entry::getKey,
+            Map.Entry::getValue,
+            (first, second) -> first,
+            TreeMap::new));
   }
 
   private NavigableMap<LocalDate, BigDecimal> invertRates(NavigableMap<LocalDate, BigDecimal> rates) {
@@ -125,7 +130,8 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
   private boolean overlaps(FxRateSource source, LocalDate from, LocalDate to) {
     LocalDate sourceStart = parseDate(source.getStartDate(), LocalDate.MIN);
     LocalDate sourceEnd = parseDate(source.getEndDate(), LocalDate.MAX);
-    return !sourceStart.isAfter(to) && !sourceEnd.isBefore(from);
+    return (to == null || !sourceStart.isAfter(to))
+        && (from == null || !sourceEnd.isBefore(from));
   }
 
   private LocalDate parseDate(String date, LocalDate defaultValue) {

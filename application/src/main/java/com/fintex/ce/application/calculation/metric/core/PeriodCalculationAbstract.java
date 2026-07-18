@@ -51,12 +51,14 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
   public final Set<TimePeriod> defaultPeriods;
   public NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns;
   public LocalDate cipsd;
+  private final List<Notification> inputWarnings;
 
   protected PeriodCalculationAbstract(PeriodCalculationInput input,
       Set<TimePeriod> defaultPeriods) {
     this.cipsd = input.getCipsd();
     this.portfolioTotalReturns = input.getWeightedAveragePortfolioReturns();
     this.defaultPeriods = defaultPeriods;
+    this.inputWarnings = input.getWarnings() == null ? List.of() : input.getWarnings();
   }
 
   /**
@@ -259,6 +261,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
   public T calculate(Set<TimePeriod> periods) {
     Set<Pair<String, V>> periodsResult = calculatePeriods(periods);
     T result = defineResponseType(periodsResult);
+    result.setWarnings(new ArrayList<>(inputWarnings));
     populateBasicDetails(result);
     addInsufficientDataWarnings(result, periodsResult);
     return result;

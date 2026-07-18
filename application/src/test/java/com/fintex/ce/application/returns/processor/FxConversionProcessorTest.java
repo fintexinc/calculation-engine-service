@@ -40,6 +40,9 @@ class FxConversionProcessorTest {
   private static final PortfolioHolding HOLDING_EUR = new PortfolioHolding(null, null,
       new SecurityIdentifier("EUR-A", FiIdentifierType.TICKER));
   private static final LocalDate JAN = LocalDate.parse("2020-01-31");
+  private static final LocalDate FEB = LocalDate.parse("2020-02-29");
+  private static final LocalDate MAR = LocalDate.parse("2020-03-31");
+  private static final LocalDate APR = LocalDate.parse("2020-04-30");
 
   private final FxRateService fxRateService = mock(FxRateService.class);
   private final FxConversionProcessor processor = new FxConversionProcessor(fxRateService);
@@ -86,7 +89,7 @@ class FxConversionProcessorTest {
   }
 
   @Test
-  void shouldFoldWarningsAndReturnPartialConversion_whenSomeHoldingDatesUnavailable() {
+  void shouldReturnEmptyAlignedSeries_whenNoCommonConvertedMonthsAreAvailable() {
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = snapshot(Map.of(
         HOLDING_USD, Currency.USD,
         HOLDING_EUR, Currency.EUR));
@@ -108,8 +111,10 @@ class FxConversionProcessorTest {
     assertThat(result.warnings()).hasSize(1);
     assertThat(result.warnings().getFirst().getCode())
         .isEqualTo(ErrorCode.FX_RATES_UNAVAILABLE.getCode());
-    assertThat(result.returnsMap().get(HOLDING_USD)).containsOnlyKeys(JAN);
+    assertThat(result.returnsMap().get(HOLDING_USD)).isEmpty();
     assertThat(result.returnsMap().get(HOLDING_EUR)).isEmpty();
+    assertThat(result.performanceStartDate()).isNull();
+    assertThat(result.performanceEndDate()).isNull();
   }
 
   @Test
@@ -129,6 +134,39 @@ class FxConversionProcessorTest {
 
     assertThat(result.holdingCurrencyMap()).containsEntry(HOLDING_USD, Currency.CAD);
     assertThat(result.holdingCurrencyMap()).containsEntry(cadHolding, Currency.CAD);
+  }
+
+  @Test
+  void shouldRetainLatestContiguousMonths_whenConversionHasMissingFxMonths() {
+    PortfolioHolding cadHolding = new PortfolioHolding(null, null,
+        new SecurityIdentifier("CAD-A", FiIdentifierType.TICKER));
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = new ReturnsSnapshot<>(
+        Map.of(HOLDING_USD, Currency.USD, cadHolding, Currency.CAD),
+        Map.of(
+            HOLDING_USD, new TreeMap<>(Map.of(JAN, BigDecimal.ONE, FEB, BigDecimal.ONE, APR, BigDecimal.ONE)),
+            cadHolding, new TreeMap<>(Map.of(JAN, BigDecimal.ONE, FEB, BigDecimal.ONE, MAR, BigDecimal.ONE,
+                APR, BigDecimal.ONE))),
+        JAN, APR, List.of());
+    when(fxRateService.convertReturns(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
+      List<Notification> warnings = invocation.getArgument(4);
+      warnings.add(ErrorCode.FX_RATES_UNAVAILABLE.toNotificationForHolding(HOLDING_USD,
+          Currency.USD, Currency.CAD));
+      return Map.of(
+          HOLDING_USD, new TreeMap<>(Map.of(JAN, BigDecimal.valueOf(1.5), FEB, BigDecimal.valueOf(1.5),
+              APR, BigDecimal.valueOf(1.5))),
+          cadHolding, new TreeMap<>(Map.of(JAN, BigDecimal.ONE, FEB, BigDecimal.ONE, MAR, BigDecimal.ONE,
+              APR, BigDecimal.ONE)));
+    });
+
+    ReturnsSnapshot<HoldingMonthlyReturns> result = processor.process(snapshot, ProcessingContext.of(null, null,
+        new FxContext(Map.of(), Currency.CAD)));
+
+    assertThat(result.returnsMap().get(HOLDING_USD)).containsOnly(Map.entry(APR, BigDecimal.valueOf(1.5)));
+    assertThat(result.returnsMap().get(cadHolding)).containsOnly(Map.entry(APR, BigDecimal.ONE));
+    assertThat(result.performanceStartDate()).isEqualTo(APR);
+    assertThat(result.performanceEndDate()).isEqualTo(APR);
+    assertThat(result.warnings()).extracting(Notification::getCode)
+        .containsExactly(ErrorCode.FX_RATES_UNAVAILABLE.getCode());
   }
 
   private static ReturnsSnapshot<HoldingMonthlyReturns> snapshot(Map<PortfolioHolding, Currency> currencies) {

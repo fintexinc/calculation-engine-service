@@ -12,6 +12,9 @@ import com.fintex.wm.commons.error.Notification;
 import com.fintex.wm.commons.error.Severity;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import static com.fintex.ce.model.error.ErrorCode.Codes.FX_RATES_UNAVAILABLE;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
@@ -37,6 +41,11 @@ import static org.mockito.Mockito.when;
 class FxRateServiceTest {
 
   private static final DateRange RANGE = new DateRange(LocalDate.parse("2025-01-01"), LocalDate.parse("2025-12-31"));
+  private static final LocalDate DECEMBER_END = LocalDate.parse("2020-12-31");
+  private static final LocalDate JANUARY_END = LocalDate.parse("2021-01-31");
+  private static final LocalDate FEBRUARY_END = LocalDate.parse("2021-02-28");
+  private static final LocalDate MARCH_END = LocalDate.parse("2021-03-31");
+  private static final LocalDate APRIL_END = LocalDate.parse("2021-04-30");
 
   private final FxRatesFetcher fxRatesFetcher = mock(FxRatesFetcher.class);
   private final FxRateService service = new FxRateService(fxRatesFetcher);
@@ -83,23 +92,25 @@ class FxRateServiceTest {
     assertTrue(warnings.isEmpty());
   }
 
-  @Test
-  void shouldReturnPartialSeriesAndEmitWarning_whenSomeMonthlyRatesAreMissing() {
-    // Rates available at month+1 only; via floorEntry, month+2's lookup resolves but month+1's previous-month
-    // lookup does not — month+1 is dropped, month+2 survives, one warning is emitted.
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("incompleteFxCoverage")
+  void shouldConvertOnlyMonthsWithCompleteFxCoverage_whenRatesDoNotCoverFullDateRange(
+      String scenario,
+      NavigableMap<LocalDate, BigDecimal> rates,
+      TreeMap<LocalDate, BigDecimal> returnsPerHolding,
+      Map<LocalDate, BigDecimal> expectedReturns) {
     var fxRates = Map.of(
         new CurrencyExchangePair(Currency.CAD, Currency.USD),
-        (NavigableMap<LocalDate, BigDecimal>) getSparseRates());
+        rates);
 
     PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
         FiIdentifierType.TICKER));
-    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(etfHolding, returnsPerHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
     List<Notification> warnings = new ArrayList<>();
 
     var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
-    assertThat(actual.get(etfHolding)).containsOnlyKeys(toLastDayOfMonth(LocalDate.now().plusMonths(2)));
     assertEquals(1, warnings.size());
     Notification warning = warnings.getFirst();
     assertEquals(FX_RATES_UNAVAILABLE, warning.getCode());
@@ -110,6 +121,38 @@ class FxRateServiceTest {
     assertEquals(etfHolding.getIdsString(), warning.getMetadata().get("param-1"));
     assertEquals(Currency.CAD, warning.getMetadata().get("param-2"));
     assertEquals(Currency.USD, warning.getMetadata().get("param-3"));
+    TreeMap<LocalDate, BigDecimal> actualReturns = actual.get(etfHolding);
+    assertThat(actualReturns).containsOnlyKeys(expectedReturns.keySet());
+    expectedReturns.forEach((date, value) -> assertThat(actualReturns.get(date)).isEqualByComparingTo(value));
+    assertCadToUsdWarning(warnings, etfHolding);
+  }
+
+  @Test
+  void shouldUseLatestRateFromSameMonth_whenMonthEndIsNonTradingDay() {
+    NavigableMap<LocalDate, BigDecimal> rates = new TreeMap<>(Map.of(
+        DECEMBER_END, BigDecimal.ONE,
+        LocalDate.parse("2021-01-29"), BigDecimal.valueOf(2),
+        LocalDate.parse("2021-02-26"), BigDecimal.valueOf(2)));
+    var fxRates = Map.of(new CurrencyExchangePair(Currency.CAD, Currency.USD), rates);
+
+    PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER));
+    TreeMap<LocalDate, BigDecimal> returnsPerHolding = new TreeMap<>(Map.of(
+        JANUARY_END, BigDecimal.ONE,
+        FEBRUARY_END, BigDecimal.valueOf(2)));
+    List<Notification> warnings = new ArrayList<>();
+
+    var actual = service.convertReturns(
+        Map.of(etfHolding, returnsPerHolding),
+        Map.of(etfHolding, Currency.CAD),
+        fxRates,
+        Currency.USD,
+        warnings);
+
+    assertThat(actual.get(etfHolding)).containsOnlyKeys(JANUARY_END, FEBRUARY_END);
+    assertThat(actual.get(etfHolding).get(JANUARY_END)).isEqualByComparingTo("102");
+    assertThat(actual.get(etfHolding).get(FEBRUARY_END)).isEqualByComparingTo("2");
+    assertThat(warnings).isEmpty();
   }
 
   @Test
@@ -127,8 +170,7 @@ class FxRateServiceTest {
     var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
     assertThat(actual.get(etfHolding)).isEmpty();
-    assertEquals(1, warnings.size());
-    assertEquals(FX_RATES_UNAVAILABLE, warnings.getFirst().getCode());
+    assertCadToUsdWarning(warnings, etfHolding);
   }
 
   @Test
@@ -144,8 +186,7 @@ class FxRateServiceTest {
     var actual = service.convertReturns(returns, holdingCurrencies, fxRates, Currency.USD, warnings);
 
     assertThat(actual.get(etfHolding)).isEmpty();
-    assertEquals(1, warnings.size());
-    assertEquals(FX_RATES_UNAVAILABLE, warnings.getFirst().getCode());
+    assertCadToUsdWarning(warnings, etfHolding);
   }
 
   @Test
@@ -257,9 +298,52 @@ class FxRateServiceTest {
     return rates;
   }
 
-  private TreeMap<LocalDate, BigDecimal> getSparseRates() {
-    TreeMap<LocalDate, BigDecimal> rates = new TreeMap<>();
-    rates.put(toLastDayOfMonth(LocalDate.now().plusMonths(1)), BigDecimal.valueOf(10));
-    return rates;
+  private static Stream<Arguments> incompleteFxCoverage() {
+    TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(
+        JANUARY_END, BigDecimal.ONE,
+        FEBRUARY_END, BigDecimal.valueOf(2)));
+    TreeMap<LocalDate, BigDecimal> extendedReturns = new TreeMap<>(returns);
+    extendedReturns.put(MARCH_END, BigDecimal.valueOf(3));
+    extendedReturns.put(APRIL_END, BigDecimal.valueOf(4));
+
+    return Stream.of(
+        Arguments.of(
+            "leading range is missing",
+            new TreeMap<>(Map.of(
+                JANUARY_END, BigDecimal.valueOf(2),
+                FEBRUARY_END, BigDecimal.valueOf(2))),
+            returns,
+            Map.of(FEBRUARY_END, BigDecimal.valueOf(2))),
+        Arguments.of(
+            "trailing range is missing",
+            new TreeMap<>(Map.of(
+                DECEMBER_END, BigDecimal.ONE,
+                JANUARY_END, BigDecimal.valueOf(2))),
+            returns,
+            Map.of(JANUARY_END, BigDecimal.valueOf(102))),
+        Arguments.of(
+            "internal month is missing",
+            new TreeMap<>(Map.of(
+                DECEMBER_END, BigDecimal.ONE,
+                JANUARY_END, BigDecimal.valueOf(2),
+                MARCH_END, BigDecimal.valueOf(4),
+                APRIL_END, BigDecimal.valueOf(4))),
+            extendedReturns,
+            Map.of(
+                JANUARY_END, BigDecimal.valueOf(102),
+                APRIL_END, BigDecimal.valueOf(4))));
+  }
+
+  private static void assertCadToUsdWarning(List<Notification> warnings, PortfolioHolding holding) {
+    assertThat(warnings).hasSize(1);
+    Notification warning = warnings.getFirst();
+    assertEquals(FX_RATES_UNAVAILABLE, warning.getCode());
+    assertEquals(Severity.WARNING, warning.getSeverity());
+    assertThat(warning.getUuid()).isNotBlank();
+    assertEquals("FX rates unavailable for holding " + holding.getIdsString()
+        + ": CAD -> USD", warning.getMessage());
+    assertEquals(holding.getIdsString(), warning.getMetadata().get("param-1"));
+    assertEquals(Currency.CAD, warning.getMetadata().get("param-2"));
+    assertEquals(Currency.USD, warning.getMetadata().get("param-3"));
   }
 }

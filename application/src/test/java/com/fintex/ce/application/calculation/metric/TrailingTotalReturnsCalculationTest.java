@@ -5,12 +5,16 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
+import com.fintex.wm.commons.error.Notification;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
@@ -19,6 +23,7 @@ import java.util.TreeMap;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -178,4 +183,22 @@ class TrailingTotalReturnsCalculationTest {
     assertEquals(expected, actual.getTrailingTotalReturn());
   }
 
+  @Test
+  void shouldRetainInputWarnings_whenCalculatingPeriods() {
+    LocalDate date = LocalDate.parse("2025-01-31");
+    Notification warning = ErrorCode.FX_RATES_UNAVAILABLE.asNotification("USD holding", Currency.USD, Currency.CAD);
+    PeriodCalculationInput input = new PeriodCalculationInput(null,
+        new TreeMap<>(Map.of(date, new BigDecimal("1.01"))), List.of(warning));
+    TrailingTotalReturnsCalculation calculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
+
+    TrailingTotalReturnsResult result = calculation.calculate(Set.of(TimePeriod.ONE_MTH));
+
+    assertThat(result.getWarnings()).containsExactly(warning);
+    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(interval -> {
+      assertThat(interval.period()).isEqualTo(TimePeriod.ONE_MTH.name());
+      assertThat(interval.value()).isEqualByComparingTo("0.01");
+    });
+    assertEquals(date, result.getPerformanceStartDate());
+    assertEquals(date, result.getPerformanceEndDate());
+  }
 }

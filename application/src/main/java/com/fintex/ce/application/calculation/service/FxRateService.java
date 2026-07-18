@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,12 @@ import static java.math.BigDecimal.ONE;
  * that calling code (returns, money values, MER) does not have to coordinate transport calls and conversion separately.
  * <p>
  * Also owns return-conversion: per-holding monthly returns are converted into a common target currency using
- * end-of-month FX rates. Missing rates are non-fatal — any month-end the formula cannot resolve is dropped from that
- * holding's series, and a single {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} {@link Notification}
- * is appended to the warnings list per affected holding. The caller surfaces those warnings on the response; the
- * calculation continues with the partial converted series.
+ * end-of-month FX rates. A month-end may use the latest observation from the same calendar month (for weekends and
+ * holidays), but never a stale observation from an earlier month. Missing monthly coverage is non-fatal — any month-end
+ * the formula cannot resolve is dropped from that holding's series, and a single
+ * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} {@link Notification} is appended to the warnings
+ * list per affected holding. The caller surfaces those warnings on the response; the calculation continues with the
+ * partial converted series.
  */
 @Slf4j
 @Service
@@ -66,8 +69,8 @@ public class FxRateService {
   }
 
   /**
-   * Converts per-holding monthly returns from each holding's source currency into {@code toCurrency}. Month-ends with
-   * no resolvable FX rate are dropped from that holding's series, and a single
+   * Converts per-holding monthly returns from each holding's source currency into {@code toCurrency}. Month-ends whose
+   * current or previous calendar month has no resolvable FX rate are dropped from that holding's series, and a single
    * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} {@link Notification} is appended to
    * {@code warnings} per affected holding (regardless of how many month-ends were dropped). Holdings already in
    * {@code toCurrency} pass through unchanged.
@@ -152,8 +155,8 @@ public class FxRateService {
   private static BigDecimal holdingPortfolioBaseTotalReturnFormula(LocalDate date, BigDecimal value,
       NavigableMap<LocalDate, BigDecimal> fxRates) {
     LocalDate previousDate = toLastDayOfMonth(date.minusMonths(1));
-    BigDecimal fxRateValue = lookupRate(fxRates, date);
-    BigDecimal previousFxValue = lookupRate(fxRates, previousDate);
+    BigDecimal fxRateValue = lookupMonthlyRate(fxRates, date);
+    BigDecimal previousFxValue = lookupMonthlyRate(fxRates, previousDate);
     if (fxRateValue == null || previousFxValue == null) {
       return null;
     }
@@ -164,8 +167,10 @@ public class FxRateService {
         .subtract(ONE).multiply(HUNDRED);
   }
 
-  private static BigDecimal lookupRate(NavigableMap<LocalDate, BigDecimal> rates, LocalDate date) {
+  private static BigDecimal lookupMonthlyRate(NavigableMap<LocalDate, BigDecimal> rates, LocalDate date) {
     Map.Entry<LocalDate, BigDecimal> entry = rates.floorEntry(date);
-    return entry != null ? entry.getValue() : null;
+    return entry != null && YearMonth.from(entry.getKey()).equals(YearMonth.from(date))
+        ? entry.getValue()
+        : null;
   }
 }

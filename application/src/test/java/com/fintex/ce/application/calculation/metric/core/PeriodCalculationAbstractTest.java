@@ -225,14 +225,18 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldDelegateToCalculatePeriods_whenCalculateIsCalled() {
-    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
-
     Set<TimePeriod> periods = Set.of(ONE_MTH);
+    Set<Pair<String, BigDecimal>> periodResults = Set.of();
+    PeriodResult result = mock(PeriodResult.class);
+    PeriodCalculationAbstract p = calculationForCalculateTests(periodResults, result);
 
     doCallRealMethod().when(p).calculate(any());
-    p.calculate(periods);
+    PeriodResult actual = p.calculate(periods);
 
     verify(p).calculatePeriods(periods);
+    verify(p).defineResponseType(periodResults);
+    verify(result).setWarnings(List.of());
+    assertEquals(result, actual);
   }
 
   @Test
@@ -252,17 +256,17 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldDelegateToDefineResponseType_whenCalculateIsCalled() {
-    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
-
     Set<TimePeriod> periods = Set.of(ONE_MTH);
-    Set<Object> periodsR = Set.of(mock(Object.class));
-
-    when(p.calculatePeriods(any())).thenReturn(periodsR);
+    Set<Pair<String, BigDecimal>> periodResults = Set.of(Pair.of(ONE_MTH.name(), ONE));
+    PeriodResult result = mock(PeriodResult.class);
+    PeriodCalculationAbstract p = calculationForCalculateTests(periodResults, result);
 
     doCallRealMethod().when(p).calculate(any());
-    p.calculate(periods);
+    PeriodResult actual = p.calculate(periods);
 
-    verify(p).defineResponseType(periodsR);
+    verify(p).defineResponseType(periodResults);
+    verify(result).setWarnings(List.of());
+    assertEquals(result, actual);
   }
 
   @Test
@@ -345,16 +349,16 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldPopulateBasicDetails_whenCalculateIsCalled() {
-    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
-
     Set<TimePeriod> periods = Set.of(ONE_MTH);
+    Set<Pair<String, BigDecimal>> periodResults = Set.of();
     PeriodResult result = mock(PeriodResult.class);
-    when(p.defineResponseType(any())).thenReturn(result);
+    PeriodCalculationAbstract p = calculationForCalculateTests(periodResults, result);
 
     doCallRealMethod().when(p).calculate(any());
     PeriodResult actual = p.calculate(periods);
 
     verify(p).populateBasicDetails(result);
+    verify(result).setWarnings(List.of());
     assertEquals(result, actual);
   }
 
@@ -370,6 +374,17 @@ class PeriodCalculationAbstractTest {
     p.calculatePeriods(periods);
 
     verify(p).getInitialPeriods(periods);
+  }
+
+  private static PeriodCalculationAbstract calculationForCalculateTests(
+      Set<Pair<String, BigDecimal>> periodResults,
+      PeriodResult result) {
+    PeriodCalculationInput input = new PeriodCalculationInput(null, new TreeMap<>(), List.of());
+    PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class,
+        withSettings().useConstructor(input, Set.of()));
+    when(calculation.calculatePeriods(any())).thenReturn(periodResults);
+    when(calculation.defineResponseType(periodResults)).thenReturn(result);
+    return calculation;
   }
 
   @Test
