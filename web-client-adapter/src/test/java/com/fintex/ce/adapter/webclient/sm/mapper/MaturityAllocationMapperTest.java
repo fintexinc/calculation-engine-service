@@ -3,8 +3,8 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.allocation.DurationAllocationValue;
 import com.fintex.wm.commons.domain.allocation.Maturities;
-import com.fintex.wm.commons.domain.allocation.MaturityDurationValue;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimeDuration;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -23,7 +23,7 @@ class MaturityAllocationMapperTest {
   @Test
   void shouldMapPeriodsAndProvider_whenResponseHasMaturityValues() {
     var smsResponse = new Maturities();
-    smsResponse.setPeriods(List.of(
+    smsResponse.setAllocations(List.of(
         createPeriod(TimeDuration.ONE_TO_SEVEN_DAYS, "10.5"),
         createPeriod(TimeDuration.THREE_TO_FIVE_YEARS, "35.0"),
         createPeriod(TimeDuration.SEVEN_TO_TEN_YEARS, "54.5")));
@@ -53,7 +53,7 @@ class MaturityAllocationMapperTest {
   @Test
   void shouldReturnEmptyMap_whenPeriodsListIsNull() {
     var smsResponse = new Maturities();
-    smsResponse.setPeriods(null);
+    smsResponse.setAllocations(null);
 
     MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
 
@@ -64,7 +64,7 @@ class MaturityAllocationMapperTest {
   @Test
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new Maturities();
-    smsResponse.setPeriods(List.of());
+    smsResponse.setAllocations(List.of());
     smsResponse.setDataProviders(null);
 
     MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
@@ -76,16 +76,16 @@ class MaturityAllocationMapperTest {
   void shouldFilterOutEntriesWithNullDurationOrValue() {
     var valid = createPeriod(TimeDuration.FIVE_TO_SEVEN_YEARS, "25.0");
 
-    var nullDuration = new MaturityDurationValue();
-    nullDuration.setMaturityDuration(null);
+    var nullDuration = new DurationAllocationValue();
+    nullDuration.setType(null);
     nullDuration.setValue(BigDecimal.valueOf(10.0));
 
-    var nullValue = new MaturityDurationValue();
-    nullValue.setMaturityDuration(TimeDuration.ONE_TO_SEVEN_DAYS);
+    var nullValue = new DurationAllocationValue();
+    nullValue.setType(TimeDuration.ONE_TO_SEVEN_DAYS);
     nullValue.setValue(null);
 
     var smsResponse = new Maturities();
-    smsResponse.setPeriods(List.of(valid, nullDuration, nullValue));
+    smsResponse.setAllocations(List.of(valid, nullDuration, nullValue));
 
     MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-005"));
 
@@ -97,7 +97,7 @@ class MaturityAllocationMapperTest {
   @Test
   void shouldSumValues_whenDuplicateDurationsExist() {
     var smsResponse = new Maturities();
-    smsResponse.setPeriods(List.of(
+    smsResponse.setAllocations(List.of(
         createPeriod(TimeDuration.THREE_TO_FIVE_YEARS, "20.0"),
         createPeriod(TimeDuration.THREE_TO_FIVE_YEARS, "15.0")));
 
@@ -108,9 +108,9 @@ class MaturityAllocationMapperTest {
         .isEqualByComparingTo("35.0");
   }
 
-  private MaturityDurationValue createPeriod(TimeDuration duration, String value) {
-    var mdv = new MaturityDurationValue();
-    mdv.setMaturityDuration(duration);
+  private DurationAllocationValue createPeriod(TimeDuration duration, String value) {
+    var mdv = new DurationAllocationValue();
+    mdv.setType(duration);
     mdv.setValue(new BigDecimal(value));
     return mdv;
   }

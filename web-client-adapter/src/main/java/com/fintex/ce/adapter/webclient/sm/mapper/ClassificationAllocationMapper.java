@@ -28,7 +28,7 @@ public class ClassificationAllocationMapper
   @Override
   public ClassificationAllocation map(SecurityClassificationAllocation smsResponse, PortfolioHolding holding) {
     Map<ClassificationAllocationType, BigDecimal> classificationMap = Optional.ofNullable(smsResponse)
-        .map(SecurityClassificationAllocation::getValues)
+        .map(SecurityClassificationAllocation::getAllocations)
         .orElse(List.of())
         .stream()
         .filter(entry -> entry.getLevelOne() != null && entry.getLevelTwo() != null && entry.getValue() != null)
