@@ -31,7 +31,7 @@ Pure logic, no data fetching.
 - **`PeriodCalculationAbstract<T, V>`** — period resolution (months, YTD, SINCE_INCEPTION), date filtering
 - **`RollingAbstractCalculation<T>`** — rolling window calculations
 - **`AlphaBetaCalculationAbstract<T>`**, **`RSquaredCalculationAbstract<T>`** — regression
-- **`UpDownSideCalculationAbstract`** — capture ratios
+- **`UpDownSideCalculationAbstract`** — capture ratios 
 
 ### Code convention rules
 - **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `mvn spotless:apply`

@@ -36,7 +36,7 @@ class ClassificationAllocationMapperTest {
         .build();
 
     var smsResponse = new SecurityClassificationAllocation();
-    smsResponse.setValues(List.of(equityCanada, fixedIncomeUs));
+    smsResponse.setAllocations(List.of(equityCanada, fixedIncomeUs));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
@@ -61,7 +61,7 @@ class ClassificationAllocationMapperTest {
   @Test
   void shouldReturnEmptyMap_whenValuesListIsNull() {
     var smsResponse = new SecurityClassificationAllocation();
-    smsResponse.setValues(null);
+    smsResponse.setAllocations(null);
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
 
@@ -71,7 +71,7 @@ class ClassificationAllocationMapperTest {
   @Test
   void shouldNotSetProvider_whenDataProviderIsNull() {
     var smsResponse = new SecurityClassificationAllocation();
-    smsResponse.setValues(List.of());
+    smsResponse.setAllocations(List.of());
     smsResponse.setDataProviders(null);
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
@@ -98,7 +98,7 @@ class ClassificationAllocationMapperTest {
         .build();
 
     var smsResponse = new SecurityClassificationAllocation();
-    smsResponse.setValues(List.of(valid, nullLevelOne, nullValue));
+    smsResponse.setAllocations(List.of(valid, nullLevelOne, nullValue));
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-005"));
 
@@ -121,7 +121,7 @@ class ClassificationAllocationMapperTest {
         .build();
 
     var smsResponse = new SecurityClassificationAllocation();
-    smsResponse.setValues(List.of(entry1, entry2));
+    smsResponse.setAllocations(List.of(entry1, entry2));
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-006"));
 
