@@ -6,6 +6,7 @@ import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.MeanResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -34,13 +35,17 @@ public class MeanCalculationServiceImpl extends WeightedAverageWithCpedAbstractS
     return CalculationMetric.MEAN;
   }
 
-  public MeanCalculation defineCalculationMethod(final PeriodCommand command) {
-    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    return MeanCalculation.builder()
+  @Override
+  public MeanResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
+    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO,
+        returnsData);
+    return MeanCalculation.<MeanResult>builder()
         .input(context)
         .defaultPeriods(defaultPeriods)
         .scale(OUTPUT_SCALE)
-        .build();
+        .build()
+        .calculate(command.getPeriods());
   }
 
 }

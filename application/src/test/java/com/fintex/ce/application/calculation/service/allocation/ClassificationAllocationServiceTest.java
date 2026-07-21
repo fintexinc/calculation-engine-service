@@ -8,8 +8,6 @@ import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocatio
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,30 +22,25 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 class ClassificationAllocationServiceTest {
 
   @Test
   void shouldFetch_whenCheckResult() {
     // SETUP
-    final var fetcher = mock(SecurityDataFetcher.class);
-    final var service = mock(ClassificationAllocationService.class, withSettings()
-        .useConstructor(fetcher));
+    final var service = mock(ClassificationAllocationService.class);
 
     final var holding = mock(PortfolioHolding.class);
     final var command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holding));
-    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     final var classificationAllocation = new ClassificationAllocation();
     classificationAllocation.setSecurityClassificationValues(Map.of(
         ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL, BigDecimal.TEN));
-    final var rawData = Map.of(holding, classificationAllocation);
+    final var data = Map.of(holding, classificationAllocation);
 
-    when(fetcher.fetch(any(), any())).thenReturn(rawData);
-    doCallRealMethod().when(service).fetchExposures(any());
+    doCallRealMethod().when(service).fetchExposures(any(), any());
     // ACT
-    final var result = service.fetchExposures(command);
+    final var result = service.fetchExposures(command, data);
     final var actual = result.allocations();
 
     // VERIFY
@@ -55,7 +48,6 @@ class ClassificationAllocationServiceTest {
     Assertions.assertTrue(actual.containsKey(holding));
     Assertions.assertEquals(BigDecimal.TEN, actual.get(holding).get(
         ClassificationAllocationType.CASH_AND_CASH_EQUIVALENTS__INTERNATIONAL));
-    verify(fetcher).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test
@@ -119,9 +111,7 @@ class ClassificationAllocationServiceTest {
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       // SETUP
-      final var fetcher = mock(SecurityDataFetcher.class);
-      final var service = mock(ClassificationAllocationService.class, withSettings()
-          .useConstructor(fetcher));
+      final var service = mock(ClassificationAllocationService.class);
 
       final var exposures = mock(Map.class);
       final var expected = ClassificationAllocationResult.builder()

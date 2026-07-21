@@ -1,6 +1,7 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.PortfolioCalculationEngineApplication;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -139,7 +140,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
     var response = postCalculation(requestBodyForSmsUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-    assertThat(response.responseBody()).contains("SYS-003");
+    assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.getCode());
     assertThat(response.responseBody()).contains("Security Master");
   }
 
@@ -153,7 +154,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
     var response = postCalculation(requestBodyForSmsUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-    assertThat(response.responseBody()).contains("SYS-003");
+    assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.getCode());
     assertThat(response.responseBody()).contains("Security Master");
   }
 
@@ -167,7 +168,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
     var response = postCalculation(requestBodyForSmsUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_GATEWAY.value());
-    assertThat(response.responseBody()).contains("SYS-004");
+    assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_BAD_RESPONSE.getCode());
     assertThat(response.responseBody()).contains("Security Master");
   }
 

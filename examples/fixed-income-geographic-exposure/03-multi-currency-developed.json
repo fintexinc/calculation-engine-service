@@ -1,0 +1,161 @@
+{
+  "metric": "fixed-income-geographic-exposure",
+  "holdings": [
+    {
+      "holdingType": "CASH",
+      "value": 8000.00,
+      "securityIdentifier": {
+        "id": "CASH-CAD",
+        "idType": "TICKER"
+      },
+      "currency": "CAD"
+    },
+    {
+      "holdingType": "CASH",
+      "value": 4000.00,
+      "securityIdentifier": {
+        "id": "CASH-USD",
+        "idType": "TICKER"
+      },
+      "currency": "USD"
+    },
+    {
+      "holdingType": "CASH",
+      "value": 2500.00,
+      "securityIdentifier": {
+        "id": "CASH-EUR",
+        "idType": "TICKER"
+      },
+      "currency": "EUR"
+    },
+    {
+      "holdingType": "CASH",
+      "value": 1500.00,
+      "securityIdentifier": {
+        "id": "CASH-GBP",
+        "idType": "TICKER"
+      },
+      "currency": "GBP"
+    },
+    {
+      "holdingType": "STOCK_CANADA",
+      "value": 6000.00,
+      "securityIdentifier": {
+        "id": "RY.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK_US",
+      "value": 9000.00,
+      "securityIdentifier": {
+        "id": "AAPL",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK_US",
+      "value": 5500.00,
+      "securityIdentifier": {
+        "id": "NVDA",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK_US",
+      "value": 4200.00,
+      "securityIdentifier": {
+        "id": "JPM",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NYSE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 350000.00,
+      "securityIdentifier": {
+        "id": "4875.T",
+        "idType": "TICKER_MIC",
+        "exchangeId": "JPX"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 2800.00,
+      "securityIdentifier": {
+        "id": "SWR.L",
+        "idType": "TICKER_MIC",
+        "exchangeId": "LSE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 3500.00,
+      "securityIdentifier": {
+        "id": "TL0.DE",
+        "idType": "TICKER_MIC",
+        "exchangeId": "XETRA"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 4100.00,
+      "securityIdentifier": {
+        "id": "BKNG.SW",
+        "idType": "TICKER_MIC",
+        "exchangeId": "SIX"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 12000.00,
+      "securityIdentifier": {
+        "id": "QQQQ",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 7000.00,
+      "securityIdentifier": {
+        "id": "HEWJ",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 4500.00,
+      "securityIdentifier": {
+        "id": "IPKW",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 3200.00,
+      "securityIdentifier": {
+        "id": "GVAL",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND_CANADA",
+      "value": 5500.00,
+      "securityIdentifier": {
+        "id": "F00000MP5E",
+        "idType": "MORNINGSTAR_ID"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND_US",
+      "value": 6800.00,
+      "securityIdentifier": {
+        "id": "F00000MBXS",
+        "idType": "MORNINGSTAR_ID"
+      }
+    }
+  ]
+}

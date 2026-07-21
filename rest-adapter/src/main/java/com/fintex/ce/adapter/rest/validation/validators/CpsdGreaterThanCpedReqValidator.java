@@ -1,8 +1,8 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.dto.command.CustomPedProvider;
-import com.fintex.ce.model.dto.command.CustomPsdProvider;
+import com.fintex.ce.model.dto.command.contract.CustomPedProvider;
+import com.fintex.ce.model.dto.command.contract.CustomPsdProvider;
 import com.fintex.ce.model.error.ErrorCode;
 
 import org.springframework.core.annotation.Order;

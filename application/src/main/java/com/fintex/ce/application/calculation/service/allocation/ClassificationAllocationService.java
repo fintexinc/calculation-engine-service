@@ -3,13 +3,15 @@ package com.fintex.ce.application.calculation.service.allocation;
 import com.fintex.ce.application.util.AllocationMappingUtils;
 import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.math.BigDecimal;
@@ -32,7 +34,9 @@ import static java.util.stream.Collectors.toMap;
 @Deprecated
 public class ClassificationAllocationService
     extends
-      BreakdownAbstractService<ClassificationAllocationResult, ClassificationAllocationType> {
+      BreakdownAbstractService<Map<PortfolioHolding, ClassificationAllocation>, ClassificationAllocationResult, ClassificationAllocationType>
+    implements
+      SingleAttributeCalculationService<PortfolioHoldingsCommand, ClassificationAllocation, ClassificationAllocationResult> {
 
   protected static final Map<ClassificationAllocationType, BigDecimal> DEFAULT_MAP = new EnumMap<>(
       ClassificationAllocationType.class);
@@ -57,20 +61,22 @@ public class ClassificationAllocationService
         FinancialInstrumentType.FIXED_INCOME, ClassificationAllocationType.FIXED_INCOME__UNCLASSIFIED);
   }
 
-  private final SecurityDataFetcher<ClassificationAllocation> classificationAllocationSecurityDataFetcher;
-
-  public ClassificationAllocationService(
-      final SecurityDataFetcher<ClassificationAllocation> classificationAllocationSecurityDataFetcher) {
-    super();
-    this.classificationAllocationSecurityDataFetcher = classificationAllocationSecurityDataFetcher;
-  }
-
   @Override
   public CalculationMetric getMetric() {
     return CalculationMetric.CLASSIFICATION_ALLOCATION;
   }
 
   @Override
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.SECURITY_CLASSIFICATION_ALLOCATION;
+  }
+
+  @Override
+  public ClassificationAllocationResult perform(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, ClassificationAllocation> data) {
+    return calculate(fetchExposures(command, data), command.getHoldings());
+  }
+
   public ClassificationAllocationResult calculate(
       ExposureDataHolder<ClassificationAllocationType> exposureData,
       List<PortfolioHolding> holdings) {
@@ -93,10 +99,10 @@ public class ClassificationAllocationService
         .build();
   }
 
-  @Override
-  public ExposureDataHolder<ClassificationAllocationType> fetchExposures(final PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, ClassificationAllocation> rawData = classificationAllocationSecurityDataFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+  public ExposureDataHolder<ClassificationAllocationType> fetchExposures(final PortfolioHoldingsCommand command,
+      final Map<PortfolioHolding, ClassificationAllocation> data) {
+    Map<PortfolioHolding, ClassificationAllocation> rawData = FilterUtils.restrictToHoldings(data,
+        command.getHoldings());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         ClassificationAllocation::getSecurityClassificationValues,
         ALLOCATION_DEFAULT_MAP, MISSING_CLASSIFICATION_ALLOCATION);

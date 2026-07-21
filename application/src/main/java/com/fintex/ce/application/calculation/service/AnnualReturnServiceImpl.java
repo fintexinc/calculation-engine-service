@@ -5,6 +5,7 @@ import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
@@ -45,8 +46,9 @@ public class AnnualReturnServiceImpl
   }
 
   @Override
-  public AnnualReturnResult<Integer> perform(ReturnCommand command) {
-    PeriodCalculationInput context = buildPeriodCalculationInput(command, SCALE_OF_TWO);
+  public AnnualReturnResult<Integer> perform(ReturnCommand command,
+      PortfolioBenchmarkReturns returnsData) {
+    PeriodCalculationInput context = buildPeriodCalculationInput(command, SCALE_OF_TWO, returnsData);
     return buildAnnualReturnResult(context.getWeightedAveragePortfolioReturns(), context.getWarnings());
   }
 

@@ -1,18 +1,14 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
-import com.fintex.ce.application.config.DefaultDataProperties;
-import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityGeographicExposureResult;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
-import com.fintex.wm.commons.domain.financial.Geography;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.error.Notification;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -39,17 +35,18 @@ public class EquityGeographicExposureService
       .or(FIXED_INCOME_PREDICATE)
       .negate();
 
-  public EquityGeographicExposureService(
-      @Qualifier("equityGeographicAllocationFetcher") SecurityDataFetcher<HoldingGeographicAllocation> equityGeographicAllocationFetcher,
-      SecurityDataFetcher<Geography> geographyFetcher,
-      PortfolioWeightCalculator portfolioWeightCalculator,
-      DefaultDataProperties defaultDataProperties) {
-    super(equityGeographicAllocationFetcher, geographyFetcher, portfolioWeightCalculator, defaultDataProperties);
+  public EquityGeographicExposureService(PortfolioWeightCalculator portfolioWeightCalculator) {
+    super(portfolioWeightCalculator);
   }
 
   @Override
   public CalculationMetric getMetric() {
     return CalculationMetric.EQUITY_GEOGRAPHIC_EXPOSURE;
+  }
+
+  @Override
+  protected CompositeSecurityAttribute geographicAllocationAttribute() {
+    return CompositeSecurityAttribute.EQUITY_GEOGRAPHIC_ALLOCATION;
   }
 
   @Override

@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.DownsideCaptureCalculation;
-import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.period.core.BenchmarkWeightedAverageWithCpedAbstractService;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
@@ -9,6 +8,7 @@ import com.fintex.ce.application.returns.pipeline.BenchmarkWeightedAverageWithCp
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.DownsideCaptureResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -41,9 +41,11 @@ public class DownsideCaptureCalculationServiceImpl
   }
 
   @Override
-  public PeriodCalculationAbstract<DownsideCaptureResult, ?> defineCalculationMethod(final PeriodCommand command) {
-    final BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.AS_IS);
-    return new DownsideCaptureCalculation(context, defaultPeriods);
+  public DownsideCaptureResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
+    final BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.AS_IS,
+        returnsData);
+    return new DownsideCaptureCalculation(context, defaultPeriods).calculate(command.getPeriods());
   }
 
 }

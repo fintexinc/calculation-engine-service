@@ -1,20 +1,20 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
-import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.model.domain.calculation.allocation.GeographicExposureData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
+import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.allocation.RegionDatapoint;
 import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.financial.Geography;
 import com.fintex.wm.commons.domain.reference.CountryDatapoint;
@@ -34,7 +34,7 @@ import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
 import static com.fintex.ce.application.util.CalculationUtils.sumProduct;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
-import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
+import static com.fintex.ce.util.FilterUtils.restrictToHoldings;
 
 /**
  * Shared base for the equity / fixed-income geographic exposure services. Resolves each relevant holding's per-region
@@ -52,29 +52,28 @@ import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
  */
 public abstract class AbstractGeographicExposureService<R extends GeographicExposureResult>
     implements
-      CalculationService<PortfolioHoldingsCommand, R> {
+      CalculationService<PortfolioHoldingsCommand, GeographicExposureData, R> {
 
-  protected final SecurityDataFetcher<HoldingGeographicAllocation> geographicAllocationFetcher;
-  protected final SecurityDataFetcher<Geography> geographyFetcher;
   protected final PortfolioWeightCalculator portfolioWeightCalculator;
-  protected final DefaultDataProperties defaultDataProperties;
 
-  protected AbstractGeographicExposureService(
-      SecurityDataFetcher<HoldingGeographicAllocation> geographicAllocationFetcher,
-      SecurityDataFetcher<Geography> geographyFetcher,
-      PortfolioWeightCalculator portfolioWeightCalculator,
-      DefaultDataProperties defaultDataProperties) {
-    this.geographicAllocationFetcher = geographicAllocationFetcher;
-    this.geographyFetcher = geographyFetcher;
+  protected AbstractGeographicExposureService(PortfolioWeightCalculator portfolioWeightCalculator) {
     this.portfolioWeightCalculator = portfolioWeightCalculator;
-    this.defaultDataProperties = defaultDataProperties;
   }
 
   @Override
-  public R perform(PortfolioHoldingsCommand command) {
+  public List<CompositeSecurityAttribute> requiredAttributes() {
+    return List.of(geographicAllocationAttribute(), CompositeSecurityAttribute.GEOGRAPHY);
+  }
+
+  @Override
+  public GeographicExposureData prepareData(SecurityData securityData) {
+    return new GeographicExposureData(securityData.get(geographicAllocationAttribute()),
+        securityData.get(CompositeSecurityAttribute.GEOGRAPHY));
+  }
+
+  @Override
+  public R perform(PortfolioHoldingsCommand command, GeographicExposureData data) {
     List<PortfolioHolding> allHoldings = command.getHoldings();
-    List<DataProvider> providers = getSpecifiedIfEmpty(command.getDataProviders(),
-        defaultDataProperties.getDataProviders());
     List<Notification> warnings = new ArrayList<>();
 
     List<PortfolioHolding> relevant = allHoldings.stream().filter(relevantHoldingPredicate()).toList();
@@ -85,9 +84,9 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
     List<PortfolioHolding> stocks = relevant.stream().filter(STOCK_PREDICATE).toList();
     List<PortfolioHolding> nonStocks = relevant.stream().filter(STOCK_PREDICATE.negate()).toList();
 
-    Map<PortfolioHolding, Geography> stockGeographies = geographyFetcher.fetch(stocks, providers);
-    Map<PortfolioHolding, HoldingGeographicAllocation> fundExposures = geographicAllocationFetcher.fetch(nonStocks,
-        providers);
+    Map<PortfolioHolding, Geography> stockGeographies = restrictToHoldings(data.geographies(), stocks);
+    Map<PortfolioHolding, HoldingGeographicAllocation> fundExposures = restrictToHoldings(data.allocations(),
+        nonStocks);
 
     Map<PortfolioHolding, Map<GeographicRegionType, BigDecimal>> exposures = new HashMap<>();
     Map<PortfolioHolding, Currency> currencies = new HashMap<>();
@@ -105,6 +104,8 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
     Map<GeographicRegionType, BigDecimal> netProducts = aggregate(exposures, weightResult.weights());
     return buildResult(toUserScale(reScaleAbs(netProducts)), warnings);
   }
+
+  protected abstract CompositeSecurityAttribute geographicAllocationAttribute();
 
   protected abstract Predicate<PortfolioHolding> relevantHoldingPredicate();
 

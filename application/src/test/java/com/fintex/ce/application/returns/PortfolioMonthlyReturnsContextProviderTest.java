@@ -39,9 +39,9 @@ class PortfolioMonthlyReturnsContextProviderTest {
 
   @Test
   void shouldEmitPortfolioRole_whenGetIsCalled() {
-    when(monthlyReturnsService.getMonthlyReturns(any())).thenReturn(ReturnsSnapshot.empty());
+    when(monthlyReturnsService.getMonthlyReturns(any(), any())).thenReturn(ReturnsSnapshot.empty());
 
-    MonthlyReturnsContext<HoldingMonthlyReturns> context = provider.get(List.of(ETF), null);
+    MonthlyReturnsContext<HoldingMonthlyReturns> context = provider.get(List.of(ETF), null, Map.of());
 
     assertThat(context.role()).isEqualTo(ReturnsRole.PORTFOLIO);
     assertThat(context.fxContext()).isEqualTo(FxContext.empty());
@@ -58,10 +58,10 @@ class PortfolioMonthlyReturnsContextProviderTest {
     TreeMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(psd, BigDecimal.ONE, ped, BigDecimal.ONE));
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = new ReturnsSnapshot<>(Map.of(ETF, Currency.USD),
         Map.of(ETF, returns), psd, ped, List.of());
-    when(monthlyReturnsService.getMonthlyReturns(any())).thenReturn(snapshot);
+    when(monthlyReturnsService.getMonthlyReturns(any(), any())).thenReturn(snapshot);
     when(fxRateService.rates(any(), any(), any())).thenReturn(Map.of());
 
-    provider.get(List.of(ETF), Currency.CAD);
+    provider.get(List.of(ETF), Currency.CAD, Map.of());
 
     ArgumentCaptor<DateRange> rangeCaptor = ArgumentCaptor.forClass(DateRange.class);
     verify(fxRateService).rates(any(), eq(Currency.CAD), rangeCaptor.capture());

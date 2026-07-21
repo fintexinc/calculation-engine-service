@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.ExcessReturnsCalculation;
-import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.period.core.BenchmarkWeightedAverageWithCpedAbstractService;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
@@ -9,6 +8,7 @@ import com.fintex.ce.application.returns.pipeline.BenchmarkWeightedAverageWithCp
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.ExcessReturnsResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -41,10 +41,11 @@ public class ExcessReturnsCalculationServiceImpl
   }
 
   @Override
-  public PeriodCalculationAbstract<ExcessReturnsResult, ?> defineCalculationMethod(final PeriodCommand command) {
+  public ExcessReturnsResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
     final BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command,
-        ReturnFactorScale.SCALE_OF_TWO);
-    return new ExcessReturnsCalculation(context, defaultPeriods);
+        ReturnFactorScale.SCALE_OF_TWO, returnsData);
+    return new ExcessReturnsCalculation(context, defaultPeriods).calculate(command.getPeriods());
   }
 
 }

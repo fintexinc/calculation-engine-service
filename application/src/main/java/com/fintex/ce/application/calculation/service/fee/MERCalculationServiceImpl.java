@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.service.fee;
 
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
-import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -9,7 +8,6 @@ import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.Notification;
 
@@ -21,36 +19,21 @@ import java.util.Map;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
-import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 
 @Service
 public class MERCalculationServiceImpl extends AbstractFeeCalculationService<AverageMerResult> {
 
-  private final SecurityDataFetcher<FeeData> feesSecurityDataFetcher;
-  private final DefaultDataProperties defaultDataProperties;
   private final FeeResolver feeResolver;
 
-  public MERCalculationServiceImpl(SecurityDataFetcher<FeeData> feesSecurityDataFetcher,
-      DefaultDataProperties defaultDataProperties, DefaultTargetCurrencyConverter defaultTargetCurrencyConverter,
+  public MERCalculationServiceImpl(DefaultTargetCurrencyConverter defaultTargetCurrencyConverter,
       MerFeeResolver feeResolver) {
     super(defaultTargetCurrencyConverter);
-    this.feesSecurityDataFetcher = feesSecurityDataFetcher;
-    this.defaultDataProperties = defaultDataProperties;
     this.feeResolver = feeResolver;
   }
 
   @Override
   public CalculationMetric getMetric() {
     return CalculationMetric.MER;
-  }
-
-  @Override
-  protected Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> fetchData(
-      AverageMerCommand command) {
-    Map<PortfolioHolding, FeeData> rawData = feesSecurityDataFetcher.fetch(
-        command.getHoldings(),
-        getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
-    return groupAndMap(rawData, command.getHoldings());
   }
 
   @Override

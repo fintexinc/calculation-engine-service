@@ -8,6 +8,7 @@ import com.fintex.ce.application.returns.pipeline.CpsdCpedScaleParams;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.application.util.Growth10KHelper;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
@@ -52,7 +53,7 @@ class GrowthOf10KCalculationServiceImplTest {
     ReturnCommand command = new ReturnCommand();
 
     MonthlyReturnsContext context = mock(MonthlyReturnsContext.class);
-    when(contextProvider.get(command.getHoldings(), command.getCurrency())).thenReturn(context);
+    when(contextProvider.get(command.getHoldings(), command.getCurrency(), Map.of())).thenReturn(context);
 
     NavigableMap<LocalDate, BigDecimal> wa = new TreeMap<>();
     wa.put(JAN_2020, new BigDecimal("1.05"));
@@ -64,7 +65,7 @@ class GrowthOf10KCalculationServiceImplTest {
         command.getCustomPsd(), command.getCustomPed(), ReturnFactorScale.SCALE_OF_TWO)))
         .thenReturn(result);
 
-    Growth10KResult response = service.perform(command);
+    Growth10KResult response = service.perform(command, PortfolioBenchmarkReturns.EMPTY);
 
     assertThat(response.getWarnings()).extracting(Notification::getCode).containsExactly("PFD-007");
     assertThat(response.getGrowth10k()).isNotEmpty();

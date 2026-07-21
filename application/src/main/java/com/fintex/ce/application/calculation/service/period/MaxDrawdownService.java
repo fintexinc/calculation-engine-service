@@ -7,6 +7,7 @@ import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.application.util.Growth10KHelper;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
@@ -60,8 +61,10 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
   }
 
   @Override
-  public MaxDrawdownResult perform(final PeriodCommand command) {
-    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+  public MaxDrawdownResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
+    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO,
+        returnsData);
     final NavigableMap<LocalDate, BigDecimal> portfolioReturns = context.getWeightedAveragePortfolioReturns();
     final LocalDate cipsd = context.getCipsd();
     // portfolioReturns is already in factor form, pass AS_IS to avoid double-scaling

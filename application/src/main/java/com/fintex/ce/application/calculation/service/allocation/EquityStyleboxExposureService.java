@@ -4,12 +4,14 @@ import com.fintex.ce.application.mapping.response.EquityStyleboxExposureResponse
 import com.fintex.ce.application.util.AllocationMappingUtils;
 import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.rating.StyleBoxType;
 
 import java.math.BigDecimal;
@@ -29,7 +31,9 @@ import static java.util.stream.Collectors.toMap;
 @Deprecated
 public class EquityStyleboxExposureService
     extends
-      BreakdownAbstractService<EquityStyleboxExposureResult, StyleBoxType> {
+      BreakdownAbstractService<Map<PortfolioHolding, EquityStyleboxExposure>, EquityStyleboxExposureResult, StyleBoxType>
+    implements
+      SingleAttributeCalculationService<PortfolioHoldingsCommand, EquityStyleboxExposure, EquityStyleboxExposureResult> {
 
   static final Map<StyleBoxType, BigDecimal> DEFAULT_MAP;
 
@@ -38,14 +42,10 @@ public class EquityStyleboxExposureService
         Stream.of(StyleBoxType.values()).collect(toMap(type -> type, type -> ZERO)));
   }
 
-  private final SecurityDataFetcher<EquityStyleboxExposure> equityStyleboxSecurityDataFetcher;
   private final EquityStyleboxExposureResponseMapper responseMapper;
 
-  public EquityStyleboxExposureService(
-      final SecurityDataFetcher<EquityStyleboxExposure> equityStyleboxSecurityDataFetcher,
-      final EquityStyleboxExposureResponseMapper responseMapper) {
+  public EquityStyleboxExposureService(final EquityStyleboxExposureResponseMapper responseMapper) {
     super();
-    this.equityStyleboxSecurityDataFetcher = equityStyleboxSecurityDataFetcher;
     this.responseMapper = responseMapper;
   }
 
@@ -55,6 +55,16 @@ public class EquityStyleboxExposureService
   }
 
   @Override
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.EQUITY_STYLEBOX;
+  }
+
+  @Override
+  public EquityStyleboxExposureResult perform(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, EquityStyleboxExposure> data) {
+    return calculate(fetchExposures(command, data), command.getHoldings());
+  }
+
   public EquityStyleboxExposureResult calculate(ExposureDataHolder<StyleBoxType> exposureData,
       List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
@@ -67,10 +77,10 @@ public class EquityStyleboxExposureService
     return responseMapper.fromNetProducts(netProducts, warnings);
   }
 
-  @Override
-  public ExposureDataHolder<StyleBoxType> fetchExposures(PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, EquityStyleboxExposure> rawData = equityStyleboxSecurityDataFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+  public ExposureDataHolder<StyleBoxType> fetchExposures(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, EquityStyleboxExposure> data) {
+    Map<PortfolioHolding, EquityStyleboxExposure> rawData = FilterUtils.restrictToHoldings(data,
+        command.getHoldings());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         EquityStyleboxExposure::getBoxValues,
         DEFAULT_MAP, MISSING_EQUITY_STYLEBOX_EXPOSURE);

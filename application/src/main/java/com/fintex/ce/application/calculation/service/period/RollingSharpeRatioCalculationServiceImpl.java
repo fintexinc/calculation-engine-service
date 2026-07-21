@@ -9,6 +9,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
@@ -46,10 +47,12 @@ public class RollingSharpeRatioCalculationServiceImpl
   }
 
   @Override
-  public RollingSharpeRatioResult perform(RollingCalculationCommand command) {
+  public RollingSharpeRatioResult perform(RollingCalculationCommand command,
+      PortfolioBenchmarkReturns returnsData) {
     var tBills = TBillsValidator.requireNonEmpty(
         treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
-    PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
+    PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE,
+        returnsData);
 
     StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation = new StandardDeviationCalculation<>(
         input, defaultPeriods);

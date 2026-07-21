@@ -5,11 +5,10 @@ import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 
 import org.junit.jupiter.api.Assertions;
@@ -40,7 +39,6 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 class EquityMarketCapitalizationServiceTest {
 
@@ -69,28 +67,28 @@ class EquityMarketCapitalizationServiceTest {
 
   @Test
   void shouldPerform_whenVerifyLoad() {
-    final var marketCapFetcher = mock(SecurityDataFetcher.class);
-    final var service = mock(EquityMarketCapitalizationService.class, withSettings()
-        .useConstructor(marketCapFetcher));
+    final var service = mock(EquityMarketCapitalizationService.class);
 
-    final var holdings = List.of(mock(PortfolioHolding.class));
+    final var holding = mock(PortfolioHolding.class);
     final var req = mock(PortfolioHoldingsCommand.class);
 
-    when(req.getHoldings()).thenReturn(holdings);
-    when(req.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
+    when(req.getHoldings()).thenReturn(List.of(holding));
+    final var marketCap = HoldingEquityMarketCap.builder()
+        .ratings(Map.of(EquityMarketCapitalizationType.SMALL, TEN))
+        .build();
+    final var data = Map.of(holding, marketCap);
 
-    doCallRealMethod().when(service).fetchExposures(any());
-    service.fetchExposures(req);
+    doCallRealMethod().when(service).fetchExposures(any(), any());
+    final var result = service.fetchExposures(req, data);
 
-    verify(marketCapFetcher).fetch(holdings, List.of(DataProvider.MORNINGSTAR));
+    Assertions.assertTrue(result.allocations().containsKey(holding));
+    assertEquals(TEN, result.allocations().get(holding).get(EquityMarketCapitalizationType.SMALL));
   }
 
   @Test
   void shouldPerform_whenVerifyAreAllValuesZerosInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final var marketCapFetcher = mock(SecurityDataFetcher.class);
-      final var service = mock(EquityMarketCapitalizationService.class, withSettings()
-          .useConstructor(marketCapFetcher));
+      final var service = mock(EquityMarketCapitalizationService.class);
 
       final var exposures = mock(Map.class);
 
@@ -104,9 +102,7 @@ class EquityMarketCapitalizationServiceTest {
   @Test
   void shouldPerform_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final var marketCapFetcher = mock(SecurityDataFetcher.class);
-      final var service = mock(EquityMarketCapitalizationService.class, withSettings()
-          .useConstructor(marketCapFetcher));
+      final var service = mock(EquityMarketCapitalizationService.class);
 
       final var exposures = mock(Map.class);
       final var expected = EquityMarketCapResult.builder()

@@ -17,6 +17,9 @@ import org.junit.jupiter.api.Test;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.Min;
 
 import java.util.List;
 import java.util.Set;
@@ -26,6 +29,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class GlobalExceptionHandlerTest {
+
+  private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 
   private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
@@ -131,16 +136,20 @@ class GlobalExceptionHandlerTest {
 
   @Test
   void constraintViolation_mapsKnownErrorCode() {
-    ConstraintViolation<?> violation = mock(ConstraintViolation.class);
-    when(violation.getMessage()).thenReturn(ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.name());
-    var exception = new ConstraintViolationException("violation", Set.of(violation));
+    Set<ConstraintViolation<TimeIntervalBean>> violations = VALIDATOR.validate(new TimeIntervalBean(0));
+    var exception = new ConstraintViolationException("violation", violations);
 
     ResponseEntity<ErrorResponse> response = handler.handleConstraintViolation(exception);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     assertThat(response.getBody()).isNotNull();
     assertThat(response.getBody().getNotifications()).hasSize(1);
-    assertThat(response.getBody().getNotifications().get(0).getCode())
-        .isEqualTo(ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.getCode());
+    Notification notification = response.getBody().getNotifications().get(0);
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.getCode());
+    assertThat(notification.getFieldName()).isEqualTo("timeIntervalPeriods");
+  }
+
+  private record TimeIntervalBean(
+      @Min(value = 1, message = "TIME_INTERVAL_PERIOD_NOT_POSITIVE") int timeIntervalPeriods) {
   }
 }

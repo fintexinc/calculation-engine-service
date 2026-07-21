@@ -108,10 +108,10 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected void enqueueForPositiveSmsScenario() {
-    // SharpeRatioCalculationServiceImpl.defineCalculationMethod fetches the T-Bill series before the portfolio
-    // returns, so the treasury-rates response must be enqueued first.
-    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
+    // The orchestrator fetches the portfolio monthly returns first, then SharpeRatioCalculationServiceImpl fetches the
+    // T-Bill series, so the returns response must be enqueued before the treasury-rates response.
     enqueueSmsMockResponse(smsPositiveResponseBody());
+    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
   }
 
   @Override
@@ -147,8 +147,8 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnBadRequest_whenTBillRateMissingForMonthInsideRequestedWindow() {
-    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024WithGapIn("2024-07-31")));
     enqueueSmsMockResponse(smsPositiveResponseBody());
+    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024WithGapIn("2024-07-31")));
 
     PeriodCommand command = periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
     HttpResponse response = postCalculation(writeJson(command));

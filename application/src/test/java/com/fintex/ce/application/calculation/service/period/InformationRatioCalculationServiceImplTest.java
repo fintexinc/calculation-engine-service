@@ -1,11 +1,11 @@
 package com.fintex.ce.application.calculation.service.period;
 
-import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
+import com.fintex.ce.application.calculation.metric.InformationRatioCalculation;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.withSettings;
 class InformationRatioCalculationServiceImplTest {
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
+  void shouldPerform_whenVerifyBuildPeriodCalculationInput() {
     // SETUP
     final var portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
@@ -37,15 +38,18 @@ class InformationRatioCalculationServiceImplTest {
 
     when(context.getCipsd()).thenReturn(LocalDate.MIN);
     when(context.getWeightedAveragePortfolioReturns()).thenReturn(new TreeMap());
-    when(service.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO))
+    when(service.buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO, PortfolioBenchmarkReturns.EMPTY))
         .thenReturn(context);
-    doCallRealMethod().when(service).defineCalculationMethod(any());
+    doCallRealMethod().when(service).perform(any(), any());
 
     // ACT
-    final PeriodCalculationAbstract<InformationRatioResult, ?> actual = service.defineCalculationMethod(command);
+    try (var ignored = mockConstruction(InformationRatioCalculation.class)) {
+      service.perform(command, PortfolioBenchmarkReturns.EMPTY);
+    }
 
     // VERIFY
-    verify(service).buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+    verify(service).buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO,
+        PortfolioBenchmarkReturns.EMPTY);
   }
 
 }

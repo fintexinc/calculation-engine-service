@@ -666,6 +666,22 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  DUPLICATE_METRIC(
+      Codes.DUPLICATE_METRIC,
+      "Duplicate calculation metric in composite request: %s",
+      "Each metric may appear at most once in a composite calculation request",
+      "Remove the duplicated command or merge the duplicates into a single command",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  METRIC_REQUIRED(
+      Codes.METRIC_REQUIRED,
+      "Calculation command is missing the metric discriminator",
+      "Every command in a composite calculation request must carry a supported 'metric' value",
+      "Add a supported metric field to each command in the request",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
   // ============================================
   // CUR-xxx — Currency errors
   // ============================================
@@ -1215,6 +1231,8 @@ public enum ErrorCode {
     // Calculation metric request
     public static final String UNSUPPORTED_METRIC = "MET-001";
     public static final String METRIC_MISMATCH = "MET-002";
+    public static final String DUPLICATE_METRIC = "MET-003";
+    public static final String METRIC_REQUIRED = "MET-004";
 
     // Currency
     public static final String PORTFOLIO_MISSING_CURRENCY = "CUR-001";

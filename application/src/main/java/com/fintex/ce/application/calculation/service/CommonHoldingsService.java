@@ -2,12 +2,11 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.Conversion;
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.CurrencyValue;
-import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.config.TopHoldingsProperties;
 import com.fintex.ce.application.constant.AccumulateHoldingType;
 import com.fintex.ce.application.constant.HoldingTypeGroup;
 import com.fintex.ce.application.util.SecurityDataValidator;
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.holding.CommonHolding;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
 import com.fintex.ce.model.domain.calculation.holding.CompositeHolding;
@@ -23,9 +22,9 @@ import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
@@ -50,7 +49,6 @@ import static com.fintex.ce.application.util.CollectorUtils.toLinkedHashMap;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.application.util.PortfolioUtils.calculateInitialPortfolioWeightFromValues;
 import static com.fintex.ce.model.util.BigDecimalConstants.MATH_CONTEXT;
-import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -59,12 +57,10 @@ import static java.util.stream.Collectors.toSet;
 @RequiredArgsConstructor
 public class CommonHoldingsService
     implements
-      CalculationService<TopCommonHoldingsCommand, TopCommonHoldingsResult> {
+      SingleAttributeCalculationService<TopCommonHoldingsCommand, CommonTopHoldings, TopCommonHoldingsResult> {
 
-  private final SecurityDataFetcher<CommonTopHoldings> commonHoldingsSecurityDataFetcher;
   private final DefaultTargetCurrencyConverter defaultTargetCurrencyConverter;
   private final TopHoldingsProperties properties;
-  private final DefaultDataProperties defaultDataProperties;
 
   @Override
   public CalculationMetric getMetric() {
@@ -72,10 +68,14 @@ public class CommonHoldingsService
   }
 
   @Override
-  public TopCommonHoldingsResult perform(TopCommonHoldingsCommand command) {
-    Map<PortfolioHolding, CommonTopHoldings> rawHoldings = commonHoldingsSecurityDataFetcher.fetch(
-        command.getHoldings(),
-        getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.TOP_HOLDINGS;
+  }
+
+  @Override
+  public TopCommonHoldingsResult perform(TopCommonHoldingsCommand command,
+      Map<PortfolioHolding, CommonTopHoldings> data) {
+    Map<PortfolioHolding, CommonTopHoldings> rawHoldings = FilterUtils.restrictToHoldings(data, command.getHoldings());
 
     SecurityDataValidator.requireDataForEveryHolding(rawHoldings, command.getHoldings(), this::isSentToSms);
     requireUnderlyingHoldingsForEveryFund(rawHoldings);

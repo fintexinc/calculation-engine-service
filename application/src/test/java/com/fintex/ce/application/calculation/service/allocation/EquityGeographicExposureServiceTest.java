@@ -1,5 +1,6 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
+import com.fintex.ce.model.domain.calculation.allocation.GeographicExposureData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityGeographicExposureResult;
@@ -10,18 +11,12 @@ import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.financial.Geography;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static java.math.BigDecimal.ONE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class EquityGeographicExposureServiceTest
     extends
@@ -29,8 +24,7 @@ class EquityGeographicExposureServiceTest
 
   @Override
   protected AbstractGeographicExposureService<EquityGeographicExposureResult> createService() {
-    return new EquityGeographicExposureService(geographicFetcher, geographyFetcher, portfolioWeightCalculator,
-        DEFAULT_DATA_PROPERTIES);
+    return new EquityGeographicExposureService(portfolioWeightCalculator);
   }
 
   @Override
@@ -68,28 +62,18 @@ class EquityGeographicExposureServiceTest
   }
 
   @Test
-  void shouldResolveStockRegionsViaGeographyFetcher_andAttributeByBusinessCountry() {
+  void shouldResolveStockRegionsViaGeographyData_andAttributeByBusinessCountry() {
     PortfolioHolding usStock = usStock("AAPL", 200);
     PortfolioHolding canadaStock = canadaStock("RY", 200);
     PortfolioHolding fund = canadaMutualFund("RBF605", 100);
 
-    when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
-        fund, allocation(Map.of(GeographicRegionType.EUROPE, ONE), Currency.CAD)));
-    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
-        usStock, geography(Country.USA, Currency.USD),
-        canadaStock, geography(Country.CANADA, Currency.CAD)));
+    GeographicExposureData data = data(Map.of(
+        fund, allocation(Map.of(GeographicRegionType.EUROPE, ONE), Currency.CAD)),
+        Map.of(
+            usStock, geography(Country.USA, Currency.USD),
+            canadaStock, geography(Country.CANADA, Currency.CAD)));
 
-    EquityGeographicExposureResult result = service.perform(command(usStock, canadaStock, fund));
-
-    @SuppressWarnings("unchecked")
-    ArgumentCaptor<List<PortfolioHolding>> stockCaptor = ArgumentCaptor.forClass(List.class);
-    verify(geographyFetcher).fetch(stockCaptor.capture(), anyList());
-    assertThat(stockCaptor.getValue()).containsExactlyInAnyOrder(usStock, canadaStock);
-
-    @SuppressWarnings("unchecked")
-    ArgumentCaptor<List<PortfolioHolding>> fundCaptor = ArgumentCaptor.forClass(List.class);
-    verify(geographicFetcher).fetch(fundCaptor.capture(), anyList());
-    assertThat(fundCaptor.getValue()).containsExactly(fund);
+    EquityGeographicExposureResult result = service.perform(command(usStock, canadaStock, fund), data);
 
     Map<GeographicRegionType, BigDecimal> expected = distribution(Map.of(
         GeographicRegionType.US, new BigDecimal("0.4"),
@@ -106,14 +90,14 @@ class EquityGeographicExposureServiceTest
     PortfolioHolding brazilStock = usStock("AURA33.SA", 100);
     PortfolioHolding southAfricaStock = usStock("ZAFR.JO", 100);
 
-    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
+    GeographicExposureData data = data(Map.of(), Map.of(
         japanStock, geography(Country.JAPAN, Currency.JPY),
         germanyStock, geography(Country.GERMANY, Currency.EUR),
         brazilStock, geography(Country.BRAZIL, Currency.USD),
         southAfricaStock, geography(Country.SOUTH_AFRICA, Currency.USD)));
 
     EquityGeographicExposureResult result = service.perform(
-        command(japanStock, germanyStock, brazilStock, southAfricaStock));
+        command(japanStock, germanyStock, brazilStock, southAfricaStock), data);
 
     Map<GeographicRegionType, BigDecimal> expected = distribution(Map.of(
         Country.JAPAN.getGeographyRegion(), new BigDecimal("0.25"),
@@ -128,11 +112,10 @@ class EquityGeographicExposureServiceTest
     PortfolioHolding fund = canadaMutualFund("RBF605", 100);
     PortfolioHolding unmappedStock = usStock("UNKNOWN", 100);
 
-    when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
-        fund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD)));
-    when(geographyFetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
+    GeographicExposureData data = data(Map.of(
+        fund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD)), Map.of());
 
-    EquityGeographicExposureResult result = service.perform(command(fund, unmappedStock));
+    EquityGeographicExposureResult result = service.perform(command(fund, unmappedStock), data);
 
     assertExposureEquals(result, distribution(Map.of(
         GeographicRegionType.US, new BigDecimal("0.5"),

@@ -34,8 +34,10 @@ public abstract class MonthlyReturnsContextProvider {
 
   protected abstract ReturnsRole role();
 
-  public final MonthlyReturnsContext<HoldingMonthlyReturns> get(List<PortfolioHolding> holdings, Currency currency) {
-    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = monthlyReturnsService.getMonthlyReturns(holdings);
+  public final MonthlyReturnsContext<HoldingMonthlyReturns> get(List<PortfolioHolding> holdings, Currency currency,
+      Map<PortfolioHolding, HoldingMonthlyReturns> monthlyReturns) {
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = monthlyReturnsService.getMonthlyReturns(holdings,
+        monthlyReturns);
     FxContext fxContext = buildFxContext(snapshot, currency);
     return new MonthlyReturnsContext<>(snapshot, fxContext, role());
   }

@@ -2,10 +2,8 @@ package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 
 import org.junit.jupiter.api.Assertions;
@@ -26,7 +24,6 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 class BreakdownAbstractServiceTest {
 
@@ -126,39 +123,4 @@ class BreakdownAbstractServiceTest {
       assertSame(expectedResult, actual);
     }
   }
-
-  @Test
-  void shouldPerform_whenVerifyFetch() {
-    var service = mock(BreakdownAbstractService.class, withSettings().useConstructor());
-
-    var holdings = List.of(mock(PortfolioHolding.class));
-    var req = mock(PortfolioHoldingsCommand.class);
-
-    when(req.getHoldings()).thenReturn(holdings);
-    when(service.fetchExposures(any())).thenReturn(new ExposureDataHolder<>(Map.of(), List.of()));
-
-    doCallRealMethod().when(service).perform(any());
-    service.perform(req);
-
-    verify(service).fetchExposures(req);
-
-  }
-
-  @Test
-  void shouldPerform_whenVerifyCalculate() {
-    var service = mock(BreakdownAbstractService.class, withSettings().useConstructor());
-
-    var holdings = List.of(mock(PortfolioHolding.class));
-    var req = mock(PortfolioHoldingsCommand.class);
-    Map exposures = mock(Map.class);
-
-    when(req.getHoldings()).thenReturn(holdings);
-    when(service.fetchExposures(any())).thenReturn(new ExposureDataHolder<>(exposures, List.of()));
-
-    doCallRealMethod().when(service).perform(any());
-    service.perform(req);
-
-    verify(service).calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
-  }
-
 }

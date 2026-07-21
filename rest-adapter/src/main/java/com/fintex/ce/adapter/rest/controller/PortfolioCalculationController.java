@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.controller;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
@@ -13,6 +13,7 @@ import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
+import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
 import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
@@ -53,9 +54,13 @@ import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.CalculationCommand;
+import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
+import com.fintex.ce.model.dto.command.PortfolioBenchmarkCommand;
+import com.fintex.ce.model.dto.command.contract.HoldingsProvider;
 import com.fintex.ce.model.error.ErrorCode;
 
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,38 +75,37 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import static java.util.stream.Collectors.groupingBy;
+
+/**
+ * REST entry point for portfolio calculations. The controller owns the request lifecycle — metric resolution, request
+ * validation and observability — and delegates the actual calculation, including Security Master data fetching, to the
+ * {@link CalculationOrchestrator}. For composite requests the shared top-level holdings, data providers and currency
+ * are propagated into every nested command that does not carry its own value, so the per-command validation chain keeps
+ * working unchanged.
+ */
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(PortfolioCalculationController.BASE_PATH)
 @Tag(name = "Portfolio Calculations", description = "Unified endpoint for all portfolio calculation metrics: "
     + "returns, risk, benchmark comparison, allocations, fees, and income")
 public class PortfolioCalculationController {
   public static final String BASE_PATH = "/api/v1/portfolio/calculations";
 
-  private final Map<CalculationMetric, CalculationService<?, ?>> serviceMap;
+  private final CalculationOrchestrator calculationOrchestrator;
   private final RequestValidationFacade validationFacade;
   private final CalculationObservability calculationObservability;
-
-  public PortfolioCalculationController(
-      List<CalculationService<?, ?>> calculationServices,
-      RequestValidationFacade validationFacade,
-      CalculationObservability calculationObservability) {
-    this.serviceMap = calculationServices.stream()
-        .collect(Collectors.toMap(CalculationService::getMetric, Function.identity(),
-            (existing, duplicate) -> {
-              throw ErrorCode.INTERNAL_SERVER_ERROR.toException();
-            }));
-    this.validationFacade = validationFacade;
-    this.calculationObservability = calculationObservability;
-  }
+  private final Validator validator;
 
   @Operation(summary = "Execute a portfolio calculation", description = "Performs the specified calculation metric on the provided portfolio holdings. "
       + "The request body schema depends on the metric — period-based metrics require time intervals, "
@@ -134,30 +138,95 @@ public class PortfolioCalculationController {
       CreditQualityResult.class, NumberOfUniqueHoldingsResult.class
   })))
   @PostMapping("/{metricName}")
-  @SuppressWarnings("unchecked")
   public BaseCalculationResult calculate(
       @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable String metricName,
       @RequestBody @Valid CalculationCommand command) {
     return calculationObservability.observe(metricName, command, observation -> {
       CalculationMetric metric = CalculationMetric.from(metricName);
-
-      if (!serviceMap.containsKey(metric)) {
-        throw ErrorCode.UNSUPPORTED_METRIC.toException(metricName);
-      }
-
       if (command.getMetric() != null && command.getMetric() != metric) {
         throw ErrorCode.METRIC_MISMATCH.toException(metricName, command.getMetric().getValue());
       }
+      command.setMetric(metric);
 
       observation.event(Observation.Event.of(CalculationObservability.VALIDATION_STARTED_EVENT));
-      validationFacade.validate(command, metric);
+      validateCommand(command);
       observation.event(Observation.Event.of(CalculationObservability.VALIDATION_COMPLETED_EVENT));
 
-      CalculationService<?, ?> service = serviceMap.get(metric);
       observation.event(Observation.Event.of(CalculationObservability.SERVICE_STARTED_EVENT));
-      BaseCalculationResult result = ((CalculationService<CalculationCommand, ?>) service).perform(command);
+      BaseCalculationResult result = calculationOrchestrator.calculate(command);
       observation.event(Observation.Event.of(CalculationObservability.SERVICE_COMPLETED_EVENT));
       return result;
     });
+  }
+
+  @Operation(summary = "Execute several portfolio calculations in one request", description = """
+      Performs any combination of calculation metrics in a single request.
+
+      Portfolio holdings, data providers and target currency are declared once at the top level and shared by every
+      nested command; a nested command may still override them with its own values. Each command carries its 'metric'
+      discriminator plus metric-specific parameters and may appear at most once. The Security Master attributes
+      required by the requested metrics are fetched together in as few round trips as possible before the individual
+      calculations run. Successful metrics are returned under 'results'; metrics whose calculation failed are returned
+      under 'failures' with the corresponding notifications, so one failing metric does not discard the other results.
+      """)
+  @ApiResponse(responseCode = "200", description = "Per-metric calculation results and failures", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CompositeCalculationResult.class)))
+  @PostMapping
+  public CompositeCalculationResult calculateComposite(@RequestBody @Valid CompositeCalculationRequest request) {
+    List<CalculationCommand> commands = request.getCommands();
+    return calculationObservability.observeComposite(commands, observation -> {
+      observation.event(Observation.Event.of(CalculationObservability.VALIDATION_STARTED_EVENT));
+      commands.forEach(this::requireMetric);
+      requireUniqueMetrics(commands);
+      commands.forEach(command -> propagateSharedInputs(request, command));
+      commands.forEach(this::validateCommand);
+      observation.event(Observation.Event.of(CalculationObservability.VALIDATION_COMPLETED_EVENT));
+
+      observation.event(Observation.Event.of(CalculationObservability.SERVICE_STARTED_EVENT));
+      CompositeCalculationResult result = calculationOrchestrator.calculateAll(commands);
+      observation.event(Observation.Event.of(CalculationObservability.SERVICE_COMPLETED_EVENT));
+      return result;
+    });
+  }
+
+  private void requireMetric(CalculationCommand command) {
+    if (command == null || command.getMetric() == null) {
+      throw ErrorCode.METRIC_REQUIRED.toException();
+    }
+  }
+
+  private void requireUniqueMetrics(List<CalculationCommand> commands) {
+    List<String> duplicates = commands.stream()
+        .collect(groupingBy(CalculationCommand::getMetric, Collectors.counting()))
+        .entrySet().stream()
+        .filter(entry -> entry.getValue() > 1)
+        .map(entry -> entry.getKey().getValue())
+        .toList();
+    if (!duplicates.isEmpty()) {
+      throw ErrorCode.DUPLICATE_METRIC.toException(String.join(", ", duplicates));
+    }
+  }
+
+  private void propagateSharedInputs(CompositeCalculationRequest request, CalculationCommand command) {
+    if (command instanceof HoldingsProvider holdingsProvider
+        && CollectionUtils.isEmpty(holdingsProvider.getHoldings())
+        && !CollectionUtils.isEmpty(request.getHoldings())) {
+      holdingsProvider.setHoldings(request.getHoldings());
+    }
+    if (CollectionUtils.isEmpty(command.getDataProviders())
+        && !CollectionUtils.isEmpty(request.getDataProviders())) {
+      command.setDataProviders(request.getDataProviders());
+    }
+    if (command instanceof PortfolioBenchmarkCommand benchmarkCommand
+        && benchmarkCommand.getCurrency() == null && request.getCurrency() != null) {
+      benchmarkCommand.setCurrency(request.getCurrency());
+    }
+  }
+
+  private void validateCommand(CalculationCommand command) {
+    var violations = validator.validate(command);
+    if (!violations.isEmpty()) {
+      throw new ConstraintViolationException(violations);
+    }
+    validationFacade.validate(command);
   }
 }

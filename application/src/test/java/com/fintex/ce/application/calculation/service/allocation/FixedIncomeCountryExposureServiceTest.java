@@ -9,8 +9,6 @@ import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.error.Notification;
 
@@ -34,11 +32,10 @@ class FixedIncomeCountryExposureServiceTest {
   @Test
   void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var storage = mock(SecurityDataFetcher.class);
       var responseMapper = mock(CountryExposureResponseMapper.class);
       var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
       var service = mock(FixedIncomeCountryExposureService.class,
-          withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
+          withSettings().useConstructor(responseMapper, countryAllocationMappingService));
 
       var exposures = mock(Map.class);
 
@@ -52,11 +49,10 @@ class FixedIncomeCountryExposureServiceTest {
   @Test
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var storage = mock(SecurityDataFetcher.class);
       var responseMapper = mock(CountryExposureResponseMapper.class);
       var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
       var service = mock(FixedIncomeCountryExposureService.class,
-          withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
+          withSettings().useConstructor(responseMapper, countryAllocationMappingService));
 
       var exposures = mock(Map.class);
       var expected = CountryExposureResult.builder()
@@ -76,40 +72,35 @@ class FixedIncomeCountryExposureServiceTest {
   @SuppressWarnings("unchecked")
   @Test
   void shouldFetch_whenCheckResult() {
-    var storage = mock(SecurityDataFetcher.class);
     var responseMapper = mock(CountryExposureResponseMapper.class);
     var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
     var service = mock(FixedIncomeCountryExposureService.class,
-        withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
+        withSettings().useConstructor(responseMapper, countryAllocationMappingService));
 
     var holding = mock(PortfolioHolding.class);
     var command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holding));
-    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     var countryExposure = new CountryExposure();
     countryExposure.setAllocations(Map.of(Country.CANADA, TEN));
-    var rawData = Map.of(holding, countryExposure);
+    var data = Map.of(holding, countryExposure);
     var mappedAllocations = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
     var mappedResult = new ExposureDataHolder<>(mappedAllocations, List.<Notification>of());
 
-    when(storage.fetch(any(), any())).thenReturn(rawData);
     when(countryAllocationMappingService.mapToCountryRegions(any(), any())).thenReturn(mappedResult);
-    doCallRealMethod().when(service).fetchExposures(any());
-    var result = service.fetchExposures(command);
+    doCallRealMethod().when(service).fetchExposures(any(), any());
+    var result = service.fetchExposures(command, data);
     var actual = result.allocations();
 
     assertEquals(mappedAllocations, actual);
-    verify(storage).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test
   void shouldCalculate_whenVerifyCalculateNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var storage = mock(SecurityDataFetcher.class);
       var responseMapper = mock(CountryExposureResponseMapper.class);
       var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
       var service = mock(FixedIncomeCountryExposureService.class,
-          withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
+          withSettings().useConstructor(responseMapper, countryAllocationMappingService));
 
       var holding = mock(PortfolioHolding.class);
       var holdings = List.of(holding);
@@ -126,11 +117,10 @@ class FixedIncomeCountryExposureServiceTest {
   @Test
   void shouldCalculate_whenVerifyReScale() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var storage = mock(SecurityDataFetcher.class);
       var responseMapper = mock(CountryExposureResponseMapper.class);
       var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
       var service = mock(FixedIncomeCountryExposureService.class,
-          withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
+          withSettings().useConstructor(responseMapper, countryAllocationMappingService));
 
       var holding = mock(PortfolioHolding.class);
       var holdings = List.of(holding);
@@ -150,11 +140,10 @@ class FixedIncomeCountryExposureServiceTest {
   @Test
   void shouldCalculate_whenVerifyResponseMapperFromNetProducts() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var storage = mock(SecurityDataFetcher.class);
       var responseMapper = mock(CountryExposureResponseMapper.class);
       var countryAllocationMappingService = mock(CountryAllocationMappingService.class);
       var service = mock(FixedIncomeCountryExposureService.class,
-          withSettings().useConstructor(storage, responseMapper, countryAllocationMappingService));
+          withSettings().useConstructor(responseMapper, countryAllocationMappingService));
 
       var holding = mock(PortfolioHolding.class);
       var holdings = List.of(holding);

@@ -8,14 +8,18 @@ import com.fintex.ce.application.returns.WeightedAverageComponent;
 import com.fintex.ce.application.returns.pipeline.CpedParams;
 import com.fintex.ce.application.returns.pipeline.PortfolioValidateCutAndFxPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.ReturnsBasedCalculationService;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -28,7 +32,7 @@ import java.util.TreeMap;
  */
 public abstract class ValidateCutAndFxAbstractService<C extends PeriodCommand, R extends BaseCalculationResult>
     implements
-      CalculationService<C, R> {
+      ReturnsBasedCalculationService<C, R> {
 
   protected final PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider;
   protected final PortfolioValidateCutAndFxPipeline portfolioValidateCutAndFx;
@@ -43,9 +47,20 @@ public abstract class ValidateCutAndFxAbstractService<C extends PeriodCommand, R
     this.weightedAverageComponent = weightedAverageComponent;
   }
 
-  protected ReturnsSnapshot<HoldingMonthlyReturns> runValidateCutAndFx(C command) {
+  @Override
+  public List<CompositeSecurityAttribute> requiredAttributes() {
+    return List.of(CompositeSecurityAttribute.MONTHLY_RETURNS);
+  }
+
+  @Override
+  public PortfolioBenchmarkReturns prepareData(SecurityData securityData) {
+    return PortfolioBenchmarkReturns.from(securityData);
+  }
+
+  protected ReturnsSnapshot<HoldingMonthlyReturns> runValidateCutAndFx(C command,
+      PortfolioBenchmarkReturns returnsData) {
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
     return portfolioValidateCutAndFx.run(portfolioContext, new CpedParams(command.getCustomPed()));
   }
 

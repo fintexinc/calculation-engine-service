@@ -10,6 +10,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.PceExceptionCollector;
@@ -41,13 +42,16 @@ public abstract class BenchmarkWeightedAverageWithCpedAbstractService<C extends 
   }
 
   @Override
-  public BenchmarkPeriodCalculationInput buildPeriodCalculationInput(C command, ReturnFactorScale returnFactorScale) {
+  public BenchmarkPeriodCalculationInput buildPeriodCalculationInput(C command, ReturnFactorScale returnFactorScale,
+      PortfolioBenchmarkReturns returnsData) {
     PceExceptionCollector collector = new PceExceptionCollector();
 
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = collector.tryCatch(
-        () -> portfolioMonthlyReturnsContextProvider.get(command.getHoldings(), command.getCurrency()));
+        () -> portfolioMonthlyReturnsContextProvider.get(command.getHoldings(), command.getCurrency(),
+            returnsData.portfolioReturns()));
     MonthlyReturnsContext<HoldingMonthlyReturns> benchmarkContext = collector.tryCatch(
-        () -> benchmarkMonthlyReturnsContextProvider.get(command.getBenchmarkHoldings(), command.getCurrency()));
+        () -> benchmarkMonthlyReturnsContextProvider.get(command.getBenchmarkHoldings(), command.getCurrency(),
+            returnsData.benchmarkReturns()));
     collector.throwIfAny();
 
     LocalDate commonStart = portfolioContext.commonPerformanceStartDate(benchmarkContext);

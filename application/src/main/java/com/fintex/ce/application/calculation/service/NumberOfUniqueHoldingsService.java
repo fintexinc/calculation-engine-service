@@ -1,12 +1,13 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.holding.NumberOfUniqueHoldingsResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.holding.HoldingIdentifiers;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -28,15 +29,12 @@ import java.util.Set;
 @Service
 public class NumberOfUniqueHoldingsService
     implements
-      CalculationService<PortfolioHoldingsCommand, NumberOfUniqueHoldingsResult> {
+      SingleAttributeCalculationService<PortfolioHoldingsCommand, HoldingIdentifiers, NumberOfUniqueHoldingsResult> {
 
-  private final SecurityDataFetcher<HoldingIdentifiers> holdingIdentifiersFetcher;
   private final FiIdentifierType defaultComparisonIdType;
 
   public NumberOfUniqueHoldingsService(
-      SecurityDataFetcher<HoldingIdentifiers> holdingIdentifiersFetcher,
       @Value("${default.holdings-identifier-type}") FiIdentifierType defaultComparisonIdType) {
-    this.holdingIdentifiersFetcher = holdingIdentifiersFetcher;
     this.defaultComparisonIdType = defaultComparisonIdType;
   }
 
@@ -46,9 +44,14 @@ public class NumberOfUniqueHoldingsService
   }
 
   @Override
-  public NumberOfUniqueHoldingsResult perform(PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, HoldingIdentifiers> fetched = holdingIdentifiersFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.HOLDING_IDENTIFIERS;
+  }
+
+  @Override
+  public NumberOfUniqueHoldingsResult perform(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, HoldingIdentifiers> data) {
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = FilterUtils.restrictToHoldings(data, command.getHoldings());
     List<PortfolioHolding> unresolved = command.getHoldings().stream()
         .filter(holding -> !fetched.containsKey(holding))
         .toList();

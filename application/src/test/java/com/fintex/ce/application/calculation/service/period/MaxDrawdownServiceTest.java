@@ -8,6 +8,7 @@ import com.fintex.ce.application.returns.pipeline.CpedScaleParams;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.Growth10KHelper;
 import com.fintex.ce.application.util.ReturnFactorScale;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -309,7 +310,8 @@ class MaxDrawdownServiceTest {
 
     final var req = mock(PeriodCommand.class);
     final var monthlyReturnsContext = mock(MonthlyReturnsContext.class);
-    when(contextProvider.get(req.getHoldings(), req.getCurrency())).thenReturn(monthlyReturnsContext);
+    when(contextProvider.get(req.getHoldings(), req.getCurrency(), Map.of()))
+        .thenReturn(monthlyReturnsContext);
 
     final TreeMap<LocalDate, BigDecimal> weightedAverageReturns = new TreeMap<>(
         Map.of(LocalDate.now(), BigDecimal.TEN));
@@ -317,7 +319,7 @@ class MaxDrawdownServiceTest {
     when(pipeline.run(monthlyReturnsContext, new CpedScaleParams(req.getCustomPed(), ReturnFactorScale.SCALE_OF_TWO)))
         .thenReturn(result);
 
-    service.perform(req);
+    service.perform(req, PortfolioBenchmarkReturns.EMPTY);
 
     verify(pipeline).run(monthlyReturnsContext,
         new CpedScaleParams(req.getCustomPed(), ReturnFactorScale.SCALE_OF_TWO));
@@ -346,7 +348,7 @@ class MaxDrawdownServiceTest {
     when(command.getPeriods()).thenReturn(Set.of("12"));
 
     final var monthlyReturnsContext = mock(MonthlyReturnsContext.class);
-    when(contextProvider.get(any(), any())).thenReturn(monthlyReturnsContext);
+    when(contextProvider.get(any(), any(), any())).thenReturn(monthlyReturnsContext);
     final var weightedAverageResult = new WeightedAverageResult<>(returns, ReturnsSnapshot.empty());
     doReturn(weightedAverageResult).when(pipeline).run(any(), any());
 
@@ -354,7 +356,7 @@ class MaxDrawdownServiceTest {
       mockedGrowth.when(() -> Growth10KHelper.compoundGrowth10K(any(), any()))
           .thenReturn(growth10K);
 
-      final MaxDrawdownResult result = service.perform(command);
+      final MaxDrawdownResult result = service.perform(command, PortfolioBenchmarkReturns.EMPTY);
 
       assertEquals(1, result.getWarnings().size());
       assertEquals(ErrorCode.Codes.DEGENERATE_GROWTH_DATA, result.getWarnings().get(0).getCode());

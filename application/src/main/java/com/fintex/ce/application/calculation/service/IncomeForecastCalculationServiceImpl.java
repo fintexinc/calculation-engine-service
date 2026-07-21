@@ -2,7 +2,7 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.application.util.PortfolioUtils;
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.constant.GeneralConstants;
 import com.fintex.ce.model.domain.calculation.distribution.Income;
 import com.fintex.ce.model.domain.calculation.yield.HoldingIncomeForecast;
@@ -13,7 +13,8 @@ import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.Notification;
 
@@ -47,7 +48,7 @@ import java.util.stream.IntStream;
 @Deprecated
 public class IncomeForecastCalculationServiceImpl
     implements
-      CalculationService<IncomeForecastCommand, IncomeForecastResult> {
+      SingleAttributeCalculationService<IncomeForecastCommand, IncomeForecast, IncomeForecastResult> {
 
   private static final int ONE_MONTH = 1;
   private static final int TWO_SYMBOLS = 2;
@@ -57,18 +58,13 @@ public class IncomeForecastCalculationServiceImpl
   private static final Set<InterestFreq> MONTHLY_FREQUENCY = Set.of(InterestFreq.DAILY, InterestFreq.WEEKLY,
       InterestFreq.BI_WEEKLY);
 
-  private final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher;
   private final Clock clock;
 
-  public IncomeForecastCalculationServiceImpl(
-      final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher) {
-    this(incomeForecastSecurityDataFetcher, Clock.systemDefaultZone());
+  public IncomeForecastCalculationServiceImpl() {
+    this(Clock.systemDefaultZone());
   }
 
-  public IncomeForecastCalculationServiceImpl(
-      final SecurityDataFetcher<IncomeForecast> incomeForecastSecurityDataFetcher,
-      final Clock clock) {
-    this.incomeForecastSecurityDataFetcher = incomeForecastSecurityDataFetcher;
+  public IncomeForecastCalculationServiceImpl(final Clock clock) {
     this.clock = clock == null ? Clock.systemDefaultZone() : clock;
   }
 
@@ -78,10 +74,16 @@ public class IncomeForecastCalculationServiceImpl
   }
 
   @Override
-  public IncomeForecastResult perform(final IncomeForecastCommand command) {
-    ArrayList<Notification> warnings = new ArrayList<>();
-    Map<PortfolioHolding, IncomeForecast> holdingIncomeForecast = incomeForecastSecurityDataFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.INCOME;
+  }
+
+  @Override
+  public IncomeForecastResult perform(final IncomeForecastCommand command,
+      final Map<PortfolioHolding, IncomeForecast> data) {
+    final ArrayList<Notification> warnings = new ArrayList<>();
+    final Map<PortfolioHolding, IncomeForecast> holdingIncomeForecast = FilterUtils.restrictToHoldings(data,
+        command.getHoldings());
 
     Integer period = Optional.ofNullable(command.getTimeIntervalPeriods()).orElse(TWELVE_MONTH);
     IncomeForecastResult result = calculate(holdingIncomeForecast, period);

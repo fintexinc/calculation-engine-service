@@ -1,5 +1,7 @@
 package com.fintex.ce.model.dto.command;
 
+import com.fintex.ce.model.dto.command.contract.CustomPsdProvider;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;

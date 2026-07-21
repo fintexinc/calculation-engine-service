@@ -7,6 +7,7 @@ import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
@@ -42,8 +43,10 @@ public class RollingStandardDeviationCalculationServiceImpl
   }
 
   @Override
-  public RollingStandardDeviationResult perform(RollingCalculationCommand command) {
-    PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+  public RollingStandardDeviationResult perform(RollingCalculationCommand command,
+      PortfolioBenchmarkReturns returnsData) {
+    PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO,
+        returnsData);
     StandardDeviationCalculation<PeriodResult> standardDeviationCalculation = StandardDeviationCalculation
         .<PeriodResult>builder()
         .input(input)

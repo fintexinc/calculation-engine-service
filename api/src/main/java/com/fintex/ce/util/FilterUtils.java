@@ -3,9 +3,13 @@ package com.fintex.ce.util;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class FilterUtils {
 
@@ -99,6 +103,21 @@ public class FilterUtils {
 
   public static <T> List<T> getSpecifiedIfEmpty(List<T> list, List<T> defaults) {
     return list == null || list.isEmpty() ? defaults : list;
+  }
+
+  /**
+   * Restricts per-holding attribute data to the given holdings, mirroring what a fetch for exactly that subset would
+   * have produced. The returned map is mutable.
+   */
+  public static <D> Map<PortfolioHolding, D> restrictToHoldings(Map<PortfolioHolding, D> data,
+      List<? extends PortfolioHolding> holdings) {
+    if (holdings == null) {
+      return new HashMap<>();
+    }
+    return holdings.stream()
+        .filter(data::containsKey)
+        .collect(Collectors.toMap(Function.identity(), data::get,
+            (existing, duplicate) -> existing, HashMap::new));
   }
 
 }

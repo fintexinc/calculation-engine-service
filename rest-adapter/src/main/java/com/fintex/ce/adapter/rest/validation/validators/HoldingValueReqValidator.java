@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.dto.command.HoldingsProvider;
+import com.fintex.ce.model.dto.command.contract.HoldingsProvider;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;

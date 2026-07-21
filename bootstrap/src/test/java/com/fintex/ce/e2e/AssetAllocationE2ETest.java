@@ -18,6 +18,7 @@ import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Geography;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
@@ -40,8 +41,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,8 +69,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 @TestPropertySource(properties = "cache.data.fx-rates.enabled=false")
 class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
-  private static final String GEOGRAPHY_PATH = "/api/v1/wealth/securities/geography";
-  private static final String ASSET_ALLOCATION_PATH = "/api/v1/wealth/securities/allocations/asset";
+  private static final String ATTRIBUTES_PATH = "/api/v1/wealth/securities/attributes";
   private static final BigDecimal TOLERANCE = new BigDecimal("0.0001");
   private static final List<DataProvider> MORNINGSTAR_ONLY = List.of(DataProvider.MORNINGSTAR);
 
@@ -119,10 +121,12 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String smsPositiveResponseBody() {
-    return writeJson(List.of(allocationRow("XBAL", FiIdentifierType.TICKER, Currency.CAD,
-        allocationValue(AssetAllocationRegionType.US_EQUITIES, "0.6"),
-        allocationValue(AssetAllocationRegionType.FIXED_INCOME, "0.3"),
-        allocationValue(AssetAllocationRegionType.CASH, "0.1"))));
+    return writeJson(Map.of(
+        CompositeSecurityAttribute.ASSET_ALLOCATION,
+        List.of(allocationRow("XBAL", FiIdentifierType.TICKER, Currency.CAD,
+            allocationValue(AssetAllocationRegionType.US_EQUITIES, "0.6"),
+            allocationValue(AssetAllocationRegionType.FIXED_INCOME, "0.3"),
+            allocationValue(AssetAllocationRegionType.CASH, "0.1")))));
   }
 
   @Override
@@ -278,17 +282,15 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static Dispatcher routingDispatcher(List<SecurityAttributeResult<Geography>> geographyRows,
       List<SecurityAttributeResult<AssetAllocationWithCurrency>> allocationRows) {
-    String geographyBody = writeJson(geographyRows);
-    String allocationBody = writeJson(allocationRows);
+    String compositeBody = writeJson(Map.of(
+        CompositeSecurityAttribute.GEOGRAPHY, geographyRows,
+        CompositeSecurityAttribute.ASSET_ALLOCATION, allocationRows));
     return new Dispatcher() {
       @Override
       public MockResponse dispatch(RecordedRequest request) {
         String path = request.getPath();
-        if (path != null && path.contains(GEOGRAPHY_PATH)) {
-          return jsonResponse(geographyBody);
-        }
-        if (path != null && path.contains(ASSET_ALLOCATION_PATH)) {
-          return jsonResponse(allocationBody);
+        if (path != null && path.contains(ATTRIBUTES_PATH)) {
+          return jsonResponse(compositeBody);
         }
         return new MockResponse().setResponseCode(404);
       }
@@ -296,7 +298,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static Dispatcher constantBocRateDispatcher(String rate) {
-    String body = "{\"observations\":[{\"d\":\"" + LocalDate.now()
+    String body = "{\"observations\":[{\"d\":\"" + LocalDate.now(ZoneOffset.UTC)
         + "\",\"FXUSDCAD\":{\"v\":\"" + rate + "\"}}]}";
     return new Dispatcher() {
       @Override

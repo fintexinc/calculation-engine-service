@@ -14,6 +14,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
@@ -57,18 +58,21 @@ public class RollingCorrelationCalculationServiceImpl
   }
 
   @Override
-  public RollingCorrelationResult perform(RollingCalculationCommand command) {
-    BenchmarkPeriodCalculationInput context = buildBenchmarkInput(command, ReturnFactorScale.SCALE_OF_TWO);
-    Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturn = getBaseTotalReturns(command);
+  public RollingCorrelationResult perform(RollingCalculationCommand command,
+      PortfolioBenchmarkReturns returnsData) {
+    BenchmarkPeriodCalculationInput context = buildBenchmarkInput(command, ReturnFactorScale.SCALE_OF_TWO,
+        returnsData);
+    Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturn = getBaseTotalReturns(command, returnsData);
     CorrelationCalculation correlationCalculation = new CorrelationCalculation(context, baseTotalReturn,
         defaultPeriods);
     return new RollingCorrelationCalculation(context, defaultPeriods, correlationCalculation,
         context.getWeightedAverageBenchmarkReturns()).calculate(command.getRollingPeriods());
   }
 
-  public Map<PortfolioHolding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand command) {
+  public Map<PortfolioHolding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand command,
+      PortfolioBenchmarkReturns returnsData) {
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
     ReturnsSnapshot<HoldingMonthlyReturns> postFx = portfolioValidateCutAndFx.run(portfolioContext,
         new CpedParams(command.getCustomPed()));
     return new HashMap<>(postFx.returnsMap());

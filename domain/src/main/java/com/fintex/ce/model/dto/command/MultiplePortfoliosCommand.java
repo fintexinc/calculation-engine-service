@@ -1,6 +1,7 @@
 package com.fintex.ce.model.dto.command;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.model.dto.command.contract.BenchmarkHoldingsProvider;
 import com.fintex.ce.model.error.ErrorCode;
 
 import io.swagger.v3.oas.annotations.media.Schema;

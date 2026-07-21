@@ -5,11 +5,15 @@ import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.HoldingReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.PeriodReqValidator;
+import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
+import com.fintex.ce.application.config.DefaultDataProperties;
+import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
@@ -17,7 +21,10 @@ import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.error.exceptions.CalculationException;
+import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -49,6 +56,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -56,6 +64,7 @@ import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationControll
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -77,14 +86,11 @@ class PortfolioCalculationControllerTest {
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     mockServices = new EnumMap<>(CalculationMetric.class);
-    List<CalculationService<?, ?>> serviceList = Arrays.stream(CalculationMetric.values())
+    List<CalculationService<?, ?, ?>> serviceList = Arrays.stream(CalculationMetric.values())
         .map(this::createMockService)
         .toList();
 
-    var controller = new PortfolioCalculationController(
-        serviceList,
-        new com.fintex.ce.adapter.rest.validation.RequestValidationFacade(java.util.List.of()),
-        calculationObservability());
+    var controller = controller(serviceList, new RequestValidationFacade(List.of()));
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -99,7 +105,7 @@ class PortfolioCalculationControllerTest {
       CalculationCommand command,
       Object serviceResult,
       Class<? extends BaseCalculationResult> responseType) throws Exception {
-    lenient().when(mockServices.get(metric).perform(any())).thenReturn((BaseCalculationResult) serviceResult);
+    lenient().when(mockServices.get(metric).perform(any(), any())).thenReturn((BaseCalculationResult) serviceResult);
 
     command.setMetric(metric);
     String requestBody = objectMapper.writeValueAsString(command);
@@ -118,7 +124,7 @@ class PortfolioCalculationControllerTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andReturn();
 
-    verify(mockServices.get(metric)).perform(any());
+    verify(mockServices.get(metric)).perform(any(), any());
 
     String responseBody = mvcResult.getResponse().getContentAsString();
     BaseCalculationResult actual = objectMapper.readValue(responseBody, responseType);
@@ -175,10 +181,11 @@ class PortfolioCalculationControllerTest {
   }
 
   @SuppressWarnings("unchecked")
-  private CalculationService<?, ?> createMockService(CalculationMetric metric) {
+  private CalculationService<?, ?, ?> createMockService(CalculationMetric metric) {
     CalculationService mock = mock(CalculationService.class);
     lenient().when(mock.getMetric()).thenReturn(metric);
-    lenient().when(mock.perform(any())).thenReturn(new BaseCalculationResult() {});
+    lenient().when(mock.requiredAttributes()).thenReturn(List.of());
+    lenient().when(mock.perform(any(), any())).thenReturn(new BaseCalculationResult() {});
     mockServices.put(metric, mock);
     return mock;
   }
@@ -187,8 +194,153 @@ class PortfolioCalculationControllerTest {
     return CalculationTestDataProvider.calculationMetricArguments();
   }
 
-  private static CalculationObservability calculationObservability() {
-    return new CalculationObservability(ObservationRegistry.create());
+  private static PortfolioCalculationController controller(List<CalculationService<?, ?, ?>> services,
+      RequestValidationFacade validationFacade) {
+    SecurityAttributesFetcher fetcher = mock(SecurityAttributesFetcher.class);
+    lenient().when(fetcher.fetch(any(), anyCollection(), any())).thenReturn(SecurityData.EMPTY);
+    lenient().when(fetcher.fetch(any(), any(CompositeSecurityAttribute.class), any())).thenReturn(Map.of());
+    CalculationOrchestrator orchestrator = new MetricCalculationOrchestrator(
+        services,
+        fetcher,
+        new DefaultDataProperties(List.of(DataProvider.MORNINGSTAR, DataProvider.FMP)));
+    LocalValidatorFactoryBean beanValidator = new LocalValidatorFactoryBean();
+    beanValidator.afterPropertiesSet();
+    return new PortfolioCalculationController(orchestrator, validationFacade,
+        new CalculationObservability(ObservationRegistry.create()), beanValidator);
+  }
+
+  @Nested
+  class CompositeEndpoint {
+
+    @Test
+    void shouldReturnResultsPerMetric_whenSeveralMetricsRequested() throws Exception {
+      String requestBody = """
+          {"currency": "CAD",
+           "holdings": [
+             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+              "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
+           ],
+           "commands": [
+             {"metric": "sharpe-ratio", "timeIntervalPeriods": ["12"]},
+             {"metric": "asset-allocations"}
+           ]}
+          """;
+
+      mockMvc.perform(
+          post(BASE_PATH)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isOk())
+          .andExpect(content().string(org.hamcrest.Matchers.containsString("results")));
+
+      verify(mockServices.get(CalculationMetric.SHARPE_RATIO)).perform(any(), any());
+      verify(mockServices.get(CalculationMetric.ASSET_ALLOCATIONS)).perform(any(), any());
+    }
+
+    @Test
+    void shouldPropagateSharedInputsToCommands_whenCommandsOmitThem() throws Exception {
+      String requestBody = """
+          {"currency": "CAD",
+           "dataProviders": ["MORNINGSTAR"],
+           "holdings": [
+             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+              "securityIdentifier": {"id": "SHARED", "idType": "TICKER"}}
+           ],
+           "commands": [
+             {"metric": "sharpe-ratio", "timeIntervalPeriods": ["12"]}
+           ]}
+          """;
+
+      mockMvc.perform(
+          post(BASE_PATH)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isOk());
+
+      org.mockito.ArgumentCaptor<CalculationCommand> captor = org.mockito.ArgumentCaptor
+          .forClass(CalculationCommand.class);
+      verify(mockServices.get(CalculationMetric.SHARPE_RATIO)).perform(captor.capture(), any());
+      PeriodCommand executed = (PeriodCommand) captor.getValue();
+      assertThat(executed.getHoldings())
+          .singleElement()
+          .satisfies(holding -> assertThat(holding.getSecurityIdentifier().getId()).isEqualTo("SHARED"));
+      assertThat(executed.getCurrency()).isEqualTo(Currency.CAD);
+      assertThat(executed.getDataProviders()).containsExactly(DataProvider.MORNINGSTAR);
+    }
+
+    @Test
+    void shouldPreferCommandValues_whenCommandOverridesSharedInputs() throws Exception {
+      String requestBody = """
+          {"currency": "CAD",
+           "holdings": [
+             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+              "securityIdentifier": {"id": "SHARED", "idType": "TICKER"}}
+           ],
+           "commands": [
+             {"metric": "sharpe-ratio", "currency": "USD", "timeIntervalPeriods": ["12"], "holdings": [
+               {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+                "securityIdentifier": {"id": "OWN", "idType": "TICKER"}}
+             ]}
+           ]}
+          """;
+
+      mockMvc.perform(
+          post(BASE_PATH)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody))
+          .andExpect(status().isOk());
+
+      org.mockito.ArgumentCaptor<CalculationCommand> captor = org.mockito.ArgumentCaptor
+          .forClass(CalculationCommand.class);
+      verify(mockServices.get(CalculationMetric.SHARPE_RATIO)).perform(captor.capture(), any());
+      PeriodCommand executed = (PeriodCommand) captor.getValue();
+      assertThat(executed.getHoldings())
+          .singleElement()
+          .satisfies(holding -> assertThat(holding.getSecurityIdentifier().getId()).isEqualTo("OWN"));
+      assertThat(executed.getCurrency()).isEqualTo(Currency.USD);
+    }
+
+    @Test
+    void shouldThrowException_whenDuplicateMetricRequested() {
+      String requestBody = """
+          {"currency": "CAD",
+           "holdings": [
+             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+              "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
+           ],
+           "commands": [
+             {"metric": "sharpe-ratio"},
+             {"metric": "sharpe-ratio"}
+           ]}
+          """;
+
+      assertThatThrownBy(() -> mockMvc.perform(
+          post(BASE_PATH)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody)))
+          .hasCauseInstanceOf(CalculationException.class)
+          .hasMessageContaining("Duplicate calculation metric");
+    }
+
+    @Test
+    void shouldThrowException_whenCommandHasNoMetric() {
+      String requestBody = """
+          {"currency": "CAD",
+           "holdings": [
+             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+              "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
+           ],
+           "commands": [
+             {"timeIntervalPeriods": ["12"]}
+           ]}
+          """;
+
+      assertThatThrownBy(() -> mockMvc.perform(
+          post(BASE_PATH)
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(requestBody)))
+          .hasCauseInstanceOf(CalculationException.class);
+    }
   }
 
   @Nested
@@ -209,21 +361,22 @@ class PortfolioCalculationControllerTest {
           new HoldingReqValidator());
       var facade = new RequestValidationFacade(validators);
 
-      List<CalculationService<?, ?>> services = new java.util.ArrayList<>();
+      List<CalculationService<?, ?, ?>> services = new java.util.ArrayList<>();
       for (CalculationMetric m : CalculationMetric.values()) {
         CalculationService svc = mock(CalculationService.class);
         lenient().when(svc.getMetric()).thenReturn(m);
+        lenient().when(svc.requiredAttributes()).thenReturn(List.of());
         Object result = switch (m) {
           case BEST_WORST_PERIODS -> new com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult();
           case DISTRIBUTION_OF_MONTHLY_RETURNS ->
             new com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult();
           default -> new BaseCalculationResult() {};
         };
-        lenient().when(svc.perform(any())).thenReturn((BaseCalculationResult) result);
+        lenient().when(svc.perform(any(), any())).thenReturn((BaseCalculationResult) result);
         services.add(svc);
       }
 
-      var controller = new PortfolioCalculationController(services, facade, calculationObservability());
+      var controller = controller(services, facade);
       LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
       validator.afterPropertiesSet();
       validatingMockMvc = MockMvcBuilders.standaloneSetup(controller)

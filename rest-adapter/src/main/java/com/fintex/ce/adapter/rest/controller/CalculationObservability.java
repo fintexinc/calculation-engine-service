@@ -3,10 +3,12 @@ package com.fintex.ce.adapter.rest.controller;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
-import com.fintex.ce.model.dto.command.BenchmarkHoldingsProvider;
+import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.dto.command.CalculationCommand;
-import com.fintex.ce.model.dto.command.HoldingsProvider;
+import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
+import com.fintex.ce.model.dto.command.contract.BenchmarkHoldingsProvider;
+import com.fintex.ce.model.dto.command.contract.HoldingsProvider;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -21,6 +23,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Wraps every metric calculation in a Micrometer observation carrying metric, command and outcome tags. The action
+ * receives the started {@link Observation} so the caller can emit phase events while validating and executing the
+ * calculation.
+ */
 @Component
 @RequiredArgsConstructor
 public class CalculationObservability {
@@ -29,6 +36,7 @@ public class CalculationObservability {
 
   static final String UNKNOWN = "unknown";
   static final String UNSUPPORTED = "unsupported";
+  static final String COMPOSITE = "composite";
   static final String NONE = "none";
   static final String SUCCESS = "success";
   static final String ERROR = "error";
@@ -44,6 +52,7 @@ public class CalculationObservability {
   static final String PORTFOLIO_HOLDINGS_COUNT_KEY = "portfolio.holdings.count";
   static final String BENCHMARK_HOLDINGS_COUNT_KEY = "benchmark.holdings.count";
   static final String WARNINGS_COUNT_KEY = "warnings.count";
+  static final String FAILED_METRICS_COUNT_KEY = "failed.metrics.count";
 
   static final String VALIDATION_STARTED_EVENT = "portfolio.calculation.validation.started";
   static final String VALIDATION_COMPLETED_EVENT = "portfolio.calculation.validation.completed";
@@ -92,6 +101,71 @@ public class CalculationObservability {
     } finally {
       observation.stop();
     }
+  }
+
+  public CompositeCalculationResult observeComposite(
+      List<CalculationCommand> commands,
+      Function<Observation, CompositeCalculationResult> action) {
+    List<CalculationCommand> observedCommands = commands == null ? List.of() : commands;
+
+    Observation observation = Observation.createNotStarted(CALCULATION_OBSERVATION_NAME, observationRegistry)
+        .contextualName("portfolio " + COMPOSITE + " calculation")
+        .lowCardinalityKeyValue(METRIC_TAG, COMPOSITE)
+        .lowCardinalityKeyValue(COMMAND_TAG, CompositeCalculationRequest.class.getSimpleName())
+        .lowCardinalityKeyValue(BODY_METRIC_TAG, COMPOSITE)
+        .highCardinalityKeyValue(REQUESTED_METRIC_KEY, requestedMetrics(observedCommands))
+        .highCardinalityKeyValue(PORTFOLIO_HOLDINGS_COUNT_KEY, String.valueOf(observedCommands.stream()
+            .mapToInt(CalculationObservability::holdingsCount)
+            .sum()))
+        .highCardinalityKeyValue(BENCHMARK_HOLDINGS_COUNT_KEY, String.valueOf(observedCommands.stream()
+            .mapToInt(CalculationObservability::benchmarkHoldingsCount)
+            .sum()));
+
+    observation.start();
+    try (Observation.Scope ignored = observation.openScope()) {
+      CompositeCalculationResult result = action.apply(observation);
+      observation.lowCardinalityKeyValue(OUTCOME_TAG, SUCCESS);
+      observation.lowCardinalityKeyValue(EXCEPTION_TAG, NONE);
+      observation.lowCardinalityKeyValue(RESULT_TAG, resultType(result));
+      observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, String.valueOf(warningsCount(result)));
+      observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, String.valueOf(failuresCount(result)));
+      observation.event(Observation.Event.of(COMPLETED_EVENT));
+      return result;
+    } catch (RuntimeException exception) {
+      observation.error(exception);
+      observation.lowCardinalityKeyValue(OUTCOME_TAG, ERROR);
+      observation.lowCardinalityKeyValue(EXCEPTION_TAG, exception.getClass().getSimpleName());
+      observation.event(Observation.Event.of(FAILED_EVENT));
+      throw exception;
+    } finally {
+      observation.stop();
+    }
+  }
+
+  private static String requestedMetrics(List<CalculationCommand> commands) {
+    if (commands.isEmpty()) {
+      return UNKNOWN;
+    }
+    return commands.stream()
+        .map(CalculationObservability::bodyMetric)
+        .collect(Collectors.joining(","));
+  }
+
+  private static String resultType(CompositeCalculationResult result) {
+    return result == null ? UNKNOWN : valueOrUnknown(result.getClass().getSimpleName());
+  }
+
+  private static int warningsCount(CompositeCalculationResult result) {
+    if (result == null || CollectionUtils.isEmpty(result.getResults())) {
+      return 0;
+    }
+    return result.getResults().values().stream()
+        .mapToInt(CalculationObservability::warningsCount)
+        .sum();
+  }
+
+  private static int failuresCount(CompositeCalculationResult result) {
+    return result == null || CollectionUtils.isEmpty(result.getFailures()) ? 0 : result.getFailures().size();
   }
 
   private static String resolveMetricTag(String metricName) {

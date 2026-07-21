@@ -8,8 +8,6 @@ import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Assertions;
@@ -32,35 +30,30 @@ class MaturityAllocationServiceTest {
 
   @Test
   void fetchExposures_checkResult() {
-    final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
     final var service = mock(MaturityAllocationService.class, withSettings()
-        .useConstructor(fetcher, responseMapper));
+        .useConstructor(responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
     final var command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holding));
-    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     final var maturityAllocation = new MaturityAllocation();
     maturityAllocation.setMaturityDurationValues(Map.of("FIVE_TO_SEVEN_YEARS", BigDecimal.TEN));
-    final var rawData = Map.of(holding, maturityAllocation);
+    final var data = Map.of(holding, maturityAllocation);
 
-    when(fetcher.fetch(any(), any())).thenReturn(rawData);
-    doCallRealMethod().when(service).fetchExposures(any());
-    final var result = service.fetchExposures(command);
+    doCallRealMethod().when(service).fetchExposures(any(), any());
+    final var result = service.fetchExposures(command, data);
     final var actual = result.allocations();
 
     Assertions.assertEquals(1, actual.size());
     Assertions.assertTrue(actual.containsKey(holding));
-    verify(fetcher).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test
   void calculate_verifyCalculateNetProducts() {
-    final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
     final var service = mock(MaturityAllocationService.class, withSettings()
-        .useConstructor(fetcher, responseMapper));
+        .useConstructor(responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
@@ -74,10 +67,9 @@ class MaturityAllocationServiceTest {
 
   @Test
   void calculate_verifyFromNetProducts() {
-    final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
     final var service = mock(MaturityAllocationService.class, withSettings()
-        .useConstructor(fetcher, responseMapper));
+        .useConstructor(responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
@@ -94,10 +86,9 @@ class MaturityAllocationServiceTest {
 
   @Test
   void calculate_verifyAreAllValuesEmptyInMapOfExposure() {
-    final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(MaturityAllocationResponseMapper.class);
     final var service = mock(MaturityAllocationService.class, withSettings()
-        .useConstructor(fetcher, responseMapper));
+        .useConstructor(responseMapper));
     try (final var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
       final var exposures = mock(Map.class);
 
@@ -111,10 +102,9 @@ class MaturityAllocationServiceTest {
   @Test
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final var fetcher = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(MaturityAllocationResponseMapper.class);
       final var service = mock(MaturityAllocationService.class, withSettings()
-          .useConstructor(fetcher, responseMapper));
+          .useConstructor(responseMapper));
 
       final var exposures = mock(Map.class);
       final var expected = MaturityAllocationResult.builder()

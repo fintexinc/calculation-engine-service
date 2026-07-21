@@ -11,6 +11,10 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Aggregates all {@link RequestValidator}s by supported metric. All violations found by the metric's validators are
+ * collected and thrown together.
+ */
 @Component
 public class RequestValidationFacade {
 
@@ -25,8 +29,8 @@ public class RequestValidationFacade {
     }
   }
 
-  public void validate(CalculationCommand command, CalculationMetric metric) {
-    List<RequestValidator> validators = validatorsByMetric.getOrDefault(metric, List.of());
+  public void validate(CalculationCommand command) {
+    List<RequestValidator> validators = validatorsByMetric.getOrDefault(command.getMetric(), List.of());
     PceExceptionCollector collector = new PceExceptionCollector();
     for (RequestValidator validator : validators) {
       collector.tryCatch(() -> {

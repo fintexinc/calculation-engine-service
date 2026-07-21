@@ -1,26 +1,22 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
+import com.fintex.ce.model.domain.calculation.allocation.GeographicExposureData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeGeographicExposureResult;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.financial.Geography;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static java.math.BigDecimal.ONE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class FixedIncomeGeographicExposureServiceTest
     extends
@@ -28,8 +24,7 @@ class FixedIncomeGeographicExposureServiceTest
 
   @Override
   protected AbstractGeographicExposureService<FixedIncomeGeographicExposureResult> createService() {
-    return new FixedIncomeGeographicExposureService(geographicFetcher, geographyFetcher, portfolioWeightCalculator,
-        DEFAULT_DATA_PROPERTIES);
+    return new FixedIncomeGeographicExposureService(portfolioWeightCalculator);
   }
 
   @Override
@@ -68,53 +63,43 @@ class FixedIncomeGeographicExposureServiceTest
   }
 
   @Test
-  void shouldExcludeBothUsAndCanadaStocks_fromBothFetchers() {
+  void shouldExcludeBothUsAndCanadaStocks_fromExposureAggregation() {
     PortfolioHolding fund = canadaMutualFund("RBF605", 100);
     PortfolioHolding usStock = usStock("AAPL", 200);
     PortfolioHolding canadaStock = canadaStock("RY", 200);
 
-    when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
-        fund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD)));
+    GeographicExposureData data = data(Map.of(
+        fund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD)),
+        Map.of(
+            usStock, geography(Country.USA, Currency.USD),
+            canadaStock, geography(Country.CANADA, Currency.CAD)));
 
-    FixedIncomeGeographicExposureResult result = service.perform(command(fund, usStock, canadaStock));
-
-    @SuppressWarnings("unchecked")
-    ArgumentCaptor<List<PortfolioHolding>> fundCaptor = ArgumentCaptor.forClass(List.class);
-    verify(geographicFetcher).fetch(fundCaptor.capture(), anyList());
-    assertThat(fundCaptor.getValue()).containsExactly(fund).doesNotContain(usStock, canadaStock);
-
-    @SuppressWarnings("unchecked")
-    ArgumentCaptor<List<PortfolioHolding>> stockCaptor = ArgumentCaptor.forClass(List.class);
-    verify(geographyFetcher).fetch(stockCaptor.capture(), anyList());
-    assertThat(stockCaptor.getValue()).isEmpty();
+    FixedIncomeGeographicExposureResult result = service.perform(command(fund, usStock, canadaStock), data);
 
     assertExposureEquals(result, distribution(Map.of(GeographicRegionType.US, ONE)));
+    assertThat(result.getWarnings()).isEmpty();
   }
 
   @Test
-  void shouldIncludeFixedIncomeAndEtf_inGeographicAllocationFetch() {
+  void shouldIncludeFixedIncomeAndEtf_inGeographicAllocationPath() {
     PortfolioHolding bond = fixedIncome("BOND", 200);
     PortfolioHolding usEtf = usEtf("BND", 100);
     PortfolioHolding canadaEtf = canadaEtf("ZCN", 100);
     PortfolioHolding fund = canadaMutualFund("RBF605", 100);
 
-    when(geographicFetcher.fetch(anyList(), anyList())).thenReturn(Map.of(
+    GeographicExposureData data = data(Map.of(
         bond, allocation(Map.of(GeographicRegionType.EUROPE, ONE), Currency.EUR),
         usEtf, allocation(Map.of(GeographicRegionType.US, ONE), Currency.USD),
         canadaEtf, allocation(Map.of(GeographicRegionType.CANADA, ONE), Currency.CAD),
-        fund, allocation(Map.of(GeographicRegionType.CANADA, ONE), Currency.CAD)));
+        fund, allocation(Map.of(GeographicRegionType.CANADA, ONE), Currency.CAD)), Map.of());
 
-    FixedIncomeGeographicExposureResult result = service.perform(command(bond, usEtf, canadaEtf, fund));
-
-    @SuppressWarnings("unchecked")
-    ArgumentCaptor<List<PortfolioHolding>> fundCaptor = ArgumentCaptor.forClass(List.class);
-    verify(geographicFetcher).fetch(fundCaptor.capture(), anyList());
-    assertThat(fundCaptor.getValue()).contains(bond, usEtf, canadaEtf, fund);
+    FixedIncomeGeographicExposureResult result = service.perform(command(bond, usEtf, canadaEtf, fund), data);
 
     Map<GeographicRegionType, BigDecimal> expected = distribution(Map.of(
         GeographicRegionType.EUROPE, new BigDecimal("0.4"),
         GeographicRegionType.US, new BigDecimal("0.2"),
         GeographicRegionType.CANADA, new BigDecimal("0.4")));
     assertExposureEquals(result, expected);
+    assertThat(result.getWarnings()).isEmpty();
   }
 }
