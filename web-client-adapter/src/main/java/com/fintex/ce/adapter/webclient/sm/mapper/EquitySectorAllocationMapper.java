@@ -7,6 +7,8 @@ import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 
 import org.springframework.stereotype.Component;
 
@@ -43,7 +45,15 @@ public class EquitySectorAllocationMapper
 
     return EquitySector.builder()
         .allocations(allocationMap)
+        .currency(toCurrency(smsResponse))
         .providers(providers)
         .build();
+  }
+
+  private Currency toCurrency(EquitySectorAllocationWithCurrency smsResponse) {
+    return Optional.ofNullable(smsResponse)
+        .map(EquitySectorAllocationWithCurrency::getCurrency)
+        .map(CurrencyDatapoint::getValue)
+        .orElse(null);
   }
 }

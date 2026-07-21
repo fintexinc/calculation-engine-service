@@ -7,6 +7,8 @@ import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -105,6 +107,28 @@ class FixedIncomeSectorAllocationMapperTest {
     assertThat(result.getFixedIncomeBondSectors()).hasSize(1);
     assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorAllocationType.CORPORATE_BONDS))
         .isEqualByComparingTo("40.0");
+  }
+
+  @Test
+  void shouldMapCurrency_whenResponseHasCurrency() {
+    FixedIncomeSectorAllocationWithCurrency smsResponse = response(List.of(
+        entry(FixedIncomeSectorAllocationType.CORPORATE_BONDS, "30.0")));
+    CurrencyDatapoint currency = new CurrencyDatapoint();
+    currency.setValue(Currency.USD);
+    smsResponse.setCurrency(currency);
+
+    FixedIncomeBondSector result = mapper.map(smsResponse, createHolding("AGG", FinancialInstrumentType.ETF));
+
+    assertThat(result.getCurrency()).isEqualTo(Currency.USD);
+  }
+
+  @Test
+  void shouldMapNullCurrency_whenResponseHasNoCurrency() {
+    FixedIncomeBondSector result = mapper.map(response(List.of(
+        entry(FixedIncomeSectorAllocationType.CORPORATE_BONDS, "30.0"))),
+        createHolding("AGG", FinancialInstrumentType.ETF));
+
+    assertThat(result.getCurrency()).isNull();
   }
 
   private static FixedIncomeSectorAllocationWithCurrency response(List<FixedIncomeSectorAllocationTypeValue> values,

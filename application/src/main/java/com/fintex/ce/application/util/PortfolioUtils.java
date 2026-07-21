@@ -2,8 +2,10 @@ package com.fintex.ce.application.util;
 
 import com.fintex.ce.model.domain.calculation.yield.HoldingIncomeForecast;
 import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -11,6 +13,8 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
@@ -79,6 +83,31 @@ public class PortfolioUtils {
   public static <T> boolean areAllValuesZerosInMap(final Map<PortfolioHolding, Map<T, BigDecimal>> map) {
     return map.values().stream().flatMap(e -> e.values().stream())
         .allMatch(v -> v == null || v.compareTo(ZERO) == 0);
+  }
+
+  /**
+   * Currency for a cash or GIC holding, read directly off the typed holding rather than a fetched SM allocation, since
+   * cash/GIC values never come from an SM security response. Empty for any other holding type.
+   */
+  public static Optional<Currency> cashOrGicCurrency(final PortfolioHolding holding) {
+    if (FilterUtils.CASH_PREDICATE.test(holding)) {
+      return Optional.ofNullable(((CashHolding) holding).getCurrency());
+    }
+    if (FilterUtils.GIC_PREDICATE.test(holding)) {
+      return Optional.ofNullable(((GicHolding) holding).getCurrency());
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Currency for a holding used in a weight computation: cash/GIC holdings resolve directly off the typed holding (see
+   * {@link #cashOrGicCurrency}), everything else falls back to {@code currencyOf} applied to its fetched SM data.
+   */
+  public static <D> Currency currencyFor(final PortfolioHolding holding, final Map<PortfolioHolding, D> rawData,
+      final Function<D, Currency> currencyOf) {
+    return cashOrGicCurrency(holding)
+        .or(() -> Optional.ofNullable(rawData.get(holding)).map(currencyOf))
+        .orElse(null);
   }
 
   public static String createKey(final PortfolioHolding holding) {

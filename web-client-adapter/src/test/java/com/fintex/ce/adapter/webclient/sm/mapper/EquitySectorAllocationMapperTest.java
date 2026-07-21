@@ -7,6 +7,8 @@ import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -42,6 +44,27 @@ class EquitySectorAllocationMapperTest {
     assertThat(result.getAllocations().get(EquitySectorAllocationType.HEALTHCARE)).isEqualByComparingTo("15.3");
     assertThat(result.getAllocations().get(EquitySectorAllocationType.ENERGY)).isEqualByComparingTo("8.7");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
+  }
+
+  @Test
+  void shouldMapCurrency_whenResponseHasCurrency() {
+    EquitySectorAllocationWithCurrency smsResponse = response(List.of(
+        createEntry(EquitySectorAllocationType.TECHNOLOGY, "28.5")), DataProvider.MORNINGSTAR);
+    CurrencyDatapoint currency = new CurrencyDatapoint();
+    currency.setValue(Currency.USD);
+    smsResponse.setCurrency(currency);
+
+    EquitySector result = mapper.map(smsResponse, createHolding("XIU.TO"));
+
+    assertThat(result.getCurrency()).isEqualTo(Currency.USD);
+  }
+
+  @Test
+  void shouldMapNullCurrency_whenResponseHasNoCurrency() {
+    EquitySector result = mapper.map(response(List.of(
+        createEntry(EquitySectorAllocationType.TECHNOLOGY, "28.5"))), createHolding("XIU.TO"));
+
+    assertThat(result.getCurrency()).isNull();
   }
 
   @ParameterizedTest

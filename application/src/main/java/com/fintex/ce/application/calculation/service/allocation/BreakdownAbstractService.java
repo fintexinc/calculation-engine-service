@@ -45,6 +45,21 @@ public abstract class BreakdownAbstractService<D, R extends BaseCalculationResul
     return products;
   }
 
+  /**
+   * Aggregates per-holding exposures into per-type net products using caller-supplied weights — e.g. the FX-adjusted
+   * weights sector services derive via {@link com.fintex.ce.application.calculation.service.PortfolioWeightCalculator}.
+   * Iterates through {@code this.calculateNetProduct} so subclasses and test doubles can intercept per-type
+   * invocations.
+   */
+  public Map<T, BigDecimal> calculateNetProductsWithWeights(Map<PortfolioHolding, Map<T, BigDecimal>> values,
+      Map<PortfolioHolding, BigDecimal> weights, T[] types) {
+    Map<T, BigDecimal> products = new HashMap<>();
+    for (T type : types) {
+      products.put(type, calculateNetProduct(type, values, weights));
+    }
+    return products;
+  }
+
   public Map<PortfolioHolding, BigDecimal> calculateRawHoldingValueWeights(List<PortfolioHolding> holdings) {
     return calculateInitialPortfolioWeight(holdings);
   }
