@@ -4,18 +4,16 @@ import com.fintex.ce.application.mapping.response.CreditQualityResponseMapper;
 import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
+import com.fintex.ce.model.domain.calculation.allocation.CreditQualityData;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.ce.util.FilterUtils;
-import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
-import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
-import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality.HIGH_YIELD;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.A;
@@ -40,64 +37,47 @@ import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.NOT_RA
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
-@SuppressWarnings("unchecked")
 class FixedIncomeCreditQualityServiceTest {
 
-  private FixedIncomeCreditQualityService mockService(SecurityDataFetcher<CreditQuality> creditQualityFetcher,
-      SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher,
-      CreditQualityResponseMapper responseMapper) {
-    return mock(FixedIncomeCreditQualityService.class, withSettings().useConstructor(
-        creditQualityFetcher, assetAllocationFetcher, responseMapper, DEFAULT_DATA_PROPERTIES));
+  private FixedIncomeCreditQualityService mockService(CreditQualityResponseMapper responseMapper) {
+    return mock(FixedIncomeCreditQualityService.class, withSettings().useConstructor(responseMapper));
   }
 
   @Test
-  void shouldPerform_whenVerifyLoad() {
-    SecurityDataFetcher<CreditQuality> creditQualityFetcher = mock(SecurityDataFetcher.class);
-    SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher = mock(SecurityDataFetcher.class);
-    CreditQualityResponseMapper responseMapper = mock(CreditQualityResponseMapper.class);
-    FixedIncomeCreditQualityService service = mockService(creditQualityFetcher, assetAllocationFetcher, responseMapper);
+  void shouldRequireCreditQualityAndAssetAllocationAttributes_whenRequiredAttributesInvoked() {
+    FixedIncomeCreditQualityService service = new FixedIncomeCreditQualityService(
+        mock(CreditQualityResponseMapper.class));
 
-    PortfolioHolding holding = mock(PortfolioHolding.class);
-    List<PortfolioHolding> holdings = List.of(holding);
-    PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
-    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
-    when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
-    when(command.getHoldings()).thenReturn(holdings);
-    when(command.getDataProviders()).thenReturn(providers);
+    List<CompositeSecurityAttribute> requirements = service.requiredAttributes();
 
-    doCallRealMethod().when(service).perform(any());
-    service.perform(command);
-
-    verify(creditQualityFetcher).fetch(eq(holdings), eq(providers));
+    assertThat(requirements).containsExactly(
+        CompositeSecurityAttribute.CREDIT_QUALITY_RATINGS,
+        CompositeSecurityAttribute.ASSET_ALLOCATION);
   }
 
   @Test
   void shouldPerform_whenVerifyAreAllValuesInMapEmpty() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      SecurityDataFetcher<CreditQuality> creditQualityFetcher = mock(SecurityDataFetcher.class);
-      SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher = mock(SecurityDataFetcher.class);
       CreditQualityResponseMapper responseMapper = mock(CreditQualityResponseMapper.class);
-      FixedIncomeCreditQualityService service = mockService(creditQualityFetcher, assetAllocationFetcher,
-          responseMapper);
+      FixedIncomeCreditQualityService service = mockService(responseMapper);
 
       PortfolioHolding holding = mock(PortfolioHolding.class);
-      when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of());
       PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
       when(command.getHoldings()).thenReturn(List.of(holding));
 
-      doCallRealMethod().when(service).perform(any());
-      service.perform(command);
+      doCallRealMethod().when(service).perform(any(), any());
+      service.perform(command, new CreditQualityData(Map.of(), Map.of()));
 
       mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(any()));
     }
@@ -105,36 +85,37 @@ class FixedIncomeCreditQualityServiceTest {
 
   @Test
   void shouldPerform_whenVerifyResponseMapperFromCalculatedValues() {
-    SecurityDataFetcher<CreditQuality> creditQualityFetcher = mock(SecurityDataFetcher.class);
-    SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher = mock(SecurityDataFetcher.class);
     CreditQualityResponseMapper responseMapper = mock(CreditQualityResponseMapper.class);
-    FixedIncomeCreditQualityService service = mockService(creditQualityFetcher, assetAllocationFetcher, responseMapper);
+    FixedIncomeCreditQualityService service = mockService(responseMapper);
 
     PortfolioHolding holding = mock(PortfolioHolding.class);
     CreditQuality rawCq = new CreditQuality();
     rawCq.setRatings(Map.of(AAA, ONE));
-    when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
+    PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    CreditQualityData data = new CreditQualityData(Map.of(holding, rawCq), Map.of());
 
     Map<FixedIncomeCreditQuality, BigDecimal> map = Map.of(HIGH_YIELD, ONE);
     when(service.calculate(any(), any(), any())).thenReturn(map);
 
-    doCallRealMethod().when(service).perform(any());
-    service.perform(mock(PortfolioHoldingsCommand.class));
+    doCallRealMethod().when(service).perform(any(), any());
+    doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), any());
+    service.perform(command, data);
 
-    verify(responseMapper).fromCalculatedValues(eq(map), anyList());
+    verify(responseMapper).fromCalculatedValues(Mockito.eq(map), anyList());
   }
 
   @Test
   void shouldPerform_whenCheckResult() {
-    SecurityDataFetcher<CreditQuality> creditQualityFetcher = mock(SecurityDataFetcher.class);
-    SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher = mock(SecurityDataFetcher.class);
     CreditQualityResponseMapper responseMapper = mock(CreditQualityResponseMapper.class);
-    FixedIncomeCreditQualityService service = mockService(creditQualityFetcher, assetAllocationFetcher, responseMapper);
+    FixedIncomeCreditQualityService service = mockService(responseMapper);
 
     PortfolioHolding holding = mock(PortfolioHolding.class);
     CreditQuality rawCq = new CreditQuality();
     rawCq.setRatings(Map.of(AAA, ONE));
-    when(creditQualityFetcher.fetch(any(), any())).thenReturn(Map.of(holding, rawCq));
+    PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holding));
+    CreditQualityData data = new CreditQualityData(Map.of(holding, rawCq), Map.of());
 
     Map<FixedIncomeCreditQuality, BigDecimal> map = Map.of(HIGH_YIELD, ONE);
     CreditQualityResult expected = CreditQualityResult.builder()
@@ -143,78 +124,32 @@ class FixedIncomeCreditQualityServiceTest {
         .build();
     when(responseMapper.fromCalculatedValues(any(), anyList())).thenReturn(expected);
 
-    doCallRealMethod().when(service).perform(any());
-    CreditQualityResult actual = service.perform(mock(PortfolioHoldingsCommand.class));
+    doCallRealMethod().when(service).perform(any(), any());
+    doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), any());
+    CreditQualityResult actual = service.perform(command, data);
 
     assertEquals(expected, actual);
   }
 
   @Test
-  void shouldGetFixedIncomeCreditQuality_whenVerifyLoad() {
-    SecurityDataFetcher<CreditQuality> creditQualityFetcher = mock(SecurityDataFetcher.class);
-    SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher = mock(SecurityDataFetcher.class);
-    CreditQualityResponseMapper responseMapper = mock(CreditQualityResponseMapper.class);
-    FixedIncomeCreditQualityService service = mockService(creditQualityFetcher, assetAllocationFetcher, responseMapper);
-
-    PortfolioHolding holding = mock(PortfolioHolding.class);
-    List<Notification> warnings = List.of(mock(Notification.class));
-    PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
-    List<PortfolioHolding> holdings = List.of(holding);
-    when(command.getHoldings()).thenReturn(holdings);
-    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
-    when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
-
-    doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), anyList());
-    service.getFixedIncomeCreditQuality(command, warnings);
-
-    verify(assetAllocationFetcher).fetch(eq(holdings), any());
-  }
-
-  @Test
-  void shouldGetFixedIncomeCreditQuality_whenVerifyGetSpecifiedIfEmpty() {
-    try (var mockedFilterUtils = Mockito.mockStatic(FilterUtils.class)) {
-      SecurityDataFetcher<CreditQuality> creditQualityFetcher = mock(SecurityDataFetcher.class);
-      SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher = mock(SecurityDataFetcher.class);
-      CreditQualityResponseMapper responseMapper = mock(CreditQualityResponseMapper.class);
-      FixedIncomeCreditQualityService service = mockService(creditQualityFetcher, assetAllocationFetcher,
-          responseMapper);
-
-      List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
-      List<DataProvider> defaultProviders = List.of(DataProvider.MORNINGSTAR);
-      PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
-      when(command.getDataProviders()).thenReturn(providers);
-      when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of());
-      mockedFilterUtils.when(() -> FilterUtils.getSpecifiedIfEmpty(providers, defaultProviders)).thenReturn(providers);
-
-      doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), anyList());
-      service.getFixedIncomeCreditQuality(command, List.of());
-
-      mockedFilterUtils.verify(() -> FilterUtils.getSpecifiedIfEmpty(providers, defaultProviders));
-    }
-  }
-
-  @Test
   void shouldGetFixedIncomeCreditQuality_returnsFixedIncomeFromAllocations() {
-    SecurityDataFetcher<CreditQuality> creditQualityFetcher = mock(SecurityDataFetcher.class);
-    SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher = mock(SecurityDataFetcher.class);
     CreditQualityResponseMapper responseMapper = mock(CreditQualityResponseMapper.class);
-    FixedIncomeCreditQualityService service = mockService(creditQualityFetcher, assetAllocationFetcher, responseMapper);
+    FixedIncomeCreditQualityService service = mockService(responseMapper);
 
     PortfolioHolding holding = mock(PortfolioHolding.class);
     HoldingAssetAllocation allocation = HoldingAssetAllocation.builder()
         .allocations(Map.of(AssetAllocationRegionType.US_EQUITIES, TEN,
             AssetAllocationRegionType.FIXED_INCOME, HUNDRED))
         .build();
-    when(assetAllocationFetcher.fetch(any(), any())).thenReturn(Map.of(holding, allocation));
+    CreditQualityData data = new CreditQualityData(Map.of(), Map.of(holding, allocation));
 
     PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holding));
-    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
 
     doCallRealMethod().when(service).getFixedIncomeValue(any());
-    doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), anyList());
+    doCallRealMethod().when(service).getFixedIncomeCreditQuality(any(), any());
 
-    Map<PortfolioHolding, BigDecimal> actual = service.getFixedIncomeCreditQuality(command, List.of());
+    Map<PortfolioHolding, BigDecimal> actual = service.getFixedIncomeCreditQuality(command, data);
 
     assertEquals(Map.of(holding, HUNDRED), actual);
   }

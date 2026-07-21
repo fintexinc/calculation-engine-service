@@ -9,6 +9,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioValidateCutAndFxPipel
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
@@ -46,9 +47,9 @@ public class CorrelationServiceImpl extends ValidateCutAndFxAbstractService<Peri
   }
 
   @Override
-  public CorrelationResult perform(PeriodCommand command) {
+  public CorrelationResult perform(PeriodCommand command, PortfolioBenchmarkReturns returnsData) {
     command.setReqCurrencyToCashHolding();
-    ReturnsSnapshot<HoldingMonthlyReturns> postFx = runValidateCutAndFx(command);
+    ReturnsSnapshot<HoldingMonthlyReturns> postFx = runValidateCutAndFx(command, returnsData);
     Map<PortfolioHolding, Map<LocalDate, BigDecimal>> baseTotalReturns = new HashMap<>(postFx.returnsMap());
 
     NavigableMap<LocalDate, BigDecimal> weightedAveragePortfolioReturns = weightedAverageAfterPsdTrim(postFx,

@@ -1,17 +1,18 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
-import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.mapping.response.CreditQualityResponseMapper;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
+import com.fintex.ce.model.domain.calculation.allocation.CreditQualityData;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
+import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
 import com.fintex.wm.commons.error.Notification;
 
@@ -32,7 +33,7 @@ import static com.fintex.ce.application.util.PortfolioUtils.areAllValuesInMapEmp
 import static com.fintex.ce.application.util.PortfolioUtils.calculateInitialPortfolioWeight;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_CREDIT_QUALITY;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
-import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
+import static com.fintex.ce.util.FilterUtils.restrictToHoldings;
 
 /**
  * @deprecated metric is broken and not supported for now
@@ -41,12 +42,9 @@ import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 @RequiredArgsConstructor
 public class FixedIncomeCreditQualityService
     implements
-      CalculationService<PortfolioHoldingsCommand, CreditQualityResult> {
+      CalculationService<PortfolioHoldingsCommand, CreditQualityData, CreditQualityResult> {
 
-  private final SecurityDataFetcher<CreditQuality> creditQualitySecurityDataFetcher;
-  private final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationSecurityDataFetcher;
   private final CreditQualityResponseMapper responseMapper;
-  private final DefaultDataProperties defaultDataProperties;
 
   @Override
   public CalculationMetric getMetric() {
@@ -54,27 +52,37 @@ public class FixedIncomeCreditQualityService
   }
 
   @Override
-  public CreditQualityResult perform(final PortfolioHoldingsCommand command) {
+  public List<CompositeSecurityAttribute> requiredAttributes() {
+    return List.of(CompositeSecurityAttribute.CREDIT_QUALITY_RATINGS, CompositeSecurityAttribute.ASSET_ALLOCATION);
+  }
+
+  @Override
+  public CreditQualityData prepareData(final SecurityData securityData) {
+    return new CreditQualityData(securityData.get(CompositeSecurityAttribute.CREDIT_QUALITY_RATINGS),
+        securityData.get(CompositeSecurityAttribute.ASSET_ALLOCATION));
+  }
+
+  @Override
+  public CreditQualityResult perform(final PortfolioHoldingsCommand command, final CreditQualityData data) {
     final ArrayList<Notification> warnings = new ArrayList<>();
-    final Map<PortfolioHolding, CreditQuality> rawCreditQuality = creditQualitySecurityDataFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+    final Map<PortfolioHolding, CreditQuality> rawCreditQuality = restrictToHoldings(data.creditQuality(),
+        command.getHoldings());
     final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> creditQuality = extractRatings(
         rawCreditQuality,
         warnings);
     if (areAllValuesInMapEmpty(creditQuality)) {
       return responseMapper.toEmptyResponse(warnings);
     }
-    final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality = getFixedIncomeCreditQuality(command, warnings);
+    final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality = getFixedIncomeCreditQuality(command, data);
     final Map<FixedIncomeCreditQuality, BigDecimal> result = calculate(command.getHoldings(), creditQuality,
         fixedIncomeCreditQuality);
     return responseMapper.fromCalculatedValues(result, warnings);
   }
 
   public Map<PortfolioHolding, BigDecimal> getFixedIncomeCreditQuality(final PortfolioHoldingsCommand command,
-      final List<Notification> warnings) {
-    final Map<PortfolioHolding, HoldingAssetAllocation> rawData = assetAllocationSecurityDataFetcher.fetch(
-        command.getHoldings(),
-        getSpecifiedIfEmpty(command.getDataProviders(), defaultDataProperties.getDataProviders()));
+      final CreditQualityData data) {
+    final Map<PortfolioHolding, HoldingAssetAllocation> rawData = restrictToHoldings(data.assetAllocations(),
+        command.getHoldings());
     return rawData.entrySet().stream().collect(toMap(Map.Entry::getKey, this::getFixedIncomeValue));
   }
 

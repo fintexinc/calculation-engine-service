@@ -8,6 +8,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -39,12 +40,16 @@ public class SharpeRatioCalculationServiceImpl
     return CalculationMetric.SHARPE_RATIO;
   }
 
-  public SharpeRatioCalculation defineCalculationMethod(final PeriodCommand command) {
+  @Override
+  public SharpeRatioResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
     final var tBills = TBillsValidator.requireNonEmpty(
         treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
-    final PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
+    final PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE,
+        returnsData);
     final var standardDeviationCalculation = new StandardDeviationCalculation<SharpeRatioResult>(input, defaultPeriods);
-    return new SharpeRatioCalculation(input, defaultPeriods, tBills, standardDeviationCalculation);
+    return new SharpeRatioCalculation(input, defaultPeriods, tBills, standardDeviationCalculation)
+        .calculate(command.getPeriods());
   }
 
 }

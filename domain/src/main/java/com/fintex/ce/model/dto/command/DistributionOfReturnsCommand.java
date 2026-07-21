@@ -1,5 +1,6 @@
 package com.fintex.ce.model.dto.command;
 
+import com.fintex.ce.model.dto.command.contract.CustomPsdProvider;
 import com.fintex.ce.model.error.ErrorCode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

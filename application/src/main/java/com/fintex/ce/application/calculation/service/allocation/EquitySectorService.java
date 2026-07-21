@@ -2,13 +2,15 @@ package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.mapping.response.EquitySectorResponseMapper;
 import com.fintex.ce.application.util.ExposureDataHolder;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
@@ -29,15 +31,14 @@ import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 @Service
 public class EquitySectorService
     extends
-      BreakdownAbstractService<EquitySectorResult, EquitySectorAllocationType> {
+      BreakdownAbstractService<Map<PortfolioHolding, EquitySector>, EquitySectorResult, EquitySectorAllocationType>
+    implements
+      SingleAttributeCalculationService<PortfolioHoldingsCommand, EquitySector, EquitySectorResult> {
 
-  private final SecurityDataFetcher<EquitySector> equitySectorSecurityDataFetcher;
   private final EquitySectorResponseMapper responseMapper;
 
-  public EquitySectorService(final SecurityDataFetcher<EquitySector> equitySectorSecurityDataFetcher,
-      final EquitySectorResponseMapper responseMapper) {
+  public EquitySectorService(final EquitySectorResponseMapper responseMapper) {
     super();
-    this.equitySectorSecurityDataFetcher = equitySectorSecurityDataFetcher;
     this.responseMapper = responseMapper;
   }
 
@@ -47,6 +48,15 @@ public class EquitySectorService
   }
 
   @Override
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.EQUITY_SECTOR_ALLOCATION;
+  }
+
+  @Override
+  public EquitySectorResult perform(PortfolioHoldingsCommand command, Map<PortfolioHolding, EquitySector> data) {
+    return calculate(fetchExposures(command, data), command.getHoldings());
+  }
+
   public EquitySectorResult calculate(ExposureDataHolder<EquitySectorAllocationType> exposureData,
       List<PortfolioHolding> holdings) {
     var sectors = exposureData.allocations();
@@ -59,10 +69,9 @@ public class EquitySectorService
     return responseMapper.fromNetProducts(netProducts, warnings);
   }
 
-  @Override
-  public ExposureDataHolder<EquitySectorAllocationType> fetchExposures(final PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, EquitySector> rawData = equitySectorSecurityDataFetcher.fetch(command.getHoldings(),
-        command.getDataProviders());
+  public ExposureDataHolder<EquitySectorAllocationType> fetchExposures(final PortfolioHoldingsCommand command,
+      final Map<PortfolioHolding, EquitySector> data) {
+    Map<PortfolioHolding, EquitySector> rawData = FilterUtils.restrictToHoldings(data, command.getHoldings());
     List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, Map<EquitySectorAllocationType, BigDecimal>> exposures = command.getHoldings().stream()
         .filter(CASH_PREDICATE.or(GIC_PREDICATE).negate())

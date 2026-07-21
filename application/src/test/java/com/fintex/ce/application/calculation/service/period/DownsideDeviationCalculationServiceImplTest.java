@@ -1,7 +1,9 @@
 package com.fintex.ce.application.calculation.service.period;
 
+import com.fintex.ce.application.calculation.metric.DownsideDeviationCalculation;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -17,13 +19,14 @@ import java.util.TreeMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 class DownsideDeviationCalculationServiceImplTest {
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyDefineCalculationMethod() {
+  void shouldPerform_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(DownsideDeviationCalculationServiceImpl.class, withSettings()
         .useConstructor(null, null, tBillsFetcher, Set.of()));
@@ -33,15 +36,17 @@ class DownsideDeviationCalculationServiceImplTest {
         BigDecimal.TEN));
 
     final var req = mock(PeriodCommand.class);
-    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any(), any())).thenReturn(benchmarkContext);
     when(req.getCurrency()).thenReturn(Currency.CAD);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
     when(tBillsFetcher.fetch(Currency.CAD)).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(service).defineCalculationMethod(req);
-    service.defineCalculationMethod(req);
+    doCallRealMethod().when(service).perform(req, PortfolioBenchmarkReturns.EMPTY);
+    try (var ignored = mockConstruction(DownsideDeviationCalculation.class)) {
+      service.perform(req, PortfolioBenchmarkReturns.EMPTY);
+    }
 
-    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_ONE);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_ONE, PortfolioBenchmarkReturns.EMPTY);
   }
 }

@@ -3,13 +3,15 @@ package com.fintex.ce.application.calculation.service.fee;
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.Conversion;
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.CurrencyValue;
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
+import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.Notification;
 
@@ -45,11 +47,11 @@ import static java.math.BigDecimal.ZERO;
  * the per-metric pieces (which fee fields to read, how to aggregate, and which response shape to populate).
  *
  * @param <R>
- *          per-metric result type returned by {@link #perform(AverageMerCommand)}.
+ *          per-metric result type returned by {@link #perform(AverageMerCommand, Map)}.
  */
 public abstract class AbstractFeeCalculationService<R extends BaseCalculationResult>
     implements
-      CalculationService<AverageMerCommand, R> {
+      SingleAttributeCalculationService<AverageMerCommand, FeeData, R> {
 
   protected final DefaultTargetCurrencyConverter defaultTargetCurrencyConverter;
 
@@ -64,8 +66,16 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
   protected abstract AverageManagementExpenseCalculation mapFeeDataToCalculation(PortfolioHolding holding,
       FeeData fees);
 
-  protected abstract Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> fetchData(
-      AverageMerCommand command);
+  @Override
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.FEES;
+  }
+
+  protected Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> fetchData(
+      AverageMerCommand command, Map<PortfolioHolding, FeeData> data) {
+    Map<PortfolioHolding, FeeData> rawData = FilterUtils.restrictToHoldings(data, command.getHoldings());
+    return groupAndMap(rawData, command.getHoldings());
+  }
 
   /**
    * Groups raw fee data by holding type and maps to calculation entries.
@@ -116,10 +126,10 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
   protected abstract void nullOutEmptyFundModes(R response, AverageMerCommand command);
 
   @Override
-  public R perform(AverageMerCommand command) {
+  public R perform(AverageMerCommand command, Map<PortfolioHolding, FeeData> data) {
     validateHoldingTypes(command.getHoldings());
     Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations = fetchData(
-        command);
+        command, data);
 
     List<Notification> warnings = new ArrayList<>(resolveFees(calculations));
     warnings.addAll(applyValueFxConversion(calculations, command));

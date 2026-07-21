@@ -16,6 +16,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.PeriodResult;
@@ -64,16 +65,17 @@ class BenchmarkWeightedAverageAlignmentTest {
     CpedTestService service = new CpedTestService(portfolioProvider, benchmarkProvider, portfolioPipeline,
         benchmarkPipeline);
     PeriodCommand command = periodCommand();
+    PortfolioBenchmarkReturns returnsData = new PortfolioBenchmarkReturns(Map.of(), Map.of());
 
-    when(portfolioProvider.get(command.getHoldings(), command.getCurrency())).thenReturn(context(ReturnsRole.PORTFOLIO,
-        PORTFOLIO_HOLDING, JAN_2020, FEB_2020, MAR_2020, APR_2020));
-    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency())).thenReturn(context(
-        ReturnsRole.BENCHMARK, BENCHMARK_HOLDING, FEB_2020, MAR_2020, APR_2020, MAY_2020));
+    when(portfolioProvider.get(command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns()))
+        .thenReturn(context(ReturnsRole.PORTFOLIO, PORTFOLIO_HOLDING, JAN_2020, FEB_2020, MAR_2020, APR_2020));
+    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency(), returnsData.benchmarkReturns()))
+        .thenReturn(context(ReturnsRole.BENCHMARK, BENCHMARK_HOLDING, FEB_2020, MAR_2020, APR_2020, MAY_2020));
     when(portfolioPipeline.run(any(), any())).thenReturn(weightedAverageResult(FEB_2020, MAR_2020, APR_2020));
     when(benchmarkPipeline.run(any(), any())).thenReturn(weightedAverageResult(FEB_2020, MAR_2020, APR_2020));
 
     BenchmarkPeriodCalculationInput result = service.buildPeriodCalculationInput(command,
-        ReturnFactorScale.SCALE_OF_TWO);
+        ReturnFactorScale.SCALE_OF_TWO, returnsData);
 
     ArgumentCaptor<MonthlyReturnsContext<HoldingMonthlyReturns>> portfolioContextCaptor = monthlyContextCaptor();
     ArgumentCaptor<MonthlyReturnsContext<HoldingMonthlyReturns>> benchmarkContextCaptor = monthlyContextCaptor();
@@ -106,15 +108,16 @@ class BenchmarkWeightedAverageAlignmentTest {
     CpsdCpedTestService service = new CpsdCpedTestService(portfolioProvider, benchmarkProvider, portfolioPipeline,
         benchmarkPipeline);
     RollingCalculationCommand command = rollingCommand();
+    PortfolioBenchmarkReturns returnsData = new PortfolioBenchmarkReturns(Map.of(), Map.of());
 
-    when(portfolioProvider.get(command.getHoldings(), command.getCurrency())).thenReturn(context(ReturnsRole.PORTFOLIO,
-        PORTFOLIO_HOLDING, JAN_2020, FEB_2020, MAR_2020, APR_2020));
-    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency())).thenReturn(context(
-        ReturnsRole.BENCHMARK, BENCHMARK_HOLDING, FEB_2020, MAR_2020, APR_2020, MAY_2020));
+    when(portfolioProvider.get(command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns()))
+        .thenReturn(context(ReturnsRole.PORTFOLIO, PORTFOLIO_HOLDING, JAN_2020, FEB_2020, MAR_2020, APR_2020));
+    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency(), returnsData.benchmarkReturns()))
+        .thenReturn(context(ReturnsRole.BENCHMARK, BENCHMARK_HOLDING, FEB_2020, MAR_2020, APR_2020, MAY_2020));
     when(portfolioPipeline.run(any(), any())).thenReturn(weightedAverageResult(MAR_2020, APR_2020));
     when(benchmarkPipeline.run(any(), any())).thenReturn(weightedAverageResult(MAR_2020, APR_2020));
 
-    BenchmarkPeriodCalculationInput result = service.buildBenchmarkInput(command, ReturnFactorScale.AS_IS);
+    BenchmarkPeriodCalculationInput result = service.buildBenchmarkInput(command, ReturnFactorScale.AS_IS, returnsData);
 
     ArgumentCaptor<MonthlyReturnsContext<HoldingMonthlyReturns>> portfolioContextCaptor = monthlyContextCaptor();
     ArgumentCaptor<MonthlyReturnsContext<HoldingMonthlyReturns>> benchmarkContextCaptor = monthlyContextCaptor();
@@ -206,6 +209,11 @@ class BenchmarkWeightedAverageAlignmentTest {
     }
 
     @Override
+    public PeriodResult perform(PeriodCommand command, PortfolioBenchmarkReturns returnsData) {
+      return new PeriodResult();
+    }
+
+    @Override
     public CalculationMetric getMetric() {
       return CalculationMetric.INFORMATION_RATIO;
     }
@@ -224,7 +232,7 @@ class BenchmarkWeightedAverageAlignmentTest {
     }
 
     @Override
-    public PeriodResult perform(RollingCalculationCommand command) {
+    public PeriodResult perform(RollingCalculationCommand command, PortfolioBenchmarkReturns returnsData) {
       return new PeriodResult();
     }
 

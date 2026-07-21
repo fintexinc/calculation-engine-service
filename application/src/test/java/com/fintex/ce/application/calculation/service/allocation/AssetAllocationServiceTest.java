@@ -10,15 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static java.math.BigDecimal.ONE;
 
 class AssetAllocationServiceTest extends AbstractAssetAllocationServiceTest<AssetAllocationResult> {
 
   @Override
   protected AbstractAssetAllocationService<AssetAllocationResult> createService() {
-    return new AssetAllocationService(assetAllocationFetcher, geographyFetcher, portfolioWeightCalculator,
-        DEFAULT_DATA_PROPERTIES);
+    return new AssetAllocationService(portfolioWeightCalculator);
   }
 
   @Override

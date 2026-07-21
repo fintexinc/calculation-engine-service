@@ -2,13 +2,15 @@ package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.mapping.response.FixedIncomeSectorResponseMapper;
 import com.fintex.ce.application.util.ExposureDataHolder;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSector;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
@@ -31,16 +33,14 @@ import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 @Service
 public class FixedIncomeBondSectorService
     extends
-      BreakdownAbstractService<FixedIncomeSectorResult, FixedIncomeSectorAllocationType> {
+      BreakdownAbstractService<Map<PortfolioHolding, FixedIncomeBondSector>, FixedIncomeSectorResult, FixedIncomeSectorAllocationType>
+    implements
+      SingleAttributeCalculationService<PortfolioHoldingsCommand, FixedIncomeBondSector, FixedIncomeSectorResult> {
 
-  private final SecurityDataFetcher<FixedIncomeBondSector> fixedIncomeBondSectorSecurityDataFetcher;
   private final FixedIncomeSectorResponseMapper responseMapper;
 
-  public FixedIncomeBondSectorService(
-      final SecurityDataFetcher<FixedIncomeBondSector> fixedIncomeBondSectorSecurityDataFetcher,
-      final FixedIncomeSectorResponseMapper responseMapper) {
+  public FixedIncomeBondSectorService(final FixedIncomeSectorResponseMapper responseMapper) {
     super();
-    this.fixedIncomeBondSectorSecurityDataFetcher = fixedIncomeBondSectorSecurityDataFetcher;
     this.responseMapper = responseMapper;
   }
 
@@ -50,10 +50,14 @@ public class FixedIncomeBondSectorService
   }
 
   @Override
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.FIXED_INCOME_SECTOR_ALLOCATION;
+  }
+
   public ExposureDataHolder<FixedIncomeSectorAllocationType> fetchExposures(
-      final PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, FixedIncomeBondSector> rawData = fixedIncomeBondSectorSecurityDataFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+      final PortfolioHoldingsCommand command, final Map<PortfolioHolding, FixedIncomeBondSector> data) {
+    Map<PortfolioHolding, FixedIncomeBondSector> rawData = FilterUtils.restrictToHoldings(data,
+        command.getHoldings());
     List<Notification> warnings = new ArrayList<>();
     Map<PortfolioHolding, Map<FixedIncomeSectorAllocationType, BigDecimal>> exposures = command.getHoldings()
         .stream()
@@ -89,6 +93,11 @@ public class FixedIncomeBondSectorService
   }
 
   @Override
+  public FixedIncomeSectorResult perform(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, FixedIncomeBondSector> data) {
+    return calculate(fetchExposures(command, data), command.getHoldings());
+  }
+
   public FixedIncomeSectorResult calculate(
       final ExposureDataHolder<FixedIncomeSectorAllocationType> exposureData,
       final List<PortfolioHolding> holdings) {

@@ -1,0 +1,136 @@
+{
+  "currency": "CAD",
+  "dataProviders": ["MORNINGSTAR"],
+  "holdings": [
+    {
+      "holdingType": "CASH",
+      "value": 4000.00,
+      "securityIdentifier": {
+        "id": "CASH-CAD",
+        "idType": "TICKER"
+      },
+      "currency": "CAD"
+    },
+    {
+      "holdingType": "GIC",
+      "value": 25000.00,
+      "securityIdentifier": {
+        "id": "GIC-TD-5Y",
+        "idType": "TICKER"
+      },
+      "currency": "CAD",
+      "investmentDate": "2022-06-01",
+      "clientIntRate": 4.95,
+      "interestFreq": "ANNUAL",
+      "term": 1825,
+      "name": "TD 5-Year GIC"
+    },
+    {
+      "holdingType": "GIC",
+      "value": 15000.00,
+      "securityIdentifier": {
+        "id": "GIC-BMO-2Y",
+        "idType": "TICKER"
+      },
+      "currency": "CAD",
+      "investmentDate": "2024-12-10",
+      "clientIntRate": 4.40,
+      "interestFreq": "ANNUAL",
+      "term": 730,
+      "name": "BMO 2-Year GIC"
+    },
+    {
+      "holdingType": "FIXED_INCOME",
+      "value": 30000.00,
+      "securityIdentifier": {
+        "id": "US91282CHA13",
+        "idType": "ISIN"
+      }
+    },
+    {
+      "holdingType": "FIXED_INCOME",
+      "value": 18000.00,
+      "securityIdentifier": {
+        "id": "CA135087Q558",
+        "idType": "ISIN"
+      }
+    },
+    {
+      "holdingType": "STOCK_CANADA",
+      "value": 6000.00,
+      "securityIdentifier": {
+        "id": "ENB.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK_CANADA",
+      "value": 4500.00,
+      "securityIdentifier": {
+        "id": "ENB-PFK.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK_CANADA",
+      "value": 3800.00,
+      "securityIdentifier": {
+        "id": "TRP-PD.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 12000.00,
+      "securityIdentifier": {
+        "id": "USFR",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 5500.00,
+      "securityIdentifier": {
+        "id": "FTLS",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND_CANADA",
+      "value": 11000.00,
+      "securityIdentifier": {
+        "id": "F00000MBXQ",
+        "idType": "MORNINGSTAR_ID"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND_CANADA",
+      "value": 8000.00,
+      "securityIdentifier": {
+        "id": "F00000MBXR",
+        "idType": "MORNINGSTAR_ID"
+      }
+    }
+  ],
+  "commands": [
+    {
+      "metric": "fixed-income-bond-sector"
+    },
+    {
+      "metric": "fixed-income-credit-quality"
+    },
+    {
+      "metric": "maturity-allocation"
+    },
+    {
+      "metric": "fixed-income-geographic-exposure"
+    },
+    {
+      "metric": "fees",
+      "parameterTypes": ["scaled", "absolute"]
+    }
+  ]
+}

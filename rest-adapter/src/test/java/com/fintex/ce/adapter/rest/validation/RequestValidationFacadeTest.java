@@ -27,9 +27,9 @@ class RequestValidationFacadeTest {
   @Test
   void shouldNotThrow_whenNoValidatorsRegisteredForMetric() {
     RequestValidationFacade facade = new RequestValidationFacade(List.of());
-    PeriodCommand command = new PeriodCommand();
+    PeriodCommand command = periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS);
 
-    assertThatCode(() -> facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS))
+    assertThatCode(() -> facade.validate(command))
         .doesNotThrowAnyException();
   }
 
@@ -40,9 +40,9 @@ class RequestValidationFacadeTest {
     doNothing().when(validator).validate(any());
 
     RequestValidationFacade facade = new RequestValidationFacade(List.of(validator));
-    PeriodCommand command = new PeriodCommand();
+    PeriodCommand command = periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS);
 
-    facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS);
+    facade.validate(command);
 
     verify(validator).validate(command);
   }
@@ -60,9 +60,9 @@ class RequestValidationFacadeTest {
     doThrow(error2).when(validator2).validate(any());
 
     RequestValidationFacade facade = new RequestValidationFacade(List.of(validator1, validator2));
-    PeriodCommand command = new PeriodCommand();
+    PeriodCommand command = periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS);
 
-    assertThatThrownBy(() -> facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS))
+    assertThatThrownBy(() -> facade.validate(command))
         .isInstanceOf(CalculationsFailedException.class)
         .satisfies(ex -> {
           CalculationsFailedException composite = (CalculationsFailedException) ex;
@@ -81,9 +81,9 @@ class RequestValidationFacadeTest {
     doNothing().when(validator2).validate(any());
 
     RequestValidationFacade facade = new RequestValidationFacade(List.of(validator1, validator2));
-    PeriodCommand command = new PeriodCommand();
+    PeriodCommand command = periodCommand(CalculationMetric.SHARPE_RATIO);
 
-    assertThatCode(() -> facade.validate(command, CalculationMetric.SHARPE_RATIO))
+    assertThatCode(() -> facade.validate(command))
         .doesNotThrowAnyException();
 
     verify(validator1).validate(command);
@@ -98,11 +98,17 @@ class RequestValidationFacadeTest {
     when(sharpeValidator.supportedMetrics()).thenReturn(List.of(CalculationMetric.SHARPE_RATIO));
 
     RequestValidationFacade facade = new RequestValidationFacade(List.of(trailingValidator, sharpeValidator));
-    PeriodCommand command = new PeriodCommand();
+    PeriodCommand command = periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS);
 
-    facade.validate(command, CalculationMetric.TRAILING_TOTAL_RETURNS);
+    facade.validate(command);
 
     verify(trailingValidator).validate(command);
     verify(sharpeValidator, never()).validate(any(CalculationCommand.class));
+  }
+
+  private static PeriodCommand periodCommand(CalculationMetric metric) {
+    PeriodCommand command = new PeriodCommand();
+    command.setMetric(metric);
+    return command;
   }
 }

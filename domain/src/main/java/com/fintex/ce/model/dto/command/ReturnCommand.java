@@ -1,5 +1,8 @@
 package com.fintex.ce.model.dto.command;
 
+import com.fintex.ce.model.dto.command.contract.CustomPedProvider;
+import com.fintex.ce.model.dto.command.contract.CustomPsdProvider;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -8,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "Command for return-based calculations with custom date range. Supports metrics: annual-return, growth-of-10k")
-public class ReturnCommand extends PortfolioCommand
+public class ReturnCommand extends PortfolioBenchmarkCommand
     implements
       CustomPsdProvider,
       CustomPedProvider {

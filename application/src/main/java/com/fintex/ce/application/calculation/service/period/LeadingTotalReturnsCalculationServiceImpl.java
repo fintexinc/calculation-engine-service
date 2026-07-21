@@ -10,6 +10,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.LeadingTotalReturnCommand;
@@ -42,11 +43,12 @@ public class LeadingTotalReturnsCalculationServiceImpl
   }
 
   @Override
-  public LeadingTotalReturnsResult perform(LeadingTotalReturnCommand command) {
+  public LeadingTotalReturnsResult perform(LeadingTotalReturnCommand command,
+      PortfolioBenchmarkReturns returnsData) {
     // Leading-returns is open-ended forward: it intentionally ignores the command's CPED and passes null to the
     // pipeline so no end-date trim is applied. That's why we don't reuse the inherited buildPeriodCalculationInput.
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
     WeightedAverageResult<HoldingMonthlyReturns> result = portfolioWeightedAverageWithCpsdAndCped.run(portfolioContext,
         new CpsdCpedScaleParams(command.getCustomPsd(), null, ReturnFactorScale.SCALE_OF_TWO));
     PeriodCalculationInput input = new PeriodCalculationInput(result.weightedAverage());

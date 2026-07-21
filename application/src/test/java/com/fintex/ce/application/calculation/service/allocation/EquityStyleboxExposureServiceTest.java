@@ -7,8 +7,6 @@ import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.rating.StyleBoxType;
 
 import org.junit.jupiter.api.Assertions;
@@ -31,35 +29,30 @@ class EquityStyleboxExposureServiceTest {
 
   @Test
   void shouldFetch_whenCheckResult() {
-    final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
     final var service = mock(EquityStyleboxExposureService.class, withSettings()
-        .useConstructor(fetcher, responseMapper));
+        .useConstructor(responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
     final var command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holding));
-    when(command.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
     final var exposure = new EquityStyleboxExposure();
     exposure.setBoxValues(Map.of(StyleBoxType.LARGE_VALUE, BigDecimal.TEN));
-    final var rawData = Map.of(holding, exposure);
+    final var data = Map.of(holding, exposure);
 
-    when(fetcher.fetch(any(), any())).thenReturn(rawData);
-    doCallRealMethod().when(service).fetchExposures(any());
-    final var result = service.fetchExposures(command);
+    doCallRealMethod().when(service).fetchExposures(any(), any());
+    final var result = service.fetchExposures(command, data);
     final var actual = result.allocations();
 
     Assertions.assertEquals(1, actual.size());
     Assertions.assertTrue(actual.containsKey(holding));
-    verify(fetcher).fetch(List.of(holding), List.of(DataProvider.MORNINGSTAR));
   }
 
   @Test
   void shouldCalculate_whenVerifyCalculateNetProducts() {
-    final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
     final var service = mock(EquityStyleboxExposureService.class, withSettings()
-        .useConstructor(fetcher, responseMapper));
+        .useConstructor(responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
@@ -73,10 +66,9 @@ class EquityStyleboxExposureServiceTest {
 
   @Test
   void shouldCalculate_whenVerifyResponseMapperFromNetProducts() {
-    final var fetcher = mock(SecurityDataFetcher.class);
     final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
     final var service = mock(EquityStyleboxExposureService.class, withSettings()
-        .useConstructor(fetcher, responseMapper));
+        .useConstructor(responseMapper));
 
     final var holding = mock(PortfolioHolding.class);
     final var holdings = List.of(holding);
@@ -94,10 +86,9 @@ class EquityStyleboxExposureServiceTest {
   void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
     // SETUP
     try (final var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final var fetcher = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
       final var service = mock(EquityStyleboxExposureService.class, withSettings()
-          .useConstructor(fetcher, responseMapper));
+          .useConstructor(responseMapper));
       final var exposures = mock(Map.class);
 
       doCallRealMethod().when(service).calculate(any(), any());
@@ -110,10 +101,9 @@ class EquityStyleboxExposureServiceTest {
   @Test
   void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
     try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      final var fetcher = mock(SecurityDataFetcher.class);
       final var responseMapper = mock(EquityStyleboxExposureResponseMapper.class);
       final var service = mock(EquityStyleboxExposureService.class, withSettings()
-          .useConstructor(fetcher, responseMapper));
+          .useConstructor(responseMapper));
 
       final var exposures = mock(Map.class);
       final var expected = EquityStyleboxExposureResult.builder()

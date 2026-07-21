@@ -1,20 +1,24 @@
 package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.returns.ReturnsSnapshot;
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.ReturnsBasedCalculationService;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
+import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.error.PceExceptionCollector;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -22,7 +26,7 @@ import java.util.stream.Stream;
 @Service
 public class CommonPerformanceDateServiceImpl
     implements
-      CalculationService<MultiplePortfoliosCommand, CommonPerformanceDatesResult> {
+      ReturnsBasedCalculationService<MultiplePortfoliosCommand, CommonPerformanceDatesResult> {
 
   private final MonthlyReturnsService monthlyReturnsService;
 
@@ -36,16 +40,27 @@ public class CommonPerformanceDateServiceImpl
   }
 
   @Override
-  public CommonPerformanceDatesResult perform(MultiplePortfoliosCommand command) {
+  public List<CompositeSecurityAttribute> requiredAttributes() {
+    return List.of(CompositeSecurityAttribute.MONTHLY_RETURNS);
+  }
+
+  @Override
+  public PortfolioBenchmarkReturns prepareData(SecurityData securityData) {
+    return PortfolioBenchmarkReturns.from(securityData);
+  }
+
+  @Override
+  public CommonPerformanceDatesResult perform(MultiplePortfoliosCommand command,
+      PortfolioBenchmarkReturns returnsData) {
     List<PortfolioHolding> portfolioHoldings = collectAllPortfolioHoldings(command.getPortfolios());
 
     PceExceptionCollector collector = new PceExceptionCollector();
     ReturnsSnapshot<HoldingMonthlyReturns> portfolioSnapshot = collector.tryCatch(
-        () -> getPortfolioMonthlyReturns(portfolioHoldings));
+        () -> getPortfolioMonthlyReturns(portfolioHoldings, returnsData.portfolioReturns()));
     DateRange commonPerformanceDateForPortfolios = collector.tryCatch(
         () -> commonPerformanceDateFor(portfolioSnapshot));
     ReturnsSnapshot<HoldingMonthlyReturns> benchmarkSnapshot = collector.tryCatch(
-        () -> getPortfolioMonthlyReturns(command.getBenchmarkHoldings()));
+        () -> getPortfolioMonthlyReturns(command.getBenchmarkHoldings(), returnsData.benchmarkReturns()));
     DateRange commonPerformanceDatesForBenchmarks = collector.tryCatch(
         () -> commonPerformanceDateFor(benchmarkSnapshot));
     collector.throwIfAny();
@@ -79,10 +94,11 @@ public class CommonPerformanceDateServiceImpl
     return new DateRange(snapshot.performanceStartDate(), snapshot.performanceEndDate());
   }
 
-  ReturnsSnapshot<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<PortfolioHolding> holdings) {
+  ReturnsSnapshot<HoldingMonthlyReturns> getPortfolioMonthlyReturns(List<PortfolioHolding> holdings,
+      Map<PortfolioHolding, HoldingMonthlyReturns> monthlyReturns) {
     if (CollectionUtils.isEmpty(holdings)) {
       return ReturnsSnapshot.empty();
     }
-    return monthlyReturnsService.getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(holdings);
+    return monthlyReturnsService.getMonthlyReturnsOnlyWithReturnsValidation(holdings, monthlyReturns);
   }
 }

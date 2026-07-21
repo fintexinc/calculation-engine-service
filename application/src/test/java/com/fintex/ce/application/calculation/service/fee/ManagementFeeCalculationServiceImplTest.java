@@ -8,7 +8,6 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.exceptions.CalculationException;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -23,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.fintex.ce.application.util.TestConstants.DEFAULT_DATA_PROPERTIES;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,15 +31,13 @@ import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings("unchecked")
 class ManagementFeeCalculationServiceImplTest {
 
-  private final SecurityDataFetcher<FeeData> feesFetcher = mock(SecurityDataFetcher.class);
   private final FxRateService fxRateService = mock(FxRateService.class);
   private final DefaultTargetCurrencyConverter defaultTargetCurrencyConverter = new DefaultTargetCurrencyConverter(
       fxRateService, new FxProperties());
-  private final ManagementFeeCalculationServiceImpl service = new ManagementFeeCalculationServiceImpl(feesFetcher,
-      DEFAULT_DATA_PROPERTIES, defaultTargetCurrencyConverter);
+  private final ManagementFeeCalculationServiceImpl service = new ManagementFeeCalculationServiceImpl(
+      defaultTargetCurrencyConverter);
 
   {
     // Default: identity FX so single-currency tests stay focused on fee math.
@@ -54,13 +50,14 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void fundsOnly_returnsManagementFeeAverageOverFundHoldings() {
     PortfolioHolding fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
-    when(feesFetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementFee(new BigDecimal("0.015"))
             .currency(Currency.CAD)
-            .build()));
+            .build());
 
-    ManagementFeeResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY, WHOLE_PORTFOLIO));
+    ManagementFeeResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY, WHOLE_PORTFOLIO),
+        securityData);
 
     assertThat(result.getManagementFee().get(FUNDS_ONLY)).isEqualByComparingTo("0.015");
   }
@@ -69,13 +66,13 @@ class ManagementFeeCalculationServiceImplTest {
   void wholePortfolio_dilutesByNonFundHoldings() {
     PortfolioHolding fund = holding("CIG-002", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
     PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "100");
-    when(feesFetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementFee(new BigDecimal("0.020"))
             .currency(Currency.CAD)
-            .build()));
+            .build());
 
-    ManagementFeeResult result = service.perform(commandFor(List.of(fund, stock), WHOLE_PORTFOLIO));
+    ManagementFeeResult result = service.perform(commandFor(List.of(fund, stock), WHOLE_PORTFOLIO), securityData);
 
     assertThat(result.getManagementFee().get(WHOLE_PORTFOLIO)).isEqualByComparingTo("0.01");
   }
@@ -89,15 +86,16 @@ class ManagementFeeCalculationServiceImplTest {
   void wholePortfolio_dilutesEvenWhenSmsReturnsRowForNonFundHolding() {
     PortfolioHolding fund = holding("CIG-DIL", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
     PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "100");
-    when(feesFetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementFee(new BigDecimal("0.020"))
             .currency(Currency.CAD)
             .build(),
         // SMS returns a row for the stock too — empty fee fields but currency present.
-        stock, FeeData.builder().currency(Currency.USD).build()));
+        stock, FeeData.builder().currency(Currency.USD).build());
 
-    ManagementFeeResult result = service.perform(commandFor(List.of(fund, stock), FUNDS_ONLY, WHOLE_PORTFOLIO));
+    ManagementFeeResult result = service.perform(commandFor(List.of(fund, stock), FUNDS_ONLY, WHOLE_PORTFOLIO),
+        securityData);
 
     assertThat(result.getManagementFee().get(FUNDS_ONLY)).isEqualByComparingTo("0.020");
     // Without the fix, WHOLE_PORTFOLIO would also be 0.020 (stock dropped from denominator).
@@ -107,10 +105,10 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void missingManagementFeeOnFund_throws() {
     PortfolioHolding fund = holding("CIG-003", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
-    when(feesFetcher.fetch(any(), any())).thenReturn(Map.of(
-        fund, FeeData.builder().currency(Currency.CAD).build()));
+    Map<PortfolioHolding, FeeData> securityData = Map.of(
+        fund, FeeData.builder().currency(Currency.CAD).build());
 
-    assertThatThrownBy(() -> service.perform(commandFor(List.of(fund), FUNDS_ONLY)))
+    assertThatThrownBy(() -> service.perform(commandFor(List.of(fund), FUNDS_ONLY), securityData))
         .isInstanceOf(CalculationException.class)
         .hasMessageContaining("missing Management Fee");
   }
@@ -118,9 +116,9 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void fundsOnly_isNulled_whenPortfolioHasNoFundHoldings() {
     PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "100");
-    when(feesFetcher.fetch(any(), any())).thenReturn(Map.of());
 
-    ManagementFeeResult result = service.perform(commandFor(List.of(stock), FUNDS_ONLY, WHOLE_PORTFOLIO));
+    ManagementFeeResult result = service.perform(commandFor(List.of(stock), FUNDS_ONLY, WHOLE_PORTFOLIO),
+        Map.of());
 
     assertThat(result.getManagementFee().get(FUNDS_ONLY)).isNull();
     assertThat(result.getManagementFee().get(WHOLE_PORTFOLIO)).isEqualByComparingTo("0");
@@ -132,7 +130,7 @@ class ManagementFeeCalculationServiceImplTest {
     // Weighted MF = (1350 * 0.005 + 1000 * 0.015) / 2350 = (6.75 + 15) / 2350 = 21.75 / 2350.
     PortfolioHolding usFund = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND_US, "1000");
     PortfolioHolding caFund = holding("CIG-XCAD", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1000");
-    when(feesFetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, FeeData> securityData = Map.of(
         usFund, FeeData.builder()
             .managementFee(new BigDecimal("0.005"))
             .currency(Currency.USD)
@@ -140,12 +138,12 @@ class ManagementFeeCalculationServiceImplTest {
         caFund, FeeData.builder()
             .managementFee(new BigDecimal("0.015"))
             .currency(Currency.CAD)
-            .build()));
+            .build());
     when(fxRateService.spotRates(anySet(), any(), any())).thenReturn(Map.of(
         Currency.USD, new BigDecimal("1.35"),
         Currency.CAD, BigDecimal.ONE));
 
-    ManagementFeeResult result = service.perform(commandFor(List.of(usFund, caFund), FUNDS_ONLY));
+    ManagementFeeResult result = service.perform(commandFor(List.of(usFund, caFund), FUNDS_ONLY), securityData);
 
     // 21.75 / 2350 ≈ 0.00925531914893617; toUserScale truncates to 10 fractional digits.
     assertThat(result.getManagementFee().get(FUNDS_ONLY)).isEqualByComparingTo("0.0092553191");
@@ -155,18 +153,18 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void usdFund_fxUnavailable_emitsWarning_andComputesUnconverted() {
     PortfolioHolding usFund = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND_US, "1000");
-    when(feesFetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, FeeData> securityData = Map.of(
         usFund, FeeData.builder()
             .managementFee(new BigDecimal("0.015"))
             .currency(Currency.USD)
-            .build()));
+            .build());
     when(fxRateService.spotRates(anySet(), any(), any())).thenAnswer(inv -> {
       Map<Currency, BigDecimal> m = new HashMap<>();
       m.put(Currency.USD, null);
       return m;
     });
 
-    ManagementFeeResult result = service.perform(commandFor(List.of(usFund), FUNDS_ONLY));
+    ManagementFeeResult result = service.perform(commandFor(List.of(usFund), FUNDS_ONLY), securityData);
 
     assertThat(result.getManagementFee().get(FUNDS_ONLY)).isEqualByComparingTo("0.015");
     assertThat(result.getWarnings()).extracting("code").contains("FX-001");
@@ -175,13 +173,13 @@ class ManagementFeeCalculationServiceImplTest {
   @Test
   void merBearingHoldingWithMissingCurrency_throws() {
     PortfolioHolding fund = holding("CIG-NOCURR", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1000");
-    when(feesFetcher.fetch(any(), any())).thenReturn(Map.of(
+    Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementFee(new BigDecimal("0.015"))
             // currency intentionally null
-            .build()));
+            .build());
 
-    assertThatThrownBy(() -> service.perform(commandFor(List.of(fund), FUNDS_ONLY)))
+    assertThatThrownBy(() -> service.perform(commandFor(List.of(fund), FUNDS_ONLY), securityData))
         .isInstanceOf(CalculationException.class)
         .hasMessageContaining("missing Currency");
   }

@@ -2,24 +2,24 @@ package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
-import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.application.util.ExposureDataHolder;
+import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.allocation.RegionDatapoint;
 import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.financial.Geography;
 import com.fintex.wm.commons.error.Notification;
 
@@ -35,7 +35,7 @@ import static com.fintex.ce.application.util.PortfolioUtils.calculateInitialPort
 import static com.fintex.ce.util.FilterUtils.CASH_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
-import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
+import static com.fintex.ce.util.FilterUtils.restrictToHoldings;
 
 /**
  * Shared implementation for asset-allocation breakdown services. Resolves each holding's region — stocks via
@@ -53,36 +53,36 @@ import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
  */
 public abstract class AbstractAssetAllocationService<R extends BaseCalculationResult>
     extends
-      BreakdownAbstractService<R, AssetAllocationRegionType> {
+      BreakdownAbstractService<AssetAllocationData, R, AssetAllocationRegionType> {
 
   private static final BigDecimal NEAR_ZERO_THRESHOLD = new BigDecimal("0.00001");
 
-  protected final SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher;
-  protected final SecurityDataFetcher<Geography> geographyFetcher;
   protected final PortfolioWeightCalculator portfolioWeightCalculator;
-  protected final DefaultDataProperties defaultDataProperties;
 
-  protected AbstractAssetAllocationService(SecurityDataFetcher<HoldingAssetAllocation> assetAllocationFetcher,
-      SecurityDataFetcher<Geography> geographyFetcher, PortfolioWeightCalculator portfolioWeightCalculator,
-      DefaultDataProperties defaultDataProperties) {
-    this.assetAllocationFetcher = assetAllocationFetcher;
-    this.geographyFetcher = geographyFetcher;
+  protected AbstractAssetAllocationService(PortfolioWeightCalculator portfolioWeightCalculator) {
     this.portfolioWeightCalculator = portfolioWeightCalculator;
-    this.defaultDataProperties = defaultDataProperties;
   }
 
   @Override
-  public R perform(PortfolioHoldingsCommand command) {
+  public List<CompositeSecurityAttribute> requiredAttributes() {
+    return List.of(CompositeSecurityAttribute.ASSET_ALLOCATION, CompositeSecurityAttribute.GEOGRAPHY);
+  }
+
+  @Override
+  public AssetAllocationData prepareData(SecurityData securityData) {
+    return new AssetAllocationData(securityData.get(CompositeSecurityAttribute.ASSET_ALLOCATION),
+        securityData.get(CompositeSecurityAttribute.GEOGRAPHY));
+  }
+
+  @Override
+  public R perform(PortfolioHoldingsCommand command, AssetAllocationData data) {
     List<PortfolioHolding> holdings = command.getHoldings();
-    List<DataProvider> providers = getSpecifiedIfEmpty(command.getDataProviders(),
-        defaultDataProperties.getDataProviders());
     List<Notification> warnings = new ArrayList<>();
 
-    Map<PortfolioHolding, Geography> stockGeographies = geographyFetcher.fetch(
-        holdings.stream().filter(STOCK_PREDICATE).toList(), providers);
-    Map<PortfolioHolding, HoldingAssetAllocation> fundAllocations = assetAllocationFetcher.fetch(
-        holdings.stream().filter(STOCK_PREDICATE.or(CASH_PREDICATE).or(GIC_PREDICATE).negate()).toList(),
-        providers);
+    Map<PortfolioHolding, Geography> stockGeographies = restrictToHoldings(data.geographies(),
+        holdings.stream().filter(STOCK_PREDICATE).toList());
+    Map<PortfolioHolding, HoldingAssetAllocation> fundAllocations = restrictToHoldings(data.allocations(),
+        holdings.stream().filter(STOCK_PREDICATE.or(CASH_PREDICATE).or(GIC_PREDICATE).negate()).toList());
 
     Map<PortfolioHolding, Map<AssetAllocationRegionType, BigDecimal>> exposures = new HashMap<>();
     Map<PortfolioHolding, Currency> currencies = new HashMap<>();
@@ -101,18 +101,15 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
     return buildResult(netProducts, warnings);
   }
 
-  @Override
-  public ExposureDataHolder<AssetAllocationRegionType> fetchExposures(PortfolioHoldingsCommand command) {
+  public ExposureDataHolder<AssetAllocationRegionType> fetchExposures(PortfolioHoldingsCommand command,
+      AssetAllocationData data) {
     List<PortfolioHolding> holdings = command.getHoldings();
-    List<DataProvider> providers = getSpecifiedIfEmpty(command.getDataProviders(),
-        defaultDataProperties.getDataProviders());
     List<Notification> warnings = new ArrayList<>();
 
-    Map<PortfolioHolding, Geography> stockGeographies = geographyFetcher.fetch(
-        holdings.stream().filter(STOCK_PREDICATE).toList(), providers);
-    Map<PortfolioHolding, HoldingAssetAllocation> fundAllocations = assetAllocationFetcher.fetch(
-        holdings.stream().filter(STOCK_PREDICATE.or(CASH_PREDICATE).or(GIC_PREDICATE).negate()).toList(),
-        providers);
+    Map<PortfolioHolding, Geography> stockGeographies = restrictToHoldings(data.geographies(),
+        holdings.stream().filter(STOCK_PREDICATE).toList());
+    Map<PortfolioHolding, HoldingAssetAllocation> fundAllocations = restrictToHoldings(data.allocations(),
+        holdings.stream().filter(STOCK_PREDICATE.or(CASH_PREDICATE).or(GIC_PREDICATE).negate()).toList());
 
     Map<PortfolioHolding, Map<AssetAllocationRegionType, BigDecimal>> exposures = new HashMap<>();
     for (PortfolioHolding holding : holdings) {
@@ -132,7 +129,6 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
    * pre-normalized values to a single currency, or (c) the test isolates a single bucket and currency does not affect
    * the assertion. For multi-currency production portfolios, call {@link #perform} instead.
    */
-  @Override
   public R calculate(ExposureDataHolder<AssetAllocationRegionType> exposureData, List<PortfolioHolding> holdings) {
     Map<PortfolioHolding, BigDecimal> weights = calculateInitialPortfolioWeight(holdings);
     Map<AssetAllocationRegionType, BigDecimal> netProducts = aggregateWith(exposureData.allocations(), weights);

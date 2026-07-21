@@ -4,13 +4,15 @@ import com.fintex.ce.application.mapping.response.MaturityAllocationResponseMapp
 import com.fintex.ce.application.util.AllocationMappingUtils;
 import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocationType;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,19 +31,17 @@ import static java.util.stream.Collectors.toMap;
 @Deprecated
 public class MaturityAllocationService
     extends
-      BreakdownAbstractService<MaturityAllocationResult, MaturityAllocationType> {
+      BreakdownAbstractService<Map<PortfolioHolding, MaturityAllocation>, MaturityAllocationResult, MaturityAllocationType>
+    implements
+      SingleAttributeCalculationService<PortfolioHoldingsCommand, MaturityAllocation, MaturityAllocationResult> {
 
-  private final SecurityDataFetcher<MaturityAllocation> maturityAllocationSecurityDataFetcher;
   private final MaturityAllocationResponseMapper responseMapper;
 
   static final Map<MaturityAllocationType, BigDecimal> ALLOCATION_DEFAULT_MAP = Collections.unmodifiableMap(
       Stream.of(MaturityAllocationType.values()).collect(toMap(type -> type, type -> ZERO)));
 
-  public MaturityAllocationService(
-      final SecurityDataFetcher<MaturityAllocation> maturityAllocationSecurityDataFetcher,
-      final MaturityAllocationResponseMapper responseMapper) {
+  public MaturityAllocationService(final MaturityAllocationResponseMapper responseMapper) {
     super();
-    this.maturityAllocationSecurityDataFetcher = maturityAllocationSecurityDataFetcher;
     this.responseMapper = responseMapper;
   }
 
@@ -51,6 +51,16 @@ public class MaturityAllocationService
   }
 
   @Override
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.MATURITIES;
+  }
+
+  @Override
+  public MaturityAllocationResult perform(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, MaturityAllocation> data) {
+    return calculate(fetchExposures(command, data), command.getHoldings());
+  }
+
   public MaturityAllocationResult calculate(ExposureDataHolder<MaturityAllocationType> exposureData,
       List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
@@ -63,10 +73,9 @@ public class MaturityAllocationService
     return responseMapper.fromNetProducts(netProducts, warnings);
   }
 
-  @Override
-  public ExposureDataHolder<MaturityAllocationType> fetchExposures(PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, MaturityAllocation> rawData = maturityAllocationSecurityDataFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+  public ExposureDataHolder<MaturityAllocationType> fetchExposures(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, MaturityAllocation> data) {
+    Map<PortfolioHolding, MaturityAllocation> rawData = FilterUtils.restrictToHoldings(data, command.getHoldings());
     return AllocationMappingUtils.mapToAllocations(rawData,
         MaturityAllocation::getMaturityDurationValues,
         MaturityAllocationType::fromValue,

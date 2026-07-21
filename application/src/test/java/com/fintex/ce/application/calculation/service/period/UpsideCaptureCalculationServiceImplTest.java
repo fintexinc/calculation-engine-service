@@ -1,9 +1,11 @@
 package com.fintex.ce.application.calculation.service.period;
 
+import com.fintex.ce.application.calculation.metric.UpsideCaptureCalculation;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -17,6 +19,7 @@ import java.util.TreeMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -24,7 +27,7 @@ import static org.mockito.Mockito.withSettings;
 class UpsideCaptureCalculationServiceImplTest {
 
   @Test
-  void shouldDefineCalculationMethod_whenVerifyBuildPeriodCalculationInput() {
+  void shouldPerform_whenVerifyBuildPeriodCalculationInput() {
     final var portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
     final var benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
     final var service = mock(UpsideCaptureCalculationServiceImpl.class, withSettings()
@@ -35,13 +38,15 @@ class UpsideCaptureCalculationServiceImplTest {
 
     final var req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
-    when(service.buildPeriodCalculationInput(any(), any())).thenReturn(benchmarkContext);
+    when(service.buildPeriodCalculationInput(any(), any(), any())).thenReturn(benchmarkContext);
     when(benchmarkContext.getWeightedAveragePortfolioReturns()).thenReturn(weightedAverageReturns);
     when(benchmarkContext.getWeightedAverageBenchmarkReturns()).thenReturn(weightedAverageReturns);
 
-    doCallRealMethod().when(service).defineCalculationMethod(req);
-    service.defineCalculationMethod(req);
+    doCallRealMethod().when(service).perform(req, PortfolioBenchmarkReturns.EMPTY);
+    try (var ignored = mockConstruction(UpsideCaptureCalculation.class)) {
+      service.perform(req, PortfolioBenchmarkReturns.EMPTY);
+    }
 
-    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.AS_IS);
+    verify(service).buildPeriodCalculationInput(req, ReturnFactorScale.AS_IS, PortfolioBenchmarkReturns.EMPTY);
   }
 }

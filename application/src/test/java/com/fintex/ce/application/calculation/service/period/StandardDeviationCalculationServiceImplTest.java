@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.metric.StandardDeviationCalculation
 import com.fintex.ce.application.returns.WeightedAverageResult;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
@@ -11,6 +12,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -22,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -29,7 +32,7 @@ import static org.mockito.Mockito.withSettings;
 class StandardDeviationCalculationServiceImplTest {
 
   @Test
-  void shouldDefineCalculationMethod_whenWeightedAverageResultProvided() {
+  void shouldBuildStandardDeviationCalculation_whenWeightedAverageResultProvided() {
     var service = mock(StandardDeviationCalculationServiceImpl.class,
         withSettings().useConstructor(null, null, Set.of("12", "36", "60", "120")));
     var req = mock(PeriodCommand.class);
@@ -38,22 +41,21 @@ class StandardDeviationCalculationServiceImplTest {
     when(weightedAverageResult.snapshot()).thenReturn(snapshot);
     when(snapshot.warnings()).thenReturn(List.of());
     when(weightedAverageResult.weightedAverage()).thenReturn(new TreeMap<>());
-    when(service.buildWeightedAverageResult(any(), any())).thenReturn(weightedAverageResult);
+    when(service.buildWeightedAverageResult(any(), any(), any())).thenReturn(weightedAverageResult);
 
-    var expected = StandardDeviationCalculation.builder()
-        .input(new PeriodCalculationInput(new TreeMap<>()))
-        .defaultPeriods(Set.of("12", "36", "60", "120"))
-        .scale(OUTPUT_SCALE)
-        .build();
+    doCallRealMethod().when(service).perform(any(), any());
+    List<Object> constructorArgs = new ArrayList<>();
+    try (var ignored = mockConstruction(StandardDeviationCalculation.class,
+        (mocked, context) -> constructorArgs.addAll(context.arguments()))) {
+      service.perform(req, PortfolioBenchmarkReturns.EMPTY);
+    }
 
-    doCallRealMethod().when(service).defineCalculationMethod(any());
-    StandardDeviationCalculation actual = service.defineCalculationMethod(req);
-
-    assertEquals(expected, actual);
+    assertEquals(List.of(new PeriodCalculationInput(new TreeMap<>()), Set.of("12", "36", "60", "120"), OUTPUT_SCALE),
+        constructorArgs);
   }
 
   @Test
-  void shouldCallBuildWeightedAverageResultWithScaleOfTwo_whenDefiningCalculationMethod() {
+  void shouldCallBuildWeightedAverageResultWithScaleOfTwo_whenPerforming() {
     var service = mock(StandardDeviationCalculationServiceImpl.class,
         withSettings().useConstructor(null, null, Set.of()));
     var req = mock(PeriodCommand.class);
@@ -62,12 +64,14 @@ class StandardDeviationCalculationServiceImplTest {
     when(weightedAverageResult.snapshot()).thenReturn(snapshot);
     when(snapshot.warnings()).thenReturn(List.of());
     when(weightedAverageResult.weightedAverage()).thenReturn(new TreeMap<>());
-    when(service.buildWeightedAverageResult(any(), any())).thenReturn(weightedAverageResult);
+    when(service.buildWeightedAverageResult(any(), any(), any())).thenReturn(weightedAverageResult);
 
-    doCallRealMethod().when(service).defineCalculationMethod(any());
-    service.defineCalculationMethod(req);
+    doCallRealMethod().when(service).perform(any(), any());
+    try (var ignored = mockConstruction(StandardDeviationCalculation.class)) {
+      service.perform(req, PortfolioBenchmarkReturns.EMPTY);
+    }
 
-    verify(service).buildWeightedAverageResult(req, ReturnFactorScale.SCALE_OF_TWO);
+    verify(service).buildWeightedAverageResult(req, ReturnFactorScale.SCALE_OF_TWO, PortfolioBenchmarkReturns.EMPTY);
   }
 
   @Test
@@ -82,12 +86,12 @@ class StandardDeviationCalculationServiceImplTest {
     var snapshot = mock(com.fintex.ce.application.returns.ReturnsSnapshot.class);
     when(weightedAverageResult.snapshot()).thenReturn(snapshot);
     when(snapshot.warnings()).thenReturn(List.of(fxWarning));
-    when(service.buildWeightedAverageResult(any(), any())).thenReturn(weightedAverageResult);
+    when(service.buildWeightedAverageResult(any(), any(), any())).thenReturn(weightedAverageResult);
 
-    doCallRealMethod().when(service).defineCalculationMethod(any());
+    doCallRealMethod().when(service).perform(any(), any());
 
     CalculationException ex = assertThrows(CalculationException.class,
-        () -> service.defineCalculationMethod(req));
+        () -> service.perform(req, PortfolioBenchmarkReturns.EMPTY));
     assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.FX_RATES_UNAVAILABLE);
   }
 }

@@ -5,6 +5,7 @@ import com.fintex.ce.application.calculation.service.period.core.WeightedAverage
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
@@ -39,8 +40,9 @@ public class BestWorstPeriodsCalculationServiceImpl
   }
 
   @Override
-  public BestWorstPeriodsResult perform(BestWorstPeriodsCommand command) {
-    PeriodCalculationInput context = buildPeriodCalculationInput(command, SCALE_OF_TWO);
+  public BestWorstPeriodsResult perform(BestWorstPeriodsCommand command,
+      PortfolioBenchmarkReturns returnsData) {
+    PeriodCalculationInput context = buildPeriodCalculationInput(command, SCALE_OF_TWO, returnsData);
     return new BestWorstPeriodCalculation(context.getWeightedAveragePortfolioReturns(), getPeriods(command))
         .calculate();
   }

@@ -8,6 +8,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -42,13 +43,15 @@ public class SortinoRatioCalculationServiceImpl
   }
 
   @Override
-  public SortinoRatioCalculation defineCalculationMethod(final PeriodCommand command) {
-    final PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
+  public SortinoRatioResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
+    final PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE,
+        returnsData);
     final var tBills = TBillsValidator.requireNonEmpty(
-
         treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
     final DownsideDeviationCalculation<SortinoRatioResult> downsideDeviationCalculation = new DownsideDeviationCalculation<>(
         input, defaultPeriods, tBills);
-    return new SortinoRatioCalculation(input, defaultPeriods, tBills, downsideDeviationCalculation);
+    return new SortinoRatioCalculation(input, defaultPeriods, tBills, downsideDeviationCalculation)
+        .calculate(command.getPeriods());
   }
 }

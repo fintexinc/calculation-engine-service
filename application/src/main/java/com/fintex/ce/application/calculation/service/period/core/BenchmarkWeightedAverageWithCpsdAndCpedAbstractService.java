@@ -10,9 +10,10 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.dto.command.CustomPsdProvider;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.dto.command.contract.CustomPsdProvider;
 import com.fintex.ce.model.error.PceExceptionCollector;
 
 import java.time.LocalDate;
@@ -40,17 +41,21 @@ public abstract class BenchmarkWeightedAverageWithCpsdAndCpedAbstractService<C e
   }
 
   /**
-   * Fetches portfolio + benchmark contexts, aligns them to the common performance window, and runs the CPSD+CPED
-   * pipeline on each. Errors from any of the four steps (two fetches + two pipeline runs) are collected so the caller
-   * sees the full picture rather than just the first failure.
+   * Builds portfolio + benchmark contexts from the supplied returns, aligns them to the common performance window
+   * (common start and end date), and runs the CPSD+CPED pipeline on each. Errors from any of the four steps (two
+   * context builds + two pipeline runs) are collected so the caller sees the full picture rather than just the first
+   * failure.
    */
-  protected BenchmarkPeriodCalculationInput buildBenchmarkInput(C command, ReturnFactorScale scale) {
+  protected BenchmarkPeriodCalculationInput buildBenchmarkInput(C command, ReturnFactorScale scale,
+      PortfolioBenchmarkReturns returnsData) {
     PceExceptionCollector collector = new PceExceptionCollector();
 
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = collector.tryCatch(
-        () -> portfolioMonthlyReturnsContextProvider.get(command.getHoldings(), command.getCurrency()));
+        () -> portfolioMonthlyReturnsContextProvider.get(command.getHoldings(), command.getCurrency(),
+            returnsData.portfolioReturns()));
     MonthlyReturnsContext<HoldingMonthlyReturns> benchmarkContext = collector.tryCatch(
-        () -> benchmarkMonthlyReturnsContextProvider.get(command.getBenchmarkHoldings(), command.getCurrency()));
+        () -> benchmarkMonthlyReturnsContextProvider.get(command.getBenchmarkHoldings(), command.getCurrency(),
+            returnsData.benchmarkReturns()));
     collector.throwIfAny();
 
     LocalDate commonStart = portfolioContext.commonPerformanceStartDate(benchmarkContext);

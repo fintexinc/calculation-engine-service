@@ -7,6 +7,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -41,10 +42,14 @@ public class DownsideDeviationCalculationServiceImpl
     return CalculationMetric.DOWNSIDE_DEVIATION;
   }
 
-  public DownsideDeviationCalculation<DownsideDeviationResult> defineCalculationMethod(final PeriodCommand command) {
-    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
+  @Override
+  public DownsideDeviationResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
+    final PeriodCalculationInput context = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE,
+        returnsData);
     final var tBills = TBillsValidator.requireNonEmpty(
         treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
-    return new DownsideDeviationCalculation<>(context, defaultPeriods, tBills);
+    return new DownsideDeviationCalculation<DownsideDeviationResult>(context, defaultPeriods, tBills)
+        .calculate(command.getPeriods());
   }
 }

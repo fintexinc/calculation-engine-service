@@ -5,8 +5,7 @@ import com.fintex.ce.model.domain.calculation.yield.Yield;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
 import com.fintex.ce.model.dto.command.YieldCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,8 +29,6 @@ import static org.mockito.Mockito.when;
 class YieldCalculationServiceImplTest {
 
   @Mock
-  private SecurityDataFetcher yieldFetcher;
-  @Mock
   private YieldResponseMapper responseMapper;
 
   private YieldCalculationServiceImpl service;
@@ -39,7 +36,7 @@ class YieldCalculationServiceImplTest {
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
-    service = new YieldCalculationServiceImpl(yieldFetcher, responseMapper);
+    service = new YieldCalculationServiceImpl(responseMapper);
   }
 
   static Map<PortfolioHolding, Yield> createMockData() {
@@ -65,51 +62,22 @@ class YieldCalculationServiceImplTest {
     Map<PortfolioHolding, Yield> mockData = createMockData();
     YieldResult expectedResponse = new YieldResult();
 
-    when(yieldFetcher.fetch(any(), any())).thenReturn(mockData);
+    when(command.getHoldings()).thenReturn(List.copyOf(mockData.keySet()));
     when(responseMapper.toResponse(any(Map.class), any())).thenReturn(expectedResponse);
 
     // ACT
-    YieldResult result = service.perform(command);
+    YieldResult result = service.perform(command, mockData);
 
     // VERIFY
-    verify(yieldFetcher).fetch(any(), any());
     verify(responseMapper).toResponse(any(Map.class), any());
     assertNotNull(result);
     assertEquals(expectedResponse, result);
   }
 
   @Test
-  void shouldTestPerform_whenVerifyFetcherLoad() {
-    // SETUP
-    YieldCommand command = mock(YieldCommand.class);
-    when(yieldFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
-    when(responseMapper.toResponse(any(Map.class), any())).thenReturn(new YieldResult());
-
-    // ACT
-    service.perform(command);
-
-    // VERIFY
-    verify(yieldFetcher).fetch(any(), any());
-  }
-
-  @Test
-  void shouldFetchWithRequestedProviders_whenCommandSpecifiesDataProviders() {
-    // SETUP
-    YieldCommand command = mock(YieldCommand.class);
-    PortfolioHolding holding = new PortfolioHolding(new BigDecimal("100"), FinancialInstrumentType.MUTUAL_FUND_CANADA,
-        null);
-    List<PortfolioHolding> holdings = List.of(holding);
-    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
-    when(command.getHoldings()).thenReturn(holdings);
-    when(command.getDataProviders()).thenReturn(providers);
-    when(yieldFetcher.fetch(any(), any())).thenReturn(new HashMap<>());
-    when(responseMapper.toResponse(any(Map.class), any())).thenReturn(new YieldResult());
-
-    // ACT
-    service.perform(command);
-
-    // VERIFY
-    verify(yieldFetcher).fetch(eq(holdings), eq(providers));
+  void shouldRequireIncomeAttribute_whenRequiredAttributesInvoked() {
+    assertEquals(List.of(CompositeSecurityAttribute.INCOME), service.requiredAttributes());
+    assertEquals(CompositeSecurityAttribute.INCOME, service.requiredAttribute());
   }
 
   @Test
@@ -117,14 +85,14 @@ class YieldCalculationServiceImplTest {
     // SETUP
     YieldCommand command = mock(YieldCommand.class);
     Map<PortfolioHolding, Yield> mockData = createMockData();
-    when(yieldFetcher.fetch(any(), any())).thenReturn(mockData);
+    when(command.getHoldings()).thenReturn(List.copyOf(mockData.keySet()));
     when(responseMapper.toResponse(any(Map.class), any())).thenReturn(new YieldResult());
 
     // ACT
-    service.perform(command);
+    service.perform(command, mockData);
 
     // VERIFY
-    verify(responseMapper).toResponse(any(Map.class), any());
+    verify(responseMapper).toResponse(eq(mockData), any());
   }
 
 }

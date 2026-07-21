@@ -3,13 +3,15 @@ package com.fintex.ce.application.calculation.service.allocation;
 import com.fintex.ce.application.util.AllocationMappingUtils;
 import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -37,7 +39,9 @@ import static java.math.BigDecimal.ZERO;
 @Deprecated
 public class EquityMarketCapitalizationService
     extends
-      BreakdownAbstractService<EquityMarketCapResult, EquityMarketCapitalizationType> {
+      BreakdownAbstractService<Map<PortfolioHolding, HoldingEquityMarketCap>, EquityMarketCapResult, EquityMarketCapitalizationType>
+    implements
+      SingleAttributeCalculationService<PortfolioHoldingsCommand, HoldingEquityMarketCap, EquityMarketCapResult> {
 
   static final Map<EquityMarketCapitalizationType, Set<EquityMarketCapitalizationType>> GROUPS;
 
@@ -57,29 +61,31 @@ public class EquityMarketCapitalizationService
         Stream.of(EquityMarketCapitalizationType.values()).collect(toMap(type -> type, type -> ZERO)));
   }
 
-  private final SecurityDataFetcher<HoldingEquityMarketCap> equityMarketCapSecurityDataFetcher;
-
-  public EquityMarketCapitalizationService(
-      final SecurityDataFetcher<HoldingEquityMarketCap> equityMarketCapSecurityDataFetcher) {
-    super();
-    this.equityMarketCapSecurityDataFetcher = equityMarketCapSecurityDataFetcher;
-  }
-
   @Override
   public CalculationMetric getMetric() {
     return CalculationMetric.EQUITY_MARKET_CAPITALIZATION;
   }
 
   @Override
-  public ExposureDataHolder<EquityMarketCapitalizationType> fetchExposures(final PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, HoldingEquityMarketCap> rawData = equityMarketCapSecurityDataFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.EQUITY_MARKET_CAPITALIZATION;
+  }
+
+  public ExposureDataHolder<EquityMarketCapitalizationType> fetchExposures(final PortfolioHoldingsCommand command,
+      final Map<PortfolioHolding, HoldingEquityMarketCap> data) {
+    Map<PortfolioHolding, HoldingEquityMarketCap> rawData = FilterUtils.restrictToHoldings(data,
+        command.getHoldings());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         HoldingEquityMarketCap::getRatings,
         ALLOCATION_DEFAULT_MAP, MISSING_EQUITY_MARKET_CAPITALIZATION);
   }
 
   @Override
+  public EquityMarketCapResult perform(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, HoldingEquityMarketCap> data) {
+    return calculate(fetchExposures(command, data), command.getHoldings());
+  }
+
   public EquityMarketCapResult calculate(ExposureDataHolder<EquityMarketCapitalizationType> exposureData,
       List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();

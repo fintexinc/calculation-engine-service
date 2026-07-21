@@ -1,6 +1,6 @@
 package com.fintex.ce;
 
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +34,7 @@ class PortfolioCalculationEngineApplicationTest {
   @Test
   void shouldStartApplication_whenApplicationContextIsBuilt() {
     assertThat(applicationContext).isNotNull();
-    assertThat(applicationContext.getBeansOfType(SecurityDataFetcher.class)).isNotEmpty();
+    assertThat(applicationContext.getBeansOfType(SecurityAttributesFetcher.class)).isNotEmpty();
     assertThat(applicationContext.getBeansWithAnnotation(Service.class)).isNotEmpty();
     assertThat(meterRegistry).isNotNull();
     assertThat(observationRegistry).isNotNull();

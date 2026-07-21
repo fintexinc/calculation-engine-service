@@ -6,6 +6,7 @@ import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -38,8 +39,9 @@ public class StandardDeviationCalculationServiceImpl
   }
 
   @Override
-  public StandardDeviationCalculation defineCalculationMethod(final PeriodCommand command) {
-    var result = buildWeightedAverageResult(command, ReturnFactorScale.SCALE_OF_TWO);
+  public StandardDeviationResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
+    var result = buildWeightedAverageResult(command, ReturnFactorScale.SCALE_OF_TWO, returnsData);
     result.snapshot().warnings().stream()
         .filter(w -> FX_RATES_UNAVAILABLE.getCode().equals(w.getCode()))
         .findFirst()
@@ -47,10 +49,11 @@ public class StandardDeviationCalculationServiceImpl
           throw new CalculationException(ErrorCode.FX_RATES_UNAVAILABLE, w.getMetadata());
         });
     var context = new PeriodCalculationInput(command.getCustomIntervalPsd(), result.weightedAverage());
-    return StandardDeviationCalculation.builder()
+    return StandardDeviationCalculation.<StandardDeviationResult>builder()
         .input(context)
         .defaultPeriods(defaultPeriods)
         .scale(OUTPUT_SCALE)
-        .build();
+        .build()
+        .calculate(command.getPeriods());
   }
 }

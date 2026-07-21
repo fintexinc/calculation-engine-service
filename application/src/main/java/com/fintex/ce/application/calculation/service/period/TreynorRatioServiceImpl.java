@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.BetaCalculation;
 import com.fintex.ce.application.calculation.metric.TreynorRatioCalculation;
-import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.period.core.BenchmarkWeightedAverageWithCpedAbstractService;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
@@ -11,6 +10,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -53,13 +53,13 @@ public class TreynorRatioServiceImpl
   }
 
   @Override
-  public PeriodCalculationAbstract<TreynorRatioResult, ?> defineCalculationMethod(PeriodCommand command) {
+  public TreynorRatioResult perform(PeriodCommand command,
+      PortfolioBenchmarkReturns returnsData) {
     BenchmarkPeriodCalculationInput betaInput = buildPeriodCalculationInput(command,
-        ReturnFactorScale.SCALE_OF_TWO);
+        ReturnFactorScale.SCALE_OF_TWO, returnsData);
     BenchmarkPeriodCalculationInput treynorRatioInput = buildPeriodCalculationInput(command,
-        ReturnFactorScale.SCALE_OF_ONE);
+        ReturnFactorScale.SCALE_OF_ONE, returnsData);
     var tBills = TBillsValidator.requireNonEmpty(
-
         treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
     NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = calculateExcessReturn(betaInput
         .getWeightedAveragePortfolioReturns(), tBills);
@@ -67,7 +67,8 @@ public class TreynorRatioServiceImpl
         .getWeightedAverageBenchmarkReturns(), tBills);
     var betaCalculation = new BetaCalculation(betaInput, defaultPeriods, portfolioExcessReturn,
         benchmarkExcessReturn);
-    return new TreynorRatioCalculation(treynorRatioInput, defaultPeriods, tBills, betaCalculation);
+    return new TreynorRatioCalculation(treynorRatioInput, defaultPeriods, tBills, betaCalculation)
+        .calculate(command.getPeriods());
   }
 
 }

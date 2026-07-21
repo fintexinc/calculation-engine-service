@@ -7,6 +7,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.Growth10KHelper;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
@@ -37,10 +38,10 @@ public class GrowthOf10KCalculationServiceImpl
   }
 
   @Override
-  public Growth10KResult perform(ReturnCommand command) {
-    // Weighted-average pipeline applies SCALE_OF_TWO upstream, so the returned series is already in factor form
-    // (e.g. 1.05 for a 5% month). compoundGrowth10K therefore uses AS_IS to avoid re-scaling.
-    WeightedAverageResult<HoldingMonthlyReturns> weighted = runWeightedAverage(command, ReturnFactorScale.SCALE_OF_TWO);
+  public Growth10KResult perform(ReturnCommand command,
+      PortfolioBenchmarkReturns returnsData) {
+    WeightedAverageResult<HoldingMonthlyReturns> weighted = runWeightedAverage(command, ReturnFactorScale.SCALE_OF_TWO,
+        returnsData);
 
     NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(weighted.weightedAverage(),
         ReturnFactorScale.AS_IS);

@@ -1,0 +1,110 @@
+{
+  "metric": "equity-geographic-exposure",
+  "dataProviders": ["MORNINGSTAR"],
+  "holdings": [
+    {
+      "holdingType": "CASH",
+      "value": 3500.00,
+      "securityIdentifier": {
+        "id": "CASH-CAD",
+        "idType": "TICKER"
+      },
+      "currency": "CAD"
+    },
+    {
+      "holdingType": "CASH",
+      "value": 2000.00,
+      "securityIdentifier": {
+        "id": "CASH-USD",
+        "idType": "TICKER"
+      },
+      "currency": "USD"
+    },
+    {
+      "holdingType": "STOCK_CANADA",
+      "value": 5500.00,
+      "securityIdentifier": {
+        "id": "AAPL.NE",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NEO"
+      }
+    },
+    {
+      "holdingType": "STOCK_US",
+      "value": 5000.00,
+      "securityIdentifier": {
+        "id": "AAPL",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 6200.00,
+      "securityIdentifier": {
+        "id": "AAPL.MX",
+        "idType": "TICKER_MIC",
+        "exchangeId": "MEX"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 950000.00,
+      "securityIdentifier": {
+        "id": "LVHK.ME",
+        "idType": "TICKER_MIC",
+        "exchangeId": "MCX"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 4200.00,
+      "securityIdentifier": {
+        "id": "NON_EXISTENT_TICKER",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NYSE"
+      }
+    },
+    {
+      "holdingType": "STOCK_CANADA",
+      "value": 3000.00,
+      "securityIdentifier": {
+        "id": "FAKE.NE",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NEO"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 7500.00,
+      "securityIdentifier": {
+        "id": "QQQQ",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 5200.00,
+      "securityIdentifier": {
+        "id": "BOGUS_ETF_TICKER",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND_CANADA",
+      "value": 8000.00,
+      "securityIdentifier": {
+        "id": "F00000MEY2",
+        "idType": "MORNINGSTAR_ID"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND_CANADA",
+      "value": 3500.00,
+      "securityIdentifier": {
+        "id": "FAKE_FUND_ID_999",
+        "idType": "MORNINGSTAR_ID"
+      }
+    }
+  ]
+}

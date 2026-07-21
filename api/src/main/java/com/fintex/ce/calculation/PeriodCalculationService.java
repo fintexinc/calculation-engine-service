@@ -5,7 +5,8 @@ import com.fintex.ce.model.dto.command.PeriodCommand;
 
 /**
  * Port interface for period-based calculation services. Implementations handle calculations like trailing returns,
- * standard deviation, sharpe ratio, beta, alpha, and other time-period based metrics.
+ * standard deviation, sharpe ratio, beta, alpha, and other time-period based metrics. All of them consume monthly
+ * returns with the portfolio and benchmark sides kept separate.
  *
  * @param <C>
  *          The command type extending PeriodCommand
@@ -14,6 +15,6 @@ import com.fintex.ce.model.dto.command.PeriodCommand;
  */
 public interface PeriodCalculationService<C extends PeriodCommand, R extends PeriodResult>
     extends
-      CalculationService<C, R> {
+      ReturnsBasedCalculationService<C, R> {
 
 }

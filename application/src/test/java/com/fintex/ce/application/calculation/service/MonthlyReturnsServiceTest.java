@@ -6,7 +6,6 @@ import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -35,17 +34,14 @@ class MonthlyReturnsServiceTest {
   private static final PortfolioHolding CASH = new PortfolioHolding(null, FinancialInstrumentType.CASH,
       new SecurityIdentifier("CASH", FiIdentifierType.TICKER));
 
-  @SuppressWarnings("unchecked")
-  private final SecurityDataFetcher<HoldingMonthlyReturns> fetcher = mock(SecurityDataFetcher.class);
   private final MonthlyReturnsGenerator generator = mock(MonthlyReturnsGenerator.class);
 
   @Test
   void shouldThrowNoSecurityDataForHolding_whenHoldingMissingFromSecurityMasterResponse() {
-    when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
     MonthlyReturnsService service = service();
 
-    assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF)))
+    assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF), Map.of()))
         .isInstanceOf(BasePceException.class)
         .satisfies(thrown -> assertThat(((BasePceException) thrown).getErrorCode())
             .isEqualTo(ErrorCode.NO_SECURITY_DATA_FOR_HOLDING));
@@ -56,11 +52,10 @@ class MonthlyReturnsServiceTest {
     HoldingMonthlyReturns empty = new HoldingMonthlyReturns();
     empty.setCurrency(Currency.USD.name());
     empty.setReturns(new TreeMap<>());
-    when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of(ETF, empty));
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
     MonthlyReturnsService service = service();
 
-    assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF)))
+    assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF), Map.of(ETF, empty)))
         .isInstanceOf(BasePceException.class)
         .satisfies(thrown -> assertThat(((BasePceException) thrown).getErrorCode())
             .isEqualTo(ErrorCode.MISSING_MONTHLY_RETURNS));
@@ -68,11 +63,10 @@ class MonthlyReturnsServiceTest {
 
   @Test
   void shouldSkipCashAndGicTypes_whenValidatingMonthlyReturnsPresence() {
-    when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of());
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
     MonthlyReturnsService service = service();
 
-    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = service.getMonthlyReturns(List.of(CASH));
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = service.getMonthlyReturns(List.of(CASH), Map.of());
 
     assertThat(snapshot.returnsMap()).isEmpty();
     assertThat(snapshot.errors()).isEmpty();
@@ -84,17 +78,17 @@ class MonthlyReturnsServiceTest {
         Map.entry(LocalDate.parse("2020-01-31"), BigDecimal.valueOf(0.01)));
     HoldingMonthlyReturns stockReturns = holdingMonthlyReturns(Currency.USD,
         Map.entry(LocalDate.parse("2020-01-31"), BigDecimal.valueOf(0.02)));
-    when(fetcher.fetch(anyList(), anyList())).thenReturn(Map.of(ETF, etfReturns));
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of(STOCK, stockReturns));
     MonthlyReturnsService service = service();
 
-    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = service.getMonthlyReturns(List.of(ETF, STOCK));
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = service.getMonthlyReturns(List.of(ETF, STOCK),
+        Map.of(ETF, etfReturns));
 
     assertThat(snapshot.returnsMap()).containsOnlyKeys(ETF, STOCK);
   }
 
   private MonthlyReturnsService service() {
-    return new MonthlyReturnsService(fetcher, generator);
+    return new MonthlyReturnsService(generator);
   }
 
   @SafeVarargs

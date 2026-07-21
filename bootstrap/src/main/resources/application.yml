@@ -102,30 +102,8 @@ external-services:
       timeout: 60000
       health-check-path: /actuator/health
       endpoints:
-        allocations:
-          asset: /api/v1/wealth/securities/allocations/asset
-          equity-sector: /api/v1/wealth/securities/allocations/equity-sector
-          fixed-income-sector: /api/v1/wealth/securities/allocations/fixed-income-sector
-          equity-stylebox: /api/v1/wealth/securities/allocations/equity-stylebox
-          fixed-income-stylebox: /api/v1/wealth/securities/allocations/fixed-income-stylebox
-          equity-market-cap: /api/v1/wealth/securities/allocations/equity-market-cap
-          country: /api/v1/wealth/securities/allocations/country
-          equity-country: /api/v1/wealth/securities/allocations/equity-country
-          fixed-income-country: /api/v1/wealth/securities/allocations/fixed-income-country
-          equity-geographic: /api/v1/wealth/securities/allocations/equity-geographic
-          fixed-income-geographic: /api/v1/wealth/securities/allocations/fixed-income-geographic
-          maturities: /api/v1/wealth/securities/allocations/maturities
-          credit-quality: /api/v1/wealth/securities/allocations/credit-quality
-          classification: /api/v1/wealth/securities/allocations/classification
-        geography: /api/v1/wealth/securities/geography
-        income: /api/v1/wealth/securities/income
-        fees: /api/v1/wealth/securities/fees
-        sales-charge: /api/v1/wealth/securities/sales-charge
-        holdings:
-          identifiers: /api/v1/wealth/securities/holdings/identifiers
-          top: /api/v1/wealth/securities/top-holdings
-        returns:
-          monthly: /api/v1/wealth/securities/returns/monthly
+        # Single generic endpoint returning any combination of security attributes; supersedes the per-attribute endpoints.
+        attributes: /api/v1/wealth/securities/attributes
         reference:
           # SMS exposes combined US + CAD T-Bill monthly returns at this endpoint; PCE selects the side it needs.
           treasury-rates: /api/v1/wealth/reference/treasury-rates

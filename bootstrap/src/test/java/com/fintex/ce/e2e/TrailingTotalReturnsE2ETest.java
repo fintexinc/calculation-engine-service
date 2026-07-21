@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -155,7 +156,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   void shouldReturnBadRequest_whenHoldingsListIsEmpty() {
     PeriodCommand command = periodCommand(Set.of("12"), null, List.of());
 
-    Notification error = assertValidationError(postCalculation(writeJson(command)), "VAL-003", "holdings");
+    Notification error = assertValidationError(postCalculation(writeJson(command)),
+        ErrorCode.FIELD_NOT_EMPTY.getCode(), "holdings");
     assertThat(error.getMessage()).isEqualTo("holdings must not be empty");
     assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "holdings");
   }
@@ -167,7 +169,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     ObjectNode body = (ObjectNode) parseJson(writeJson(command));
     ((ObjectNode) body.get("holdings").get(0)).remove("holdingType");
 
-    Notification error = assertValidationError(postCalculation(body.toString()), "VAL-001", "holdingType");
+    Notification error = assertValidationError(postCalculation(body.toString()),
+        ErrorCode.FIELD_NOT_NULL.getCode(), "holdingType");
     assertThat(error.getMessage()).isEqualTo("Holding Type must not be null");
   }
 

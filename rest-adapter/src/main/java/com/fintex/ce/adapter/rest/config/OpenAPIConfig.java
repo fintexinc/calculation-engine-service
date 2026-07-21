@@ -54,7 +54,7 @@ public class OpenAPIConfig {
    * {@code metric} field — keeping Swagger in sync with the endpoints that can actually be called.
    */
   @Bean
-  public OpenApiCustomizer enabledMetricsOpenApiCustomizer(List<CalculationService<?, ?>> calculationServices) {
+  public OpenApiCustomizer enabledMetricsOpenApiCustomizer(List<CalculationService<?, ?, ?>> calculationServices) {
     Set<String> enabledMetrics = calculationServices.stream()
         .map(CalculationService::getMetric)
         .map(CalculationMetric::getValue)

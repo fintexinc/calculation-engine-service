@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.AlphaCalculation;
-import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.calculation.service.period.core.BenchmarkWeightedAverageWithCpedAbstractService;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
@@ -10,6 +9,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.AlphaResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -52,17 +52,18 @@ public class AlphaCalculationServiceImpl
   }
 
   @Override
-  public PeriodCalculationAbstract<AlphaResult, ?> defineCalculationMethod(final PeriodCommand command) {
+  public AlphaResult perform(final PeriodCommand command,
+      final PortfolioBenchmarkReturns returnsData) {
     final BenchmarkPeriodCalculationInput context = buildPeriodCalculationInput(command,
-        ReturnFactorScale.SCALE_OF_ONE);
+        ReturnFactorScale.SCALE_OF_ONE, returnsData);
     final var tBills = TBillsValidator.requireNonEmpty(
-
         treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
     final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn = calculateExcessReturn(context
         .getWeightedAveragePortfolioReturns(), tBills);
     final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn = calculateExcessReturn(context
         .getWeightedAverageBenchmarkReturns(), tBills);
-    return new AlphaCalculation(context, defaultPeriods, portfolioExcessReturn, benchmarkExcessReturn);
+    return new AlphaCalculation(context, defaultPeriods, portfolioExcessReturn, benchmarkExcessReturn)
+        .calculate(command.getPeriods());
   }
 
 }

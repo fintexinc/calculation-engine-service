@@ -6,22 +6,23 @@ import com.fintex.ce.application.util.SecurityDataValidator;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Application-layer entry point for monthly-returns data sourcing. Fetches per-holding monthly returns from Security
- * Master, merges in locally-synthesized GIC returns, validates the result, and wraps it in a {@link ReturnsSnapshot}.
+ * Application-layer entry point for monthly-returns data sourcing. Consumes the pre-fetched monthly-returns map
+ * supplied by the orchestrator, restricts it to the requested holdings (the map may cover a superset, e.g. portfolio
+ * plus benchmark), merges in locally-synthesized GIC returns, validates the result, and wraps it in a
+ * {@link ReturnsSnapshot}.
  *
  * <p>
  * Role-tagged context construction (snapshot + FX + role) is delegated to
@@ -35,30 +36,23 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MonthlyReturnsService {
 
-  private final SecurityDataFetcher<HoldingMonthlyReturns> monthlyReturnsSecurityDataFetcher;
   private final MonthlyReturnsGenerator monthlyReturnsGenerator;
 
-  public MonthlyReturnsService(SecurityDataFetcher<HoldingMonthlyReturns> monthlyReturnsSecurityDataFetcher,
-      MonthlyReturnsGenerator monthlyReturnsGenerator) {
-    this.monthlyReturnsSecurityDataFetcher = monthlyReturnsSecurityDataFetcher;
-    this.monthlyReturnsGenerator = monthlyReturnsGenerator;
-  }
-
-  public ReturnsSnapshot<HoldingMonthlyReturns> getMonthlyReturns(List<PortfolioHolding> holdings) {
-    Map<PortfolioHolding, HoldingMonthlyReturns> sourceData = new HashMap<>(
-        monthlyReturnsSecurityDataFetcher.fetch(holdings, List.of()));
+  public ReturnsSnapshot<HoldingMonthlyReturns> getMonthlyReturns(List<PortfolioHolding> holdings,
+      Map<PortfolioHolding, HoldingMonthlyReturns> monthlyReturns) {
+    Map<PortfolioHolding, HoldingMonthlyReturns> sourceData = FilterUtils.restrictToHoldings(monthlyReturns,
+        holdings);
     sourceData.putAll(monthlyReturnsGenerator.generateGicMonthlyReturns(holdings));
     validateMonthlyReturnsPresent(holdings, sourceData);
     return ReturnsSnapshot.forMonthlyReturns(sourceData);
   }
 
-  public ReturnsSnapshot<HoldingMonthlyReturns> getMonthlyReturnsOnlyWithMonthlyReturnsDataValidation(
-      List<PortfolioHolding> holdings) {
-    Map<PortfolioHolding, HoldingMonthlyReturns> sourceData = monthlyReturnsSecurityDataFetcher.fetch(holdings,
-        List.of());
-    return ReturnsSnapshot.validateOnly(sourceData);
+  public ReturnsSnapshot<HoldingMonthlyReturns> getMonthlyReturnsOnlyWithReturnsValidation(
+      List<PortfolioHolding> holdings, Map<PortfolioHolding, HoldingMonthlyReturns> monthlyReturns) {
+    return ReturnsSnapshot.validateOnly(FilterUtils.restrictToHoldings(monthlyReturns, holdings));
   }
 
   /**

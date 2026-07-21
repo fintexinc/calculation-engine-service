@@ -6,13 +6,18 @@ import com.fintex.ce.application.returns.WeightedAverageResult;
 import com.fintex.ce.application.returns.pipeline.CpsdCpedScaleParams;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
-import com.fintex.ce.calculation.CalculationService;
+import com.fintex.ce.calculation.ReturnsBasedCalculationService;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
-import com.fintex.ce.model.dto.command.CustomPedProvider;
-import com.fintex.ce.model.dto.command.CustomPsdProvider;
-import com.fintex.ce.model.dto.command.PortfolioCommand;
+import com.fintex.ce.model.domain.security.SecurityData;
+import com.fintex.ce.model.dto.command.PortfolioBenchmarkCommand;
+import com.fintex.ce.model.dto.command.contract.CustomPedProvider;
+import com.fintex.ce.model.dto.command.contract.CustomPsdProvider;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+
+import java.util.List;
 
 /**
  * Base class for services whose pipeline contract is the portfolio-side weighted-average with both CPSD and CPED
@@ -24,9 +29,9 @@ import com.fintex.ce.model.dto.command.PortfolioCommand;
  * @param <R>
  *          result type produced by the service
  */
-public abstract class WeightedAverageWithCpsdAndCpedAbstractService<C extends PortfolioCommand & CustomPsdProvider & CustomPedProvider, R extends BaseCalculationResult>
+public abstract class WeightedAverageWithCpsdAndCpedAbstractService<C extends PortfolioBenchmarkCommand & CustomPsdProvider & CustomPedProvider, R extends BaseCalculationResult>
     implements
-      CalculationService<C, R> {
+      ReturnsBasedCalculationService<C, R> {
 
   protected final PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider;
   protected final PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped;
@@ -38,13 +43,25 @@ public abstract class WeightedAverageWithCpsdAndCpedAbstractService<C extends Po
     this.portfolioWeightedAverageWithCpsdAndCped = portfolioWeightedAverageWithCpsdAndCped;
   }
 
+  @Override
+  public List<CompositeSecurityAttribute> requiredAttributes() {
+    return List.of(CompositeSecurityAttribute.MONTHLY_RETURNS);
+  }
+
+  @Override
+  public PortfolioBenchmarkReturns prepareData(SecurityData securityData) {
+    return PortfolioBenchmarkReturns.from(securityData);
+  }
+
   /**
-   * Fetches the portfolio context and runs the CPSD+CPED weighted-average pipeline. Subclasses call this to obtain the
-   * raw {@link WeightedAverageResult} when they need direct access to the snapshot (e.g. Growth-of-10K).
+   * Builds the portfolio context from the supplied monthly returns and runs the CPSD+CPED weighted-average pipeline.
+   * Subclasses call this to obtain the raw {@link WeightedAverageResult} when they need direct access to the snapshot
+   * (e.g. Growth-of-10K).
    */
-  protected WeightedAverageResult<HoldingMonthlyReturns> runWeightedAverage(C command, ReturnFactorScale scale) {
+  protected WeightedAverageResult<HoldingMonthlyReturns> runWeightedAverage(C command, ReturnFactorScale scale,
+      PortfolioBenchmarkReturns returnsData) {
     MonthlyReturnsContext<HoldingMonthlyReturns> context = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
     return portfolioWeightedAverageWithCpsdAndCped.run(context,
         new CpsdCpedScaleParams(command.getCustomPsd(), command.getCustomPed(), scale));
   }
@@ -53,8 +70,9 @@ public abstract class WeightedAverageWithCpsdAndCpedAbstractService<C extends Po
    * Default {@link PeriodCalculationInput} builder for subclasses that consume the weighted-average series via the
    * period-calculation pipeline. Carries the upstream warnings so they propagate into the final result.
    */
-  protected PeriodCalculationInput buildPeriodCalculationInput(C command, ReturnFactorScale scale) {
-    WeightedAverageResult<HoldingMonthlyReturns> result = runWeightedAverage(command, scale);
+  protected PeriodCalculationInput buildPeriodCalculationInput(C command, ReturnFactorScale scale,
+      PortfolioBenchmarkReturns returnsData) {
+    WeightedAverageResult<HoldingMonthlyReturns> result = runWeightedAverage(command, scale, returnsData);
     return PeriodCalculationInput.builder()
         .weightedAveragePortfolioReturns(result.weightedAverage())
         .warnings(result.getErrorsAsWarnings())

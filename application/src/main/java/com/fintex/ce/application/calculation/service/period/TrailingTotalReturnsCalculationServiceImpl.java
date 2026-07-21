@@ -7,6 +7,7 @@ import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCp
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.application.util.TBillsValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -38,11 +39,15 @@ public class TrailingTotalReturnsCalculationServiceImpl
     return CalculationMetric.TRAILING_TOTAL_RETURNS;
   }
 
-  public TrailingTotalReturnsCalculation defineCalculationMethod(PeriodCommand command) {
-    PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+  @Override
+  public TrailingTotalReturnsResult perform(PeriodCommand command,
+      PortfolioBenchmarkReturns returnsData) {
+    PeriodCalculationInput input = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO,
+        returnsData);
     var tBills = TBillsValidator.requireNonEmpty(
         treasuryBillsFetcher.fetch(command.getCurrency()), command.getCurrency());
-    return TrailingTotalReturnsCalculation.withTBillPrecondition(input, defaultPeriods, tBills);
+    return TrailingTotalReturnsCalculation.withTBillPrecondition(input, defaultPeriods, tBills)
+        .calculate(command.getPeriods());
   }
 
 }

@@ -1,0 +1,203 @@
+{
+  "metric": "fixed-income-geographic-exposure",
+  "holdings": [
+    {
+      "holdingType": "CASH",
+      "value": 5000.00,
+      "securityIdentifier": {
+        "id": "CASH-CAD",
+        "idType": "TICKER"
+      },
+      "currency": "CAD"
+    },
+    {
+      "holdingType": "CASH",
+      "value": 3000.00,
+      "securityIdentifier": {
+        "id": "CASH-USD",
+        "idType": "TICKER"
+      },
+      "currency": "USD"
+    },
+    {
+      "holdingType": "CASH",
+      "value": 1500.00,
+      "securityIdentifier": {
+        "id": "CASH-GBP",
+        "idType": "TICKER"
+      },
+      "currency": "GBP"
+    },
+    {
+      "holdingType": "GIC",
+      "value": 10000.00,
+      "securityIdentifier": {
+        "id": "GIC-BNS-5Y",
+        "idType": "TICKER"
+      },
+      "currency": "CAD",
+      "investmentDate": "2023-04-15",
+      "clientIntRate": 5.10,
+      "interestFreq": "ANNUAL",
+      "term": 1825,
+      "name": "Scotiabank 5-Year GIC"
+    },
+    {
+      "holdingType": "GIC",
+      "value": 4000.00,
+      "securityIdentifier": {
+        "id": "GIC-CASH-180D",
+        "idType": "TICKER"
+      },
+      "currency": "USD",
+      "investmentDate": "2025-11-20",
+      "clientIntRate": 4.25,
+      "interestFreq": "SEMI_ANNUAL",
+      "term": 180,
+      "name": "180-Day Cashable GIC"
+    },
+    {
+      "holdingType": "STOCK_CANADA",
+      "value": 7200.00,
+      "securityIdentifier": {
+        "id": "RY.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK_CANADA",
+      "value": 5400.00,
+      "securityIdentifier": {
+        "id": "TD.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK_US",
+      "value": 11000.00,
+      "securityIdentifier": {
+        "id": "AAPL",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK_US",
+      "value": 6500.00,
+      "securityIdentifier": {
+        "id": "NVDA",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK_US",
+      "value": 5200.00,
+      "securityIdentifier": {
+        "id": "BRK-B",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NYSE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 420000.00,
+      "securityIdentifier": {
+        "id": "4875.T",
+        "idType": "TICKER_MIC",
+        "exchangeId": "JPX"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 3200.00,
+      "securityIdentifier": {
+        "id": "SWR.L",
+        "idType": "TICKER_MIC",
+        "exchangeId": "LSE"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 9500.00,
+      "securityIdentifier": {
+        "id": "QQQQ",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 4200.00,
+      "securityIdentifier": {
+        "id": "NVDH.U",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 3000.00,
+      "securityIdentifier": {
+        "id": "HEWJ",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 2800.00,
+      "securityIdentifier": {
+        "id": "USFR",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 2600.00,
+      "securityIdentifier": {
+        "id": "USDU",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF_US",
+      "value": 6800.00,
+      "securityIdentifier": {
+        "id": "IFV",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND_CANADA",
+      "value": 9200.00,
+      "securityIdentifier": {
+        "id": "F00000MP5F",
+        "idType": "MORNINGSTAR_ID"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND_US",
+      "value": 7400.00,
+      "securityIdentifier": {
+        "id": "F00000MP5G",
+        "idType": "MORNINGSTAR_ID"
+      }
+    },
+    {
+      "holdingType": "FIXED_INCOME",
+      "value": 15000.00,
+      "securityIdentifier": {
+        "id": "US912828Z781",
+        "idType": "ISIN"
+      }
+    },
+    {
+      "holdingType": "FIXED_INCOME",
+      "value": 8000.00,
+      "securityIdentifier": {
+        "id": "CA135087L286",
+        "idType": "ISIN"
+      }
+    }
+  ]
+}

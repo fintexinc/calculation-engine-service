@@ -4,12 +4,14 @@ import com.fintex.ce.application.mapping.response.FixedIncomeStyleboxExposureRes
 import com.fintex.ce.application.util.AllocationMappingUtils;
 import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.exposure.FixedIncomeStyleboxExposure;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
+import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
 
 import java.math.BigDecimal;
@@ -29,7 +31,9 @@ import static java.util.stream.Collectors.toMap;
 @Deprecated
 public class FixedIncomeStyleboxExposureService
     extends
-      BreakdownAbstractService<FixedIncomeStyleboxExposureResult, FixedIncomeStyleBoxType> {
+      BreakdownAbstractService<Map<PortfolioHolding, FixedIncomeStyleboxExposure>, FixedIncomeStyleboxExposureResult, FixedIncomeStyleBoxType>
+    implements
+      SingleAttributeCalculationService<PortfolioHoldingsCommand, FixedIncomeStyleboxExposure, FixedIncomeStyleboxExposureResult> {
 
   static final Map<FixedIncomeStyleBoxType, BigDecimal> DEFAULT_MAP;
 
@@ -38,14 +42,10 @@ public class FixedIncomeStyleboxExposureService
         Stream.of(FixedIncomeStyleBoxType.values()).collect(toMap(type -> type, type -> ZERO)));
   }
 
-  private final SecurityDataFetcher<FixedIncomeStyleboxExposure> fixedIncomeStyleboxSecurityDataFetcher;
   private final FixedIncomeStyleboxExposureResponseMapper responseMapper;
 
-  public FixedIncomeStyleboxExposureService(
-      final SecurityDataFetcher<FixedIncomeStyleboxExposure> fixedIncomeStyleboxSecurityDataFetcher,
-      final FixedIncomeStyleboxExposureResponseMapper responseMapper) {
+  public FixedIncomeStyleboxExposureService(final FixedIncomeStyleboxExposureResponseMapper responseMapper) {
     super();
-    this.fixedIncomeStyleboxSecurityDataFetcher = fixedIncomeStyleboxSecurityDataFetcher;
     this.responseMapper = responseMapper;
   }
 
@@ -55,6 +55,16 @@ public class FixedIncomeStyleboxExposureService
   }
 
   @Override
+  public CompositeSecurityAttribute requiredAttribute() {
+    return CompositeSecurityAttribute.FIXED_INCOME_STYLEBOX;
+  }
+
+  @Override
+  public FixedIncomeStyleboxExposureResult perform(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, FixedIncomeStyleboxExposure> data) {
+    return calculate(fetchExposures(command, data), command.getHoldings());
+  }
+
   public FixedIncomeStyleboxExposureResult calculate(ExposureDataHolder<FixedIncomeStyleBoxType> exposureData,
       List<PortfolioHolding> holdings) {
     var exposures = exposureData.allocations();
@@ -67,10 +77,10 @@ public class FixedIncomeStyleboxExposureService
     return responseMapper.fromNetProducts(netProducts, warnings);
   }
 
-  @Override
-  public ExposureDataHolder<FixedIncomeStyleBoxType> fetchExposures(PortfolioHoldingsCommand command) {
-    Map<PortfolioHolding, FixedIncomeStyleboxExposure> rawData = fixedIncomeStyleboxSecurityDataFetcher.fetch(
-        command.getHoldings(), command.getDataProviders());
+  public ExposureDataHolder<FixedIncomeStyleBoxType> fetchExposures(PortfolioHoldingsCommand command,
+      Map<PortfolioHolding, FixedIncomeStyleboxExposure> data) {
+    Map<PortfolioHolding, FixedIncomeStyleboxExposure> rawData = FilterUtils.restrictToHoldings(data,
+        command.getHoldings());
     return AllocationMappingUtils.mapTypedAllocations(rawData,
         FixedIncomeStyleboxExposure::getBoxValues,
         DEFAULT_MAP, MISSING_FIXED_INCOME_STYLEBOX_EXPOSURE);

@@ -8,6 +8,7 @@ import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
@@ -34,9 +35,12 @@ public class DistributionOfReturnsServiceImpl
   }
 
   @Override
-  public DistributionOfReturnsResult perform(DistributionOfReturnsCommand command) {
-    PeriodCalculationInput inputWithScaleOfOne = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE);
-    PeriodCalculationInput inputWithScaleOfTwo = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO);
+  public DistributionOfReturnsResult perform(DistributionOfReturnsCommand command,
+      PortfolioBenchmarkReturns returnsData) {
+    PeriodCalculationInput inputWithScaleOfOne = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_ONE,
+        returnsData);
+    PeriodCalculationInput inputWithScaleOfTwo = buildPeriodCalculationInput(command, ReturnFactorScale.SCALE_OF_TWO,
+        returnsData);
     TrailingTotalReturnsCalculation trailingTotalReturnsCalculation = TrailingTotalReturnsCalculation.mathOnly(
         inputWithScaleOfTwo, Set.of());
     RollingTotalReturnsCalculation rollingTotalReturnsCalculation = new RollingTotalReturnsCalculation(

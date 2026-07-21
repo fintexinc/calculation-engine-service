@@ -1,6 +1,5 @@
 package com.fintex.ce.application.calculation.service.period.core;
 
-import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.returns.MonthlyReturnsContext;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.WeightedAverageResult;
@@ -10,9 +9,13 @@ import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.calculation.PeriodCalculationService;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.result.PeriodResult;
+import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -40,25 +43,27 @@ public abstract class WeightedAverageWithCpedAbstractService<C extends PeriodCom
     this.defaultPeriods = defaultPeriods;
   }
 
-  protected <V> PeriodCalculationAbstract<R, V> defineCalculationMethod(C command) {
-    throw new UnsupportedOperationException(
-        "subclasses must either implement defineCalculationMethod or override perform()");
+  @Override
+  public List<CompositeSecurityAttribute> requiredAttributes() {
+    return List.of(CompositeSecurityAttribute.MONTHLY_RETURNS);
   }
 
   @Override
-  public R perform(C command) {
-    return defineCalculationMethod(command).calculate(command.getPeriods());
+  public PortfolioBenchmarkReturns prepareData(SecurityData securityData) {
+    return PortfolioBenchmarkReturns.from(securityData);
   }
 
   public WeightedAverageResult<HoldingMonthlyReturns> buildWeightedAverageResult(C command,
-      ReturnFactorScale scale) {
+      ReturnFactorScale scale, PortfolioBenchmarkReturns returnsData) {
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
     return portfolioWeightedAverageWithCped.run(portfolioContext, new CpedScaleParams(command.getCustomPed(), scale));
   }
 
-  public PeriodCalculationInput buildPeriodCalculationInput(C command, ReturnFactorScale returnFactorScale) {
-    WeightedAverageResult<HoldingMonthlyReturns> result = buildWeightedAverageResult(command, returnFactorScale);
+  public PeriodCalculationInput buildPeriodCalculationInput(C command, ReturnFactorScale returnFactorScale,
+      PortfolioBenchmarkReturns returnsData) {
+    WeightedAverageResult<HoldingMonthlyReturns> result = buildWeightedAverageResult(command, returnFactorScale,
+        returnsData);
     return new PeriodCalculationInput(command.getCustomIntervalPsd(), result.weightedAverage());
   }
 }

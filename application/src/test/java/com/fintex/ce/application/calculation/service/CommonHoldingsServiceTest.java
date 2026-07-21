@@ -1,6 +1,5 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.application.config.TopHoldingsProperties;
 import com.fintex.ce.application.constant.AccumulateHoldingType;
@@ -11,8 +10,6 @@ import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.ce.model.error.exceptions.CalculationException;
-import com.fintex.ce.port.webclient.sm.SecurityDataFetcher;
-import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -26,7 +23,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.util.EnumSet;
@@ -42,21 +38,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CommonHoldingsServiceTest {
 
-  private SecurityDataFetcher<CommonTopHoldings> fetcher;
   private FxRateService fxRateService;
   private TopHoldingsProperties properties;
-  private DefaultDataProperties defaultDataProperties;
   private CommonHoldingsService service;
 
   @BeforeEach
-  @SuppressWarnings("unchecked")
   void setup() {
-    fetcher = mock(SecurityDataFetcher.class);
     fxRateService = mock(FxRateService.class);
     when(fxRateService.spotRates(anySet(), any(), any())).thenAnswer(inv -> {
       Set<Currency> src = inv.getArgument(0);
@@ -65,9 +56,7 @@ class CommonHoldingsServiceTest {
     DefaultTargetCurrencyConverter converter = new DefaultTargetCurrencyConverter(fxRateService, new FxProperties());
     properties = new TopHoldingsProperties();
     properties.setAccumulateTypes(EnumSet.of(AccumulateHoldingType.E));
-    defaultDataProperties = new DefaultDataProperties();
-    defaultDataProperties.setDataProviders(List.of(DataProvider.MORNINGSTAR, DataProvider.FMP));
-    service = new CommonHoldingsService(fetcher, converter, properties, defaultDataProperties);
+    service = new CommonHoldingsService(converter, properties);
   }
 
   @Test
@@ -89,11 +78,9 @@ class CommonHoldingsServiceTest {
         equityHolding("Hotel Corp", "0.12"),
         equityHolding("India Corp", "0.10")));
 
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
-
     TopCommonHoldingsCommand command = command(List.of(parentA, parentB), 5);
 
-    TopCommonHoldingsResult result = service.perform(command);
+    TopCommonHoldingsResult result = service.perform(command, sms);
 
     assertThat(result.getCommonHoldings()).hasSize(5);
     List<String> names = result.getCommonHoldings().stream().map(TopCommonHoldingData::getName).toList();
@@ -112,14 +99,13 @@ class CommonHoldingsServiceTest {
     sms.put(cad, topHoldings(Currency.CAD, equityHolding("Alpha Corp", "0.50")));
     sms.put(usd, topHoldings(Currency.USD, equityHolding("Alpha Corp", "0.50")));
 
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
     when(fxRateService.spotRates(anySet(), any(), any())).thenAnswer(inv -> Map.of(
         Currency.CAD, BigDecimal.ONE,
         Currency.USD, new BigDecimal("2")));
 
     TopCommonHoldingsCommand command = command(List.of(cad, usd), 5);
 
-    TopCommonHoldingsResult result = service.perform(command);
+    TopCommonHoldingsResult result = service.perform(command, sms);
 
     // CAD: 50000 -> 50000 CAD weight 1/3
     // USD: 50000 -> 100000 CAD weight 2/3
@@ -134,11 +120,9 @@ class CommonHoldingsServiceTest {
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent,
         topHoldings(null, equityHolding("Alpha Corp", "0.50")));
 
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
-
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, "HOLDING_MISSING_CURRENCY_FROM_FDS");
+    assertCalculationFails(command, sms, "HOLDING_MISSING_CURRENCY_FROM_FDS");
   }
 
   @Test
@@ -146,21 +130,18 @@ class CommonHoldingsServiceTest {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD));
 
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
-
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, "HOLDING_MISSING_UNDERLYING_HOLDINGS");
+    assertCalculationFails(command, sms, "HOLDING_MISSING_UNDERLYING_HOLDINGS");
   }
 
   @Test
   void shouldThrowSmsNoData_whenSmsReturnsNothingForMandatoryHolding() {
     PortfolioHolding parent = etfHolding("AAA", 1000);
-    when(fetcher.fetch(any(), any())).thenReturn(Map.of());
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, "NO_SECURITY_DATA_FOR_HOLDING");
+    assertCalculationFails(command, Map.of(), "NO_SECURITY_DATA_FOR_HOLDING");
   }
 
   @Test
@@ -169,14 +150,12 @@ class CommonHoldingsServiceTest {
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent,
         topHoldings(Currency.CAD, equityHolding("Alpha Corp", "1.0")));
 
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
-
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
     command.setHoldings(List.of(parent));
     // numOfTopCommonHoldings = null -> default 10
     // accumulateHoldingTypes = null -> default Set.of(E)
 
-    TopCommonHoldingsResult result = service.perform(command);
+    TopCommonHoldingsResult result = service.perform(command, sms);
 
     assertThat(result.getCommonHoldings()).hasSize(1);
     assertThat(result.getCommonHoldings().get(0).getName()).isEqualTo("Alpha Corp");
@@ -189,11 +168,9 @@ class CommonHoldingsServiceTest {
     child.setWeight(null);
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, child));
 
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
-
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, "HOLDING_MISSING_WEIGHTING_FROM_FDS");
+    assertCalculationFails(command, sms, "HOLDING_MISSING_WEIGHTING_FROM_FDS");
   }
 
   @ParameterizedTest(name = "[{index}] {0} -> isOfType STOCK = leaf short-circuit applies")
@@ -203,9 +180,7 @@ class CommonHoldingsServiceTest {
     CommonHolding selfEquity = equityHolding("Alpha Corp", "0.42");
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(stock, topHoldings(Currency.CAD, selfEquity));
 
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
-
-    TopCommonHoldingsResult result = service.perform(command(List.of(stock), 10));
+    TopCommonHoldingsResult result = service.perform(command(List.of(stock), 10), sms);
 
     // Leaf-stock short-circuit: child weight 0.42 is ignored — inherited weight (100%) is used directly.
     assertThat(result.getCommonHoldings()).hasSize(1);
@@ -226,9 +201,8 @@ class CommonHoldingsServiceTest {
     CommonHolding leaf = equityHolding("Alpha Corp", "1.0");
     leaf.setType(type);
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, leaf));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10));
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
 
     assertThat(result.getCommonHoldings()).hasSize(accumulated ? 1 : 0);
   }
@@ -251,9 +225,8 @@ class CommonHoldingsServiceTest {
     middle.setType(childType);
     middle.setUnderlyingHoldings(List.of(deepEquity));
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, middle));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10));
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
 
     if (shouldDescend) {
       assertThat(result.getCommonHoldings()).extracting(TopCommonHoldingData::getName)
@@ -280,9 +253,8 @@ class CommonHoldingsServiceTest {
     level0Fund.setType("FO");
     level0Fund.setUnderlyingHoldings(List.of(level1Fund));
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, level0Fund));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10));
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
 
     // depth=0 descends into level0; depth=1 NOT descended → level1Fund itself is emitted as a leaf.
     // level1Fund type "FO" is not in accumulate set (only "E") so result is empty — proves no deeper descent happened.
@@ -301,10 +273,9 @@ class CommonHoldingsServiceTest {
     ancestor.setUnderlyingHoldings(List.of(cycleChild));
     cycleChild.setUnderlyingHoldings(List.of(ancestor));
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, ancestor));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
 
     // No StackOverflowError; cycle guard short-circuits at the repeated identity.
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10));
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
 
     assertThat(result.getCommonHoldings()).isEmpty();
   }
@@ -317,9 +288,8 @@ class CommonHoldingsServiceTest {
     CommonHolding alphaB = equityHolding("Alpha", "0.5");
     alphaB.setPrimaryIdentifier(new SecurityIdentifier("A-FIRST", FiIdentifierType.TICKER));
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, alphaA, alphaB));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10));
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
 
     assertThat(result.getCommonHoldings()).hasSize(1);
     // Lexicographically smallest identifier wins — A-FIRST is the chosen representative.
@@ -332,9 +302,8 @@ class CommonHoldingsServiceTest {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, child,
         equityHolding("Valid Equity", "0.5")));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10));
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
 
     assertThat(result.getCommonHoldings()).extracting(TopCommonHoldingData::getName).containsExactly("Valid Equity");
   }
@@ -363,9 +332,8 @@ class CommonHoldingsServiceTest {
         equityHolding("Alpha", "0.5"),
         equityHolding("Bravo", "0.3"),
         equityHolding("Charlie", "0.2")));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), numOfTop));
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), numOfTop), sms);
 
     assertThat(result.getCommonHoldings()).hasSize(expectedSize);
   }
@@ -380,51 +348,16 @@ class CommonHoldingsServiceTest {
     PortfolioHolding etf = etfHolding("AAA", 1000);
     Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(etf,
         topHoldings(Currency.CAD, equityHolding("Alpha", "1.0")));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
 
     // Should not throw.
-    TopCommonHoldingsResult result = service.perform(command(List.of(etf, nonSmsHolding), 10));
+    TopCommonHoldingsResult result = service.perform(command(List.of(etf, nonSmsHolding), 10), sms);
 
     assertThat(result.getCommonHoldings()).hasSize(1);
   }
 
-  @Test
-  void shouldFetchWithDefaultDataProviders_whenCommandSpecifiesNone() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent,
-        topHoldings(Currency.CAD, equityHolding("Alpha Corp", "1.0")));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
-
-    // command(...) leaves dataProviders null → service must fall back to the configured defaults.
-    service.perform(command(List.of(parent), 10));
-
-    assertThat(captureFetchProviders()).containsExactly(DataProvider.MORNINGSTAR, DataProvider.FMP);
-  }
-
-  @Test
-  void shouldFetchWithCommandDataProviders_whenSpecified() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent,
-        topHoldings(Currency.CAD, equityHolding("Alpha Corp", "1.0")));
-    when(fetcher.fetch(any(), any())).thenReturn(sms);
-
-    TopCommonHoldingsCommand command = command(List.of(parent), 10);
-    command.setDataProviders(List.of(DataProvider.FMP));
-
-    service.perform(command);
-
-    assertThat(captureFetchProviders()).containsExactly(DataProvider.FMP);
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<DataProvider> captureFetchProviders() {
-    ArgumentCaptor<List<DataProvider>> providersCaptor = ArgumentCaptor.forClass(List.class);
-    verify(fetcher).fetch(any(), providersCaptor.capture());
-    return providersCaptor.getValue();
-  }
-
-  private void assertCalculationFails(TopCommonHoldingsCommand command, String expectedErrorCode) {
-    assertThatThrownBy(() -> service.perform(command))
+  private void assertCalculationFails(TopCommonHoldingsCommand command,
+      Map<PortfolioHolding, CommonTopHoldings> securityData, String expectedErrorCode) {
+    assertThatThrownBy(() -> service.perform(command, securityData))
         .isInstanceOf(CalculationException.class)
         .satisfies(ex -> assertThat(((CalculationException) ex).getErrorCode().name()).isEqualTo(expectedErrorCode));
   }
