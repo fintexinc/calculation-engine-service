@@ -33,7 +33,7 @@ public class PortfolioWeightCalculator {
   private final DefaultTargetCurrencyConverter currencyConverter;
 
   public Result compute(List<PortfolioHolding> holdings, Map<PortfolioHolding, Currency> currencies) {
-    Map<PortfolioHolding, CurrencyValue> input = new HashMap<>(holdings.size());
+    Map<PortfolioHolding, CurrencyValue> input = HashMap.newHashMap(holdings.size());
     for (PortfolioHolding holding : holdings) {
       BigDecimal value = holding.getValue() == null ? ZERO : holding.getValue();
       input.put(holding, new CurrencyValue(currencies.get(holding), value));
@@ -41,7 +41,7 @@ public class PortfolioWeightCalculator {
     Conversion conversion = currencyConverter.convert(input);
     List<Notification> warnings = new ArrayList<>(conversion.warnings());
 
-    Map<PortfolioHolding, BigDecimal> normalized = new HashMap<>(holdings.size());
+    Map<PortfolioHolding, BigDecimal> normalized = HashMap.newHashMap(holdings.size());
     BigDecimal totalNormalized = ZERO;
     for (PortfolioHolding holding : holdings) {
       BigDecimal converted = conversion.converted().get(holding);
@@ -56,7 +56,7 @@ public class PortfolioWeightCalculator {
     if (totalNormalized.signum() == 0) {
       return new Result(calculateInitialPortfolioWeight(holdings), warnings);
     }
-    Map<PortfolioHolding, BigDecimal> weights = new HashMap<>(holdings.size());
+    Map<PortfolioHolding, BigDecimal> weights = HashMap.newHashMap(holdings.size());
     for (PortfolioHolding holding : holdings) {
       weights.put(holding, DecimalUtils.divide(normalized.get(holding), totalNormalized));
     }

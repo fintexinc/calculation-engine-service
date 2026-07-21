@@ -7,6 +7,8 @@ import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
+import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 
 import org.springframework.stereotype.Component;
 
@@ -49,7 +51,15 @@ public class FixedIncomeSectorAllocationMapper
     return FixedIncomeBondSector.builder()
         .fixedIncomeBondSectors(allocationMap)
         .holdingType(holding.getHoldingType())
+        .currency(toCurrency(smsResponse))
         .providers(providers)
         .build();
+  }
+
+  private Currency toCurrency(FixedIncomeSectorAllocationWithCurrency smsResponse) {
+    return Optional.ofNullable(smsResponse)
+        .map(FixedIncomeSectorAllocationWithCurrency::getCurrency)
+        .map(CurrencyDatapoint::getValue)
+        .orElse(null);
   }
 }

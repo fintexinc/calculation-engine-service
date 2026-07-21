@@ -2,6 +2,7 @@ package com.fintex.ce.model.domain.calculation.allocation;
 
 import com.fintex.ce.model.domain.calculation.BaseCalculationData;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
+import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.math.BigDecimal;
@@ -22,5 +23,6 @@ public class FixedIncomeBondSector extends BaseCalculationData {
 
   private FinancialInstrumentType holdingType;
   private Map<FixedIncomeSectorAllocationType, BigDecimal> fixedIncomeBondSectors;
+  private Currency currency;
 
 }
