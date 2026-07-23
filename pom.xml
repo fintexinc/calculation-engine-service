@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.6</version>
+        <version>3.5.8</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -39,10 +39,9 @@
         <!-- External dependencies -->
         <spring-openapi.version>2.8.6</spring-openapi.version>
         <swagger-annotations.version>2.2.29</swagger-annotations.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
         <guava.version>32.1.3-jre</guava.version>
         <azure-monitor-opentelemetry.version>1.2.0</azure-monitor-opentelemetry.version>
-        <tomcat-embed-core.version>10.1.43</tomcat-embed-core.version>
 
         <!-- Test dependencies -->
         <mockito.version>5.18.0</mockito.version>
@@ -151,13 +150,6 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-monitor-opentelemetry-autoconfigure</artifactId>
                 <version>${azure-monitor-opentelemetry.version}</version>
-            </dependency>
-
-            <!-- Vulnerability fixes -->
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-core</artifactId>
-                <version>${tomcat-embed-core.version}</version>
             </dependency>
 
             <!-- Test dependencies -->
