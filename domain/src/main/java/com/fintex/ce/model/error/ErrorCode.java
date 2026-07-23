@@ -351,6 +351,14 @@ public enum ErrorCode {
       HttpStatus.OK,
       Severity.WARNING),
 
+  CIPSD_OUTSIDE_DATA_RANGE_ERROR(
+      Codes.CIPSD_OUTSIDE_DATA_RANGE_ERROR,
+      "CIPSD %s is outside the available monthly returns range [%s, %s]",
+      "The custom interval performance start date falls outside the available monthly returns window and is treated as an invalid custom date, so the request is rejected",
+      "Pick a CIPSD on or after the earliest month-end and on or before the latest month-end of the available returns, or extend the returns history",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
   HOLDING_PSD_OUT_OF_RANGE(
       Codes.HOLDING_PSD_OUT_OF_RANGE,
       "Holding performance start date is not within common performance date range.",
@@ -1200,6 +1208,7 @@ public enum ErrorCode {
     public static final String MISSING_PORTFOLIO_RETURN_FOR_DATE = "RET-013";
     public static final String MISSING_BENCHMARK_RETURN_FOR_DATE = "RET-014";
     public static final String PERIOD_RESULT_NOT_AVAILABLE = "RET-015";
+    public static final String CIPSD_OUTSIDE_DATA_RANGE_ERROR = "RET-016";
 
     // Performance Dates
     public static final String CPSD_AFTER_CPED = "PFD-001";
