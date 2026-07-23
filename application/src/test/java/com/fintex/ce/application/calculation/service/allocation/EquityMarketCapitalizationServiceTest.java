@@ -155,7 +155,7 @@ class EquityMarketCapitalizationServiceTest {
       doCallRealMethod().when(service).calculate(any(), any());
       service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
-      mockedCalculationUtils.verify(() -> CalculationUtils.reScaleAbs(netProducts));
+      mockedCalculationUtils.verify(() -> CalculationUtils.reScale(netProducts));
     }
   }
 
@@ -171,7 +171,7 @@ class EquityMarketCapitalizationServiceTest {
       final var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(anyMap())).thenReturn(false);
-      mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(netProducts)).thenReturn(reScaled);
+      mockedCalculationUtils.when(() -> CalculationUtils.reScale(netProducts)).thenReturn(reScaled);
       when(service.calculateNetProducts(exposures, holdings, EquityMarketCapitalizationType.values())).thenReturn(
           netProducts);
 

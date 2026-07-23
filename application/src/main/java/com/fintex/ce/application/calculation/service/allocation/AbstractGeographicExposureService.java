@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
+import static com.fintex.ce.application.util.CalculationUtils.reScale;
 import static com.fintex.ce.application.util.CalculationUtils.sumProduct;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
@@ -102,7 +102,7 @@ public abstract class AbstractGeographicExposureService<R extends GeographicExpo
     warnings.addAll(weightResult.warnings());
 
     Map<GeographicRegionType, BigDecimal> netProducts = aggregate(exposures, weightResult.weights());
-    return buildResult(toUserScale(reScaleAbs(netProducts)), warnings);
+    return buildResult(toUserScale(reScale(netProducts)), warnings);
   }
 
   protected abstract CompositeSecurityAttribute geographicAllocationAttribute();

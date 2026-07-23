@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
+import static com.fintex.ce.application.util.CalculationUtils.reScale;
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_MARKET_CAPITALIZATION;
@@ -98,7 +98,7 @@ public class EquityMarketCapitalizationService
     }
     final Map<EquityMarketCapitalizationType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings,
         EquityMarketCapitalizationType.values());
-    final Map<EquityMarketCapitalizationType, BigDecimal> reScaled = toUserScale(groupedResults(reScaleAbs(
+    final Map<EquityMarketCapitalizationType, BigDecimal> reScaled = toUserScale(groupedResults(reScale(
         netProducts)));
     return EquityMarketCapResult.builder()
         .equityMarketCapitalization(reScaled)

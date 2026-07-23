@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
+import static com.fintex.ce.application.util.CalculationUtils.reScale;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.application.util.PortfolioUtils.areAllValuesInMapEmpty;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_COUNTRY_EXPOSURE;
@@ -76,7 +76,7 @@ public class EquityCountryExposureService
     }
     final Map<CountryRegionType, BigDecimal> netProducts = calculateNetProducts(exposures, holdings, CountryRegionType
         .values());
-    final Map<CountryRegionType, BigDecimal> scaledValues = toUserScale(reScaleAbs(netProducts));
+    final Map<CountryRegionType, BigDecimal> scaledValues = toUserScale(reScale(netProducts));
     return EquityCountryExposureResult.builder()
         .equityCountryExposure(scaledValues)
         .warnings(warnings)
