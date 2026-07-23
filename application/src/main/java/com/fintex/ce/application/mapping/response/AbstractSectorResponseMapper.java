@@ -8,7 +8,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
+import static com.fintex.ce.application.util.CalculationUtils.reScale;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 
 /**
@@ -35,11 +35,11 @@ public abstract class AbstractSectorResponseMapper<T extends Enum<T>, R> {
   }
 
   /**
-   * Builds a result from aggregated, FX-adjusted net products: rescales by absolute weight and applies the user display
+   * Builds a result from aggregated, FX-adjusted net products: rescales by the net total and applies the user display
    * scale before delegating to {@link #buildResult}.
    */
   public R fromNetProducts(Map<T, BigDecimal> netProducts, List<Notification> warnings) {
-    return buildResult(toUserScale(reScaleAbs(netProducts)), warnings);
+    return buildResult(toUserScale(reScale(netProducts)), warnings);
   }
 
   /**

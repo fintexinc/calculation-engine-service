@@ -69,6 +69,25 @@ class FixedIncomeSectorResponseMapperTest {
   }
 
   @Test
+  void shouldNormalizeSectorsToNetTotal_whenNetProductsContainLongAndShortExposure() {
+    var netProducts = Map.of(
+        FixedIncomeSectorAllocationType.GOVERNMENT_BONDS, new BigDecimal("0.100"),
+        FixedIncomeSectorAllocationType.CORPORATE_BONDS, new BigDecimal("-0.099"));
+
+    var result = mapper.fromNetProducts(netProducts, List.of());
+
+    assertTrue(result.getWarnings().isEmpty());
+    assertEquals(0, result.getFixedIncomeSector().get(FixedIncomeSectorAllocationType.GOVERNMENT_BONDS)
+        .compareTo(new BigDecimal("100.0000000000")));
+    assertEquals(0, result.getFixedIncomeSector().get(FixedIncomeSectorAllocationType.CORPORATE_BONDS)
+        .compareTo(new BigDecimal("-99.0000000000")));
+    var sum = result.getFixedIncomeSector().values().stream()
+        .filter(Objects::nonNull)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    assertEquals(0, sum.compareTo(BigDecimal.ONE));
+  }
+
+  @Test
   void shouldNormalizePartialSectorDataToSumToOne_whenNotAllSectorsPresent() {
     var netProducts = Map.of(
         FixedIncomeSectorAllocationType.GOVERNMENT_BONDS, new BigDecimal("0.3"),

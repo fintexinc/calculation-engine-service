@@ -251,7 +251,7 @@ class FixedIncomeCreditQualityServiceTest {
       doCallRealMethod().when(service).calculate(any(), any(), any());
       service.calculate(List.of(mock(PortfolioHolding.class)), Map.of(), Map.of());
 
-      mockedCalculationUtils.verify(() -> CalculationUtils.reScaleAbs(rescaled));
+      mockedCalculationUtils.verify(() -> CalculationUtils.reScale(rescaled));
     }
   }
 
@@ -260,7 +260,7 @@ class FixedIncomeCreditQualityServiceTest {
     try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class)) {
       FixedIncomeCreditQualityService service = mock(FixedIncomeCreditQualityService.class);
       Map<CreditQualityRatingType, BigDecimal> rescaled = Map.of(AAA, TEN);
-      mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(any())).thenReturn(rescaled);
+      mockedCalculationUtils.when(() -> CalculationUtils.reScale(any())).thenReturn(rescaled);
       HashMap<FixedIncomeCreditQuality, BigDecimal> expected = new HashMap<>();
       when(service.toFixedIncomeCreditQuality(rescaled)).thenReturn(expected);
 

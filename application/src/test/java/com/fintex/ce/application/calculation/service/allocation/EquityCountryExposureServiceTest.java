@@ -192,7 +192,7 @@ class EquityCountryExposureServiceTest {
       doCallRealMethod().when(service).calculate(any(), any());
       service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
 
-      mockedCalculationUtils.verify(() -> CalculationUtils.reScaleAbs(netProducts));
+      mockedCalculationUtils.verify(() -> CalculationUtils.reScale(netProducts));
     }
   }
 
@@ -209,7 +209,7 @@ class EquityCountryExposureServiceTest {
       var netProducts = mock(Map.class);
 
       mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(anyMap())).thenReturn(false);
-      mockedCalculationUtils.when(() -> CalculationUtils.reScaleAbs(any())).thenReturn(netProducts);
+      mockedCalculationUtils.when(() -> CalculationUtils.reScale(any())).thenReturn(netProducts);
 
       when(service.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
 

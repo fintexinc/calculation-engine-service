@@ -31,6 +31,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.math.BigDecimal.ONE;
@@ -342,19 +343,22 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   }
 
   @Test
-  void shouldRescaleWithAbsoluteSum_whenAllocationsContainNegativeValues() {
+  void shouldRescaleToSignedNetTotal_whenAllocationsContainLongAndShortValues() {
     PortfolioHolding fund = canadaMutualFund("RBF605", 100);
     GeographicExposureData data = data(Map.of(
         fund, allocation(Map.of(
-            GeographicRegionType.US, ONE,
-            GeographicRegionType.CANADA, ONE.negate()), Currency.CAD)), Map.of());
+            GeographicRegionType.US, new BigDecimal("0.100"),
+            GeographicRegionType.CANADA, new BigDecimal("-0.099")), Currency.CAD)), Map.of());
 
     R result = service.perform(command(fund), data);
 
     Map<GeographicRegionType, BigDecimal> expected = distribution(Map.of(
-        GeographicRegionType.US, new BigDecimal("0.5"),
-        GeographicRegionType.CANADA, new BigDecimal("-0.5")));
+        GeographicRegionType.US, new BigDecimal("100"),
+        GeographicRegionType.CANADA, new BigDecimal("-99")));
     assertExposureEquals(result, expected);
+    assertThat(result.getGeographicExposure().values().stream()
+        .filter(Objects::nonNull)
+        .reduce(ZERO, BigDecimal::add)).isEqualByComparingTo(ONE);
   }
 
   @Test

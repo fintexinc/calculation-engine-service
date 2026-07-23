@@ -135,7 +135,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnServiceUnavailable_whenExternalSecurityMasterIsUnavailable() {
-    smsMockServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+    smsMockServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AFTER_REQUEST));
 
     var response = postCalculation(requestBodyForSmsUnavailableScenario());
 

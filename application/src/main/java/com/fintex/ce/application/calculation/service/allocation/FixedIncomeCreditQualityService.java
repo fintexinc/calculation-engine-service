@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
-import static com.fintex.ce.application.util.CalculationUtils.reScaleAbs;
+import static com.fintex.ce.application.util.CalculationUtils.reScale;
 import static com.fintex.ce.application.util.CalculationUtils.sumProduct;
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.application.util.DecimalUtils.divide;
@@ -99,7 +99,7 @@ public class FixedIncomeCreditQualityService
       final Map<PortfolioHolding, BigDecimal> fixedIncomeCreditQuality) {
     final Map<CreditQualityRatingType, BigDecimal> ratings = calculateCreditQualityRatingTypes(holdings, creditQuality,
         fixedIncomeCreditQuality);
-    final Map<CreditQualityRatingType, BigDecimal> reScaled = reScaleAbs(ratings);
+    final Map<CreditQualityRatingType, BigDecimal> reScaled = reScale(ratings);
     return toFixedIncomeCreditQuality(reScaled);
   }
 

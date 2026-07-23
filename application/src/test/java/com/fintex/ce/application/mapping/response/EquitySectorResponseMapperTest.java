@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -36,17 +37,39 @@ class EquitySectorResponseMapperTest {
   }
 
   @Test
-  void shouldNormalizeSectorsToSumToOne_whenRawSectorsTotalLessThanOne() {
+  void shouldNormalizeFinalSectorExposure_whenRawSectorsTotalLessThanOne() {
     Map<EquitySectorAllocationType, BigDecimal> netProducts = Map.of(
-        EquitySectorAllocationType.ENERGY, new BigDecimal("0.2"),
-        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2"));
+        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.20"),
+        EquitySectorAllocationType.FINANCIAL_SERVICES, new BigDecimal("0.60"));
 
     EquitySectorResult result = mapper.fromNetProducts(netProducts, List.of());
 
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getEquitySector()).hasSize(2)
+        .containsEntry(EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.2500000000"))
+        .containsEntry(EquitySectorAllocationType.FINANCIAL_SERVICES, new BigDecimal("0.7500000000"));
     BigDecimal sum = result.getEquitySector().values().stream()
         .filter(Objects::nonNull)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
-    assertEquals(0, sum.compareTo(BigDecimal.ONE));
+    assertThat(sum).isEqualByComparingTo(BigDecimal.ONE);
+  }
+
+  @Test
+  void shouldNormalizeSectorsToNetTotal_whenNetProductsContainLongAndShortExposure() {
+    Map<EquitySectorAllocationType, BigDecimal> netProducts = Map.of(
+        EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("0.100"),
+        EquitySectorAllocationType.ENERGY, new BigDecimal("-0.099"));
+
+    EquitySectorResult result = mapper.fromNetProducts(netProducts, List.of());
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getEquitySector()).hasSize(2)
+        .containsEntry(EquitySectorAllocationType.TECHNOLOGY, new BigDecimal("100.0000000000"))
+        .containsEntry(EquitySectorAllocationType.ENERGY, new BigDecimal("-99.0000000000"));
+    BigDecimal totalExposure = result.getEquitySector().values().stream()
+        .filter(Objects::nonNull)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    assertThat(totalExposure).isEqualByComparingTo(BigDecimal.ONE);
   }
 
   @Test
