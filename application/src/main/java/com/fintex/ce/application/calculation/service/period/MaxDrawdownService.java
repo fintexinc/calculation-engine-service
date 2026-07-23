@@ -83,11 +83,16 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
           periodsResult.add(Pair.of(p, calculateEntry(months, portfolioReturns, growth10K)));
         });
 
+    boolean sinceCipsdRequested = cipsd != null
+        || initialPeriods.contains(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name());
     if (isCipsdValid(cipsd, portfolioReturns)) {
       final int months = getMonthsBetweenDates(cipsd, portfolioReturns.lastKey(), firstDayOfMonth());
       periodsResult.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(),
           calculateEntry(months, portfolioReturns, growth10K)));
-    } else if (cipsd != null || initialPeriods.contains(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name())) {
+    } else if (cipsd != null && !CollectionUtils.isEmpty(portfolioReturns) && sinceCipsdRequested) {
+      throw ErrorCode.CIPSD_OUTSIDE_DATA_RANGE_ERROR.toException(
+          cipsd, portfolioReturns.firstKey(), portfolioReturns.lastKey());
+    } else if (sinceCipsdRequested) {
       periodsResult.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
     }
 
@@ -95,7 +100,7 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
     result.setCustomIntervalPerformanceStartDate(cipsd);
     result.setPerformanceEndDate(portfolioReturns.lastKey());
     result.setPerformanceStartDate(portfolioReturns.firstKey());
-    addWarnings(result, periodsResult, portfolioReturns, cipsd, growth10K);
+    addWarnings(result, periodsResult, portfolioReturns, growth10K);
     return result;
   }
 
@@ -219,7 +224,6 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
   private void addWarnings(final MaxDrawdownResult result,
       final Set<Pair<String, MaxDrawdownEntry>> periodsResult,
       final NavigableMap<LocalDate, BigDecimal> portfolioReturns,
-      final LocalDate cipsd,
       final NavigableMap<LocalDate, BigDecimal> growth10K) {
     final int availableMonths = portfolioReturns.size();
     final List<Notification> warnings = new ArrayList<>(result.getWarnings());
@@ -239,15 +243,6 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
         .filter(pair -> isDegenerateGrowthData(pair.getKey().trim(), portfolioReturns, growth10K))
         .map(pair -> ErrorCode.DEGENERATE_GROWTH_DATA.asNotification(pair.getKey().trim()))
         .forEach(warnings::add);
-
-    final boolean sinceCipsdRequestedAndNull = periodsResult.stream()
-        .anyMatch(pair -> SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name()
-            .equalsIgnoreCase(pair.getKey().trim()) && pair.getValue() == null);
-    if (cipsd != null && !portfolioReturns.isEmpty() && !isCipsdValid(cipsd, portfolioReturns)
-        && sinceCipsdRequestedAndNull) {
-      warnings.add(ErrorCode.CIPSD_OUTSIDE_DATA_RANGE.asNotification(
-          cipsd, portfolioReturns.firstKey(), portfolioReturns.lastKey()));
-    }
 
     result.setWarnings(warnings);
   }
