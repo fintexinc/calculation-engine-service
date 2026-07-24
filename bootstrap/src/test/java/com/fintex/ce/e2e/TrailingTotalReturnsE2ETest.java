@@ -26,7 +26,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,7 +43,6 @@ import static org.assertj.core.api.Assertions.within;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.QueueDispatcher;
 import okhttp3.mockwebserver.RecordedRequest;
 
 @TestPropertySource(properties = {
@@ -85,11 +83,6 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   static void registerBocBaseUrl(DynamicPropertyRegistry registry) {
     registry.add("external-services.bank-of-canada.base-url",
         () -> bocMockServer.url("/").toString().replaceAll("/$", ""));
-  }
-
-  @BeforeEach
-  void resetSmsMockServerQueue() {
-    smsMockServer.setDispatcher(new QueueDispatcher());
   }
 
   @Override

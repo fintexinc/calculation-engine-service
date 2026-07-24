@@ -25,7 +25,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -39,7 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.QueueDispatcher;
 
 /**
  * End-to-end HTTP-boundary coverage for the {@code sharpe-ratio} metric's T-Bill contract: a complete risk-free series
@@ -84,11 +82,6 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
   static void registerBocBaseUrl(DynamicPropertyRegistry registry) {
     registry.add("external-services.bank-of-canada.base-url",
         () -> bocMockServer.url("/").toString().replaceAll("/$", ""));
-  }
-
-  @BeforeEach
-  void resetSmsMockServerQueue() {
-    smsMockServer.setDispatcher(new QueueDispatcher());
   }
 
   @Override

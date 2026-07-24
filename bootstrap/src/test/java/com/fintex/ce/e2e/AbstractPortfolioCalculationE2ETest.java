@@ -18,6 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.QueueDispatcher;
 import okhttp3.mockwebserver.SocketPolicy;
 
 @Tag("e2e")
@@ -114,9 +116,20 @@ abstract class AbstractPortfolioCalculationE2ETest {
   }
 
   /**
-   * Do not shut down {@link #smsMockServer} in {@code @AfterAll}: several e2e classes share this static server in the
-   * same Surefire fork ({@code reuseForks=true}), and shutting down after the first class breaks later classes with
-   * HTTP 500.
+   * Reset this class's {@link #smsMockServer} queue before every test so a response enqueued by one test can never leak
+   * into the next test in the same class (the server is shared by all tests within a class). Cross-class isolation is
+   * handled separately by {@code reuseForks=false}, which gives each test class its own JVM and thus its own server.
+   */
+  @BeforeEach
+  void resetSmsMockServerQueue() {
+    smsMockServer.setDispatcher(new QueueDispatcher());
+  }
+
+  /**
+   * This module runs e2e tests with {@code reuseForks=false} (see {@code bootstrap/pom.xml}), so each test class gets
+   * its own JVM and therefore its own instance of this static server — classes never share it. That isolation is what
+   * prevents mock state from leaking or racing across classes. No {@code @AfterAll} shutdown is needed: the server is
+   * reclaimed when the per-class JVM exits.
    */
   private static String smsMockBaseUrl() {
     try {

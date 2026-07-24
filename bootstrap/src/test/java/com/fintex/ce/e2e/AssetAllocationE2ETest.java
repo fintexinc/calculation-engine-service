@@ -53,7 +53,6 @@ import static org.assertj.core.api.Assertions.within;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.QueueDispatcher;
 import okhttp3.mockwebserver.RecordedRequest;
 
 /**
@@ -91,8 +90,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @AfterEach
-  void resetMockDispatchers() {
-    smsMockServer.setDispatcher(new QueueDispatcher());
+  void resetBocDispatcher() {
     bocMockServer.setDispatcher(BocMockResponses.dailyUsdCadDispatcher());
   }
 

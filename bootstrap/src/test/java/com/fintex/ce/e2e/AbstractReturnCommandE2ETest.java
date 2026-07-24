@@ -15,15 +15,11 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
 import com.fintex.wm.commons.domain.value.DateBigDecimalValue;
 
-import org.junit.jupiter.api.BeforeEach;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.mockwebserver.QueueDispatcher;
 
 /**
  * Shared e2e infrastructure for {@link ReturnCommand}-based metrics (growth-of-10k, annual-returns). Both metrics use
@@ -45,11 +41,6 @@ abstract class AbstractReturnCommandE2ETest extends AbstractPortfolioCalculation
       .idType(FiIdentifierType.TICKER_MIC)
       .exchangeId("TSX")
       .build();
-
-  @BeforeEach
-  void resetSmsMockServerQueue() {
-    smsMockServer.setDispatcher(new QueueDispatcher());
-  }
 
   protected static ReturnCommand commandFor(CalculationMetric metric, Currency currency,
       List<PortfolioHolding> holdings) {
