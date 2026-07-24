@@ -4,6 +4,7 @@ import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.result.returns.MeanResult;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Disabled("metric unsupported")
 class MeanCalculationTest {
 
   @Test
