@@ -27,7 +27,15 @@ import static com.fintex.ce.application.util.PortfolioUtils.calculateInitialPort
  *          result object
  * @param <T>
  *          allocation enum type
+ *
+ * @deprecated superseded by {@link AbstractBreakdownService}, which owns the whole breakdown pipeline — currency
+ *             resolution, FX-converted weighting, aggregation, rescaling and result assembly — instead of only the
+ *             net-product math, so a metric supplies just its attribute and bucket mapping. Do not extend this class
+ *             for new metrics. The metrics still on it (classification-allocation, maturity-allocation,
+ *             equity-market-capitalization, equity-stylebox-exposure, fixed-income-stylebox-exposure) are yet to be
+ *             migrated; this class goes away once they are.
  */
+@Deprecated(forRemoval = true)
 public abstract class BreakdownAbstractService<D, R extends BaseCalculationResult, T>
     implements
       CalculationService<PortfolioHoldingsCommand, D, R> {

@@ -33,7 +33,7 @@ public class AssetAllocationEmergingMarketsService extends AbstractAssetAllocati
   protected AssetAllocationEMResult buildResult(Map<AssetAllocationRegionType, BigDecimal> netProducts,
       List<Notification> warnings) {
     return AssetAllocationEMResult.builder()
-        .assetAllocationEmergingMarkets(toUserScale(netProducts))
+        .assetAllocationEmergingMarkets(netProducts)
         .warnings(warnings)
         .build();
   }

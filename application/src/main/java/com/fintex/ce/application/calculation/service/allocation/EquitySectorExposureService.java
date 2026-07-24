@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
-import com.fintex.ce.application.mapping.response.EquitySectorResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -23,21 +22,16 @@ import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_SECTOR_ALLOCATI
 import static com.fintex.ce.model.error.ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC;
 
 /**
- * Converts each holding's value to the default target currency before weighting equity-sector exposures, so
- * multi-currency portfolios produce correct sector percentages. See {@link AbstractSectorAllocationService} for the
- * shared template.
+ * Equity-sector breakdown. Only the equity-sector specifics live here; the weighting, aggregation, normalization and
+ * response assembly are the shared {@link AbstractBreakdownService} pipeline.
  */
 @Service
 public class EquitySectorExposureService
     extends
-      AbstractSectorAllocationService<EquitySector, EquitySectorResult, EquitySectorAllocationType> {
+      AbstractSingleAttributeBreakdownService<EquitySector, EquitySectorResult, EquitySectorAllocationType> {
 
-  private final EquitySectorResponseMapper responseMapper;
-
-  public EquitySectorExposureService(final EquitySectorResponseMapper responseMapper,
-      final PortfolioWeightCalculator portfolioWeightCalculator) {
-    super(portfolioWeightCalculator);
-    this.responseMapper = responseMapper;
+  public EquitySectorExposureService(PortfolioWeightCalculator portfolioWeightCalculator) {
+    super(portfolioWeightCalculator, EquitySectorAllocationType.class);
   }
 
   @Override
@@ -45,17 +39,13 @@ public class EquitySectorExposureService
     return CalculationMetric.EQUITY_SECTOR;
   }
 
-  // TODO(TMI-475): EQUITY_SECTOR_ALLOCATION only exists for funds. Individual stocks are not published with a
-  // sector-allocation breakdown and need a distinct sector/industry attribute; add separate stock-data handling once
-  // TMI-475 decides which attribute stores the stock sector.
+  // TMI-475 decision: individual stocks are classified through this SAME attribute, not a separate one. Security
+  // Master publishes a stock's single sector as a one-bucket EQUITY_SECTOR_ALLOCATION ({ sector -> 1.0 } with
+  // currency), so no stock-specific handling is needed here. Until SM publishes it, a stock resolves to UNKNOWN plus
+  // a warning, exactly like a fund missing its allocation. See equity-stock-sector-source-decision-for-pm.txt.
   @Override
   public CompositeSecurityAttribute requiredAttribute() {
     return CompositeSecurityAttribute.EQUITY_SECTOR_ALLOCATION;
-  }
-
-  @Override
-  protected EquitySectorAllocationType[] allocationTypes() {
-    return EquitySectorAllocationType.values();
   }
 
   @Override
@@ -64,35 +54,27 @@ public class EquitySectorExposureService
   }
 
   @Override
-  protected EquitySectorResult emptyResponse(List<Notification> warnings) {
-    return responseMapper.toEmptyResponse(warnings);
-  }
-
-  @Override
-  protected EquitySectorResult fromNetProducts(Map<EquitySectorAllocationType, BigDecimal> netProducts,
-      List<Notification> warnings) {
-    return responseMapper.fromNetProducts(netProducts, warnings);
-  }
-
-  @Override
-  protected Map<EquitySectorAllocationType, BigDecimal> toSectorExposure(PortfolioHolding holding, EquitySector sector,
+  protected Map<EquitySectorAllocationType, BigDecimal> toBuckets(PortfolioHolding holding, EquitySector sector,
       List<Notification> warnings) {
     if (sector == null) {
       warnings.add(SECURITY_NOT_FOUND_FOR_METRIC.toNotificationForHolding(holding,
           getMetric().getUserFriendlyName()));
-      return unknownAllocation();
+      return singleBucket(EquitySectorAllocationType.UNKNOWN);
     }
     Map<EquitySectorAllocationType, BigDecimal> allocations = sector.getAllocations();
     if (CollectionUtils.isEmpty(allocations)) {
       warnings.add(MISSING_EQUITY_SECTOR_ALLOCATION.toNotificationForHolding(holding));
-      return unknownAllocation();
+      return singleBucket(EquitySectorAllocationType.UNKNOWN);
     }
     return new EnumMap<>(allocations);
   }
 
-  private static Map<EquitySectorAllocationType, BigDecimal> unknownAllocation() {
-    Map<EquitySectorAllocationType, BigDecimal> result = new EnumMap<>(EquitySectorAllocationType.class);
-    result.put(EquitySectorAllocationType.UNKNOWN, BigDecimal.ONE);
-    return result;
+  @Override
+  protected EquitySectorResult buildResult(Map<EquitySectorAllocationType, BigDecimal> buckets,
+      List<Notification> warnings) {
+    return EquitySectorResult.builder()
+        .equitySector(buckets)
+        .warnings(warnings)
+        .build();
   }
 }

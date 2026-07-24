@@ -1,223 +1,110 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
+import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
+import com.fintex.ce.application.calculation.service.FxRateService;
+import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
+import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.application.mapping.CountryAllocationMappingService;
-import com.fintex.ce.application.util.CalculationUtils;
-import com.fintex.ce.application.util.DecimalUtils;
-import com.fintex.ce.application.util.ExposureDataHolder;
-import com.fintex.ce.application.util.PortfolioUtils;
+import com.fintex.ce.application.mapping.CountryRegionResolver;
 import com.fintex.ce.model.domain.calculation.allocation.CountryRegionType;
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_COUNTRY_EXPOSURE;
-import static java.math.BigDecimal.TEN;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.eq;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 class EquityCountryExposureServiceTest {
 
-  private final CountryAllocationMappingService countryAllocationMappingService = mock(
-      CountryAllocationMappingService.class);
+  private final FxRateService fxRateService = mock(FxRateService.class);
+  private final EquityCountryExposureService service = new EquityCountryExposureService(
+      new PortfolioWeightCalculator(new DefaultTargetCurrencyConverter(fxRateService, new FxProperties())),
+      new CountryAllocationMappingService(new CountryRegionResolver()));
 
-  @Test
-  void shouldPerform_whenVerifyValidateHoldings() {
-    var service = mock(EquityCountryExposureService.class,
-        withSettings().useConstructor(countryAllocationMappingService));
-
-    PortfolioHoldingsCommand req = mock(PortfolioHoldingsCommand.class);
-    List<PortfolioHolding> holdings = List.of(mock(PortfolioHolding.class));
-    when(req.getHoldings()).thenReturn(holdings);
-    when(service.fetchExposures(any(), any())).thenReturn(new ExposureDataHolder<>(Map.of(), List.of()));
-
-    doCallRealMethod().when(service).perform(any(), any());
-    service.perform(req, Map.of());
-
-    verify(service).fetchExposures(req, Map.of());
-    verify(service).calculate(any(), eq(holdings));
+  @BeforeEach
+  void setUp() {
+    when(fxRateService.spotRates(anySet(), any(), any())).thenReturn(Map.of());
   }
 
   @Test
-  void shouldCalculateNetProduct_whenCheckResult() {
-    EquityCountryExposureService e = mock(EquityCountryExposureService.class);
+  void shouldAggregateCountryRegions_whenHoldingHasAllocation() {
+    var fund = fund("RBF605", "100");
+    var data = Map.of(fund,
+        alloc(Map.of(Country.CANADA, new BigDecimal("0.6"), Country.USA, new BigDecimal("0.4"))));
 
-    CountryRegionType canada = CountryRegionType.CANADA;
+    var result = service.perform(command(fund), data);
 
-    PortfolioHolding h1 = new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.CASH, null);
-    PortfolioHolding h2 = new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.ETF_US, null);
-
-    Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> exposures = Map.of(
-        h1, Map.of(canada, BigDecimal.valueOf(2), CountryRegionType.EMERGING_MARKET, BigDecimal.valueOf(21)),
-        h2, Map.of(canada, BigDecimal.valueOf(5)));
-
-    doCallRealMethod().when(e).calculateNetProduct(any(), any(), any());
-    BigDecimal actual = e.calculateNetProduct(canada, exposures, Map.of(h1, BigDecimal.valueOf(3), h2, BigDecimal
-        .valueOf(4)));
-
-    assertEquals(0, BigDecimal.valueOf(26).compareTo(actual));
+    assertThat(result.getEquityCountryExposure().get(CountryRegionType.CANADA)).isEqualByComparingTo("0.6");
+    assertThat(result.getEquityCountryExposure().get(CountryRegionType.UNITED_STATES)).isEqualByComparingTo("0.4");
+    assertThat(result.getWarnings()).isEmpty();
   }
 
   @Test
-  void shouldCalculateNetProduct_whenCheckResult2() {
-    EquityCountryExposureService e = mock(EquityCountryExposureService.class);
+  void shouldRescaleSurvivorsToOneHundredPercent_whenAllocationsDoNotSumToOne() {
+    var fund = fund("RBF605", "100");
+    var data = Map.of(fund,
+        alloc(Map.of(Country.CANADA, new BigDecimal("0.3"), Country.USA, new BigDecimal("0.1"))));
 
-    CountryRegionType type = CountryRegionType.EMERGING_MARKET;
+    var result = service.perform(command(fund), data);
 
-    PortfolioHolding h1 = new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF_US, null);
-    PortfolioHolding h2 = new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
-
-    Map<PortfolioHolding, Map<CountryRegionType, BigDecimal>> exposures = Map.of(
-        h1, Map.of(type, BigDecimal.valueOf(2), CountryRegionType.CANADA, BigDecimal.valueOf(21)),
-        h2, Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(5)));
-
-    doCallRealMethod().when(e).calculateNetProduct(any(), any(), any());
-    BigDecimal actual = e.calculateNetProduct(type, exposures, Map.of(h1, BigDecimal.valueOf(3), h2, BigDecimal
-        .valueOf(4)));
-
-    assertEquals(0, BigDecimal.valueOf(6).compareTo(actual));
+    // survivors rescaled to 100%: 0.3/0.4 and 0.1/0.4
+    assertThat(result.getEquityCountryExposure().get(CountryRegionType.CANADA)).isEqualByComparingTo("0.75");
+    assertThat(result.getEquityCountryExposure().get(CountryRegionType.UNITED_STATES)).isEqualByComparingTo("0.25");
   }
 
   @Test
-  void shouldCalculate_whenVerifyAreAllValuesEmptyInMapOfExposure() {
-    try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var service = mock(EquityCountryExposureService.class,
-          withSettings().useConstructor(countryAllocationMappingService));
+  void shouldBlendByValue_acrossHoldings() {
+    var canFund = fund("CAN1", "100");
+    var usFund = fund("US1", "100");
+    var data = Map.of(
+        canFund, alloc(Map.of(Country.CANADA, BigDecimal.ONE)),
+        usFund, alloc(Map.of(Country.USA, BigDecimal.ONE)));
 
-      var exposures = mock(Map.class);
+    var result = service.perform(command(canFund, usFund), data);
 
-      doCallRealMethod().when(service).calculate(any(), any());
-      service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
-
-      mockedPortfolioUtils.verify(() -> PortfolioUtils.areAllValuesInMapEmpty(exposures));
-    }
+    assertThat(result.getEquityCountryExposure().get(CountryRegionType.CANADA)).isEqualByComparingTo("0.5");
+    assertThat(result.getEquityCountryExposure().get(CountryRegionType.UNITED_STATES)).isEqualByComparingTo("0.5");
+    assertThat(result.getWarnings()).isEmpty();
   }
 
   @Test
-  void shouldCalculate_whenCheckResultWhenExposureIsAllZeroValuesMap() {
-    try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var service = mock(EquityCountryExposureService.class,
-          withSettings().useConstructor(countryAllocationMappingService));
+  void shouldWarnAndReturnAllNullBuckets_whenDataMissing() {
+    var fund = fund("RBF605", "100");
 
-      var exposures = mock(Map.class);
-      var expected = EquityCountryExposureResult.builder()
-          .equityCountryExposure(EquityCountryExposureService.DEFAULT_MAP)
-          .warnings(List.of())
-          .build();
-      mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(any())).thenReturn(true);
+    var result = service.perform(command(fund), Map.of());
 
-      doCallRealMethod().when(service).calculate(any(), any());
-      var actual = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of());
-
-      assertEquals(expected, actual);
-    }
+    assertThat(result.getEquityCountryExposure().values()).containsOnlyNulls();
+    assertThat(result.getWarnings()).extracting("code").containsExactly(MISSING_EQUITY_COUNTRY_EXPOSURE.getCode());
   }
 
-  @Test
-  void shouldFetchExposures_whenCheckResult() {
-    var service = mock(EquityCountryExposureService.class,
-        withSettings().useConstructor(countryAllocationMappingService));
-
-    var holding = mock(PortfolioHolding.class);
-    var command = mock(PortfolioHoldingsCommand.class);
-    when(command.getHoldings()).thenReturn(List.of(holding));
-
-    var allocation = new EquityCountryAllocation();
-    allocation.setAllocations(Map.of(Country.CANADA, BigDecimal.valueOf(0.65)));
-    var data = Map.of(holding, allocation);
-
-    var expectedAllocations = Map.of(holding, Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(0.65)));
-    var expectedHolder = new ExposureDataHolder<>(expectedAllocations, List.<Notification>of());
-    when(countryAllocationMappingService.mapToCountryRegions(any(), any())).thenReturn(expectedHolder);
-
-    doCallRealMethod().when(service).fetchExposures(any(), any());
-    var result = service.fetchExposures(command, data);
-    var actual = result.allocations();
-
-    assertEquals(expectedAllocations, actual);
-    assertTrue(actual.containsKey(holding));
-    verify(countryAllocationMappingService).mapToCountryRegions(
-        Map.of(holding, allocation.getAllocations()), MISSING_EQUITY_COUNTRY_EXPOSURE);
+  private static PortfolioHoldingsCommand command(PortfolioHolding... holdings) {
+    return PortfolioHoldingsCommand.builder().holdings(List.of(holdings)).build();
   }
 
-  @Test
-  void shouldCalculate_whenVerifyCalculateNetProducts() {
-    try (var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var service = mock(EquityCountryExposureService.class);
-
-      var holding = mock(PortfolioHolding.class);
-      var holdings = List.of(holding);
-      var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
-
-      mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
-      doCallRealMethod().when(service).calculate(any(), any());
-      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
-
-      verify(service).calculateNetProducts(exposures, holdings, CountryRegionType.values());
-    }
+  private static PortfolioHolding fund(String id, String value) {
+    return PortfolioHolding.builder()
+        .value(new BigDecimal(value))
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
+        .build();
   }
 
-  @Test
-  void shouldCalculate_whenVerifyReScale() {
-    try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
-        var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var service = mock(EquityCountryExposureService.class);
-
-      var holding = mock(PortfolioHolding.class);
-      var holdings = List.of(holding);
-      var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
-      var netProducts = mock(Map.class);
-
-      mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesZerosInMap(any())).thenReturn(false);
-      when(service.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
-
-      doCallRealMethod().when(service).calculate(any(), any());
-      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
-
-      mockedCalculationUtils.verify(() -> CalculationUtils.reScale(netProducts));
-    }
+  private static EquityCountryAllocation alloc(Map<Country, BigDecimal> allocations) {
+    return EquityCountryAllocation.builder().allocations(allocations).build();
   }
-
-  @Test
-  void shouldCalculate_whenVerifyToUserScale() {
-    try (var mockedCalculationUtils = Mockito.mockStatic(CalculationUtils.class);
-        var mockedDecimalUtils = Mockito.mockStatic(DecimalUtils.class);
-        var mockedPortfolioUtils = Mockito.mockStatic(PortfolioUtils.class)) {
-      var service = mock(EquityCountryExposureService.class);
-
-      var holding = mock(PortfolioHolding.class);
-      var holdings = List.of(holding);
-      var exposures = Map.of(holding, Map.of(CountryRegionType.INTERNATIONAL_DEVELOPED, TEN));
-      var netProducts = mock(Map.class);
-
-      mockedPortfolioUtils.when(() -> PortfolioUtils.areAllValuesInMapEmpty(anyMap())).thenReturn(false);
-      mockedCalculationUtils.when(() -> CalculationUtils.reScale(any())).thenReturn(netProducts);
-
-      when(service.calculateNetProducts(exposures, holdings, CountryRegionType.values())).thenReturn(netProducts);
-
-      doCallRealMethod().when(service).calculate(any(), any());
-      service.calculate(new ExposureDataHolder<>(exposures, List.of()), holdings);
-
-      mockedDecimalUtils.verify(() -> DecimalUtils.toUserScale(netProducts));
-    }
-  }
-
 }
