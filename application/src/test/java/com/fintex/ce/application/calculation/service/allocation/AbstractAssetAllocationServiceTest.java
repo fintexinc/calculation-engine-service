@@ -4,7 +4,6 @@ import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConver
 import com.fintex.ce.application.calculation.service.FxRateService;
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.FxProperties;
-import com.fintex.ce.application.util.ExposureDataHolder;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.holding.CashHolding;
@@ -409,13 +408,13 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   }
 
   @Test
-  void calculate_directInvocationOnEmExposure_handlesPerServiceConvention() {
-    PortfolioHolding holding = mock(PortfolioHolding.class);
-    when(holding.getValue()).thenReturn(ONE);
-    Map<PortfolioHolding, Map<AssetAllocationRegionType, BigDecimal>> exposures = Map.of(
-        holding, Map.of(AssetAllocationRegionType.EM_EQUITIES, ONE));
+  void singleEmEquitiesExposure_handlesPerServiceConvention() {
+    PortfolioHolding emEtf = etf("CSEMAS");
+    HoldingAssetAllocation emAllocation = HoldingAssetAllocation.builder()
+        .allocations(Map.of(AssetAllocationRegionType.EM_EQUITIES, ONE))
+        .build();
 
-    R result = service.calculate(new ExposureDataHolder<>(exposures, List.of()), List.of(holding));
+    R result = service.perform(command(emEtf), data(Map.of(emEtf, emAllocation), Map.of()));
 
     assertAllocationEquals(result, expectedForCalculateOnSingleEmEquity());
   }

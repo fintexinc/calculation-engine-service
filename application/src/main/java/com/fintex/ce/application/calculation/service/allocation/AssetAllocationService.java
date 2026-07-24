@@ -29,19 +29,20 @@ public class AssetAllocationService extends AbstractAssetAllocationService<Asset
   }
 
   @Override
-  protected void postProcess(Map<AssetAllocationRegionType, BigDecimal> netProducts) {
+  protected Map<AssetAllocationRegionType, BigDecimal> collapseBuckets(
+      Map<AssetAllocationRegionType, BigDecimal> netProducts) {
     BigDecimal em = netProducts.remove(AssetAllocationRegionType.EM_EQUITIES);
-    if (em == null || em.signum() == 0) {
-      return;
+    if (em != null && em.signum() != 0) {
+      netProducts.merge(AssetAllocationRegionType.INTERNATIONAL_EQUITIES, em, BigDecimal::add);
     }
-    netProducts.merge(AssetAllocationRegionType.INTERNATIONAL_EQUITIES, em, BigDecimal::add);
+    return netProducts;
   }
 
   @Override
   protected AssetAllocationResult buildResult(Map<AssetAllocationRegionType, BigDecimal> netProducts,
       List<Notification> warnings) {
     return AssetAllocationResult.builder()
-        .assetAllocation(toUserScale(netProducts))
+        .assetAllocation(netProducts)
         .warnings(warnings)
         .build();
   }

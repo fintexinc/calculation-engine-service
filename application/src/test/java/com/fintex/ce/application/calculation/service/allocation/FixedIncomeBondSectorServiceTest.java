@@ -4,7 +4,6 @@ import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConver
 import com.fintex.ce.application.calculation.service.FxRateService;
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.FxProperties;
-import com.fintex.ce.application.mapping.response.FixedIncomeSectorResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSector;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
@@ -32,7 +31,6 @@ class FixedIncomeBondSectorServiceTest {
 
   private final FxRateService fxRateService = mock(FxRateService.class);
   private final FixedIncomeBondSectorService service = new FixedIncomeBondSectorService(
-      new FixedIncomeSectorResponseMapper(),
       new PortfolioWeightCalculator(new DefaultTargetCurrencyConverter(fxRateService, new FxProperties())));
 
   private PortfolioHolding bond(BigDecimal value) {

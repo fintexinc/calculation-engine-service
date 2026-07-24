@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
-import com.fintex.ce.application.mapping.response.FixedIncomeSectorResponseMapper;
 import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSector;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -25,21 +24,16 @@ import static com.fintex.ce.model.error.ErrorCode.MISSING_FIXED_INCOME_BOND_SECT
 import static com.fintex.ce.model.error.ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC;
 
 /**
- * Converts each holding's value to the default target currency before weighting fixed-income bond-sector exposures, so
- * multi-currency portfolios produce correct sector percentages. See {@link AbstractSectorAllocationService} for the
- * shared template.
+ * Fixed-income bond-sector breakdown. Only the bond-sector specifics live here; the weighting, aggregation,
+ * normalization and response assembly are the shared {@link AbstractBreakdownService} pipeline.
  */
 @Service
 public class FixedIncomeBondSectorService
     extends
-      AbstractSectorAllocationService<FixedIncomeBondSector, FixedIncomeSectorResult, FixedIncomeSectorAllocationType> {
+      AbstractSingleAttributeBreakdownService<FixedIncomeBondSector, FixedIncomeSectorResult, FixedIncomeSectorAllocationType> {
 
-  private final FixedIncomeSectorResponseMapper responseMapper;
-
-  public FixedIncomeBondSectorService(final FixedIncomeSectorResponseMapper responseMapper,
-      final PortfolioWeightCalculator portfolioWeightCalculator) {
-    super(portfolioWeightCalculator);
-    this.responseMapper = responseMapper;
+  public FixedIncomeBondSectorService(PortfolioWeightCalculator portfolioWeightCalculator) {
+    super(portfolioWeightCalculator, FixedIncomeSectorAllocationType.class);
   }
 
   @Override
@@ -53,39 +47,23 @@ public class FixedIncomeBondSectorService
   }
 
   @Override
-  protected FixedIncomeSectorAllocationType[] allocationTypes() {
-    return FixedIncomeSectorAllocationType.values();
-  }
-
-  @Override
   protected Currency currencyOf(FixedIncomeBondSector data) {
     return data.getCurrency();
   }
 
   @Override
-  protected FixedIncomeSectorResult emptyResponse(List<Notification> warnings) {
-    return responseMapper.toEmptyResponse(warnings);
-  }
-
-  @Override
-  protected FixedIncomeSectorResult fromNetProducts(Map<FixedIncomeSectorAllocationType, BigDecimal> netProducts,
-      List<Notification> warnings) {
-    return responseMapper.fromNetProducts(netProducts, warnings);
-  }
-
-  @Override
-  protected Map<FixedIncomeSectorAllocationType, BigDecimal> toSectorExposure(PortfolioHolding holding,
+  protected Map<FixedIncomeSectorAllocationType, BigDecimal> toBuckets(PortfolioHolding holding,
       FixedIncomeBondSector sector, List<Notification> warnings) {
     if (sector == null) {
       warnings.add(SECURITY_NOT_FOUND_FOR_METRIC.toNotificationForHolding(holding,
           getMetric().getUserFriendlyName()));
-      return unknownAllocation();
+      return singleBucket(FixedIncomeSectorAllocationType.UNKNOWN);
     }
     Map<FixedIncomeSectorAllocationType, BigDecimal> rawSectors = Optional.ofNullable(
         sector.getFixedIncomeBondSectors()).orElseGet(Map::of);
     if (CollectionUtils.isEmpty(rawSectors)) {
       warnings.add(MISSING_FIXED_INCOME_BOND_SECTOR.toNotificationForHolding(holding));
-      return unknownAllocation();
+      return singleBucket(FixedIncomeSectorAllocationType.UNKNOWN);
     }
     return rawSectors.entrySet().stream()
         .filter(entry -> entry.getValue() != null)
@@ -93,9 +71,12 @@ public class FixedIncomeBondSectorService
             () -> new EnumMap<>(FixedIncomeSectorAllocationType.class)));
   }
 
-  private static Map<FixedIncomeSectorAllocationType, BigDecimal> unknownAllocation() {
-    Map<FixedIncomeSectorAllocationType, BigDecimal> result = new EnumMap<>(FixedIncomeSectorAllocationType.class);
-    result.put(FixedIncomeSectorAllocationType.UNKNOWN, BigDecimal.ONE);
-    return result;
+  @Override
+  protected FixedIncomeSectorResult buildResult(Map<FixedIncomeSectorAllocationType, BigDecimal> buckets,
+      List<Notification> warnings) {
+    return FixedIncomeSectorResult.builder()
+        .fixedIncomeSector(buckets)
+        .warnings(warnings)
+        .build();
   }
 }
