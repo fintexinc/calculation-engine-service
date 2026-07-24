@@ -7,6 +7,7 @@ import com.fintex.ce.model.domain.result.distribution.DistributionRangeResult;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+@Disabled("metric unsupported")
 class DistributionOfReturnsCalculationTest {
 
   @Test

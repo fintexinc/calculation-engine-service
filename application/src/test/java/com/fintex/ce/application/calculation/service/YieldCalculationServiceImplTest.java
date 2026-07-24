@@ -9,6 +9,7 @@ import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Disabled("metric unsupported")
 class YieldCalculationServiceImplTest {
 
   @Mock

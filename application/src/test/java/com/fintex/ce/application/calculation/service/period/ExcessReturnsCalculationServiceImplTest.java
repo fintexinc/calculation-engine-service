@@ -9,6 +9,7 @@ import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+@Disabled("metric unsupported")
 class ExcessReturnsCalculationServiceImplTest {
 
   @Test

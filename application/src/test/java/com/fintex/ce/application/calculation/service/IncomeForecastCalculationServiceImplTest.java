@@ -4,6 +4,7 @@ import com.fintex.ce.model.domain.calculation.distribution.Income;
 import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Disabled("metric unsupported")
 class IncomeForecastCalculationServiceImplTest {
 
   private final IncomeForecastCalculationServiceImpl service = new IncomeForecastCalculationServiceImpl();

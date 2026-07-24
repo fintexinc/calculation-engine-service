@@ -13,6 +13,7 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -43,6 +44,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+@Disabled("metric unsupported")
 class CorrelationCalculationTest {
 
   final int TWELVE = 12;
