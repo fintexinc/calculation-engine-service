@@ -4,6 +4,8 @@ import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -13,9 +15,12 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
@@ -23,6 +28,8 @@ import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,6 +67,7 @@ class StandardDeviationCalculationTest {
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
+    stubCompleteCoverage(treeMap);
 
     doCallRealMethod().when(calculation).calculatePeriodForNumberOfMonths(anyInt(), any());
     calculation.calculatePeriodForNumberOfMonths(TWELVE, treeMap);
@@ -88,6 +96,7 @@ class StandardDeviationCalculationTest {
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
+    stubCompleteCoverage(treeMap);
 
     final var periodStartDate = LocalDate.now();
     when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
@@ -130,6 +139,7 @@ class StandardDeviationCalculationTest {
     when(calculation.getPortfolioTotalReturns()).thenReturn(treeMap);
     when(calculation.getSubMapByPeriodStartDate(any(), any())).thenReturn(treeMap);
     when(treeMap.size()).thenReturn(TWELVE);
+    stubCompleteCoverage(treeMap);
 
     final LocalDate periodStartDate = LocalDate.now();
     when(calculation.getPeriodStartDate(anyInt(), any())).thenReturn(periodStartDate);
@@ -162,6 +172,24 @@ class StandardDeviationCalculationTest {
     final BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(11, mock(NavigableMap.class));
 
     assertNull(actual);
+  }
+
+  @Test
+  void shouldThrowMissingPortfolioReturnError_whenRequestedWindowContainsMissingMonths() {
+    TreeMap<LocalDate, BigDecimal> returns = monthlyReturns(LocalDate.parse("2024-01-31"), 14);
+    returns.remove(LocalDate.parse("2024-11-30"));
+    returns.remove(LocalDate.parse("2024-12-31"));
+    StandardDeviationCalculation<StandardDeviationResult> calculation = new StandardDeviationCalculation<>(
+        new PeriodCalculationInput(null, returns), Set.of());
+
+    assertThatThrownBy(() -> calculation.calculatePeriodForNumberOfMonths(TWELVE))
+        .isInstanceOfSatisfying(CalculationException.class, exception -> {
+          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE);
+          assertThat(exception).hasMessage(
+              "Portfolio is missing monthly return values for date 2024-11-30, 2024-12-31");
+          assertThat(exception.getMetadata()).containsExactlyEntriesOf(
+              Map.of("param-1", "2024-11-30, 2024-12-31"));
+        });
   }
 
   @Test
@@ -224,6 +252,17 @@ class StandardDeviationCalculationTest {
     final StandardDeviationResult actual = (StandardDeviationResult) calculation.defineResponseType(pairs);
 
     assertEquals(expected, actual.getStandardDeviation());
+  }
+
+  private static TreeMap<LocalDate, BigDecimal> monthlyReturns(LocalDate startDate, int months) {
+    return IntStream.range(0, months)
+        .mapToObj(startDate::plusMonths)
+        .collect(Collectors.toMap(date -> toLastDayOfMonth(date), date -> ONE, (left, right) -> right, TreeMap::new));
+  }
+
+  private static void stubCompleteCoverage(NavigableMap<LocalDate, BigDecimal> returns) {
+    when(returns.lastKey()).thenReturn(LocalDate.parse("2024-12-31"));
+    when(returns.containsKey(any(LocalDate.class))).thenReturn(true);
   }
 
   @AfterAll

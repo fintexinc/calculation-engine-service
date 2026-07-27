@@ -4,6 +4,9 @@ import com.fintex.ce.PortfolioCalculationEngineApplication;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.error.ErrorResponse;
+import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.error.Severity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -37,7 +40,7 @@ import okhttp3.mockwebserver.SocketPolicy;
 
 @Tag("e2e")
 @ActiveProfiles("test")
-@AutoConfigureWebTestClient
+@AutoConfigureWebTestClient(timeout = "PT30S")
 @SpringBootTest(classes = PortfolioCalculationEngineApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class AbstractPortfolioCalculationE2ETest {
 
@@ -204,11 +207,26 @@ abstract class AbstractPortfolioCalculationE2ETest {
   }
 
   @Test
-  void shouldReturnInternalServerError_whenMetricInBodyDoesNotMatchPathMetric() {
-    var response = postCalculation(requestBodyForMismatchedMetricScenario());
+  void shouldReturnBadRequest_whenMetricInBodyDoesNotMatchPathMetric() {
+    String requestBody = requestBodyForMismatchedMetricScenario();
+    String bodyMetric = parseJson(requestBody).path("metric").asText();
+
+    var response = postCalculation(requestBody);
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    assertThat(response.responseBody()).contains("Metric mismatch");
+    ErrorResponse error = readJson(response.responseBody(), ErrorResponse.class);
+    assertThat(error.getNotifications()).hasSize(1);
+    Notification notification = error.getNotifications().getFirst();
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.METRIC_MISMATCH.getCode());
+    assertThat(notification.getMessage())
+        .isEqualTo(ErrorCode.METRIC_MISMATCH.getFormattedMessage(metricPath(), bodyMetric));
+    assertThat(notification.getDescription()).isEqualTo(ErrorCode.METRIC_MISMATCH.getDescription());
+    assertThat(notification.getAction()).isEqualTo(ErrorCode.METRIC_MISMATCH.getAction());
+    assertThat(notification.getSeverity()).isEqualTo(Severity.ERROR);
+    assertThat(notification.getMetadata())
+        .containsOnlyKeys("param-1", "param-2")
+        .containsEntry("param-1", metricPath())
+        .containsEntry("param-2", bodyMetric);
   }
 
   protected HttpResponse postCalculation(String body) {

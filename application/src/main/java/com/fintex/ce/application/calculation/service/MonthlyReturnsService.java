@@ -18,6 +18,9 @@ import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import static com.fintex.ce.application.util.ReturnSeriesAlignmentValidator.findMissingCalendarMonthEnds;
+import static java.util.stream.Collectors.joining;
+
 /**
  * Application-layer entry point for monthly-returns data sourcing. Consumes the pre-fetched monthly-returns map
  * supplied by the orchestrator, restricts it to the requested holdings (the map may cover a superset, e.g. portfolio
@@ -81,6 +84,15 @@ public class MonthlyReturnsService {
         .findFirst()
         .ifPresent(entry -> {
           throw ErrorCode.MISSING_MONTHLY_RETURNS.toExceptionForHolding(entry.getKey());
+        });
+    sourceData.entrySet().stream()
+        .filter(entry -> mandatoryForExternalSource.test(entry.getKey()))
+        .map(entry -> Map.entry(entry.getKey(), findMissingCalendarMonthEnds(entry.getValue().getReturns())))
+        .filter(entry -> !entry.getValue().isEmpty())
+        .findFirst()
+        .ifPresent(entry -> {
+          String missingDates = entry.getValue().stream().map(Object::toString).collect(joining(", "));
+          throw ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE.toExceptionForHolding(entry.getKey(), missingDates);
         });
   }
 

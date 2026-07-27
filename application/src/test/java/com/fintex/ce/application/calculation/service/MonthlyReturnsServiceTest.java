@@ -5,7 +5,9 @@ import com.fintex.ce.application.returns.ReturnsSnapshot;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.ce.model.error.exceptions.BasePceException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -60,6 +62,25 @@ class MonthlyReturnsServiceTest {
         .isInstanceOf(BasePceException.class)
         .satisfies(thrown -> assertThat(((BasePceException) thrown).getErrorCode())
             .isEqualTo(ErrorCode.MISSING_MONTHLY_RETURNS));
+  }
+
+  @Test
+  void shouldThrowMissingMonthlyReturnForDate_whenHoldingHistoryContainsCalendarGap() {
+    HoldingMonthlyReturns returns = holdingMonthlyReturns(Currency.USD,
+        Map.entry(LocalDate.parse("2024-01-31"), BigDecimal.valueOf(0.01)),
+        Map.entry(LocalDate.parse("2024-03-31"), BigDecimal.valueOf(0.02)));
+    when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
+    MonthlyReturnsService service = service();
+
+    assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF), Map.of(ETF, returns)))
+        .isInstanceOfSatisfying(CalculationException.class, exception -> {
+          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE);
+          assertThat(exception).hasMessage("The holding is missing monthly return values for date 2024-02-29");
+          assertThat(exception.getMetadata())
+              .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1")
+              .containsEntry(ErrorParams.HOLDING_ID, ErrorParams.holdingId(ETF))
+              .containsEntry("param-1", "2024-02-29");
+        });
   }
 
   @Test
