@@ -34,6 +34,14 @@ mvn spring-boot:run -D"spring-boot.run.profiles"=dev  # Run locally
 mvn jib:build                              # Build Docker image
 ```
 
+### Troubleshooting: broken classes / ApplicationContext fails to load
+
+If the build reports unresolved/broken classes from `com.fintex.wm` or the Spring
+`ApplicationContext` fails to load (e.g. bean-wiring errors, `401 Unauthorized` fetching
+`catalog-investment-commons` metadata from Azure Artifacts), the local `catalog-investment-commons`
+is stale or missing. Update the `catalog-investment-commons` project and install it into the local
+Maven repo (`mvn clean install` in that project) so `~/.m2` has the current SNAPSHOT, then rebuild.
+
 ---
 
 ## Module Structure & Rules
@@ -92,6 +100,7 @@ Pure logic, no data fetching.
 - **Ternary:** use for simple single-expression returns/assignments instead of if/else
 - **No `final`** on method parameters/variables
 - **No fully qualified class names** — always use imports
+- **No ticket references in code** — never put a ticket id (e.g. `TMI-536`, `JIRA-123`) in a comment or Javadoc. Comments must explain the behavior/rationale on their own terms; ticket traceability belongs in commit messages and PRs, not in the source. (Applies to production code and tests alike.)
 - **No magic strings** — extract to constants or enums
 - **Enum factory methods:** always name `fromValue(value)`
 - **Extract strings into constants or enums** - no magic strings in code

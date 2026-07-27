@@ -7,6 +7,7 @@ import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.FeesResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -179,16 +180,36 @@ class FeesCalculationServiceImplTest {
   }
 
   @Test
-  void usFund_onlyManagementFeePresent_isIncludedWithCascadingWarnings() {
-    // Real SMS data: a US mutual fund with all expense ratios null but managementFee populated.
+  void usFund_missingNerAndGer_throwsMissingNerAndGer_evenWhenManagementFeePresent() {
+    // Intended behavior: the MER and Fees metrics share one US resolution chain (NER → GER), so Fees does NOT keep a
+    // Management-Fee fallback for US funds. With NER and GER both absent the Fees request hard-fails with MER-002
+    // instead of reporting a fee off the Management Fee (0.01). The Management Fee metric is unaffected.
     PortfolioHolding etf = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND_US, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         etf, fee(null, "0.01", null, null));
 
-    FeesResult result = service.perform(commandFor(List.of(etf), FUNDS_ONLY), securityData);
+    assertThatThrownBy(() -> service.perform(commandFor(List.of(etf), FUNDS_ONLY), securityData))
+        .isInstanceOf(CalculationException.class)
+        .hasMessageContaining("missing both Net Expense Ratio and Gross Expense Ratio")
+        .extracting(e -> ((CalculationException) e).getErrorCode())
+        .isEqualTo(ErrorCode.MISSING_NER_AND_GER);
+  }
 
-    assertThat(result.getAnnualFee().get(FUNDS_ONLY)).isEqualByComparingTo("10");
-    assertThat(result.getWarnings()).extracting("code").containsExactly("FDS-024", "FDS-025");
+  @Test
+  void usEtf_missingNerAndGer_throwsMissingNerAndGer_evenWhenManagementFeeIsZero() {
+    // Real reported security F000015AWQ for the Fees metric: NER and GER blank, ActualManagementFee = 0.00000
+    // (present, not null). A present zero previously resolved to a 0 fee via the Management Fee fallback; it must now
+    // fail MER-002 rather than report a fee of 0.
+    PortfolioHolding etf = holding("F000015AWQ", FinancialInstrumentType.ETF_US, "100000");
+    Map<PortfolioHolding, FeeData> securityData = Map.of(
+        etf, fee(null, "0.00", null, null));
+
+    assertThatThrownBy(() -> service.perform(commandFor(List.of(etf), FUNDS_ONLY), securityData))
+        .isInstanceOf(CalculationException.class)
+        .hasMessageContaining("missing both Net Expense Ratio and Gross Expense Ratio")
+        .hasMessageContaining("F000015AWQ")
+        .extracting(e -> ((CalculationException) e).getErrorCode())
+        .isEqualTo(ErrorCode.MISSING_NER_AND_GER);
   }
 
   @Test

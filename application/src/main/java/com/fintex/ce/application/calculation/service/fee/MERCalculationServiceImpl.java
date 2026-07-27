@@ -26,7 +26,7 @@ public class MERCalculationServiceImpl extends AbstractFeeCalculationService<Ave
   private final FeeResolver feeResolver;
 
   public MERCalculationServiceImpl(DefaultTargetCurrencyConverter defaultTargetCurrencyConverter,
-      MerFeeResolver feeResolver) {
+      FeeResolver feeResolver) {
     super(defaultTargetCurrencyConverter);
     this.feeResolver = feeResolver;
   }

@@ -22,6 +22,8 @@ Follow these rules strictly.
 Don't write stupid useless comments like "when" "then" "assert" "helper method" etc. They do not bring any value.
 You can write only meaningful comments that explain some complex code/tests.
 
+**Never reference a ticket id (e.g. `TMI-536`, `JIRA-123`) in a test comment, Javadoc, or method name.** A comment must explain the scenario/behavior on its own terms; ticket traceability belongs in the commit message and PR, not in the test source.
+
 All test methods MUST follow this pattern:
 
 `shouldDoSmth_whenCondition...`
