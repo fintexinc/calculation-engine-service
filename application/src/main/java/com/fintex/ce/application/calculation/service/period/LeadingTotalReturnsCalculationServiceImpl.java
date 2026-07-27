@@ -48,7 +48,7 @@ public class LeadingTotalReturnsCalculationServiceImpl
     // Leading-returns is open-ended forward: it intentionally ignores the command's CPED and passes null to the
     // pipeline so no end-date trim is applied. That's why we don't reuse the inherited buildPeriodCalculationInput.
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolio());
     WeightedAverageResult<HoldingMonthlyReturns> result = portfolioWeightedAverageWithCpsdAndCped.run(portfolioContext,
         new CpsdCpedScaleParams(command.getCustomPsd(), null, ReturnFactorScale.SCALE_OF_TWO));
     PeriodCalculationInput input = new PeriodCalculationInput(result.weightedAverage());

@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service.fee;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -31,8 +31,8 @@ public class ManagementFeeCalculationServiceImpl
     extends
       AbstractFeeCalculationService<ManagementFeeResult> {
 
-  public ManagementFeeCalculationServiceImpl(DefaultTargetCurrencyConverter defaultTargetCurrencyConverter) {
-    super(defaultTargetCurrencyConverter);
+  public ManagementFeeCalculationServiceImpl(HoldingCurrencyConverter currencyConverter) {
+    super(currencyConverter);
   }
 
   @Override

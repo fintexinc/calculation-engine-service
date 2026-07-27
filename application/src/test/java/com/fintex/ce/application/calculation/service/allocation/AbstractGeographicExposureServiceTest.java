@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
 import com.fintex.ce.application.calculation.service.FxRateService;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.model.domain.calculation.allocation.GeographicExposureData;
@@ -49,16 +49,15 @@ import static org.mockito.Mockito.when;
  * type-specific relevant holding (a stock for the equity variant, a bond for the fixed-income variant) and the expected
  * per-region distribution for the heterogeneous portfolio that includes it. Each happy-path assertion checks every
  * {@link GeographicRegionType} bucket via {@link #assertExposureEquals} — silent zero buckets are validated too, not
- * just the headline non-zero ones. The real {@link PortfolioWeightCalculator} and
- * {@link DefaultTargetCurrencyConverter} participate; only {@link FxRateService} is stubbed so FX scenarios are
- * deterministic.
+ * just the headline non-zero ones. The real {@link PortfolioWeightCalculator} and {@link HoldingCurrencyConverter}
+ * participate; only {@link FxRateService} is stubbed so FX scenarios are deterministic.
  */
 abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposureResult> {
 
   protected static final BigDecimal TOLERANCE = new BigDecimal("0.0000000001");
 
   protected final FxRateService fxRateService = mock(FxRateService.class);
-  protected final DefaultTargetCurrencyConverter currencyConverter = new DefaultTargetCurrencyConverter(
+  protected final HoldingCurrencyConverter currencyConverter = new HoldingCurrencyConverter(
       fxRateService, new FxProperties());
   protected final PortfolioWeightCalculator portfolioWeightCalculator = new PortfolioWeightCalculator(
       currencyConverter);

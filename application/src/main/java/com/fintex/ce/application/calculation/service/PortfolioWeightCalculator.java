@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.Conversion;
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.CurrencyValue;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter.Conversion;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -21,16 +21,16 @@ import static java.math.BigDecimal.ZERO;
 
 /**
  * Computes per-holding portfolio weights normalized to the default target currency. Holding values denominated in
- * non-target currencies are converted via {@link DefaultTargetCurrencyConverter} before the weight denominator is
- * formed; holdings without a known source currency, or with a currency that lacks an FX rate, fall back to their raw
- * value (with a warning emitted by the converter). When the normalized total is zero the calculator falls back to raw
- * value weights so that downstream consumers still get a valid weight distribution.
+ * non-target currencies are converted via {@link HoldingCurrencyConverter} before the weight denominator is formed;
+ * holdings without a known source currency, or with a currency that lacks an FX rate, fall back to their raw value
+ * (with a warning emitted by the converter). When the normalized total is zero the calculator falls back to raw value
+ * weights so that downstream consumers still get a valid weight distribution.
  */
 @Service
 @RequiredArgsConstructor
 public class PortfolioWeightCalculator {
 
-  private final DefaultTargetCurrencyConverter currencyConverter;
+  private final HoldingCurrencyConverter currencyConverter;
 
   public Result compute(List<PortfolioHolding> holdings, Map<PortfolioHolding, Currency> currencies) {
     Map<PortfolioHolding, CurrencyValue> input = HashMap.newHashMap(holdings.size());

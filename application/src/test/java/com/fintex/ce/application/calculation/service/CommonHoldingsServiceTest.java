@@ -53,7 +53,7 @@ class CommonHoldingsServiceTest {
       Set<Currency> src = inv.getArgument(0);
       return src.stream().collect(Collectors.toMap(c -> c, c -> BigDecimal.ONE));
     });
-    DefaultTargetCurrencyConverter converter = new DefaultTargetCurrencyConverter(fxRateService, new FxProperties());
+    HoldingCurrencyConverter converter = new HoldingCurrencyConverter(fxRateService, new FxProperties());
     properties = new TopHoldingsProperties();
     properties.setAccumulateTypes(EnumSet.of(AccumulateHoldingType.E));
     service = new CommonHoldingsService(converter, properties);

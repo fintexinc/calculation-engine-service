@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service.fee;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -8,6 +8,7 @@ import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.FeesResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
+import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.Notification;
 
@@ -32,7 +33,7 @@ import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
  *
  * <p>
  * FX: each MER-bearing holding's {@code marketValue} is converted to the default target currency via
- * {@link DefaultTargetCurrencyConverter} before the sum. Missing currency on a MER-bearing holding → hard error
+ * {@link HoldingCurrencyConverter} before the sum. Missing currency on a MER-bearing holding → hard error
  * ({@link com.fintex.ce.model.error.ErrorCode#HOLDING_MISSING_CURRENCY_FROM_FDS}). Rate unavailable → emit
  * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} and leave the value in its native currency. Zero-fee
  * holdings (stocks, cash, GIC, fixed income) are skipped — they contribute 0 either way.
@@ -42,9 +43,9 @@ public class FeesCalculationServiceImpl extends AbstractFeeCalculationService<Fe
 
   private final FeeResolver feeResolver;
 
-  public FeesCalculationServiceImpl(DefaultTargetCurrencyConverter defaultTargetCurrencyConverter,
+  public FeesCalculationServiceImpl(HoldingCurrencyConverter currencyConverter,
       FeeResolver feeResolver) {
-    super(defaultTargetCurrencyConverter);
+    super(currencyConverter);
     this.feeResolver = feeResolver;
   }
 
@@ -72,12 +73,12 @@ public class FeesCalculationServiceImpl extends AbstractFeeCalculationService<Fe
   @Override
   protected List<Notification> applyValueFxConversion(
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations,
-      AverageMerCommand command) {
+      Currency targetCurrency) {
     Map<PortfolioHolding, AverageManagementExpenseCalculation> merBearing = flattenCalcs(calculations).entrySet()
         .stream()
         .filter(e -> MER_BEARING_TYPES.contains(e.getValue().getHoldingType()))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    return convertMarketValuesToDefaultTargetCurrency(merBearing);
+    return convertMarketValuesToTargetCurrency(merBearing, targetCurrency);
   }
 
   @Override

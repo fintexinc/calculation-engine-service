@@ -48,10 +48,10 @@ public abstract class BenchmarkWeightedAverageWithCpedAbstractService<C extends 
 
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = collector.tryCatch(
         () -> portfolioMonthlyReturnsContextProvider.get(command.getHoldings(), command.getCurrency(),
-            returnsData.portfolioReturns()));
+            returnsData.portfolio()));
     MonthlyReturnsContext<HoldingMonthlyReturns> benchmarkContext = collector.tryCatch(
         () -> benchmarkMonthlyReturnsContextProvider.get(command.getBenchmarkHoldings(), command.getCurrency(),
-            returnsData.benchmarkReturns()));
+            returnsData.benchmark()));
     collector.throwIfAny();
 
     LocalDate commonStart = portfolioContext.commonPerformanceStartDate(benchmarkContext);

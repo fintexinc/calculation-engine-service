@@ -61,7 +61,7 @@ public abstract class WeightedAverageWithCpsdAndCpedAbstractService<C extends Po
   protected WeightedAverageResult<HoldingMonthlyReturns> runWeightedAverage(C command, ReturnFactorScale scale,
       PortfolioBenchmarkReturns returnsData) {
     MonthlyReturnsContext<HoldingMonthlyReturns> context = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolio());
     return portfolioWeightedAverageWithCpsdAndCped.run(context,
         new CpsdCpedScaleParams(command.getCustomPsd(), command.getCustomPed(), scale));
   }

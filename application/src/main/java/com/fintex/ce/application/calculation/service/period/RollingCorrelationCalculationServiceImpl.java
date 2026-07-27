@@ -72,7 +72,7 @@ public class RollingCorrelationCalculationServiceImpl
   public Map<PortfolioHolding, Map<LocalDate, BigDecimal>> getBaseTotalReturns(RollingCalculationCommand command,
       PortfolioBenchmarkReturns returnsData) {
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolio());
     ReturnsSnapshot<HoldingMonthlyReturns> postFx = portfolioValidateCutAndFx.run(portfolioContext,
         new CpedParams(command.getCustomPed()));
     return new HashMap<>(postFx.returnsMap());

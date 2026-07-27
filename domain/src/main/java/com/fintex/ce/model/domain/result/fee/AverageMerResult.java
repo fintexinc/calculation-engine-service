@@ -3,10 +3,12 @@ package com.fintex.ce.model.domain.result.fee;
 import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,5 +28,16 @@ public class AverageMerResult extends BaseCalculationResult {
 
   @Schema(description = "Management expense ratio by parameter type (scaled/absolute)")
   @Builder.Default
-  private Map<FeeAggregationMode, BigDecimal> managementExpenseRatio = new HashMap<>();
+  private Map<FeeAggregationMode, BigDecimal> managementExpenseRatio = new EnumMap<>(FeeAggregationMode.class);
+
+  /**
+   * The FX-converted market-value denominator behind each mode's weighted-average MER, i.e. the exact asset base that
+   * mode's ratio is normalised over (MER-bearing holdings only for {@code FUNDS_ONLY}, the whole portfolio for
+   * {@code WHOLE_PORTFOLIO}). Consumed by {@code mer-benchmark-comparison} to turn a ratio difference into an annual
+   * dollar impact without re-running FX conversion or fee resolution. Internal to the calculation pipeline — excluded
+   * from the {@code mer} metric's response contract.
+   */
+  @JsonIgnore
+  @Builder.Default
+  private Map<FeeAggregationMode, BigDecimal> baseValue = new EnumMap<>(FeeAggregationMode.class);
 }

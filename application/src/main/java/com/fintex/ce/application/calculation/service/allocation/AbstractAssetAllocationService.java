@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
@@ -35,11 +35,11 @@ import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
  * and GIC holdings are first-class buckets here (not excluded): cash maps to {@code CASH}, GIC to its typed region.
  * Stocks resolve via {@link Geography#getRegion()} mapped to {@link AssetAllocationRegionType}, funds via the typed
  * allocations. Weights are normalized to the default target currency configured in
- * {@link FxProperties#getDefaultTargetCurrency()} via {@link DefaultTargetCurrencyConverter}. Before rescaling,
- * near-zero aggregated values (|value| &lt; 1e-5) are clamped to zero — Morningstar reports tiny residual values in
- * buckets like {@code OTHER} or {@code CASH} for derivatives accounting and percentage-rounding offsets, and surfacing
- * them as ~1e-6 noise in user output is confusing while real positions are always orders of magnitude larger.
- * Subclasses may collapse buckets via {@link #collapseBuckets}.
+ * {@link FxProperties#getDefaultTargetCurrency()} via {@link HoldingCurrencyConverter}. Before rescaling, near-zero
+ * aggregated values (|value| &lt; 1e-5) are clamped to zero — Morningstar reports tiny residual values in buckets like
+ * {@code OTHER} or {@code CASH} for derivatives accounting and percentage-rounding offsets, and surfacing them as ~1e-6
+ * noise in user output is confusing while real positions are always orders of magnitude larger. Subclasses may collapse
+ * buckets via {@link #collapseBuckets}.
  */
 public abstract class AbstractAssetAllocationService<R extends BaseCalculationResult>
     extends

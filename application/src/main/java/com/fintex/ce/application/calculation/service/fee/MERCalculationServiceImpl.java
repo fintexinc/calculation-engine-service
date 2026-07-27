@@ -1,6 +1,6 @@
 package com.fintex.ce.application.calculation.service.fee;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -25,9 +25,9 @@ public class MERCalculationServiceImpl extends AbstractFeeCalculationService<Ave
 
   private final FeeResolver feeResolver;
 
-  public MERCalculationServiceImpl(DefaultTargetCurrencyConverter defaultTargetCurrencyConverter,
+  public MERCalculationServiceImpl(HoldingCurrencyConverter currencyConverter,
       FeeResolver feeResolver) {
-    super(defaultTargetCurrencyConverter);
+    super(currencyConverter);
     this.feeResolver = feeResolver;
   }
 
@@ -53,12 +53,15 @@ public class MERCalculationServiceImpl extends AbstractFeeCalculationService<Ave
     var result = new AverageMerResult();
     if (modes.contains(FUNDS_ONLY)) {
       result.getManagementExpenseRatio().put(FUNDS_ONLY, getFundsOnlyAverage(calculations));
+      result.getBaseValue().put(FUNDS_ONLY, getFundsOnlyBase(calculations));
     }
     if (modes.contains(WHOLE_PORTFOLIO)) {
       result.getManagementExpenseRatio().put(WHOLE_PORTFOLIO, getWholePortfolioAverage(calculations));
+      result.getBaseValue().put(WHOLE_PORTFOLIO, getWholePortfolioBase(calculations));
     }
     if (modes.contains(FUNDS_ONLY_STRICT)) {
       result.getManagementExpenseRatio().put(FUNDS_ONLY_STRICT, getFundsOnlyStrictAverage(calculations));
+      result.getBaseValue().put(FUNDS_ONLY_STRICT, getFundsOnlyStrictBase(calculations));
     }
     return result;
   }

@@ -1,8 +1,11 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.model.dto.command.MerComparisonCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -24,6 +27,12 @@ class BenchmarkHoldingReqValidatorTest {
   private final BenchmarkHoldingReqValidator validator = new BenchmarkHoldingReqValidator();
 
   @Test
+  void shouldSupportEveryBenchmarkMetric() {
+    assertThat(validator.supportedMetrics())
+        .containsExactlyElementsOf(CalculationMetric.BENCHMARK_METRICS);
+  }
+
+  @Test
   void shouldThrow_whenBenchmarkCashHoldingHasNullCurrency() {
     CashHolding cashHolding = CashHolding.builder()
         .value(BigDecimal.TEN)
@@ -39,7 +48,7 @@ class BenchmarkHoldingReqValidatorTest {
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_MISSING_CURRENCY");
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.HOLDING_MISSING_CURRENCY);
         });
   }
 
@@ -47,10 +56,10 @@ class BenchmarkHoldingReqValidatorTest {
   void shouldNotThrow_whenBenchmarkHoldingsAreValid() {
     PortfolioHolding h1 = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+        new SecurityIdentifier("CIG1101", FiIdentifierType.FUNDSERV));
     PortfolioHolding h2 = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.ETF_CANADA,
-        new SecurityIdentifier("ID2", FiIdentifierType.TICKER));
+        new SecurityIdentifier("VCNS", FiIdentifierType.TICKER));
 
     PeriodCommand cmd = new PeriodCommand();
     cmd.setCurrency(Currency.CAD);
@@ -69,8 +78,8 @@ class BenchmarkHoldingReqValidatorTest {
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_EMPTY");
-          assertThat(rve.getFieldName()).isEqualTo("benchmarkHoldings");
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.FIELD_NOT_EMPTY);
+          assertThat(rve.getFieldName()).isEqualTo(BenchmarkHoldingReqValidator.BENCHMARK_HOLDINGS_FIELD);
         });
   }
 
@@ -84,8 +93,51 @@ class BenchmarkHoldingReqValidatorTest {
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("FIELD_NOT_EMPTY");
-          assertThat(rve.getFieldName()).isEqualTo("benchmarkHoldings");
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.FIELD_NOT_EMPTY);
+          assertThat(rve.getFieldName()).isEqualTo(BenchmarkHoldingReqValidator.BENCHMARK_HOLDINGS_FIELD);
         });
+  }
+
+  @Test
+  void shouldThrow_whenMerComparisonBenchmarkHoldingsAreNull() {
+    var cmd = new MerComparisonCommand();
+
+    assertThatThrownBy(() -> validator.validate(cmd))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.FIELD_NOT_EMPTY);
+          assertThat(rve.getFieldName()).isEqualTo(BenchmarkHoldingReqValidator.BENCHMARK_HOLDINGS_FIELD);
+        });
+  }
+
+  @Test
+  void shouldThrow_whenMerComparisonBenchmarkHoldingHasNullHoldingType() {
+    var cmd = new MerComparisonCommand();
+    cmd.setBenchmarkHoldings(List.of(new PortfolioHolding(BigDecimal.TEN, null,
+        new SecurityIdentifier("TDB622", FiIdentifierType.FUNDSERV))));
+
+    assertThatThrownBy(() -> validator.validate(cmd)).isInstanceOf(ValidationException.class);
+  }
+
+  @Test
+  void shouldNotThrow_whenMerComparisonBenchmarkIsASingleFund() {
+    var cmd = new MerComparisonCommand();
+    cmd.setBenchmarkHoldings(List.of(new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new SecurityIdentifier("TDB622", FiIdentifierType.FUNDSERV))));
+
+    assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
+  }
+
+  @Test
+  void shouldNotThrow_whenMerComparisonBenchmarkHasSeveralFunds() {
+    var cmd = new MerComparisonCommand();
+    cmd.setBenchmarkHoldings(List.of(
+        new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+            new SecurityIdentifier("TDB622", FiIdentifierType.FUNDSERV)),
+        new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF_CANADA,
+            new SecurityIdentifier("XBAL", FiIdentifierType.TICKER))));
+
+    assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
   }
 }

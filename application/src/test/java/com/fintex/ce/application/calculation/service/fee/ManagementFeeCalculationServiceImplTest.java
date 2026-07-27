@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.fee;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
 import com.fintex.ce.application.calculation.service.FxRateService;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -16,7 +16,7 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,10 +34,10 @@ import static org.mockito.Mockito.when;
 class ManagementFeeCalculationServiceImplTest {
 
   private final FxRateService fxRateService = mock(FxRateService.class);
-  private final DefaultTargetCurrencyConverter defaultTargetCurrencyConverter = new DefaultTargetCurrencyConverter(
+  private final HoldingCurrencyConverter currencyConverter = new HoldingCurrencyConverter(
       fxRateService, new FxProperties());
   private final ManagementFeeCalculationServiceImpl service = new ManagementFeeCalculationServiceImpl(
-      defaultTargetCurrencyConverter);
+      currencyConverter);
 
   {
     // Default: identity FX so single-currency tests stay focused on fee math.
@@ -159,7 +159,7 @@ class ManagementFeeCalculationServiceImplTest {
             .currency(Currency.USD)
             .build());
     when(fxRateService.spotRates(anySet(), any(), any())).thenAnswer(inv -> {
-      Map<Currency, BigDecimal> m = new HashMap<>();
+      Map<Currency, BigDecimal> m = new EnumMap<>(Currency.class);
       m.put(Currency.USD, null);
       return m;
     });
