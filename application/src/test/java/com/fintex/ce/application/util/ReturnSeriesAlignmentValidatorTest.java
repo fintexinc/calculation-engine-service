@@ -14,11 +14,20 @@ import java.util.stream.IntStream;
 
 import static java.math.BigDecimal.ONE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReturnSeriesAlignmentValidatorTest {
 
   private static final int TWELVE_MONTHS = 12;
+
+  @Test
+  void shouldNotThrowException_whenPortfolioReturnsAreEmpty() {
+    TreeMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
+
+    assertThatCode(() -> ReturnSeriesAlignmentValidator.requirePortfolioCoverage(portfolioReturns, TWELVE_MONTHS))
+        .doesNotThrowAnyException();
+  }
 
   @Test
   void shouldReportAllMissingPortfolioDates_whenPortfolioCoverageHasMultipleGaps() {
