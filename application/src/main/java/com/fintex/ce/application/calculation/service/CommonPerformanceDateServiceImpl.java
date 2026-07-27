@@ -56,11 +56,11 @@ public class CommonPerformanceDateServiceImpl
 
     PceExceptionCollector collector = new PceExceptionCollector();
     ReturnsSnapshot<HoldingMonthlyReturns> portfolioSnapshot = collector.tryCatch(
-        () -> getPortfolioMonthlyReturns(portfolioHoldings, returnsData.portfolioReturns()));
+        () -> getPortfolioMonthlyReturns(portfolioHoldings, returnsData.portfolio()));
     DateRange commonPerformanceDateForPortfolios = collector.tryCatch(
         () -> commonPerformanceDateFor(portfolioSnapshot));
     ReturnsSnapshot<HoldingMonthlyReturns> benchmarkSnapshot = collector.tryCatch(
-        () -> getPortfolioMonthlyReturns(command.getBenchmarkHoldings(), returnsData.benchmarkReturns()));
+        () -> getPortfolioMonthlyReturns(command.getBenchmarkHoldings(), returnsData.benchmark()));
     DateRange commonPerformanceDatesForBenchmarks = collector.tryCatch(
         () -> commonPerformanceDateFor(benchmarkSnapshot));
     collector.throwIfAny();

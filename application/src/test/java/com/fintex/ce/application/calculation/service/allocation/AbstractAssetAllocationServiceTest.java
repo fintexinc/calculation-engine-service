@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
 import com.fintex.ce.application.calculation.service.FxRateService;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.model.domain.calculation.allocation.AssetAllocationData;
@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +55,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   protected static final BigDecimal HALF = new BigDecimal("0.5");
 
   protected final FxRateService fxRateService = mock(FxRateService.class);
-  protected final DefaultTargetCurrencyConverter currencyConverter = new DefaultTargetCurrencyConverter(
+  protected final HoldingCurrencyConverter currencyConverter = new HoldingCurrencyConverter(
       fxRateService, new FxProperties());
   protected final PortfolioWeightCalculator portfolioWeightCalculator = new PortfolioWeightCalculator(
       currencyConverter);
@@ -389,7 +388,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
         .region(regionDatapoint(SecurityRegion.USA))
         .currency(currencyDatapoint(Currency.USD))
         .build();
-    Map<Currency, BigDecimal> noRate = new HashMap<>();
+    Map<Currency, BigDecimal> noRate = new EnumMap<>(Currency.class);
     noRate.put(Currency.USD, null);
     when(fxRateService.spotRates(anySet(), any(), any())).thenReturn(noRate);
 

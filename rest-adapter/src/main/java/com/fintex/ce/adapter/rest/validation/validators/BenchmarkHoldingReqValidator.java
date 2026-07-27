@@ -8,15 +8,22 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Requires and validates {@code benchmarkHoldings} for every metric that compares a portfolio against a benchmark — the
+ * returns-based performance metrics and {@code mer-benchmark-comparison} alike. Without this guard a missing benchmark
+ * reaches the calculation and fails with an unhandled server error instead of a validation response.
+ */
 @Component
 @Order(450)
 public class BenchmarkHoldingReqValidator
     extends
       AbstractHoldingsValidationReqValidator<BenchmarkHoldingsProvider> {
 
+  static final String BENCHMARK_HOLDINGS_FIELD = "benchmarkHoldings";
+
   public BenchmarkHoldingReqValidator() {
     super(BenchmarkHoldingsProvider.class, BenchmarkHoldingsProvider::getBenchmarkHoldings,
-        HoldingsValidationHelper::validate, "benchmarkHoldings", true);
+        HoldingsValidationHelper::validate, BENCHMARK_HOLDINGS_FIELD, true);
   }
 
   @Override

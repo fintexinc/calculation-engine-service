@@ -56,7 +56,7 @@ public abstract class WeightedAverageWithCpedAbstractService<C extends PeriodCom
   public WeightedAverageResult<HoldingMonthlyReturns> buildWeightedAverageResult(C command,
       ReturnFactorScale scale, PortfolioBenchmarkReturns returnsData) {
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolio());
     return portfolioWeightedAverageWithCped.run(portfolioContext, new CpedScaleParams(command.getCustomPed(), scale));
   }
 

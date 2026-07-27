@@ -60,7 +60,7 @@ public abstract class ValidateCutAndFxAbstractService<C extends PeriodCommand, R
   protected ReturnsSnapshot<HoldingMonthlyReturns> runValidateCutAndFx(C command,
       PortfolioBenchmarkReturns returnsData) {
     MonthlyReturnsContext<HoldingMonthlyReturns> portfolioContext = portfolioMonthlyReturnsContextProvider.get(
-        command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns());
+        command.getHoldings(), command.getCurrency(), returnsData.portfolio());
     return portfolioValidateCutAndFx.run(portfolioContext, new CpedParams(command.getCustomPed()));
   }
 

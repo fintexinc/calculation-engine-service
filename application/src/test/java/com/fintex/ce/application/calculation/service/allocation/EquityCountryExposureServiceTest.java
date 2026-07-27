@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service.allocation;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
 import com.fintex.ce.application.calculation.service.FxRateService;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
 import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.application.mapping.CountryAllocationMappingService;
@@ -33,7 +33,7 @@ class EquityCountryExposureServiceTest {
 
   private final FxRateService fxRateService = mock(FxRateService.class);
   private final EquityCountryExposureService service = new EquityCountryExposureService(
-      new PortfolioWeightCalculator(new DefaultTargetCurrencyConverter(fxRateService, new FxProperties())),
+      new PortfolioWeightCalculator(new HoldingCurrencyConverter(fxRateService, new FxProperties())),
       new CountryAllocationMappingService(new CountryRegionResolver()));
 
   @BeforeEach

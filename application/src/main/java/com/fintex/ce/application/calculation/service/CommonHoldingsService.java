@@ -1,7 +1,7 @@
 package com.fintex.ce.application.calculation.service;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.Conversion;
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.CurrencyValue;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter.Conversion;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
 import com.fintex.ce.application.config.TopHoldingsProperties;
 import com.fintex.ce.application.constant.AccumulateHoldingType;
 import com.fintex.ce.application.constant.HoldingTypeGroup;
@@ -59,7 +59,7 @@ public class CommonHoldingsService
     implements
       SingleAttributeCalculationService<TopCommonHoldingsCommand, CommonTopHoldings, TopCommonHoldingsResult> {
 
-  private final DefaultTargetCurrencyConverter defaultTargetCurrencyConverter;
+  private final HoldingCurrencyConverter currencyConverter;
   private final TopHoldingsProperties properties;
 
   @Override
@@ -121,7 +121,7 @@ public class CommonHoldingsService
     for (PortfolioHolding holding : requestedHoldings) {
       input.put(holding, new CurrencyValue(currencyFor(holding, rawHoldings), holding.getValue()));
     }
-    Conversion conversion = defaultTargetCurrencyConverter.convert(input);
+    Conversion conversion = currencyConverter.convert(input);
     for (PortfolioHolding holding : conversion.missingCurrency()) {
       if (isSentToSms(holding)) {
         throw ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS.toExceptionForHolding(holding);

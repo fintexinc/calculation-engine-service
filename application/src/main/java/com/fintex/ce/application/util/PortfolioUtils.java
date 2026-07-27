@@ -33,7 +33,7 @@ public class PortfolioUtils {
   /**
    * Variant for pipelines that have already normalised each holding's value into a single common currency. The map's
    * values are summed directly without re-reading {@code PortfolioHolding.value}, so callers can pass FX-converted
-   * amounts produced by {@code DefaultTargetCurrencyConverter}.
+   * amounts produced by {@code HoldingCurrencyConverter}.
    */
   public static Map<PortfolioHolding, BigDecimal> calculateInitialPortfolioWeightFromValues(
       Map<PortfolioHolding, BigDecimal> convertedValues) {

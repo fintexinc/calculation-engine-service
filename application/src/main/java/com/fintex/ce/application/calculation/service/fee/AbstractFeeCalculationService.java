@@ -1,8 +1,8 @@
 package com.fintex.ce.application.calculation.service.fee;
 
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter;
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.Conversion;
-import com.fintex.ce.application.calculation.service.DefaultTargetCurrencyConverter.CurrencyValue;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter.Conversion;
+import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
 import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
@@ -11,6 +11,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.Notification;
@@ -53,10 +54,10 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
     implements
       SingleAttributeCalculationService<AverageMerCommand, FeeData, R> {
 
-  protected final DefaultTargetCurrencyConverter defaultTargetCurrencyConverter;
+  protected final HoldingCurrencyConverter currencyConverter;
 
-  protected AbstractFeeCalculationService(DefaultTargetCurrencyConverter defaultTargetCurrencyConverter) {
-    this.defaultTargetCurrencyConverter = defaultTargetCurrencyConverter;
+  protected AbstractFeeCalculationService(HoldingCurrencyConverter currencyConverter) {
+    this.currencyConverter = currencyConverter;
   }
 
   /**
@@ -132,7 +133,7 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
         command, data);
 
     List<Notification> warnings = new ArrayList<>(resolveFees(calculations));
-    warnings.addAll(applyValueFxConversion(calculations, command));
+    warnings.addAll(applyValueFxConversion(calculations, command.getTargetCurrency()));
     var result = calculateAverageValue(
         getSpecifiedIfEmpty(command.getParameterTypes(), FUNDS_ONLY, WHOLE_PORTFOLIO),
         calculations);
@@ -143,9 +144,10 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
   }
 
   /**
-   * Converts each holding's {@code marketValue} into the configured default target currency by delegating to
-   * {@link DefaultTargetCurrencyConverter} and applying the fee-specific rule that a non-zero fee with a missing source
-   * currency is fatal.
+   * Converts each holding's {@code marketValue} into {@code targetCurrency} by delegating to
+   * {@link HoldingCurrencyConverter} and applying the fee-specific rule that a non-zero fee with a missing source
+   * currency is fatal. A null target means the caller did not ask for one, and the converter falls back to the
+   * configured reporting currency.
    *
    * <p>
    * Why default to converting <i>all</i> holdings (not just MER-bearing): weighted-average MER/Management-Fee in
@@ -158,8 +160,8 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
    */
   protected List<Notification> applyValueFxConversion(
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations,
-      AverageMerCommand command) {
-    return convertMarketValuesToDefaultTargetCurrency(flattenCalcs(calculations));
+      Currency targetCurrency) {
+    return convertMarketValuesToTargetCurrency(flattenCalcs(calculations), targetCurrency);
   }
 
   /**
@@ -167,15 +169,15 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
    * holding whose fee actually contributes to the numerator has no source currency (we won't guess and silently
    * miscount); applies converted values in place; returns the converter's FX-rate-unavailable warnings.
    */
-  protected final List<Notification> convertMarketValuesToDefaultTargetCurrency(
-      Map<PortfolioHolding, AverageManagementExpenseCalculation> calcByHolding) {
+  protected final List<Notification> convertMarketValuesToTargetCurrency(
+      Map<PortfolioHolding, AverageManagementExpenseCalculation> calcByHolding, Currency targetCurrency) {
     Map<PortfolioHolding, CurrencyValue> input = new HashMap<>();
     for (Map.Entry<PortfolioHolding, AverageManagementExpenseCalculation> entry : calcByHolding.entrySet()) {
       AverageManagementExpenseCalculation calc = entry.getValue();
       input.put(entry.getKey(), new CurrencyValue(calc.getCurrency(), calc.getMarketValue()));
     }
 
-    Conversion conversion = defaultTargetCurrencyConverter.convert(input);
+    Conversion conversion = currencyConverter.convert(input, targetCurrency);
 
     for (PortfolioHolding holding : conversion.missingCurrency()) {
       if (feeContributesToNumerator(calcByHolding.get(holding))) {
@@ -258,11 +260,35 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
    */
   protected BigDecimal getWholePortfolioAverage(
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
-    List<AverageManagementExpenseCalculation> all = calculations.values().stream()
-        .map(Map::values)
-        .flatMap(Collection::stream)
-        .toList();
-    return weightedAverage(all);
+    return weightedAverage(allCalculations(calculations));
+  }
+
+  /**
+   * FX-converted market-value denominator behind {@link #getFundsOnlyAverage} — the exact asset base its weighted
+   * average normalises over. Consumed by {@code mer-benchmark-comparison} to scale a ratio difference into an annual
+   * dollar impact for the funds-only view.
+   */
+  protected BigDecimal getFundsOnlyBase(
+      Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
+    return includedMarketValue(merBearingCalculations(calculations));
+  }
+
+  /**
+   * FX-converted market-value denominator behind {@link #getWholePortfolioAverage} — the whole portfolio's converted
+   * value. Consumed by {@code mer-benchmark-comparison} for the whole-portfolio view's annual dollar impact.
+   */
+  protected BigDecimal getWholePortfolioBase(
+      Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
+    return includedMarketValue(allCalculations(calculations));
+  }
+
+  /**
+   * Base behind {@link #getFundsOnlyStrictAverage}: same set as {@link #getFundsOnlyBase}, but null when the strict
+   * average is null (any included holding missing its primary datapoint), so the base always tracks its ratio.
+   */
+  protected BigDecimal getFundsOnlyStrictBase(
+      Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
+    return anyMissingPrimary(calculations) ? null : includedMarketValue(merBearingCalculations(calculations));
   }
 
   /**
@@ -271,10 +297,7 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
    */
   protected BigDecimal getFundsOnlyStrictAverage(
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
-    if (anyMissingPrimary(calculations)) {
-      return null;
-    }
-    return weightedAverage(merBearingCalculations(calculations));
+    return anyMissingPrimary(calculations) ? null : weightedAverage(merBearingCalculations(calculations));
   }
 
   private List<AverageManagementExpenseCalculation> merBearingCalculations(
@@ -314,11 +337,15 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
    */
   protected BigDecimal getWholePortfolioSum(
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
-    List<AverageManagementExpenseCalculation> all = calculations.values().stream()
+    return feeWeightedMarketValueSum(allCalculations(calculations));
+  }
+
+  private static List<AverageManagementExpenseCalculation> allCalculations(
+      Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
+    return calculations.values().stream()
         .map(Map::values)
         .flatMap(Collection::stream)
         .toList();
-    return feeWeightedMarketValueSum(all);
   }
 
   /**
@@ -345,10 +372,7 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
    * numerator and denominator (they were never resolved into a usable fee).
    */
   private BigDecimal weightedAverage(List<AverageManagementExpenseCalculation> calcs) {
-    BigDecimal totalMarketValue = calcs.stream()
-        .filter(c -> Objects.nonNull(c.getModifiedFee()))
-        .map(AverageManagementExpenseCalculation::getMarketValue)
-        .reduce(ZERO, BigDecimal::add);
+    BigDecimal totalMarketValue = includedMarketValue(calcs);
     if (totalMarketValue.signum() == 0) {
       return toUserScale(ZERO);
     }
@@ -357,6 +381,19 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
         .map(c -> c.getModifiedFee().multiply(divide(c.getMarketValue(), totalMarketValue)))
         .reduce(ZERO, BigDecimal::add);
     return toUserScale(weighted);
+  }
+
+  /**
+   * Sum of market values over the holdings that actually contribute to a weighted average — i.e. those with a resolved
+   * {@code modifiedFee}. This is exactly the denominator {@link #weightedAverage} normalises over, so a mode's base and
+   * its ratio always cover the same holding set. Values are already FX-converted to the default target currency by
+   * {@link #convertMarketValuesToTargetCurrency} before this runs.
+   */
+  private BigDecimal includedMarketValue(List<AverageManagementExpenseCalculation> calcs) {
+    return calcs.stream()
+        .filter(c -> Objects.nonNull(c.getModifiedFee()))
+        .map(AverageManagementExpenseCalculation::getMarketValue)
+        .reduce(ZERO, BigDecimal::add);
   }
 
 }

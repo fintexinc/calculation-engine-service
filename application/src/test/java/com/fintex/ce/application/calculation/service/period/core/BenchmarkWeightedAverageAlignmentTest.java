@@ -67,9 +67,9 @@ class BenchmarkWeightedAverageAlignmentTest {
     PeriodCommand command = periodCommand();
     PortfolioBenchmarkReturns returnsData = new PortfolioBenchmarkReturns(Map.of(), Map.of());
 
-    when(portfolioProvider.get(command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns()))
+    when(portfolioProvider.get(command.getHoldings(), command.getCurrency(), returnsData.portfolio()))
         .thenReturn(context(ReturnsRole.PORTFOLIO, PORTFOLIO_HOLDING, JAN_2020, FEB_2020, MAR_2020, APR_2020));
-    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency(), returnsData.benchmarkReturns()))
+    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency(), returnsData.benchmark()))
         .thenReturn(context(ReturnsRole.BENCHMARK, BENCHMARK_HOLDING, FEB_2020, MAR_2020, APR_2020, MAY_2020));
     when(portfolioPipeline.run(any(), any())).thenReturn(weightedAverageResult(FEB_2020, MAR_2020, APR_2020));
     when(benchmarkPipeline.run(any(), any())).thenReturn(weightedAverageResult(FEB_2020, MAR_2020, APR_2020));
@@ -110,9 +110,9 @@ class BenchmarkWeightedAverageAlignmentTest {
     RollingCalculationCommand command = rollingCommand();
     PortfolioBenchmarkReturns returnsData = new PortfolioBenchmarkReturns(Map.of(), Map.of());
 
-    when(portfolioProvider.get(command.getHoldings(), command.getCurrency(), returnsData.portfolioReturns()))
+    when(portfolioProvider.get(command.getHoldings(), command.getCurrency(), returnsData.portfolio()))
         .thenReturn(context(ReturnsRole.PORTFOLIO, PORTFOLIO_HOLDING, JAN_2020, FEB_2020, MAR_2020, APR_2020));
-    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency(), returnsData.benchmarkReturns()))
+    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency(), returnsData.benchmark()))
         .thenReturn(context(ReturnsRole.BENCHMARK, BENCHMARK_HOLDING, FEB_2020, MAR_2020, APR_2020, MAY_2020));
     when(portfolioPipeline.run(any(), any())).thenReturn(weightedAverageResult(MAR_2020, APR_2020));
     when(benchmarkPipeline.run(any(), any())).thenReturn(weightedAverageResult(MAR_2020, APR_2020));

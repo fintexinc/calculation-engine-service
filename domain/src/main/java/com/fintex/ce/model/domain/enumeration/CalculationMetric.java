@@ -7,6 +7,7 @@ import com.fintex.ce.model.dto.command.CorrelationCommand;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.model.dto.command.LeadingTotalReturnCommand;
+import com.fintex.ce.model.dto.command.MerComparisonCommand;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
@@ -164,6 +165,9 @@ public enum CalculationMetric {
   @Schema(description = "Annual and monthly fee dollar amounts for the portfolio (Σ value × MER and that ÷ 12)")
   FEES("fees", AverageMerCommand.class),
 
+  @Schema(description = "MER comparison — portfolio MER vs the benchmark's MER, per view")
+  MER_BENCHMARK_COMPARISON("mer-benchmark-comparison", MerComparisonCommand.class),
+
   @Schema(description = "Sales charge breakdown by holding")
   SALES_CHARGE("sales-charge", PortfolioHoldingsCommand.class),
 
@@ -189,9 +193,11 @@ public enum CalculationMetric {
   private final String value;
   private final Class<? extends CalculationCommand> commandType;
 
+  /** Every metric that requires a benchmark side in the request. */
   public static final List<CalculationMetric> BENCHMARK_METRICS = List.of(
       EXCESS_RETURNS, TREYNOR_RATIO, INFORMATION_RATIO, TRACKING_ERROR, ALPHA,
-      BETA, R_SQUARED, UPSIDE_CAPTURE, DOWNSIDE_CAPTURE, ROLLING_CORRELATION);
+      BETA, R_SQUARED, UPSIDE_CAPTURE, DOWNSIDE_CAPTURE, ROLLING_CORRELATION,
+      MER_BENCHMARK_COMPARISON);
 
   public static final List<CalculationMetric> ROLLING_METRICS = List.of(
       ROLLING_TOTAL_RETURNS, ROLLING_STANDARD_DEVIATION, ROLLING_SHARPE_RATIO,
