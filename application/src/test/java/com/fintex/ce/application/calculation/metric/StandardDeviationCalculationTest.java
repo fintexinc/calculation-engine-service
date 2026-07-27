@@ -26,6 +26,7 @@ import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -190,6 +191,19 @@ class StandardDeviationCalculationTest {
           assertThat(exception.getMetadata()).containsExactlyEntriesOf(
               Map.of("param-1", "2024-11-30, 2024-12-31"));
         });
+  }
+
+  @Test
+  void shouldReturnNullStandardDeviation_whenRequestedPeriodIsLessThanTwelveMonths() {
+    final var calculation = new StandardDeviationCalculation<StandardDeviationResult>(new PeriodCalculationInput(map),
+        Set.of());
+
+    final StandardDeviationResult actual = calculation.calculate(Set.of(SIX_MTH));
+
+    assertEquals(Set.of(new TimeIntervalResult(SIX_MTH.name(), null)), actual.getStandardDeviation());
+    assertEquals(map.firstKey(), actual.getPerformanceStartDate());
+    assertEquals(map.lastKey(), actual.getPerformanceEndDate());
+    assertNull(actual.getCustomIntervalPerformanceStartDate());
   }
 
   @Test
