@@ -32,13 +32,20 @@ import static java.math.BigDecimal.ZERO;
  * </ul>
  *
  * <p>
- * Supported countries come from the injected list of {@link CountryFeeResolutionStrategy} beans — adding a country
- * means dropping a new {@code @Component} into the application context, no edit here.
+ * Supported countries come from every {@link CountryFeeResolutionStrategy} bean, injected as a list. This resolver is a
+ * pure chain-walker: the concrete chains (and the error raised when a chain is exhausted) live in the strategies.
  *
  * <pre>
- *   CANADA  →  MER  →  Management Fee  →  error (MER-005)
- *   USA     →  NER  →  GER  →  Management Fee  →  error (MER-005)
+ *   CANADA →  MER  →  Management Fee  →  error (MER-005)
+ *   USA    →  NER  →  GER  →  error (MER-002)
  * </pre>
+ *
+ * <p>
+ * <b>The MER and Fees metrics share this single resolver, so both apply the same per-country policy.</b> In particular,
+ * the US chain deliberately omits the Management Fee: a US holding missing both NER and GER fails with
+ * {@link com.fintex.ce.model.error.ErrorCode#MISSING_NER_AND_GER} (MER-002) for the Fees metric as well as for MER —
+ * there is no Fees-only Management-Fee fallback. The Management Fee <i>metric</i> is unaffected; it does not use this
+ * resolver (see {@code ManagementFeeCalculationServiceImpl}).
  */
 @Service
 public class MerFeeResolver implements FeeResolver {
@@ -92,13 +99,13 @@ public class MerFeeResolver implements FeeResolver {
     if (strategy == null) {
       throw MISSING_FUND_FEE_DATA.toExceptionForHolding(holding, holding.getIdsString());
     }
-    return walkChain(strategy.sources(), calc, holding);
+    return walkChain(strategy, calc, holding);
   }
 
-  private List<Notification> walkChain(List<FeeSource> sources, AverageManagementExpenseCalculation calc,
+  private List<Notification> walkChain(CountryFeeResolutionStrategy strategy, AverageManagementExpenseCalculation calc,
       PortfolioHolding holding) {
     List<Notification> warnings = new ArrayList<>();
-    for (FeeSource source : sources) {
+    for (FeeSource source : strategy.sources()) {
       Optional<BigDecimal> value = source.extract(calc);
       if (value.isPresent()) {
         calc.setModifiedFee(value.get());
@@ -106,6 +113,6 @@ public class MerFeeResolver implements FeeResolver {
       }
       source.warningIfMissing(holding).ifPresent(warnings::add);
     }
-    throw MISSING_FUND_FEE_DATA.toExceptionForHolding(holding, holding.getIdsString());
+    throw strategy.exhaustedError().toExceptionForHolding(holding, holding.getIdsString());
   }
 }

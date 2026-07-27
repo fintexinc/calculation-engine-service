@@ -50,14 +50,25 @@ git fetch origin
 git rev-list --count HEAD..origin/main
 ```
 
-If the count is `0` the branch is up to date with `origin/main` → ✅. If `> 0`, the branch is
-behind → ❌, advise:
+If the count is `0` the branch is up to date with `origin/main` → ✅.
+
+If `> 0`, the branch is behind → ❌. **The branch must be rebased before preparing any commit
+(step 4)** — always check this first. Do not merely advise the command: when the branch is behind,
+**ask the developer for confirmation before starting the rebase** (never rebase automatically),
+then run it:
 
 ```bash
 git rebase origin/main
 ```
 
+Only proceed to step 4 (commit prep) once the rebase completes (or the developer declines). If the
+rebase produces conflicts, stop and report them — do not auto-resolve.
+
 ## 4. Commit changes (optional, confirmed) ✅/⚠️
+
+**Prerequisite:** step 3 must be green first. If the branch is behind `origin/main`, do not prepare
+or create any commit until the rebase is done — ask the developer to confirm the rebase, run it,
+and only then continue here.
 
 Detect whether there is uncommitted work:
 

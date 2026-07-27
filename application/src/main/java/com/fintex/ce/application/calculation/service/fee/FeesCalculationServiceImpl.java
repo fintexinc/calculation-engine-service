@@ -27,7 +27,8 @@ import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 
 /**
  * Annual / Monthly fee dollar amounts in the configured default target currency (default CAD). Annual = Σ (marketValue
- * × resolved fee) per aggregation mode using {@link MerFeeResolver}; Monthly = Annual ÷ 12.
+ * × resolved fee) per aggregation mode, with the fee resolved through the injected {@link FeeResolver}; Monthly =
+ * Annual ÷ 12.
  *
  * <p>
  * FX: each MER-bearing holding's {@code marketValue} is converted to the default target currency via
@@ -42,7 +43,7 @@ public class FeesCalculationServiceImpl extends AbstractFeeCalculationService<Fe
   private final FeeResolver feeResolver;
 
   public FeesCalculationServiceImpl(DefaultTargetCurrencyConverter defaultTargetCurrencyConverter,
-      MerFeeResolver feeResolver) {
+      FeeResolver feeResolver) {
     super(defaultTargetCurrencyConverter);
     this.feeResolver = feeResolver;
   }
