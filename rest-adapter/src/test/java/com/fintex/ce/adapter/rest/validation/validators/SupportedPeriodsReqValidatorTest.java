@@ -47,6 +47,7 @@ class SupportedPeriodsReqValidatorTest {
   private static final List<RequestValidator> REPORTING_PERIOD_VALIDATORS = List.of(
       new TrailingPeriodsReqValidator(),
       new LeadingPeriodsReqValidator(),
+      new StandardDeviationPeriodsReqValidator(),
       new TwelveMonthMinimumPeriodsReqValidator());
 
   private static final List<RequestValidator> ROLLING_WINDOW_VALIDATORS = List.of(

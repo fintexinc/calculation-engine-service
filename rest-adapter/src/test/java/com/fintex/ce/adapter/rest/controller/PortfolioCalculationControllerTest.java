@@ -6,6 +6,7 @@ import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqV
 import com.fintex.ce.adapter.rest.validation.validators.HoldingReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidationProperties;
 import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator;
+import com.fintex.ce.adapter.rest.validation.validators.StandardDeviationPeriodsReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.TrailingPeriodsReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.TwelveMonthMinimumPeriodsReqValidator;
 import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
@@ -16,6 +17,8 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
@@ -366,7 +369,7 @@ class PortfolioCalculationControllerTest {
 
     private MockMvc validatingMockMvc;
     private ObjectMapper om;
-    private EnumMap<CalculationMetric, CalculationService<?, ?, ?>> validationServices;
+    private Map<CalculationMetric, CalculationService<?, ?, ?>> calculationServices;
 
     @BeforeEach
     void setUp() {
@@ -378,12 +381,13 @@ class PortfolioCalculationControllerTest {
       List<RequestValidator> validators = List.of(
           new TwelveMonthMinimumPeriodsReqValidator(),
           new TrailingPeriodsReqValidator(),
+          new StandardDeviationPeriodsReqValidator(),
           new CipsdGreaterThanCpedReqValidator(),
           new HoldingReqValidator(new HoldingsValidator(new HoldingsValidationProperties())));
       var facade = new RequestValidationFacade(validators);
 
       List<CalculationService<?, ?, ?>> services = new java.util.ArrayList<>();
-      validationServices = new EnumMap<>(CalculationMetric.class);
+      calculationServices = new EnumMap<>(CalculationMetric.class);
       for (CalculationMetric m : CalculationMetric.values()) {
         CalculationService<?, ?, ?> svc = mock(CalculationService.class);
         lenient().when(svc.getMetric()).thenReturn(m);
@@ -396,7 +400,7 @@ class PortfolioCalculationControllerTest {
         };
         stubCalculationResult(svc, (BaseCalculationResult) result);
         services.add(svc);
-        validationServices.put(m, svc);
+        calculationServices.put(m, svc);
       }
 
       var controller = controller(services, facade);
@@ -444,6 +448,56 @@ class PortfolioCalculationControllerTest {
     }
 
     @Test
+    void shouldReturnNullStandardDeviation_whenPeriodIsLessThanTwelveMonths() throws Exception {
+      PeriodCommand command = new PeriodCommand();
+      command.setMetric(CalculationMetric.STANDARD_DEVIATION);
+      command.setCurrency(Currency.CAD);
+      command.setHoldings(List.of(dummyHolding()));
+      command.setPeriods(Set.of(TimePeriod.SIX_MTH));
+      StandardDeviationResult result = new StandardDeviationResult(Set.of(new TimeIntervalResult(TimePeriod.SIX_MTH
+          .name(),
+          null)));
+      stubCalculationResult(calculationServices.get(CalculationMetric.STANDARD_DEVIATION), result);
+
+      MvcResult mvcResult = validatingMockMvc.perform(
+          post(BASE_PATH + "/standard-deviation")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(command)))
+          .andExpect(status().isOk())
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andReturn();
+
+      StandardDeviationResult actual = om.readValue(mvcResult.getResponse().getContentAsString(),
+          StandardDeviationResult.class);
+
+      assertThat(actual.getStandardDeviation())
+          .containsExactlyInAnyOrder(new TimeIntervalResult(TimePeriod.SIX_MTH.name(), null));
+
+      verify(calculationServices.get(CalculationMetric.STANDARD_DEVIATION)).perform(any(), any());
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenStandardDeviationPeriodIsYearToDate() throws Exception {
+      PeriodCommand command = new PeriodCommand();
+      command.setMetric(CalculationMetric.STANDARD_DEVIATION);
+      command.setCurrency(Currency.CAD);
+      command.setHoldings(List.of(dummyHolding()));
+      command.setPeriods(Set.of(TimePeriod.YTD));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/standard-deviation")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(command)))
+          .andExpect(status().isBadRequest())
+          .andExpect(content().string(org.hamcrest.Matchers.containsString("TIP-011")))
+          .andExpect(content().string(org.hamcrest.Matchers.containsString(
+              "Time interval period 'YTD' is not supported")));
+
+      verify(calculationServices.get(CalculationMetric.STANDARD_DEVIATION), org.mockito.Mockito.never())
+          .perform(any(), any());
+    }
+
+    @Test
     void shouldReturnBadRequest_whenCipsdIsAfterCped() throws Exception {
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.SHARPE_RATIO);
@@ -473,7 +527,7 @@ class PortfolioCalculationControllerTest {
       command.setPeriods(Set.of(TimePeriod.ONE_YR));
       command.setCustomIntervalPsd(cipsd);
       doThrow(ErrorCode.CIPSD_OUTSIDE_DATA_RANGE_ERROR.toException(cipsd, performanceStartDate, performanceEndDate))
-          .when(validationServices.get(CalculationMetric.STANDARD_DEVIATION)).perform(any(), any());
+          .when(calculationServices.get(CalculationMetric.STANDARD_DEVIATION)).perform(any(), any());
 
       validatingMockMvc.perform(
           post(BASE_PATH + "/standard-deviation")
@@ -488,7 +542,7 @@ class PortfolioCalculationControllerTest {
           .andExpect(jsonPath("$.notifications[0].metadata['param-2']").value("1998-05-31"))
           .andExpect(jsonPath("$.notifications[0].metadata['param-3']").value("2025-09-30"));
 
-      verify(validationServices.get(CalculationMetric.STANDARD_DEVIATION)).perform(any(), any());
+      verify(calculationServices.get(CalculationMetric.STANDARD_DEVIATION)).perform(any(), any());
     }
 
     @Test
