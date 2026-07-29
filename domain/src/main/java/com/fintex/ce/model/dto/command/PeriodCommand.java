@@ -23,7 +23,7 @@ public class PeriodCommand extends PortfolioBenchmarkCommand implements CustomPe
   @Schema(description = "Custom performance end date")
   @JsonProperty("customPerformanceEndDate")
   private LocalDate customPed;
-  @Schema(description = "Time interval periods in months", example = "[\"1\", \"3\", \"12\", \"36\", \"60\"]")
+  @Schema(description = "Time interval periods in months", example = "[\"1\", \"3\", \"12\", \"36\", \"60\", \"120\", \"240\"]")
   @JsonProperty("timeIntervalPeriods")
   private Set<TimePeriod> periods;
 }

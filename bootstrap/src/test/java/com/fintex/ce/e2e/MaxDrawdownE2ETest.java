@@ -190,7 +190,9 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
         .satisfies(warning -> {
           assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD);
           // Message must carry both substituted values (requested period 36, only 12 available).
-          assertThat(warning.getMessage()).contains(THREE_YR.name()).contains("12");
+          assertThat(warning.getMessage())
+              .contains(String.valueOf(THREE_YR.getMonths()))
+              .contains("12");
         });
   }
 

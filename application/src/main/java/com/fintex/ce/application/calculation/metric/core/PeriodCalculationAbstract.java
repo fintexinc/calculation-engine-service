@@ -283,8 +283,8 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
         .filter(pair -> pair.getValue() == null)
         .filter(pair -> !CIPSD.name().equals(pair.getKey()))
         .filter(pair -> requiresInsufficientDataWarning(pair.getKey(), availableMonths))
-        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey(),
-            availableMonths))
+        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(
+            getNumberOfMonthsFor(portfolioTotalReturns, TimePeriod.valueOf(pair.getKey())), availableMonths))
         .forEach(warnings::add);
 
     // CIPSD lies outside [firstKey, lastKey] → SINCE_CIPSD is silently null. Without this warning the caller
@@ -447,7 +447,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * additional null-return paths (e.g. degenerate input data) should override and call {@code super} first.
    */
   protected boolean requiresInsufficientDataWarning(final String period, final int availableMonths) {
-    return getNumberOfMonthsFor(portfolioTotalReturns, TimePeriod.fromJson(period)) > availableMonths;
+    return getNumberOfMonthsFor(portfolioTotalReturns, TimePeriod.valueOf(period)) > availableMonths;
   }
 
   /**

@@ -36,7 +36,10 @@ import java.util.TreeMap;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static java.math.BigDecimal.TEN;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -429,5 +432,72 @@ class MaxDrawdownServiceTest {
     assertEquals(1, result.getMaxDrawdown().size());
     assertEquals(TimePeriod.CIPSD.name(), result.getMaxDrawdown().get(0).period());
     assertTrue(result.getWarnings().isEmpty());
+  }
+
+  @Test
+  void shouldReturnTwentyYearMaxDrawdown_whenPeriodIs240AndHistoryExceeds240Months() {
+    NavigableMap<LocalDate, BigDecimal> returns = patternedFactorReturns(TWENTY_YR.getMonths() + ONE_YR.getMonths());
+    var contextProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+    var pipeline = mock(PortfolioWeightedAverageWithCpedPipeline.class);
+    var service = new MaxDrawdownService(contextProvider, pipeline, new PeriodProperties());
+
+    var command = mock(PeriodCommand.class);
+    when(command.getPeriods()).thenReturn(Set.of(TWENTY_YR));
+    when(contextProvider.get(any(), any(), any())).thenReturn(mock(MonthlyReturnsContext.class));
+    doReturn(new WeightedAverageResult<>(returns, ReturnsSnapshot.empty())).when(pipeline).run(any(), any());
+
+    MaxDrawdownResult result = service.perform(command, PortfolioBenchmarkReturns.EMPTY);
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getPerformanceEndDate()).isEqualTo(returns.lastKey());
+    // The recurring one-month decline gives a -0.6% peak-to-trough drawdown that recovers the following month.
+    assertThat(result.getMaxDrawdown()).singleElement().satisfies(entry -> {
+      assertThat(entry.period()).isEqualTo(TWENTY_YR.name());
+      assertThat(entry.value()).isEqualByComparingTo("-0.006");
+      assertThat(entry.recoveryTime()).isEqualTo(1);
+    });
+  }
+
+  @Test
+  void shouldIncludeTwentyYearPeriodByDefault_whenNoPeriodsRequested() {
+    NavigableMap<LocalDate, BigDecimal> returns = patternedFactorReturns(TWENTY_YR.getMonths() + ONE_YR.getMonths());
+    var contextProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+    var pipeline = mock(PortfolioWeightedAverageWithCpedPipeline.class);
+    PeriodProperties periods = new PeriodProperties();
+    periods.setRiskCalculations(new HashSet<>(Set.of(ONE_YR, TEN_YR, TWENTY_YR)));
+    var service = new MaxDrawdownService(contextProvider, pipeline, periods);
+
+    var command = mock(PeriodCommand.class);
+    when(command.getPeriods()).thenReturn(null);
+    when(contextProvider.get(any(), any(), any())).thenReturn(mock(MonthlyReturnsContext.class));
+    doReturn(new WeightedAverageResult<>(returns, ReturnsSnapshot.empty())).when(pipeline).run(any(), any());
+
+    MaxDrawdownResult result = service.perform(command, PortfolioBenchmarkReturns.EMPTY);
+
+    assertThat(result.getMaxDrawdown())
+        .extracting(MaxDrawdownEntry::period)
+        .contains(TEN_YR.name(), TWENTY_YR.name());
+    assertThat(findEntry(result, TWENTY_YR).value()).isEqualByComparingTo("-0.006");
+  }
+
+  private static MaxDrawdownEntry findEntry(MaxDrawdownResult result, TimePeriod period) {
+    return result.getMaxDrawdown().stream()
+        .filter(entry -> period.name().equals(entry.period()))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("Missing period " + period));
+  }
+
+  // Percent-return cycle (base 1.0% + recurring deltas) already scaled to factor form (SCALE_OF_TWO), the shape the
+  // pipeline hands MaxDrawdownService. The single -1.6pp month per cycle drives the -0.6% drawdown.
+  private static final double[] DELTA_CYCLE = {0.0, -0.7, 0.9, -1.6, 1.4, -0.9, 0.3, 0.8, -1.2, 1.1, -0.5, 0.6};
+
+  private static NavigableMap<LocalDate, BigDecimal> patternedFactorReturns(int count) {
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    LocalDate end = LocalDate.of(2024, 12, 31);
+    for (int i = 0; i < count; i++) {
+      LocalDate month = end.minusMonths((long) count - 1 - i).with(TemporalAdjusters.lastDayOfMonth());
+      returns.put(month, BigDecimal.valueOf((101.0 + DELTA_CYCLE[i % DELTA_CYCLE.length]) / 100.0));
+    }
+    return returns;
   }
 }
