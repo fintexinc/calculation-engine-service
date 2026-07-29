@@ -10,6 +10,7 @@ import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.error.exceptions.CalculationException;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -32,12 +33,19 @@ import java.util.stream.Stream;
 
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static com.fintex.ce.model.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.domain.enumeration.Period.SINCE_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.domain.enumeration.Period.YEAR_TO_DATE;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.CIPSD;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.FIVE_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.QTD;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SI;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWO_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWO_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.YTD;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,9 +89,7 @@ class PeriodCalculationAbstractTest {
 
     doCallRealMethod().when(calculation).addSinceCustomIntervalPerformanceStartDate(any(), any());
     Set<Pair<String, BigDecimal>> results = new HashSet<>();
-    calculation.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SINCE_PERFORMANCE_START_DATE.name(),
-        YEAR_TO_DATE
-            .name(), "12"));
+    calculation.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SI, YTD, ONE_YR));
 
     assertEquals(0, results.size());
   }
@@ -99,11 +105,11 @@ class PeriodCalculationAbstractTest {
 
     doCallRealMethod().when(p).addSinceCustomIntervalPerformanceStartDate(any(), any());
     Set<Pair<String, BigDecimal>> results = new HashSet<>();
-    p.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name()));
+    p.addSinceCustomIntervalPerformanceStartDate(results, Set.of(CIPSD));
 
     assertEquals(1, results.size());
     Pair<String, BigDecimal> actual = results.stream().findFirst().orElseThrow();
-    assertEquals(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), actual.getKey());
+    assertEquals(CIPSD.name(), actual.getKey());
     assertNull(actual.getValue());
   }
 
@@ -114,8 +120,7 @@ class PeriodCalculationAbstractTest {
     when(p.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(true);
 
     doCallRealMethod().when(p).addSinceCustomIntervalPerformanceStartDate(any(), any());
-    p.addSinceCustomIntervalPerformanceStartDate(new HashSet<>(), Set.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE
-        .name()));
+    p.addSinceCustomIntervalPerformanceStartDate(new HashSet<>(), Set.of(CIPSD));
 
     verify(p).calculatePeriodForCustomIntervalStartDate();
   }
@@ -132,10 +137,9 @@ class PeriodCalculationAbstractTest {
 
     doCallRealMethod().when(p).addSinceCustomIntervalPerformanceStartDate(any(), any());
     HashSet<Pair<String, BigDecimal>> resultSet = new HashSet<>();
-    p.addSinceCustomIntervalPerformanceStartDate(resultSet, Set.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE
-        .name()));
+    p.addSinceCustomIntervalPerformanceStartDate(resultSet, Set.of(CIPSD));
 
-    assertEquals(Set.of(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), one)), resultSet);
+    assertEquals(Set.of(Pair.of(CIPSD.name(), one)), resultSet);
   }
 
   @Test
@@ -154,11 +158,11 @@ class PeriodCalculationAbstractTest {
   }
 
   @Test
-  void shouldReturnProvidedMonths_whenPeriodIsNumeric() {
+  void shouldReturnDeclaredLength_whenPeriodHasOne() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    String period = "3";
+    TimePeriod period = THREE_MTH;
 
     doCallRealMethod().when(p).getNumberOfMonthsFor(any(), any());
     int actual = p.getNumberOfMonthsFor(returns, period);
@@ -171,7 +175,7 @@ class PeriodCalculationAbstractTest {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    String period = YEAR_TO_DATE.name();
+    TimePeriod period = YTD;
 
     int months = 10;
     when(p.getNumberOfMonthsForYearToDate(any())).thenReturn(months);
@@ -188,7 +192,7 @@ class PeriodCalculationAbstractTest {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    String period = SINCE_PERFORMANCE_START_DATE.name();
+    TimePeriod period = SI;
 
     int months = 15;
     when(p.getNumberOfMonthsForSinceInception(any())).thenReturn(months);
@@ -200,25 +204,30 @@ class PeriodCalculationAbstractTest {
     verify(p).getNumberOfMonthsForSinceInception(returns);
   }
 
+  /**
+   * A malformed period string can no longer reach this method — the type makes it unrepresentable. What remains
+   * reachable is a real member whose length this pipeline cannot resolve: {@code QTD} carries no length of its own and,
+   * unlike {@code YTD} and {@code SI}, has no resolution rule here.
+   */
   @Test
-  void shouldReturnNull_whenPeriodFormatIsUnsupported() {
+  void shouldThrowNamingThePeriod_whenLengthCannotBeResolved() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>(Map.of(LOCAL_DATE_NOW, ONE));
-    String period = "TEST";
+    TimePeriod period = QTD;
 
     doCallRealMethod().when(p).getNumberOfMonthsFor(any(), any());
     CalculationException e = assertThrows(CalculationException.class, () -> p.getNumberOfMonthsFor(returns,
         period));
 
-    assertTrue(e.getMessage().contains(period));
+    assertTrue(e.getMessage().contains(period.name()));
   }
 
   @Test
   void shouldDelegateToCalculatePeriods_whenCalculateIsCalled() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    Set<String> periods = Set.of("1");
+    Set<TimePeriod> periods = Set.of(ONE_MTH);
 
     doCallRealMethod().when(p).calculate(any());
     p.calculate(periods);
@@ -230,22 +239,22 @@ class PeriodCalculationAbstractTest {
   void shouldAddSinceCustomIntervalPeriod_whenCalculatingPeriods() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    String interval = "12";
-    Set<String> periods = Set.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), interval);
+    TimePeriod interval = ONE_YR;
+    Set<TimePeriod> periods = Set.of(CIPSD, interval);
 
     doCallRealMethod().when(p).getInitialPeriods(any());
     doCallRealMethod().when(p).calculatePeriods(any());
     p.calculatePeriods(periods);
 
     verify(p).calculateForPeriod(interval);
-    verify(p, times(0)).calculateForPeriod(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name());
+    verify(p, times(0)).calculateForPeriod(CIPSD);
   }
 
   @Test
   void shouldDelegateToDefineResponseType_whenCalculateIsCalled() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    Set<String> periods = Set.of("1");
+    Set<TimePeriod> periods = Set.of(ONE_MTH);
     Set<Object> periodsR = Set.of(mock(Object.class));
 
     when(p.calculatePeriods(any())).thenReturn(periodsR);
@@ -258,7 +267,7 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldReturnDefaultPeriods_whenInputPeriodsEmpty() {
-    Set<String> periods = Set.of("3");
+    Set<TimePeriod> periods = Set.of(THREE_MTH);
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), periods));
 
@@ -270,12 +279,12 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldReturnInputPeriods_whenInputPeriodsProvided() {
-    Set<String> periods = Set.of("3");
+    Set<TimePeriod> periods = Set.of(THREE_MTH);
     PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class,
         withSettings().useConstructor(mock(PeriodCalculationInput.class), periods));
 
     doCallRealMethod().when(calculation).getInitialPeriods(any());
-    Set<String> userP = Set.of("5");
+    Set<TimePeriod> userP = Set.of(FIVE_MTH);
     Set actual = calculation.getInitialPeriods(userP);
 
     assertEquals(userP, actual);
@@ -338,7 +347,7 @@ class PeriodCalculationAbstractTest {
   void shouldPopulateBasicDetails_whenCalculateIsCalled() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    Set<String> periods = Set.of("1");
+    Set<TimePeriod> periods = Set.of(ONE_MTH);
     PeriodResult result = mock(PeriodResult.class);
     when(p.defineResponseType(any())).thenReturn(result);
 
@@ -355,7 +364,7 @@ class PeriodCalculationAbstractTest {
 
     when(p.getInitialPeriods(any())).thenReturn(Set.of());
 
-    Set<String> periods = Set.of("2");
+    Set<TimePeriod> periods = Set.of(TWO_MTH);
 
     doCallRealMethod().when(p).calculatePeriods(any());
     p.calculatePeriods(periods);
@@ -367,8 +376,8 @@ class PeriodCalculationAbstractTest {
   void shouldCalculateValueForEachPeriod_whenCalculatingPeriods() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    String period = "2";
-    Set<String> periods = Set.of(period);
+    TimePeriod period = TWO_MTH;
+    Set<TimePeriod> periods = Set.of(period);
 
     when(p.getInitialPeriods(any())).thenReturn(periods);
 
@@ -382,9 +391,9 @@ class PeriodCalculationAbstractTest {
   void shouldAppendSinceCustomIntervalPeriod_whenCalculatingPeriods() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
-    String period = "2";
-    Set<String> periods = Set.of(period);
-    Pair<String, BigDecimal> pair = Pair.of(period, ONE);
+    TimePeriod period = TWO_MTH;
+    Set<TimePeriod> periods = Set.of(period);
+    Pair<String, BigDecimal> pair = Pair.of(period.name(), ONE);
 
     when(p.getInitialPeriods(any())).thenReturn(periods);
     when(p.calculateForPeriod(any())).thenReturn(pair);
@@ -396,17 +405,23 @@ class PeriodCalculationAbstractTest {
     assertEquals(Set.of(pair), actual);
   }
 
+  /**
+   * The period reaches resolution unchanged. This used to assert that a whitespace-padded {@code "3 "} was trimmed
+   * first — an artefact of the comma-separated yml values being split into raw strings. Typed periods cannot carry
+   * whitespace, so what is worth pinning now is only that the same portfolio series and the same period are passed
+   * through.
+   */
   @Test
   void shouldDelegateToCalculatePeriodForNumberOfMonths_whenCalculatingForPeriod() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
     p.portfolioTotalReturns = new TreeMap();
 
-    String period = "3 ";
+    TimePeriod period = THREE_MTH;
 
     doCallRealMethod().when(p).calculateForPeriod(any());
     p.calculateForPeriod(period);
 
-    verify(p).getNumberOfMonthsFor(argThat(argument -> argument == p.portfolioTotalReturns), eq(period.trim()));
+    verify(p).getNumberOfMonthsFor(argThat(argument -> argument == p.portfolioTotalReturns), eq(period));
   }
 
   @Test
@@ -417,24 +432,25 @@ class PeriodCalculationAbstractTest {
     when(p.getNumberOfMonthsFor(any(), any())).thenReturn(months);
 
     doCallRealMethod().when(p).calculateForPeriod(any());
-    p.calculateForPeriod("32");
+    p.calculateForPeriod(TWO_YR);
 
     verify(p).calculatePeriodForNumberOfMonths(months);
   }
 
+  /** The pair is keyed by the period's name, which is the form the response DTOs and the wire both use. */
   @Test
   void shouldReturnPeriodPair_whenCalculationSucceeds() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     BigDecimal one = ONE;
     when(p.calculatePeriodForNumberOfMonths(0)).thenReturn(one);
-    String period = "32";
+    TimePeriod period = TWO_YR;
 
     when(p.toUserFormat(any())).thenReturn(one);
     doCallRealMethod().when(p).calculateForPeriod(any());
     Pair actual = p.calculateForPeriod(period);
 
-    assertEquals(Pair.of(period, toUserScale(one)), actual);
+    assertEquals(Pair.of(period.name(), toUserScale(one)), actual);
   }
 
   @Test
@@ -703,22 +719,24 @@ class PeriodCalculationAbstractTest {
     }
   }
 
+  /**
+   * The period here is a <i>result</i> key, which is still a string — always a {@link TimePeriod} name, since that is
+   * the only thing {@code calculateForPeriod} writes. The whitespace case that used to sit in this list is gone with
+   * the SpEL splits that produced it: a padded {@code " 36"} can no longer occur, so a test asserting it was trimmed
+   * would only be testing the test.
+   */
   static Stream<Arguments> insufficientDataWarningCases() {
     return Stream.of(
-        // Numeric periods.
-        Arguments.of("numeric period exceeds available months", 1, "12", null, 1, "RET-008"),
-        Arguments.of("numeric period fits available months", 12, "12", null, 1, "RET-015"),
-        Arguments.of("value is not null (period not exceeded)", 1, "12", ONE, 0, null),
-        // Period keys carrying whitespace (e.g. SpEL split of "12, 36" yields " 36") must be trimmed before
-        // getNumberOfMonthsFor — otherwise isNumeric() rejects them and the dispatch throws.
-        Arguments.of("whitespace-padded numeric period exceeds available months", 1, " 36", null, 1, "RET-008"),
-        // Symbolic YEAR_TO_DATE: with 13 entries the resolved YTD month count is always ≤ 12 ≤ 13, so it fits.
-        // Confirms symbolic periods are resolved (would warn if the resolution returned 0 default from the mock).
-        Arguments.of("symbolic YEAR_TO_DATE fits available months", 13, YEAR_TO_DATE.name(), null, 1, "RET-015"),
-        // SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE is gated by CIPSD position, not month count, so the
-        // count-based path skips it. With no CIPSD set, the dedicated CIPSD-out-of-range path is also a no-op.
-        Arguments.of("SINCE_CUSTOM_INTERVAL with no CIPSD is skipped", 1,
-            SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null, 0, null));
+        // Fixed-length periods.
+        Arguments.of("fixed-length period exceeds available months", 1, ONE_YR.name(), null, 1, "RET-008"),
+        Arguments.of("fixed-length period fits available months", 12, ONE_YR.name(), null, 1, "RET-015"),
+        Arguments.of("value is not null (period not exceeded)", 1, ONE_YR.name(), ONE, 0, null),
+        // With 13 entries the resolved YTD month count is always ≤ 12 ≤ 13, so it fits. Confirms length-less periods
+        // are resolved from the series (this would warn if resolution fell through to the mock's 0 default).
+        Arguments.of("length-less YTD fits available months", 13, YTD.name(), null, 1, "RET-015"),
+        // CIPSD is gated by the date's position rather than by a month count, so the count-based path skips it. With no
+        // CIPSD set, the dedicated out-of-range path is also a no-op.
+        Arguments.of("CIPSD with no date set is skipped", 1, CIPSD.name(), null, 0, null));
   }
 
   @Test
@@ -732,7 +750,7 @@ class PeriodCalculationAbstractTest {
     calculation.cipsd = LOCAL_DATE_NOW.minusMonths(24);
     TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
     Set<Pair<String, BigDecimal>> periodValues = Set.of(
-        Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+        Pair.of(CIPSD.name(), null));
 
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();
@@ -759,7 +777,7 @@ class PeriodCalculationAbstractTest {
     calculation.cipsd = LOCAL_DATE_NOW.plusMonths(6);
     TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
     Set<Pair<String, BigDecimal>> periodValues = Set.of(
-        Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+        Pair.of(CIPSD.name(), null));
 
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();
@@ -786,7 +804,7 @@ class PeriodCalculationAbstractTest {
     calculation.cipsd = LOCAL_DATE_NOW.minusMonths(1);
     TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
     Set<Pair<String, BigDecimal>> periodValues = Set.of(
-        Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+        Pair.of(CIPSD.name(), null));
 
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();

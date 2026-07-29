@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.metric.core;
 import com.fintex.ce.application.util.ReturnSeriesAlignmentValidator;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ public abstract class BenchmarkWeightedAverageCalculation<T extends PeriodResult
   protected NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns;
 
   protected BenchmarkWeightedAverageCalculation(final BenchmarkPeriodCalculationInput input,
-      final Set<String> periods) {
+      final Set<TimePeriod> periods) {
     super(input, periods);
     this.benchmarkTotalReturns = input.getWeightedAverageBenchmarkReturns();
   }

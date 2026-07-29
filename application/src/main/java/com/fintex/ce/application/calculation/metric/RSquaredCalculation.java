@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.RSquaredCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.RSquaredResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,7 +17,7 @@ import lombok.Getter;
 public class RSquaredCalculation extends RSquaredCalculationAbstract<RSquaredResult> {
 
   public RSquaredCalculation(final BenchmarkPeriodCalculationInput input,
-      final Set<String> periods,
+      final Set<TimePeriod> periods,
       final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn,
       final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn) {
     super(input, periods, portfolioExcessReturn, benchmarkExcessReturn);

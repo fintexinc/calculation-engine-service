@@ -4,6 +4,7 @@ import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public abstract class RSquaredCalculationAbstract<T extends PeriodResult>
       PortfolioBenchmarkCalculationAbstract<T> {
 
   protected RSquaredCalculationAbstract(final BenchmarkPeriodCalculationInput input,
-      final Set<String> periods,
+      final Set<TimePeriod> periods,
       final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn,
       final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn) {
     super(input, periods, portfolioExcessReturn, benchmarkExcessReturn);

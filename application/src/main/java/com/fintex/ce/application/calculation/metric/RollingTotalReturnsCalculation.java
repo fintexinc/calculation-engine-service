@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.RollingAbstractCalculation;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,7 +17,7 @@ public class RollingTotalReturnsCalculation extends RollingAbstractCalculation<R
   private final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation;
 
   public RollingTotalReturnsCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods,
+      final Set<TimePeriod> defaultPeriods,
       final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation) {
     super(input, defaultPeriods);
     this.trailingTotalReturnsCalculation = trailingTotalReturnsCalculation;

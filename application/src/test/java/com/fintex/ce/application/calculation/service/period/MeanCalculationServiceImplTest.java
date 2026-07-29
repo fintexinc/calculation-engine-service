@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.FIVE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_YR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -27,7 +31,7 @@ class MeanCalculationServiceImplTest {
   @Test
   void shouldBuildMeanCalculation_whenPerformIsCalled() {
     var service = mock(MeanCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, null, Set.of("12", "36", "60", "120")));
+        .useConstructor(null, null, Set.of(ONE_YR, THREE_YR, FIVE_YR, TEN_YR)));
     var req = mock(PeriodCommand.class);
     var context = mock(PeriodCalculationInput.class);
 
@@ -40,7 +44,7 @@ class MeanCalculationServiceImplTest {
       service.perform(req, PortfolioBenchmarkReturns.EMPTY);
     }
 
-    assertEquals(List.of(context, Set.of("12", "36", "60", "120"), OUTPUT_SCALE), constructorArgs);
+    assertEquals(List.of(context, Set.of(ONE_YR, THREE_YR, FIVE_YR, TEN_YR), OUTPUT_SCALE), constructorArgs);
   }
 
 }

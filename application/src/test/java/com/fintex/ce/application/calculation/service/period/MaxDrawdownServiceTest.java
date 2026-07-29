@@ -1,5 +1,6 @@
 package com.fintex.ce.application.calculation.service.period;
 
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.MonthlyReturnsContext;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.ReturnsSnapshot;
@@ -15,6 +16,7 @@ import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.model.util.BigDecimalConstants;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ import java.util.TreeMap;
 
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -309,7 +312,7 @@ class MaxDrawdownServiceTest {
   void shouldPerform_whenVerifyBuildPeriodCalculationInput() {
     var contextProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
     var pipeline = mock(PortfolioWeightedAverageWithCpedPipeline.class);
-    var service = new MaxDrawdownService(contextProvider, pipeline, Set.of());
+    var service = new MaxDrawdownService(contextProvider, pipeline, new PeriodProperties());
 
     var req = mock(PeriodCommand.class);
     var monthlyReturnsContext = mock(MonthlyReturnsContext.class);
@@ -345,10 +348,10 @@ class MaxDrawdownServiceTest {
 
     var contextProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
     var pipeline = mock(PortfolioWeightedAverageWithCpedPipeline.class);
-    var service = new MaxDrawdownService(contextProvider, pipeline, Set.of());
+    var service = new MaxDrawdownService(contextProvider, pipeline, new PeriodProperties());
 
     var command = mock(PeriodCommand.class);
-    when(command.getPeriods()).thenReturn(Set.of("12"));
+    when(command.getPeriods()).thenReturn(Set.of(ONE_YR));
 
     var monthlyReturnsContext = mock(MonthlyReturnsContext.class);
     when(contextProvider.get(any(), any(), any())).thenReturn(monthlyReturnsContext);
@@ -376,7 +379,7 @@ class MaxDrawdownServiceTest {
 
     var contextProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
     var pipeline = mock(PortfolioWeightedAverageWithCpedPipeline.class);
-    var service = new MaxDrawdownService(contextProvider, pipeline, Set.of());
+    var service = new MaxDrawdownService(contextProvider, pipeline, new PeriodProperties());
 
     var command = mock(PeriodCommand.class);
     // CIPSD is earlier than the earliest available month-end, so it is out of range.
@@ -404,7 +407,7 @@ class MaxDrawdownServiceTest {
 
     var contextProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
     var pipeline = mock(PortfolioWeightedAverageWithCpedPipeline.class);
-    var service = new MaxDrawdownService(contextProvider, pipeline, Set.of());
+    var service = new MaxDrawdownService(contextProvider, pipeline, new PeriodProperties());
 
     var command = mock(PeriodCommand.class);
 
@@ -424,7 +427,7 @@ class MaxDrawdownServiceTest {
     // Only SINCE_CIPSD was requested (via a supplied CIPSD), so exactly that one entry is produced and no
     // out-of-range error/warning is raised for an in-range CIPSD.
     assertEquals(1, result.getMaxDrawdown().size());
-    assertEquals("SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE", result.getMaxDrawdown().get(0).period());
+    assertEquals(TimePeriod.CIPSD.name(), result.getMaxDrawdown().get(0).period());
     assertTrue(result.getWarnings().isEmpty());
   }
 }

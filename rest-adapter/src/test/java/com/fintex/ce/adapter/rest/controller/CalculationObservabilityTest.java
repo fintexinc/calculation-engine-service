@@ -7,6 +7,7 @@ import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -128,7 +129,7 @@ class CalculationObservabilityTest {
     PeriodCommand command = new PeriodCommand();
     command.setMetric(CalculationMetric.TRAILING_TOTAL_RETURNS);
     command.setCurrency(Currency.CAD);
-    command.setPeriods(Set.of("12"));
+    command.setPeriods(Set.of(TimePeriod.ONE_YR));
     command.setHoldings(List.of(holding("XIU.TO"), holding("VFV.TO")));
     command.setBenchmarkHoldings(List.of(holding("SPY")));
     return command;

@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.metric.InformationRatioCalculation;
 import com.fintex.ce.application.calculation.metric.TrackingErrorCalculation;
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.period.core.BenchmarkWeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.BenchmarkWeightedAverageWithCpedPipeline;
@@ -14,8 +15,6 @@ import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Set;
 
@@ -32,9 +31,9 @@ public class InformationRatioCalculationServiceImpl
       BenchmarkMonthlyReturnsContextProvider benchmarkMonthlyReturnsContextProvider,
       PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
       BenchmarkWeightedAverageWithCpedPipeline benchmarkWeightedAverageWithCped,
-      @Value("#{'${default.periods.information-ratio-returns}'.split(',')}") final Set<String> defaultPeriods) {
+      PeriodProperties periods) {
     super(portfolioMonthlyReturnsContextProvider, benchmarkMonthlyReturnsContextProvider,
-        portfolioWeightedAverageWithCped, benchmarkWeightedAverageWithCped, defaultPeriods);
+        portfolioWeightedAverageWithCped, benchmarkWeightedAverageWithCped, periods.getInformationRatioReturns());
   }
 
   @Override

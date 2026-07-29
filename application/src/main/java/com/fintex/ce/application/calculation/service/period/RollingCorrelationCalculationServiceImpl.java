@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.CorrelationCalculation;
 import com.fintex.ce.application.calculation.metric.RollingCorrelationCalculation;
 import com.fintex.ce.application.calculation.service.period.core.BenchmarkWeightedAverageWithCpsdAndCpedAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.MonthlyReturnsContext;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
@@ -19,8 +20,7 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
-
-import org.springframework.beans.factory.annotation.Value;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,7 +37,7 @@ public class RollingCorrelationCalculationServiceImpl
       BenchmarkWeightedAverageWithCpsdAndCpedAbstractService<RollingCalculationCommand, RollingCorrelationResult> {
 
   private final PortfolioValidateCutAndFxPipeline portfolioValidateCutAndFx;
-  private final Set<String> defaultPeriods;
+  private final Set<TimePeriod> defaultPeriods;
 
   public RollingCorrelationCalculationServiceImpl(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
@@ -45,11 +45,11 @@ public class RollingCorrelationCalculationServiceImpl
       PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped,
       BenchmarkWeightedAverageWithCpsdAndCpedPipeline benchmarkWeightedAverageWithCpsdAndCped,
       PortfolioValidateCutAndFxPipeline portfolioValidateCutAndFx,
-      @Value("#{'${default.periods.rolling-calculations}'.split(',')}") Set<String> defaultPeriods) {
+      PeriodProperties periods) {
     super(portfolioMonthlyReturnsContextProvider, benchmarkMonthlyReturnsContextProvider,
         portfolioWeightedAverageWithCpsdAndCped, benchmarkWeightedAverageWithCpsdAndCped);
     this.portfolioValidateCutAndFx = portfolioValidateCutAndFx;
-    this.defaultPeriods = defaultPeriods;
+    this.defaultPeriods = periods.getRollingCalculations();
   }
 
   @Override

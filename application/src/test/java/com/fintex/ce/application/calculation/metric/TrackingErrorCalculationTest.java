@@ -22,6 +22,7 @@ import java.util.stream.IntStream;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -376,7 +377,7 @@ class TrackingErrorCalculationTest {
     TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(LocalDate.parse("2024-02-29"), 12, ONE);
 
     TrackingErrorCalculation calculation = new TrackingErrorCalculation(benchmarkInput(portfolioReturns,
-        benchmarkReturns), Set.of("12"));
+        benchmarkReturns), Set.of(ONE_YR));
 
     assertThat(calculation.portfolioReturnOverBenchmark).doesNotContainKey(missingDate);
     assertThatThrownBy(() -> calculation.calculatePeriodForNumberOfMonths(12))
@@ -394,7 +395,7 @@ class TrackingErrorCalculationTest {
     benchmarkReturns.put(LocalDate.parse("2023-12-31"), ONE);
 
     TrackingErrorCalculation calculation = new TrackingErrorCalculation(benchmarkInput(portfolioReturns,
-        benchmarkReturns), Set.of("12"));
+        benchmarkReturns), Set.of(ONE_YR));
 
     assertThat(calculation.portfolioReturnOverBenchmark).doesNotContainKey(gapDate);
     assertThatThrownBy(() -> calculation.calculatePeriodForNumberOfMonths(12))

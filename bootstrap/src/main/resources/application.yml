@@ -125,7 +125,9 @@ default:
   # MORNINGSTAR_ID is chosen due to the best availability of the data
   holdings-identifier-type: MORNINGSTAR_ID
   periods:
-    trailing-total-returns: "1,3,6,12,36,60,120,YEAR_TO_DATE,SINCE_PERFORMANCE_START_DATE"
+    # Values are TimePeriod members (catalog-investment-commons), given either by name or by their length in months.
+    # YTD = year to date, SI = since inception — both resolve their length from the data rather than carrying one.
+    trailing-total-returns: "1,3,6,12,36,60,120,YTD,SI"
     leading-total-returns: "1,3,6,12,36,60,120"
     rolling-calculations: "12, 36, 60, 120"
     information-ratio-returns: "12, 36, 60, 120"

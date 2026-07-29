@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.AlphaBetaCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.AlphaResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -19,7 +20,7 @@ import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 public class AlphaCalculation extends AlphaBetaCalculationAbstract<AlphaResult> {
 
   public AlphaCalculation(final BenchmarkPeriodCalculationInput input,
-      final Set<String> periods,
+      final Set<TimePeriod> periods,
       final NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn,
       final NavigableMap<LocalDate, BigDecimal> benchmarkExcessReturn) {
     super(input, periods, portfolioExcessReturn, benchmarkExcessReturn);

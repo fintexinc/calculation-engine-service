@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -22,7 +23,7 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
   public NavigableMap<LocalDate, BigDecimal> tBills;
 
   public SortinoRatioCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods,
+      final Set<TimePeriod> defaultPeriods,
       final NavigableMap<LocalDate, BigDecimal> tBills,
       final DownsideDeviationCalculation<SortinoRatioResult> downsideDeviationCalculation) {
     super(input, defaultPeriods);

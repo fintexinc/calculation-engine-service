@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.DecimalUtils;
@@ -13,9 +14,9 @@ import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.error.Notification;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -36,14 +37,10 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import static com.fintex.ce.model.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.domain.enumeration.Period.SINCE_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.domain.enumeration.Period.YEAR_TO_DATE;
 import static com.fintex.ce.util.DateTimeUtils.getMonthsBetweenDates;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
-import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 @Service
 public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<PeriodCommand, MaxDrawdownResult> {
@@ -51,8 +48,8 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
   public MaxDrawdownService(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
       PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
-      @Value("${default.periods.risk-calculations}") final Set<String> defaultPeriods) {
-    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, defaultPeriods);
+      PeriodProperties periods) {
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, periods.getRiskCalculations());
   }
 
   @Override
@@ -71,29 +68,28 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
     final NavigableMap<LocalDate, BigDecimal> growth10K = Growth10KHelper.compoundGrowth10K(
         portfolioReturns, ReturnFactorScale.AS_IS);
 
-    final Set<String> initialPeriods = CollectionUtils.isEmpty(command.getPeriods())
+    final Set<TimePeriod> initialPeriods = CollectionUtils.isEmpty(command.getPeriods())
         ? defaultPeriods
         : command.getPeriods();
     final Set<Pair<String, MaxDrawdownEntry>> periodsResult = new HashSet<>();
 
     initialPeriods.stream()
-        .filter(p -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(p))
+        .filter(p -> p != TimePeriod.CIPSD)
         .forEach(p -> {
-          final int months = getNumberOfMonthsFor(portfolioReturns, p.trim());
-          periodsResult.add(Pair.of(p, calculateEntry(months, portfolioReturns, growth10K)));
+          final int months = getNumberOfMonthsFor(portfolioReturns, p);
+          periodsResult.add(Pair.of(p.name(), calculateEntry(months, portfolioReturns, growth10K)));
         });
 
-    boolean sinceCipsdRequested = cipsd != null
-        || initialPeriods.contains(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name());
+    boolean sinceCipsdRequested = cipsd != null || initialPeriods.contains(TimePeriod.CIPSD);
     if (isCipsdValid(cipsd, portfolioReturns)) {
       final int months = getMonthsBetweenDates(cipsd, portfolioReturns.lastKey(), firstDayOfMonth());
-      periodsResult.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(),
+      periodsResult.add(Pair.of(TimePeriod.CIPSD.name(),
           calculateEntry(months, portfolioReturns, growth10K)));
     } else if (cipsd != null && !CollectionUtils.isEmpty(portfolioReturns) && sinceCipsdRequested) {
       throw ErrorCode.CIPSD_OUTSIDE_DATA_RANGE_ERROR.toException(
           cipsd, portfolioReturns.firstKey(), portfolioReturns.lastKey());
     } else if (sinceCipsdRequested) {
-      periodsResult.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+      periodsResult.add(Pair.of(TimePeriod.CIPSD.name(), null));
     }
 
     final MaxDrawdownResult result = buildResult(periodsResult);
@@ -230,18 +226,18 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
 
     periodsResult.stream()
         .filter(pair -> pair.getValue() == null)
-        .filter(pair -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(pair.getKey().trim()))
-        .filter(pair -> getNumberOfMonthsFor(portfolioReturns, pair.getKey().trim()) > availableMonths)
-        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey().trim(),
+        .filter(pair -> !TimePeriod.CIPSD.name().equals(pair.getKey()))
+        .filter(pair -> getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(pair.getKey())) > availableMonths)
+        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey(),
             availableMonths))
         .forEach(warnings::add);
 
     periodsResult.stream()
         .filter(pair -> pair.getValue() == null)
-        .filter(pair -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(pair.getKey().trim()))
-        .filter(pair -> getNumberOfMonthsFor(portfolioReturns, pair.getKey().trim()) <= availableMonths)
-        .filter(pair -> isDegenerateGrowthData(pair.getKey().trim(), portfolioReturns, growth10K))
-        .map(pair -> ErrorCode.DEGENERATE_GROWTH_DATA.asNotification(pair.getKey().trim()))
+        .filter(pair -> !TimePeriod.CIPSD.name().equals(pair.getKey()))
+        .filter(pair -> getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(pair.getKey())) <= availableMonths)
+        .filter(pair -> isDegenerateGrowthData(pair.getKey(), portfolioReturns, growth10K))
+        .map(pair -> ErrorCode.DEGENERATE_GROWTH_DATA.asNotification(pair.getKey()))
         .forEach(warnings::add);
 
     result.setWarnings(warnings);
@@ -250,23 +246,23 @@ public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<P
   private boolean isDegenerateGrowthData(final String period,
       final NavigableMap<LocalDate, BigDecimal> portfolioReturns,
       final NavigableMap<LocalDate, BigDecimal> growth10K) {
-    final int months = getNumberOfMonthsFor(portfolioReturns, period);
+    final int months = getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(period));
     final SortedMap<LocalDate, BigDecimal> periodGrowth10K = getSubMapByPeriodStartDate(
         getPeriodStartDateWithOneMonthOffset(months, growth10K), growth10K);
     return !periodGrowth10K.isEmpty()
         && periodGrowth10K.get(periodGrowth10K.firstKey()).compareTo(BigDecimal.ZERO) == 0;
   }
 
-  private int getNumberOfMonthsFor(final NavigableMap<LocalDate, BigDecimal> returns, final String period) {
-    if (isNumeric(period)) {
-      return Integer.parseInt(period);
-    } else if (YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
+  private int getNumberOfMonthsFor(final NavigableMap<LocalDate, BigDecimal> returns, final TimePeriod period) {
+    if (period.isFixedLength()) {
+      return period.getMonths();
+    } else if (period == TimePeriod.YTD) {
       final LocalDate endDate = returns.keySet().stream().max(LocalDate::compareTo).orElseThrow();
       return getMonthsBetweenDates(endDate, endDate, firstDayOfYear());
-    } else if (SINCE_PERFORMANCE_START_DATE.name().equalsIgnoreCase(period)) {
+    } else if (period == TimePeriod.SI) {
       return getMonthsBetweenDates(returns.firstKey(), returns.lastKey(), firstDayOfMonth());
     }
-    throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toException(period);
+    throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toException(period.name());
   }
 
   private boolean isCipsdValid(final LocalDate cipsd, final NavigableMap<LocalDate, BigDecimal> returns) {

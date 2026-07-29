@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
@@ -13,10 +14,7 @@ import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 @Service
 public class TrailingTotalReturnsCalculationServiceImpl
@@ -29,8 +27,8 @@ public class TrailingTotalReturnsCalculationServiceImpl
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
       PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
       TreasuryBillsFetcher treasuryBillsFetcher,
-      @Value("#{'${default.periods.trailing-total-returns}'.split(',')}") final Set<String> defaultPeriods) {
-    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, defaultPeriods);
+      PeriodProperties periods) {
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, periods.getTrailingTotalReturns());
     this.treasuryBillsFetcher = treasuryBillsFetcher;
   }
 

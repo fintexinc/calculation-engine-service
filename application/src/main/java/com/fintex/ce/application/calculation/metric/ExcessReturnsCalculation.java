@@ -5,6 +5,7 @@ import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.returns.ExcessReturnsResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -20,7 +21,7 @@ import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 public class ExcessReturnsCalculation extends BenchmarkWeightedAverageCalculation<ExcessReturnsResult, BigDecimal> {
 
   public ExcessReturnsCalculation(final BenchmarkPeriodCalculationInput input,
-      final Set<String> periods) {
+      final Set<TimePeriod> periods) {
     super(input, periods);
   }
 

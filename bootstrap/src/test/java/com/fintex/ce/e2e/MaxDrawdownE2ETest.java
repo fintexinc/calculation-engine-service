@@ -1,7 +1,6 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.enumeration.Period;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
@@ -12,6 +11,7 @@ import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
@@ -27,6 +27,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -44,7 +48,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
   private static final LocalDate RETURNS_FIRST_MONTH_END = LocalDate.of(2024, 1, 31);
   private static final LocalDate RETURNS_LAST_MONTH_END = LocalDate.of(2024, 12, 31);
 
-  private static final String SINCE_CIPSD_PERIOD = Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name();
+  private static final String SINCE_CIPSD_PERIOD = TimePeriod.CIPSD.name();
 
   private static final String[] MONTH_ENDS_2024 = {
       "2024-01-31", "2024-02-29", "2024-03-31", "2024-04-30", "2024-05-31", "2024-06-30",
@@ -89,10 +93,10 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getPerformanceStartDate()).isEqualTo(RETURNS_FIRST_MONTH_END);
     assertThat(result.getPerformanceEndDate()).isEqualTo(RETURNS_LAST_MONTH_END);
-    // No CIPSD was supplied, so exactly the requested "12" month period is returned - never a since-CIPSD entry.
+    // No CIPSD was supplied, so exactly the requested one-year period is returned - never a since-CIPSD entry.
     assertThat(result.getMaxDrawdown())
         .extracting(MaxDrawdownEntry::period)
-        .containsExactly("12")
+        .containsExactly(ONE_YR.name())
         .doesNotContain(SINCE_CIPSD_PERIOD);
     // Golden values captured from the deterministic pipeline for the seeded two-security blend. The blended growth
     // curve dips in April 2024 (both series decline that month), giving a single-month peak-to-trough drawdown that
@@ -134,7 +138,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getCustomIntervalPerformanceStartDate()).isEqualTo(cipsd);
     assertThat(result.getMaxDrawdown())
         .extracting(MaxDrawdownEntry::period)
-        .contains("12", SINCE_CIPSD_PERIOD);
+        .contains(ONE_YR.name(), SINCE_CIPSD_PERIOD);
   }
 
   /**
@@ -146,7 +150,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
     enqueueSmsMockResponse(smsPositiveResponseBody());
 
     PeriodCommand command = periodCommand(CalculationMetric.MAX_DRAWDOWN);
-    command.setPeriods(Set.of("3", "6", "12"));
+    command.setPeriods(Set.of(THREE_MTH, SIX_MTH, ONE_YR));
 
     var response = postCalculation(writeJson(command));
 
@@ -155,7 +159,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getMaxDrawdown())
         .extracting(MaxDrawdownEntry::period)
-        .containsExactlyInAnyOrder("3", "6", "12");
+        .containsExactlyInAnyOrder(THREE_MTH.name(), SIX_MTH.name(), ONE_YR.name());
   }
 
   /**
@@ -168,7 +172,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
     enqueueSmsMockResponse(smsPositiveResponseBody());
 
     PeriodCommand command = periodCommand(CalculationMetric.MAX_DRAWDOWN);
-    command.setPeriods(Set.of("36")); // only 12 months of returns are available
+    command.setPeriods(Set.of(THREE_YR)); // only 12 months of returns are available
 
     var response = postCalculation(writeJson(command));
 
@@ -178,7 +182,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getMaxDrawdown())
         .singleElement()
         .satisfies(entry -> {
-          assertThat(entry.period()).isEqualTo("36");
+          assertThat(entry.period()).isEqualTo(THREE_YR.name());
           assertThat(entry.value()).isNull();
         });
     assertThat(result.getWarnings())
@@ -186,33 +190,41 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
         .satisfies(warning -> {
           assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD);
           // Message must carry both substituted values (requested period 36, only 12 available).
-          assertThat(warning.getMessage()).contains("36").contains("12");
+          assertThat(warning.getMessage()).contains(THREE_YR.name()).contains("12");
         });
   }
 
   /**
-   * An unsupported time-interval period token is rejected up front with {@code 400 Bad Request} and
-   * {@link ErrorCode.Codes#TIME_INTERVAL_PERIOD_NOT_ALLOWED} (TIP-004), echoing the offending token in the message.
+   * An unsupported time-interval period is rejected up front with {@code 400 Bad Request} and
+   * {@link ErrorCode.Codes#TIME_INTERVAL_PERIOD_NOT_SUPPORTED} (TIP-011), echoing the offending token and listing what
+   * would have been accepted.
+   *
+   * <p>
+   * Posted as raw JSON because a period is now a typed enum: the value cannot be put on the command object at all, and
+   * the rejection happens while reading the body. That is the path a real caller takes, so it is the one worth
+   * covering.
    */
   @Test
-  void shouldReturnBadRequest_whenPeriodTokenIsNotAllowed() {
+  void shouldReturnBadRequest_whenPeriodIsNotAKnownPeriod() {
     enqueueSmsMockResponse(smsPositiveResponseBody());
 
-    PeriodCommand command = periodCommand(CalculationMetric.MAX_DRAWDOWN);
-    command.setPeriods(Set.of("not-a-period"));
+    String body = writeJson(periodCommand(CalculationMetric.MAX_DRAWDOWN))
+        .replace("\"ONE_YR\"", "\"not-a-period\"");
 
-    var response = postCalculation(writeJson(command));
+    var response = postCalculation(body);
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    assertThat(response.responseBody()).contains(ErrorCode.Codes.TIME_INTERVAL_PERIOD_NOT_ALLOWED);
-    assertThat(response.responseBody()).contains("Time Interval Period is not allowed: not-a-period");
+    assertThat(response.responseBody()).contains(ErrorCode.Codes.TIME_INTERVAL_PERIOD_NOT_SUPPORTED);
+    assertThat(response.responseBody()).contains("not-a-period");
+    // the message names the alternatives, so a caller can fix the request without reading our source
+    assertThat(response.responseBody()).contains("TWENTY_YR");
   }
 
   private static PeriodCommand periodCommand(CalculationMetric metric) {
     PeriodCommand command = new PeriodCommand();
     command.setMetric(metric);
     command.setCurrency(Currency.CAD);
-    command.setPeriods(Set.of("12"));
+    command.setPeriods(Set.of(ONE_YR));
     command.setCustomPed(LocalDate.parse("2024-12-31"));
     command.setHoldings(List.of(
         new PortfolioHolding(new BigDecimal("60000.00"), FinancialInstrumentType.ETF, Country.CANADA, XBAL),

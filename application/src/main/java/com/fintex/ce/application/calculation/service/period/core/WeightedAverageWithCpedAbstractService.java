@@ -14,6 +14,7 @@ import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.util.List;
 import java.util.Set;
@@ -30,14 +31,14 @@ import java.util.Set;
 public abstract class WeightedAverageWithCpedAbstractService<C extends PeriodCommand, R extends PeriodResult>
     implements
       PeriodCalculationService<C, R> {
-  protected final Set<String> defaultPeriods;
+  protected final Set<TimePeriod> defaultPeriods;
   protected final PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider;
   protected final PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped;
 
   protected WeightedAverageWithCpedAbstractService(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
       PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
-      Set<String> defaultPeriods) {
+      Set<TimePeriod> defaultPeriods) {
     this.portfolioMonthlyReturnsContextProvider = portfolioMonthlyReturnsContextProvider;
     this.portfolioWeightedAverageWithCped = portfolioWeightedAverageWithCped;
     this.defaultPeriods = defaultPeriods;

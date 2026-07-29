@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -26,7 +27,7 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
   public StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation;
 
   public SharpeRatioCalculation(PeriodCalculationInput input,
-      Set<String> defaultPeriods,
+      Set<TimePeriod> defaultPeriods,
       NavigableMap<LocalDate, BigDecimal> tBills,
       StandardDeviationCalculation<SharpeRatioResult> standardDeviationCalculation) {
     super(input, defaultPeriods);

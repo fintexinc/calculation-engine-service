@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.UpDownSideCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.UpsideCaptureResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,7 +17,7 @@ import static java.math.BigDecimal.ZERO;
 public class UpsideCaptureCalculation extends UpDownSideCalculationAbstract<UpsideCaptureResult> {
 
   public UpsideCaptureCalculation(final BenchmarkPeriodCalculationInput input,
-      final Set<String> periods) {
+      final Set<TimePeriod> periods) {
     super(input, periods);
   }
 

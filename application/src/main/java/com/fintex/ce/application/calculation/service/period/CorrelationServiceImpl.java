@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.CorrelationCalculation;
 import com.fintex.ce.application.calculation.service.period.core.ValidateCutAndFxAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.ReturnsSnapshot;
 import com.fintex.ce.application.returns.WeightedAverageComponent;
@@ -14,8 +15,7 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-
-import org.springframework.beans.factory.annotation.Value;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,15 +30,15 @@ import java.util.Set;
 @Deprecated
 public class CorrelationServiceImpl extends ValidateCutAndFxAbstractService<PeriodCommand, CorrelationResult> {
 
-  private final Set<String> defaultPeriods;
+  private final Set<TimePeriod> defaultPeriods;
 
   public CorrelationServiceImpl(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
       PortfolioValidateCutAndFxPipeline portfolioValidateCutAndFx,
       WeightedAverageComponent weightedAverageComponent,
-      @Value("#{'${default.periods.risk-calculations}'.split(',')}") Set<String> defaultPeriods) {
+      PeriodProperties periods) {
     super(portfolioMonthlyReturnsContextProvider, portfolioValidateCutAndFx, weightedAverageComponent);
-    this.defaultPeriods = defaultPeriods;
+    this.defaultPeriods = periods.getRiskCalculations();
   }
 
   @Override

@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.util.CollectionUtils;
@@ -29,16 +30,15 @@ import static com.fintex.ce.application.util.CalculationUtils.sum;
 import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.application.util.DecimalUtils.divide;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
-import static com.fintex.ce.model.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.domain.enumeration.Period.SINCE_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.domain.enumeration.Period.YEAR_TO_DATE;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.DateTimeUtils.getMonthsBetweenDates;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.CIPSD;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SI;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.YTD;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
-import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 /**
  * V - type of calculated value. e.g If calculation returns BigDecimal value for period, then V -> BigDecimal.
@@ -48,12 +48,12 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
 
   private static final long ONE_MONTH = 1;
 
-  public final Set<String> defaultPeriods;
+  public final Set<TimePeriod> defaultPeriods;
   public NavigableMap<LocalDate, BigDecimal> portfolioTotalReturns;
   public LocalDate cipsd;
 
   protected PeriodCalculationAbstract(PeriodCalculationInput input,
-      Set<String> defaultPeriods) {
+      Set<TimePeriod> defaultPeriods) {
     this.cipsd = input.getCipsd();
     this.portfolioTotalReturns = input.getWeightedAveragePortfolioReturns();
     this.defaultPeriods = defaultPeriods;
@@ -75,26 +75,31 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          entered periods
    * @return calculated periods
    */
-  public Set<Pair<String, V>> calculatePeriods(Set<String> periods) {
-    Set<String> initialPeriods = getInitialPeriods(periods);
+  public Set<Pair<String, V>> calculatePeriods(Set<TimePeriod> periods) {
+    Set<TimePeriod> initialPeriods = getInitialPeriods(periods);
     Set<Pair<String, V>> result = initialPeriods.stream()
-        .filter(periodStr -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(periodStr))
+        .filter(period -> period != CIPSD)
         .map(this::calculateForPeriod).collect(Collectors.toSet());
     addSinceCustomIntervalPerformanceStartDate(result, initialPeriods);
     return result;
   }
 
   /**
-   * Calculates single period
+   * Calculates a single period.
+   *
+   * <p>
+   * The returned pair keeps the period as its name rather than as the enum: this is the one point where the typed
+   * vocabulary meets the response DTOs, which are string-keyed throughout ({@link TimeIntervalResult}). The name is
+   * what the enum serializes as anyway, so the wire format is the same either way.
    *
    * @param period
    *          period
    * @return result for a single period
    */
-  public Pair<String, V> calculateForPeriod(String period) {
-    int months = getNumberOfMonthsFor(portfolioTotalReturns, Objects.requireNonNull(period).trim());
+  public Pair<String, V> calculateForPeriod(TimePeriod period) {
+    int months = getNumberOfMonthsFor(portfolioTotalReturns, Objects.requireNonNull(period));
     V result = calculatePeriodForNumberOfMonths(months);
-    return Pair.of(period, toUserFormat(result));
+    return Pair.of(period.name(), toUserFormat(result));
   }
 
   /**
@@ -132,12 +137,12 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          requested periods
    */
   public void addSinceCustomIntervalPerformanceStartDate(Set<Pair<String, V>> resultSet,
-      Set<String> periods) {
+      Set<TimePeriod> periods) {
     if (isSinceCustomIntervalPerformanceStartDateValid()) {
       V periodValue = calculatePeriodForCustomIntervalStartDate();
-      resultSet.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), toUserFormat(periodValue)));
-    } else if (cipsd != null || periods.contains(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name())) {
-      resultSet.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+      resultSet.add(Pair.of(CIPSD.name(), toUserFormat(periodValue)));
+    } else if (cipsd != null || periods.contains(CIPSD)) {
+      resultSet.add(Pair.of(CIPSD.name(), null));
     }
   }
 
@@ -160,15 +165,15 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          user entered period
    * @return number of months
    */
-  public int getNumberOfMonthsFor(NavigableMap<LocalDate, BigDecimal> returns, String period) {
-    if (isNumeric(period)) {
-      return Integer.parseInt(period);
-    } else if (YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
+  public int getNumberOfMonthsFor(NavigableMap<LocalDate, BigDecimal> returns, TimePeriod period) {
+    if (period.isFixedLength()) {
+      return period.getMonths();
+    } else if (period == YTD) {
       return getNumberOfMonthsForYearToDate(returns);
-    } else if (SINCE_PERFORMANCE_START_DATE.name().equalsIgnoreCase(period)) {
+    } else if (period == SI) {
       return getNumberOfMonthsForSinceInception(returns);
     }
-    throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toException(period);
+    throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toException(period.name());
   }
 
   /**
@@ -240,7 +245,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          user entered periods
    * @return periods
    */
-  public Set<String> getInitialPeriods(Set<String> periods) {
+  public Set<TimePeriod> getInitialPeriods(Set<TimePeriod> periods) {
     return CollectionUtils.isEmpty(periods) ? this.defaultPeriods : periods;
   }
 
@@ -251,7 +256,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          entered periods
    * @return final result
    */
-  public T calculate(Set<String> periods) {
+  public T calculate(Set<TimePeriod> periods) {
     Set<Pair<String, V>> periodsResult = calculatePeriods(periods);
     T result = defineResponseType(periodsResult);
     populateBasicDetails(result);
@@ -273,19 +278,16 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
     List<Notification> warnings = new ArrayList<>(result.getWarnings());
     periodsResult.stream()
         .filter(pair -> pair.getValue() == null)
-        // Period keys may carry whitespace from `application.yml` SpEL splits (e.g. "12, 36, 60, 120" → " 36").
-        // calculateForPeriod trims before resolving but stores the original in the pair, so trim again here.
-        .filter(pair -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(pair.getKey().trim()))
-        .filter(pair -> requiresInsufficientDataWarning(pair.getKey().trim(), availableMonths))
-        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey().trim(),
+        .filter(pair -> !CIPSD.name().equals(pair.getKey()))
+        .filter(pair -> requiresInsufficientDataWarning(pair.getKey(), availableMonths))
+        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey(),
             availableMonths))
         .forEach(warnings::add);
 
     // CIPSD lies outside [firstKey, lastKey] → SINCE_CIPSD is silently null. Without this warning the caller
     // has no signal whether the cause was an out-of-range CIPSD vs missing data vs anything else.
     boolean sinceCipsdRequestedAndNull = periodsResult.stream().anyMatch(
-        pair -> SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE
-            .name().equalsIgnoreCase(pair.getKey().trim()) && pair.getValue() == null);
+        pair -> CIPSD.name().equals(pair.getKey()) && pair.getValue() == null);
     if (cipsd != null && !portfolioTotalReturns.isEmpty()
         && !isSinceCustomIntervalPerformanceStartDateValid()
         && sinceCipsdRequestedAndNull) {
@@ -295,8 +297,8 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
 
     periodsResult.stream()
         .filter(pair -> pair.getValue() == null)
-        .filter(pair -> requiresUnavailablePeriodWarning(pair.getKey().trim(), availableMonths))
-        .map(pair -> unavailablePeriodWarning(pair.getKey().trim()))
+        .filter(pair -> requiresUnavailablePeriodWarning(pair.getKey(), availableMonths))
+        .map(pair -> unavailablePeriodWarning(pair.getKey()))
         .forEach(warnings::add);
 
     result.setWarnings(warnings);
@@ -442,7 +444,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * additional null-return paths (e.g. degenerate input data) should override and call {@code super} first.
    */
   protected boolean requiresInsufficientDataWarning(final String period, final int availableMonths) {
-    return getNumberOfMonthsFor(portfolioTotalReturns, period) > availableMonths;
+    return getNumberOfMonthsFor(portfolioTotalReturns, TimePeriod.fromJson(period)) > availableMonths;
   }
 
   /**
@@ -451,7 +453,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * alignment gaps handled internally by a metric.
    */
   protected boolean requiresUnavailablePeriodWarning(final String period, final int availableMonths) {
-    if (SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(period)) {
+    if (CIPSD.name().equals(period)) {
       return cipsd != null && isSinceCustomIntervalPerformanceStartDateValid();
     }
     return !requiresInsufficientDataWarning(period, availableMonths);

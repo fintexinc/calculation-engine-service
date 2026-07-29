@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
@@ -213,7 +214,7 @@ class UpDownSideCalculationAbstractTest {
     benchmarkReturns.put(startDate, ONE);
     benchmarkReturns.put(secondDate, ONE);
     UpDownSideCalculationAbstract<?> calculation = new UpsideCaptureCalculation(benchmarkInput(portfolioReturns,
-        benchmarkReturns), Set.of("12"));
+        benchmarkReturns), Set.of(ONE_YR));
 
     BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(12);
 
@@ -239,10 +240,10 @@ class UpDownSideCalculationAbstractTest {
     return Stream.of(
         Arguments.of("upside",
             (Function<BenchmarkPeriodCalculationInput, UpDownSideCalculationAbstract<?>>) input -> new UpsideCaptureCalculation(
-                input, Set.of("12")), ONE),
+                input, Set.of(ONE_YR)), ONE),
         Arguments.of("downside",
             (Function<BenchmarkPeriodCalculationInput, UpDownSideCalculationAbstract<?>>) input -> new DownsideCaptureCalculation(
-                input, Set.of("12")), ONE.negate()));
+                input, Set.of(ONE_YR)), ONE.negate()));
   }
 
   private static BenchmarkPeriodCalculationInput benchmarkInput(

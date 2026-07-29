@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,8 +67,8 @@ class GlobalExceptionHandlerTest {
 
   @Test
   void calculationsFailedException_aggregatesAllNotifications() {
-    CalculationException error1 = ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12.toException();
-    CalculationException error2 = ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.toException();
+    CalculationException error1 = ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.toException();
+    CalculationException error2 = ErrorCode.REQUEST_CONTAINS_CUSTOM_INTERVAL_PSD.toException();
     CalculationsFailedException composite = new CalculationsFailedException(List.of(error1, error2));
 
     ResponseEntity<ErrorResponse> response = handler.handleCalculationsFailed(composite);
@@ -76,9 +77,12 @@ class GlobalExceptionHandlerTest {
     assertThat(response.getBody()).isNotNull();
     assertThat(response.getBody().getNotifications()).hasSize(2);
     assertThat(response.getBody().getNotifications())
-        .extracting(Notification::getCode)
-        .containsExactly(ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12.getCode(),
-            ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.getCode());
+        .extracting(Notification::getCode, Notification::getMessage, Notification::getSeverity)
+        .containsExactly(
+            tuple(ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.getCode(),
+                ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.getMessage(), Severity.ERROR),
+            tuple(ErrorCode.REQUEST_CONTAINS_CUSTOM_INTERVAL_PSD.getCode(),
+                ErrorCode.REQUEST_CONTAINS_CUSTOM_INTERVAL_PSD.getMessage(), Severity.ERROR));
   }
 
   @Test

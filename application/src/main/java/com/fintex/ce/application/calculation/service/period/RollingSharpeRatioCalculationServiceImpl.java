@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.metric.RollingSharpeRatioCalculatio
 import com.fintex.ce.application.calculation.metric.SharpeRatioCalculation;
 import com.fintex.ce.application.calculation.metric.StandardDeviationCalculation;
 import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpsdAndCpedAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
 import com.fintex.ce.application.util.ReturnFactorScale;
@@ -15,8 +16,7 @@ import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
-
-import org.springframework.beans.factory.annotation.Value;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.util.Set;
 
@@ -29,16 +29,16 @@ public class RollingSharpeRatioCalculationServiceImpl
       WeightedAverageWithCpsdAndCpedAbstractService<RollingCalculationCommand, RollingSharpeRatioResult> {
 
   private final TreasuryBillsFetcher treasuryBillsFetcher;
-  private final Set<String> defaultPeriods;
+  private final Set<TimePeriod> defaultPeriods;
 
   public RollingSharpeRatioCalculationServiceImpl(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
       PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped,
       TreasuryBillsFetcher treasuryBillsFetcher,
-      @Value("#{'${default.periods.rolling-calculations}'.split(',')}") Set<String> defaultPeriods) {
+      PeriodProperties periods) {
     super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCpsdAndCped);
     this.treasuryBillsFetcher = treasuryBillsFetcher;
-    this.defaultPeriods = defaultPeriods;
+    this.defaultPeriods = periods.getRollingCalculations();
   }
 
   @Override

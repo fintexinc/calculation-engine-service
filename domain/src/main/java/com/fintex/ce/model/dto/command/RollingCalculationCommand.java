@@ -1,6 +1,7 @@
 package com.fintex.ce.model.dto.command;
 
 import com.fintex.ce.model.dto.command.contract.CustomPsdProvider;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,5 +22,5 @@ public class RollingCalculationCommand extends PeriodCommand implements CustomPs
   private LocalDate customPsd;
   @Schema(description = "Rolling time interval periods in months", example = "[\"12\", \"36\"]")
   @JsonProperty("rollingTimeIntervalPeriod")
-  private Set<String> rollingPeriods;
+  private Set<TimePeriod> rollingPeriods;
 }

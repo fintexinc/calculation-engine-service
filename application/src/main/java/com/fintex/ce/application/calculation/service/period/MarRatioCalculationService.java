@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
 import com.fintex.ce.application.util.DecimalUtils;
@@ -15,9 +16,9 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.error.Notification;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,14 +34,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.util.DecimalUtils.abs;
-import static com.fintex.ce.model.domain.enumeration.Period.SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.domain.enumeration.Period.SINCE_PERFORMANCE_START_DATE;
-import static com.fintex.ce.model.domain.enumeration.Period.YEAR_TO_DATE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 import static com.fintex.ce.util.DateTimeUtils.getMonthsBetweenDates;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
-import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 /**
  * @deprecated metric is broken and not supported for now
@@ -55,9 +52,9 @@ public class MarRatioCalculationService
   public MarRatioCalculationService(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
       PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
-      @Value("#{'${default.periods.risk-calculations}'.split(',')}") final Set<String> defaultPeriods,
+      PeriodProperties periods,
       MaxDrawdownService maxDrawdownService) {
-    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, defaultPeriods);
+    super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, periods.getRiskCalculations());
     this.maxDrawdownService = maxDrawdownService;
   }
 
@@ -78,24 +75,24 @@ public class MarRatioCalculationService
     NavigableMap<LocalDate, BigDecimal> growth10K = Growth10KHelper.compoundGrowth10K(
         portfolioReturns, ReturnFactorScale.AS_IS);
 
-    Set<String> initialPeriods = CollectionUtils.isEmpty(command.getPeriods())
+    Set<TimePeriod> initialPeriods = CollectionUtils.isEmpty(command.getPeriods())
         ? defaultPeriods
         : command.getPeriods();
     Set<Pair<String, BigDecimal>> rawResults = new HashSet<>();
 
     initialPeriods.stream()
-        .filter(p -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(p))
+        .filter(p -> p != TimePeriod.CIPSD)
         .forEach(p -> {
-          int months = getNumberOfMonthsFor(portfolioReturns, p.trim());
-          rawResults.add(Pair.of(p, calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr)));
+          int months = getNumberOfMonthsFor(portfolioReturns, p);
+          rawResults.add(Pair.of(p.name(), calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr)));
         });
 
     if (isCipsdValid(cipsd, portfolioReturns)) {
       int months = getMonthsBetweenDates(cipsd, portfolioReturns.lastKey(), firstDayOfMonth());
-      rawResults.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(),
+      rawResults.add(Pair.of(TimePeriod.CIPSD.name(),
           calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr)));
-    } else if (cipsd != null || initialPeriods.contains(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name())) {
-      rawResults.add(Pair.of(SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name(), null));
+    } else if (cipsd != null || initialPeriods.contains(TimePeriod.CIPSD)) {
+      rawResults.add(Pair.of(TimePeriod.CIPSD.name(), null));
     }
 
     Set<Pair<String, BigDecimal>> periodsResult = rawResults.stream()
@@ -148,15 +145,15 @@ public class MarRatioCalculationService
 
     periodsResult.stream()
         .filter(pair -> pair.getValue() == null)
-        .filter(pair -> !SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name().equalsIgnoreCase(pair.getKey().trim()))
-        .filter(pair -> getNumberOfMonthsFor(portfolioReturns, pair.getKey().trim()) > availableMonths)
-        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey().trim(),
+        .filter(pair -> !TimePeriod.CIPSD.name().equals(pair.getKey()))
+        .filter(pair -> getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(pair.getKey())) > availableMonths)
+        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey(),
             availableMonths))
         .forEach(warnings::add);
 
     boolean sinceCipsdRequestedAndNull = periodsResult.stream()
-        .anyMatch(pair -> SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE.name()
-            .equalsIgnoreCase(pair.getKey().trim()) && pair.getValue() == null);
+        .anyMatch(pair -> TimePeriod.CIPSD.name()
+            .equalsIgnoreCase(pair.getKey()) && pair.getValue() == null);
     if (cipsd != null && !portfolioReturns.isEmpty() && !isCipsdValid(cipsd, portfolioReturns)
         && sinceCipsdRequestedAndNull) {
       warnings.add(ErrorCode.CIPSD_OUTSIDE_DATA_RANGE.asNotification(
@@ -166,16 +163,16 @@ public class MarRatioCalculationService
     result.setWarnings(warnings);
   }
 
-  private int getNumberOfMonthsFor(final NavigableMap<LocalDate, BigDecimal> returns, final String period) {
-    if (isNumeric(period)) {
-      return Integer.parseInt(period);
-    } else if (YEAR_TO_DATE.name().equalsIgnoreCase(period)) {
+  private int getNumberOfMonthsFor(final NavigableMap<LocalDate, BigDecimal> returns, final TimePeriod period) {
+    if (period.isFixedLength()) {
+      return period.getMonths();
+    } else if (period == TimePeriod.YTD) {
       LocalDate endDate = returns.keySet().stream().max(LocalDate::compareTo).orElseThrow();
       return getMonthsBetweenDates(endDate, endDate, firstDayOfYear());
-    } else if (SINCE_PERFORMANCE_START_DATE.name().equalsIgnoreCase(period)) {
+    } else if (period == TimePeriod.SI) {
       return getMonthsBetweenDates(returns.firstKey(), returns.lastKey(), firstDayOfMonth());
     }
-    throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toException(period);
+    throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_ALLOWED.toException(period.name());
   }
 
   private boolean isCipsdValid(final LocalDate cipsd, final NavigableMap<LocalDate, BigDecimal> returns) {

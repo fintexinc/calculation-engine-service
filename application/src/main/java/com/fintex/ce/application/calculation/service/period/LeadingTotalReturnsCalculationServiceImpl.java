@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.LeadingTotalReturnsCalculation;
 import com.fintex.ce.application.calculation.service.period.core.WeightedAverageWithCpsdAndCpedAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.MonthlyReturnsContext;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.WeightedAverageResult;
@@ -14,8 +15,7 @@ import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.LeadingTotalReturnCommand;
-
-import org.springframework.beans.factory.annotation.Value;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.util.Set;
 
@@ -27,14 +27,14 @@ public class LeadingTotalReturnsCalculationServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<LeadingTotalReturnCommand, LeadingTotalReturnsResult> {
 
-  private final Set<String> defaultPeriods;
+  private final Set<TimePeriod> defaultPeriods;
 
   public LeadingTotalReturnsCalculationServiceImpl(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
       PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped,
-      @Value("#{'${default.periods.leading-total-returns}'.split(',')}") Set<String> defaultPeriods) {
+      PeriodProperties periods) {
     super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCpsdAndCped);
-    this.defaultPeriods = defaultPeriods;
+    this.defaultPeriods = periods.getLeadingTotalReturns();
   }
 
   @Override
