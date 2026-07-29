@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.holding.TopHolding;
@@ -156,8 +157,8 @@ class TopHoldingsMapperTest {
   }
 
   private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, new SecurityIdentifier(securityId,
-        null));
+    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        new SecurityIdentifier(securityId, null));
   }
 
   private static SecurityIdentifier identifier(FiIdentifierType type, String id) {

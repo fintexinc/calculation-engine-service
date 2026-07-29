@@ -348,8 +348,8 @@ public class CommonHoldingsService
   }
 
   /**
-   * Generic stock check via the {@code STOCK} parent in the {@link FinancialInstrumentType} hierarchy. Picks up any
-   * country-specific descendant ({@code STOCK_US}, {@code STOCK_CANADA}, …) without listing each variant.
+   * Generic stock check via the {@code STOCK} parent in the {@link FinancialInstrumentType} hierarchy. Country is
+   * carried as a separate dimension, so this matches stocks of any country.
    */
   private boolean isStockHolding(PortfolioHolding holding) {
     return FilterUtils.isOfType(holding.getHoldingType(), FinancialInstrumentType.STOCK);

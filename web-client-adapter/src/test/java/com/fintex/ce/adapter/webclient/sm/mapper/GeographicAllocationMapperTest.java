@@ -9,6 +9,7 @@ import com.fintex.wm.commons.domain.allocation.GeographicAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -109,7 +110,7 @@ class GeographicAllocationMapperTest {
   }
 
   private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF_CANADA,
+    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
         new SecurityIdentifier(securityId, FiIdentifierType.TICKER));
   }
 }

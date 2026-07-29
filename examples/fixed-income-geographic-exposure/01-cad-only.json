@@ -25,7 +25,8 @@
       "name": "RBC 3-Year GIC"
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 8000.00,
       "securityIdentifier": {
         "id": "RY.TO",
@@ -34,7 +35,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 7200.00,
       "securityIdentifier": {
         "id": "TD.TO",
@@ -43,7 +45,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 5500.00,
       "securityIdentifier": {
         "id": "BMO.TO",
@@ -52,7 +55,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 4800.00,
       "securityIdentifier": {
         "id": "BN.TO",
@@ -61,7 +65,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 3500.00,
       "securityIdentifier": {
         "id": "SHOP.TO",
@@ -70,7 +75,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 6500.00,
       "securityIdentifier": {
         "id": "IFV",
@@ -78,7 +84,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 12000.00,
       "securityIdentifier": {
         "id": "F00000MP5F",
@@ -86,7 +93,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 4000.00,
       "securityIdentifier": {
         "id": "F00000MP5G",

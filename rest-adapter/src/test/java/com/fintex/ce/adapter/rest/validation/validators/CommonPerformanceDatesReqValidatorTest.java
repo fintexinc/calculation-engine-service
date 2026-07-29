@@ -4,8 +4,10 @@ import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -23,7 +25,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CommonPerformanceDatesReqValidatorTest {
 
-  private final CommonPerformanceDatesReqValidator validator = new CommonPerformanceDatesReqValidator();
+  private final CommonPerformanceDatesReqValidator validator = new CommonPerformanceDatesReqValidator(
+      new HoldingsValidator(new HoldingsValidationProperties()));
 
   @Test
   void shouldThrow_whenBenchmarkHasCashWithNullCurrency() {
@@ -41,7 +44,7 @@ class CommonPerformanceDatesReqValidatorTest {
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_MISSING_CURRENCY");
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.HOLDING_MISSING_CURRENCY);
         });
   }
 
@@ -61,7 +64,7 @@ class CommonPerformanceDatesReqValidatorTest {
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_MISSING_CURRENCY");
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.HOLDING_MISSING_CURRENCY);
         });
   }
 
@@ -69,7 +72,8 @@ class CommonPerformanceDatesReqValidatorTest {
   void shouldNotThrow_whenAllHoldingsAreValid() {
     PortfolioHolding holding = new PortfolioHolding(
         BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
     CashHolding cashHolding = CashHolding.builder()
         .value(BigDecimal.TEN)

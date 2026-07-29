@@ -113,6 +113,11 @@ calculation:
     # Reporting currency that money-value calculations (fees, MER, management fee, AUM, allocations) convert into
     # before weighting / summing. Pick the currency comparable across all multi-currency holdings in the portfolio.
     default-target-currency: CAD
+  validation:
+    # Countries whose securities the engine can price and process. Holdings from any other country are rejected.
+    supported-security-countries:
+      - USA
+      - CANADA
 
 default:
   data-providers: MORNINGSTAR, FMP

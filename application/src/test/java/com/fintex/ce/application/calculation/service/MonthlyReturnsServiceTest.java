@@ -7,6 +7,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -27,9 +28,9 @@ import static org.mockito.Mockito.when;
 
 class MonthlyReturnsServiceTest {
 
-  private static final PortfolioHolding ETF = new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
+  private static final PortfolioHolding ETF = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
       new SecurityIdentifier("ETF-A", FiIdentifierType.TICKER));
-  private static final PortfolioHolding STOCK = new PortfolioHolding(null, FinancialInstrumentType.STOCK_US,
+  private static final PortfolioHolding STOCK = new PortfolioHolding(null, FinancialInstrumentType.STOCK, Country.USA,
       new SecurityIdentifier("STK-B", FiIdentifierType.TICKER));
   private static final PortfolioHolding CASH = new PortfolioHolding(null, FinancialInstrumentType.CASH,
       new SecurityIdentifier("CASH", FiIdentifierType.TICKER));

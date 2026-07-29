@@ -19,7 +19,7 @@ class SecurityDataValidatorTest {
 
   @Test
   void passes_whenAllMandatoryHoldingsHaveRawDataEntry() {
-    final var fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
+    final var fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, "100");
     final var rawData = Map.of(fund, "fee-data");
 
     assertThatCode(() -> SecurityDataValidator.requireDataForEveryHolding(rawData, List.of(fund), h -> true))
@@ -28,8 +28,8 @@ class SecurityDataValidatorTest {
 
   @Test
   void throws_whenMandatoryHoldingHasNoRawDataEntry() {
-    final var present = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
-    final var missing = holding("US-MISSING", FinancialInstrumentType.MUTUAL_FUND_US, "100");
+    final var present = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, "100");
+    final var missing = holding("US-MISSING", FinancialInstrumentType.MUTUAL_FUND, "100");
     final var rawData = Map.of(present, "fee-data");
 
     assertThatThrownBy(
@@ -41,15 +41,15 @@ class SecurityDataValidatorTest {
 
   @Test
   void exemptHoldings_areSkipped_evenWhenAbsentFromRawData() {
-    final var fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
-    final var stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "100");
+    final var fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, "100");
+    final var stock = holding("AAPL", FinancialInstrumentType.STOCK, "100");
     final var rawData = Map.of(fund, "fee-data");
 
     // Only fund holdings are mandatory — the stock is exempt and its absence from rawData is fine.
     assertThatCode(() -> SecurityDataValidator.requireDataForEveryHolding(
         rawData,
         List.of(fund, stock),
-        h -> h.getHoldingType() == FinancialInstrumentType.MUTUAL_FUND_CANADA))
+        h -> h.getHoldingType() == FinancialInstrumentType.MUTUAL_FUND))
         .doesNotThrowAnyException();
   }
 
@@ -61,12 +61,12 @@ class SecurityDataValidatorTest {
     final var sharedId = new SecurityIdentifier("CIG-DUP", FiIdentifierType.MORNINGSTAR_ID);
     final var fundA = PortfolioHolding.builder()
         .value(new BigDecimal("100"))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
         .securityIdentifier(sharedId)
         .build();
     final var fundB = PortfolioHolding.builder()
         .value(new BigDecimal("300"))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
         .securityIdentifier(sharedId)
         .build();
     final var rawData = Map.of(fundA, "fee-data"); // only one entry, despite two holdings requested
@@ -80,7 +80,7 @@ class SecurityDataValidatorTest {
   void holdingWithNullIdentifier_isTreatedAsMissing_whenMandatory() {
     final var noId = PortfolioHolding.builder()
         .value(new BigDecimal("100"))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
         .securityIdentifier(null)
         .build();
 

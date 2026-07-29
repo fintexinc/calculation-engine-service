@@ -2,6 +2,7 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MonthlyReturnsContextTest {
 
-  private static final PortfolioHolding SPY = new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
+  private static final PortfolioHolding SPY = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
       new SecurityIdentifier("SPY", FiIdentifierType.TICKER));
 
   @Test

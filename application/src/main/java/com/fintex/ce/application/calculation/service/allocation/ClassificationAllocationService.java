@@ -52,12 +52,9 @@ public class ClassificationAllocationService
         Stream.of(ClassificationAllocationType.values()).collect(toMap(type -> type, type -> ZERO)));
 
     UNCLASSIFIED_MAP = Map.of(
-        FinancialInstrumentType.MUTUAL_FUND_CANADA, ClassificationAllocationType.UNCLASSIFIED__CANADA,
-        FinancialInstrumentType.ETF_CANADA, ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED,
-        FinancialInstrumentType.ETF_US, ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED,
-        FinancialInstrumentType.MUTUAL_FUND_US, ClassificationAllocationType.UNCLASSIFIED__US,
-        FinancialInstrumentType.STOCK_CANADA, ClassificationAllocationType.EQUITY__UNCLASSIFIED,
-        FinancialInstrumentType.STOCK_US, ClassificationAllocationType.EQUITY__UNCLASSIFIED,
+        FinancialInstrumentType.MUTUAL_FUND, ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED,
+        FinancialInstrumentType.ETF, ClassificationAllocationType.UNCLASSIFIED__UNCLASSIFIED,
+        FinancialInstrumentType.STOCK, ClassificationAllocationType.EQUITY__UNCLASSIFIED,
         FinancialInstrumentType.FIXED_INCOME, ClassificationAllocationType.FIXED_INCOME__UNCLASSIFIED);
   }
 

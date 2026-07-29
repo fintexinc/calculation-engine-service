@@ -174,7 +174,7 @@ class CommonHoldingsServiceTest {
   }
 
   @ParameterizedTest(name = "[{index}] {0} -> isOfType STOCK = leaf short-circuit applies")
-  @EnumSource(value = FinancialInstrumentType.class, names = {"STOCK_US", "STOCK_CANADA", "STOCK"})
+  @EnumSource(value = FinancialInstrumentType.class, names = {"STOCK"})
   void shouldShortCircuit_whenRequestHoldingIsAnyStockVariant(FinancialInstrumentType stockType) {
     PortfolioHolding stock = portfolioHolding("STK", 1000, stockType);
     CommonHolding selfEquity = equityHolding("Alpha Corp", "0.42");
@@ -370,7 +370,7 @@ class CommonHoldingsServiceTest {
   }
 
   private static PortfolioHolding etfHolding(String id, int value) {
-    return portfolioHolding(id, value, FinancialInstrumentType.ETF_CANADA);
+    return portfolioHolding(id, value, FinancialInstrumentType.ETF);
   }
 
   private static PortfolioHolding portfolioHolding(String id, int value, FinancialInstrumentType type) {

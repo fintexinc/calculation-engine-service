@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
@@ -55,10 +56,14 @@ public class MonthlyReturnsMapper
   }
 
   private String resolveCurrency(PortfolioHolding holding) {
-    return Optional.ofNullable(holding.getHoldingType())
-        .map(type -> type.getCountry())
-        .map(COUNTRY_CURRENCY_MAP::get)
-        .map(Currency::name)
-        .orElse(null);
+    Country country = holding.getCountry();
+    if (country == null) {
+      return null;
+    }
+    Currency currency = COUNTRY_CURRENCY_MAP.get(country);
+    if (currency == null) {
+      throw ErrorCode.COUNTRY_NOT_SUPPORTED.toExceptionForHolding(holding, country.name());
+    }
+    return currency.name();
   }
 }

@@ -15,8 +15,8 @@ public class HoldingReqValidator
     extends
       AbstractHoldingsValidationReqValidator<HoldingsProvider> {
 
-  public HoldingReqValidator() {
-    super(HoldingsProvider.class, HoldingsProvider::getHoldings, HoldingsValidationHelper::validate);
+  public HoldingReqValidator(HoldingsValidator holdingsValidator) {
+    super(HoldingsProvider.class, HoldingsProvider::getHoldings, holdingsValidator::validate);
   }
 
   @Override

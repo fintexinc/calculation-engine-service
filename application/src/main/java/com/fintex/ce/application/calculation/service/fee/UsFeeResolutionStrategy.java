@@ -11,7 +11,7 @@ import static com.fintex.ce.model.error.ErrorCode.MISSING_NER_AND_GER;
 
 /**
  * US fund chain: NER → GER. NER (net) is the after-waiver US operating-expense ratio; GER (gross) is pre-waiver. MER is
- * a Canadian regulatory term; US Morningstar data only populates it for ETF_US (where it duplicates NER) and never for
+ * a Canadian regulatory term; US Morningstar data only populates it for US ETFs (where it duplicates NER) and never for
  * US mutual funds, so it is intentionally excluded from this chain.
  *
  * <p>

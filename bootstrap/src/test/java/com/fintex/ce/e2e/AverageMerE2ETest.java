@@ -8,6 +8,7 @@ import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -93,7 +94,8 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   private static PortfolioHolding holding(String id) {
     return new PortfolioHolding(
         BigDecimal.valueOf(50_000),
-        FinancialInstrumentType.ETF_CANADA,
+        FinancialInstrumentType.ETF,
+        Country.CANADA,
         new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 

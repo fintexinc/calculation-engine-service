@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.DurationAllocationValue;
 import com.fintex.wm.commons.domain.allocation.Maturities;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimeDuration;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -31,7 +32,7 @@ class MaturityAllocationMapperTest {
 
     MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
+    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getMaturityDurationValues()).hasSize(3);
     assertThat(result.getMaturityDurationValues())
@@ -116,6 +117,7 @@ class MaturityAllocationMapperTest {
   }
 
   private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
+        new SecurityIdentifier(securityId, null));
   }
 }

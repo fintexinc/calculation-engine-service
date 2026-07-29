@@ -435,7 +435,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   protected static PortfolioHolding canadaMutualFund(String id, long value) {
     return PortfolioHolding.builder()
         .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND).country(Country.CANADA)
         .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.MORNINGSTAR_ID))
         .build();
   }
@@ -443,7 +443,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   protected static PortfolioHolding usEtf(String ticker, long value) {
     return PortfolioHolding.builder()
         .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.ETF_US)
+        .holdingType(FinancialInstrumentType.ETF).country(Country.USA)
         .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
         .build();
   }
@@ -451,7 +451,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   protected static PortfolioHolding canadaEtf(String ticker, long value) {
     return PortfolioHolding.builder()
         .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.ETF_CANADA)
+        .holdingType(FinancialInstrumentType.ETF).country(Country.CANADA)
         .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
         .build();
   }
@@ -459,7 +459,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   protected static PortfolioHolding usStock(String ticker, long value) {
     return PortfolioHolding.builder()
         .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.STOCK_US)
+        .holdingType(FinancialInstrumentType.STOCK).country(Country.USA)
         .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
         .build();
   }
@@ -467,7 +467,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   protected static PortfolioHolding canadaStock(String ticker, long value) {
     return PortfolioHolding.builder()
         .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.STOCK_CANADA)
+        .holdingType(FinancialInstrumentType.STOCK).country(Country.CANADA)
         .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
         .build();
   }

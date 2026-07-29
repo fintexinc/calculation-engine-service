@@ -7,8 +7,11 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.ce.util.DateTimeUtils;
 import com.fintex.ce.util.FilterUtils;
+import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,17 +20,21 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import lombok.experimental.UtilityClass;
+import lombok.RequiredArgsConstructor;
 
 /**
- * Shared helper that encapsulates holding-level validation rules used by several request validators (portfolio
- * holdings, benchmark holdings, and per-portfolio holdings inside multi-portfolio commands).
+ * Holding-level request validation shared by the portfolio, benchmark and multi-portfolio request validators. Applies
+ * structural rules (holding type, country, security identifier), business rules (GIC investment date, cash currency)
+ * and holding-value rules, throwing a {@link ValidationException} on the first violation.
  */
-@UtilityClass
-public class HoldingsValidationHelper {
+@Component
+@RequiredArgsConstructor
+public class HoldingsValidator {
 
   private static final String HOLDING_TYPE_FIELD = "holdingType";
   private static final String USER_FORMATTED_HOLDING_TYPE_FIELD = "Holding Type";
+  private static final String COUNTRY_FIELD = "country";
+  private static final String USER_FORMATTED_COUNTRY_FIELD = "Country";
   private static final String SECURITY_IDENTIFIER_FIELD = "securityIdentifier";
   private static final String USER_FORMATTED_SECURITY_IDENTIFIER_FIELD = "Security Identifier";
   private static final String SECURITY_IDENTIFIER_ID_FIELD = "securityIdentifier.id";
@@ -35,17 +42,20 @@ public class HoldingsValidationHelper {
   private static final String SECURITY_IDENTIFIER_ID_TYPE_FIELD = "securityIdentifier.idType";
   private static final String USER_FORMATTED_SECURITY_IDENTIFIER_ID_TYPE_FIELD = "Security Identifier ID Type";
 
-  public static void validate(List<PortfolioHolding> holdings) {
+  private final HoldingsValidationProperties properties;
+
+  public void validate(List<PortfolioHolding> holdings) {
     if (CollectionUtils.isEmpty(holdings)) {
       return;
     }
     validateHoldingTypes(holdings);
+    validateCountries(holdings);
     validateSecurityIdentifiers(holdings);
     validateGicInvestmentDates(holdings);
     validateCashHoldingCurrencies(holdings);
   }
 
-  public static void validateHoldingValues(List<PortfolioHolding> holdings) {
+  public void validateHoldingValues(List<PortfolioHolding> holdings) {
     if (CollectionUtils.isEmpty(holdings)) {
       return;
     }
@@ -72,6 +82,28 @@ public class HoldingsValidationHelper {
             USER_FORMATTED_HOLDING_TYPE_FIELD);
       }
     }
+  }
+
+  private void validateCountries(List<PortfolioHolding> holdings) {
+    for (PortfolioHolding holding : holdings) {
+      if (!requiresCountry(holding)) {
+        continue;
+      }
+      Country country = holding.getCountry();
+      if (country == null) {
+        throw ErrorCode.FIELD_NOT_NULL.toValidationExceptionForField(COUNTRY_FIELD, USER_FORMATTED_COUNTRY_FIELD);
+      }
+      if (!properties.getSupportedSecurityCountries().contains(country)) {
+        throw ErrorCode.COUNTRY_NOT_SUPPORTED.toValidationExceptionForField(COUNTRY_FIELD, country.name());
+      }
+    }
+  }
+
+  private static boolean requiresCountry(PortfolioHolding holding) {
+    FinancialInstrumentType type = holding.getHoldingType();
+    return type != null
+        && !FilterUtils.LOCALLY_SOURCED_TYPES.contains(type)
+        && type != FinancialInstrumentType.BENCHMARK_INDEX;
   }
 
   private static void validateSecurityIdentifiers(List<PortfolioHolding> holdings) {

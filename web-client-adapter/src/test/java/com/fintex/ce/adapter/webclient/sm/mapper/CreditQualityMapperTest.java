@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
@@ -158,6 +159,7 @@ class CreditQualityMapperTest {
   }
 
   private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
+        new SecurityIdentifier(securityId, null));
   }
 }

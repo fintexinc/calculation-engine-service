@@ -40,23 +40,8 @@
       "name": "BMO 2-Year GIC"
     },
     {
-      "holdingType": "FIXED_INCOME",
-      "value": 30000.00,
-      "securityIdentifier": {
-        "id": "US91282CHA13",
-        "idType": "ISIN"
-      }
-    },
-    {
-      "holdingType": "FIXED_INCOME",
-      "value": 18000.00,
-      "securityIdentifier": {
-        "id": "CA135087Q558",
-        "idType": "ISIN"
-      }
-    },
-    {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 6000.00,
       "securityIdentifier": {
         "id": "ENB.TO",
@@ -65,7 +50,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 4500.00,
       "securityIdentifier": {
         "id": "ENB-PFK.TO",
@@ -74,7 +60,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 3800.00,
       "securityIdentifier": {
         "id": "TRP-PD.TO",
@@ -83,7 +70,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 12000.00,
       "securityIdentifier": {
         "id": "USFR",
@@ -91,7 +79,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 5500.00,
       "securityIdentifier": {
         "id": "FTLS",
@@ -99,7 +88,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 11000.00,
       "securityIdentifier": {
         "id": "F00000MBXQ",
@@ -107,7 +97,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 8000.00,
       "securityIdentifier": {
         "id": "F00000MBXR",

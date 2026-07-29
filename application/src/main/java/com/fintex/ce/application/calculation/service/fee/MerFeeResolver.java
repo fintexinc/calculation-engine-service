@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.constant.HoldingTypeGroup.MER_BEARING_TYPES;
 import static com.fintex.ce.application.constant.HoldingTypeGroup.ZERO_MER_TYPES;
-import static com.fintex.ce.model.error.ErrorCode.MISSING_FUND_FEE_DATA;
+import static com.fintex.ce.model.error.ErrorCode.COUNTRY_NOT_SUPPORTED;
 import static java.math.BigDecimal.ZERO;
 
 /**
@@ -95,9 +95,10 @@ public class MerFeeResolver implements FeeResolver {
   }
 
   private List<Notification> resolveSingle(AverageManagementExpenseCalculation calc, PortfolioHolding holding) {
-    CountryFeeResolutionStrategy strategy = strategiesByCountry.get(holding.getHoldingType().getCountry());
+    Country country = holding.getCountry();
+    CountryFeeResolutionStrategy strategy = strategiesByCountry.get(country);
     if (strategy == null) {
-      throw MISSING_FUND_FEE_DATA.toExceptionForHolding(holding, holding.getIdsString());
+      throw COUNTRY_NOT_SUPPORTED.toExceptionForHolding(holding, country == null ? null : country.name());
     }
     return walkChain(strategy, calc, holding);
   }

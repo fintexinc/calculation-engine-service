@@ -23,8 +23,10 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -69,7 +71,7 @@ public class GlobalExceptionHandler {
         .flatMap(result -> result.getResolvableErrors().stream())
         .map(error -> error instanceof ObjectError oe
             ? toNotification(oe)
-            : buildNotification(null, null, error.getDefaultMessage(), Severity.ERROR, null, null, null))
+            : buildNotification(null, error.getDefaultMessage(), Severity.ERROR, null, null, null))
         .toList();
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(notifications));
   }
@@ -97,7 +99,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {
     log.error(e.getMessage(), e);
-    Notification notification = buildNotification(null, null, e.getMessage(), Severity.ERROR,
+    Notification notification = buildNotification(null, e.getMessage(), Severity.ERROR,
         ErrorCode.BAD_INPUT.getCode(), ErrorCode.BAD_INPUT.getDescription(), ErrorCode.BAD_INPUT.getAction());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(List.of(notification)));
   }
@@ -119,7 +121,7 @@ public class GlobalExceptionHandler {
     String fieldName = error instanceof FieldError fe ? fe.getField() : null;
     return resolveErrorCode(defaultMessage)
         .map(code -> code.toNotificationForField(fieldName, fieldName))
-        .orElseGet(() -> buildNotification(null, fieldName, defaultMessage, Severity.ERROR, error.getCode(), null,
+        .orElseGet(() -> buildNotification(fieldName, defaultMessage, Severity.ERROR, error.getCode(), null,
             null));
   }
 
@@ -128,19 +130,20 @@ public class GlobalExceptionHandler {
     String fieldName = extractFieldName(violation.getPropertyPath());
     return resolveErrorCode(message)
         .map(code -> code.toNotificationForField(fieldName, fieldName))
-        .orElseGet(() -> buildNotification(null, fieldName, message, Severity.ERROR, null, null, null));
+        .orElseGet(() -> buildNotification(fieldName, message, Severity.ERROR, null, null, null));
   }
 
-  private static Notification buildNotification(String id, String fieldName, String message,
+  private static Notification buildNotification(String fieldName, String message,
       Severity severity, String code, String description, String action) {
     return Notification.builder()
-        .uuid(id)
+        .uuid(UUID.randomUUID().toString())
         .code(code)
         .message(message)
         .description(description)
         .action(action)
         .severity(severity == null ? Severity.ERROR : severity)
         .fieldName(fieldName)
+        .timestamp(OffsetDateTime.now())
         .build();
   }
 

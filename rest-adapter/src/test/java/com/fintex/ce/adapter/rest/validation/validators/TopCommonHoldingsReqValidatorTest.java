@@ -3,7 +3,9 @@ package com.fintex.ce.adapter.rest.validation.validators;
 import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ValidationException;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -22,7 +24,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TopCommonHoldingsReqValidatorTest {
 
-  private final TopCommonHoldingsReqValidator validator = new TopCommonHoldingsReqValidator();
+  private final TopCommonHoldingsReqValidator validator = new TopCommonHoldingsReqValidator(new HoldingsValidator(
+      new HoldingsValidationProperties()));
 
   @Test
   void shouldThrow_whenAccumulateHoldingTypesExceedsTwelve() {
@@ -38,7 +41,7 @@ class TopCommonHoldingsReqValidatorTest {
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("ACCUMULATE_HOLDING_TYPES_EXCEED_MAX");
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX);
         });
   }
 
@@ -56,7 +59,7 @@ class TopCommonHoldingsReqValidatorTest {
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("GIC_HOLDING_NAME_EMPTY");
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.GIC_HOLDING_NAME_EMPTY);
         });
   }
 
@@ -64,7 +67,8 @@ class TopCommonHoldingsReqValidatorTest {
   void shouldThrow_whenAnyHoldingHasNullValue() {
     PortfolioHolding nullValueHolding = new PortfolioHolding(
         null,
-        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
@@ -74,7 +78,7 @@ class TopCommonHoldingsReqValidatorTest {
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode().name()).isEqualTo("HOLDING_VALUE_NEGATIVE_OR_NULL");
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL);
         });
   }
 
@@ -96,7 +100,8 @@ class TopCommonHoldingsReqValidatorTest {
   private PortfolioHolding createHolding(String id) {
     return new PortfolioHolding(
         BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA,
         new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 }

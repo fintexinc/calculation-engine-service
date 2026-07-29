@@ -11,7 +11,8 @@
       "currency": "USD"
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 12000.00,
       "securityIdentifier": {
         "id": "AAPL",
@@ -20,7 +21,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 9500.00,
       "securityIdentifier": {
         "id": "MSFT",
@@ -29,7 +31,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 8200.00,
       "securityIdentifier": {
         "id": "NVDA",
@@ -38,7 +41,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 7000.00,
       "securityIdentifier": {
         "id": "AMZN",
@@ -47,7 +51,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 6500.00,
       "securityIdentifier": {
         "id": "GOOGL",
@@ -56,7 +61,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 4800.00,
       "securityIdentifier": {
         "id": "LULU",
@@ -65,7 +71,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 15000.00,
       "securityIdentifier": {
         "id": "QQQQ",
@@ -73,7 +80,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 4500.00,
       "securityIdentifier": {
         "id": "NVDH",
@@ -81,7 +89,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 3800.00,
       "securityIdentifier": {
         "id": "AMZH",
@@ -89,7 +98,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 2500.00,
       "securityIdentifier": {
         "id": "DIV",
@@ -97,7 +107,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_US",
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
       "value": 6000.00,
       "securityIdentifier": {
         "id": "F00000MP5D",

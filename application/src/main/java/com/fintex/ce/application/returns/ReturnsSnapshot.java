@@ -24,6 +24,7 @@ import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
+import static com.fintex.ce.model.error.ErrorParams.HOLDING_ID;
 
 /**
  * Immutable snapshot of returns data at a single point in a calculation pipeline.
@@ -222,8 +223,14 @@ public record ReturnsSnapshot<T extends ReturnsData>(
       return List.of();
     }
     return notifications.stream()
-        .map(notification -> ErrorCode.fromCode(notification.getCode()).toExceptionForId(notification.getUuid()))
+        .map(notification -> ErrorCode.fromCode(notification.getCode()).toExceptionForId(holdingIdOf(notification)))
         .toList();
+  }
+
+  private static String holdingIdOf(Notification notification) {
+    Map<String, Object> metadata = notification.getMetadata();
+    Object holdingId = metadata == null ? null : metadata.get(HOLDING_ID);
+    return holdingId != null ? holdingId.toString() : notification.getUuid();
   }
 
   private static Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> deepCopyReturns(

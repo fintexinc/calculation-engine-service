@@ -34,7 +34,8 @@
       "name": "Scotiabank 5-Year GIC"
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 7200.00,
       "securityIdentifier": {
         "id": "RY.TO",
@@ -43,7 +44,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 11000.00,
       "securityIdentifier": {
         "id": "AAPL",
@@ -52,7 +54,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 6500.00,
       "securityIdentifier": {
         "id": "NVDA",
@@ -61,7 +64,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 5200.00,
       "securityIdentifier": {
         "id": "BRK-B",
@@ -79,7 +83,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 9500.00,
       "securityIdentifier": {
         "id": "QQQQ",
@@ -87,7 +92,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 6800.00,
       "securityIdentifier": {
         "id": "IFV",
@@ -95,7 +101,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 9200.00,
       "securityIdentifier": {
         "id": "F0CAN05QNU",
@@ -103,7 +110,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_US",
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
       "value": 7400.00,
       "securityIdentifier": {
         "id": "FOUSA08N6U",
@@ -120,10 +128,11 @@
     },
     {
       "metric": "trailing-total-returns",
-      "timeIntervalPeriods": ["12", "36", "60"],
+      "timeIntervalPeriods": ["3", "6", "12", "24"],
       "benchmarkHoldings": [
         {
-          "holdingType": "ETF_US",
+          "holdingType": "ETF",
+          "country": "USA",
           "value": 60000.00,
           "securityIdentifier": {
             "id": "QQQQ",
@@ -131,7 +140,8 @@
           }
         },
         {
-          "holdingType": "ETF_US",
+          "holdingType": "ETF",
+          "country": "USA",
           "value": 40000.00,
           "securityIdentifier": {
             "id": "IFV",

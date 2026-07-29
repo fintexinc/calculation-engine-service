@@ -7,6 +7,7 @@ import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
 
@@ -75,7 +76,7 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
         etfCanada(XBAL, "45234.67"),
         etfCanada(VCNS, "18765.43"),
         stockCanada(RY_TO, "9234.12"),
-        fund(F0CAN999, FinancialInstrumentType.MUTUAL_FUND_CANADA, "15678.90"),
+        fund(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "15678.90"),
         fundServ(CCM4752, "11234.56"),
         gic(Currency.CAD, "25000.00", "365", "12.0"),
         cash(Currency.CAD, "10000.00")));

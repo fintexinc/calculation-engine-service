@@ -80,6 +80,7 @@ import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -105,7 +106,7 @@ class CalculationTestDataProvider {
   static final LocalDate CUSTOM_IPSD = LocalDate.of(2024, 6, 1);
 
   static final PortfolioHolding DUMMY_HOLDING = new PortfolioHolding(
-      BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+      BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
       new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
 
   static final Set<TimeIntervalResult> TIME_INTERVALS = Set.of(

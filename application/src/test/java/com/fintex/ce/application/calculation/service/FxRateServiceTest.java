@@ -104,7 +104,7 @@ class FxRateServiceTest {
     Notification warning = warnings.getFirst();
     assertEquals(FX_RATES_UNAVAILABLE, warning.getCode());
     assertEquals(Severity.WARNING, warning.getSeverity());
-    assertEquals(etfHolding.getIdsString(), warning.getUuid());
+    assertEquals(etfHolding.getIdsString(), warning.getMetadata().get("holdingId"));
     assertEquals("FX rates unavailable for holding " + etfHolding.getIdsString()
         + ": CAD -> USD", warning.getMessage());
     assertEquals(etfHolding.getIdsString(), warning.getMetadata().get("param-1"));

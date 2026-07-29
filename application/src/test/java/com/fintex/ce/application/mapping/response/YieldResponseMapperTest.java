@@ -3,6 +3,7 @@ package com.fintex.ce.application.mapping.response;
 import com.fintex.ce.model.domain.calculation.yield.Yield;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.Notification;
 
@@ -40,9 +41,11 @@ class YieldResponseMapperTest {
 
   @Test
   void shouldCalculateWeightedAverageYield_whenMappingPortfolioDomainMap() {
-    PortfolioHolding stock = new PortfolioHolding(new BigDecimal("2"), FinancialInstrumentType.STOCK_US, null);
+    PortfolioHolding stock = new PortfolioHolding(new BigDecimal("2"), FinancialInstrumentType.STOCK, Country.USA,
+        null);
     PortfolioHolding gic = new PortfolioHolding(new BigDecimal("3"), FinancialInstrumentType.GIC, null);
-    PortfolioHolding skipped = new PortfolioHolding(new BigDecimal("5"), FinancialInstrumentType.STOCK_CANADA, null);
+    PortfolioHolding skipped = new PortfolioHolding(new BigDecimal("5"), FinancialInstrumentType.STOCK, Country.CANADA,
+        null);
 
     Map<PortfolioHolding, Yield> domainMap = Map.of(
         stock, yieldOf(new BigDecimal("0.1")),
@@ -59,7 +62,7 @@ class YieldResponseMapperTest {
 
   @Test
   void shouldReturnZeroYield_whenNoValidEntriesProvided() {
-    PortfolioHolding invalid = new PortfolioHolding(null, FinancialInstrumentType.STOCK_US, null);
+    PortfolioHolding invalid = new PortfolioHolding(null, FinancialInstrumentType.STOCK, Country.USA, null);
     Map<PortfolioHolding, Yield> domainMap = Map.of(invalid, yieldOf(new BigDecimal("0.1")));
 
     YieldResult result = mapper.toResponse(domainMap, List.of());

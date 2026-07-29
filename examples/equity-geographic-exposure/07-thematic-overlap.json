@@ -11,7 +11,8 @@
       "currency": "USD"
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 14000.00,
       "securityIdentifier": {
         "id": "NVDA",
@@ -20,7 +21,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 10500.00,
       "securityIdentifier": {
         "id": "AMZN",
@@ -29,7 +31,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 8900.00,
       "securityIdentifier": {
         "id": "META.NE",
@@ -38,7 +41,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 7600.00,
       "securityIdentifier": {
         "id": "TSLA.NE",
@@ -47,7 +51,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 5200.00,
       "securityIdentifier": {
         "id": "MSFT.NE",
@@ -56,7 +61,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 4800.00,
       "securityIdentifier": {
         "id": "AAPL.NE",
@@ -65,7 +71,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 18000.00,
       "securityIdentifier": {
         "id": "QQQQ",
@@ -73,7 +80,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 5800.00,
       "securityIdentifier": {
         "id": "NVDH",
@@ -81,7 +89,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 5400.00,
       "securityIdentifier": {
         "id": "NVHE.U",
@@ -89,7 +98,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 4900.00,
       "securityIdentifier": {
         "id": "AMZH",
@@ -97,7 +107,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 3700.00,
       "securityIdentifier": {
         "id": "GMOM",
@@ -105,7 +116,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 2900.00,
       "securityIdentifier": {
         "id": "VAMO",
@@ -113,7 +125,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 2400.00,
       "securityIdentifier": {
         "id": "MALX",
@@ -121,7 +134,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_US",
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
       "value": 9300.00,
       "securityIdentifier": {
         "id": "F00000MP5F",
@@ -129,7 +143,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_US",
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
       "value": 6700.00,
       "securityIdentifier": {
         "id": "F00000MP5G",

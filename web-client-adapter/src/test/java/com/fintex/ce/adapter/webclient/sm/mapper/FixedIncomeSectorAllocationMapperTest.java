@@ -90,7 +90,7 @@ class FixedIncomeSectorAllocationMapperTest {
         new FixedIncomeSectorAllocationTypeValue(FixedIncomeSectorAllocationType.ST_INVESTMENTS, null, null, null)));
 
     FixedIncomeBondSector result = mapper.map(smsResponse, createHolding("TEST.ID",
-        FinancialInstrumentType.ETF_CANADA));
+        FinancialInstrumentType.ETF));
 
     assertThat(result.getFixedIncomeBondSectors()).hasSize(1);
     assertThat(result.getFixedIncomeBondSectors()).containsKey(FixedIncomeSectorAllocationType.OTHER_BONDS);

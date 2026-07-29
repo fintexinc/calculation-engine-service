@@ -31,7 +31,7 @@ class CountryExposureMapperTest {
 
     CountryExposure result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
+    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getAllocations()).hasSize(2);
     assertThat(result.getAllocations()).containsEntry(Country.CANADA, BigDecimal.valueOf(0.65));
@@ -111,6 +111,7 @@ class CountryExposureMapperTest {
   }
 
   private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
+        new SecurityIdentifier(securityId, null));
   }
 }

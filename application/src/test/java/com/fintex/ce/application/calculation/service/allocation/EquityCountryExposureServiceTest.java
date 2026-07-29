@@ -99,7 +99,8 @@ class EquityCountryExposureServiceTest {
   private static PortfolioHolding fund(String id, String value) {
     return PortfolioHolding.builder()
         .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
+        .country(Country.CANADA)
         .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
         .build();
   }

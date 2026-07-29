@@ -23,6 +23,7 @@ import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -187,7 +188,7 @@ class BenchmarkWeightedAverageAlignmentTest {
   }
 
   private static PortfolioHolding holding(String id) {
-    return new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.ETF_US,
+    return new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.ETF, Country.USA,
         new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 

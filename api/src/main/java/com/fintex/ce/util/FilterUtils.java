@@ -1,6 +1,7 @@
 package com.fintex.ce.util;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import java.util.HashMap;
@@ -23,26 +24,24 @@ public class FilterUtils {
       FinancialInstrumentType.CASH,
       FinancialInstrumentType.GIC);
 
-  public static final Predicate<PortfolioHolding> CANADA_MUTUAL_PREDICATE = h -> FinancialInstrumentType.MUTUAL_FUND_CANADA
-      .equals(h
-          .getHoldingType()) || FinancialInstrumentType.SEGREGATED_FUND_CANADA.equals(h.getHoldingType());
+  public static final Predicate<PortfolioHolding> CANADA_MUTUAL_PREDICATE = h -> Country.CANADA.equals(h.getCountry())
+      && (FinancialInstrumentType.MUTUAL_FUND.equals(h.getHoldingType())
+          || FinancialInstrumentType.SEGREGATED_FUND.equals(h.getHoldingType()));
 
   public static final Predicate<PortfolioHolding> STOCK_PREDICATE = h -> isOfType(h.getHoldingType(),
       FinancialInstrumentType.STOCK);
 
-  public static final Predicate<PortfolioHolding> US_STOCKS_PREDICATE = h -> FinancialInstrumentType.STOCK_US.equals(h
-      .getHoldingType());
+  public static final Predicate<PortfolioHolding> US_STOCKS_PREDICATE = h -> Country.USA.equals(h.getCountry())
+      && isOfType(h.getHoldingType(), FinancialInstrumentType.STOCK);
 
-  public static final Predicate<PortfolioHolding> CANADA_STOCKS_PREDICATE = h -> FinancialInstrumentType.STOCK_CANADA
-      .equals(h
-          .getHoldingType());
+  public static final Predicate<PortfolioHolding> CANADA_STOCKS_PREDICATE = h -> Country.CANADA.equals(h.getCountry())
+      && isOfType(h.getHoldingType(), FinancialInstrumentType.STOCK);
 
-  public static final Predicate<PortfolioHolding> US_ETF_PREDICATE = h -> FinancialInstrumentType.ETF_US.equals(h
-      .getHoldingType());
+  public static final Predicate<PortfolioHolding> US_ETF_PREDICATE = h -> Country.USA.equals(h.getCountry())
+      && isOfType(h.getHoldingType(), FinancialInstrumentType.ETF);
 
-  public static final Predicate<PortfolioHolding> CANADA_ETF_PREDICATE = h -> FinancialInstrumentType.ETF_CANADA.equals(
-      h
-          .getHoldingType());
+  public static final Predicate<PortfolioHolding> CANADA_ETF_PREDICATE = h -> Country.CANADA.equals(h.getCountry())
+      && isOfType(h.getHoldingType(), FinancialInstrumentType.ETF);
 
   public static final Predicate<PortfolioHolding> BENCHMARKS_PREDICATE = h -> FinancialInstrumentType.BENCHMARK_INDEX
       .equals(h
@@ -73,8 +72,8 @@ public class FilterUtils {
   /**
    * Returns true when {@code type} is either {@code target} or any descendant of {@code target} reachable through the
    * {@link FinancialInstrumentType#getParent()} chain. Used by the family predicates ({@code STOCK_PREDICATE},
-   * {@code ETF_PREDICATE}, {@code GIC_PREDICATE}) so a generic parent type (e.g. {@code STOCK} for a non-NA stock)
-   * routes through the same branch as its country-specific variants ({@code STOCK_US}, {@code STOCK_CANADA}).
+   * {@code ETF_PREDICATE}, {@code GIC_PREDICATE}) so a specific type routes through the same branch as its parent
+   * category regardless of the holding's country, which is now carried as a separate dimension.
    */
   public static boolean isOfType(FinancialInstrumentType type, FinancialInstrumentType target) {
     FinancialInstrumentType current = type;

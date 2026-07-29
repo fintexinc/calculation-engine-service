@@ -4,6 +4,7 @@ import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Fees;
 import com.fintex.wm.commons.domain.financial.ManagementFeeDatapoint;
@@ -109,6 +110,6 @@ class FeesMapperTest {
   private PortfolioHolding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, identifier);
+    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, identifier);
   }
 }
