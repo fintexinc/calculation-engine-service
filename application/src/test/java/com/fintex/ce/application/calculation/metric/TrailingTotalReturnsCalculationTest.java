@@ -19,7 +19,12 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.IntStream;
 
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.FIVE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
@@ -164,6 +169,77 @@ class TrailingTotalReturnsCalculationTest {
     // annualized over 12 months yields 1.01^12 - 1.
     BigDecimal result = calculation.calculatePeriodForNumberOfMonths(12);
     assertEquals(0, result.compareTo(new BigDecimal("0.1268250301319698")));
+  }
+
+  @Test
+  void shouldComputeAnnualizedReturn_whenExactly240MonthsAvailable() {
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(constantFactorReturns(TWENTY_YR.getMonths()));
+    var calculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
+
+    // 240 months of a constant 1.01 factor annualized over 240 months collapse to 1.01^12 - 1.
+    BigDecimal result = calculation.calculatePeriodForNumberOfMonths(TWENTY_YR.getMonths());
+    assertEquals(0, result.compareTo(new BigDecimal("0.1268250301319698")));
+  }
+
+  @Test
+  void shouldReturnNull_whenPeriod240ExceedsAvailableByOneMonth() {
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(constantFactorReturns(TWENTY_YR.getMonths() - 1));
+    var calculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
+
+    assertNull(calculation.calculatePeriodForNumberOfMonths(TWENTY_YR.getMonths()));
+  }
+
+  @Test
+  void shouldIncludeTwentyYearPeriodByDefault_whenNoPeriodsRequested() {
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(constantFactorReturns(TWENTY_YR.getMonths() + ONE_YR.getMonths()));
+    var calculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of(ONE_YR, TEN_YR, TWENTY_YR));
+
+    TrailingTotalReturnsResult result = calculation.calculate(Set.of());
+
+    assertThat(result.getTrailingTotalReturn())
+        .extracting(TimeIntervalResult::period)
+        .contains(TEN_YR.name(), TWENTY_YR.name());
+    // A constant 1.01 factor annualized over any window collapses to 1.01^12 - 1 (user-scaled), window-independent.
+    assertThat(period(result, TWENTY_YR).value()).isEqualByComparingTo("0.1268250301");
+    assertThat(result.getWarnings()).isEmpty();
+  }
+
+  @Test
+  void shouldReturnNullWithInsufficientDataWarning_whenTwentyYearExceedsAvailableHistory() {
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(constantFactorReturns(FIVE_YR.getMonths()));
+    var calculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
+
+    TrailingTotalReturnsResult result = calculation.calculate(Set.of(ONE_YR, TWENTY_YR));
+
+    assertThat(period(result, TWENTY_YR).value()).isNull();
+    assertThat(period(result, ONE_YR).value()).isNotNull();
+    assertThat(result.getWarnings()).singleElement().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.getCode());
+      assertThat(warning.getMessage())
+          .contains(String.valueOf(TWENTY_YR.getMonths()))
+          .contains(String.valueOf(FIVE_YR.getMonths()));
+    });
+  }
+
+  private static TimeIntervalResult period(TrailingTotalReturnsResult result, TimePeriod period) {
+    return result.getTrailingTotalReturn().stream()
+        .filter(interval -> period.name().equals(interval.period()))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("Missing period " + period));
+  }
+
+  private static NavigableMap<LocalDate, BigDecimal> constantFactorReturns(int count) {
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    LocalDate firstOfMonth = LocalDate.of(2005, 1, 1);
+    IntStream.range(0, count).forEach(i -> {
+      LocalDate month = firstOfMonth.plusMonths(i);
+      returns.put(month.withDayOfMonth(month.lengthOfMonth()), BigDecimal.valueOf(1.01));
+    });
+    return returns;
   }
 
   @Test

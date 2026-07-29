@@ -1,25 +1,35 @@
 package com.fintex.ce.application.util;
 
+import com.fintex.ce.model.domain.enumeration.MetricRole;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.util.DateTimeUtils;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static java.math.BigDecimal.ONE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class ReturnSeriesAlignmentValidatorTest {
 
-  private static final int TWELVE_MONTHS = 12;
+  private static final int TWELVE_MONTHS = ONE_YR.getMonths();
+  private static final int TWENTY_YEAR_MONTHS = TWENTY_YR.getMonths();
 
   @Test
   void shouldNotThrowException_whenPortfolioReturnsAreEmpty() {
@@ -30,39 +40,52 @@ class ReturnSeriesAlignmentValidatorTest {
   }
 
   @Test
-  void shouldReportAllMissingPortfolioDates_whenPortfolioCoverageHasMultipleGaps() {
-    TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(LocalDate.parse("2024-01-31"));
-    TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(LocalDate.parse("2024-01-31"));
-    portfolioReturns.remove(LocalDate.parse("2024-01-31"));
-    portfolioReturns.remove(LocalDate.parse("2024-06-30"));
+  void shouldPassCoverage_whenPortfolioAndBenchmarkAlignedOverTwoHundredFortyMonthWindow() {
+    TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(LocalDate.parse("2005-01-31"), TWENTY_YEAR_MONTHS);
+    TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(LocalDate.parse("2005-01-31"), TWENTY_YEAR_MONTHS);
+
+    assertThatCode(() -> ReturnSeriesAlignmentValidator.requirePortfolioBenchmarkCoverage(portfolioReturns,
+        benchmarkReturns, TWENTY_YEAR_MONTHS))
+        .doesNotThrowAnyException();
+  }
+
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("coverageGapCases")
+  void shouldReportMissingDates_whenCoverageHasGaps(String description, LocalDate startDate, int windowMonths,
+      MetricRole roleWithGap, List<String> missingDates, ErrorCode expectedErrorCode) {
+    TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(startDate, windowMonths);
+    TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(startDate, windowMonths);
+    TreeMap<LocalDate, BigDecimal> seriesToBreak = roleWithGap == MetricRole.PORTFOLIO
+        ? portfolioReturns
+        : benchmarkReturns;
+    missingDates.forEach(date -> seriesToBreak.remove(LocalDate.parse(date)));
 
     assertThatThrownBy(() -> ReturnSeriesAlignmentValidator.requirePortfolioBenchmarkCoverage(portfolioReturns,
-        benchmarkReturns, 12))
+        benchmarkReturns, windowMonths))
         .isInstanceOfSatisfying(CalculationException.class, exception -> {
-          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE);
-          assertThat(exception).hasMessageContaining("2024-01-31")
-              .hasMessageContaining("2024-06-30");
+          assertThat(exception.getErrorCode()).isEqualTo(expectedErrorCode);
+          missingDates.forEach(date -> assertThat(exception).hasMessageContaining(date));
         });
   }
 
-  @Test
-  void shouldReportAllMissingBenchmarkDates_whenBenchmarkCoverageHasMultipleGaps() {
-    TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(LocalDate.parse("2024-01-31"));
-    TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(LocalDate.parse("2024-01-31"));
-    benchmarkReturns.remove(LocalDate.parse("2024-01-31"));
-    benchmarkReturns.remove(LocalDate.parse("2024-06-30"));
-
-    assertThatThrownBy(() -> ReturnSeriesAlignmentValidator.requirePortfolioBenchmarkCoverage(portfolioReturns,
-        benchmarkReturns, 12))
-        .isInstanceOfSatisfying(CalculationException.class, exception -> {
-          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_BENCHMARK_RETURN_FOR_DATE);
-          assertThat(exception).hasMessageContaining("2024-01-31")
-              .hasMessageContaining("2024-06-30");
-        });
+  private static Stream<Arguments> coverageGapCases() {
+    return Stream.of(
+        arguments("all missing portfolio dates over twelve-month window", LocalDate.parse("2024-01-31"),
+            TWELVE_MONTHS, MetricRole.PORTFOLIO, List.of("2024-01-31", "2024-06-30"),
+            ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE),
+        arguments("all missing benchmark dates over twelve-month window", LocalDate.parse("2024-01-31"),
+            TWELVE_MONTHS, MetricRole.BENCHMARK, List.of("2024-01-31", "2024-06-30"),
+            ErrorCode.MISSING_BENCHMARK_RETURN_FOR_DATE),
+        arguments("missing portfolio date inside two-hundred-forty-month window", LocalDate.parse("2005-01-31"),
+            TWENTY_YEAR_MONTHS, MetricRole.PORTFOLIO, List.of("2015-06-30"),
+            ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE),
+        arguments("missing benchmark date inside two-hundred-forty-month window", LocalDate.parse("2005-01-31"),
+            TWENTY_YEAR_MONTHS, MetricRole.BENCHMARK, List.of("2015-06-30"),
+            ErrorCode.MISSING_BENCHMARK_RETURN_FOR_DATE));
   }
 
-  private static TreeMap<LocalDate, BigDecimal> monthlyReturns(LocalDate startDate) {
-    return IntStream.range(0, TWELVE_MONTHS)
+  private static TreeMap<LocalDate, BigDecimal> monthlyReturns(LocalDate startDate, int count) {
+    return IntStream.range(0, count)
         .mapToObj(startDate::plusMonths)
         .collect(Collectors.toMap(DateTimeUtils::toLastDayOfMonth, date -> ONE, (left, right) -> right, TreeMap::new));
   }

@@ -7,6 +7,7 @@ import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.model.util.BigDecimalConstants;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
@@ -22,9 +23,14 @@ import java.util.TreeMap;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.FIVE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -340,6 +346,78 @@ class SharpeRatioCalculationTest {
 
       verify(calculation.standardDeviationCalculation).calculatePeriodForNumberOfMonths(eq(TWELVE), any());
     }
+  }
+
+  @Test
+  void shouldComputeSharpeRatio_whenPeriodIs240AndHistoryExceeds240Months() {
+    NavigableMap<LocalDate, BigDecimal> returns = patternedFactorReturns(TWENTY_YR.getMonths() + ONE_YR.getMonths());
+    var calculation = sharpeRatioCalculation(returns, Set.of());
+
+    SharpeRatioResult result = calculation.calculate(Set.of(TWENTY_YR));
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getPerformanceStartDate()).isEqualTo(returns.firstKey());
+    assertThat(result.getPerformanceEndDate()).isEqualTo(returns.lastKey());
+    assertThat(result.getSharpeRatio()).hasSize(1);
+    assertThat(period(result, TWENTY_YR).value()).isNotNull().isPositive();
+  }
+
+  @Test
+  void shouldIncludeTwentyYearPeriodByDefault_whenNoPeriodsRequested() {
+    NavigableMap<LocalDate, BigDecimal> returns = patternedFactorReturns(TWENTY_YR.getMonths() + ONE_YR.getMonths());
+    var calculation = sharpeRatioCalculation(returns, Set.of(ONE_YR, TEN_YR, TWENTY_YR));
+
+    SharpeRatioResult result = calculation.calculate(Set.of());
+
+    assertThat(result.getSharpeRatio())
+        .extracting(TimeIntervalResult::period)
+        .contains(TEN_YR.name(), TWENTY_YR.name());
+    assertThat(period(result, TWENTY_YR).value()).isNotNull();
+  }
+
+  @Test
+  void shouldReturnNullWithInsufficientDataWarning_whenTwentyYearExceedsAvailableHistory() {
+    NavigableMap<LocalDate, BigDecimal> returns = patternedFactorReturns(FIVE_YR.getMonths());
+    var calculation = sharpeRatioCalculation(returns, Set.of());
+
+    SharpeRatioResult result = calculation.calculate(Set.of(ONE_YR, TWENTY_YR));
+
+    assertThat(period(result, TWENTY_YR).value()).isNull();
+    assertThat(period(result, ONE_YR).value()).isNotNull();
+    assertThat(result.getWarnings()).singleElement().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.getCode());
+      assertThat(warning.getMessage())
+          .contains(String.valueOf(TWENTY_YR.getMonths()))
+          .contains(String.valueOf(FIVE_YR.getMonths()));
+    });
+  }
+
+  private static SharpeRatioCalculation sharpeRatioCalculation(NavigableMap<LocalDate, BigDecimal> returns,
+      Set<TimePeriod> defaultPeriods) {
+    NavigableMap<LocalDate, BigDecimal> tBills = new TreeMap<>();
+    returns.keySet().forEach(month -> tBills.put(month, valueOf(0.001)));
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(returns);
+    return new SharpeRatioCalculation(input, defaultPeriods, tBills,
+        new StandardDeviationCalculation<>(input, defaultPeriods));
+  }
+
+  /** Non-degenerate month-end factor series: the alternating step keeps the excess-return standard deviation > 0. */
+  private static NavigableMap<LocalDate, BigDecimal> patternedFactorReturns(int count) {
+    NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
+    LocalDate first = LocalDate.of(2005, 1, 31);
+    for (int i = 0; i < count; i++) {
+      LocalDate month = first.plusMonths(i);
+      returns.put(month.withDayOfMonth(month.lengthOfMonth()), valueOf(1.01 + (i % 2 == 0 ? 0.002 : -0.001)));
+    }
+    return returns;
+  }
+
+  private static TimeIntervalResult period(SharpeRatioResult result, TimePeriod period) {
+    return result.getSharpeRatio().stream()
+        .filter(interval -> period.name().equals(interval.period()))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("Missing period " + period));
   }
 
 }

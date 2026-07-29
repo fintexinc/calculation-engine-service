@@ -147,8 +147,8 @@ public class MarRatioCalculationService
         .filter(pair -> pair.getValue() == null)
         .filter(pair -> !TimePeriod.CIPSD.name().equals(pair.getKey()))
         .filter(pair -> getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(pair.getKey())) > availableMonths)
-        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(pair.getKey(),
-            availableMonths))
+        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(
+            getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(pair.getKey())), availableMonths))
         .forEach(warnings::add);
 
     boolean sinceCipsdRequestedAndNull = periodsResult.stream()
