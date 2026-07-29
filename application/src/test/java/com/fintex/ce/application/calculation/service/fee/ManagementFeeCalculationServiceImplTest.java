@@ -9,6 +9,7 @@ import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -49,7 +50,7 @@ class ManagementFeeCalculationServiceImplTest {
 
   @Test
   void fundsOnly_returnsManagementFeeAverageOverFundHoldings() {
-    PortfolioHolding fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
+    PortfolioHolding fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementFee(new BigDecimal("0.015"))
@@ -64,8 +65,8 @@ class ManagementFeeCalculationServiceImplTest {
 
   @Test
   void wholePortfolio_dilutesByNonFundHoldings() {
-    PortfolioHolding fund = holding("CIG-002", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
-    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "100");
+    PortfolioHolding fund = holding("CIG-002", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementFee(new BigDecimal("0.020"))
@@ -84,8 +85,8 @@ class ManagementFeeCalculationServiceImplTest {
    */
   @Test
   void wholePortfolio_dilutesEvenWhenSmsReturnsRowForNonFundHolding() {
-    PortfolioHolding fund = holding("CIG-DIL", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
-    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "100");
+    PortfolioHolding fund = holding("CIG-DIL", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementFee(new BigDecimal("0.020"))
@@ -104,7 +105,7 @@ class ManagementFeeCalculationServiceImplTest {
 
   @Test
   void missingManagementFeeOnFund_throws() {
-    PortfolioHolding fund = holding("CIG-003", FinancialInstrumentType.MUTUAL_FUND_CANADA, "100");
+    PortfolioHolding fund = holding("CIG-003", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder().currency(Currency.CAD).build());
 
@@ -115,7 +116,7 @@ class ManagementFeeCalculationServiceImplTest {
 
   @Test
   void fundsOnly_isNulled_whenPortfolioHasNoFundHoldings() {
-    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "100");
+    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "100");
 
     ManagementFeeResult result = service.perform(commandFor(List.of(stock), FUNDS_ONLY, WHOLE_PORTFOLIO),
         Map.of());
@@ -128,8 +129,8 @@ class ManagementFeeCalculationServiceImplTest {
   void fundsOnly_weightedManagementFee_reflectsCadConvertedWeights_acrossCurrencies() {
     // USD fund and CAD fund with identical native marketValue (1000) but different management fees.
     // Weighted MF = (1350 * 0.005 + 1000 * 0.015) / 2350 = (6.75 + 15) / 2350 = 21.75 / 2350.
-    PortfolioHolding usFund = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND_US, "1000");
-    PortfolioHolding caFund = holding("CIG-XCAD", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1000");
+    PortfolioHolding usFund = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
+    PortfolioHolding caFund = holding("CIG-XCAD", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         usFund, FeeData.builder()
             .managementFee(new BigDecimal("0.005"))
@@ -152,7 +153,7 @@ class ManagementFeeCalculationServiceImplTest {
 
   @Test
   void usdFund_fxUnavailable_emitsWarning_andComputesUnconverted() {
-    PortfolioHolding usFund = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND_US, "1000");
+    PortfolioHolding usFund = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         usFund, FeeData.builder()
             .managementFee(new BigDecimal("0.015"))
@@ -172,7 +173,7 @@ class ManagementFeeCalculationServiceImplTest {
 
   @Test
   void merBearingHoldingWithMissingCurrency_throws() {
-    PortfolioHolding fund = holding("CIG-NOCURR", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1000");
+    PortfolioHolding fund = holding("CIG-NOCURR", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementFee(new BigDecimal("0.015"))
@@ -184,10 +185,12 @@ class ManagementFeeCalculationServiceImplTest {
         .hasMessageContaining("missing Currency");
   }
 
-  private static PortfolioHolding holding(String id, FinancialInstrumentType type, String value) {
+  private static PortfolioHolding holding(String id, FinancialInstrumentType type, Country country,
+      String value) {
     return PortfolioHolding.builder()
         .value(new BigDecimal(value))
         .holdingType(type)
+        .country(country)
         .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.MORNINGSTAR_ID))
         .build();
   }

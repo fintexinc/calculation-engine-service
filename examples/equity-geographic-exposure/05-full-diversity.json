@@ -57,7 +57,8 @@
       "name": "180-Day Cashable GIC"
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 7200.00,
       "securityIdentifier": {
         "id": "RY.TO",
@@ -66,7 +67,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 5400.00,
       "securityIdentifier": {
         "id": "TD.TO",
@@ -75,7 +77,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 11000.00,
       "securityIdentifier": {
         "id": "AAPL",
@@ -84,7 +87,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 6500.00,
       "securityIdentifier": {
         "id": "NVDA",
@@ -93,7 +97,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 5200.00,
       "securityIdentifier": {
         "id": "BRK-B",
@@ -120,7 +125,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 9500.00,
       "securityIdentifier": {
         "id": "QQQQ",
@@ -128,7 +134,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 4200.00,
       "securityIdentifier": {
         "id": "NVDH.U",
@@ -136,7 +143,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 3000.00,
       "securityIdentifier": {
         "id": "HEWJ",
@@ -144,7 +152,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 2800.00,
       "securityIdentifier": {
         "id": "USFR",
@@ -152,7 +161,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 2600.00,
       "securityIdentifier": {
         "id": "USDU",
@@ -160,7 +170,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 6800.00,
       "securityIdentifier": {
         "id": "IFV",
@@ -168,7 +179,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 9200.00,
       "securityIdentifier": {
         "id": "F00000MP5F",
@@ -176,27 +188,12 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_US",
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
       "value": 7400.00,
       "securityIdentifier": {
         "id": "F00000MP5G",
         "idType": "MORNINGSTAR_ID"
-      }
-    },
-    {
-      "holdingType": "FIXED_INCOME",
-      "value": 15000.00,
-      "securityIdentifier": {
-        "id": "US912828Z781",
-        "idType": "ISIN"
-      }
-    },
-    {
-      "holdingType": "FIXED_INCOME",
-      "value": 8000.00,
-      "securityIdentifier": {
-        "id": "CA135087L286",
-        "idType": "ISIN"
       }
     }
   ]

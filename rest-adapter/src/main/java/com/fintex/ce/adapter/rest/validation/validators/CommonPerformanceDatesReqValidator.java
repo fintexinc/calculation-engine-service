@@ -11,12 +11,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 
 @Component
 @Order(400)
+@RequiredArgsConstructor
 public class CommonPerformanceDatesReqValidator implements RequestValidator {
+
+  private final HoldingsValidator holdingsValidator;
 
   @Override
   public List<CalculationMetric> supportedMetrics() {
@@ -30,12 +34,12 @@ public class CommonPerformanceDatesReqValidator implements RequestValidator {
     }
     List<PortfolioHolding> benchmarkHoldings = mpc.getBenchmarkHoldings();
     if (!CollectionUtils.isEmpty(benchmarkHoldings)) {
-      HoldingsValidationHelper.validate(benchmarkHoldings);
+      holdingsValidator.validate(benchmarkHoldings);
     }
     if (!CollectionUtils.isEmpty(mpc.getPortfolios())) {
       mpc.getPortfolios().stream()
           .filter(portfolio -> !portfolio.getHoldings().isEmpty())
-          .forEach(portfolio -> HoldingsValidationHelper.validate(portfolio.getHoldings()));
+          .forEach(portfolio -> holdingsValidator.validate(portfolio.getHoldings()));
     }
   }
 }

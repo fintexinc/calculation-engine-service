@@ -4,6 +4,8 @@ import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.HoldingReqValidator;
+import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidationProperties;
+import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator;
 import com.fintex.ce.adapter.rest.validation.validators.PeriodReqValidator;
 import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
 import com.fintex.ce.application.config.DefaultDataProperties;
@@ -25,6 +27,7 @@ import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -141,7 +144,7 @@ class PortfolioCalculationControllerTest {
   void shouldThrowException_whenUnknownMetricRequested() {
     String requestBody = """
         {"metric": "trailing-total-returns", "currency": "CAD", "holdings": [
-          {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+          {"value": 1, "holdingType": "MUTUAL_FUND", "country": "CANADA",
            "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
         ]}
         """;
@@ -158,7 +161,7 @@ class PortfolioCalculationControllerTest {
   void shouldThrowException_whenMetricInBodyMismatchesPathParameter() {
     String requestBody = """
         {"metric": "sharpe-ratio", "currency": "CAD", "holdings": [
-          {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+          {"value": 1, "holdingType": "MUTUAL_FUND", "country": "CANADA",
            "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
         ]}
         """;
@@ -217,7 +220,7 @@ class PortfolioCalculationControllerTest {
       String requestBody = """
           {"currency": "CAD",
            "holdings": [
-             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+             {"value": 1, "holdingType": "MUTUAL_FUND", "country": "CANADA",
               "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
            ],
            "commands": [
@@ -243,7 +246,7 @@ class PortfolioCalculationControllerTest {
           {"currency": "CAD",
            "dataProviders": ["MORNINGSTAR"],
            "holdings": [
-             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+             {"value": 1, "holdingType": "MUTUAL_FUND", "country": "CANADA",
               "securityIdentifier": {"id": "SHARED", "idType": "TICKER"}}
            ],
            "commands": [
@@ -273,12 +276,12 @@ class PortfolioCalculationControllerTest {
       String requestBody = """
           {"currency": "CAD",
            "holdings": [
-             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+             {"value": 1, "holdingType": "MUTUAL_FUND", "country": "CANADA",
               "securityIdentifier": {"id": "SHARED", "idType": "TICKER"}}
            ],
            "commands": [
              {"metric": "sharpe-ratio", "currency": "USD", "timeIntervalPeriods": ["12"], "holdings": [
-               {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+               {"value": 1, "holdingType": "MUTUAL_FUND", "country": "CANADA",
                 "securityIdentifier": {"id": "OWN", "idType": "TICKER"}}
              ]}
            ]}
@@ -305,7 +308,7 @@ class PortfolioCalculationControllerTest {
       String requestBody = """
           {"currency": "CAD",
            "holdings": [
-             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+             {"value": 1, "holdingType": "MUTUAL_FUND", "country": "CANADA",
               "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
            ],
            "commands": [
@@ -327,7 +330,7 @@ class PortfolioCalculationControllerTest {
       String requestBody = """
           {"currency": "CAD",
            "holdings": [
-             {"value": 1, "holdingType": "MUTUAL_FUND_CANADA",
+             {"value": 1, "holdingType": "MUTUAL_FUND", "country": "CANADA",
               "securityIdentifier": {"id": "DUMMY", "idType": "TICKER"}}
            ],
            "commands": [
@@ -358,7 +361,7 @@ class PortfolioCalculationControllerTest {
       List<RequestValidator> validators = List.of(
           new PeriodReqValidator(),
           new CipsdGreaterThanCpedReqValidator(),
-          new HoldingReqValidator());
+          new HoldingReqValidator(new HoldingsValidator(new HoldingsValidationProperties())));
       var facade = new RequestValidationFacade(validators);
 
       List<CalculationService<?, ?, ?>> services = new java.util.ArrayList<>();
@@ -590,7 +593,7 @@ class PortfolioCalculationControllerTest {
 
     private static PortfolioHolding dummyHolding() {
       return new PortfolioHolding(
-          BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+          BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
           new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
     }
 

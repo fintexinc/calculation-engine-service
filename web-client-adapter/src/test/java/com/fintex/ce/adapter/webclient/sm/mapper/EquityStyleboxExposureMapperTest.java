@@ -33,7 +33,7 @@ class EquityStyleboxExposureMapperTest {
         new StyleBoxValue(StyleBoxType.MID_GROWTH, new BigDecimal("3.8"))));
     styleBoxes.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    PortfolioHolding holding = createHolding("XIU.TO", FinancialInstrumentType.ETF_CANADA);
+    PortfolioHolding holding = createHolding("XIU.TO", FinancialInstrumentType.ETF);
 
     EquityStyleboxExposure result = mapper.map(styleBoxes, holding);
 
@@ -41,7 +41,7 @@ class EquityStyleboxExposureMapperTest {
     assertThat(result.getBoxValues().get(StyleBoxType.LARGE_VALUE)).isEqualByComparingTo("18.5");
     assertThat(result.getBoxValues().get(StyleBoxType.LARGE_CORE)).isEqualByComparingTo("42.3");
     assertThat(result.getBoxValues().get(StyleBoxType.MID_GROWTH)).isEqualByComparingTo("3.8");
-    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
+    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 

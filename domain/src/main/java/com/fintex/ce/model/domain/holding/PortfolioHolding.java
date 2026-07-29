@@ -1,5 +1,6 @@
 package com.fintex.ce.model.domain.holding;
 
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -38,6 +39,8 @@ public sealed class PortfolioHolding permits CashHolding, GicHolding {
   @NotNull(message = FIELD_NOT_NULL)
   private final FinancialInstrumentType holdingType;
 
+  private final Country country;
+
   @NotNull(message = FIELD_NOT_NULL)
   @Valid
   private final SecurityIdentifier securityIdentifier;
@@ -46,10 +49,17 @@ public sealed class PortfolioHolding permits CashHolding, GicHolding {
   public PortfolioHolding(
       @JsonProperty("value") BigDecimal value,
       @JsonProperty("holdingType") FinancialInstrumentType holdingType,
+      @JsonProperty("country") Country country,
       @JsonProperty("securityIdentifier") SecurityIdentifier securityIdentifier) {
     this.value = value;
     this.holdingType = holdingType;
+    this.country = country;
     this.securityIdentifier = securityIdentifier;
+  }
+
+  public PortfolioHolding(BigDecimal value, FinancialInstrumentType holdingType,
+      SecurityIdentifier securityIdentifier) {
+    this(value, holdingType, null, securityIdentifier);
   }
 
   public String getIdsString() {

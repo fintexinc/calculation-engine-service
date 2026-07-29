@@ -92,7 +92,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 9000.00,
       "securityIdentifier": {
         "id": "BCHI",
@@ -100,7 +101,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 6500.00,
       "securityIdentifier": {
         "id": "CCHI",
@@ -108,7 +110,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 5800.00,
       "securityIdentifier": {
         "id": "CRHI",
@@ -116,7 +119,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 3500.00,
       "securityIdentifier": {
         "id": "ABHI",
@@ -124,7 +128,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 7500.00,
       "securityIdentifier": {
         "id": "F00000Q2UI",
@@ -132,7 +137,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 5000.00,
       "securityIdentifier": {
         "id": "F00000THEX",

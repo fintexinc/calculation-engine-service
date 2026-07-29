@@ -8,6 +8,7 @@ import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -24,7 +25,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BenchmarkHoldingReqValidatorTest {
 
-  private final BenchmarkHoldingReqValidator validator = new BenchmarkHoldingReqValidator();
+  private final HoldingsValidator holdingsValidator = new HoldingsValidator(new HoldingsValidationProperties());
+  private final BenchmarkHoldingReqValidator validator = new BenchmarkHoldingReqValidator(holdingsValidator);
 
   @Test
   void shouldSupportEveryBenchmarkMetric() {
@@ -55,10 +57,10 @@ class BenchmarkHoldingReqValidatorTest {
   @Test
   void shouldNotThrow_whenBenchmarkHoldingsAreValid() {
     PortfolioHolding h1 = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
         new SecurityIdentifier("CIG1101", FiIdentifierType.FUNDSERV));
     PortfolioHolding h2 = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.ETF_CANADA,
+        BigDecimal.TEN, FinancialInstrumentType.ETF, Country.CANADA,
         new SecurityIdentifier("VCNS", FiIdentifierType.TICKER));
 
     PeriodCommand cmd = new PeriodCommand();
@@ -66,6 +68,38 @@ class BenchmarkHoldingReqValidatorTest {
     cmd.setBenchmarkHoldings(List.of(h1, h2));
 
     assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
+  }
+
+  @Test
+  void shouldNotThrow_whenBenchmarkIndexHasNoCountry() {
+    PortfolioHolding index = new PortfolioHolding(
+        BigDecimal.ONE, FinancialInstrumentType.BENCHMARK_INDEX,
+        new SecurityIdentifier("F000015366", FiIdentifierType.TICKER));
+
+    PeriodCommand cmd = new PeriodCommand();
+    cmd.setCurrency(Currency.CAD);
+    cmd.setBenchmarkHoldings(List.of(index));
+
+    assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
+  }
+
+  @Test
+  void shouldThrow_whenBenchmarkFundHoldingIsMissingCountry() {
+    PortfolioHolding fund = new PortfolioHolding(
+        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND,
+        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+
+    PeriodCommand cmd = new PeriodCommand();
+    cmd.setCurrency(Currency.CAD);
+    cmd.setBenchmarkHoldings(List.of(fund));
+
+    assertThatThrownBy(() -> validator.validate(cmd))
+        .isInstanceOf(ValidationException.class)
+        .satisfies(ex -> {
+          ValidationException rve = (ValidationException) ex;
+          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.FIELD_NOT_NULL);
+          assertThat(rve.getFieldName()).isEqualTo("country");
+        });
   }
 
   @Test
@@ -123,8 +157,8 @@ class BenchmarkHoldingReqValidatorTest {
   @Test
   void shouldNotThrow_whenMerComparisonBenchmarkIsASingleFund() {
     var cmd = new MerComparisonCommand();
-    cmd.setBenchmarkHoldings(List.of(new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
-        new SecurityIdentifier("TDB622", FiIdentifierType.FUNDSERV))));
+    cmd.setBenchmarkHoldings(List.of(new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA, new SecurityIdentifier("TDB622", FiIdentifierType.FUNDSERV))));
 
     assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();
   }
@@ -133,9 +167,9 @@ class BenchmarkHoldingReqValidatorTest {
   void shouldNotThrow_whenMerComparisonBenchmarkHasSeveralFunds() {
     var cmd = new MerComparisonCommand();
     cmd.setBenchmarkHoldings(List.of(
-        new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
             new SecurityIdentifier("TDB622", FiIdentifierType.FUNDSERV)),
-        new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF_CANADA,
+        new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
             new SecurityIdentifier("XBAL", FiIdentifierType.TICKER))));
 
     assertThatCode(() -> validator.validate(cmd)).doesNotThrowAnyException();

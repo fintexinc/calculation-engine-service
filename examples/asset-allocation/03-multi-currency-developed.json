@@ -38,7 +38,8 @@
       "currency": "GBP"
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 6000.00,
       "securityIdentifier": {
         "id": "RY.TO",
@@ -47,7 +48,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 9000.00,
       "securityIdentifier": {
         "id": "AAPL",
@@ -56,7 +58,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 5500.00,
       "securityIdentifier": {
         "id": "NVDA",
@@ -65,7 +68,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 4200.00,
       "securityIdentifier": {
         "id": "JPM",
@@ -110,7 +114,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 12000.00,
       "securityIdentifier": {
         "id": "QQQQ",
@@ -118,7 +123,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 7000.00,
       "securityIdentifier": {
         "id": "HEWJ",
@@ -126,7 +132,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 4500.00,
       "securityIdentifier": {
         "id": "IPKW",
@@ -134,7 +141,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 3200.00,
       "securityIdentifier": {
         "id": "GVAL",
@@ -142,7 +150,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 5500.00,
       "securityIdentifier": {
         "id": "F00000WL0Y",
@@ -150,7 +159,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_US",
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
       "value": 6800.00,
       "securityIdentifier": {
         "id": "FOUSA08ZBU",

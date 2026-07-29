@@ -29,7 +29,7 @@ class WeightedAverageResultTest {
     List<Notification> warnings = result.getErrorsAsWarnings();
     assertThat(warnings).hasSize(1);
     assertThat(warnings.getFirst().getCode()).isEqualTo(ErrorCode.Codes.HOLDING_PSD_OUT_OF_RANGE);
-    assertThat(warnings.getFirst().getUuid()).isEqualTo("hid");
+    assertThat(warnings.getFirst().getMetadata()).containsEntry("holdingId", "hid");
     assertThat(result.weightedAverage()).containsEntry(LocalDate.parse("2020-01-31"), BigDecimal.ONE);
   }
 }

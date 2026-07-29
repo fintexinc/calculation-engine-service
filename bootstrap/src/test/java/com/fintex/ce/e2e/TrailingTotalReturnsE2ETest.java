@@ -9,6 +9,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -18,6 +19,7 @@ import com.fintex.wm.commons.domain.rates.DateRateValue;
 import com.fintex.wm.commons.domain.value.DateBigDecimalValue;
 import com.fintex.wm.commons.error.ErrorResponse;
 import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.error.Severity;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -158,7 +160,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   @Test
   void shouldReturnBadRequest_whenHoldingTypeIsMissing() {
     PeriodCommand command = periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"),
-        List.of(holding(XBAL, FinancialInstrumentType.ETF_CANADA, "50000")));
+        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
     ObjectNode body = (ObjectNode) parseJson(writeJson(command));
     ((ObjectNode) body.get("holdings").get(0)).remove("holdingType");
 
@@ -175,7 +177,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         "0.0035")))));
 
     PeriodCommand command = periodCommand(Set.of("1"), LocalDate.parse("2024-12-31"),
-        List.of(holding(XBAL, FinancialInstrumentType.ETF_CANADA, "50000")));
+        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
     HttpResponse response = postCalculation(writeJson(command));
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
@@ -196,7 +198,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     PeriodCommand command = periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
     HttpResponse response = postCalculation(writeJson(command));
 
-    Notification error = assertValidationError(response, "TBL-002", null);
+    Notification error = assertValidationError(response, ErrorCode.Codes.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, null);
     assertThat(error.getMessage()).isEqualTo("T-Bill rates are not available for currency CAD");
     assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "CAD");
   }
@@ -207,7 +209,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(error.getNotifications()).hasSize(1);
     Notification first = error.getNotifications().getFirst();
     assertThat(first.getCode()).isEqualTo(expectedCode);
-    assertThat(first.getSeverity().name()).isEqualTo("ERROR");
+    assertThat(first.getSeverity()).isEqualTo(Severity.ERROR);
     if (expectedFieldName != null) {
       assertThat(first.getFieldName()).isEqualTo(expectedFieldName);
     }
@@ -216,15 +218,15 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static List<PortfolioHolding> richPortfolioHoldings() {
     return List.of(
-        holding(XBAL, FinancialInstrumentType.ETF_CANADA, "45234.67"),
-        holding(VCNS, FinancialInstrumentType.ETF_CANADA, "33100.50"),
-        holding(SPY, FinancialInstrumentType.ETF_US, "25500.00"),
-        holding(VTI, FinancialInstrumentType.ETF_US, "10875.25"),
-        equity("AAPL", "NASDAQ", FinancialInstrumentType.STOCK_US, "40000.00"),
-        equity("RY.TO", "TSX", FinancialInstrumentType.STOCK_CANADA, "28750.00"),
-        holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND_CANADA, "15200.00"),
-        holding(CCM4752, FinancialInstrumentType.MUTUAL_FUND_CANADA, "12500.00"),
-        holding(VANGUARD_ISIN, FinancialInstrumentType.MUTUAL_FUND_CANADA, "9800.00"));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "33100.50"),
+        holding(SPY, FinancialInstrumentType.ETF, Country.USA, "25500.00"),
+        holding(VTI, FinancialInstrumentType.ETF, Country.USA, "10875.25"),
+        equity("AAPL", "NASDAQ", FinancialInstrumentType.STOCK, Country.USA, "40000.00"),
+        equity("RY.TO", "TSX", FinancialInstrumentType.STOCK, Country.CANADA, "28750.00"),
+        holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "15200.00"),
+        holding(CCM4752, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "12500.00"),
+        holding(VANGUARD_ISIN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "9800.00"));
   }
 
   private static TimeIntervalResult findPeriod(TrailingTotalReturnsResult result, String period) {
@@ -302,12 +304,13 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static PortfolioHolding holding(SecurityIdentifier securityIdentifier, FinancialInstrumentType type,
-      String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, securityIdentifier);
+      Country country, String value) {
+    return new PortfolioHolding(new BigDecimal(value), type, country, securityIdentifier);
   }
 
-  private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, equityId(ticker, exchange));
+  private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type,
+      Country country, String value) {
+    return new PortfolioHolding(new BigDecimal(value), type, country, equityId(ticker, exchange));
   }
 
   private static Dispatcher bocDailyUsdCadDispatcher(String rate) {

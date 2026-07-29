@@ -17,12 +17,7 @@ public enum ReturnFactorScale {
 
   SCALE_OF_ONE(entry -> divide(entry.getValue(), BigDecimalConstants.HUNDRED)), // e.g. 20% would be converted to 0.2
   SCALE_OF_TWO(entry -> divide(entry.getValue().add(BigDecimalConstants.HUNDRED), BigDecimalConstants.HUNDRED)), // e.g.
-                                                                                                                 // 20%
-                                                                                                                 // would
-                                                                                                                 // be
-                                                                                                                 // converted
-                                                                                                                 // to
-                                                                                                                 // 1.2
+  // 1.2
   AS_IS(Map.Entry::getValue); // e.g. 20% would be converted to 20
 
   private final Function<Map.Entry<LocalDate, BigDecimal>, BigDecimal> formula;

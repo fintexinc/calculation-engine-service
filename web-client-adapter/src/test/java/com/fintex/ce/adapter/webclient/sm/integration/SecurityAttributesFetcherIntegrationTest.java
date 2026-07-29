@@ -9,6 +9,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Fees;
 import com.fintex.wm.commons.domain.financial.ManagementFeeDatapoint;
@@ -259,7 +260,7 @@ class SecurityAttributesFetcherIntegrationTest {
   }
 
   private static PortfolioHolding holding(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF_CANADA,
+    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
         new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
   }
 }

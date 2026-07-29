@@ -13,6 +13,8 @@ description: >
 Portfolio calculation engine: fetches data from Security Master (SM) via REST, performs financial
 calculations. **No database, no GraphQL.** (Caching goes through the `cache-adapter` module.)
 
+Trigger `api-contract-review`, `performance-smell-detection`, `clean-code`, `security-audit`, `testing-guideline` skills to review code.
+
 **Cross-check findings against the `review-lessons` skill** — recurring defect patterns caught in
 past reviews. When this review surfaces a genuinely new class of problem, add a distilled entry there.
 

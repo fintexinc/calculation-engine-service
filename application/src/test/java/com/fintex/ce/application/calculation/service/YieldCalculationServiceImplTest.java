@@ -6,6 +6,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.income.YieldResult;
 import com.fintex.ce.model.dto.command.YieldCommand;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -45,11 +46,13 @@ class YieldCalculationServiceImplTest {
     Map<PortfolioHolding, Yield> mockData = new HashMap<>();
     Yield yield1 = new Yield();
     yield1.setDividendYield(new BigDecimal("0.05"));
-    mockData.put(new PortfolioHolding(new BigDecimal("100"), FinancialInstrumentType.MUTUAL_FUND_CANADA, null), yield1);
+    mockData.put(new PortfolioHolding(new BigDecimal("100"), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, null),
+        yield1);
 
     Yield yield2 = new Yield();
     yield2.setDividendYield(new BigDecimal("0.10"));
-    mockData.put(new PortfolioHolding(new BigDecimal("200"), FinancialInstrumentType.HEDGE_FUND_CANADA, null), yield2);
+    mockData.put(new PortfolioHolding(new BigDecimal("200"), FinancialInstrumentType.HEDGE_FUND, Country.CANADA, null),
+        yield2);
 
     Yield yield3 = new Yield();
     yield3.setDividendYield(new BigDecimal("0.06"));

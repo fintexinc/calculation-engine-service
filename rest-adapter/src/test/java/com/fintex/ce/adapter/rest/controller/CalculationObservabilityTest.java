@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -136,7 +137,8 @@ class CalculationObservabilityTest {
   private static PortfolioHolding holding(String id) {
     return new PortfolioHolding(
         BigDecimal.ONE,
-        FinancialInstrumentType.ETF_CANADA,
+        FinancialInstrumentType.ETF,
+        Country.CANADA,
         new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 

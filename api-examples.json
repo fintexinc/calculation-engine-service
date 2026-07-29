@@ -10,12 +10,12 @@
         "metric": "trailing-total-returns",
         "holdings": [
           {
-            "holdingType": "MUTUAL_FUND_CANADA",
+            "holdingType": "MUTUAL_FUND", "country": "CANADA",
             "value": 50000,
             "securityIdentifier": { "id": "CCM4752", "idType": "FUNDSERV" }
           },
           {
-            "holdingType": "ETF_CANADA",
+            "holdingType": "ETF", "country": "CANADA",
             "value": 30000,
             "securityIdentifier": { "id": "GMOM", "idType": "TICKER" }
           }
@@ -40,7 +40,7 @@
         "metric": "sharpe-ratio",
         "holdings": [
           {
-            "holdingType": "MUTUAL_FUND_CANADA",
+            "holdingType": "MUTUAL_FUND", "country": "CANADA",
             "value": 60000,
             "securityIdentifier": { "id": "CCM4752", "idType": "FUNDSERV" }
           }
@@ -58,17 +58,17 @@
         "metric": "asset-allocations",
         "holdings": [
           {
-            "holdingType": "MUTUAL_FUND_CANADA",
+            "holdingType": "MUTUAL_FUND", "country": "CANADA",
             "value": 50000,
             "securityIdentifier": { "id": "FID1291", "idType": "FUNDSERV" }
           },
           {
-            "holdingType": "ETF_CANADA",
+            "holdingType": "ETF", "country": "CANADA",
             "value": 25000,
             "securityIdentifier": { "id": "NVHE.U", "idType": "TICKER" }
           },
           {
-            "holdingType": "STOCK_CANADA",
+            "holdingType": "STOCK", "country": "CANADA",
             "value": 15000,
             "securityIdentifier": { "id": "CNQ.TO", "idType": "TICKER" }
           }
@@ -84,12 +84,12 @@
         "metric": "equity-sector",
         "holdings": [
           {
-            "holdingType": "ETF_CANADA",
+            "holdingType": "ETF", "country": "CANADA",
             "value": 40000,
             "securityIdentifier": { "id": "GMOM", "idType": "TICKER" }
           },
           {
-            "holdingType": "STOCK_CANADA",
+            "holdingType": "STOCK", "country": "CANADA",
             "value": 15000,
             "securityIdentifier": { "id": "CNQ.TO", "idType": "TICKER" }
           }
@@ -105,12 +105,12 @@
         "metric": "maturity-allocation",
         "holdings": [
           {
-            "holdingType": "ETF_CANADA",
+            "holdingType": "ETF", "country": "CANADA",
             "value": 40000,
             "securityIdentifier": { "id": "NVHE.U", "idType": "TICKER" }
           },
           {
-            "holdingType": "MUTUAL_FUND_CANADA",
+            "holdingType": "MUTUAL_FUND", "country": "CANADA",
             "value": 30000,
             "securityIdentifier": { "id": "VCC403", "idType": "FUNDSERV" }
           }
@@ -126,7 +126,7 @@
         "metric": "fixed-income-credit-quality",
         "holdings": [
           {
-            "holdingType": "ETF_CANADA",
+            "holdingType": "ETF", "country": "CANADA",
             "value": 40000,
             "securityIdentifier": { "id": "NVHE.U", "idType": "TICKER" }
           }
@@ -142,12 +142,12 @@
         "metric": "mer",
         "holdings": [
           {
-            "holdingType": "MUTUAL_FUND_CANADA",
+            "holdingType": "MUTUAL_FUND", "country": "CANADA",
             "value": 50000,
             "securityIdentifier": { "id": "CCM4752", "idType": "FUNDSERV" }
           },
           {
-            "holdingType": "ETF_CANADA",
+            "holdingType": "ETF", "country": "CANADA",
             "value": 30000,
             "securityIdentifier": { "id": "GMOM", "idType": "TICKER" }
           }
@@ -164,7 +164,7 @@
         "metric": "management-fee",
         "holdings": [
           {
-            "holdingType": "MUTUAL_FUND_CANADA",
+            "holdingType": "MUTUAL_FUND", "country": "CANADA",
             "value": 50000,
             "securityIdentifier": { "id": "CCM4752", "idType": "FUNDSERV" }
           }
@@ -181,7 +181,7 @@
         "metric": "sales-charge",
         "holdings": [
           {
-            "holdingType": "MUTUAL_FUND_CANADA",
+            "holdingType": "MUTUAL_FUND", "country": "CANADA",
             "value": 50000,
             "securityIdentifier": { "id": "CCM4752", "idType": "FUNDSERV" }
           }
@@ -197,12 +197,12 @@
         "metric": "yield",
         "holdings": [
           {
-            "holdingType": "MUTUAL_FUND_CANADA",
+            "holdingType": "MUTUAL_FUND", "country": "CANADA",
             "value": 50000,
             "securityIdentifier": { "id": "CCM4752", "idType": "FUNDSERV" }
           },
           {
-            "holdingType": "ETF_CANADA",
+            "holdingType": "ETF", "country": "CANADA",
             "value": 25000,
             "securityIdentifier": { "id": "NVHE.U", "idType": "TICKER" }
           }

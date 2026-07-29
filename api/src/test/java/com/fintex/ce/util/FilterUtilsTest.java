@@ -2,6 +2,7 @@ package com.fintex.ce.util;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.junit.jupiter.api.Assertions;
@@ -23,10 +24,10 @@ class FilterUtilsTest {
     when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.CASH);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_CANADA);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final List<PortfolioHolding> holdings = List.of(h1, h2, h3);
@@ -42,13 +43,15 @@ class FilterUtilsTest {
   void filterHoldings_canadaETFCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_CANADA);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
+    when(h1.getCountry()).thenReturn(Country.CANADA);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
     when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.CASH);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
+    when(h3.getCountry()).thenReturn(Country.USA);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final List<PortfolioHolding> holdings = List.of(h1, h2, h3);
@@ -64,13 +67,16 @@ class FilterUtilsTest {
   void filterHoldings_usETFCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
+    when(h1.getCountry()).thenReturn(Country.USA);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_CANADA);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
+    when(h2.getCountry()).thenReturn(Country.CANADA);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
+    when(h3.getCountry()).thenReturn(Country.CANADA);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final List<PortfolioHolding> holdings = List.of(h1, h2, h3);
@@ -86,13 +92,13 @@ class FilterUtilsTest {
   void filterHoldings_stockCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final List<PortfolioHolding> holdings = List.of(h1, h2, h3);
@@ -110,7 +116,7 @@ class FilterUtilsTest {
     when(genericStock.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
 
     PortfolioHolding etf = mock(PortfolioHolding.class);
-    when(etf.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(etf.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     List<PortfolioHolding> result = FilterUtils.filterHoldings(List.of(genericStock, etf),
         FilterUtils.STOCK_PREDICATE);
@@ -124,10 +130,10 @@ class FilterUtilsTest {
     when(genericEtf.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     PortfolioHolding usEtf = mock(PortfolioHolding.class);
-    when(usEtf.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(usEtf.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     PortfolioHolding stock = mock(PortfolioHolding.class);
-    when(stock.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+    when(stock.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
 
     List<PortfolioHolding> result = FilterUtils.filterHoldings(List.of(genericEtf, usEtf, stock),
         FilterUtils.ETF_PREDICATE);
@@ -141,7 +147,8 @@ class FilterUtilsTest {
     when(genericGic.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
 
     PortfolioHolding canadaGic = mock(PortfolioHolding.class);
-    when(canadaGic.getHoldingType()).thenReturn(FinancialInstrumentType.GIC_CANADA);
+    when(canadaGic.getHoldingType()).thenReturn(FinancialInstrumentType.GIC);
+    when(canadaGic.getCountry()).thenReturn(Country.CANADA);
 
     PortfolioHolding cash = mock(PortfolioHolding.class);
     when(cash.getHoldingType()).thenReturn(FinancialInstrumentType.CASH);
@@ -154,11 +161,10 @@ class FilterUtilsTest {
 
   @Test
   void isOfType_walksParentChain() {
-    Assertions.assertTrue(FilterUtils.isOfType(FinancialInstrumentType.STOCK_US, FinancialInstrumentType.STOCK));
     Assertions.assertTrue(FilterUtils.isOfType(FinancialInstrumentType.STOCK, FinancialInstrumentType.STOCK));
-    Assertions.assertTrue(FilterUtils.isOfType(FinancialInstrumentType.MUTUAL_FUND_CANADA,
+    Assertions.assertTrue(FilterUtils.isOfType(FinancialInstrumentType.MUTUAL_FUND,
         FinancialInstrumentType.FUND));
-    Assertions.assertFalse(FilterUtils.isOfType(FinancialInstrumentType.ETF_US, FinancialInstrumentType.STOCK));
+    Assertions.assertFalse(FilterUtils.isOfType(FinancialInstrumentType.ETF, FinancialInstrumentType.STOCK));
     Assertions.assertFalse(FilterUtils.isOfType(null, FinancialInstrumentType.STOCK));
   }
 
@@ -166,13 +172,14 @@ class FilterUtilsTest {
   void filterHoldings_canadaMutualFundCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND);
+    when(h3.getCountry()).thenReturn(Country.CANADA);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final List<PortfolioHolding> holdings = List.of(h1, h2, h3);
@@ -188,13 +195,14 @@ class FilterUtilsTest {
   void filterHoldings_usStockFundCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
+    when(h2.getCountry()).thenReturn(Country.USA);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final List<PortfolioHolding> holdings = List.of(h1, h2, h3);
@@ -210,13 +218,13 @@ class FilterUtilsTest {
   void filterHoldings_fixedIncomeCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final PortfolioHolding h4 = mock(PortfolioHolding.class);
@@ -235,13 +243,13 @@ class FilterUtilsTest {
   void filterHoldings_separatelyManagedAccountCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final PortfolioHolding h4 = mock(PortfolioHolding.class);
@@ -264,17 +272,18 @@ class FilterUtilsTest {
   void filterHoldings_canadaStockFundCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_US);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final PortfolioHolding h4 = mock(PortfolioHolding.class);
-    when(h4.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_CANADA);
+    when(h4.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
+    when(h4.getCountry()).thenReturn(Country.CANADA);
     when(h4.getValue()).thenReturn(BigDecimal.TEN);
 
     final List<PortfolioHolding> holdings = List.of(h1, h2, h3, h4);
@@ -290,17 +299,17 @@ class FilterUtilsTest {
   void filterHoldings_canadaEtfCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_CANADA);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final PortfolioHolding h4 = mock(PortfolioHolding.class);
-    when(h4.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_CANADA);
+    when(h4.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
     when(h4.getValue()).thenReturn(BigDecimal.TEN);
 
     final List<PortfolioHolding> holdings = List.of(h1, h2, h3, h4);
@@ -316,17 +325,17 @@ class FilterUtilsTest {
   void filterHoldings_benchmarksCheckResult() {
     // SETUP
     final PortfolioHolding h1 = mock(PortfolioHolding.class);
-    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_US);
+    when(h1.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h2 = mock(PortfolioHolding.class);
-    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.ETF_CANADA);
+    when(h2.getHoldingType()).thenReturn(FinancialInstrumentType.ETF);
 
     final PortfolioHolding h3 = mock(PortfolioHolding.class);
-    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    when(h3.getHoldingType()).thenReturn(FinancialInstrumentType.MUTUAL_FUND);
     when(h3.getValue()).thenReturn(BigDecimal.ONE);
 
     final PortfolioHolding h4 = mock(PortfolioHolding.class);
-    when(h4.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK_CANADA);
+    when(h4.getHoldingType()).thenReturn(FinancialInstrumentType.STOCK);
     when(h4.getValue()).thenReturn(BigDecimal.TEN);
 
     final PortfolioHolding h5 = mock(PortfolioHolding.class);

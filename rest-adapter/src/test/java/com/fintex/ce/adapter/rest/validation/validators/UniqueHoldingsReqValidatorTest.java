@@ -10,6 +10,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -87,8 +88,8 @@ class UniqueHoldingsReqValidatorTest {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.DUPLICATE_HOLDING);
           assertThat(rve.getMessage()).isEqualTo("Duplicate holding with id ID1 found in request");
-          assertThat(rve.getId()).isEqualTo("MUTUAL_FUND_CANADA-ID1");
-          assertThat(rve.getMetadata()).containsEntry(ErrorParams.HOLDING_ID, "MUTUAL_FUND_CANADA-ID1");
+          assertThat(rve.getId()).isEqualTo("MUTUAL_FUND-ID1");
+          assertThat(rve.getMetadata()).containsEntry(ErrorParams.HOLDING_ID, "MUTUAL_FUND-ID1");
         });
   }
 
@@ -103,7 +104,7 @@ class UniqueHoldingsReqValidatorTest {
         gicHolding(Currency.USD, BigDecimal.valueOf(365), BigDecimal.valueOf(2.5), "GIC D"),
         fundHolding("ID1", BigDecimal.TEN),
         fundHolding("ID2", BigDecimal.TEN),
-        new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
             new SecurityIdentifier("ID1", FiIdentifierType.FUNDSERV)));
 
     PeriodCommand command = new PeriodCommand();
@@ -154,7 +155,7 @@ class UniqueHoldingsReqValidatorTest {
   }
 
   private static PortfolioHolding fundHolding(String id, BigDecimal value) {
-    return new PortfolioHolding(value, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+    return new PortfolioHolding(value, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
         new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 }

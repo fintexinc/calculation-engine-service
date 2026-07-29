@@ -9,6 +9,7 @@ import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -159,6 +160,6 @@ class EquitySectorAllocationMapperTest {
   private PortfolioHolding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, identifier);
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA, identifier);
   }
 }

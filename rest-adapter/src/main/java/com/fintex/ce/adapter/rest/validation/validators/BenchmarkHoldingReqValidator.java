@@ -21,9 +21,9 @@ public class BenchmarkHoldingReqValidator
 
   static final String BENCHMARK_HOLDINGS_FIELD = "benchmarkHoldings";
 
-  public BenchmarkHoldingReqValidator() {
+  public BenchmarkHoldingReqValidator(HoldingsValidator holdingsValidator) {
     super(BenchmarkHoldingsProvider.class, BenchmarkHoldingsProvider::getBenchmarkHoldings,
-        HoldingsValidationHelper::validate, BENCHMARK_HOLDINGS_FIELD, true);
+        holdingsValidator::validate, BENCHMARK_HOLDINGS_FIELD, true);
   }
 
   @Override

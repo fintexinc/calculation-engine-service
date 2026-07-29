@@ -8,6 +8,7 @@ import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.holding.TopHolding;
@@ -125,7 +126,8 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
   private static PortfolioHolding holding(SecurityIdentifier securityIdentifier, int value) {
     return new PortfolioHolding(
         BigDecimal.valueOf(value),
-        FinancialInstrumentType.ETF_CANADA,
+        FinancialInstrumentType.ETF,
+        Country.CANADA,
         securityIdentifier);
   }
 

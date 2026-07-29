@@ -75,6 +75,6 @@ class EquityCountryAllocationMapperTest {
   private PortfolioHolding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, identifier);
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA, identifier);
   }
 }

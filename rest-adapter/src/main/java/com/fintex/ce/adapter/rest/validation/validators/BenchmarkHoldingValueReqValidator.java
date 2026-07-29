@@ -16,9 +16,9 @@ public class BenchmarkHoldingValueReqValidator
     extends
       AbstractHoldingsValidationReqValidator<BenchmarkHoldingsProvider> {
 
-  public BenchmarkHoldingValueReqValidator() {
+  public BenchmarkHoldingValueReqValidator(HoldingsValidator holdingsValidator) {
     super(BenchmarkHoldingsProvider.class, BenchmarkHoldingsProvider::getBenchmarkHoldings,
-        HoldingsValidationHelper::validateHoldingValues);
+        holdingsValidator::validateHoldingValues);
   }
 
   @Override

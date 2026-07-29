@@ -10,6 +10,7 @@ import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationTypeValue;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -96,7 +97,7 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static PortfolioHolding etfHolding(long value, SecurityIdentifier identifier) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), FinancialInstrumentType.ETF_CANADA, identifier);
+    return new PortfolioHolding(BigDecimal.valueOf(value), FinancialInstrumentType.ETF, Country.CANADA, identifier);
   }
 
   private static SecurityAttributeResult<EquitySectorAllocationWithCurrency> sectorAllocationRow(

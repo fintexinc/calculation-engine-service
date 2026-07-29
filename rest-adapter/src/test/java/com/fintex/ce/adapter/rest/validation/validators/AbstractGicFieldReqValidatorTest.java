@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.exceptions.ValidationException;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -55,7 +56,7 @@ abstract class AbstractGicFieldReqValidatorTest {
   @Test
   void shouldNotThrow_whenNoGicHoldings() {
     PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
 
     var cmd = new PortfolioHoldingsCommand();

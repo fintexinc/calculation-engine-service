@@ -4,6 +4,7 @@ import com.fintex.ce.model.domain.calculation.yield.Yield;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Income;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -71,6 +72,6 @@ class YieldMapperTest {
   private PortfolioHolding createHolding(String securityId) {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, identifier);
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA, identifier);
   }
 }

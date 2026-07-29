@@ -11,6 +11,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -187,17 +188,18 @@ class EquitySectorExposureServiceTest {
   }
 
   private static PortfolioHolding fund(String id, String value) {
-    return holding(FinancialInstrumentType.MUTUAL_FUND_CANADA, id, value);
+    return holding(FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, id, value);
   }
 
   private static PortfolioHolding stock(String id, String value) {
-    return holding(FinancialInstrumentType.STOCK_CANADA, id, value);
+    return holding(FinancialInstrumentType.STOCK, Country.CANADA, id, value);
   }
 
-  private static PortfolioHolding holding(FinancialInstrumentType type, String id, String value) {
+  private static PortfolioHolding holding(FinancialInstrumentType type, Country country, String id, String value) {
     return PortfolioHolding.builder()
         .value(new BigDecimal(value))
         .holdingType(type)
+        .country(country)
         .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
         .build();
   }

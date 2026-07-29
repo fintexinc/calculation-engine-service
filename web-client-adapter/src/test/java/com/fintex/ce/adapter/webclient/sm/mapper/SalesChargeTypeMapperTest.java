@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.sales.SalesChargeData;
@@ -71,7 +72,8 @@ class SalesChargeTypeMapperTest {
     var identifier = new SecurityIdentifier();
     identifier.setId(securityId);
     return PortfolioHolding.builder()
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
+        .country(Country.CANADA)
         .securityIdentifier(identifier)
         .build();
   }

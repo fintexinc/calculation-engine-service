@@ -226,7 +226,7 @@ class ReturnsSnapshotTest {
     assertThat(warnings).hasSize(1);
     Notification warning = warnings.getFirst();
     assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.HOLDING_PSD_OUT_OF_RANGE);
-    assertThat(warning.getUuid()).isEqualTo("hid");
+    assertThat(warning.getMetadata()).containsEntry("holdingId", "hid");
   }
 
   @Test

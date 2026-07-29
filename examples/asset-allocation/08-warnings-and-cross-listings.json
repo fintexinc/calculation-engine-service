@@ -21,7 +21,8 @@
       "currency": "USD"
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 5500.00,
       "securityIdentifier": {
         "id": "AAPL.NE",
@@ -30,7 +31,8 @@
       }
     },
     {
-      "holdingType": "STOCK_US",
+      "holdingType": "STOCK",
+      "country": "USA",
       "value": 5000.00,
       "securityIdentifier": {
         "id": "AAPL",
@@ -66,7 +68,8 @@
       }
     },
     {
-      "holdingType": "STOCK_CANADA",
+      "holdingType": "STOCK",
+      "country": "CANADA",
       "value": 3000.00,
       "securityIdentifier": {
         "id": "FAKE.NE",
@@ -75,7 +78,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 7500.00,
       "securityIdentifier": {
         "id": "QQQQ",
@@ -83,7 +87,8 @@
       }
     },
     {
-      "holdingType": "ETF_US",
+      "holdingType": "ETF",
+      "country": "USA",
       "value": 5200.00,
       "securityIdentifier": {
         "id": "BOGUS_ETF_TICKER",
@@ -91,7 +96,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 8000.00,
       "securityIdentifier": {
         "id": "F00000MEY2",
@@ -99,7 +105,8 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND_CANADA",
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
       "value": 3500.00,
       "securityIdentifier": {
         "id": "FAKE_FUND_ID_999",

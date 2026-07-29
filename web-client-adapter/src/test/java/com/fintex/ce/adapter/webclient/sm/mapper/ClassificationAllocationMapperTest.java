@@ -8,6 +8,7 @@ import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.wm.commons.domain.classification.SecurityClassificationLevelOne;
 import com.fintex.wm.commons.domain.classification.SecurityClassificationLevelTwo;
 import com.fintex.wm.commons.domain.classification.SecurityClassificationTypeValue;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -41,7 +42,7 @@ class ClassificationAllocationMapperTest {
 
     ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.MUTUAL_FUND_CANADA);
+    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.MUTUAL_FUND);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getSecurityClassificationValues()).hasSize(2);
     assertThat(result.getSecurityClassificationValues())
@@ -131,7 +132,7 @@ class ClassificationAllocationMapperTest {
   }
 
   private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, new SecurityIdentifier(securityId,
-        null));
+    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        new SecurityIdentifier(securityId, null));
   }
 }

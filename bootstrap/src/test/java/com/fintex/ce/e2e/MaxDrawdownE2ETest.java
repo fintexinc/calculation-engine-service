@@ -10,6 +10,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -214,8 +215,9 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
     command.setPeriods(Set.of("12"));
     command.setCustomPed(LocalDate.parse("2024-12-31"));
     command.setHoldings(List.of(
-        new PortfolioHolding(new BigDecimal("60000.00"), FinancialInstrumentType.ETF_CANADA, XBAL),
-        new PortfolioHolding(new BigDecimal("40000.00"), FinancialInstrumentType.MUTUAL_FUND_CANADA, CCM4752)));
+        new PortfolioHolding(new BigDecimal("60000.00"), FinancialInstrumentType.ETF, Country.CANADA, XBAL),
+        new PortfolioHolding(new BigDecimal("40000.00"), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+            CCM4752)));
     return command;
   }
 

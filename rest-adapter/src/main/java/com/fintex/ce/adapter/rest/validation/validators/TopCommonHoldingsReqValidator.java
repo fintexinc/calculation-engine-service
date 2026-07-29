@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 import static com.fintex.ce.model.domain.enumeration.CalculationMetric.*;
 import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
@@ -21,7 +22,10 @@ import static com.fintex.ce.util.FilterUtils.filterHoldings;
 
 @Component
 @Order(500)
+@RequiredArgsConstructor
 public class TopCommonHoldingsReqValidator implements RequestValidator {
+
+  private final HoldingsValidator holdingsValidator;
 
   @Override
   public List<CalculationMetric> supportedMetrics() {
@@ -42,7 +46,7 @@ public class TopCommonHoldingsReqValidator implements RequestValidator {
     if (checkGicHoldingName(tch.getHoldings())) {
       throw ErrorCode.GIC_HOLDING_NAME_EMPTY.toValidationException();
     }
-    HoldingsValidationHelper.validateHoldingValues(tch.getHoldings());
+    holdingsValidator.validateHoldingValues(tch.getHoldings());
   }
 
   private boolean checkGicHoldingName(List<PortfolioHolding> holdings) {

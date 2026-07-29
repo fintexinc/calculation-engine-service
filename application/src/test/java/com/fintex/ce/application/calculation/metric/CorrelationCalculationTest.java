@@ -7,6 +7,7 @@ import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -256,8 +257,8 @@ class CorrelationCalculationTest {
     var calculation = mock(CorrelationCalculation.class);
     var date = LocalDate.now();
     var map = Map.of(date, ONE);
-    var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US, null);
-    var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
+    var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA, null);
+    var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, null);
     var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
     when(calculation.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
@@ -273,8 +274,8 @@ class CorrelationCalculationTest {
     var calculation = mock(CorrelationCalculation.class);
     var date = LocalDate.now();
     var map = Map.of(date, ONE);
-    var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US, null);
-    var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA, null);
+    var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA, null);
+    var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, null);
     var holdings = Map.of(usEtfHolding, map, mutualFundsHolding, map);
 
     when(calculation.calculateCorrelation(any(), any())).thenReturn(BigDecimal.ONE);
@@ -405,9 +406,9 @@ class CorrelationCalculationTest {
   @Test
   void shouldBuildCorrelationPeriodResult_whenMappingCorrelationValues() {
     var calculation = mock(CorrelationCalculation.class);
-    var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
+    var usEtfHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV));
-    var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+    var mutualFundsHolding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV));
     var map = Map.of(mutualFundsHolding, BigDecimalConstants.TWELVE);
 
@@ -416,16 +417,16 @@ class CorrelationCalculationTest {
         map);
 
     assertEquals(String.valueOf(TWELVE), correlationPeriod.period());
-    assertEquals("ETF_US_TEST", correlationPeriod.key());
+    assertEquals("ETF_TEST", correlationPeriod.key());
     assertEquals(1, correlationPeriod.correlations().size());
-    assertEquals("MUTUAL_FUND_CANADA_TEST", correlationPeriod.correlations().get(0).correlationKey());
+    assertEquals("MUTUAL_FUND_TEST", correlationPeriod.correlations().get(0).correlationKey());
     assertEquals(BigDecimal.valueOf(TWELVE), correlationPeriod.correlations().get(0).value());
   }
 
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     var context = mock(PeriodCalculationInput.class);
-    var map = Map.of(new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
+    var map = Map.of(new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
         new SecurityIdentifier("TEST", FiIdentifierType.FUNDSERV)), mock(Map.class));
     var portfolioBaseTotalReturn = Map.of(mock(PortfolioHolding.class), map);
     var calculation = mock(CorrelationCalculation.class, withSettings()

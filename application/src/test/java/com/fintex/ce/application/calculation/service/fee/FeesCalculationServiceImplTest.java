@@ -10,6 +10,7 @@ import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -51,8 +52,8 @@ class FeesCalculationServiceImplTest {
   @Test
   void annualFee_isSumOfValueTimesMer_overFundHoldings() {
     // 1000 @ 0.02 + 2000 @ 0.01 = 20 + 20 = 40
-    PortfolioHolding cad = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1000");
-    PortfolioHolding us = holding("VTI", FinancialInstrumentType.ETF_US, "2000");
+    PortfolioHolding cad = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding us = holding("VTI", FinancialInstrumentType.ETF, Country.USA, "2000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         cad, fee("0.02", null, null, null),
         us, fee(null, null, "0.01", null));
@@ -65,7 +66,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void monthlyFee_isAnnualDividedBy12() {
-    PortfolioHolding fund = holding("CIG-002", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1200");
+    PortfolioHolding fund = holding("CIG-002", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1200");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee("0.10", null, null, null));
 
@@ -79,8 +80,8 @@ class FeesCalculationServiceImplTest {
   @Test
   void wholePortfolio_includesNonFundHoldingsAt0Pct() {
     // Fund 1000 × 0.02 = 20; stock contributes 0.
-    PortfolioHolding fund = holding("CIG-003", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1000");
-    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "1000");
+    PortfolioHolding fund = holding("CIG-003", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee("0.02", null, null, null));
 
@@ -93,7 +94,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void fundsOnlyStrict_isNull_whenAnyIncludedHoldingMissingPrimary() {
-    PortfolioHolding fund = holding("CIG-004", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1000");
+    PortfolioHolding fund = holding("CIG-004", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee(null, "0.02", null, null));
 
@@ -107,7 +108,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void parentHoldingType_isRejectedWithCleanError() {
-    PortfolioHolding parent = holding("X", FinancialInstrumentType.FUND, "1000");
+    PortfolioHolding parent = holding("X", FinancialInstrumentType.FUND, null, "1000");
 
     assertThatThrownBy(() -> service.perform(commandFor(List.of(parent), FUNDS_ONLY), Map.of()))
         .isInstanceOf(CalculationException.class)
@@ -117,7 +118,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void allFeeFieldsNull_throws() {
-    PortfolioHolding hedge = holding("HF-001", FinancialInstrumentType.HEDGE_FUND_CANADA, "1000");
+    PortfolioHolding hedge = holding("HF-001", FinancialInstrumentType.HEDGE_FUND, Country.CANADA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         hedge, fee(null, null, null, null));
 
@@ -129,7 +130,7 @@ class FeesCalculationServiceImplTest {
   @Test
   void usdFund_isConvertedToCadBeforeFeeSum() {
     // USD 1000 fund × 0.02 NER = USD 20 annual fee × 1.35 USD/CAD = CAD 27.
-    PortfolioHolding usdFund = holding("VTI", FinancialInstrumentType.MUTUAL_FUND_US, "1000");
+    PortfolioHolding usdFund = holding("VTI", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         usdFund, FeeData.builder()
             .netExpenseRatio(new BigDecimal("0.02"))
@@ -147,7 +148,7 @@ class FeesCalculationServiceImplTest {
   @Test
   void usdFund_fxUnavailable_emitsWarningAndLeavesValueUnconverted() {
     // USD 1000 fund × 0.02 NER = USD 20. With no FX rate available, value is left in USD, sum is 20, FX-001 warning.
-    PortfolioHolding usdFund = holding("VTI", FinancialInstrumentType.MUTUAL_FUND_US, "1000");
+    PortfolioHolding usdFund = holding("VTI", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         usdFund, FeeData.builder()
             .netExpenseRatio(new BigDecimal("0.02"))
@@ -167,7 +168,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void merBearingHoldingWithMissingCurrency_throws() {
-    PortfolioHolding fund = holding("CIG-NOCURR", FinancialInstrumentType.MUTUAL_FUND_CANADA, "1000");
+    PortfolioHolding fund = holding("CIG-NOCURR", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementExpenseRatio(new BigDecimal("0.02"))
@@ -184,7 +185,7 @@ class FeesCalculationServiceImplTest {
     // Intended behavior: the MER and Fees metrics share one US resolution chain (NER → GER), so Fees does NOT keep a
     // Management-Fee fallback for US funds. With NER and GER both absent the Fees request hard-fails with MER-002
     // instead of reporting a fee off the Management Fee (0.01). The Management Fee metric is unaffected.
-    PortfolioHolding etf = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND_US, "1000");
+    PortfolioHolding etf = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         etf, fee(null, "0.01", null, null));
 
@@ -200,7 +201,7 @@ class FeesCalculationServiceImplTest {
     // Real reported security F000015AWQ for the Fees metric: NER and GER blank, ActualManagementFee = 0.00000
     // (present, not null). A present zero previously resolved to a 0 fee via the Management Fee fallback; it must now
     // fail MER-002 rather than report a fee of 0.
-    PortfolioHolding etf = holding("F000015AWQ", FinancialInstrumentType.ETF_US, "100000");
+    PortfolioHolding etf = holding("F000015AWQ", FinancialInstrumentType.ETF, Country.USA, "100000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         etf, fee(null, "0.00", null, null));
 
@@ -214,7 +215,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void emptyFundModes_areNulled_whenNoFundHoldingsPresent() {
-    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK_US, "1000");
+    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "1000");
 
     FeesResult result = service.perform(commandFor(List.of(stock), FUNDS_ONLY, WHOLE_PORTFOLIO,
         FUNDS_ONLY_STRICT), Map.of());
@@ -229,10 +230,11 @@ class FeesCalculationServiceImplTest {
 
   // ---------- helpers ----------
 
-  private static PortfolioHolding holding(String id, FinancialInstrumentType type, String value) {
+  private static PortfolioHolding holding(String id, FinancialInstrumentType type, Country country, String value) {
     return PortfolioHolding.builder()
         .value(new BigDecimal(value))
         .holdingType(type)
+        .country(country)
         .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.MORNINGSTAR_ID))
         .build();
   }

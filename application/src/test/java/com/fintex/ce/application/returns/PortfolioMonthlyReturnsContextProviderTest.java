@@ -6,6 +6,7 @@ import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 class PortfolioMonthlyReturnsContextProviderTest {
 
-  private static final PortfolioHolding ETF = new PortfolioHolding(null, FinancialInstrumentType.ETF_US,
+  private static final PortfolioHolding ETF = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
       new SecurityIdentifier("SPY", FiIdentifierType.TICKER));
 
   private final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);

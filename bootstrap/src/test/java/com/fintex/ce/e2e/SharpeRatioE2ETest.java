@@ -5,9 +5,11 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -150,7 +152,7 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
     ErrorResponse error = readJson(response.responseBody(), ErrorResponse.class);
     assertThat(error.getNotifications()).hasSize(1);
     Notification notification = error.getNotifications().getFirst();
-    assertThat(notification.getCode()).isEqualTo("TBL-001");
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.Codes.MISSING_TBILL_RATE);
     assertThat(notification.getMessage()).isEqualTo("Missing T-Bill rate for date 2024-07-31");
     assertThat(notification.getMetadata()).hasSize(1).containsEntry("param-1", "2024-07-31");
   }
@@ -164,15 +166,15 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static List<PortfolioHolding> richPortfolioHoldings() {
     return List.of(
-        holding(XBAL, FinancialInstrumentType.ETF_CANADA, "45234.67"),
-        holding(VCNS, FinancialInstrumentType.ETF_CANADA, "33100.50"),
-        holding(SPY, FinancialInstrumentType.ETF_US, "25500.00"),
-        holding(VTI, FinancialInstrumentType.ETF_US, "10875.25"),
-        equity("AAPL", "NASDAQ", FinancialInstrumentType.STOCK_US, "40000.00"),
-        equity("RY.TO", "TSX", FinancialInstrumentType.STOCK_CANADA, "28750.00"),
-        holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND_CANADA, "15200.00"),
-        holding(CCM4752, FinancialInstrumentType.MUTUAL_FUND_CANADA, "12500.00"),
-        holding(VANGUARD_ISIN, FinancialInstrumentType.MUTUAL_FUND_CANADA, "9800.00"));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "33100.50"),
+        holding(SPY, FinancialInstrumentType.ETF, Country.USA, "25500.00"),
+        holding(VTI, FinancialInstrumentType.ETF, Country.USA, "10875.25"),
+        equity("AAPL", "NASDAQ", FinancialInstrumentType.STOCK, Country.USA, "40000.00"),
+        equity("RY.TO", "TSX", FinancialInstrumentType.STOCK, Country.CANADA, "28750.00"),
+        holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "15200.00"),
+        holding(CCM4752, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "12500.00"),
+        holding(VANGUARD_ISIN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "9800.00"));
   }
 
   private static PeriodCommand periodCommand(Set<String> periods, LocalDate customPed,
@@ -228,8 +230,9 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
         .build();
   }
 
-  private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, equityId(ticker, exchange));
+  private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type,
+      Country country, String value) {
+    return new PortfolioHolding(new BigDecimal(value), type, country, equityId(ticker, exchange));
   }
 
   private static DateBigDecimalValue dateValue(String date, String percent) {
@@ -252,7 +255,7 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static PortfolioHolding holding(SecurityIdentifier securityIdentifier, FinancialInstrumentType type,
-      String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, securityIdentifier);
+      Country country, String value) {
+    return new PortfolioHolding(new BigDecimal(value), type, country, securityIdentifier);
   }
 }

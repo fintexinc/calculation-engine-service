@@ -19,17 +19,15 @@ public final class ErrorParams {
 
   /**
    * Metadata key under which {@link #holdingId(PortfolioHolding)} is stored on a {@link Notification} or
-   * {@link com.fintex.ce.model.error.exceptions.BasePceException}. Consumers reading the holding identifier from a
-   * notification or exception MUST read this metadata entry rather than rely on the {@code uuid} / {@code id} field —
-   * those fields carry the holding id only by historical convention and are not guaranteed for notifications/exceptions
-   * created through other code paths.
+   * {@link com.fintex.ce.model.error.exceptions.BasePceException}. This metadata entry is the single source of truth
+   * for the holding identifier: {@link com.fintex.wm.commons.error.Notification#getUuid()} always carries a freshly
+   * generated UUID, never the holding id.
    */
   public static final String HOLDING_ID = "holdingId";
 
   /**
-   * Returns the holding's identifier string. Stored in metadata under {@link #HOLDING_ID} (and, by current convention,
-   * also as the {@link com.fintex.wm.commons.error.Notification#getUuid()} and
-   * {@link com.fintex.ce.model.error.exceptions.BasePceException#getId()}).
+   * Returns the holding's identifier string. Stored in metadata under {@link #HOLDING_ID} and, for exceptions, also in
+   * {@link com.fintex.ce.model.error.exceptions.BasePceException#getId()}.
    */
   public static String holdingId(PortfolioHolding holding) {
     return holding == null ? null : holding.getIdsString();

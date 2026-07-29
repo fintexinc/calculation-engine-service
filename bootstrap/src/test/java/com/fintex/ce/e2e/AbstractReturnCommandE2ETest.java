@@ -8,6 +8,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -54,32 +55,37 @@ abstract class AbstractReturnCommandE2ETest extends AbstractPortfolioCalculation
   protected static PortfolioHolding etfCanada(SecurityIdentifier securityIdentifier, String value) {
     return new PortfolioHolding(
         new BigDecimal(value),
-        FinancialInstrumentType.ETF_CANADA,
+        FinancialInstrumentType.ETF,
+        Country.CANADA,
         securityIdentifier);
   }
 
   protected static PortfolioHolding usEtf(SecurityIdentifier securityIdentifier, String value) {
     return new PortfolioHolding(
         new BigDecimal(value),
-        FinancialInstrumentType.ETF_US,
+        FinancialInstrumentType.ETF,
+        Country.USA,
         securityIdentifier);
   }
 
   protected static PortfolioHolding stockCanada(EquitySecurityIdentifier securityIdentifier, String value) {
     return new PortfolioHolding(
         new BigDecimal(value),
-        FinancialInstrumentType.STOCK_CANADA,
+        FinancialInstrumentType.STOCK,
+        Country.CANADA,
         securityIdentifier);
   }
 
-  protected static PortfolioHolding fund(SecurityIdentifier morningstarId, FinancialInstrumentType type, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, morningstarId);
+  protected static PortfolioHolding fund(SecurityIdentifier morningstarId, FinancialInstrumentType type,
+      Country country, String value) {
+    return new PortfolioHolding(new BigDecimal(value), type, country, morningstarId);
   }
 
   protected static PortfolioHolding fundServ(SecurityIdentifier fundservId, String value) {
     return new PortfolioHolding(
         new BigDecimal(value),
-        FinancialInstrumentType.MUTUAL_FUND_CANADA,
+        FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA,
         fundservId);
   }
 

@@ -83,7 +83,7 @@ class FixedIncomeStyleboxExposureMapperTest {
     smsResponse.setBoxValues(List.of(validEntry, nullTypeEntry, nullValueEntry));
 
     FixedIncomeStyleboxExposure result = mapper.map(smsResponse, createHolding("TEST.ID",
-        FinancialInstrumentType.ETF_CANADA));
+        FinancialInstrumentType.ETF));
 
     assertThat(result.getBoxValues()).hasSize(1);
     assertThat(result.getBoxValues()).containsKey(FixedIncomeStyleBoxType.LOW_LIMITED);

@@ -204,8 +204,8 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
   }
 
   /**
-   * Rejects holdings whose holdingType is null, a parent / non-leaf category (e.g. {@code FUND}, {@code STOCK}), or a
-   * leaf type the fee calculator doesn't bucket — i.e. anything not in
+   * Rejects holdings whose holdingType is null, a parent / non-leaf category (e.g. {@code FUND}), or a leaf type the
+   * fee calculator doesn't bucket — i.e. anything not in
    * {@link com.fintex.ce.application.constant.HoldingTypeGroup#MER_BEARING_TYPES} ∪
    * {@link com.fintex.ce.application.constant.HoldingTypeGroup#ZERO_MER_TYPES}. Without this guard, an unrecognised
    * leaf type would fall through the resolver with {@code modifiedFee = null} and be silently dropped from both

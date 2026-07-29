@@ -17,6 +17,7 @@ import com.fintex.wm.commons.domain.allocation.RegionDatapoint;
 import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Geography;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
@@ -425,17 +426,17 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   }
 
   protected static PortfolioHolding stock(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.STOCK_US,
+    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.STOCK, Country.USA,
         EquitySecurityIdentifier.builder().id(ticker).idType(FiIdentifierType.TICKER).exchangeId("XNAS").build());
   }
 
   protected static PortfolioHolding etf(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF_US,
+    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.USA,
         EquitySecurityIdentifier.builder().id(ticker).idType(FiIdentifierType.TICKER).exchangeId("XNAS").build());
   }
 
   protected static PortfolioHolding mutualFund(String fundserv) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND_CANADA,
+    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
         new SecurityIdentifier(fundserv, FiIdentifierType.FUNDSERV));
   }
 

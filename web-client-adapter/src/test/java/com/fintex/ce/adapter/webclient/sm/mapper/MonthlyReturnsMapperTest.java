@@ -2,7 +2,10 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.DataProvider;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
@@ -15,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MonthlyReturnsMapperTest {
 
@@ -30,7 +34,7 @@ class MonthlyReturnsMapperTest {
 
     HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-001"));
 
-    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF_CANADA);
+    assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getReturns()).hasSize(2);
     assertThat(result.getReturns().get(LocalDate.of(2025, 1, 31)))
@@ -148,6 +152,19 @@ class MonthlyReturnsMapperTest {
         .isEqualByComparingTo("0.0100");
   }
 
+  @Test
+  void shouldThrowCountryNotSupported_whenCountryHasNoCurrencyMapping() {
+    var smsResponse = new MonthlyReturns();
+    smsResponse.setReturns(List.of());
+    PortfolioHolding ukHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.UNITED_KINGDOM,
+        new SecurityIdentifier("SEC-UK", null));
+
+    assertThatThrownBy(() -> mapper.map(smsResponse, ukHolding))
+        .isInstanceOf(CalculationException.class)
+        .extracting(ex -> ((CalculationException) ex).getErrorCode())
+        .isEqualTo(ErrorCode.COUNTRY_NOT_SUPPORTED);
+  }
+
   private DateBigDecimalValue createDateValue(String date, String value) {
     var dv = new DateBigDecimalValue();
     dv.setDate(date);
@@ -156,6 +173,7 @@ class MonthlyReturnsMapperTest {
   }
 
   private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF_CANADA, new SecurityIdentifier(securityId, null));
+    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
+        new SecurityIdentifier(securityId, null));
   }
 }

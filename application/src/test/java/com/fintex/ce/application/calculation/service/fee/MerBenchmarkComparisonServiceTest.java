@@ -11,6 +11,7 @@ import com.fintex.ce.model.domain.result.fee.MerComparison;
 import com.fintex.ce.model.domain.result.fee.MerComparisonResult;
 import com.fintex.ce.model.dto.command.MerComparisonCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -238,7 +239,8 @@ class MerBenchmarkComparisonServiceTest {
   private static PortfolioHolding fund(String id, String value) {
     return PortfolioHolding.builder()
         .value(value == null ? null : new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND_CANADA)
+        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
+        .country(Country.CANADA)
         .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.FUNDSERV))
         .build();
   }
@@ -246,7 +248,8 @@ class MerBenchmarkComparisonServiceTest {
   private static PortfolioHolding stock(String id, String value) {
     return PortfolioHolding.builder()
         .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.STOCK_CANADA)
+        .holdingType(FinancialInstrumentType.STOCK)
+        .country(Country.CANADA)
         .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
         .build();
   }

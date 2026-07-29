@@ -7,6 +7,7 @@ import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -177,7 +178,7 @@ class CompositeSecurityMasterFetcherTest {
   }
 
   private static PortfolioHolding holding(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF_CANADA,
+    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
         new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
   }
 }

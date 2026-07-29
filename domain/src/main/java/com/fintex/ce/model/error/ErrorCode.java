@@ -7,6 +7,7 @@ import com.fintex.wm.commons.error.HttpStatus;
 import com.fintex.wm.commons.error.Notification;
 import com.fintex.wm.commons.error.Severity;
 
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -890,9 +891,8 @@ public enum ErrorCode {
       Codes.HOLDING_TYPE_NOT_LEAF,
       "The holding %s has unsupported holding type %s; pick a specific subtype",
       "Holding type must be a leaf instrument type, not a parent category",
-      "Use a leaf holding type such as MUTUAL_FUND_CANADA, ETF_CANADA, ETF_US, "
-          + "MUTUAL_FUND_US, HEDGE_FUND_CANADA, SEGREGATED_FUND_CANADA, STOCK_CANADA, "
-          + "STOCK_US, CASH, GIC, POOLED_FUND_CANADA, or FIXED_INCOME",
+      "Use a leaf holding type such as MUTUAL_FUND, ETF, HEDGE_FUND, SEGREGATED_FUND, "
+          + "STOCK, CASH, GIC, POOLED_FUND, or FIXED_INCOME (with an optional country)",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -901,6 +901,15 @@ public enum ErrorCode {
       "Investment date of holding %s must not be older than %s years",
       "Investment date of the GIC holding is older than the allowed limit",
       "Provide an investment date within the allowed range",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  COUNTRY_NOT_SUPPORTED(
+      Codes.COUNTRY_NOT_SUPPORTED,
+      "The holding country %s is not supported",
+      "The holding's country is not supported by the calculation engine (no fee resolution strategy and no currency "
+          + "mapping exist for it)",
+      "Use a supported country (CAD/USD markets: Canada or USA)",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -1130,15 +1139,20 @@ public enum ErrorCode {
 
   private Notification buildNotification(String id, String fieldName, String formattedMessage,
       Map<String, Object> metadata) {
+    Map<String, Object> resolvedMetadata = metadata == null ? new LinkedHashMap<>() : new LinkedHashMap<>(metadata);
+    if (id != null) {
+      resolvedMetadata.putIfAbsent(HOLDING_ID, id);
+    }
     return Notification.builder()
-        .uuid(id == null ? UUID.randomUUID().toString() : id)
+        .uuid(UUID.randomUUID().toString())
         .code(code)
         .message(formattedMessage)
         .description(description)
         .action(action)
         .severity(severity)
         .fieldName(fieldName)
-        .metadata(metadata == null ? new LinkedHashMap<>() : metadata)
+        .timestamp(OffsetDateTime.now())
+        .metadata(resolvedMetadata)
         .build();
   }
 
@@ -1277,6 +1291,7 @@ public enum ErrorCode {
     public static final String HOLDING_TYPE_NOT_LEAF = "HLD-004";
     public static final String DUPLICATE_CASH_HOLDING = "HLD-005";
     public static final String DUPLICATE_GIC_HOLDING = "HLD-006";
+    public static final String COUNTRY_NOT_SUPPORTED = "HLD-007";
 
     // Mutual Fund classification
     public static final String INVALID_SHARE_CLASS = "MF-001";
