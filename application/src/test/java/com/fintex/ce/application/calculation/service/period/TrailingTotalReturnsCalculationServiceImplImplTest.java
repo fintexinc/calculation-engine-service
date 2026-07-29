@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +36,7 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
     var monthlyReturnsService = mock(PortfolioMonthlyReturnsContextProvider.class);
     var treasuryBillsFetcher = mock(TreasuryBillsFetcher.class);
     var service = mock(TrailingTotalReturnsCalculationServiceImpl.class,
-        withSettings().useConstructor(monthlyReturnsService, null, treasuryBillsFetcher, Set.of()));
+        withSettings().useConstructor(monthlyReturnsService, null, treasuryBillsFetcher, new PeriodProperties()));
 
     PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
@@ -58,7 +58,7 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
   void shouldFetchTBills_whenPerforming() {
     var treasuryBillsFetcher = mock(TreasuryBillsFetcher.class);
     var service = mock(TrailingTotalReturnsCalculationServiceImpl.class,
-        withSettings().useConstructor(null, null, treasuryBillsFetcher, Set.of()));
+        withSettings().useConstructor(null, null, treasuryBillsFetcher, new PeriodProperties()));
 
     PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.CAD);
@@ -78,7 +78,7 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
   void shouldThrowTBillSeriesNotAvailable_whenTBillSeriesEmptyForRequestedCurrency() {
     var treasuryBillsFetcher = mock(TreasuryBillsFetcher.class);
     var service = mock(TrailingTotalReturnsCalculationServiceImpl.class,
-        withSettings().useConstructor(null, null, treasuryBillsFetcher, Set.of()));
+        withSettings().useConstructor(null, null, treasuryBillsFetcher, new PeriodProperties()));
 
     PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.EUR);

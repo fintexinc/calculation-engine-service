@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWO_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +51,7 @@ class InformationRatioCalculationTest {
     var portfolioTotalReturn = monthlyReturns(LocalDate.parse("2024-01-31"), 100, BigDecimal.TEN);
     var benchmarkTotalReturn = monthlyReturns(LocalDate.parse("2024-01-31"), 100, BigDecimal.ONE);
     var calculation = new InformationRatioCalculation(benchmarkInput(portfolioTotalReturn, benchmarkTotalReturn),
-        Set.of("12", "24"), trailingTotalReturnsCalculation, trackingErrorCalculation);
+        Set.of(ONE_YR, TWO_YR), trailingTotalReturnsCalculation, trackingErrorCalculation);
 
     when(trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(eq(12), any())).thenReturn(BigDecimal.TEN,
         BigDecimal.valueOf(4));
@@ -67,7 +69,7 @@ class InformationRatioCalculationTest {
     var portfolioTotalReturn = monthlyReturns(LocalDate.parse("2024-01-31"), 12, BigDecimal.TEN);
     var benchmarkTotalReturn = monthlyReturns(LocalDate.parse("2024-01-31"), 13, BigDecimal.ONE);
     var calculation = new InformationRatioCalculation(benchmarkInput(portfolioTotalReturn, benchmarkTotalReturn),
-        Set.of("12", "24"), trailingTotalReturnsCalculation, trackingErrorCalculation);
+        Set.of(ONE_YR, TWO_YR), trailingTotalReturnsCalculation, trackingErrorCalculation);
 
     when(trailingTotalReturnsCalculation.calculatePeriodForNumberOfMonths(eq(12), any())).thenReturn(BigDecimal.TEN);
     when(trackingErrorCalculation.calculatePeriodForNumberOfMonths(anyInt())).thenReturn(BigDecimal.TEN);
@@ -92,7 +94,7 @@ class InformationRatioCalculationTest {
     var input = mock(BenchmarkPeriodCalculationInput.class);
     var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12"),
+    var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of(ONE_YR),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     var portfolioTotalReturn = mock(TreeMap.class);
@@ -123,7 +125,7 @@ class InformationRatioCalculationTest {
     TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(LocalDate.parse("2024-02-29"), 12,
         BigDecimal.ONE);
     InformationRatioCalculation calculation = new InformationRatioCalculation(benchmarkInput(portfolioReturns,
-        benchmarkReturns), Set.of("12"), trailingTotalReturnsCalculation, trackingErrorCalculation);
+        benchmarkReturns), Set.of(ONE_YR), trailingTotalReturnsCalculation, trackingErrorCalculation);
 
     assertThatThrownBy(() -> calculation.calculatePeriodForNumberOfMonths(12))
         .isInstanceOfSatisfying(CalculationException.class,
@@ -136,8 +138,8 @@ class InformationRatioCalculationTest {
     var input = mock(BenchmarkPeriodCalculationInput.class);
     var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12",
-        "24"),
+    var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of(ONE_YR,
+        TWO_YR),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     var portfolioTotalReturn = mock(TreeMap.class);
@@ -159,8 +161,8 @@ class InformationRatioCalculationTest {
     var input = mock(BenchmarkPeriodCalculationInput.class);
     var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12",
-        "24"),
+    var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of(ONE_YR,
+        TWO_YR),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     var portfolioTotalReturn = mock(TreeMap.class);
@@ -182,8 +184,8 @@ class InformationRatioCalculationTest {
     var input = mock(BenchmarkPeriodCalculationInput.class);
     var trailingTotalReturnsCalculation = mock(TrailingTotalReturnsCalculation.class);
     var trackingErrorCalculation = mock(TrackingErrorCalculation.class);
-    var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of("12",
-        "24"),
+    var calculation = mock(InformationRatioCalculation.class, withSettings().useConstructor(input, Set.of(ONE_YR,
+        TWO_YR),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
     Set<Pair<String, BigDecimal>> periodAndInformationRatio = mock(Set.class);

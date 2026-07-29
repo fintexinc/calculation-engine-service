@@ -82,6 +82,7 @@ import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxType;
@@ -286,7 +287,7 @@ class CalculationTestDataProvider {
     PeriodCommand cmd = new PeriodCommand();
     cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setCurrency(Currency.CAD);
-    cmd.setPeriods(Set.of("12M", "36M"));
+    cmd.setPeriods(Set.of(TimePeriod.ONE_YR, TimePeriod.THREE_YR));
     return cmd;
   }
 
@@ -294,8 +295,8 @@ class CalculationTestDataProvider {
     RollingCalculationCommand cmd = new RollingCalculationCommand();
     cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setCurrency(Currency.CAD);
-    cmd.setPeriods(Set.of("12M"));
-    cmd.setRollingPeriods(Set.of("12M"));
+    cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
+    cmd.setRollingPeriods(Set.of(TimePeriod.ONE_YR));
     return cmd;
   }
 
@@ -304,8 +305,8 @@ class CalculationTestDataProvider {
     cmd.setHoldings(List.of(DUMMY_HOLDING));
     cmd.setBenchmarkHoldings(List.of(DUMMY_HOLDING));
     cmd.setCurrency(Currency.CAD);
-    cmd.setPeriods(Set.of("12M"));
-    cmd.setRollingPeriods(Set.of("12M"));
+    cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
+    cmd.setRollingPeriods(Set.of(TimePeriod.ONE_YR));
     return cmd;
   }
 

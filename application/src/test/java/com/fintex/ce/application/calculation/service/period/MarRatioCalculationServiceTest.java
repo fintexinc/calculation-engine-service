@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
@@ -30,7 +31,8 @@ class MarRatioCalculationServiceTest {
 
   private MarRatioCalculationService mockService(MaxDrawdownService maxDrawdownService) {
     return mock(MarRatioCalculationService.class, withSettings()
-        .useConstructor(mock(PortfolioMonthlyReturnsContextProvider.class), null, Set.of(), maxDrawdownService));
+        .useConstructor(mock(PortfolioMonthlyReturnsContextProvider.class), null, new PeriodProperties(),
+            maxDrawdownService));
   }
 
   @Test

@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -20,7 +21,7 @@ import static java.math.BigDecimal.ONE;
 public class LeadingTotalReturnsCalculation extends PeriodCalculationAbstract<LeadingTotalReturnsResult, BigDecimal> {
 
   public LeadingTotalReturnsCalculation(final PeriodCalculationInput context,
-      final Set<String> defaultPeriods) {
+      final Set<TimePeriod> defaultPeriods) {
     super(context, defaultPeriods);
   }
 

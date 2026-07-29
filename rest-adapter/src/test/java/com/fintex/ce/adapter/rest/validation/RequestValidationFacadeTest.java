@@ -54,8 +54,8 @@ class RequestValidationFacadeTest {
     when(validator1.supportedMetrics()).thenReturn(List.of(CalculationMetric.TRAILING_TOTAL_RETURNS));
     when(validator2.supportedMetrics()).thenReturn(List.of(CalculationMetric.TRAILING_TOTAL_RETURNS));
 
-    ValidationException error1 = ErrorCode.TIME_INTERVAL_PERIOD_LESS_THAN_12.toValidationException();
-    ValidationException error2 = ErrorCode.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE.toValidationException();
+    ValidationException error1 = ErrorCode.TIME_INTERVAL_PERIOD_NOT_POSITIVE.toValidationException();
+    ValidationException error2 = ErrorCode.REQUEST_CONTAINS_CUSTOM_INTERVAL_PSD.toValidationException();
     doThrow(error1).when(validator1).validate(any());
     doThrow(error2).when(validator2).validate(any());
 

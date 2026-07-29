@@ -3,6 +3,7 @@ package com.fintex.ce.application.calculation.service.period;
 import com.fintex.ce.application.calculation.metric.BetaCalculation;
 import com.fintex.ce.application.calculation.metric.TreynorRatioCalculation;
 import com.fintex.ce.application.calculation.service.period.core.BenchmarkWeightedAverageWithCpedAbstractService;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.application.returns.pipeline.BenchmarkWeightedAverageWithCpedPipeline;
@@ -16,12 +17,9 @@ import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
-import java.util.Set;
 
 import static com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract.calculateExcessReturn;
 
@@ -41,9 +39,9 @@ public class TreynorRatioServiceImpl
       PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
       BenchmarkWeightedAverageWithCpedPipeline benchmarkWeightedAverageWithCped,
       TreasuryBillsFetcher treasuryBillsFetcher,
-      @Value("#{'${default.periods.risk-calculations}'.split(',')}") Set<String> defaultPeriods) {
+      PeriodProperties periods) {
     super(portfolioMonthlyReturnsContextProvider, benchmarkMonthlyReturnsContextProvider,
-        portfolioWeightedAverageWithCped, benchmarkWeightedAverageWithCped, defaultPeriods);
+        portfolioWeightedAverageWithCped, benchmarkWeightedAverageWithCped, periods.getRiskCalculations());
     this.treasuryBillsFetcher = treasuryBillsFetcher;
   }
 

@@ -6,7 +6,8 @@ import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqV
 import com.fintex.ce.adapter.rest.validation.validators.HoldingReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidationProperties;
 import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator;
-import com.fintex.ce.adapter.rest.validation.validators.PeriodReqValidator;
+import com.fintex.ce.adapter.rest.validation.validators.TrailingPeriodsReqValidator;
+import com.fintex.ce.adapter.rest.validation.validators.TwelveMonthMinimumPeriodsReqValidator;
 import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.calculation.CalculationOrchestrator;
@@ -29,6 +30,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -359,7 +361,8 @@ class PortfolioCalculationControllerTest {
           .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
       List<RequestValidator> validators = List.of(
-          new PeriodReqValidator(),
+          new TwelveMonthMinimumPeriodsReqValidator(),
+          new TrailingPeriodsReqValidator(),
           new CipsdGreaterThanCpedReqValidator(),
           new HoldingReqValidator(new HoldingsValidator(new HoldingsValidationProperties())));
       var facade = new RequestValidationFacade(validators);
@@ -389,13 +392,32 @@ class PortfolioCalculationControllerTest {
           .build();
     }
 
+    /**
+     * Posted as raw JSON on purpose: a period is now a typed enum, so an unusable value cannot be put on the command
+     * object at all and this rejection has moved into deserialization. Raw JSON is the only way to exercise the path a
+     * real caller would take.
+     */
     @Test
-    void shouldReturnBadRequest_whenPeriodIsInvalid() throws Exception {
+    void shouldReturnBadRequest_whenPeriodIsNotAKnownPeriod() throws Exception {
+      String body = """
+          {"metric":"STANDARD_DEVIATION","currency":"CAD","holdings":[],
+           "timeIntervalPeriods":["INVALID_PERIOD"]}""";
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/standard-deviation")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(body))
+          .andExpect(status().isBadRequest());
+    }
+
+    /** A real period, but shorter than the twelve months a standard deviation needs — rejected by the subset check. */
+    @Test
+    void shouldReturnBadRequest_whenPeriodIsTooShortForTheMetric() throws Exception {
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.STANDARD_DEVIATION);
       cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of("INVALID_PERIOD"));
+      cmd.setPeriods(Set.of(TimePeriod.SIX_MTH));
 
       validatingMockMvc.perform(
           post(BASE_PATH + "/standard-deviation")
@@ -410,7 +432,7 @@ class PortfolioCalculationControllerTest {
       cmd.setMetric(CalculationMetric.SHARPE_RATIO);
       cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of("12"));
+      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       cmd.setCustomIntervalPsd(LocalDate.of(2025, 12, 31));
       cmd.setCustomPed(LocalDate.of(2024, 1, 31));
 
@@ -431,7 +453,7 @@ class PortfolioCalculationControllerTest {
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.TRAILING_TOTAL_RETURNS);
       cmd.setCurrency(Currency.CAD);
-      cmd.setPeriods(Set.of("12"));
+      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       cmd.setHoldings(List.of(cashHolding));
 
       validatingMockMvc.perform(
@@ -466,7 +488,7 @@ class PortfolioCalculationControllerTest {
       cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of("12"));
+      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       cmd.setCustomNumberOfBins(4);
 
       validatingMockMvc.perform(
@@ -484,7 +506,7 @@ class PortfolioCalculationControllerTest {
       cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       cmd.setCurrency(Currency.CAD);
       cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of("12"));
+      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       cmd.setCustomNumberOfBins(31);
 
       validatingMockMvc.perform(
@@ -568,7 +590,7 @@ class PortfolioCalculationControllerTest {
       lowerBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       lowerBoundCmd.setCurrency(Currency.CAD);
       lowerBoundCmd.setHoldings(List.of(dummyHolding()));
-      lowerBoundCmd.setPeriods(Set.of("12"));
+      lowerBoundCmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       lowerBoundCmd.setCustomNumberOfBins(5);
 
       validatingMockMvc.perform(
@@ -581,7 +603,7 @@ class PortfolioCalculationControllerTest {
       upperBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       upperBoundCmd.setCurrency(Currency.CAD);
       upperBoundCmd.setHoldings(List.of(dummyHolding()));
-      upperBoundCmd.setPeriods(Set.of("12"));
+      upperBoundCmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       upperBoundCmd.setCustomNumberOfBins(30);
 
       validatingMockMvc.perform(
@@ -602,7 +624,7 @@ class PortfolioCalculationControllerTest {
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.SHARPE_RATIO);
       cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of("12"));
+      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
 
       validatingMockMvc.perform(
           post(BASE_PATH + "/sharpe-ratio")
@@ -633,7 +655,7 @@ class PortfolioCalculationControllerTest {
       DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
       cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of("12"));
+      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       cmd.setCustomNumberOfBins(999);
 
       validatingMockMvc.perform(

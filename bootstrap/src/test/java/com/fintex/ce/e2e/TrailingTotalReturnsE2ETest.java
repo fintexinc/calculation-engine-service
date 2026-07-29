@@ -11,6 +11,7 @@ import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -39,6 +40,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_MTH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
@@ -94,12 +99,12 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String requestBodyForSmsUnavailableScenario() {
-    return writeJson(periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
+    return writeJson(periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
   }
 
   @Override
   protected String requestBodyForPositiveSmsScenario() {
-    return writeJson(periodCommand(Set.of("1", "3", "6", "12"), LocalDate.parse("2024-12-31"),
+    return writeJson(periodCommand(Set.of(ONE_MTH, THREE_MTH, SIX_MTH, ONE_YR), LocalDate.parse("2024-12-31"),
         richPortfolioHoldings()));
   }
 
@@ -125,7 +130,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String requestBodyForMismatchedMetricScenario() {
-    return writeJson(periodCommand(CalculationMetric.SHARPE_RATIO, Set.of("12"), null,
+    return writeJson(periodCommand(CalculationMetric.SHARPE_RATIO, Set.of(ONE_YR), null,
         richPortfolioHoldings()));
   }
 
@@ -137,19 +142,19 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
     assertThat(result.getTrailingTotalReturn()).hasSize(4);
 
-    assertThat(findPeriod(result, "1").value())
+    assertThat(findPeriod(result, ONE_MTH.name()).value())
         .isCloseTo(new BigDecimal("0.0176198704"), within(TOLERANCE));
-    assertThat(findPeriod(result, "3").value())
+    assertThat(findPeriod(result, THREE_MTH.name()).value())
         .isCloseTo(new BigDecimal("0.0475271907"), within(TOLERANCE));
-    assertThat(findPeriod(result, "6").value())
+    assertThat(findPeriod(result, SIX_MTH.name()).value())
         .isCloseTo(new BigDecimal("0.0832827785"), within(TOLERANCE));
-    assertThat(findPeriod(result, "12").value())
+    assertThat(findPeriod(result, ONE_YR.name()).value())
         .isCloseTo(new BigDecimal("0.1503798415"), within(TOLERANCE));
   }
 
   @Test
   void shouldReturnBadRequest_whenHoldingsListIsEmpty() {
-    PeriodCommand command = periodCommand(Set.of("12"), null, List.of());
+    PeriodCommand command = periodCommand(Set.of(ONE_YR), null, List.of());
 
     Notification error = assertValidationError(postCalculation(writeJson(command)),
         ErrorCode.FIELD_NOT_EMPTY.getCode(), "holdings");
@@ -159,7 +164,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnBadRequest_whenHoldingTypeIsMissing() {
-    PeriodCommand command = periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"),
+    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"),
         List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
     ObjectNode body = (ObjectNode) parseJson(writeJson(command));
     ((ObjectNode) body.get("holdings").get(0)).remove("holdingType");
@@ -176,7 +181,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     enqueueSmsMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
         "0.0035")))));
 
-    PeriodCommand command = periodCommand(Set.of("1"), LocalDate.parse("2024-12-31"),
+    PeriodCommand command = periodCommand(Set.of(ONE_MTH), LocalDate.parse("2024-12-31"),
         List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
     HttpResponse response = postCalculation(writeJson(command));
 
@@ -186,7 +191,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 12, 31));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
     assertThat(result.getTrailingTotalReturn()).hasSize(1);
-    assertThat(findPeriod(result, "1").value())
+    assertThat(findPeriod(result, ONE_MTH.name()).value())
         .isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
   }
 
@@ -195,7 +200,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     enqueueSmsMockResponse(smsPositiveResponseBody());
     enqueueSmsMockResponse(writeJson(List.<DateRateValue>of()));
 
-    PeriodCommand command = periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
+    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
     HttpResponse response = postCalculation(writeJson(command));
 
     Notification error = assertValidationError(response, ErrorCode.Codes.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, null);
@@ -236,12 +241,12 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         .orElseThrow(() -> new AssertionError("Missing period " + period));
   }
 
-  private static PeriodCommand periodCommand(Set<String> periods, LocalDate customPed,
+  private static PeriodCommand periodCommand(Set<TimePeriod> periods, LocalDate customPed,
       List<PortfolioHolding> holdings) {
     return periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS, periods, customPed, holdings);
   }
 
-  private static PeriodCommand periodCommand(CalculationMetric metric, Set<String> periods, LocalDate customPed,
+  private static PeriodCommand periodCommand(CalculationMetric metric, Set<TimePeriod> periods, LocalDate customPed,
       List<PortfolioHolding> holdings) {
     PeriodCommand command = new PeriodCommand();
     command.setMetric(metric);

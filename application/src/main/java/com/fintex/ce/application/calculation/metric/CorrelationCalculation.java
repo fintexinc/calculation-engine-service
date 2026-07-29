@@ -8,6 +8,7 @@ import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
 import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.springframework.util.CollectionUtils;
 
@@ -41,7 +42,7 @@ public class CorrelationCalculation
 
   public CorrelationCalculation(final PeriodCalculationInput context,
       final Map<PortfolioHolding, Map<LocalDate, BigDecimal>> portfolioBaseTotalReturn,
-      final Set<String> defaultPeriods) {
+      final Set<TimePeriod> defaultPeriods) {
     super(context, defaultPeriods);
     this.portfolioBaseTotalReturn = portfolioBaseTotalReturn;
   }

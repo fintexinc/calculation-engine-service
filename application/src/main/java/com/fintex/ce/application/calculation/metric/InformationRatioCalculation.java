@@ -6,6 +6,7 @@ import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationIn
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -23,7 +24,7 @@ public class InformationRatioCalculation
   private final TrackingErrorCalculation trackingErrorCalculation;
 
   public InformationRatioCalculation(final BenchmarkPeriodCalculationInput input,
-      final Set<String> defaultPeriods,
+      final Set<TimePeriod> defaultPeriods,
       final TrailingTotalReturnsCalculation trailingTotalReturnsCalculation,
       final TrackingErrorCalculation trackingErrorCalculation) {
     super(input, defaultPeriods);

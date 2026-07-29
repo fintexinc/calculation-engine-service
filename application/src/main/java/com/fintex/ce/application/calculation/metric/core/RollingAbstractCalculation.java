@@ -4,6 +4,7 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -24,7 +25,7 @@ public abstract class RollingAbstractCalculation<T extends PeriodResult>
       PeriodCalculationAbstract<T, NavigableMap<LocalDate, BigDecimal>> {
 
   protected RollingAbstractCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods) {
+      final Set<TimePeriod> defaultPeriods) {
     super(input, defaultPeriods);
   }
 

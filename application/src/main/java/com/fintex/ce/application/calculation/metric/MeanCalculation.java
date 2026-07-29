@@ -5,6 +5,7 @@ import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.returns.MeanResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -29,13 +30,13 @@ public class MeanCalculation<T extends PeriodResult> extends PeriodCalculationAb
   private int scale = INTERNAL_SCALE;
 
   public MeanCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods) {
+      final Set<TimePeriod> defaultPeriods) {
     super(input, defaultPeriods);
   }
 
   @Builder
   public MeanCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods,
+      final Set<TimePeriod> defaultPeriods,
       final Integer scale) {
     super(input, defaultPeriods);
     this.scale = Optional.ofNullable(scale).orElse(INTERNAL_SCALE);

@@ -2,6 +2,7 @@ package com.fintex.ce.application.calculation.metric.core;
 
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,7 +30,7 @@ public abstract class UpDownSideCalculationAbstract<T extends PeriodResult>
   public NavigableMap<LocalDate, BigDecimal> portfolioDetermination;
   public NavigableMap<LocalDate, BigDecimal> benchmarkDetermination;
 
-  protected UpDownSideCalculationAbstract(BenchmarkPeriodCalculationInput input, Set<String> periods) {
+  protected UpDownSideCalculationAbstract(BenchmarkPeriodCalculationInput input, Set<TimePeriod> periods) {
     super(input, periods);
     portfolioDetermination = getPortfolioDetermination();
     benchmarkDetermination = getBenchmarkDetermination(portfolioDetermination);

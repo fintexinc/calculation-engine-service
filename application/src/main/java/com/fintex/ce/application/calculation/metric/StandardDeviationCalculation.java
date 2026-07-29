@@ -6,6 +6,7 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -34,13 +35,13 @@ public class StandardDeviationCalculation<T extends PeriodResult> extends Period
   private int scale = INTERNAL_SCALE;
 
   public StandardDeviationCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods) {
+      final Set<TimePeriod> defaultPeriods) {
     super(input, defaultPeriods);
   }
 
   @Builder
   public StandardDeviationCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods,
+      final Set<TimePeriod> defaultPeriods,
       final Integer scale) {
     super(input, defaultPeriods);
     this.scale = Optional.ofNullable(scale).orElse(INTERNAL_SCALE);

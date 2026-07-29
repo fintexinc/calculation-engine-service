@@ -14,6 +14,7 @@ import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.PceExceptionCollector;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -35,7 +36,7 @@ public abstract class BenchmarkWeightedAverageWithCpedAbstractService<C extends 
       BenchmarkMonthlyReturnsContextProvider benchmarkMonthlyReturnsContextProvider,
       PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
       BenchmarkWeightedAverageWithCpedPipeline benchmarkWeightedAverageWithCped,
-      Set<String> defaultPeriods) {
+      Set<TimePeriod> defaultPeriods) {
     super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCped, defaultPeriods);
     this.benchmarkMonthlyReturnsContextProvider = benchmarkMonthlyReturnsContextProvider;
     this.benchmarkWeightedAverageWithCped = benchmarkWeightedAverageWithCped;

@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -23,18 +24,18 @@ public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<T
   private final boolean requireTBillsCoverage;
   private final NavigableMap<LocalDate, BigDecimal> tBills;
 
-  public static TrailingTotalReturnsCalculation mathOnly(PeriodCalculationInput input, Set<String> defaultPeriods) {
+  public static TrailingTotalReturnsCalculation mathOnly(PeriodCalculationInput input, Set<TimePeriod> defaultPeriods) {
     return new TrailingTotalReturnsCalculation(input, defaultPeriods, null, false);
   }
 
   public static TrailingTotalReturnsCalculation withTBillPrecondition(PeriodCalculationInput input,
-      Set<String> defaultPeriods,
+      Set<TimePeriod> defaultPeriods,
       NavigableMap<LocalDate, BigDecimal> tBills) {
     return new TrailingTotalReturnsCalculation(input, defaultPeriods, tBills, true);
   }
 
   private TrailingTotalReturnsCalculation(PeriodCalculationInput input,
-      Set<String> defaultPeriods,
+      Set<TimePeriod> defaultPeriods,
       NavigableMap<LocalDate, BigDecimal> tBills,
       boolean requireTBillsCoverage) {
     super(input, defaultPeriods);

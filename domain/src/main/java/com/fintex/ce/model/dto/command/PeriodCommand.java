@@ -1,6 +1,7 @@
 package com.fintex.ce.model.dto.command;
 
 import com.fintex.ce.model.dto.command.contract.CustomPedProvider;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,5 +25,5 @@ public class PeriodCommand extends PortfolioBenchmarkCommand implements CustomPe
   private LocalDate customPed;
   @Schema(description = "Time interval periods in months", example = "[\"1\", \"3\", \"12\", \"36\", \"60\"]")
   @JsonProperty("timeIntervalPeriods")
-  private Set<String> periods;
+  private Set<TimePeriod> periods;
 }

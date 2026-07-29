@@ -5,6 +5,7 @@ import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -30,7 +31,7 @@ public class DownsideDeviationCalculation<T extends PeriodResult> extends Period
   public NavigableMap<LocalDate, BigDecimal> portfolioExcessReturn;
 
   public DownsideDeviationCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods,
+      final Set<TimePeriod> defaultPeriods,
       final NavigableMap<LocalDate, BigDecimal> tBills) {
     super(input, defaultPeriods);
     this.tBills = restrictTBillsRange(tBills);

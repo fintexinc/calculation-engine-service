@@ -41,6 +41,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -206,7 +207,7 @@ class BenchmarkWeightedAverageAlignmentTest {
         PortfolioWeightedAverageWithCpedPipeline portfolioWeightedAverageWithCped,
         BenchmarkWeightedAverageWithCpedPipeline benchmarkWeightedAverageWithCped) {
       super(portfolioMonthlyReturnsContextProvider, benchmarkMonthlyReturnsContextProvider,
-          portfolioWeightedAverageWithCped, benchmarkWeightedAverageWithCped, Set.of("12"));
+          portfolioWeightedAverageWithCped, benchmarkWeightedAverageWithCped, Set.of(ONE_YR));
     }
 
     @Override

@@ -576,22 +576,6 @@ public enum ErrorCode {
   // ============================================
   // TIP-xxx — Time Interval Period errors
   // ============================================
-  TIME_INTERVAL_PERIOD_LESS_THAN_12(
-      Codes.TIME_INTERVAL_PERIOD_LESS_THAN_12,
-      "Time Interval Period must be >=12",
-      "A numeric time interval period below 12 was supplied",
-      "Use time interval periods of 12 or more",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
-  TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE(
-      Codes.TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE,
-      "Time Interval Period must not include Year to Date",
-      "YEAR_TO_DATE is not supported for this metric",
-      "Remove YEAR_TO_DATE from the requested periods",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
   TIME_INTERVAL_PERIOD_NOT_POSITIVE(
       Codes.TIME_INTERVAL_PERIOD_NOT_POSITIVE,
       "Time Interval Period can not be zero or negative value",
@@ -624,35 +608,11 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
-  TIME_INTERVAL_PERIOD_CONTAINS_SINCE_PSD(
-      Codes.TIME_INTERVAL_PERIOD_CONTAINS_SINCE_PSD,
-      "Time Interval Period must not include Since Performance Start Date",
-      "SINCE_PERFORMANCE_START_DATE is not supported for this metric",
-      "Remove SINCE_PERFORMANCE_START_DATE from the requested periods",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
-  TIME_INTERVAL_PERIOD_CONTAINS_SINCE_CIPSD(
-      Codes.TIME_INTERVAL_PERIOD_CONTAINS_SINCE_CIPSD,
-      "Time Interval Period must not include Since Custom Interval Performance Start Date",
-      "SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE is not supported for this metric",
-      "Remove SINCE_CUSTOM_INTERVAL_PERFORMANCE_START_DATE from the requested periods",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
-  ROLLING_INTERVAL_LESS_THAN_12(
-      Codes.ROLLING_INTERVAL_LESS_THAN_12,
-      "Rolling Period Interval must be greater or equal than 12.",
-      "Rolling period interval below 12 was supplied",
-      "Use rolling period intervals of 12 or more",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
-  ROLLING_TIME_INTERVAL_NOT_POSITIVE(
-      Codes.ROLLING_TIME_INTERVAL_NOT_POSITIVE,
-      "Time interval periods for rolling periods must be greater than 0",
-      "A non-positive rolling time interval period was supplied",
-      "Use positive integer values for rolling time interval periods",
+  TIME_INTERVAL_PERIOD_NOT_SUPPORTED(
+      Codes.TIME_INTERVAL_PERIOD_NOT_SUPPORTED,
+      "Time interval period '%s' is not supported. Supported periods: %s",
+      "The supplied time interval period is not one this service declares support for",
+      "Use one of the supported time interval periods, or its length in whole months",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
@@ -1239,17 +1199,13 @@ public enum ErrorCode {
     public static final String CIPSD_AFTER_CPED = "PFD-012";
     public static final String CPSD_NOT_MONTH_END = "PFD-013";
 
-    // Time Interval Periods
-    public static final String TIME_INTERVAL_PERIOD_LESS_THAN_12 = "TIP-001";
-    public static final String TIME_INTERVAL_PERIOD_CONTAINS_YEAR_TO_DATE = "TIP-002";
+    // Time Interval Periods. TIP-001, -002 and -007 to -010 were the per-rule period rejections that
+    // TIME_INTERVAL_PERIOD_NOT_SUPPORTED now covers on its own; the numbers are left unused rather than reassigned.
     public static final String TIME_INTERVAL_PERIOD_NOT_POSITIVE = "TIP-003";
     public static final String TIME_INTERVAL_PERIOD_NOT_ALLOWED = "TIP-004";
     public static final String REQUEST_CONTAINS_CUSTOM_INTERVAL_PSD = "TIP-005";
     public static final String REQUEST_CONTAINS_CUSTOM_PED = "TIP-006";
-    public static final String TIME_INTERVAL_PERIOD_CONTAINS_SINCE_PSD = "TIP-007";
-    public static final String TIME_INTERVAL_PERIOD_CONTAINS_SINCE_CIPSD = "TIP-008";
-    public static final String ROLLING_INTERVAL_LESS_THAN_12 = "TIP-009";
-    public static final String ROLLING_TIME_INTERVAL_NOT_POSITIVE = "TIP-010";
+    public static final String TIME_INTERVAL_PERIOD_NOT_SUPPORTED = "TIP-011";
 
     // Calculation metric request
     public static final String UNSUPPORTED_METRIC = "MET-001";

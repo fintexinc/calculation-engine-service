@@ -1,6 +1,7 @@
 package com.fintex.ce.application.calculation.service.period;
 
 import com.fintex.ce.application.calculation.metric.SharpeRatioCalculation;
+import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
@@ -33,7 +34,7 @@ class SharpeRatioCalculationServiceImplTest {
   void shouldPerform_whenVerifyBuildPeriodCalculationInput() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, null, tBillsFetcher, null));
+        .useConstructor(null, null, tBillsFetcher, new PeriodProperties()));
 
     final var weightedAverageInput = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
@@ -56,7 +57,7 @@ class SharpeRatioCalculationServiceImplTest {
   void shouldPerform_whenVerifyLoadTBillsFor() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, null, tBillsFetcher, null));
+        .useConstructor(null, null, tBillsFetcher, new PeriodProperties()));
 
     final var context = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);
@@ -79,7 +80,7 @@ class SharpeRatioCalculationServiceImplTest {
   void shouldThrowTBillSeriesNotAvailable_whenTBillSeriesEmptyForRequestedCurrency() {
     final var tBillsFetcher = mock(TreasuryBillsFetcher.class);
     final var service = mock(SharpeRatioCalculationServiceImpl.class, withSettings()
-        .useConstructor(null, null, tBillsFetcher, null));
+        .useConstructor(null, null, tBillsFetcher, new PeriodProperties()));
 
     final var context = mock(PeriodCalculationInput.class);
     final PeriodCommand req = mock(PeriodCommand.class);

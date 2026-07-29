@@ -4,6 +4,7 @@ import com.fintex.ce.application.calculation.metric.core.RollingAbstractCalculat
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -20,7 +21,7 @@ public class RollingCorrelationCalculation extends RollingAbstractCalculation<Ro
   private final NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns;
 
   public RollingCorrelationCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods,
+      final Set<TimePeriod> defaultPeriods,
       final CorrelationCalculation correlationCalculation,
       final NavigableMap<LocalDate, BigDecimal> benchmarkTotalReturns) {
     super(input, defaultPeriods);

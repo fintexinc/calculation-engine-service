@@ -11,6 +11,7 @@ import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
@@ -93,12 +95,12 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String requestBodyForSmsUnavailableScenario() {
-    return writeJson(periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
+    return writeJson(periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
   }
 
   @Override
   protected String requestBodyForPositiveSmsScenario() {
-    return writeJson(periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
+    return writeJson(periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
   }
 
   @Override
@@ -125,7 +127,7 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String requestBodyForMismatchedMetricScenario() {
-    return writeJson(periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS, Set.of("12"), null,
+    return writeJson(periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS, Set.of(ONE_YR), null,
         richPortfolioHoldings()));
   }
 
@@ -136,7 +138,7 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 1, 31));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
     assertThat(result.getSharpeRatio()).hasSize(1);
-    assertThat(findPeriod(result, "12").value())
+    assertThat(findPeriod(result, ONE_YR.name()).value())
         .isCloseTo(new BigDecimal("3.0056605434"), within(TOLERANCE));
   }
 
@@ -145,7 +147,7 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
     enqueueSmsMockResponse(smsPositiveResponseBody());
     enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024WithGapIn("2024-07-31")));
 
-    PeriodCommand command = periodCommand(Set.of("12"), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
+    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
     HttpResponse response = postCalculation(writeJson(command));
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -177,12 +179,12 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
         holding(VANGUARD_ISIN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "9800.00"));
   }
 
-  private static PeriodCommand periodCommand(Set<String> periods, LocalDate customPed,
+  private static PeriodCommand periodCommand(Set<TimePeriod> periods, LocalDate customPed,
       List<PortfolioHolding> holdings) {
     return periodCommand(CalculationMetric.SHARPE_RATIO, periods, customPed, holdings);
   }
 
-  private static PeriodCommand periodCommand(CalculationMetric metric, Set<String> periods, LocalDate customPed,
+  private static PeriodCommand periodCommand(CalculationMetric metric, Set<TimePeriod> periods, LocalDate customPed,
       List<PortfolioHolding> holdings) {
     PeriodCommand command = new PeriodCommand();
     command.setMetric(metric);

@@ -5,6 +5,7 @@ import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -25,7 +26,7 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
   private final BetaCalculation betaCalculation;
 
   public TreynorRatioCalculation(final PeriodCalculationInput input,
-      final Set<String> defaultPeriods,
+      final Set<TimePeriod> defaultPeriods,
       final NavigableMap<LocalDate, BigDecimal> tBills,
       final BetaCalculation betaCalculation) {
     super(input, defaultPeriods);
