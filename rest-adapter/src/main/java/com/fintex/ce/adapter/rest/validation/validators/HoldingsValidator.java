@@ -9,6 +9,7 @@ import com.fintex.ce.util.DateTimeUtils;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.stereotype.Component;
@@ -22,6 +23,8 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
+import static com.fintex.wm.commons.domain.id.FiIdentifierType.TICKER_MIC;
+
 /**
  * Holding-level request validation shared by the portfolio, benchmark and multi-portfolio request validators. Applies
  * structural rules (holding type, country, security identifier), business rules (GIC investment date, cash currency)
@@ -33,14 +36,16 @@ public class HoldingsValidator {
 
   private static final String HOLDING_TYPE_FIELD = "holdingType";
   private static final String USER_FORMATTED_HOLDING_TYPE_FIELD = "Holding Type";
-  private static final String COUNTRY_FIELD = "country";
-  private static final String USER_FORMATTED_COUNTRY_FIELD = "Country";
+  static final String COUNTRY_FIELD = "country";
+  static final String USER_FORMATTED_COUNTRY_FIELD = "Country";
   private static final String SECURITY_IDENTIFIER_FIELD = "securityIdentifier";
   private static final String USER_FORMATTED_SECURITY_IDENTIFIER_FIELD = "Security Identifier";
-  private static final String SECURITY_IDENTIFIER_ID_FIELD = "securityIdentifier.id";
-  private static final String USER_FORMATTED_SECURITY_IDENTIFIER_ID_FIELD = "Security Identifier ID";
+  static final String SECURITY_IDENTIFIER_ID_FIELD = "securityIdentifier.id";
+  static final String USER_FORMATTED_SECURITY_IDENTIFIER_ID_FIELD = "Security Identifier ID";
   private static final String SECURITY_IDENTIFIER_ID_TYPE_FIELD = "securityIdentifier.idType";
   private static final String USER_FORMATTED_SECURITY_IDENTIFIER_ID_TYPE_FIELD = "Security Identifier ID Type";
+  static final String SECURITY_IDENTIFIER_EXCHANGE_ID_FIELD = "securityIdentifier.exchangeId";
+  static final String USER_FORMATTED_SECURITY_IDENTIFIER_EXCHANGE_ID_FIELD = "Security Identifier Exchange ID";
 
   private final HoldingsValidationProperties properties;
 
@@ -131,6 +136,14 @@ public class HoldingsValidator {
       throw ErrorCode.FIELD_NOT_BLANK.toValidationExceptionForField(SECURITY_IDENTIFIER_ID_FIELD,
           USER_FORMATTED_SECURITY_IDENTIFIER_ID_FIELD);
     }
+    if (identifier.getIdType() == TICKER_MIC && isExchangeIdMissing(identifier)) {
+      throw ErrorCode.FIELD_NOT_BLANK.toValidationExceptionForField(SECURITY_IDENTIFIER_EXCHANGE_ID_FIELD,
+          USER_FORMATTED_SECURITY_IDENTIFIER_EXCHANGE_ID_FIELD);
+    }
+  }
+
+  private static boolean isExchangeIdMissing(SecurityIdentifier identifier) {
+    return !(identifier instanceof EquitySecurityIdentifier equity) || StringUtils.isBlank(equity.getExchangeId());
   }
 
   private static void validateGicInvestmentDates(List<PortfolioHolding> holdings) {

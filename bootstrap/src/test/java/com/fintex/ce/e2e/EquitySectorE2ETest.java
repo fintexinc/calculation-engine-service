@@ -4,6 +4,7 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocation;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
@@ -12,10 +13,16 @@ import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrenc
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.error.ErrorResponse;
+import com.fintex.wm.commons.error.Notification;
+
+import org.springframework.http.HttpStatus;
 
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -82,6 +89,39 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
         .filter(Objects::nonNull)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
     assertThat(totalExposure).isEqualByComparingTo(BigDecimal.ONE);
+  }
+
+  @Test
+  void shouldReturnBadRequest_whenTickerMicHoldingMissingExchangeId() {
+    int smsRequestsBefore = smsMockServer.getRequestCount();
+
+    var response = postCalculation(writeJson(tickerMicWithoutExchangeCommand()));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+    ErrorResponse errorResponse = readJson(response.responseBody(), ErrorResponse.class);
+    assertThat(errorResponse.getNotifications()).hasSize(1);
+    Notification notification = errorResponse.getNotifications().getFirst();
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.FIELD_NOT_BLANK.getCode());
+    assertThat(notification.getFieldName()).isEqualTo("securityIdentifier.exchangeId");
+    assertThat(notification.getMessage()).isEqualTo("Security Identifier Exchange ID must not be blank");
+
+    // The malformed body must be rejected locally before any Security Master call is made.
+    assertThat(smsMockServer.getRequestCount()).isEqualTo(smsRequestsBefore);
+  }
+
+  private static PortfolioHoldingsCommand tickerMicWithoutExchangeCommand() {
+    PortfolioHolding stock = new PortfolioHolding(
+        BigDecimal.valueOf(50_000), FinancialInstrumentType.STOCK, Country.CANADA,
+        EquitySecurityIdentifier.builder()
+            .id("CNQ")
+            .idType(FiIdentifierType.TICKER_MIC)
+            .build());
+    return PortfolioHoldingsCommand.builder()
+        .metric(CalculationMetric.EQUITY_SECTOR)
+        .dataProviders(List.of(DataProvider.MORNINGSTAR))
+        .holdings(List.of(stock))
+        .build();
   }
 
   private static PortfolioHoldingsCommand equitySectorCommand(CalculationMetric metric) {
