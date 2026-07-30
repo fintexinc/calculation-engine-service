@@ -48,7 +48,7 @@ public class MERCalculationServiceImpl extends AbstractFeeCalculationService<Ave
   }
 
   @Override
-  protected AverageMerResult calculateAverageValue(List<FeeAggregationMode> modes,
+  protected AverageMerResult calculateAverageValue(AverageMerCommand command, List<FeeAggregationMode> modes,
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
     var result = new AverageMerResult();
     if (modes.contains(FUNDS_ONLY)) {

@@ -91,7 +91,7 @@ public class ManagementFeeCalculationServiceImpl
   }
 
   @Override
-  protected ManagementFeeResult calculateAverageValue(List<FeeAggregationMode> modes,
+  protected ManagementFeeResult calculateAverageValue(AverageMerCommand command, List<FeeAggregationMode> modes,
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
     var result = new ManagementFeeResult();
     if (modes.contains(FUNDS_ONLY)) {

@@ -16,7 +16,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Response for the {@code mer-benchmark-comparison} metric: one {@link MerComparison} per requested aggregation view
+ * Response for the {@code mer-benchmark-comparison} metric: one {@link FeeComparison} per requested aggregation view
  * (funds-only / whole-portfolio / funds-only-strict).
  */
 @SuperBuilder
@@ -25,10 +25,10 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "Response for mer-benchmark-comparison: portfolio MER vs benchmark MER by aggregation view")
+@Schema(description = "Response for mer-benchmark-comparison: portfolio fee rate vs benchmark fee rate, and the projected spend of each, by aggregation view")
 public class MerComparisonResult extends BaseCalculationResult {
 
   @Schema(description = "Comparison by aggregation view (scaled/absolute/forceReportFee)")
   @Builder.Default
-  private Map<FeeAggregationMode, MerComparison> comparison = new EnumMap<>(FeeAggregationMode.class);
+  private Map<FeeAggregationMode, FeeComparison> comparison = new EnumMap<>(FeeAggregationMode.class);
 }

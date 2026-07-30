@@ -11,8 +11,16 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.CIPSD;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.FIVE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SI;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_MTH;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWO_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.YTD;
 
 /**
@@ -23,6 +31,12 @@ import static com.fintex.wm.commons.domain.enumeration.TimePeriod.YTD;
  * request: it carries every period a datapoint can be keyed by, including lengths this service has no use for and
  * length-less members only some metrics can resolve. Admissibility therefore belongs to the contract rather than to the
  * enum — a fee projection cannot answer "year to date", and a rolling window shorter than a year is not a window.
+ *
+ * <p>
+ * Every set here is an unmodifiable {@link EnumSet}, and nothing reads it in order. Membership is the only question
+ * asked of these sets: the order a report shows its periods in comes from {@code PeriodProperties} or from the request,
+ * both of which keep their own insertion order, and the order the error message lists them in comes from an explicit
+ * comparator in {@code AbstractSupportedPeriodsReqValidator}. Neither depends on how a set here iterates.
  *
  * <p>
  * These sets replace what used to be a class per rule — {@code PeriodLessThan12ReqValidator},
@@ -36,6 +50,15 @@ public class SupportedPeriods {
   /** Every period that has a length of its own, i.e. everything except the data- and request-resolved members. */
   public static final Set<TimePeriod> FIXED_LENGTH = unmodifiable(
       Arrays.stream(TimePeriod.values()).filter(TimePeriod::isFixedLength).toList());
+
+  /**
+   * Horizons the fee metrics project spend over. Fixed lengths only, and deliberately the agreed reporting ladder
+   * rather than every length {@link TimePeriod} happens to define: the arithmetic would handle {@code SEVEN_YR}
+   * perfectly well, but nothing asks for it, and every extra column is a column the report has to explain.
+   * {@link TimePeriod#ONE_MTH} is the monthly fee, {@link TimePeriod#ONE_YR} the annual one.
+   */
+  public static final Set<TimePeriod> FEE_PROJECTION = unmodifiable(
+      List.of(ONE_MTH, THREE_MTH, SIX_MTH, ONE_YR, TWO_YR, THREE_YR, FIVE_YR, TEN_YR, TWENTY_YR));
 
   /**
    * Trailing returns, which can look back over a fixed window or over one the data defines. The widest set in the

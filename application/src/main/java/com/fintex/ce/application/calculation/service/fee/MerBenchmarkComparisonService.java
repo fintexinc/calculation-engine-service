@@ -1,5 +1,7 @@
 package com.fintex.ce.application.calculation.service.fee;
 
+import com.fintex.ce.application.config.FeeProjectionProperties;
+import com.fintex.ce.application.util.FeeProjectionUtils;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.calculation.SingleAttributeCalculationService;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
@@ -8,12 +10,16 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
-import com.fintex.ce.model.domain.result.fee.MerComparison;
+import com.fintex.ce.model.domain.result.fee.FeeComparison;
+import com.fintex.ce.model.domain.result.fee.FeeRateComparison;
+import com.fintex.ce.model.domain.result.fee.FeeSpendComparison;
 import com.fintex.ce.model.domain.result.fee.MerComparisonResult;
 import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.dto.command.MerComparisonCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
@@ -21,8 +27,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +42,13 @@ import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
 import static java.math.BigDecimal.ZERO;
 
 /**
- * {@code mer-benchmark-comparison} metric (TMI-543): compares the portfolio's weighted-average MER to the benchmark's,
- * once per requested aggregation view. Both MER numbers are produced by reusing the existing MER pipeline (the
- * {@code mer} calculation service — once for the portfolio, once for the benchmark holdings as a portfolio of their
- * own), so fee resolution, FX handling, and warnings stay consistent with the standalone {@code mer} metric.
+ * {@code mer-benchmark-comparison} metric (TMI-543 / TMI-545): compares the portfolio's weighted-average fee rate to
+ * the benchmark's, once per requested aggregation view, and projects what each side costs over the configured horizons
+ * so the saving from switching can be read straight off the response. Both rates are produced by reusing the existing
+ * MER pipeline (the {@code mer} calculation service — once for the portfolio, once for the benchmark holdings as a
+ * portfolio of their own), so fee resolution, FX handling, and warnings stay consistent with the standalone {@code mer}
+ * metric, and the dollar figures reuse the asset base that pipeline already computed rather than re-summing holding
+ * values.
  */
 @Service
 @RequiredArgsConstructor
@@ -45,7 +56,13 @@ public class MerBenchmarkComparisonService
     implements
       CalculationService<MerComparisonCommand, MerComparisonData, MerComparisonResult> {
 
+  /** The three ways a view can fail to be comparable, as they read in {@code FEE_COMPARISON_NOT_AVAILABLE}. */
+  static final String NO_PORTFOLIO_RATE = "the portfolio has no fee rate for this view";
+  static final String NO_BENCHMARK_RATE = "the benchmark has no fee rate";
+  static final String NO_ASSET_BASE = "the view has no asset base to charge the rates against";
+
   private final SingleAttributeCalculationService<AverageMerCommand, FeeData, AverageMerResult> merCalculationService;
+  private final FeeProjectionProperties projectionProperties;
 
   @Override
   public CalculationMetric getMetric() {
@@ -71,10 +88,11 @@ public class MerBenchmarkComparisonService
 
     BigDecimal benchmarkMer = benchmarkResult.getManagementExpenseRatio().get(FUNDS_ONLY);
 
-    Map<FeeAggregationMode, MerComparison> comparison = new EnumMap<>(FeeAggregationMode.class);
+    Set<TimePeriod> periods = projectionProperties.periodsFor(command.getProjectionPeriods());
+    Map<FeeAggregationMode, FeeComparison> comparison = new EnumMap<>(FeeAggregationMode.class);
     portfolioResult.getManagementExpenseRatio()
         .forEach((mode, portfolioMer) -> comparison.put(mode,
-            compare(portfolioMer, benchmarkMer, portfolioResult.getBaseValue().get(mode))));
+            compare(mode, portfolioMer, benchmarkMer, portfolioResult.getBaseValue().get(mode), periods)));
 
     List<Notification> warnings = new ArrayList<>(portfolioResult.getWarnings());
     warnings.addAll(benchmarkResult.getWarnings());
@@ -136,26 +154,69 @@ public class MerBenchmarkComparisonService
 
   /**
    * @param baseValue
-   *          the FX-converted market-value denominator behind {@code portfolioMer} for this aggregation view (see
+   *          the FX-converted market-value denominator behind {@code portfolioRate} for this aggregation view (see
    *          {@link AverageMerResult#getBaseValue()}). Using the mode's own base — funds-only value for
-   *          {@code FUNDS_ONLY}, whole-portfolio value for {@code WHOLE_PORTFOLIO} — keeps the dollar impact consistent
-   *          with the ratio's asset base and in a single currency.
+   *          {@code FUNDS_ONLY}, whole-portfolio value for {@code WHOLE_PORTFOLIO} — keeps every dollar figure
+   *          consistent with the ratio's asset base and in a single currency.
    */
-  private MerComparison compare(BigDecimal portfolioMer, BigDecimal benchmarkMer, BigDecimal baseValue) {
-    MerComparison.MerComparisonBuilder builder = MerComparison.builder()
-        .portfolioMer(portfolioMer)
-        .benchmarkMer(benchmarkMer);
-    if (portfolioMer == null || benchmarkMer == null) {
-      return builder.equal(false).build();
+  private FeeComparison compare(FeeAggregationMode mode, BigDecimal portfolioRate, BigDecimal benchmarkRate,
+      BigDecimal baseValue, Set<TimePeriod> periods) {
+    require(portfolioRate != null, mode, NO_PORTFOLIO_RATE);
+    require(benchmarkRate != null, mode, NO_BENCHMARK_RATE);
+    require(baseValue != null, mode, NO_ASSET_BASE);
+
+    return FeeComparison.builder()
+        .feeRate(new FeeRateComparison(
+            portfolioRate,
+            benchmarkRate,
+            percentDifference(portfolioRate, benchmarkRate),
+            portfolioRate.compareTo(benchmarkRate) == 0))
+        .spend(project(portfolioRate, benchmarkRate, baseValue, periods))
+        .build();
+  }
+
+  /**
+   * A view that cannot be compared is an error rather than a comparison full of nulls. The caller asked what switching
+   * would save; "the portfolio holds no funds in this view" is an answer they have to act on, not a number they can
+   * read, and a null-filled body leaves them to work out which of the three reasons applied.
+   */
+  private static void require(boolean comparable, FeeAggregationMode mode, String reason) {
+    if (!comparable) {
+      throw ErrorCode.FEE_COMPARISON_NOT_AVAILABLE.toException(mode, reason);
     }
-    builder.equal(portfolioMer.compareTo(benchmarkMer) == 0);
-    if (benchmarkMer.signum() != 0) {
-      builder.percentDifference(
-          toUserScale(divide(portfolioMer.subtract(benchmarkMer), benchmarkMer).multiply(HUNDRED)));
+  }
+
+  /** Undefined when the benchmark charges nothing, since the portfolio's rate would then be infinitely larger. */
+  private static BigDecimal percentDifference(BigDecimal portfolioRate, BigDecimal benchmarkRate) {
+    if (benchmarkRate.signum() == 0) {
+      return null;
     }
-    if (baseValue != null) {
-      builder.annualDollarImpact(toUserScale(benchmarkMer.subtract(portfolioMer).multiply(baseValue)));
+    return toUserScale(divide(portfolioRate.subtract(benchmarkRate), benchmarkRate).multiply(HUNDRED));
+  }
+
+  /**
+   * Turns the two rates into what each side costs over every configured horizon. Both are charged against the same
+   * {@code baseValue}, so the saving is a difference between two amounts drawn from one pool rather than a comparison
+   * of differently-sized portfolios — the whole-portfolio view answers "what if all of this moved into the benchmark
+   * fund", the funds-only view answers the same question about the fund portion alone.
+   */
+  private Map<TimePeriod, FeeSpendComparison> project(BigDecimal portfolioRate, BigDecimal benchmarkRate,
+      BigDecimal baseValue, Set<TimePeriod> periods) {
+    BigDecimal portfolioAnnual = portfolioRate.multiply(baseValue);
+    BigDecimal benchmarkAnnual = benchmarkRate.multiply(baseValue);
+    BigDecimal annualSaving = portfolioAnnual.subtract(benchmarkAnnual);
+    BigDecimal growthRate = projectionProperties.getAnnualGrowthRate();
+
+    Map<TimePeriod, FeeSpendComparison> byPeriod = new LinkedHashMap<>();
+    for (TimePeriod period : periods) {
+      byPeriod.put(period, new FeeSpendComparison(
+          FeeProjectionUtils.spend(portfolioAnnual, growthRate, period),
+          FeeProjectionUtils.spend(benchmarkAnnual, growthRate, period),
+          // Projected from the annual difference rather than subtracting the two rounded spends: the latter rounds
+          // twice and leaves the saving off the exact figure by up to a unit in the last reported place, so a portfolio
+          // charging exactly double the benchmark reported a saving a hair away from the benchmark's own spend.
+          FeeProjectionUtils.spend(annualSaving, growthRate, period)));
     }
-    return builder.build();
+    return byPeriod;
   }
 }
