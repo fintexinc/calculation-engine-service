@@ -53,6 +53,9 @@ Red flags — STOP and investigate the production code instead of the test:
   `instanceof` branch dead, and the tag then reports a fabricated constant (e.g. every failure as `500`).
 - [ ] **[test-quality] Behavior-preserving refactor?** Add a test for the specific pre-existing behavior you intend
   to keep, so a regression turns a test red instead of shipping silently.
+- [ ] **[test-quality] Does each assertion fail when the named behavior is broken?** Trace the exercised path and
+  exclude incidental causes such as deserialization filters, empty defaults, or earlier short-circuits that can make
+  the expected value appear without reaching the behavior under test.
 - [ ] **[test-quality] Asserting an error outcome — a thrown domain exception (unit) OR an HTTP error response
   (e2e `ErrorResponse`/`Notification`)?** Assert the full payload — the error code **and** the
   formatted message **and** the metadata/`param-N` map — not just the code, so a regression that

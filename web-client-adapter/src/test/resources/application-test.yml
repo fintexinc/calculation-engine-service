@@ -8,3 +8,5 @@ external-services:
       timeout: 60000
       endpoints:
         attributes: /api/v1/wealth/securities/attributes
+        reference:
+          treasury-rates: /api/v1/wealth/reference/treasury-rates

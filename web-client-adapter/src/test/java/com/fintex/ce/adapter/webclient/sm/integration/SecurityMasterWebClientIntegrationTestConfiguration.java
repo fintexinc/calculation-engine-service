@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Import;
 @EnableAutoConfiguration
 @Import({SecurityMasterWebClientConfig.class, SecurityAttributeFetcherConfig.class})
 @ComponentScan(basePackages = {"com.fintex.ce.adapter.webclient.sm.client",
+    "com.fintex.ce.adapter.webclient.sm.fetcher",
+    "com.fintex.ce.adapter.webclient.observability",
     "com.fintex.ce.adapter.webclient.sm.mapper"})
 public class SecurityMasterWebClientIntegrationTestConfiguration {
 
