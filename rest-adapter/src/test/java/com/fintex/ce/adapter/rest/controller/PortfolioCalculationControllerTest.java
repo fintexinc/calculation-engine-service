@@ -23,6 +23,7 @@ import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
 import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
@@ -52,6 +53,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.micrometer.observation.ObservationRegistry;
@@ -70,11 +72,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,7 +86,7 @@ class PortfolioCalculationControllerTest {
 
   private MockMvc mockMvc;
   private ObjectMapper objectMapper;
-  private EnumMap<CalculationMetric, CalculationService> mockServices;
+  private EnumMap<CalculationMetric, CalculationService<?, ?, ?>> mockServices;
 
   @BeforeEach
   void setUp() {
@@ -92,7 +96,7 @@ class PortfolioCalculationControllerTest {
 
     mockServices = new EnumMap<>(CalculationMetric.class);
     List<CalculationService<?, ?, ?>> serviceList = Arrays.stream(CalculationMetric.values())
-        .map(this::createMockService)
+        .<CalculationService<?, ?, ?>>map(this::createMockService)
         .toList();
 
     var controller = controller(serviceList, new RequestValidationFacade(List.of()));
@@ -104,13 +108,12 @@ class PortfolioCalculationControllerTest {
 
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("calculationMetricArguments")
-  @SuppressWarnings("unchecked")
   void shouldReturnMappedResponse_whenValidMetricRequested(
       CalculationMetric metric,
       CalculationCommand command,
       Object serviceResult,
       Class<? extends BaseCalculationResult> responseType) throws Exception {
-    lenient().when(mockServices.get(metric).perform(any(), any())).thenReturn((BaseCalculationResult) serviceResult);
+    stubCalculationResult(mockServices.get(metric), (BaseCalculationResult) serviceResult);
 
     command.setMetric(metric);
     String requestBody = objectMapper.writeValueAsString(command);
@@ -185,12 +188,11 @@ class PortfolioCalculationControllerTest {
         .andExpect(status().isUnsupportedMediaType());
   }
 
-  @SuppressWarnings("unchecked")
   private CalculationService<?, ?, ?> createMockService(CalculationMetric metric) {
-    CalculationService mock = mock(CalculationService.class);
+    CalculationService<?, ?, ?> mock = mock(CalculationService.class);
     lenient().when(mock.getMetric()).thenReturn(metric);
     lenient().when(mock.requiredAttributes()).thenReturn(List.of());
-    lenient().when(mock.perform(any(), any())).thenReturn(new BaseCalculationResult() {});
+    stubCalculationResult(mock, new BaseCalculationResult() {});
     mockServices.put(metric, mock);
     return mock;
   }
@@ -212,6 +214,17 @@ class PortfolioCalculationControllerTest {
     beanValidator.afterPropertiesSet();
     return new PortfolioCalculationController(orchestrator, validationFacade,
         new CalculationObservability(ObservationRegistry.create()), beanValidator);
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private static void verifyCalculationPerformed(CalculationService<?, ?, ?> service,
+      org.mockito.ArgumentCaptor<CalculationCommand> commandCaptor) {
+    verify((CalculationService) service).perform(commandCaptor.capture(), any());
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private static void stubCalculationResult(CalculationService<?, ?, ?> service, BaseCalculationResult result) {
+    lenient().when(((CalculationService) service).perform(any(), any())).thenReturn(result);
   }
 
   @Nested
@@ -264,7 +277,7 @@ class PortfolioCalculationControllerTest {
 
       org.mockito.ArgumentCaptor<CalculationCommand> captor = org.mockito.ArgumentCaptor
           .forClass(CalculationCommand.class);
-      verify(mockServices.get(CalculationMetric.SHARPE_RATIO)).perform(captor.capture(), any());
+      verifyCalculationPerformed(mockServices.get(CalculationMetric.SHARPE_RATIO), captor);
       PeriodCommand executed = (PeriodCommand) captor.getValue();
       assertThat(executed.getHoldings())
           .singleElement()
@@ -297,7 +310,7 @@ class PortfolioCalculationControllerTest {
 
       org.mockito.ArgumentCaptor<CalculationCommand> captor = org.mockito.ArgumentCaptor
           .forClass(CalculationCommand.class);
-      verify(mockServices.get(CalculationMetric.SHARPE_RATIO)).perform(captor.capture(), any());
+      verifyCalculationPerformed(mockServices.get(CalculationMetric.SHARPE_RATIO), captor);
       PeriodCommand executed = (PeriodCommand) captor.getValue();
       assertThat(executed.getHoldings())
           .singleElement()
@@ -353,11 +366,13 @@ class PortfolioCalculationControllerTest {
 
     private MockMvc validatingMockMvc;
     private ObjectMapper om;
+    private EnumMap<CalculationMetric, CalculationService<?, ?, ?>> validationServices;
 
     @BeforeEach
     void setUp() {
       om = new ObjectMapper()
           .registerModule(new JavaTimeModule())
+          .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
           .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
       List<RequestValidator> validators = List.of(
@@ -368,8 +383,9 @@ class PortfolioCalculationControllerTest {
       var facade = new RequestValidationFacade(validators);
 
       List<CalculationService<?, ?, ?>> services = new java.util.ArrayList<>();
+      validationServices = new EnumMap<>(CalculationMetric.class);
       for (CalculationMetric m : CalculationMetric.values()) {
-        CalculationService svc = mock(CalculationService.class);
+        CalculationService<?, ?, ?> svc = mock(CalculationService.class);
         lenient().when(svc.getMetric()).thenReturn(m);
         lenient().when(svc.requiredAttributes()).thenReturn(List.of());
         Object result = switch (m) {
@@ -378,8 +394,9 @@ class PortfolioCalculationControllerTest {
             new com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult();
           default -> new BaseCalculationResult() {};
         };
-        lenient().when(svc.perform(any(), any())).thenReturn((BaseCalculationResult) result);
+        stubCalculationResult(svc, (BaseCalculationResult) result);
         services.add(svc);
+        validationServices.put(m, svc);
       }
 
       var controller = controller(services, facade);
@@ -441,6 +458,37 @@ class PortfolioCalculationControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnCipsdOutsideDataRangeError_whenStandardDeviationCipsdIsAfterPortfolioPerformanceEndDate()
+        throws Exception {
+      LocalDate cipsd = LocalDate.of(2025, 10, 31);
+      LocalDate performanceStartDate = LocalDate.of(1998, 5, 31);
+      LocalDate performanceEndDate = LocalDate.of(2025, 9, 30);
+      PeriodCommand command = new PeriodCommand();
+      command.setMetric(CalculationMetric.STANDARD_DEVIATION);
+      command.setCurrency(Currency.CAD);
+      command.setHoldings(List.of(dummyHolding()));
+      command.setPeriods(Set.of(TimePeriod.ONE_YR));
+      command.setCustomIntervalPsd(cipsd);
+      doThrow(ErrorCode.CIPSD_OUTSIDE_DATA_RANGE_ERROR.toException(cipsd, performanceStartDate, performanceEndDate))
+          .when(validationServices.get(CalculationMetric.STANDARD_DEVIATION)).perform(any(), any());
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/standard-deviation")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(command)))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.notifications[0].code").value("RET-016"))
+          .andExpect(jsonPath("$.notifications[0].severity").value("ERROR"))
+          .andExpect(jsonPath("$.notifications[0].message").value(
+              "CIPSD 2025-10-31 is outside the available monthly returns range [1998-05-31, 2025-09-30]"))
+          .andExpect(jsonPath("$.notifications[0].metadata['param-1']").value("2025-10-31"))
+          .andExpect(jsonPath("$.notifications[0].metadata['param-2']").value("1998-05-31"))
+          .andExpect(jsonPath("$.notifications[0].metadata['param-3']").value("2025-09-30"));
+
+      verify(validationServices.get(CalculationMetric.STANDARD_DEVIATION)).perform(any(), any());
     }
 
     @Test
