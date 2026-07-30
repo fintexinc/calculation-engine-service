@@ -12,6 +12,7 @@ import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
@@ -108,16 +109,16 @@ class StandardDeviationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static TimeIntervalResult findPeriod(StandardDeviationResult result) {
     return result.getStandardDeviation().stream()
-        .filter(entry -> "12".equals(entry.period()))
+        .filter(entry -> TimePeriod.ONE_YR.name().equals(entry.period()))
         .findFirst()
-        .orElseThrow(() -> new AssertionError("Missing period 12"));
+        .orElseThrow(() -> new AssertionError("Missing period " + TimePeriod.ONE_YR.name()));
   }
 
   private static PeriodCommand standardDeviationCommand() {
     PeriodCommand command = new PeriodCommand();
     command.setMetric(CalculationMetric.STANDARD_DEVIATION);
     command.setCurrency(Currency.CAD);
-    command.setPeriods(Set.of("12"));
+    command.setPeriods(Set.of(TimePeriod.ONE_YR));
     command.setHoldings(List.of(new PortfolioHolding(new BigDecimal("100000"),
         FinancialInstrumentType.MUTUAL_FUND,
         Country.CANADA,
