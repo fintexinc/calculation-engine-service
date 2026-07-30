@@ -194,11 +194,17 @@ public class MetricCalculationOrchestrator implements CalculationOrchestrator {
 
     SecurityData benchmarkData = SecurityData.EMPTY;
     RuntimeException benchmarkFailure = null;
-    try {
-      benchmarkData = fetchAttributes(List.copyOf(benchmarkHoldings), benchmarkAttributes, providers);
-    } catch (RuntimeException exception) {
-      log.error("Fetching benchmark attributes {} failed", benchmarkAttributes, exception);
-      benchmarkFailure = exception;
+    // Only worth asking for benchmark attributes while the portfolio fetch is still viable: every command that carries
+    // benchmark holdings also requires portfolio attributes, so FetchOutcome#securityDataFor rethrows the portfolio
+    // failure before it ever looks at the benchmark side. Fetching anyway would double the load we put on a Security
+    // Master that has just failed, retries included, to produce data no caller can reach.
+    if (portfolioFailure == null) {
+      try {
+        benchmarkData = fetchAttributes(List.copyOf(benchmarkHoldings), benchmarkAttributes, providers);
+      } catch (RuntimeException exception) {
+        log.error("Fetching benchmark attributes {} failed", benchmarkAttributes, exception);
+        benchmarkFailure = exception;
+      }
     }
 
     return new FetchOutcome(SecurityData.of(portfolioData.asMap(), benchmarkData.asMap()), portfolioFailure,

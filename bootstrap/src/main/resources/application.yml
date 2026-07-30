@@ -118,6 +118,28 @@ calculation:
     supported-security-countries:
       - USA
       - CANADA
+  fee:
+    projection:
+      # Answers "what will these fees have cost me by then?" — one column per period.
+      # TimePeriod members, named or given as a length in months; ONE_MTH is the monthly fee and ONE_YR the
+      # annual one. Must be non-empty, and every value must be one the fee metrics can project
+      # (SupportedPeriods.FEE_PROJECTION — fixed lengths only, so no YTD or SI).
+      periods: "12,120,240"
+
+      # Assumed annual growth of the balance the fee is charged on, as a ratio: 0.06 = 6% a year.
+      # The fee is charged on that growing balance every year and summed, so a period costs more than
+      # annualFee x years. A 2% fee on $100k (annualFee 2,000) projects to:
+      #   0.06  ->  10Y 26,361.59   20Y 73,571.18   <- shipped assumption
+      #   0     ->  10Y 20,000.00   20Y 40,000.00   <- flat balance, exactly annualFee x years
+      #  -0.20  ->  10Y  8,926.26   20Y  9,884.71   <- shrinking balance, so later fees are smaller
+      # The 20Y column nearly doubles between the first two rows, which is why this is configuration
+      # and not a constant: a 20Y figure cannot be read without knowing which row produced it.
+      #
+      # The fee is not treated as a drag: the balance grows at this rate whatever is paid out in fees.
+      # Accepted range is -1 upwards. At -1 the balance is gone after the first year, so exactly one
+      # annual fee is charged. Below -1 the balance would lose more than 100%, which no portfolio can
+      # do, and the service refuses to start.
+      annual-growth-rate: 0.06
 
 default:
   data-providers: MORNINGSTAR, FMP

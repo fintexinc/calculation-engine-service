@@ -2,8 +2,10 @@ package com.fintex.ce.application.calculation.service.fee;
 
 import com.fintex.ce.application.calculation.service.FxRateService;
 import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
+import com.fintex.ce.application.config.FeeProjectionProperties;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
+import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.FeesResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
@@ -12,19 +14,28 @@ import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.FIVE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,8 +48,21 @@ class FeesCalculationServiceImplTest {
   private final FxRateService fxRateService = mock(FxRateService.class);
   private final HoldingCurrencyConverter currencyConverter = new HoldingCurrencyConverter(
       fxRateService, new FxProperties());
+  private final FeeProjectionProperties projectionProperties = flatProjection();
   private final FeesCalculationServiceImpl service = new FeesCalculationServiceImpl(currencyConverter,
-      new MerFeeResolver(List.of(new CanadianFeeResolutionStrategy(), new UsFeeResolutionStrategy())));
+      new MerFeeResolver(List.of(new CanadianFeeResolutionStrategy(), new UsFeeResolutionStrategy())),
+      projectionProperties);
+
+  /**
+   * A flat balance keeps the projections at {@code annual x years} so the existing fee assertions stay readable; the
+   * growth formula is covered by {@code FeeProjectionUtilsTest}.
+   */
+  private static FeeProjectionProperties flatProjection() {
+    var properties = new FeeProjectionProperties();
+    properties.setAnnualGrowthRate(BigDecimal.ZERO);
+    properties.setPeriods(new LinkedHashSet<>(List.of(ONE_YR, TEN_YR, TWENTY_YR)));
+    return properties;
+  }
 
   {
     // Default: identity FX for any source currency so single-currency fee math is the focus of each test. Tests that
@@ -52,7 +76,7 @@ class FeesCalculationServiceImplTest {
   @Test
   void annualFee_isSumOfValueTimesMer_overFundHoldings() {
     // 1000 @ 0.02 + 2000 @ 0.01 = 20 + 20 = 40
-    PortfolioHolding cad = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding cad = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, "1000");
     PortfolioHolding us = holding("VTI", FinancialInstrumentType.ETF, Country.USA, "2000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         cad, fee("0.02", null, null, null),
@@ -66,7 +90,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void monthlyFee_isAnnualDividedBy12() {
-    PortfolioHolding fund = holding("CIG-002", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1200");
+    PortfolioHolding fund = holding("CIG-002", FinancialInstrumentType.MUTUAL_FUND, "1200");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee("0.10", null, null, null));
 
@@ -80,7 +104,7 @@ class FeesCalculationServiceImplTest {
   @Test
   void wholePortfolio_includesNonFundHoldingsAt0Pct() {
     // Fund 1000 × 0.02 = 20; stock contributes 0.
-    PortfolioHolding fund = holding("CIG-003", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding fund = holding("CIG-003", FinancialInstrumentType.MUTUAL_FUND, "1000");
     PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee("0.02", null, null, null));
@@ -94,7 +118,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void fundsOnlyStrict_isNull_whenAnyIncludedHoldingMissingPrimary() {
-    PortfolioHolding fund = holding("CIG-004", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding fund = holding("CIG-004", FinancialInstrumentType.MUTUAL_FUND, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee(null, "0.02", null, null));
 
@@ -108,7 +132,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void parentHoldingType_isRejectedWithCleanError() {
-    PortfolioHolding parent = holding("X", FinancialInstrumentType.FUND, null, "1000");
+    PortfolioHolding parent = holding("X", FinancialInstrumentType.FUND, "1000");
 
     assertThatThrownBy(() -> service.perform(commandFor(List.of(parent), FUNDS_ONLY), Map.of()))
         .isInstanceOf(CalculationException.class)
@@ -118,7 +142,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void allFeeFieldsNull_throws() {
-    PortfolioHolding hedge = holding("HF-001", FinancialInstrumentType.HEDGE_FUND, Country.CANADA, "1000");
+    PortfolioHolding hedge = holding("HF-001", FinancialInstrumentType.HEDGE_FUND, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         hedge, fee(null, null, null, null));
 
@@ -168,7 +192,7 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void merBearingHoldingWithMissingCurrency_throws() {
-    PortfolioHolding fund = holding("CIG-NOCURR", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding fund = holding("CIG-NOCURR", FinancialInstrumentType.MUTUAL_FUND, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementExpenseRatio(new BigDecimal("0.02"))
@@ -226,9 +250,133 @@ class FeesCalculationServiceImplTest {
     assertThat(result.getMonthlyFee().get(FUNDS_ONLY)).isNull();
     assertThat(result.getMonthlyFee().get(FUNDS_ONLY_STRICT)).isNull();
     assertThat(result.getMonthlyFee().get(WHOLE_PORTFOLIO)).isEqualByComparingTo("0");
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY)).isNull();
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY_STRICT)).isNull();
+    assertThat(result.getProjectedSpend().get(WHOLE_PORTFOLIO))
+        .containsOnlyKeys(ONE_YR, TEN_YR, TWENTY_YR)
+        .allSatisfy((years, spend) -> assertThat(spend).isEqualByComparingTo("0"));
+  }
+
+  @Test
+  void shouldProjectEveryConfiguredHorizonPerMode_whenPortfolioHoldsFunds() {
+    // 1000 @ 0.02 = 20 a year over the funds; the 3000 stock only widens the whole-portfolio denominator
+    PortfolioHolding fund = holding("CIG-010", FinancialInstrumentType.MUTUAL_FUND, "1000");
+    PortfolioHolding stock = holding("RY", FinancialInstrumentType.STOCK, "3000");
+
+    FeesResult result = service.perform(commandFor(List.of(fund, stock), FUNDS_ONLY, WHOLE_PORTFOLIO),
+        Map.of(fund, fee("0.02", null, null, null)));
+
+    assertThat(result.getProjectedSpend()).containsOnlyKeys(FUNDS_ONLY, WHOLE_PORTFOLIO);
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY)).containsOnlyKeys(ONE_YR, TEN_YR, TWENTY_YR);
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY).get(ONE_YR)).isEqualByComparingTo("20");
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY).get(TEN_YR)).isEqualByComparingTo("200");
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY).get(TWENTY_YR)).isEqualByComparingTo("400");
+    // a zero-fee stock contributes no dollars, so both views project the same spend
+    assertThat(result.getProjectedSpend().get(WHOLE_PORTFOLIO).get(TWENTY_YR)).isEqualByComparingTo("400");
+  }
+
+  @Test
+  void shouldMatchTheAnnualFee_whenHorizonIsOneYear() {
+    PortfolioHolding fund = holding("CIG-011", FinancialInstrumentType.MUTUAL_FUND, "1234.56");
+
+    FeesResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY, WHOLE_PORTFOLIO),
+        Map.of(fund, fee("0.0175", null, null, null)));
+
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY).get(ONE_YR))
+        .isEqualByComparingTo(result.getAnnualFee().get(FUNDS_ONLY));
+    assertThat(result.getProjectedSpend().get(WHOLE_PORTFOLIO).get(ONE_YR))
+        .isEqualByComparingTo(result.getAnnualFee().get(WHOLE_PORTFOLIO));
+  }
+
+  @Test
+  void shouldProjectNullsRatherThanZeros_whenTheStrictModeHasNoAnswer() {
+    PortfolioHolding fund = holding("CIG-012", FinancialInstrumentType.MUTUAL_FUND, "1000");
+
+    FeesResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY, FUNDS_ONLY_STRICT),
+        Map.of(fund, fee(null, "0.01", null, null)));
+
+    assertThat(result.getAnnualFee().get(FUNDS_ONLY_STRICT)).isNull();
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY_STRICT)).isNull();
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY).get(TEN_YR)).isEqualByComparingTo("100");
+  }
+
+  @Test
+  void shouldProjectOnTheConvertedValue_whenHoldingCurrencyDiffersFromReportingCurrency() {
+    when(fxRateService.spotRates(anySet(), any(), any()))
+        .thenReturn(Map.of(Currency.USD, new BigDecimal("1.25"), Currency.CAD, BigDecimal.ONE));
+    PortfolioHolding usFund = holding("VTI", FinancialInstrumentType.ETF, Country.USA, "1000");
+
+    FeesResult result = service.perform(commandFor(List.of(usFund), FUNDS_ONLY),
+        Map.of(usFund, FeeData.builder()
+            .netExpenseRatio(new BigDecimal("0.01"))
+            .currency(Currency.USD)
+            .build()));
+
+    // 1000 USD -> 1250 CAD, so the annual fee is 12.5 and ten years of a flat balance is 125
+    assertThat(result.getAnnualFee().get(FUNDS_ONLY)).isEqualByComparingTo("12.5");
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY).get(TEN_YR)).isEqualByComparingTo("125");
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY).get(TWENTY_YR)).isEqualByComparingTo("250");
+  }
+
+  @Test
+  void shouldGrowTheProjectionAboveTheFlatCase_whenAGrowthRateIsConfigured() {
+    projectionProperties.setAnnualGrowthRate(new BigDecimal("0.06"));
+    PortfolioHolding fund = holding("CIG-013", FinancialInstrumentType.MUTUAL_FUND, "1000");
+
+    FeesResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY),
+        Map.of(fund, fee("0.02", null, null, null)));
+
+    Map<TimePeriod, BigDecimal> projected = result.getProjectedSpend().get(FUNDS_ONLY);
+    assertThat(projected.get(ONE_YR)).isEqualByComparingTo("20");
+    assertThat(projected.get(TEN_YR)).isEqualByComparingTo("263.6158988476");
+    assertThat(projected.get(TWENTY_YR)).isEqualByComparingTo("735.7118240709");
+    assertThat(projected.get(TWENTY_YR)).isGreaterThan(projected.get(TEN_YR).multiply(BigDecimal.valueOf(2)));
+  }
+
+  @Test
+  void shouldReportTheRequestedHorizons_whenTheCommandSuppliesThem() {
+    PortfolioHolding fund = holding("CIG-014", FinancialInstrumentType.MUTUAL_FUND, "1000");
+
+    FeesResult result = service.perform(commandWithHorizons(List.of(fund), new LinkedHashSet<>(List.of(THREE_YR,
+        FIVE_YR)), FUNDS_ONLY),
+        Map.of(fund, fee("0.02", null, null, null)));
+
+    // the configured 1/10/20 give way entirely to the requested set — a request narrows and widens, it does not merge
+    Map<TimePeriod, BigDecimal> projected = result.getProjectedSpend().get(FUNDS_ONLY);
+    assertThat(projected).containsOnlyKeys(THREE_YR, FIVE_YR);
+    assertThat(projected.get(THREE_YR)).isEqualByComparingTo("60");
+    assertThat(projected.get(FIVE_YR)).isEqualByComparingTo("100");
+  }
+
+  @Test
+  void shouldKeepTheRequestedOrder_whenHorizonsArriveUnsorted() {
+    PortfolioHolding fund = holding("CIG-015", FinancialInstrumentType.MUTUAL_FUND, "1000");
+
+    FeesResult result = service.perform(commandWithHorizons(List.of(fund), new LinkedHashSet<>(List.of(TWENTY_YR,
+        ONE_YR, TEN_YR)), FUNDS_ONLY),
+        Map.of(fund, fee("0.02", null, null, null)));
+
+    assertThat(result.getProjectedSpend().get(FUNDS_ONLY).keySet()).containsExactly(TWENTY_YR, ONE_YR, TEN_YR);
+  }
+
+  @Test
+  void shouldFallBackToTheConfiguredHorizons_whenTheCommandOmitsThem() {
+    PortfolioHolding fund = holding("CIG-016", FinancialInstrumentType.MUTUAL_FUND, "1000");
+
+    FeesResult omitted = service.perform(commandWithHorizons(List.of(fund), null, FUNDS_ONLY),
+        Map.of(fund, fee("0.02", null, null, null)));
+    FeesResult empty = service.perform(commandWithHorizons(List.of(fund), Set.of(), FUNDS_ONLY),
+        Map.of(fund, fee("0.02", null, null, null)));
+
+    assertThat(omitted.getProjectedSpend().get(FUNDS_ONLY)).containsOnlyKeys(ONE_YR, TEN_YR, TWENTY_YR);
+    assertThat(empty.getProjectedSpend().get(FUNDS_ONLY)).containsOnlyKeys(ONE_YR, TEN_YR, TWENTY_YR);
   }
 
   // ---------- helpers ----------
+
+  private static PortfolioHolding holding(String id, FinancialInstrumentType type, String value) {
+    return holding(id, type, Country.CANADA, value);
+  }
 
   private static PortfolioHolding holding(String id, FinancialInstrumentType type, Country country, String value) {
     return PortfolioHolding.builder()
@@ -251,11 +399,17 @@ class FeesCalculationServiceImplTest {
         .build();
   }
 
-  private static AverageMerCommand commandFor(List<PortfolioHolding> holdings,
-      com.fintex.ce.model.domain.enumeration.FeeAggregationMode... modes) {
+  private static AverageMerCommand commandFor(List<PortfolioHolding> holdings, FeeAggregationMode... modes) {
     var cmd = new AverageMerCommand();
-    cmd.setHoldings(new java.util.ArrayList<>(holdings));
+    cmd.setHoldings(new ArrayList<>(holdings));
     cmd.setParameterTypes(List.of(modes));
     return cmd;
+  }
+
+  private static AverageMerCommand commandWithHorizons(List<PortfolioHolding> holdings, Set<TimePeriod> periods,
+      FeeAggregationMode... modes) {
+    AverageMerCommand command = commandFor(holdings, modes);
+    command.setProjectionPeriods(periods);
+    return command;
   }
 }

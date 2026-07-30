@@ -706,6 +706,14 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
+  FEE_COMPARISON_NOT_AVAILABLE(
+      Codes.FEE_COMPARISON_NOT_AVAILABLE,
+      "Fee comparison for the %s view cannot be calculated: %s",
+      "One side of the comparison has no fee rate for this view, or the view has no asset base to charge it against",
+      "Request a view whose holdings resolve a fee rate on both sides, and give those holdings market values",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
   MISSING_NER_AND_GER(
       Codes.MISSING_NER_AND_GER,
       "The holding is missing both Net Expense Ratio and Gross Expense Ratio",
@@ -1225,6 +1233,7 @@ public enum ErrorCode {
     public static final String MISSING_MANAGEMENT_FEE = "MER-003";
     public static final String MISSING_SALES_CHARGE_TYPE = "MER-004";
     public static final String MISSING_FUND_FEE_DATA = "MER-005";
+    public static final String FEE_COMPARISON_NOT_AVAILABLE = "MER-006";
 
     // Best / Worst Periods
     public static final String BEST_WORST_TIME_INTERVAL_NOT_POSITIVE = "BWP-001";

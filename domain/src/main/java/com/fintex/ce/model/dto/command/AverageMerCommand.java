@@ -3,10 +3,12 @@ package com.fintex.ce.model.dto.command;
 import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -30,6 +32,12 @@ public class AverageMerCommand extends PortfolioHoldingsCommand {
       + "service's configured reporting currency (CAD).", example = "CAD")
   private Currency targetCurrency;
 
+  @Schema(description = "Periods to project fee amounts over, named or given as a length in months. ONE_MTH reproduces "
+      + "the monthly fee and ONE_YR the annual one. Applies only to the metrics that report projected amounts — "
+      + "'fees' and 'mer-benchmark-comparison'. 'mer' and 'management-fee' report rates, which have no length, and "
+      + "ignore it. Omit to use the service's configured periods.", example = "[\"ONE_MTH\", \"ONE_YR\", \"FIVE_YR\", \"TEN_YR\", \"TWENTY_YR\"]")
+  private Set<TimePeriod> projectionPeriods;
+
   /**
    * An {@code mer} command over {@code holdings} for {@code parameterTypes}, inheriting the data providers and target
    * currency of the command it is derived from. Lets a calculation that runs two sets of holdings through the MER
@@ -43,6 +51,7 @@ public class AverageMerCommand extends PortfolioHoldingsCommand {
     command.setParameterTypes(parameterTypes);
     command.setDataProviders(source.getDataProviders());
     command.setTargetCurrency(source.getTargetCurrency());
+    command.setProjectionPeriods(source.getProjectionPeriods());
     return command;
   }
 }

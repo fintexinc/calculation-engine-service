@@ -1,6 +1,8 @@
 package com.fintex.ce.application.calculation.service.fee;
 
 import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter;
+import com.fintex.ce.application.config.FeeProjectionProperties;
+import com.fintex.ce.application.util.FeeProjectionUtils;
 import com.fintex.ce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -10,6 +12,7 @@ import com.fintex.ce.model.domain.result.fee.FeesResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.constant.HoldingTypeGroup.MER_BEARING_TYPES;
@@ -27,9 +31,10 @@ import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PO
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 
 /**
- * Annual / Monthly fee dollar amounts in the configured default target currency (default CAD). Annual = Σ (marketValue
- * × resolved fee) per aggregation mode, with the fee resolved through the injected {@link FeeResolver}; Monthly =
- * Annual ÷ 12.
+ * Annual / Monthly / multi-year projected fee dollar amounts in the configured default target currency (default CAD).
+ * Annual = Σ (marketValue × resolved fee) per aggregation mode, with the fee resolved through the injected
+ * {@link FeeResolver}; Monthly = Annual ÷ 12; the projections extend Annual over the horizons configured in
+ * {@link FeeProjectionProperties} (see {@link FeeProjectionUtils} for the formula).
  *
  * <p>
  * FX: each MER-bearing holding's {@code marketValue} is converted to the default target currency via
@@ -42,11 +47,13 @@ import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
 public class FeesCalculationServiceImpl extends AbstractFeeCalculationService<FeesResult> {
 
   private final FeeResolver feeResolver;
+  private final FeeProjectionProperties projectionProperties;
 
   public FeesCalculationServiceImpl(HoldingCurrencyConverter currencyConverter,
-      FeeResolver feeResolver) {
+      FeeResolver feeResolver, FeeProjectionProperties projectionProperties) {
     super(currencyConverter);
     this.feeResolver = feeResolver;
+    this.projectionProperties = projectionProperties;
   }
 
   @Override
@@ -82,7 +89,7 @@ public class FeesCalculationServiceImpl extends AbstractFeeCalculationService<Fe
   }
 
   @Override
-  protected FeesResult calculateAverageValue(List<FeeAggregationMode> modes,
+  protected FeesResult calculateAverageValue(AverageMerCommand command, List<FeeAggregationMode> modes,
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations) {
     var result = new FeesResult();
     if (modes.contains(FUNDS_ONLY)) {
@@ -94,7 +101,11 @@ public class FeesCalculationServiceImpl extends AbstractFeeCalculationService<Fe
     if (modes.contains(FUNDS_ONLY_STRICT)) {
       result.getAnnualFee().put(FUNDS_ONLY_STRICT, getFundsOnlyStrictSum(calculations));
     }
-    result.getAnnualFee().forEach((mode, annual) -> result.getMonthlyFee().put(mode, monthlyFrom(annual)));
+    Set<TimePeriod> periods = projectionProperties.periodsFor(command.getProjectionPeriods());
+    result.getAnnualFee().forEach((mode, annual) -> {
+      result.getMonthlyFee().put(mode, monthlyFrom(annual));
+      result.getProjectedSpend().put(mode, projectedFrom(annual, periods));
+    });
     return result;
   }
 
@@ -102,9 +113,20 @@ public class FeesCalculationServiceImpl extends AbstractFeeCalculationService<Fe
     return annual == null ? null : divide(annual, TWELVE);
   }
 
+  private Map<TimePeriod, BigDecimal> projectedFrom(BigDecimal annual, Set<TimePeriod> periods) {
+    return annual == null
+        ? null
+        : FeeProjectionUtils.byPeriod(annual, projectionProperties.getAnnualGrowthRate(), periods);
+  }
+
   @Override
   protected void nullOutEmptyFundModes(FeesResult response, AverageMerCommand command) {
     nullOutEmptyFundModes(response.getAnnualFee(), command);
     nullOutEmptyFundModes(response.getMonthlyFee(), command);
+    if (hasNoFundHolding(command)) {
+      FUND_ONLY_MODES.stream()
+          .filter(response.getProjectedSpend()::containsKey)
+          .forEach(mode -> response.getProjectedSpend().put(mode, null));
+    }
   }
 }

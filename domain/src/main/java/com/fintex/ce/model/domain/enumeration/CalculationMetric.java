@@ -199,6 +199,13 @@ public enum CalculationMetric {
       BETA, R_SQUARED, UPSIDE_CAPTURE, DOWNSIDE_CAPTURE, ROLLING_CORRELATION,
       MER_BENCHMARK_COMPARISON);
 
+  /**
+   * Fee metrics that report projected dollar amounts, and therefore honour a requested horizon set. {@code MER} is
+   * deliberately absent — it reports rates, which carry no horizon.
+   */
+  public static final List<CalculationMetric> FEE_PROJECTION_METRICS = List.of(
+      FEES, MER_BENCHMARK_COMPARISON);
+
   public static final List<CalculationMetric> ROLLING_METRICS = List.of(
       ROLLING_TOTAL_RETURNS, ROLLING_STANDARD_DEVIATION, ROLLING_SHARPE_RATIO,
       ROLLING_CORRELATION);

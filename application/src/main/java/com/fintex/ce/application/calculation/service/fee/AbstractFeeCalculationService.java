@@ -54,6 +54,12 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
     implements
       SingleAttributeCalculationService<AverageMerCommand, FeeData, R> {
 
+  /**
+   * The aggregation views whose holding set is the MER-bearing subset, and which therefore have no defined answer for a
+   * portfolio holding no fund.
+   */
+  protected static final List<FeeAggregationMode> FUND_ONLY_MODES = List.of(FUNDS_ONLY, FUNDS_ONLY_STRICT);
+
   protected final HoldingCurrencyConverter currencyConverter;
 
   protected AbstractFeeCalculationService(HoldingCurrencyConverter currencyConverter) {
@@ -121,7 +127,13 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
   protected abstract List<Notification> resolveFees(
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> groupOfMers);
 
-  protected abstract R calculateAverageValue(List<FeeAggregationMode> modes,
+  /**
+   * @param command
+   *          the originating request. Passed alongside the already-defaulted {@code modes} so a subclass whose output
+   *          depends on request settings beyond the aggregation modes — the projection horizons of {@code fees} — can
+   *          read them without re-deriving the mode defaulting.
+   */
+  protected abstract R calculateAverageValue(AverageMerCommand command, List<FeeAggregationMode> modes,
       Map<FinancialInstrumentType, Map<PortfolioHolding, AverageManagementExpenseCalculation>> calculations);
 
   protected abstract void nullOutEmptyFundModes(R response, AverageMerCommand command);
@@ -134,7 +146,7 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
 
     List<Notification> warnings = new ArrayList<>(resolveFees(calculations));
     warnings.addAll(applyValueFxConversion(calculations, command.getTargetCurrency()));
-    var result = calculateAverageValue(
+    var result = calculateAverageValue(command,
         getSpecifiedIfEmpty(command.getParameterTypes(), FUNDS_ONLY, WHOLE_PORTFOLIO),
         calculations);
 
@@ -229,17 +241,24 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
    * null those entries out so the response signals that explicitly instead of returning 0.
    */
   protected void nullOutEmptyFundModes(Map<FeeAggregationMode, BigDecimal> responseMap, AverageMerCommand command) {
-    boolean noFundHolding = command.getHoldings().stream()
-        .map(PortfolioHolding::getHoldingType)
-        .noneMatch(MER_BEARING_TYPES::contains);
-    if (!noFundHolding) {
+    if (!hasNoFundHolding(command)) {
       return;
     }
-    for (FeeAggregationMode mode : List.of(FUNDS_ONLY, FUNDS_ONLY_STRICT)) {
+    for (FeeAggregationMode mode : FUND_ONLY_MODES) {
       if (responseMap.containsKey(mode)) {
         responseMap.put(mode, null);
       }
     }
+  }
+
+  /**
+   * True when the request contains no MER-bearing holding. Exposed to subclasses so every response map they own —
+   * ratios, dollar sums, projections — is nulled on the same condition instead of each re-deriving it.
+   */
+  protected static boolean hasNoFundHolding(AverageMerCommand command) {
+    return command.getHoldings().stream()
+        .map(PortfolioHolding::getHoldingType)
+        .noneMatch(MER_BEARING_TYPES::contains);
   }
 
   protected void setFeeValues(AverageManagementExpenseCalculation calc, BigDecimal fee) {
