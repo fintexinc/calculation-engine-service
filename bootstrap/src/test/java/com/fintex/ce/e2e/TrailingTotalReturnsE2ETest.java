@@ -6,6 +6,7 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -248,6 +249,31 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "CAD");
   }
 
+  @Test
+  void shouldReturnBadRequestWithMissingMonthlyReturnError_whenMonthlyReturnValueIsNull() {
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(F0CAN999, monthlyReturnsWithNullValue("2024-05-01")))));
+    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"),
+        List.of(holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100000")));
+
+    HttpResponse response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    ErrorResponse error = readJson(response.responseBody(), ErrorResponse.class);
+    assertThat(error.getNotifications()).hasSize(1);
+    Notification notification = error.getNotifications().getFirst();
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE.getCode());
+    assertThat(notification.getMessage())
+        .isEqualTo("The holding is missing monthly return values for date 2024-05-31");
+    assertThat(notification.getDescription()).isEqualTo("Monthly return is missing for the specified date");
+    assertThat(notification.getAction()).isEqualTo("Populate the monthly return for the missing date");
+    assertThat(notification.getSeverity()).isEqualTo(Severity.ERROR);
+    assertThat(notification.getMetadata())
+        .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1")
+        .containsEntry(ErrorParams.HOLDING_ID, "MUTUAL_FUND-F0CAN999")
+        .containsEntry("param-1", "2024-05-31");
+  }
+
   private Notification assertValidationError(HttpResponse response, String expectedCode, String expectedFieldName) {
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     ErrorResponse error = readJson(response.responseBody(), ErrorResponse.class);
@@ -334,11 +360,27 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         .toList();
   }
 
+  private static List<DateBigDecimalValue> monthlyReturnsWithNullValue(String date) {
+    YearMonth affectedMonth = YearMonth.from(LocalDate.parse(date));
+    return monthlyReturnsFor2024("1.0").stream()
+        .map(monthlyReturn -> affectedMonth.equals(YearMonth.from(LocalDate.parse(monthlyReturn.getDate())))
+            ? dateValueWithNullValue(date)
+            : monthlyReturn)
+        .toList();
+  }
+
   private static DateBigDecimalValue dateValue(String date, String percent) {
     DateBigDecimalValue dv = new DateBigDecimalValue();
     dv.setDate(date);
     dv.setValue(new BigDecimal(percent));
     return dv;
+  }
+
+  private static DateBigDecimalValue dateValueWithNullValue(String date) {
+    DateBigDecimalValue value = new DateBigDecimalValue();
+    value.setDate(date);
+    value.setValue(null);
+    return value;
   }
 
   private static List<DateRateValue> cadTreasuryRatesSeriesFor2024() {

@@ -15,11 +15,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
+import static java.util.stream.Collectors.joining;
 
 @Component
 public class MonthlyReturnsMapper
@@ -32,10 +34,14 @@ public class MonthlyReturnsMapper
 
   @Override
   public HoldingMonthlyReturns map(MonthlyReturns smsResponse, PortfolioHolding holding) {
-    TreeMap<LocalDate, BigDecimal> returnsMap = Optional.ofNullable(smsResponse)
+    List<DateBigDecimalValue> monthlyReturns = Optional.ofNullable(smsResponse)
         .map(MonthlyReturns::getReturns)
-        .orElse(List.of())
+        .orElse(List.of());
+    validateMonthlyReturnValues(monthlyReturns, holding);
+
+    TreeMap<LocalDate, BigDecimal> returnsMap = monthlyReturns
         .stream()
+        .filter(Objects::nonNull)
         .filter(entry -> entry.getDate() != null && entry.getValue() != null)
         .collect(Collectors.toMap(
             entry -> toLastDayOfMonth(LocalDate.parse(entry.getDate())),
@@ -53,6 +59,20 @@ public class MonthlyReturnsMapper
         .holdingType(holding.getHoldingType())
         .providers(providers)
         .build();
+  }
+
+  private void validateMonthlyReturnValues(List<DateBigDecimalValue> monthlyReturns, PortfolioHolding holding) {
+    String missingDates = monthlyReturns.stream()
+        .filter(Objects::nonNull)
+        .filter(entry -> entry.getDate() != null && entry.getValue() == null)
+        .map(entry -> toLastDayOfMonth(LocalDate.parse(entry.getDate())))
+        .distinct()
+        .sorted()
+        .map(LocalDate::toString)
+        .collect(joining(", "));
+    if (!missingDates.isEmpty()) {
+      throw ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE.toExceptionForHolding(holding, missingDates);
+    }
   }
 
   private String resolveCurrency(PortfolioHolding holding) {
