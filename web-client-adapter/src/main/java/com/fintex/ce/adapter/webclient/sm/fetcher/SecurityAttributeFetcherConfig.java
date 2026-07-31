@@ -13,10 +13,10 @@ import com.fintex.ce.adapter.webclient.sm.mapper.FeesMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeSectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeStyleboxExposureMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.GeographicAllocationMapper;
+import com.fintex.ce.adapter.webclient.sm.mapper.LimitedHoldingsMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.MaturityAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.MonthlyReturnsMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SalesChargeMapper;
-import com.fintex.ce.adapter.webclient.sm.mapper.TopHoldingsMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.YieldMapper;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
@@ -49,7 +49,7 @@ import com.fintex.wm.commons.domain.financial.Fees;
 import com.fintex.wm.commons.domain.financial.Geography;
 import com.fintex.wm.commons.domain.financial.Income;
 import com.fintex.wm.commons.domain.holding.HoldingIdentifiers;
-import com.fintex.wm.commons.domain.holding.TopHoldings;
+import com.fintex.wm.commons.domain.holding.Holdings;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
 import com.fintex.wm.commons.domain.rating.CreditQualityRatings;
 import com.fintex.wm.commons.domain.rating.FixedIncomeStyleBoxes;
@@ -213,9 +213,9 @@ public class SecurityAttributeFetcherConfig {
   }
 
   @Bean
-  CompositeAttributeBinding<CommonTopHoldings, TopHoldings> topHoldingsBinding(TopHoldingsMapper mapper) {
-    return new CompositeAttributeBinding<>(CompositeSecurityAttribute.TOP_HOLDINGS,
-        TopHoldings.class, CommonTopHoldings.class, mapper);
+  CompositeAttributeBinding<CommonTopHoldings, Holdings> limitedHoldingsBinding(LimitedHoldingsMapper mapper) {
+    return new CompositeAttributeBinding<>(CompositeSecurityAttribute.LIMITED_HOLDINGS,
+        Holdings.class, CommonTopHoldings.class, mapper);
   }
 
   @Bean

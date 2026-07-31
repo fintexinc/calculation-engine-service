@@ -67,9 +67,13 @@ public class CommonHoldingsService
     return CalculationMetric.TOP_COMMON_HOLDINGS;
   }
 
+  /**
+   * Reads the holdings table decomposed through nested funds rather than the stored top-holdings column, so a leaf held
+   * inside a lower-ranked ETF still contributes its share instead of being dropped with the fund that wraps it.
+   */
   @Override
   public CompositeSecurityAttribute requiredAttribute() {
-    return CompositeSecurityAttribute.TOP_HOLDINGS;
+    return CompositeSecurityAttribute.LIMITED_HOLDINGS;
   }
 
   @Override

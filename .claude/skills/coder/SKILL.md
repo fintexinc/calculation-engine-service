@@ -100,6 +100,7 @@ Pure logic, no data fetching.
 - **Ternary:** use for simple single-expression returns/assignments instead of if/else
 - **No `final`** on method parameters/variables
 - **No fully qualified class names** — always use imports
+- **Keep Javadoc and comments short — 2-3 sentences.** Explain briefly *why* the code is the way it is; do not write essays. Multi-paragraph Javadoc with measurements, history and caveats belongs in the commit message or PR description, not above a method. If the explanation genuinely needs more than a few sentences, that is usually a sign the code should be simpler.
 - **No ticket references in code** — never put a ticket id (e.g. `TMI-536`, `JIRA-123`) in a comment or Javadoc. Comments must explain the behavior/rationale on their own terms; ticket traceability belongs in commit messages and PRs, not in the source. (Applies to production code and tests alike.)
 - **No magic strings** — extract to constants or enums
 - **Enum factory methods:** always name `fromValue(value)`
