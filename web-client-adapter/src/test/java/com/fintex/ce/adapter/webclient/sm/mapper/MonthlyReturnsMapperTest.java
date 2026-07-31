@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.Country;
@@ -74,24 +75,42 @@ class MonthlyReturnsMapperTest {
   }
 
   @Test
-  void shouldFilterOutEntriesWithNullDateOrValue() {
+  void shouldFilterOutEntry_whenDateIsNull() {
     var valid = createDateValue("2025-03-31", "0.0200");
 
     var nullDate = new DateBigDecimalValue();
     nullDate.setDate(null);
     nullDate.setValue(BigDecimal.valueOf(0.01));
 
-    var nullValue = new DateBigDecimalValue();
-    nullValue.setDate("2025-04-30");
-    nullValue.setValue(null);
-
     var smsResponse = new MonthlyReturns();
-    smsResponse.setReturns(List.of(valid, nullDate, nullValue));
+    smsResponse.setReturns(List.of(valid, nullDate));
 
     HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-005"));
 
-    assertThat(result.getReturns()).hasSize(1);
-    assertThat(result.getReturns()).containsKey(LocalDate.of(2025, 3, 31));
+    assertThat(result.getReturns())
+        .containsOnlyKeys(LocalDate.of(2025, 3, 31))
+        .containsEntry(LocalDate.of(2025, 3, 31), new BigDecimal("0.0200"));
+  }
+
+  @Test
+  void shouldThrowMissingMonthlyReturnForDate_whenMultipleEntryValuesAreNull() {
+    var smsResponse = new MonthlyReturns();
+    smsResponse.setReturns(List.of(
+        createDateValueWithNullValue("2025-12-01"),
+        createDateValueWithNullValue("2025-04-01"),
+        createDateValueWithNullValue("2025-01-01")));
+    PortfolioHolding holding = createHolding("SEC-006");
+
+    assertThatThrownBy(() -> mapper.map(smsResponse, holding))
+        .isInstanceOfSatisfying(CalculationException.class, exception -> {
+          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE);
+          assertThat(exception).hasMessage(
+              "The holding is missing monthly return values for date 2025-01-31, 2025-04-30, 2025-12-31");
+          assertThat(exception.getMetadata())
+              .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1")
+              .containsEntry(ErrorParams.HOLDING_ID, ErrorParams.holdingId(holding))
+              .containsEntry("param-1", "2025-01-31, 2025-04-30, 2025-12-31");
+        });
   }
 
   @Test
@@ -101,7 +120,7 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-01-31", "0.0100"),
         createDateValue("2025-01-31", "0.0200")));
 
-    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-006"));
+    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-007"));
 
     assertThat(result.getReturns()).hasSize(1);
     assertThat(result.getReturns().get(LocalDate.of(2025, 1, 31)))
@@ -116,7 +135,7 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-01-31", "0.01"),
         createDateValue("2025-02-28", "0.02")));
 
-    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-007"));
+    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-008"));
 
     assertThat(result.getReturns().firstKey()).isEqualTo(LocalDate.of(2025, 1, 31));
     assertThat(result.getReturns().lastKey()).isEqualTo(LocalDate.of(2025, 3, 31));
@@ -130,7 +149,7 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-01-01", "3.60137"),
         createDateValue("2025-02-01", "-2.02298")));
 
-    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-008"));
+    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-009"));
 
     assertThat(result.getReturns()).containsOnlyKeys(
         LocalDate.of(2024, 12, 31),
@@ -145,7 +164,7 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-01-01", "0.0100"),
         createDateValue("2025-01-15", "0.0200")));
 
-    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-009"));
+    HoldingMonthlyReturns result = mapper.map(smsResponse, createHolding("SEC-010"));
 
     assertThat(result.getReturns()).hasSize(1);
     assertThat(result.getReturns().get(LocalDate.of(2025, 1, 31)))
@@ -170,6 +189,13 @@ class MonthlyReturnsMapperTest {
     dv.setDate(date);
     dv.setValue(new BigDecimal(value));
     return dv;
+  }
+
+  private DateBigDecimalValue createDateValueWithNullValue(String date) {
+    var value = new DateBigDecimalValue();
+    value.setDate(date);
+    value.setValue(null);
+    return value;
   }
 
   private PortfolioHolding createHolding(String securityId) {
