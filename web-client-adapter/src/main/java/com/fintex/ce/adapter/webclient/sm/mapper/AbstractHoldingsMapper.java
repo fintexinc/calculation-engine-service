@@ -6,55 +6,63 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.util.BigDecimalUtils;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.datapoint.DatapointMetadata;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.holding.Holding;
 import com.fintex.wm.commons.domain.holding.SecurityHolding;
-import com.fintex.wm.commons.domain.holding.TopHoldings;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.IdentifiersDatapoint;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.value.MultilingualString;
 
-import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 /**
- * Maps SM TopHoldings response to PCE CommonTopHoldings domain model. Produces {@link CommonHolding} directly so the
- * calculation pipeline has a single domain shape; the parent reference and final weight are populated later by
- * {@code CommonHoldingsService} during tree expansion.
+ * Maps an SM holdings payload to {@link CommonTopHoldings}. Every payload variant carries the same three things — an
+ * allocation of {@link SecurityHolding}, a currency and the provenance from {@link DatapointMetadata} — so subclasses
+ * only expose the first two and inherit the conversion.
+ *
+ * @param <R>
+ *          the Security Master holdings payload type
  */
-@Component
-public class TopHoldingsMapper implements SecurityMasterResponseMapper<CommonTopHoldings, TopHoldings> {
+public abstract class AbstractHoldingsMapper<R extends DatapointMetadata>
+    implements
+      SecurityMasterResponseMapper<CommonTopHoldings, R> {
 
   /**
-   * Priority order for the primary identifier of each underlying holding. MORNINGSTAR_ID is most reliable across
-   * providers and is preferred; the rest are listed in decreasing global uniqueness. This identifier is what the
-   * calculation uses for the cycle guard and what the response surfaces to clients. Best-effort fallback to a display
-   * triple happens in the calculation when none of these are populated.
+   * Priority order for the primary identifier of each underlying holding, in decreasing global uniqueness —
+   * MORNINGSTAR_ID is the most reliable across providers, TICKER the least, since the same symbol is reused across
+   * exchanges. This identifier is what the calculation uses for the cycle guard and what the response surfaces to
+   * clients; when none are populated the calculation falls back to a display triple.
    */
   private static final List<FiIdentifierType> IDENTIFIER_PRIORITY = List.of(
       FiIdentifierType.MORNINGSTAR_ID,
-      FiIdentifierType.TICKER,
       FiIdentifierType.FUNDSERV,
       FiIdentifierType.ISIN,
-      FiIdentifierType.CUSIP);
+      FiIdentifierType.CUSIP,
+      FiIdentifierType.TICKER);
+
+  protected abstract List<? extends SecurityHolding> allocationOf(R smsResponse);
+
+  protected abstract Currency currencyOf(R smsResponse);
 
   @Override
-  public CommonTopHoldings map(TopHoldings smsResponse, PortfolioHolding holding) {
+  public CommonTopHoldings map(R smsResponse, PortfolioHolding holding) {
     List<CommonHolding> holdings = Optional.ofNullable(smsResponse)
-        .map(TopHoldings::getAllocation)
+        .map(this::allocationOf)
         .orElse(List.of())
         .stream()
         .map(this::toCommonHolding)
         .toList();
 
     List<DataProvider> providers = Optional.ofNullable(smsResponse)
-        .map(TopHoldings::getDataProviders)
+        .map(DatapointMetadata::getDataProviders)
         .orElseGet(List::of);
 
-    Currency currency = Optional.ofNullable(smsResponse).map(TopHoldings::getCurrency).orElse(null);
+    Currency currency = Optional.ofNullable(smsResponse).map(this::currencyOf).orElse(null);
 
     return CommonTopHoldings.builder()
         .currency(currency)
@@ -77,8 +85,8 @@ public class TopHoldingsMapper implements SecurityMasterResponseMapper<CommonTop
   }
 
   private List<CommonHolding> mapUnderlyingHoldings(List<Holding> underlyingHoldings) {
-    if (underlyingHoldings == null || underlyingHoldings.isEmpty()) {
-      return Collections.emptyList();
+    if (CollectionUtils.isEmpty(underlyingHoldings)) {
+      return List.of();
     }
     return underlyingHoldings.stream()
         .filter(SecurityHolding.class::isInstance)
@@ -98,7 +106,7 @@ public class TopHoldingsMapper implements SecurityMasterResponseMapper<CommonTop
   }
 
   private String extractEnglishName(List<MultilingualString> names) {
-    if (names == null || names.isEmpty()) {
+    if (CollectionUtils.isEmpty(names)) {
       return null;
     }
     return names.stream()

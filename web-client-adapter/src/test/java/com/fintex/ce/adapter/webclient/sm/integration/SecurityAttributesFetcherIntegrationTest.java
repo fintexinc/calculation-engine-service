@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.integration;
 
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
+import com.fintex.ce.model.domain.calculation.holding.CommonHolding;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -17,8 +18,8 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.financial.Fees;
 import com.fintex.wm.commons.domain.financial.ManagementFeeDatapoint;
-import com.fintex.wm.commons.domain.holding.TopHolding;
-import com.fintex.wm.commons.domain.holding.TopHoldings;
+import com.fintex.wm.commons.domain.holding.Holdings;
+import com.fintex.wm.commons.domain.holding.SecurityHolding;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.IdentifiersDatapoint;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -46,11 +47,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,16 +63,9 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 /**
- * HTTP-level test of the generic security-attributes fetcher against a mocked SMS endpoint. It exercises the full round
- * trip — request serialization, response deserialization, response-to-domain mapping and per-holding placement — using
- * the {@code FEES} attribute, whose mapper does real work: Security Master sends fee fields in percentage form
- * ({@code 1.51}) and the engine stores them in ratio form ({@code 0.0151}), so asserting the mapped {@link FeeData}
- * proves the conversion and the identifier matching, not merely that some object of the right class came back.
- *
- * <p>
- * OkHttp {@link MockWebServer} has neither {@code getBaseUrl()} nor {@code baseUrl()} — only
- * {@link MockWebServer#url(String)} returning {@link okhttp3.HttpUrl}; {@link #smsMockBaseUrl()} wraps that and
- * lazy-starts the server so the {@code DynamicPropertySource} supplier works during context init.
+ * HTTP-level test of the generic security-attributes fetcher against a mocked SMS endpoint, exercising the full round
+ * trip through the {@code FEES} attribute — whose mapper converts percentage form ({@code 1.51}) to ratio form
+ * ({@code 0.0151}), so the assertions prove real conversion and identifier matching rather than just a returned type.
  */
 @Tag("integration")
 @SpringBootTest(classes = SecurityMasterWebClientIntegrationTestConfiguration.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -76,6 +73,17 @@ import okhttp3.mockwebserver.RecordedRequest;
 class SecurityAttributesFetcherIntegrationTest {
 
   private static final String ATTRIBUTES_PATH = "/api/v1/wealth/securities/attributes";
+
+  /**
+   * Spring WebFlux's out-of-the-box {@code maxInMemorySize}. A holding serialises to roughly 610 bytes, so a security
+   * at Security Master's 1,000-holding cap is about 610 KB on its own, and the composite fetcher batches a whole
+   * portfolio into a single request. The SM WebClient therefore raises this limit; without that, a body of this size
+   * fails to decode and the adapter reports SMS as unavailable.
+   */
+  private static final int SPRING_DEFAULT_MAX_IN_MEMORY_SIZE = 262144;
+
+  /** Enough unrequested fee rows to push the response body past {@link #SPRING_DEFAULT_MAX_IN_MEMORY_SIZE}. */
+  private static final int FILLER_ROW_COUNT = 2000;
 
   private static MockWebServer smsMockServer;
 
@@ -273,30 +281,61 @@ class SecurityAttributesFetcherIntegrationTest {
     assertThat(mapped.get(benchmark).getReturns()).doesNotContainKey(LocalDate.of(2024, 2, 29));
   }
 
+  /**
+   * The attribute behind top-common-holdings: proves the {@code LIMITED_HOLDINGS} binding is registered and that a
+   * {@link Holdings} payload — plain holding rows plus the security's own currency — reaches the calculation as
+   * {@link CommonTopHoldings} with weights converted to ratio form.
+   */
   @Test
-  void shouldPreserveNullTopHoldingFields_whenSmsOmitsCurrencyAndWeight() throws Exception {
-    PortfolioHolding missingCurrency = holding("NO-CURRENCY");
-    PortfolioHolding missingWeight = holding("NO-WEIGHT");
-    enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.TOP_HOLDINGS,
-        List.of(
-            attributeRow("NO-CURRENCY", topHoldings(null, topHolding("Equity", "E", "5.0", null))),
-            attributeRow("NO-WEIGHT", topHoldings(Currency.CAD, topHolding("Missing Weight", "E", null, "TREE"))))));
+  void shouldMapLimitedHoldings_whenSmsReturnsAggregatedHoldings() throws Exception {
+    PortfolioHolding etf = holding("AGGREGATED");
+    enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.LIMITED_HOLDINGS,
+        List.of(attributeRow("AGGREGATED", limitedHoldings(Currency.CAD,
+            securityHolding("NVIDIA Corp", "8.87516", "0P000003RE"),
+            securityHolding("Microsoft Corp", "7.54319", "0P00000203"))))));
 
     SecurityData securityData = securityAttributesFetcher.fetch(
-        List.of(missingCurrency, missingWeight), List.of(CompositeSecurityAttribute.TOP_HOLDINGS),
+        List.of(etf), List.of(CompositeSecurityAttribute.LIMITED_HOLDINGS), List.of(DataProvider.MORNINGSTAR));
+
+    smsMockServer.takeRequest();
+    Map<PortfolioHolding, CommonTopHoldings> mapped = securityData.<CommonTopHoldings>get(
+        CompositeSecurityAttribute.LIMITED_HOLDINGS);
+    assertThat(mapped).containsOnlyKeys(etf);
+    assertThat(mapped.get(etf).getCurrency()).isEqualTo(Currency.CAD);
+    assertThat(mapped.get(etf).getProviders()).containsExactly(DataProvider.MORNINGSTAR);
+    assertThat(mapped.get(etf).getHoldings()).hasSize(2);
+
+    CommonHolding nvidia = mapped.get(etf).getHoldings().getFirst();
+    assertThat(nvidia.getName()).isEqualTo("NVIDIA Corp");
+    assertThat(nvidia.getWeight()).isEqualByComparingTo("0.0887516");
+    assertThat(nvidia.getPrimaryIdentifier().getId()).isEqualTo("0P000003RE");
+    assertThat(nvidia.getUnderlyingHoldings()).isEmpty();
+  }
+
+  @Test
+  void shouldPreserveNullHoldingFields_whenSmsOmitsCurrencyAndWeight() throws Exception {
+    PortfolioHolding missingCurrency = holding("NO-CURRENCY");
+    PortfolioHolding missingWeight = holding("NO-WEIGHT");
+    enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.LIMITED_HOLDINGS,
+        List.of(
+            attributeRow("NO-CURRENCY", limitedHoldings(null, securityHolding("Equity", "5.0", null))),
+            attributeRow("NO-WEIGHT",
+                limitedHoldings(Currency.CAD, securityHolding("Missing Weight", null, "TREE"))))));
+
+    SecurityData securityData = securityAttributesFetcher.fetch(
+        List.of(missingCurrency, missingWeight), List.of(CompositeSecurityAttribute.LIMITED_HOLDINGS),
         List.of(DataProvider.MORNINGSTAR));
 
     smsMockServer.takeRequest();
-    Map<PortfolioHolding, CommonTopHoldings> topHoldings = securityData.<CommonTopHoldings>get(
-        CompositeSecurityAttribute.TOP_HOLDINGS);
-    assertThat(topHoldings).containsOnlyKeys(missingCurrency, missingWeight);
-    assertThat(topHoldings.get(missingCurrency).getCurrency()).isNull();
-    assertThat(topHoldings.get(missingCurrency).getHoldings()).hasSize(1);
-    assertThat(topHoldings.get(missingCurrency).getHoldings().getFirst().getWeight()).isEqualByComparingTo("0.05");
-    assertThat(topHoldings.get(missingWeight).getHoldings()).hasSize(1);
-    assertThat(topHoldings.get(missingWeight).getHoldings().getFirst().getWeight()).isNull();
-    assertThat(topHoldings.get(missingWeight).getHoldings().getFirst().getPrimaryIdentifier().getId()).isEqualTo(
-        "TREE");
+    Map<PortfolioHolding, CommonTopHoldings> holdings = securityData.<CommonTopHoldings>get(
+        CompositeSecurityAttribute.LIMITED_HOLDINGS);
+    assertThat(holdings).containsOnlyKeys(missingCurrency, missingWeight);
+    assertThat(holdings.get(missingCurrency).getCurrency()).isNull();
+    assertThat(holdings.get(missingCurrency).getHoldings()).hasSize(1);
+    assertThat(holdings.get(missingCurrency).getHoldings().getFirst().getWeight()).isEqualByComparingTo("0.05");
+    assertThat(holdings.get(missingWeight).getHoldings()).hasSize(1);
+    assertThat(holdings.get(missingWeight).getHoldings().getFirst().getWeight()).isNull();
+    assertThat(holdings.get(missingWeight).getHoldings().getFirst().getPrimaryIdentifier().getId()).isEqualTo("TREE");
   }
 
   @Test
@@ -315,6 +354,29 @@ class SecurityAttributesFetcherIntegrationTest {
     assertThat(fees).containsOnlyKeys(available);
     assertThat(fees).doesNotContainKey(missing);
     assertThat(fees.get(available).getManagementExpenseRatio()).isEqualByComparingTo("0.0225");
+  }
+
+  @Test
+  void shouldDecodeResponse_whenPayloadExceedsTheFrameworkDefaultCodecLimit() throws Exception {
+    PortfolioHolding requested = holding("XIU");
+    List<Map<String, Object>> rows = new ArrayList<>();
+    rows.add(feeRow("XIU", "1.51", DataProvider.MORNINGSTAR, "2.25", Currency.CAD));
+    IntStream.rangeClosed(1, FILLER_ROW_COUNT).forEach(index -> rows.add(
+        feeRow("FILLER" + index, "0.10", DataProvider.MORNINGSTAR, "0.20", Currency.CAD)));
+
+    String body = objectMapper.writeValueAsString(Map.of(CompositeSecurityAttribute.FEES, rows));
+    assertThat(body.getBytes(StandardCharsets.UTF_8).length).isGreaterThan(SPRING_DEFAULT_MAX_IN_MEMORY_SIZE);
+    smsMockServer.enqueue(new MockResponse()
+        .setBody(body)
+        .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+    SecurityData securityData = securityAttributesFetcher.fetch(
+        List.of(requested), List.of(CompositeSecurityAttribute.FEES), List.of(DataProvider.MORNINGSTAR));
+
+    smsMockServer.takeRequest();
+    Map<PortfolioHolding, FeeData> fees = securityData.get(CompositeSecurityAttribute.FEES);
+    assertThat(fees).containsOnlyKeys(requested);
+    assertThat(fees.get(requested).getManagementFee()).isEqualByComparingTo("0.0151");
   }
 
   private void enqueueCompositeResponse(Map<CompositeSecurityAttribute, List<Map<String, Object>>> body)
@@ -352,19 +414,19 @@ class SecurityAttributesFetcherIntegrationTest {
     return result;
   }
 
-  private static TopHoldings topHoldings(Currency currency, TopHolding... allocations) {
-    TopHoldings topHoldings = new TopHoldings();
-    topHoldings.setAllocation(List.of(allocations));
-    topHoldings.setCurrency(currency);
-    topHoldings.setDataProviders(List.of(DataProvider.MORNINGSTAR));
-    return topHoldings;
+  private static Holdings limitedHoldings(Currency currency, SecurityHolding... allocation) {
+    Holdings holdings = new Holdings();
+    holdings.setAllocation(List.of(allocation));
+    holdings.setCurrency(currency);
+    holdings.setDataProviders(List.of(DataProvider.MORNINGSTAR));
+    return holdings;
   }
 
-  private static TopHolding topHolding(String name, String type, String weighting, String identifier) {
-    TopHolding holding = new TopHolding();
+  private static SecurityHolding securityHolding(String name, String weighting, String identifier) {
+    SecurityHolding holding = new SecurityHolding();
     holding.setName(List.of(new MultilingualString(LanguageCode.EN, name)));
     holding.setCompanyName(name);
-    holding.setType(type);
+    holding.setType("E");
     holding.setWeighting(weighting == null ? null : new BigDecimal(weighting));
     if (identifier != null) {
       IdentifiersDatapoint identifiers = new IdentifiersDatapoint();

@@ -11,8 +11,8 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
-import com.fintex.wm.commons.domain.holding.TopHolding;
-import com.fintex.wm.commons.domain.holding.TopHoldings;
+import com.fintex.wm.commons.domain.holding.Holdings;
+import com.fintex.wm.commons.domain.holding.SecurityHolding;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.value.MultilingualString;
@@ -60,7 +60,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
     var response = List.of(
         securityAttributeResult(
             new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER),
-            topHoldings(
+            holdings(
                 allocation("Alpha Corp", "E", "0.20", "50000"),
                 allocation("Bravo Corp", "E", "0.18", "45000"),
                 allocation("Charlie Corp", "E", "0.16", "40000"),
@@ -69,7 +69,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
                 allocation("Foxtrot Corp", "E", "0.10", "25000"))),
         securityAttributeResult(
             new SecurityIdentifier("BBB_PARENT", FiIdentifierType.FUNDSERV),
-            topHoldings(
+            holdings(
                 allocation("Alpha Corp", "E", "0.25", "60000"),
                 allocation("Bravo Corp", "E", "0.20", "48000"),
                 allocation("Golf Corp", "E", "0.15", "36000"),
@@ -131,19 +131,20 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
         securityIdentifier);
   }
 
-  private static TopHoldings topHoldings(TopHolding... allocations) {
-    var th = new TopHoldings();
+  private static Holdings holdings(SecurityHolding... allocations) {
+    var th = new Holdings();
     th.setAllocation(List.of(allocations));
     th.setDataProviders(List.of(DataProvider.MORNINGSTAR));
+    th.setCurrency(Currency.CAD);
     return th;
   }
 
-  private static TopHolding allocation(
+  private static SecurityHolding allocation(
       String companyName,
       String type,
       String weighting,
       String marketValue) {
-    var a = new TopHolding();
+    var a = new SecurityHolding();
     a.setCompanyName(companyName);
     a.setName(List.of(new MultilingualString(LanguageCode.EN, companyName)));
     a.setType(type);

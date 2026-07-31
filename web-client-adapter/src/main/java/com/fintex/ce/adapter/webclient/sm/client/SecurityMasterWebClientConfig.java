@@ -50,7 +50,8 @@ public class SecurityMasterWebClientConfig {
         .baseUrl(properties.getBaseUrl())
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .clientConnector(new ReactorClientHttpConnector(httpClient))
-        .filter(propagateRequestId());
+        .filter(propagateRequestId())
+        .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(properties.getMaxInMemorySize()));
 
     if (properties.isLogRequests()) {
       builder = builder.filter(logRequest()).filter(logResponse());
