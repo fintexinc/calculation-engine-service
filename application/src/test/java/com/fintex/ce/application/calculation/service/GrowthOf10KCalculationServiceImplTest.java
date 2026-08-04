@@ -40,8 +40,10 @@ class GrowthOf10KCalculationServiceImplTest {
       PortfolioMonthlyReturnsContextProvider.class);
   private final PortfolioWeightedAverageWithCpsdAndCpedPipeline pipeline = mock(
       PortfolioWeightedAverageWithCpsdAndCpedPipeline.class);
+  private final ReturnBenchmarkComparisonService returnBenchmarkComparisonService = mock(
+      ReturnBenchmarkComparisonService.class);
   private final GrowthOf10KCalculationServiceImpl service = new GrowthOf10KCalculationServiceImpl(
-      contextProvider, pipeline);
+      contextProvider, pipeline, returnBenchmarkComparisonService);
 
   @Test
   void shouldReportGrowthOf10KMetric() {

@@ -1,7 +1,10 @@
 package com.fintex.ce.e2e;
 
+import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.error.ErrorResponse;
 import com.fintex.wm.commons.error.Notification;
 
@@ -10,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +51,38 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
         "No complete calendar year (Jan-Dec) found in monthly returns range [2024-10-31, 2025-09-30]; "
             + "annual returns cannot be computed");
     assertThat(notification.getMetadata()).containsKeys("param-1", "param-2");
+  }
+
+  @Test
+  void shouldReturnComparison_whenBenchmarkHoldingsAreProvided() {
+    enqueueSmsMockResponse(writeJson(List.of(
+        securityAttributeResult(XBAL, fullYear2024Returns()),
+        securityAttributeResult(F0CAN999, fullYear2024Returns()))));
+    enqueueSmsMockResponse(writeJson(List.of(
+        securityAttributeResult(VCNS, benchmarkFullYear2024Returns()),
+        securityAttributeResult(CCM4752, benchmarkFullYear2024Returns()))));
+    ReturnCommand command = commandFor(Currency.CAD, List.of(
+        etfCanada(XBAL, "60000"),
+        fund(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "40000")));
+    command.setBenchmarkHoldings(List.of(
+        etfCanada(VCNS, "55000"),
+        fundServ(CCM4752, "45000")));
+
+    HttpResponse response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+    AnnualReturnResult<?> result = readJson(response.responseBody(), AnnualReturnResult.class);
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getAnnualReturns()).singleElement().satisfies(annualReturn -> {
+      assertThat(annualReturn.key()).isEqualTo(2024);
+      assertThat(annualReturn.value()).isEqualByComparingTo(new BigDecimal("0.0114842466"));
+    });
+    assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
+      assertThat(comparison.period()).isEqualTo(2024);
+      assertThat(comparison.portfolio()).isEqualByComparingTo(new BigDecimal("0.0114842466"));
+      assertThat(comparison.benchmark()).isEqualByComparingTo(new BigDecimal("0.0068870814"));
+      assertThat(comparison.percentDifference()).isEqualByComparingTo(new BigDecimal("66.7505570647"));
+    });
   }
 
   private Notification assertSingleError(HttpResponse response, String expectedCode, String expectedMessage) {

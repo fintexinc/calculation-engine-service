@@ -123,7 +123,7 @@ class CalculationTestDataProvider {
   static Stream<Arguments> calculationMetricArguments() {
     return Stream.of(
         period(CalculationMetric.TRAILING_TOTAL_RETURNS, init(new TrailingTotalReturnsResult(), r -> r
-            .setTrailingTotalReturn(TIME_INTERVALS)), TrailingTotalReturnsResult.class),
+            .setTrailingTotalReturn(List.copyOf(TIME_INTERVALS))), TrailingTotalReturnsResult.class),
         period(CalculationMetric.LEADING_TOTAL_RETURNS, init(new LeadingTotalReturnsResult(), r -> r
             .setLeadingTotalReturn(TIME_INTERVALS)), LeadingTotalReturnsResult.class),
         period(CalculationMetric.EXCESS_RETURNS, init(new ExcessReturnsResult(), r -> r.setExcessReturns(

@@ -84,6 +84,8 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
     assertGrowthPoint(result.getGrowth10k().get(0), "2023-12-31", "10000");
     assertGrowthPoint(result.getGrowth10k().get(1), "2024-01-31", "10338.9322554409");
     assertGrowthPoint(result.getGrowth10k().get(2), "2024-02-29", "10294.7136234902");
+    assertThat(result.getComparison()).isNull();
+    assertThat(responseBody).doesNotContain("\"comparison\"");
   }
 
   protected static ReturnCommand richPortfolioCommand() {
@@ -106,7 +108,7 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
     assertThat(point.value()).isEqualByComparingTo(new BigDecimal(expectedValue));
   }
 
-  private static MonthlyReturns twoMonthReturns(String janPercent, String febPercent) {
+  protected static MonthlyReturns twoMonthReturns(String janPercent, String febPercent) {
     return monthlyReturns(
         returns("2024-01-31", janPercent, "2024-02-29", febPercent),
         DataProvider.MORNINGSTAR,

@@ -14,6 +14,7 @@ import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,10 +27,14 @@ public class GrowthOf10KCalculationServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<ReturnCommand, Growth10KResult> {
 
+  private final ReturnBenchmarkComparisonService returnBenchmarkComparisonService;
+
   public GrowthOf10KCalculationServiceImpl(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
-      PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped) {
+      PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped,
+      ReturnBenchmarkComparisonService returnBenchmarkComparisonService) {
     super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCpsdAndCped);
+    this.returnBenchmarkComparisonService = returnBenchmarkComparisonService;
   }
 
   @Override
@@ -42,7 +47,24 @@ public class GrowthOf10KCalculationServiceImpl
       PortfolioBenchmarkReturns returnsData) {
     WeightedAverageResult<HoldingMonthlyReturns> weighted = runWeightedAverage(command, ReturnFactorScale.SCALE_OF_TWO,
         returnsData);
+    Growth10KResult result = buildResult(weighted);
+    if (CollectionUtils.isEmpty(command.getBenchmarkHoldings())) {
+      return result;
+    }
 
+    var comparison = returnBenchmarkComparisonService.compare(
+        new ReturnBenchmarkComparisonService.ReturnBenchmarkComparisonRequest<>(
+            result.getGrowth10k(),
+            returnBenchmarkComparisonService.benchmarkWeightedAverage(
+                command, returnsData, ReturnFactorScale.SCALE_OF_TWO),
+            GrowthOf10KCalculationServiceImpl::buildResult,
+            Growth10KResult::getGrowth10k));
+    result.setComparison(comparison.comparison());
+    result.setWarnings(returnBenchmarkComparisonService.mergeWarnings(result.getWarnings(), comparison.warnings()));
+    return result;
+  }
+
+  private static Growth10KResult buildResult(WeightedAverageResult<HoldingMonthlyReturns> weighted) {
     NavigableMap<LocalDate, BigDecimal> growth = Growth10KHelper.compoundGrowth10K(weighted.weightedAverage(),
         ReturnFactorScale.AS_IS);
     List<KeyValueResult<LocalDate>> points = growth.entrySet().stream()
