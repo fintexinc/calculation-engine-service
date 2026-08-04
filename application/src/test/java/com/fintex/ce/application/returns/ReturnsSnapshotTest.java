@@ -9,6 +9,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.error.Severity;
 
 import org.junit.jupiter.api.Test;
 
@@ -96,10 +97,10 @@ class ReturnsSnapshotTest {
   }
 
   @Test
-  void shouldThrow_whenForMonthlyReturnsContainsFatalError() {
+  void shouldThrow_whenForMonthlyReturnsContainsFatalBeforeStartDateError() {
     HoldingMonthlyReturns broken = holdingMonthlyReturns(Currency.USD.name(),
         entry(LocalDate.parse("2020-01-31"), BigDecimal.valueOf(0.01)));
-    broken.addError(ErrorCode.CPED_AFTER_PORTFOLIO_PED.toNotification());
+    broken.addError(ErrorCode.CPED_BEFORE_PORTFOLIO_PSD.toNotification());
 
     assertThatThrownBy(() -> ReturnsSnapshot.forMonthlyReturns(Map.of(HOLDING_USD, broken)))
         .isInstanceOf(CalculationsFailedException.class);
@@ -216,8 +217,8 @@ class ReturnsSnapshotTest {
   }
 
   @Test
-  void shouldTranslateErrorsToNotifications_whenGetErrorsAsWarnings() {
-    BasePceException error = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("hid");
+  void shouldTranslateEndDateAfterPerformanceToWarning_whenGetErrorsAsWarnings() {
+    BasePceException error = ErrorCode.CPED_AFTER_PORTFOLIO_PED.toException();
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = ReturnsSnapshot.<HoldingMonthlyReturns>empty()
         .withErrors(List.of(error));
 
@@ -225,8 +226,8 @@ class ReturnsSnapshotTest {
 
     assertThat(warnings).hasSize(1);
     Notification warning = warnings.getFirst();
-    assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.HOLDING_PSD_OUT_OF_RANGE);
-    assertThat(warning.getMetadata()).containsEntry("holdingId", "hid");
+    assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.CPED_AFTER_PORTFOLIO_PED);
+    assertThat(warning.getSeverity()).isEqualTo(Severity.WARNING);
   }
 
   @Test

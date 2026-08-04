@@ -141,6 +141,78 @@ class BenchmarkWeightedAverageAlignmentTest {
     assertThat(result.getCipsd()).isEqualTo(command.getCustomIntervalPsd());
   }
 
+  @Test
+  void shouldCapBenchmarkCped_whenRequestedCpedIsAfterPortfolioPed() {
+    PortfolioMonthlyReturnsContextProvider portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+    BenchmarkMonthlyReturnsContextProvider benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
+    PortfolioWeightedAverageWithCpedPipeline portfolioPipeline = mock(PortfolioWeightedAverageWithCpedPipeline.class);
+    BenchmarkWeightedAverageWithCpedPipeline benchmarkPipeline = mock(BenchmarkWeightedAverageWithCpedPipeline.class);
+    CpedTestService service = new CpedTestService(portfolioProvider, benchmarkProvider, portfolioPipeline,
+        benchmarkPipeline);
+    PeriodCommand command = periodCommand();
+    command.setCustomPed(MAY_2020);
+    PortfolioBenchmarkReturns returnsData = new PortfolioBenchmarkReturns(Map.of(), Map.of());
+
+    when(portfolioProvider.get(command.getHoldings(), command.getCurrency(), returnsData.portfolio()))
+        .thenReturn(context(ReturnsRole.PORTFOLIO, PORTFOLIO_HOLDING, JAN_2020, FEB_2020, MAR_2020, APR_2020));
+    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency(), returnsData.benchmark()))
+        .thenReturn(context(ReturnsRole.BENCHMARK, BENCHMARK_HOLDING, FEB_2020, MAR_2020, APR_2020, MAY_2020));
+    when(portfolioPipeline.run(any(), any())).thenReturn(weightedAverageResult(FEB_2020, MAR_2020, APR_2020));
+    when(benchmarkPipeline.run(any(), any())).thenReturn(weightedAverageResult(FEB_2020, MAR_2020, APR_2020));
+
+    BenchmarkPeriodCalculationInput result = service.buildPeriodCalculationInput(command,
+        ReturnFactorScale.SCALE_OF_TWO,
+        returnsData);
+
+    ArgumentCaptor<CpedScaleParams> portfolioParamsCaptor = ArgumentCaptor.forClass(CpedScaleParams.class);
+    ArgumentCaptor<CpedScaleParams> benchmarkParamsCaptor = ArgumentCaptor.forClass(CpedScaleParams.class);
+    verify(portfolioPipeline).run(any(), portfolioParamsCaptor.capture());
+    verify(benchmarkPipeline).run(any(), benchmarkParamsCaptor.capture());
+
+    assertThat(portfolioParamsCaptor.getValue()).isEqualTo(new CpedScaleParams(MAY_2020,
+        ReturnFactorScale.SCALE_OF_TWO));
+    assertThat(benchmarkParamsCaptor.getValue()).isEqualTo(new CpedScaleParams(APR_2020,
+        ReturnFactorScale.SCALE_OF_TWO));
+    assertThat(result.getWeightedAveragePortfolioReturns()).containsOnlyKeys(FEB_2020, MAR_2020, APR_2020);
+    assertThat(result.getWeightedAverageBenchmarkReturns()).containsOnlyKeys(FEB_2020, MAR_2020, APR_2020);
+  }
+
+  @Test
+  void shouldCapBenchmarkCpedForCpsdPipeline_whenRequestedCpedIsAfterPortfolioPed() {
+    PortfolioMonthlyReturnsContextProvider portfolioProvider = mock(PortfolioMonthlyReturnsContextProvider.class);
+    BenchmarkMonthlyReturnsContextProvider benchmarkProvider = mock(BenchmarkMonthlyReturnsContextProvider.class);
+    PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioPipeline = mock(
+        PortfolioWeightedAverageWithCpsdAndCpedPipeline.class);
+    BenchmarkWeightedAverageWithCpsdAndCpedPipeline benchmarkPipeline = mock(
+        BenchmarkWeightedAverageWithCpsdAndCpedPipeline.class);
+    CpsdCpedTestService service = new CpsdCpedTestService(portfolioProvider, benchmarkProvider, portfolioPipeline,
+        benchmarkPipeline);
+    RollingCalculationCommand command = rollingCommand();
+    command.setCustomPed(MAY_2020);
+    PortfolioBenchmarkReturns returnsData = new PortfolioBenchmarkReturns(Map.of(), Map.of());
+
+    when(portfolioProvider.get(command.getHoldings(), command.getCurrency(), returnsData.portfolio()))
+        .thenReturn(context(ReturnsRole.PORTFOLIO, PORTFOLIO_HOLDING, JAN_2020, FEB_2020, MAR_2020, APR_2020));
+    when(benchmarkProvider.get(command.getBenchmarkHoldings(), command.getCurrency(), returnsData.benchmark()))
+        .thenReturn(context(ReturnsRole.BENCHMARK, BENCHMARK_HOLDING, FEB_2020, MAR_2020, APR_2020, MAY_2020));
+    when(portfolioPipeline.run(any(), any())).thenReturn(weightedAverageResult(MAR_2020, APR_2020));
+    when(benchmarkPipeline.run(any(), any())).thenReturn(weightedAverageResult(MAR_2020, APR_2020));
+
+    BenchmarkPeriodCalculationInput result = service.buildBenchmarkInput(command, ReturnFactorScale.AS_IS, returnsData);
+
+    ArgumentCaptor<CpsdCpedScaleParams> portfolioParamsCaptor = ArgumentCaptor.forClass(CpsdCpedScaleParams.class);
+    ArgumentCaptor<CpsdCpedScaleParams> benchmarkParamsCaptor = ArgumentCaptor.forClass(CpsdCpedScaleParams.class);
+    verify(portfolioPipeline).run(any(), portfolioParamsCaptor.capture());
+    verify(benchmarkPipeline).run(any(), benchmarkParamsCaptor.capture());
+
+    assertThat(portfolioParamsCaptor.getValue()).isEqualTo(new CpsdCpedScaleParams(MAR_2020, MAY_2020,
+        ReturnFactorScale.AS_IS));
+    assertThat(benchmarkParamsCaptor.getValue()).isEqualTo(new CpsdCpedScaleParams(MAR_2020, APR_2020,
+        ReturnFactorScale.AS_IS));
+    assertThat(result.getWeightedAveragePortfolioReturns()).containsOnlyKeys(MAR_2020, APR_2020);
+    assertThat(result.getWeightedAverageBenchmarkReturns()).containsOnlyKeys(MAR_2020, APR_2020);
+  }
+
   private static PeriodCommand periodCommand() {
     PeriodCommand command = new PeriodCommand();
     command.setHoldings(List.of(PORTFOLIO_HOLDING));

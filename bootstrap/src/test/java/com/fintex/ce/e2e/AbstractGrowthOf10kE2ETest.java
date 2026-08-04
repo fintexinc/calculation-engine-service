@@ -5,11 +5,15 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.performance.MonthlyReturns;
+import com.fintex.wm.commons.domain.rates.DateRateValue;
+import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.error.Severity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,7 +43,15 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
 
   @Override
   protected String requestBodyForPositiveSmsScenario() {
-    return writeJson(richPortfolioCommand());
+    ReturnCommand command = richPortfolioCommand();
+    command.setCustomPed(LocalDate.of(2024, 12, 31));
+    return writeJson(command);
+  }
+
+  @Override
+  protected void enqueueForPositiveSmsScenario() {
+    enqueueSmsMockResponse(smsPositiveResponseBody());
+    enqueueSmsMockResponse(writeJson(cadTreasuryRates()));
   }
 
   @Override
@@ -62,7 +74,10 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
   @Override
   protected void assertPositiveResponseBody(String responseBody) {
     Growth10KResult result = readJson(responseBody, Growth10KResult.class);
-    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getWarnings()).extracting(Notification::getCode)
+        .containsExactly(ErrorCode.CPED_AFTER_PORTFOLIO_PED.getCode());
+    assertThat(result.getWarnings()).extracting(Notification::getSeverity)
+        .containsExactly(Severity.WARNING);
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2023, 12, 31));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 2, 29));
     assertThat(result.getGrowth10k()).hasSize(3);
@@ -96,5 +111,11 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
         returns("2024-01-31", janPercent, "2024-02-29", febPercent),
         DataProvider.MORNINGSTAR,
         "2024-02-29T00:00:00");
+  }
+
+  private static List<DateRateValue> cadTreasuryRates() {
+    return List.of(
+        new DateRateValue(LocalDate.of(2024, 1, 31), BigDecimal.valueOf(0.0030)),
+        new DateRateValue(LocalDate.of(2024, 2, 29), BigDecimal.valueOf(0.0031)));
   }
 }

@@ -61,4 +61,10 @@ public record MonthlyReturnsContext<T extends ReturnsData>(
     }
     return first.isBefore(second) ? first : second;
   }
+
+  /** Returns whether the requested end date falls after this context's available performance end date. */
+  public boolean isCustomPedAfterPerformanceEndDate(LocalDate customPed) {
+    LocalDate performanceEndDate = snapshot.performanceEndDate();
+    return customPed != null && performanceEndDate != null && customPed.isAfter(performanceEndDate);
+  }
 }
