@@ -14,6 +14,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,10 +35,14 @@ public class AnnualReturnServiceImpl
     extends
       WeightedAverageWithCpsdAndCpedAbstractService<ReturnCommand, AnnualReturnResult<Integer>> {
 
+  private final ReturnBenchmarkComparisonService returnBenchmarkComparisonService;
+
   public AnnualReturnServiceImpl(
       PortfolioMonthlyReturnsContextProvider portfolioMonthlyReturnsContextProvider,
-      PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped) {
+      PortfolioWeightedAverageWithCpsdAndCpedPipeline portfolioWeightedAverageWithCpsdAndCped,
+      ReturnBenchmarkComparisonService returnBenchmarkComparisonService) {
     super(portfolioMonthlyReturnsContextProvider, portfolioWeightedAverageWithCpsdAndCped);
+    this.returnBenchmarkComparisonService = returnBenchmarkComparisonService;
   }
 
   @Override
@@ -49,7 +54,23 @@ public class AnnualReturnServiceImpl
   public AnnualReturnResult<Integer> perform(ReturnCommand command,
       PortfolioBenchmarkReturns returnsData) {
     PeriodCalculationInput context = buildPeriodCalculationInput(command, SCALE_OF_TWO, returnsData);
-    return buildAnnualReturnResult(context.getWeightedAveragePortfolioReturns(), context.getWarnings());
+    AnnualReturnResult<Integer> result = buildAnnualReturnResult(context.getWeightedAveragePortfolioReturns(),
+        context.getWarnings());
+    if (CollectionUtils.isEmpty(command.getBenchmarkHoldings())) {
+      return result;
+    }
+
+    var comparison = returnBenchmarkComparisonService.compare(
+        new ReturnBenchmarkComparisonService.ReturnBenchmarkComparisonRequest<>(
+            result.getAnnualReturns(),
+            returnBenchmarkComparisonService.benchmarkWeightedAverage(command, returnsData, SCALE_OF_TWO),
+            benchmarkWeightedAverage -> buildAnnualReturnResult(
+                benchmarkWeightedAverage.weightedAverage(),
+                benchmarkWeightedAverage.getErrorsAsWarnings()),
+            AnnualReturnResult::getAnnualReturns));
+    result.setComparison(comparison.comparison());
+    result.setWarnings(returnBenchmarkComparisonService.mergeWarnings(result.getWarnings(), comparison.warnings()));
+    return result;
   }
 
   static AnnualReturnResult<Integer> buildAnnualReturnResult(NavigableMap<LocalDate, BigDecimal> portfolioReturns,

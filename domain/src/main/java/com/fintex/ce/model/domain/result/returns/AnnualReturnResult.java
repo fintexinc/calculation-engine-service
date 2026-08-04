@@ -3,6 +3,8 @@ package com.fintex.ce.model.domain.result.returns;
 import com.fintex.ce.model.domain.result.DatesResult;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -23,4 +25,8 @@ public class AnnualReturnResult<T> extends DatesResult {
 
   @Schema(description = "Annual returns by calendar year")
   private List<KeyValueResult<T>> annualReturns;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Schema(description = "Portfolio-versus-benchmark annual return comparison by calendar year")
+  private List<ReturnComparison<T>> comparison;
 }

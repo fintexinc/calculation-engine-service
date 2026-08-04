@@ -39,6 +39,8 @@ abstract class AbstractAnnualReturnsE2ETest extends AbstractReturnCommandE2ETest
   // Realistic 12-month path in percentage points, including down months, shared by every holding.
   private static final String[] MONTHLY_PERCENTS_2024 = {
       "1.0", "-0.7", "0.9", "-1.6", "1.4", "-0.9", "0.3", "0.8", "-1.2", "1.1", "-0.5", "0.6"};
+  private static final String[] BENCHMARK_MONTHLY_PERCENTS_2024 = {
+      "0.4", "-0.3", "0.5", "-0.8", "0.7", "-0.4", "0.2", "0.4", "-0.6", "0.5", "-0.2", "0.3"};
 
   @Override
   protected String metricPath() {
@@ -84,6 +86,8 @@ abstract class AbstractAnnualReturnsE2ETest extends AbstractReturnCommandE2ETest
     KeyValueResult<?> entry = result.getAnnualReturns().getFirst();
     assertThat(entry.key()).isEqualTo(2024);
     assertThat(entry.value()).isEqualByComparingTo(new BigDecimal("0.0114842466"));
+    assertThat(result.getComparison()).isNull();
+    assertThat(responseBody).doesNotContain("\"comparison\"");
   }
 
   protected static ReturnCommand commandFor(Currency currency, List<PortfolioHolding> holdings) {
@@ -100,8 +104,16 @@ abstract class AbstractAnnualReturnsE2ETest extends AbstractReturnCommandE2ETest
   }
 
   protected static MonthlyReturns fullYear2024Returns() {
+    return fullYearReturns(MONTHLY_PERCENTS_2024);
+  }
+
+  protected static MonthlyReturns benchmarkFullYear2024Returns() {
+    return fullYearReturns(BENCHMARK_MONTHLY_PERCENTS_2024);
+  }
+
+  private static MonthlyReturns fullYearReturns(String[] monthlyPercents) {
     List<DateBigDecimalValue> monthly = IntStream.range(0, MONTH_ENDS_2024.length)
-        .mapToObj(i -> new DateBigDecimalValue(MONTH_ENDS_2024[i], new BigDecimal(MONTHLY_PERCENTS_2024[i])))
+        .mapToObj(i -> new DateBigDecimalValue(MONTH_ENDS_2024[i], new BigDecimal(monthlyPercents[i])))
         .toList();
     return monthlyReturns(monthly, DataProvider.MORNINGSTAR, "2024-12-31T00:00:00");
   }

@@ -3,6 +3,8 @@ package com.fintex.ce.model.domain.result.returns;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -29,4 +31,8 @@ public class Growth10KResult extends BaseCalculationResult {
   private LocalDate performanceStartDate;
   @Schema(description = "Growth of $10K data points over time")
   private List<KeyValueResult<LocalDate>> growth10k;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Schema(description = "Portfolio-versus-benchmark growth-of-10k comparison by valuation date")
+  private List<ReturnComparison<LocalDate>> comparison;
 }
