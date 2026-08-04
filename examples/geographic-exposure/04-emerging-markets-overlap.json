@@ -1,0 +1,149 @@
+{
+  "metric": "geographic-exposure",
+  "holdings": [
+    {
+      "holdingType": "CASH",
+      "value": 2500.00,
+      "securityIdentifier": {
+        "id": "CASH-USD",
+        "idType": "TICKER"
+      },
+      "currency": "USD"
+    },
+    {
+      "holdingType": "CASH",
+      "value": 22000.00,
+      "securityIdentifier": {
+        "id": "CASH-HKD",
+        "idType": "TICKER"
+      },
+      "currency": "HKD"
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 80000.00,
+      "securityIdentifier": {
+        "id": "950160.KQ",
+        "idType": "TICKER_MIC",
+        "exchangeId": "KOE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 65000.00,
+      "securityIdentifier": {
+        "id": "950130.KQ",
+        "idType": "TICKER_MIC",
+        "exchangeId": "KOE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 18000.00,
+      "securityIdentifier": {
+        "id": "2012.HK",
+        "idType": "TICKER_MIC",
+        "exchangeId": "HKSE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 12000.00,
+      "securityIdentifier": {
+        "id": "3395.HK",
+        "idType": "TICKER_MIC",
+        "exchangeId": "HKSE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 9000.00,
+      "securityIdentifier": {
+        "id": "2099.HK",
+        "idType": "TICKER_MIC",
+        "exchangeId": "HKSE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 7500.00,
+      "securityIdentifier": {
+        "id": "6598.TW",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TAI"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 4500.00,
+      "securityIdentifier": {
+        "id": "PAAS.BA",
+        "idType": "TICKER_MIC",
+        "exchangeId": "BUE"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "value": 3800.00,
+      "securityIdentifier": {
+        "id": "AURA33.SA",
+        "idType": "TICKER_MIC",
+        "exchangeId": "SAO"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 9000.00,
+      "securityIdentifier": {
+        "id": "BCHI",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 6500.00,
+      "securityIdentifier": {
+        "id": "CCHI",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 5800.00,
+      "securityIdentifier": {
+        "id": "CRHI",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 3500.00,
+      "securityIdentifier": {
+        "id": "ABHI",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
+      "value": 7500.00,
+      "securityIdentifier": {
+        "id": "F00000MBXT",
+        "idType": "MORNINGSTAR_ID"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
+      "value": 5000.00,
+      "securityIdentifier": {
+        "id": "F00000MGD8",
+        "idType": "MORNINGSTAR_ID"
+      }
+    }
+  ]
+}

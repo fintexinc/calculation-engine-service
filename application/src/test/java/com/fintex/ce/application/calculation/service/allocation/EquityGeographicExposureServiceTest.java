@@ -24,7 +24,7 @@ class EquityGeographicExposureServiceTest
 
   @Override
   protected AbstractGeographicExposureService<EquityGeographicExposureResult> createService() {
-    return new EquityGeographicExposureService(portfolioWeightCalculator);
+    return new EquityGeographicExposureService(portfolioWeightCalculator, stockRegionResolver);
   }
 
   @Override

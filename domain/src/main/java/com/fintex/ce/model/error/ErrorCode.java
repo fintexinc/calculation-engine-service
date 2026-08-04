@@ -282,6 +282,14 @@ public enum ErrorCode {
       HttpStatus.OK,
       Severity.WARNING),
 
+  MISSING_GEOGRAPHIC_EXPOSURE(
+      Codes.MISSING_GEOGRAPHIC_EXPOSURE,
+      "The holding %s is missing values for Geographic Exposure",
+      "Geographic Exposure is absent in the data provider response",
+      "Populate Geographic Exposure in the source data",
+      HttpStatus.OK,
+      Severity.WARNING),
+
   // ============================================
   // FX-xxx — FX rate errors
   // ============================================
@@ -1162,6 +1170,7 @@ public enum ErrorCode {
     public static final String MISSING_HOLDING_IDENTIFIERS = "FDS-029";
     public static final String MISSING_UNDERLYING_HOLDING_ID_VALUE = "FDS-030";
     public static final String MISSING_FIXED_INCOME_GEOGRAPHIC_EXPOSURE = "FDS-031";
+    public static final String MISSING_GEOGRAPHIC_EXPOSURE = "FDS-032";
 
     // FX
     public static final String FX_RATES_UNAVAILABLE = "FX-001";

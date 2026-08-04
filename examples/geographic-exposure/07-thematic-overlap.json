@@ -1,0 +1,155 @@
+{
+  "metric": "geographic-exposure",
+  "holdings": [
+    {
+      "holdingType": "CASH",
+      "value": 2000.00,
+      "securityIdentifier": {
+        "id": "CASH-USD",
+        "idType": "TICKER"
+      },
+      "currency": "USD"
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "USA",
+      "value": 14000.00,
+      "securityIdentifier": {
+        "id": "NVDA",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "USA",
+      "value": 10500.00,
+      "securityIdentifier": {
+        "id": "AMZN",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 8900.00,
+      "securityIdentifier": {
+        "id": "META.NE",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NEO"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 7600.00,
+      "securityIdentifier": {
+        "id": "TSLA.NE",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NEO"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 5200.00,
+      "securityIdentifier": {
+        "id": "MSFT.NE",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NEO"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 4800.00,
+      "securityIdentifier": {
+        "id": "AAPL.NE",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NEO"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 18000.00,
+      "securityIdentifier": {
+        "id": "QQQQ",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 5800.00,
+      "securityIdentifier": {
+        "id": "NVDH",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 5400.00,
+      "securityIdentifier": {
+        "id": "NVHE.U",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 4900.00,
+      "securityIdentifier": {
+        "id": "AMZH",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 3700.00,
+      "securityIdentifier": {
+        "id": "GMOM",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 2900.00,
+      "securityIdentifier": {
+        "id": "VAMO",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 2400.00,
+      "securityIdentifier": {
+        "id": "MALX",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
+      "value": 9300.00,
+      "securityIdentifier": {
+        "id": "F00000MP5F",
+        "idType": "MORNINGSTAR_ID"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
+      "value": 6700.00,
+      "securityIdentifier": {
+        "id": "F00000MP5G",
+        "idType": "MORNINGSTAR_ID"
+      }
+    }
+  ]
+}
