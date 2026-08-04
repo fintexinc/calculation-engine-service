@@ -116,6 +116,18 @@ public class SecurityAttributeFetcherConfig {
         GeographicAllocationWithCurrency.class, HoldingGeographicAllocation.class, mapper);
   }
 
+  /**
+   * The whole-security counterpart of the two sleeve bindings above. Same wrapper, same mapper: Security Master buckets
+   * all three into {@code GeographicRegionType} with one mapping, so the consolidated metric and the per-sleeve ones
+   * classify a given country identically.
+   */
+  @Bean
+  CompositeAttributeBinding<HoldingGeographicAllocation, GeographicAllocationWithCurrency> geographicAllocationBinding(
+      GeographicAllocationMapper mapper) {
+    return new CompositeAttributeBinding<>(CompositeSecurityAttribute.GEOGRAPHIC_ALLOCATION,
+        GeographicAllocationWithCurrency.class, HoldingGeographicAllocation.class, mapper);
+  }
+
   @Bean
   CompositeAttributeBinding<HoldingEquityMarketCap, EquityMarketCapitalization> equityMarketCapitalizationBinding(
       EquityMarketCapitalizationMapper mapper) {

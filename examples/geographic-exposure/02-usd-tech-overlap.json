@@ -1,0 +1,119 @@
+{
+  "metric": "geographic-exposure",
+  "holdings": [
+    {
+      "holdingType": "CASH",
+      "value": 3000.00,
+      "securityIdentifier": {
+        "id": "CASH-USD",
+        "idType": "TICKER"
+      },
+      "currency": "USD"
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "USA",
+      "value": 12000.00,
+      "securityIdentifier": {
+        "id": "AAPL",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "USA",
+      "value": 9500.00,
+      "securityIdentifier": {
+        "id": "MSFT",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "USA",
+      "value": 8200.00,
+      "securityIdentifier": {
+        "id": "NVDA",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "USA",
+      "value": 7000.00,
+      "securityIdentifier": {
+        "id": "AMZN",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "USA",
+      "value": 6500.00,
+      "securityIdentifier": {
+        "id": "GOOGL",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "USA",
+      "value": 4800.00,
+      "securityIdentifier": {
+        "id": "LULU",
+        "idType": "TICKER_MIC",
+        "exchangeId": "NASDAQ"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 15000.00,
+      "securityIdentifier": {
+        "id": "QQQQ",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 4500.00,
+      "securityIdentifier": {
+        "id": "NVDH",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 3800.00,
+      "securityIdentifier": {
+        "id": "AMZH",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 2500.00,
+      "securityIdentifier": {
+        "id": "DIV",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND",
+      "country": "USA",
+      "value": 6000.00,
+      "securityIdentifier": {
+        "id": "F00000MP5D",
+        "idType": "MORNINGSTAR_ID"
+      }
+    }
+  ]
+}
