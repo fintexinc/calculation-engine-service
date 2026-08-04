@@ -29,7 +29,8 @@ class ReturnsErrorPolicyTest {
     List<BasePceException> allowed = List.of(
         ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("h1"),
         ErrorCode.MISSING_MONTHLY_RETURNS.toExceptionForId("h2"),
-        ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS.toExceptionForId("h3"));
+        ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS.toExceptionForId("h3"),
+        ErrorCode.CPED_AFTER_PORTFOLIO_PED.toExceptionForId("h4"));
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = ReturnsSnapshot.<HoldingMonthlyReturns>empty().withErrors(
         allowed);
 
@@ -42,7 +43,7 @@ class ReturnsErrorPolicyTest {
   void shouldThrow_whenAnyErrorIsNotAllowed() {
     List<BasePceException> mixed = List.of(
         ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("allowed"),
-        ErrorCode.CPED_AFTER_PORTFOLIO_PED.toExceptionForId("fatal"));
+        ErrorCode.CPED_BEFORE_PORTFOLIO_PSD.toExceptionForId("fatal"));
 
     assertThatThrownBy(() -> ReturnsErrorPolicy.throwIfFatal(mixed))
         .isInstanceOf(CalculationsFailedException.class);
@@ -51,7 +52,7 @@ class ReturnsErrorPolicyTest {
   @Test
   void shouldThrowWithAllExceptions_whenFatalErrorPresent() {
     BasePceException allowed = ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("allowed");
-    BasePceException fatal = ErrorCode.CPED_AFTER_PORTFOLIO_PED.toExceptionForId("fatal");
+    BasePceException fatal = ErrorCode.CPED_BEFORE_PORTFOLIO_PSD.toExceptionForId("fatal");
 
     assertThatThrownBy(() -> ReturnsErrorPolicy.throwIfFatal(List.of(allowed, fatal)))
         .isInstanceOf(CalculationsFailedException.class)
@@ -73,6 +74,7 @@ class ReturnsErrorPolicyTest {
         .containsExactlyInAnyOrder(
             ErrorCode.HOLDING_PSD_OUT_OF_RANGE,
             ErrorCode.MISSING_MONTHLY_RETURNS,
-            ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS);
+            ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS,
+            ErrorCode.CPED_AFTER_PORTFOLIO_PED);
   }
 }
