@@ -9,6 +9,7 @@ import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -26,6 +27,7 @@ import java.util.TreeMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -89,32 +91,35 @@ class FxConversionProcessorTest {
   }
 
   @Test
-  void shouldReturnEmptyAlignedSeries_whenNoCommonConvertedMonthsAreAvailable() {
+  void shouldThrowFxRatesUnavailable_whenNoCommonConvertedMonthsAreAvailable() {
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = snapshot(Map.of(
         HOLDING_USD, Currency.USD,
         HOLDING_EUR, Currency.EUR));
     when(fxRateService.convertReturns(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
       List<Notification> warnings = invocation.getArgument(4);
+      warnings.add(ErrorCode.FX_RATES_UNAVAILABLE.toNotificationForHolding(HOLDING_USD,
+          Currency.USD, Currency.CAD));
       warnings.add(ErrorCode.FX_RATES_UNAVAILABLE.toNotificationForHolding(HOLDING_EUR,
           Currency.EUR, Currency.CAD));
       return Map.of(
           HOLDING_USD, treeMap(Map.entry(JAN, BigDecimal.valueOf(1.5))),
-          HOLDING_EUR, new TreeMap<LocalDate, BigDecimal>());
+          HOLDING_EUR, treeMap(Map.entry(FEB, BigDecimal.valueOf(1.5))));
     });
 
     ProcessingContext context = ProcessingContext.of(null, null,
         new FxContext(Map.of(new CurrencyExchangePair(Currency.USD, Currency.CAD), navigable()), Currency.CAD));
 
-    ReturnsSnapshot<HoldingMonthlyReturns> result = processor.process(snapshot, context);
+    CalculationException exception = assertThrows(CalculationException.class, () -> processor.process(snapshot,
+        context));
 
-    assertThat(result.errors()).isEmpty();
-    assertThat(result.warnings()).hasSize(1);
-    assertThat(result.warnings().getFirst().getCode())
-        .isEqualTo(ErrorCode.FX_RATES_UNAVAILABLE.getCode());
-    assertThat(result.returnsMap().get(HOLDING_USD)).isEmpty();
-    assertThat(result.returnsMap().get(HOLDING_EUR)).isEmpty();
-    assertThat(result.performanceStartDate()).isNull();
-    assertThat(result.performanceEndDate()).isNull();
+    assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.FX_RATES_UNAVAILABLE);
+    assertThat(exception.getMessage()).isEqualTo("FX rates unavailable for holding " + HOLDING_EUR.getIdsString()
+        + ": EUR -> CAD");
+    assertThat(exception.getMetadata())
+        .containsEntry("holdingId", HOLDING_EUR.getIdsString())
+        .containsEntry("param-1", HOLDING_EUR.getIdsString())
+        .containsEntry("param-2", Currency.EUR)
+        .containsEntry("param-3", Currency.CAD);
   }
 
   @Test

@@ -43,8 +43,7 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
     when(treasuryBillsFetcher.fetch(Currency.CAD))
         .thenReturn(new TreeMap<>(Map.of(LocalDate.now(), BigDecimal.ONE)));
     when(service.buildPeriodCalculationInput(req, ReturnFactorScale.SCALE_OF_TWO, PortfolioBenchmarkReturns.EMPTY))
-        .thenReturn(
-            new PeriodCalculationInput());
+        .thenReturn(new PeriodCalculationInput());
 
     doCallRealMethod().when(service).perform(req, PortfolioBenchmarkReturns.EMPTY);
     try (var ignored = mockConstruction(TrailingTotalReturnsCalculation.class)) {

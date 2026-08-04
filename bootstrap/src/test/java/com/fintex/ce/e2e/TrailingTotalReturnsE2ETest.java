@@ -29,6 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -87,6 +88,11 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
       bocMockServer.shutdown();
       bocMockServer = null;
     }
+  }
+
+  @BeforeEach
+  void resetBocMockServer() {
+    bocMockServer.setDispatcher(bocDailyUsdCadDispatcher("1.0000"));
   }
 
   @DynamicPropertySource
@@ -233,6 +239,30 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(findPeriod(result, THREE_MTH.name()).value())
         .isCloseTo(new BigDecimal("0.04252268"), within(TOLERANCE));
     assertThat(findPeriod(result, SIX_MTH.name()).value()).isNull();
+  }
+
+  @Test
+  void shouldReturnFxRatesUnavailableBusinessError_whenAllRequiredFxRatesAreUnavailable() {
+    bocMockServer.setDispatcher(bocUnavailableDispatcher());
+    PortfolioHolding holding = holding(VTI, FinancialInstrumentType.ETF, Country.USA, "50000");
+    enqueueSmsMockResponse(writeJson(List.of(holdingReturnsRow(VTI, monthlyReturnsFor2024("1.0")))));
+
+    HttpResponse response = postCalculation(writeJson(
+        periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), List.of(holding))));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    ErrorResponse error = readJson(response.responseBody(), ErrorResponse.class);
+    assertThat(error.getNotifications()).hasSize(1);
+    Notification notification = error.getNotifications().getFirst();
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.Codes.FX_RATES_UNAVAILABLE);
+    assertThat(notification.getSeverity()).isEqualTo(Severity.WARNING);
+    assertThat(notification.getMessage()).isEqualTo("FX rates unavailable for holding " + holding.getIdsString()
+        + ": USD -> CAD");
+    assertThat(notification.getMetadata())
+        .containsEntry("holdingId", holding.getIdsString())
+        .containsEntry("param-1", holding.getIdsString())
+        .containsEntry("param-2", Currency.USD.name())
+        .containsEntry("param-3", Currency.CAD.name());
   }
 
   @Test
@@ -388,6 +418,17 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         return new MockResponse()
             .setHeader("Content-Type", "application/json")
             .setBody(body);
+      }
+    };
+  }
+
+  private static Dispatcher bocUnavailableDispatcher() {
+    return new Dispatcher() {
+      @Override
+      public MockResponse dispatch(RecordedRequest request) {
+        return new MockResponse()
+            .setHeader("Content-Type", "application/json")
+            .setBody("{\"observations\":[]}");
       }
     };
   }
