@@ -8,6 +8,8 @@ import com.fintex.ce.application.returns.ReturnsErrorPolicy;
 import com.fintex.ce.application.returns.ReturnsSnapshot;
 import com.fintex.ce.model.domain.calculation.returns.ReturnsData;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.error.Notification;
 
@@ -18,11 +20,13 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
+import static com.fintex.ce.model.error.ErrorParams.HOLDING_ID;
 
 /**
  * Converts each holding's returns from its source currency into the request's target currency. Per the FX contract
@@ -61,6 +65,12 @@ public class FxConversionProcessor implements ReturnsProcessor {
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> aligned = CollectionUtils.isEmpty(warnings)
         ? converted
         : PerformancePeriodCalculator.trimToTrailingContiguousCommonMonths(converted);
+    if (!CollectionUtils.isEmpty(warnings) && aligned.values().stream().allMatch(Map::isEmpty)) {
+      Notification representativeWarning = warnings.stream()
+          .min(Comparator.comparing(notification -> notification.getMetadata().get(HOLDING_ID).toString()))
+          .orElseThrow();
+      throw new CalculationException(ErrorCode.FX_RATES_UNAVAILABLE, representativeWarning.getMetadata());
+    }
 
     ReturnsSnapshot<T> convertedSnapshot = snapshot
         .withReturnsMap(aligned)
