@@ -208,6 +208,72 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertCloseTo(result, AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE);
   }
 
+  @Test
+  void shouldClassifyGicAsCashOrFixedIncome_basedOnTermBoundary() {
+    var response = postCalculation(writeJson(gicTermBoundaryCommand()));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+
+    AssetAllocationResult result =
+            readJson(response.responseBody(), AssetAllocationResult.class);
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertCloseTo(
+            result,
+            AssetAllocationRegionType.CASH,
+            new BigDecimal("0.1666666667"));
+    assertCloseTo(
+            result,
+            AssetAllocationRegionType.FIXED_INCOME,
+            new BigDecimal("0.8333333333"));
+  }
+
+  @Test
+  void shouldRejectRequest_whenHoldingsAreEmpty() {
+    PortfolioHoldingsCommand command = PortfolioHoldingsCommand.builder()
+            .metric(CalculationMetric.ASSET_ALLOCATIONS)
+            .holdings(List.of())
+            .dataProviders(MORNINGSTAR_ONLY)
+            .build();
+
+    var response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    assertThat(response.responseBody())
+            .contains("VAL-003")
+            .contains("holdings must not be empty");
+  }
+
+  @Test
+  void shouldRejectRequest_whenHoldingsAreDuplicated() {
+    PortfolioHoldingsCommand command = allocationsCommand(
+            etf("XBAL", FinancialInstrumentType.ETF, Country.CANADA, 100_000),
+            etf("XBAL", FinancialInstrumentType.ETF, Country.CANADA, 100_000));
+
+    var response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    assertThat(response.responseBody()).contains("HLD-002");
+  }
+
+  @Test
+  void shouldRejectRequest_whenHoldingTypeIsMissing() {
+    PortfolioHolding holdingWithoutType = etf(
+            "XBAL",
+            FinancialInstrumentType.ETF,
+            Country.CANADA,
+            100_000)
+            .toBuilder()
+            .holdingType(null)
+            .build();
+
+    var response = postCalculation(
+            writeJson(allocationsCommand(holdingWithoutType)));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    assertThat(response.responseBody()).contains("VAL-001");
+  }
+
   private static PortfolioHoldingsCommand mixedPortfolioCommand() {
     return allocationsCommand(
         cash("CASH-CAD", Currency.CAD, 50),
@@ -228,6 +294,13 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static PortfolioHoldingsCommand singleUsdStockCommand() {
     return allocationsCommand(equity("AAPL", "NASDAQ", FinancialInstrumentType.STOCK, Country.USA, 1000));
+  }
+
+  private static PortfolioHoldingsCommand gicTermBoundaryCommand() {
+    return allocationsCommand(
+            gic("GIC-364-DAYS", Currency.CAD, 100, 364),
+            gic("GIC-365-DAYS", Currency.CAD, 200, 365),
+            gic("GIC-366-DAYS", Currency.CAD, 300, 366));
   }
 
   private static PortfolioHoldingsCommand allocationsCommand(PortfolioHolding... holdings) {
