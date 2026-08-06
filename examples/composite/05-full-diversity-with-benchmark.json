@@ -75,6 +75,7 @@
     },
     {
       "holdingType": "STOCK",
+      "country": "USA",
       "value": 3200.00,
       "securityIdentifier": {
         "id": "WPM.L",

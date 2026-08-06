@@ -1,8 +1,11 @@
-package com.fintex.ce.adapter.rest.controller;
+package com.fintex.ce.adapter.rest.observability;
 
+import com.fintex.ce.application.calculation.observability.CalculationMetricStatistics;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
+import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
+import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
@@ -13,6 +16,7 @@ import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
@@ -20,6 +24,7 @@ import io.micrometer.observation.ObservationRegistry;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,14 +34,14 @@ class CalculationObservabilityTest {
 
   @Test
   void shouldReturnCalculationResult_whenCalculationCompletes() {
-    CalculationObservability observability = new CalculationObservability(ObservationRegistry.create());
-    PeriodCommand command = periodCommand();
+    CalculationObservability observability = new CalculationObservability(
+        ObservationRegistry.create(), statistics());
     BaseCalculationResult expected = new BaseCalculationResult() {};
 
     BaseCalculationResult actual = observability.observe(
         CalculationMetric.TRAILING_TOTAL_RETURNS.getValue(),
-        command,
-        observation -> expected);
+        periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS),
+        () -> expected);
 
     assertThat(actual).isSameAs(expected);
   }
@@ -44,32 +49,28 @@ class CalculationObservabilityTest {
   @Test
   void shouldPublishTraceContext_whenCalculationCompletes() {
     CapturingObservationHandler observationHandler = new CapturingObservationHandler();
-    CalculationObservability traceObservability = new CalculationObservability(
-        observationRegistry(observationHandler));
-    PeriodCommand command = periodCommand();
+    CalculationObservability observability = new CalculationObservability(
+        observationRegistry(observationHandler), statistics());
 
-    traceObservability.observe(
+    observability.observe(
         CalculationMetric.TRAILING_TOTAL_RETURNS.getValue(),
-        command,
-        observation -> {
-          observation.event(Observation.Event.of(CalculationObservability.VALIDATION_STARTED_EVENT));
-          observation.event(Observation.Event.of(CalculationObservability.VALIDATION_COMPLETED_EVENT));
-          return new BaseCalculationResult() {};
-        });
+        periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS),
+        () -> new BaseCalculationResult() {});
 
     assertThat(observationHandler.eventNames)
-        .contains(
-            CalculationObservability.VALIDATION_STARTED_EVENT,
-            CalculationObservability.VALIDATION_COMPLETED_EVENT,
-            CalculationObservability.COMPLETED_EVENT);
+        .as("phase events would each become a meaningless counter named after the observation")
+        .isEmpty();
     assertThat(observationHandler.stoppedContexts)
         .singleElement()
         .satisfies(context -> {
-          assertThat(context.getName()).isEqualTo(CalculationObservability.CALCULATION_OBSERVATION_NAME);
-          assertThat(lowCardinalityValue(context, CalculationObservability.METRIC_TAG))
-              .isEqualTo(CalculationMetric.TRAILING_TOTAL_RETURNS.getValue());
+          assertThat(context.getName()).isEqualTo(CalculationObservability.REQUEST_OBSERVATION_NAME);
+          assertThat(context.getContextualName()).isEqualTo("portfolio trailing-total-returns calculation");
+          assertThat(lowCardinalityValue(context, CalculationObservability.COMMAND_TAG))
+              .isEqualTo(PeriodCommand.class.getSimpleName());
           assertThat(lowCardinalityValue(context, CalculationObservability.OUTCOME_TAG))
               .isEqualTo(CalculationObservability.SUCCESS);
+          assertThat(lowCardinalityValue(context, CalculationObservability.EXCEPTION_TAG))
+              .isEqualTo(CalculationObservability.NONE);
           assertThat(highCardinalityValue(context, CalculationObservability.REQUESTED_METRIC_KEY))
               .isEqualTo(CalculationMetric.TRAILING_TOTAL_RETURNS.getValue());
           assertThat(highCardinalityValue(context, CalculationObservability.PORTFOLIO_HOLDINGS_COUNT_KEY))
@@ -83,25 +84,23 @@ class CalculationObservabilityTest {
   @Test
   void shouldPublishTraceContext_whenCalculationFails() {
     CapturingObservationHandler observationHandler = new CapturingObservationHandler();
-    CalculationObservability traceObservability = new CalculationObservability(
-        observationRegistry(observationHandler));
-    PeriodCommand command = periodCommand();
+    CalculationObservability observability = new CalculationObservability(
+        observationRegistry(observationHandler), statistics());
 
-    assertThatThrownBy(() -> traceObservability.observe(
+    assertThatThrownBy(() -> observability.observe(
         "not-supported",
-        command,
-        observation -> {
+        periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS),
+        () -> {
           throw new IllegalStateException("boom");
         }))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("boom");
 
-    assertThat(observationHandler.eventNames).contains(CalculationObservability.FAILED_EVENT);
     assertThat(observationHandler.stoppedContexts)
         .singleElement()
         .satisfies(context -> {
-          assertThat(lowCardinalityValue(context, CalculationObservability.METRIC_TAG))
-              .isEqualTo(CalculationObservability.UNSUPPORTED);
+          assertThat(context.getContextualName())
+              .isEqualTo("portfolio " + CalculationObservability.UNSUPPORTED + " calculation");
           assertThat(lowCardinalityValue(context, CalculationObservability.OUTCOME_TAG))
               .isEqualTo(CalculationObservability.ERROR);
           assertThat(lowCardinalityValue(context, CalculationObservability.EXCEPTION_TAG))
@@ -109,6 +108,43 @@ class CalculationObservabilityTest {
           assertThat(highCardinalityValue(context, CalculationObservability.REQUESTED_METRIC_KEY))
               .isEqualTo("not-supported");
         });
+  }
+
+  @Test
+  void shouldUseTheSameObservationWithoutMetricTag_whenCompositeRequestIsObserved() {
+    CapturingObservationHandler observationHandler = new CapturingObservationHandler();
+    CalculationObservability observability = new CalculationObservability(
+        observationRegistry(observationHandler), statistics());
+    List<CalculationCommand> commands = List.of(
+        periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS),
+        periodCommand(CalculationMetric.ALPHA));
+
+    observability.observeComposite(commands, () -> CompositeCalculationResult.builder()
+        .results(Map.of())
+        .failures(Map.of())
+        .build());
+
+    assertThat(observationHandler.stoppedContexts)
+        .singleElement()
+        .satisfies(context -> {
+          assertThat(context.getName())
+              .as("both endpoints must share one request timer name")
+              .isEqualTo(CalculationObservability.REQUEST_OBSERVATION_NAME);
+          assertThat(context.getLowCardinalityKeyValues())
+              .as("no tag may carry a metric name, least of all the literal 'composite'")
+              .noneMatch(keyValue -> keyValue.getKey().equals("calculation.metric")
+                  || keyValue.getValue().equals(CalculationObservability.COMPOSITE));
+          assertThat(highCardinalityValue(context, CalculationObservability.REQUESTED_METRIC_KEY))
+              .isEqualTo("trailing-total-returns,alpha");
+          assertThat(highCardinalityValue(context, CalculationObservability.REQUESTED_METRICS_COUNT_KEY))
+              .isEqualTo("2");
+          assertThat(highCardinalityValue(context, CalculationObservability.PORTFOLIO_HOLDINGS_COUNT_KEY))
+              .isEqualTo("4");
+        });
+  }
+
+  private static CalculationMetricStatistics statistics() {
+    return new CalculationMetricStatistics(new SimpleMeterRegistry());
   }
 
   private static ObservationRegistry observationRegistry(CapturingObservationHandler observationHandler) {
@@ -125,9 +161,9 @@ class CalculationObservabilityTest {
     return context.getHighCardinalityKeyValue(key).getValue();
   }
 
-  private static PeriodCommand periodCommand() {
+  private static PeriodCommand periodCommand(CalculationMetric metric) {
     PeriodCommand command = new PeriodCommand();
-    command.setMetric(CalculationMetric.TRAILING_TOTAL_RETURNS);
+    command.setMetric(metric);
     command.setCurrency(Currency.CAD);
     command.setPeriods(Set.of(TimePeriod.ONE_YR));
     command.setHoldings(List.of(holding("XIU.TO"), holding("VFV.TO")));

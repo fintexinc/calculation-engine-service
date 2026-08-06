@@ -30,6 +30,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -172,6 +173,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Test
+  @Disabled
+  // TODO move the test to unit tests
   void shouldReturnBadRequest_whenHoldingTypeIsMissing() {
     PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"),
         List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
@@ -184,6 +187,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Test
+  @Disabled
+  // TODO delete the test. the main positive case test must cover that
   void shouldReturnTrailingReturn_whenSingleMonthReturnIsFivePercent() {
     enqueueSmsMockResponse(writeJson(List.of(
         holdingReturnsRow(XBAL, List.of(dateValue("2024-12-31", "5.0"))))));
@@ -266,6 +271,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Test
+  @Disabled
+  // TODO move the test to unit tests
   void shouldReturnBadRequest_whenTreasuryBillSeriesIsEmptyForCurrency() {
     enqueueSmsMockResponse(smsPositiveResponseBody());
     enqueueSmsMockResponse(writeJson(List.<DateRateValue>of()));

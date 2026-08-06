@@ -1,5 +1,6 @@
 package com.fintex.ce.application.config;
 
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.SupportedPeriods;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,8 +52,19 @@ public class TimePeriodJacksonModule extends SimpleModule {
       try {
         return TimePeriod.fromJson(raw);
       } catch (IllegalArgumentException exception) {
-        throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_SUPPORTED.toValidationException(raw, supported());
+        throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_SUPPORTED.toValidationException(raw, allMetrics(), supported());
       }
+    }
+
+    /**
+     * Every metric the service exposes. Deserialization fails before the request is dispatched to a metric, and a token
+     * that is not a {@link TimePeriod} at all is unusable for all of them, so the message names them all rather than
+     * implying the period would have worked somewhere else.
+     */
+    private static String allMetrics() {
+      return Arrays.stream(CalculationMetric.values())
+          .map(CalculationMetric::getValue)
+          .collect(Collectors.joining(", "));
     }
 
     /**

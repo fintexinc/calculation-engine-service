@@ -9,6 +9,9 @@ import org.apache.commons.collections4.MapUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.cache.CaffeineCacheMetrics;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,6 +43,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CaffeineFxRatesCache implements FxRatesCache {
 
+  public static final String CACHE_NAME = "fx-rates";
+
   private final Cache<RateKey, CachedRate> rates;
 
   /**
@@ -47,10 +52,21 @@ public class CaffeineFxRatesCache implements FxRatesCache {
    * toward the cap regardless of whether it holds a rate or {@link CachedRate#ABSENT}.
    */
   public CaffeineFxRatesCache(FxRatesCacheProperties properties) {
+    this(properties, null);
+  }
+
+  /**
+   * Same as {@link #CaffeineFxRatesCache(FxRatesCacheProperties)} but additionally publishes the Caffeine statistics as
+   * {@code cache.*} meters tagged {@code cache=fx-rates}. A {@code null} registry disables the binding.
+   */
+  public CaffeineFxRatesCache(FxRatesCacheProperties properties, MeterRegistry meterRegistry) {
     this.rates = Caffeine.newBuilder()
         .maximumSize(properties.getMaxEntries())
         .recordStats()
         .build();
+    if (meterRegistry != null) {
+      CaffeineCacheMetrics.monitor(meterRegistry, rates, CACHE_NAME);
+    }
   }
 
   @Override
