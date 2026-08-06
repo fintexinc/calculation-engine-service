@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
+import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.SupportedPeriods;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.error.ErrorCode;
@@ -56,8 +57,16 @@ public abstract class AbstractSupportedPeriodsReqValidator<T extends Calculation
         .filter(period -> !admissible.contains(period))
         .findFirst()
         .ifPresent(period -> {
-          throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_SUPPORTED.toValidationException(period.name(), admissibleNames());
+          throw ErrorCode.TIME_INTERVAL_PERIOD_NOT_SUPPORTED
+              .toValidationException(period.name(), claimedMetricNames(), admissibleNames());
         });
+  }
+
+  /** The metrics this validator speaks for, rendered the same way every other call site renders them. */
+  private String claimedMetricNames() {
+    return supportedMetrics().stream()
+        .map(CalculationMetric::getValue)
+        .collect(Collectors.joining(", "));
   }
 
   /** Fixed lengths in ascending order of length, then the data-defined ones, so the list reads as a ladder. */

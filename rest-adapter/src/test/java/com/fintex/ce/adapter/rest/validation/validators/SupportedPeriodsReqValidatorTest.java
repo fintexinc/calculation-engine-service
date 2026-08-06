@@ -102,14 +102,17 @@ class SupportedPeriodsReqValidatorTest {
   }
 
   @Test
-  void shouldNameTheOffendingPeriodAndListTheAdmissibleOnesAsALadder() {
+  void shouldNameTheOffendingPeriodTheClaimedMetricsAndListTheAdmissibleOnesAsALadder() {
     CalculationCommand command = periodCommand(ONE_YR, CIPSD);
 
     assertThatThrownBy(() -> new LeadingPeriodsReqValidator().validate(command))
         .isInstanceOf(ValidationException.class)
         .satisfies(thrown -> {
           ValidationException exception = (ValidationException) thrown;
-          assertThat(exception.getMessage()).startsWith("Time interval period 'CIPSD' is not supported.");
+          assertThat(exception.getMessage()).startsWith(
+              "Time interval period 'CIPSD' is not supported for metrics "
+                  + CalculationMetric.LEADING_TOTAL_RETURNS.getValue()
+                  + ". Supported periods: ");
           assertThat(exception.getMetadata()).containsEntry("param-1", "CIPSD");
           assertThat(listedPeriods(exception.getMessage()))
               .containsExactlyElementsOf(fixedLengthNamesShortestFirst())

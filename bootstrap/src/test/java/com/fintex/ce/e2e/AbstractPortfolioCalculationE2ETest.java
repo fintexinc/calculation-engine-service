@@ -38,9 +38,19 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.QueueDispatcher;
 import okhttp3.mockwebserver.SocketPolicy;
 
+/**
+ * Shared scenarios every calculation endpoint must satisfy: the upstream being unavailable, answering with a server or
+ * a client error, answering correctly, and the request contradicting the path it was sent to.
+ *
+ * <p>
+ * {@code WebTestClient} defaults to a five-second response timeout, which is a statement about how fast a healthy
+ * service replies, not about how fast a CI agent running several application contexts at once gets around to replying.
+ * The timeout is raised so a slow agent produces a slow test rather than a failed one; the assertions, not the clock,
+ * decide whether the behaviour is correct.
+ */
 @Tag("e2e")
 @ActiveProfiles("test")
-@AutoConfigureWebTestClient(timeout = "PT30S")
+@AutoConfigureWebTestClient(timeout = "60s")
 @SpringBootTest(classes = PortfolioCalculationEngineApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 abstract class AbstractPortfolioCalculationE2ETest {
 

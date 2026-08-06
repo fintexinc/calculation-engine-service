@@ -44,6 +44,13 @@ Red flags — STOP and investigate the production code instead of the test:
 - [ ] **[contract/behavior] Refactoring near a documented graceful-degradation contract** (empty/insufficient data →
   `null` + warning, not an exception)? Preserve it, and keep/add a test pinning the
   empty/insufficient path.
+- [ ] **[correctness] Changed the `%s` count in an `ErrorCode` message pattern?** `getFormattedMessage` calls
+  `String.format`, so every existing `toException`/`toValidationException`/`asNotification` call site must be updated
+  in the same diff — a stale call site throws `MissingFormatArgumentException` at runtime and turns a documented 4xx
+  into an unhandled 500. Grep the enum constant for **all** callers, and expect message-text assertions to go red.
+- [ ] **[correctness] Tagging an outcome from an exception type at an observability boundary?** Verify the exception
+  can still reach that boundary — a client that maps transport/HTTP exceptions to domain exceptions first makes the
+  `instanceof` branch dead, and the tag then reports a fabricated constant (e.g. every failure as `500`).
 - [ ] **[test-quality] Behavior-preserving refactor?** Add a test for the specific pre-existing behavior you intend
   to keep, so a regression turns a test red instead of shipping silently.
 - [ ] **[test-quality] Asserting an error outcome — a thrown domain exception (unit) OR an HTTP error response

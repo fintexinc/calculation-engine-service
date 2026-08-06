@@ -6,6 +6,7 @@ import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaWebClient;
 import com.fintex.ce.adapter.webclient.boc.client.FxRateSource;
 import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse;
 import com.fintex.ce.adapter.webclient.boc.mapper.BankOfCanadaFxRateMapper;
+import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
@@ -44,6 +45,7 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
   private final BankOfCanadaWebClient client;
   private final BankOfCanadaFxRateMapper mapper;
   private final BankOfCanadaProperties properties;
+  private final ExternalServiceObservability observability;
 
   @Override
   public NavigableMap<LocalDate, BigDecimal> fetch(CurrencyExchangePair currencyPair, DateRange dateRange) {
@@ -105,6 +107,7 @@ public class BocFxRatesFetcher implements FxRatesFetcher {
 
       BankOfCanadaFxRateResponse response = client.get(url, BankOfCanadaFxRateResponse.class);
       Map<LocalDate, BigDecimal> rates = mapper.map(response, source.getSeriesNames(), source.getFrequency());
+      observability.recordResultSize(BankOfCanadaWebClient.SERVICE_TAG_VALUE, source.getPath(), rates.size());
 
       log.debug("Fetched {} FX rates ({}) from source: {}", rates.size(), source.getFrequency(), source.getPath());
       rates.forEach(mergedRates::putIfAbsent);

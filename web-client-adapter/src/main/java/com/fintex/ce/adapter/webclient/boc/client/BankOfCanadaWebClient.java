@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.webclient.boc.client;
 
 import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability;
+import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability.ExternalCall;
 import com.fintex.ce.model.error.exceptions.ExternalServiceBadResponseException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
 
@@ -28,20 +29,21 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class BankOfCanadaWebClient {
 
+  public static final String SERVICE_TAG_VALUE = "bank-of-canada";
+
   private static final String SERVICE_NAME = "Bank of Canada";
-  private static final String SERVICE_TAG_VALUE = "bank-of-canada";
   private static final String GET = HttpMethod.GET.name();
 
   private final WebClient bocWebClient;
   private final ExternalServiceObservability observability;
 
   public <R> R get(String path, Class<R> responseType) {
-    return observability.observe(SERVICE_TAG_VALUE, GET, path, () -> {
+    return observability.observe(SERVICE_TAG_VALUE, GET, path, call -> {
       log.debug("GET request to Bank of Canada: {}", path);
       R result = bocWebClient.get()
           .uri(path)
           .retrieve()
-          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response))
+          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response, call))
           .bodyToMono(responseType)
           .onErrorMap(BankOfCanadaWebClient::handleError)
           .block();
@@ -50,8 +52,9 @@ public class BankOfCanadaWebClient {
     });
   }
 
-  private Mono<Throwable> handleErrorResponse(String path, ClientResponse response) {
+  private Mono<Throwable> handleErrorResponse(String path, ClientResponse response, ExternalCall call) {
     HttpStatusCode status = response.statusCode();
+    observability.upstreamStatus(call, status.value());
     return response.bodyToMono(String.class)
         .defaultIfEmpty("")
         .flatMap(body -> {

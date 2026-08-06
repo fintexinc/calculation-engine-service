@@ -1,14 +1,12 @@
-package com.fintex.ce.adapter.rest.controller;
+package com.fintex.ce.adapter.rest.observability;
 
+import com.fintex.ce.application.calculation.observability.CalculationMetricStatistics;
+import com.fintex.ce.application.calculation.observability.RequestShape;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
-import com.fintex.ce.model.dto.command.MultiplePortfoliosCommand;
-import com.fintex.ce.model.dto.command.contract.BenchmarkHoldingsProvider;
-import com.fintex.ce.model.dto.command.contract.HoldingsProvider;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -19,20 +17,36 @@ import io.micrometer.observation.ObservationRegistry;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Wraps every metric calculation in a Micrometer observation carrying metric, command and outcome tags. The action
- * receives the started {@link Observation} so the caller can emit phase events while validating and executing the
- * calculation.
+ * Traces every calculation request as one Micrometer observation and delegates the per-metric numbers to
+ * {@link CalculationMetricStatistics}.
+ *
+ * <p>
+ * Both endpoints share the observation name {@code portfolio.calculation.request} and the same low-cardinality tag set,
+ * so the derived timer measures request latency without caring which endpoint was used and without ever tagging a
+ * request as a metric. Which metrics a request covered is recorded as span attributes only; the numbers per metric —
+ * counts, durations, warnings, codes — live in the dedicated meters.
+ *
+ * <p>
+ * What the request asked for — metrics and holding counts — is attached before dispatch and what came back after, so a
+ * failed request carries the same attributes as a successful one and a trace can be read without knowing the outcome
+ * first.
+ *
+ * <p>
+ * Everything observed here has already passed metric resolution and request validation: the caller wraps the dispatch,
+ * not the whole request. An exception reaching these catch blocks therefore comes from a calculation that was actually
+ * attempted, which is what keeps a rejected request out of the per-metric failure counts and out of the error-code
+ * ranking.
  */
 @Component
 @RequiredArgsConstructor
 public class CalculationObservability {
 
-  static final String CALCULATION_OBSERVATION_NAME = "portfolio.calculation";
+  static final String REQUEST_OBSERVATION_NAME = "portfolio.calculation.request";
 
   static final String UNKNOWN = "unknown";
   static final String UNSUPPORTED = "unsupported";
@@ -41,11 +55,9 @@ public class CalculationObservability {
   static final String SUCCESS = "success";
   static final String ERROR = "error";
 
-  static final String METRIC_TAG = "calculation.metric";
   static final String COMMAND_TAG = "command.type";
   static final String OUTCOME_TAG = "outcome";
   static final String EXCEPTION_TAG = "exception";
-  static final String BODY_METRIC_TAG = "body.metric";
   static final String RESULT_TAG = "result.type";
 
   static final String REQUESTED_METRIC_KEY = "requested.metric";
@@ -53,50 +65,48 @@ public class CalculationObservability {
   static final String BENCHMARK_HOLDINGS_COUNT_KEY = "benchmark.holdings.count";
   static final String WARNINGS_COUNT_KEY = "warnings.count";
   static final String FAILED_METRICS_COUNT_KEY = "failed.metrics.count";
-
-  static final String VALIDATION_STARTED_EVENT = "portfolio.calculation.validation.started";
-  static final String VALIDATION_COMPLETED_EVENT = "portfolio.calculation.validation.completed";
-  static final String SERVICE_STARTED_EVENT = "portfolio.calculation.service.started";
-  static final String SERVICE_COMPLETED_EVENT = "portfolio.calculation.service.completed";
-  static final String COMPLETED_EVENT = "portfolio.calculation.completed";
-  static final String FAILED_EVENT = "portfolio.calculation.failed";
+  static final String REQUESTED_METRICS_COUNT_KEY = "requested.metrics.count";
 
   private static final Set<String> SUPPORTED_METRIC_VALUES = Arrays.stream(CalculationMetric.values())
       .map(CalculationMetric::getValue)
       .collect(Collectors.toUnmodifiableSet());
 
   private final ObservationRegistry observationRegistry;
+  private final CalculationMetricStatistics statistics;
 
   public BaseCalculationResult observe(
       String metricName,
       CalculationCommand command,
-      Function<Observation, BaseCalculationResult> action) {
+      Supplier<BaseCalculationResult> action) {
     String metricTag = resolveMetricTag(metricName);
-    String commandTag = commandType(command);
+    RequestShape shape = RequestShape.of(command);
 
-    Observation observation = Observation.createNotStarted(CALCULATION_OBSERVATION_NAME, observationRegistry)
+    Observation observation = Observation.createNotStarted(REQUEST_OBSERVATION_NAME, observationRegistry)
         .contextualName("portfolio " + metricTag + " calculation")
-        .lowCardinalityKeyValue(METRIC_TAG, metricTag)
-        .lowCardinalityKeyValue(COMMAND_TAG, commandTag)
-        .lowCardinalityKeyValue(BODY_METRIC_TAG, bodyMetric(command))
+        .lowCardinalityKeyValue(COMMAND_TAG, commandType(command))
         .highCardinalityKeyValue(REQUESTED_METRIC_KEY, valueOrUnknown(metricName))
-        .highCardinalityKeyValue(PORTFOLIO_HOLDINGS_COUNT_KEY, String.valueOf(holdingsCount(command)))
-        .highCardinalityKeyValue(BENCHMARK_HOLDINGS_COUNT_KEY, String.valueOf(benchmarkHoldingsCount(command)));
+        .highCardinalityKeyValue(REQUESTED_METRICS_COUNT_KEY, "1")
+        .highCardinalityKeyValue(PORTFOLIO_HOLDINGS_COUNT_KEY, String.valueOf(shape.holdings()))
+        .highCardinalityKeyValue(BENCHMARK_HOLDINGS_COUNT_KEY, String.valueOf(shape.benchmarkHoldings()));
 
     observation.start();
     try (Observation.Scope ignored = observation.openScope()) {
-      BaseCalculationResult result = action.apply(observation);
+      BaseCalculationResult result = action.get();
       observation.lowCardinalityKeyValue(OUTCOME_TAG, SUCCESS);
       observation.lowCardinalityKeyValue(EXCEPTION_TAG, NONE);
       observation.lowCardinalityKeyValue(RESULT_TAG, resultType(result));
       observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, String.valueOf(warningsCount(result)));
-      observation.event(Observation.Event.of(COMPLETED_EVENT));
+      observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, "0");
+      statistics.recordSingleSuccess(metricTag, result, shape);
       return result;
     } catch (RuntimeException exception) {
       observation.error(exception);
       observation.lowCardinalityKeyValue(OUTCOME_TAG, ERROR);
       observation.lowCardinalityKeyValue(EXCEPTION_TAG, exception.getClass().getSimpleName());
-      observation.event(Observation.Event.of(FAILED_EVENT));
+      observation.lowCardinalityKeyValue(RESULT_TAG, NONE);
+      observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, "0");
+      observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, "1");
+      statistics.recordSingleFailure(metricTag, exception, shape);
       throw exception;
     } finally {
       observation.stop();
@@ -105,41 +115,46 @@ public class CalculationObservability {
 
   public CompositeCalculationResult observeComposite(
       List<CalculationCommand> commands,
-      Function<Observation, CompositeCalculationResult> action) {
+      Supplier<CompositeCalculationResult> action) {
     List<CalculationCommand> observedCommands = commands == null ? List.of() : commands;
+    RequestShape shape = compositeShape(observedCommands);
 
-    Observation observation = Observation.createNotStarted(CALCULATION_OBSERVATION_NAME, observationRegistry)
+    Observation observation = Observation.createNotStarted(REQUEST_OBSERVATION_NAME, observationRegistry)
         .contextualName("portfolio " + COMPOSITE + " calculation")
-        .lowCardinalityKeyValue(METRIC_TAG, COMPOSITE)
         .lowCardinalityKeyValue(COMMAND_TAG, CompositeCalculationRequest.class.getSimpleName())
-        .lowCardinalityKeyValue(BODY_METRIC_TAG, COMPOSITE)
         .highCardinalityKeyValue(REQUESTED_METRIC_KEY, requestedMetrics(observedCommands))
-        .highCardinalityKeyValue(PORTFOLIO_HOLDINGS_COUNT_KEY, String.valueOf(observedCommands.stream()
-            .mapToInt(CalculationObservability::holdingsCount)
-            .sum()))
-        .highCardinalityKeyValue(BENCHMARK_HOLDINGS_COUNT_KEY, String.valueOf(observedCommands.stream()
-            .mapToInt(CalculationObservability::benchmarkHoldingsCount)
-            .sum()));
+        .highCardinalityKeyValue(REQUESTED_METRICS_COUNT_KEY, String.valueOf(observedCommands.size()))
+        .highCardinalityKeyValue(PORTFOLIO_HOLDINGS_COUNT_KEY, String.valueOf(shape.holdings()))
+        .highCardinalityKeyValue(BENCHMARK_HOLDINGS_COUNT_KEY, String.valueOf(shape.benchmarkHoldings()));
 
     observation.start();
     try (Observation.Scope ignored = observation.openScope()) {
-      CompositeCalculationResult result = action.apply(observation);
+      CompositeCalculationResult result = action.get();
       observation.lowCardinalityKeyValue(OUTCOME_TAG, SUCCESS);
       observation.lowCardinalityKeyValue(EXCEPTION_TAG, NONE);
       observation.lowCardinalityKeyValue(RESULT_TAG, resultType(result));
       observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, String.valueOf(warningsCount(result)));
       observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, String.valueOf(failuresCount(result)));
-      observation.event(Observation.Event.of(COMPLETED_EVENT));
+      statistics.recordComposite(observedCommands, result);
       return result;
     } catch (RuntimeException exception) {
       observation.error(exception);
       observation.lowCardinalityKeyValue(OUTCOME_TAG, ERROR);
       observation.lowCardinalityKeyValue(EXCEPTION_TAG, exception.getClass().getSimpleName());
-      observation.event(Observation.Event.of(FAILED_EVENT));
+      observation.lowCardinalityKeyValue(RESULT_TAG, NONE);
+      observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, "0");
+      observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, String.valueOf(observedCommands.size()));
+      statistics.recordCompositeFailure(observedCommands, exception);
       throw exception;
     } finally {
       observation.stop();
     }
+  }
+
+  private static RequestShape compositeShape(List<CalculationCommand> commands) {
+    return commands.stream()
+        .map(RequestShape::of)
+        .reduce(RequestShape.EMPTY, RequestShape::plus);
   }
 
   private static String requestedMetrics(List<CalculationCommand> commands) {
@@ -182,34 +197,6 @@ public class CalculationObservability {
 
   private static String valueOrUnknown(String value) {
     return value == null || value.isBlank() ? UNKNOWN : value;
-  }
-
-  private static int holdingsCount(CalculationCommand command) {
-    if (command instanceof MultiplePortfoliosCommand multiplePortfoliosCommand) {
-      return multiplePortfoliosHoldingsCount(multiplePortfoliosCommand);
-    }
-    if (command instanceof HoldingsProvider holdingsProvider) {
-      return sizeOf(holdingsProvider.getHoldings());
-    }
-    return 0;
-  }
-
-  private static int multiplePortfoliosHoldingsCount(MultiplePortfoliosCommand command) {
-    if (CollectionUtils.isEmpty(command.getPortfolios())) {
-      return 0;
-    }
-    return command.getPortfolios().stream()
-        .map(MultiplePortfoliosCommand.Portfolio::getHoldings)
-        .mapToInt(CalculationObservability::sizeOf)
-        .sum();
-  }
-
-  private static int benchmarkHoldingsCount(CalculationCommand command) {
-    return command instanceof BenchmarkHoldingsProvider provider ? sizeOf(provider.getBenchmarkHoldings()) : 0;
-  }
-
-  private static int sizeOf(List<PortfolioHolding> holdings) {
-    return CollectionUtils.isEmpty(holdings) ? 0 : holdings.size();
   }
 
   private static String resultType(BaseCalculationResult result) {

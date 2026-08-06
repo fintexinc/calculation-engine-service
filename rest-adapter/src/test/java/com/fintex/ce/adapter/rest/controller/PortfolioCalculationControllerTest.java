@@ -1,5 +1,6 @@
 package com.fintex.ce.adapter.rest.controller;
 
+import com.fintex.ce.adapter.rest.observability.CalculationObservability;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqValidator;
@@ -9,8 +10,10 @@ import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator;
 import com.fintex.ce.adapter.rest.validation.validators.StandardDeviationPeriodsReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.TrailingPeriodsReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.TwelveMonthMinimumPeriodsReqValidator;
+import com.fintex.ce.application.calculation.observability.CalculationMetricStatistics;
 import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
 import com.fintex.ce.application.config.DefaultDataProperties;
+import com.fintex.ce.calculation.CalculationDurationRecorder;
 import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -59,6 +62,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.micrometer.observation.ObservationRegistry;
 
 import java.math.BigDecimal;
@@ -102,7 +106,7 @@ class PortfolioCalculationControllerTest {
         .<CalculationService<?, ?, ?>>map(this::createMockService)
         .toList();
 
-    var controller = controller(serviceList, new RequestValidationFacade(List.of()));
+    var controller = controller(serviceList, new RequestValidationFacade(List.of()), new SimpleMeterRegistry());
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -205,18 +209,20 @@ class PortfolioCalculationControllerTest {
   }
 
   private static PortfolioCalculationController controller(List<CalculationService<?, ?, ?>> services,
-      RequestValidationFacade validationFacade) {
+      RequestValidationFacade validationFacade, SimpleMeterRegistry meterRegistry) {
     SecurityAttributesFetcher fetcher = mock(SecurityAttributesFetcher.class);
     lenient().when(fetcher.fetch(any(), anyCollection(), any())).thenReturn(SecurityData.EMPTY);
     lenient().when(fetcher.fetch(any(), any(CompositeSecurityAttribute.class), any())).thenReturn(Map.of());
     CalculationOrchestrator orchestrator = new MetricCalculationOrchestrator(
         services,
         fetcher,
-        new DefaultDataProperties(List.of(DataProvider.MORNINGSTAR, DataProvider.FMP)));
+        new DefaultDataProperties(List.of(DataProvider.MORNINGSTAR, DataProvider.FMP)),
+        CalculationDurationRecorder.NO_OP);
     LocalValidatorFactoryBean beanValidator = new LocalValidatorFactoryBean();
     beanValidator.afterPropertiesSet();
     return new PortfolioCalculationController(orchestrator, validationFacade,
-        new CalculationObservability(ObservationRegistry.create()), beanValidator);
+        new CalculationObservability(ObservationRegistry.create(),
+            new CalculationMetricStatistics(meterRegistry)), beanValidator);
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
@@ -370,6 +376,7 @@ class PortfolioCalculationControllerTest {
     private MockMvc validatingMockMvc;
     private ObjectMapper om;
     private Map<CalculationMetric, CalculationService<?, ?, ?>> calculationServices;
+    private SimpleMeterRegistry meterRegistry;
 
     @BeforeEach
     void setUp() {
@@ -403,7 +410,8 @@ class PortfolioCalculationControllerTest {
         calculationServices.put(m, svc);
       }
 
-      var controller = controller(services, facade);
+      meterRegistry = new SimpleMeterRegistry();
+      var controller = controller(services, facade, meterRegistry);
       LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
       validator.afterPropertiesSet();
       validatingMockMvc = MockMvcBuilders.standaloneSetup(controller)
@@ -495,6 +503,60 @@ class PortfolioCalculationControllerTest {
 
       verify(calculationServices.get(CalculationMetric.STANDARD_DEVIATION), org.mockito.Mockito.never())
           .perform(any(), any());
+    }
+
+    /**
+     * The per-metric counters describe calculations, not HTTP traffic. A request rejected before dispatch never reached
+     * a calculator, so counting it would let malformed input raise the failure rate of a metric that is working. Both
+     * halves are asserted together because "nothing is ever recorded" would satisfy the first half on its own.
+     */
+    @Test
+    void shouldCountOnlyDispatchedCalculations_whenARequestIsRejectedBeforeTheCalculationRuns() throws Exception {
+      PeriodCommand rejected = new PeriodCommand();
+      rejected.setMetric(CalculationMetric.STANDARD_DEVIATION);
+      rejected.setCurrency(Currency.CAD);
+      rejected.setHoldings(List.of(dummyHolding()));
+      rejected.setPeriods(Set.of(TimePeriod.YTD));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/standard-deviation")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(rejected)))
+          .andExpect(status().isBadRequest());
+
+      assertThat(meterRegistry.find(CalculationMetricStatistics.EXECUTIONS_METER_NAME).counters())
+          .as("a rejected request is not a calculation execution")
+          .isEmpty();
+      assertThat(meterRegistry.find(CalculationMetricStatistics.ERROR_CODES_METER_NAME).counters())
+          .as("and its error code must stay out of the per-metric ranking")
+          .isEmpty();
+
+      PeriodCommand dispatched = new PeriodCommand();
+      dispatched.setMetric(CalculationMetric.SHARPE_RATIO);
+      dispatched.setCurrency(Currency.CAD);
+      dispatched.setHoldings(List.of(dummyHolding()));
+      dispatched.setPeriods(Set.of(TimePeriod.ONE_YR));
+      doThrow(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.toException("Security Master"))
+          .when(calculationServices.get(CalculationMetric.SHARPE_RATIO)).perform(any(), any());
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/sharpe-ratio")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(dispatched)))
+          .andExpect(status().isServiceUnavailable());
+
+      assertThat(meterRegistry.find(CalculationMetricStatistics.EXECUTIONS_METER_NAME)
+          .tag(CalculationMetricStatistics.METRIC_TAG, CalculationMetric.SHARPE_RATIO.getValue())
+          .tag(CalculationMetricStatistics.OUTCOME_TAG, CalculationMetricStatistics.ERROR)
+          .counter())
+          .as("a calculation that ran and failed is exactly what these counters are for")
+          .isNotNull()
+          .satisfies(counter -> assertThat(counter.count()).isEqualTo(1.0));
+      assertThat(meterRegistry.find(CalculationMetricStatistics.ERROR_CODES_METER_NAME)
+          .tag(CalculationMetricStatistics.METRIC_TAG, CalculationMetric.SHARPE_RATIO.getValue())
+          .tag(CalculationMetricStatistics.ERROR_CODE_TAG, ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.getCode())
+          .counter())
+          .isNotNull();
     }
 
     @Test

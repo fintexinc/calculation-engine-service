@@ -610,7 +610,7 @@ public enum ErrorCode {
 
   TIME_INTERVAL_PERIOD_NOT_SUPPORTED(
       Codes.TIME_INTERVAL_PERIOD_NOT_SUPPORTED,
-      "Time interval period '%s' is not supported. Supported periods: %s",
+      "Time interval period '%s' is not supported for metrics %s. Supported periods: %s",
       "The supplied time interval period is not one this service declares support for",
       "Use one of the supported time interval periods, or its length in whole months",
       HttpStatus.BAD_REQUEST,

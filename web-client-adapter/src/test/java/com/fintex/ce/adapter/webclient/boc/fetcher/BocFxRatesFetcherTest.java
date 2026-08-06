@@ -6,6 +6,7 @@ import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaWebClient;
 import com.fintex.ce.adapter.webclient.boc.client.FxRateSource;
 import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse;
 import com.fintex.ce.adapter.webclient.boc.mapper.BankOfCanadaFxRateMapper;
+import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -50,13 +51,16 @@ class BocFxRatesFetcherTest {
   @Mock
   private BankOfCanadaFxRateMapper mapper;
 
+  @Mock
+  private ExternalServiceObservability observability;
+
   private final BankOfCanadaProperties properties = new BankOfCanadaProperties();
 
   private BocFxRatesFetcher fetcher;
 
   @BeforeEach
   void setUp() {
-    fetcher = new BocFxRatesFetcher(client, mapper, properties);
+    fetcher = new BocFxRatesFetcher(client, mapper, properties, observability);
   }
 
   @Test

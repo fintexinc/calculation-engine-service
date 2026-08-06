@@ -7,8 +7,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import org.slf4j.MDC;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.logging.LogLevel;
@@ -25,6 +28,9 @@ import reactor.netty.transport.logging.AdvancedByteBufFormat;
 @EnableConfigurationProperties(SecurityMasterRestProperties.class)
 @ConditionalOnProperty(name = "external-services.security-master.api-type", havingValue = "rest", matchIfMissing = true)
 public class SecurityMasterWebClientConfig {
+
+  static final String REQUEST_ID_HEADER = "X-Request-ID";
+  static final String REQUEST_ID_MDC_KEY = "requestId";
 
   @Bean
   public WebClient smWebClient(
@@ -43,13 +49,29 @@ public class SecurityMasterWebClientConfig {
     WebClient.Builder builder = webClientBuilder
         .baseUrl(properties.getBaseUrl())
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        .clientConnector(new ReactorClientHttpConnector(httpClient));
+        .clientConnector(new ReactorClientHttpConnector(httpClient))
+        .filter(propagateRequestId());
 
     if (properties.isLogRequests()) {
       builder = builder.filter(logRequest()).filter(logResponse());
     }
 
     return builder.build();
+  }
+
+  /**
+   * Forwards the inbound {@code requestId} to Security Master so both services log the same identifier. The W3C
+   * {@code traceparent} header is propagated separately by the Micrometer/OpenTelemetry instrumentation of the
+   * auto-configured {@link WebClient.Builder}.
+   */
+  private ExchangeFilterFunction propagateRequestId() {
+    return ExchangeFilterFunction.ofRequestProcessor(request -> {
+      String requestId = MDC.get(REQUEST_ID_MDC_KEY);
+      if (requestId == null || requestId.isBlank() || request.headers().containsKey(REQUEST_ID_HEADER)) {
+        return Mono.just(request);
+      }
+      return Mono.just(ClientRequest.from(request).header(REQUEST_ID_HEADER, requestId).build());
+    });
   }
 
   private ExchangeFilterFunction logRequest() {
