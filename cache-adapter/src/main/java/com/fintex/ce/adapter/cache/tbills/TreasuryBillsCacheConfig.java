@@ -1,17 +1,15 @@
 package com.fintex.ce.adapter.cache.tbills;
 
 import com.fintex.ce.adapter.cache.config.CacheDataProperties;
+import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import io.micrometer.core.instrument.MeterRegistry;
 
 /**
  * Registers the caching proxy around {@link TreasuryBillsFetcher} when {@code cache.data.t-bills.enabled=true}. The
@@ -31,10 +29,10 @@ public class TreasuryBillsCacheConfig {
   public TreasuryBillsFetcher cachingTreasuryBillsFetcher(
       @Qualifier(DELEGATE_BEAN_NAME) TreasuryBillsFetcher delegate,
       CacheDataProperties properties,
-      ObjectProvider<MeterRegistry> meterRegistryProvider) {
+      CacheObservability cacheObservability) {
     return new CachingTreasuryBillsFetcher(
         delegate,
         properties.getTBills().getRefreshAfter(),
-        meterRegistryProvider.getIfAvailable());
+        cacheObservability);
   }
 }

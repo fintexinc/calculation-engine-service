@@ -36,12 +36,6 @@
             <artifactId>spring-boot</artifactId>
         </dependency>
 
-        <!-- Micrometer meters (per-metric calculation statistics). Version managed by Spring Boot BOM. -->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-        </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

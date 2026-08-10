@@ -2,16 +2,13 @@ package com.fintex.ce.adapter.webclient.sm.integration;
 
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClientConfig;
 import com.fintex.ce.adapter.webclient.sm.fetcher.SecurityAttributeFetcherConfig;
+import com.fintex.ce.port.observability.ExternalCallObservability;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import io.micrometer.observation.ObservationRegistry;
 
 /**
  * Minimal Spring context for SM REST integration tests in this module. The full CE application lives in {@code
@@ -20,26 +17,22 @@ import io.micrometer.observation.ObservationRegistry;
  * registry, and the mappers.
  *
  * <p>
- * The registries are declared here because this module has no actuator on its classpath to auto-configure them, while
- * production always does. They are real registries, not stand-ins: the observability component requires them rather
- * than quietly substituting a private one, so a deployment missing them fails at startup instead of losing its metrics
- * in silence.
+ * The subject here is the client's HTTP behaviour, and the implementation that turns a call into metrics and spans
+ * lives in a module this one does not depend on, so the observability port is wired to
+ * {@link ExternalCallObservability#NO_OP}. That is a decision stated here rather than a fallback the client makes for
+ * itself: the client requires the port, so a deployment missing it fails at startup instead of losing its telemetry
+ * quietly. What the real implementation publishes is covered where it lives, and the two together are exercised by the
+ * e2e suite.
  */
 @SpringBootConfiguration
 @EnableAutoConfiguration
 @Import({SecurityMasterWebClientConfig.class, SecurityAttributeFetcherConfig.class})
 @ComponentScan(basePackages = {"com.fintex.ce.adapter.webclient.sm.client",
-    "com.fintex.ce.adapter.webclient.observability",
     "com.fintex.ce.adapter.webclient.sm.mapper"})
 public class SecurityMasterWebClientIntegrationTestConfiguration {
 
   @Bean
-  public ObservationRegistry observationRegistry() {
-    return ObservationRegistry.create();
-  }
-
-  @Bean
-  public MeterRegistry meterRegistry() {
-    return new SimpleMeterRegistry();
+  public ExternalCallObservability externalCallObservability() {
+    return ExternalCallObservability.NO_OP;
   }
 }

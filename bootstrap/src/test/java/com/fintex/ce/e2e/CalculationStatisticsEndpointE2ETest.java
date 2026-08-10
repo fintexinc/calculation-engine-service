@@ -1,14 +1,14 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.PortfolioCalculationEngineApplication;
-import com.fintex.ce.adapter.rest.observability.CalculationStatisticsReport;
-import com.fintex.ce.adapter.rest.observability.CalculationStatisticsReport.CodeFrequency;
-import com.fintex.ce.adapter.rest.observability.CalculationStatisticsReport.MetricStatistics;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.port.observability.CalculationStatisticsReport;
+import com.fintex.ce.port.observability.CalculationStatisticsReport.CodeFrequency;
+import com.fintex.ce.port.observability.CalculationStatisticsReport.MetricStatistics;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;

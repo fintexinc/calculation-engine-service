@@ -1,9 +1,11 @@
 package com.fintex.ce.adapter.webclient.boc.client;
 
-import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability;
-import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability.ExternalCall;
+import com.fintex.ce.adapter.webclient.observability.ResponseItemCount;
 import com.fintex.ce.model.error.exceptions.ExternalServiceBadResponseException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
+import com.fintex.ce.port.observability.ExternalCallObservability;
+import com.fintex.ce.port.observability.ExternalCallObservability.ExternalCall;
+import com.fintex.ce.port.observability.ExternalService;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
@@ -23,22 +25,26 @@ import reactor.core.publisher.Mono;
  * <li>5xx response or transport/connection error → {@link ExternalServiceUnavailableException} (HTTP 503 Service
  * Unavailable)</li>
  * </ul>
+ *
+ * <p>
+ * Every call is reported to {@link ExternalCallObservability}. The outcome is filed by this class rather than by the
+ * fetchers above it, so that no call can go unreported, and the upstream status is filed from the one place that sees
+ * the raw response — the error handler — before it is mapped to a domain exception.
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class BankOfCanadaWebClient {
 
-  public static final String SERVICE_TAG_VALUE = "bank-of-canada";
-
   private static final String SERVICE_NAME = "Bank of Canada";
   private static final String GET = HttpMethod.GET.name();
 
   private final WebClient bocWebClient;
-  private final ExternalServiceObservability observability;
+  private final ExternalCallObservability observability;
 
   public <R> R get(String path, Class<R> responseType) {
-    return observability.observe(SERVICE_TAG_VALUE, GET, path, call -> {
+    ExternalCall call = observability.start(ExternalService.BANK_OF_CANADA, GET, path);
+    try {
       log.debug("GET request to Bank of Canada: {}", path);
       R result = bocWebClient.get()
           .uri(path)
@@ -48,20 +54,25 @@ public class BankOfCanadaWebClient {
           .onErrorMap(BankOfCanadaWebClient::handleError)
           .block();
       log.debug("GET response from Bank of Canada: {} - status OK", path);
+      call.completed(ResponseItemCount.of(result));
       return result;
-    });
+    } catch (RuntimeException exception) {
+      call.failed(exception);
+      throw exception;
+    }
   }
 
-  private Mono<Throwable> handleErrorResponse(String path, ClientResponse response, ExternalCall call) {
+  private static Mono<Throwable> handleErrorResponse(String path, ClientResponse response, ExternalCall call) {
     HttpStatusCode status = response.statusCode();
-    observability.upstreamStatus(call, status.value());
     return response.bodyToMono(String.class)
         .defaultIfEmpty("")
         .flatMap(body -> {
           log.error("Bank of Canada API error: {} {} - {}", path, status, body);
-          return Mono.error(status.is4xxClientError()
+          Throwable error = status.is4xxClientError()
               ? new ExternalServiceBadResponseException(SERVICE_NAME)
-              : new ExternalServiceUnavailableException(SERVICE_NAME));
+              : new ExternalServiceUnavailableException(SERVICE_NAME);
+          call.httpFailed(status.value(), error);
+          return Mono.error(error);
         });
   }
 

@@ -1,4 +1,4 @@
-package com.fintex.ce.adapter.rest.observability;
+package com.fintex.ce.port.observability;
 
 import java.util.List;
 
@@ -11,6 +11,11 @@ import java.util.List;
  */
 public record CalculationStatisticsReport(Overall overall, List<MetricStatistics> metrics) {
 
+  /**
+   * The aggregate across every metric. The code rankings are merged from the complete per-metric tallies rather than
+   * from the truncated per-metric lists, so a code that sits just below the cut-off for every metric individually still
+   * shows up when it is the most frequent code service-wide.
+   */
   public record Overall(
       long executions,
       long successes,

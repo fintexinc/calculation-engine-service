@@ -1,11 +1,10 @@
-package com.fintex.ce.adapter.rest.observability;
+package com.fintex.ce.adapter.observability.calculation;
 
-import com.fintex.ce.adapter.rest.observability.CalculationStatisticsReport.MetricStatistics;
-import com.fintex.ce.application.calculation.observability.CalculationMetricStatistics;
-import com.fintex.ce.application.calculation.observability.RequestShape;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.port.observability.CalculationStatisticsReport;
+import com.fintex.ce.port.observability.CalculationStatisticsReport.MetricStatistics;
 import com.fintex.wm.commons.error.Notification;
 import com.fintex.wm.commons.error.Severity;
 
@@ -18,7 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CalculationStatisticsEndpointTest {
+class MeterCalculationStatisticsProviderTest {
 
   private static final String ALPHA = CalculationMetric.ALPHA.getValue();
   private static final String BETA = CalculationMetric.BETA.getValue();
@@ -37,7 +36,7 @@ class CalculationStatisticsEndpointTest {
 
   private final SimpleMeterRegistry meterRegistry = ConfiguredMeterRegistry.withPercentiles();
   private final CalculationMetricStatistics statistics = new CalculationMetricStatistics(meterRegistry);
-  private final CalculationStatisticsEndpoint endpoint = new CalculationStatisticsEndpoint(meterRegistry);
+  private final MeterCalculationStatisticsProvider provider = new MeterCalculationStatisticsProvider(meterRegistry);
 
   @Test
   void shouldRankMostFailingMetricFirst_whenSeveralMetricsExecuted() {
@@ -52,7 +51,7 @@ class CalculationStatisticsEndpointTest {
     statistics.recordSuccess(CalculationMetric.ALPHA, Duration.ofMillis(30));
     statistics.recordSuccess(CalculationMetric.ALPHA, Duration.ofMillis(70));
 
-    CalculationStatisticsReport report = endpoint.statistics();
+    CalculationStatisticsReport report = provider.statistics();
 
     assertThat(report.metrics()).extracting(MetricStatistics::metric).containsExactly(BETA, ALPHA);
 
@@ -111,7 +110,7 @@ class CalculationStatisticsEndpointTest {
     recordWarnings(ALPHA, List.of(SHARED_WARNING), 2);
     recordWarnings(BETA, List.of(SHARED_WARNING), 2);
 
-    CalculationStatisticsReport report = endpoint.statistics();
+    CalculationStatisticsReport report = provider.statistics();
 
     assertThat(codes(metric(report, ALPHA).topErrorCodes()))
         .as("five codes beat it within this metric, so it is cut from the per-metric list")
@@ -142,7 +141,7 @@ class CalculationStatisticsEndpointTest {
 
   @Test
   void shouldReturnEmptyReport_whenNoCalculationRecorded() {
-    CalculationStatisticsReport report = endpoint.statistics();
+    CalculationStatisticsReport report = provider.statistics();
 
     assertThat(report.metrics()).isEmpty();
     assertThat(report.overall().executions()).isZero();

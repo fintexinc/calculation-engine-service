@@ -1,17 +1,15 @@
 package com.fintex.ce.adapter.cache.fx;
 
 import com.fintex.ce.adapter.cache.config.CacheDataProperties;
+import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import io.micrometer.core.instrument.MeterRegistry;
 
 /**
  * Registers the caching proxy around {@link FxRatesFetcher} when {@code cache.data.fx-rates.enabled=true}. The proxy is
@@ -27,10 +25,8 @@ public class FxRatesCacheConfig {
 
   @Bean
   @ConditionalOnProperty(prefix = "cache.data.fx-rates", name = "enabled", havingValue = "true")
-  public FxRatesCache fxRatesCache(
-      CacheDataProperties properties,
-      ObjectProvider<MeterRegistry> meterRegistryProvider) {
-    return new CaffeineFxRatesCache(properties.getFxRates(), meterRegistryProvider.getIfAvailable());
+  public FxRatesCache fxRatesCache(CacheDataProperties properties, CacheObservability cacheObservability) {
+    return new CaffeineFxRatesCache(properties.getFxRates(), cacheObservability);
   }
 
   @Bean

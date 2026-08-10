@@ -1,13 +1,12 @@
 package com.fintex.ce.adapter.cache.tbills;
 
+import com.fintex.ce.adapter.cache.observability.CaffeineCacheStatistics;
+import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.binder.cache.CaffeineCacheMetrics;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -24,6 +23,12 @@ import lombok.extern.slf4j.Slf4j;
  * The cache size is bounded to the number of supported {@link Currency} values, so the cache is effectively permanent
  * once populated; only {@code expireAfterWrite} drives evictions.
  * </p>
+ *
+ * <p>
+ * The cache registers itself with {@link CacheObservability} so its effectiveness is reportable under
+ * {@code cache=t-bills}. The dependency is required rather than optional: pass {@link CacheObservability#NO_OP} to
+ * publish nothing, which is a decision made at the point of wiring instead of a consequence of a missing bean.
+ * </p>
  */
 @Slf4j
 public class CachingTreasuryBillsFetcher implements TreasuryBillsFetcher {
@@ -33,28 +38,17 @@ public class CachingTreasuryBillsFetcher implements TreasuryBillsFetcher {
   private final TreasuryBillsFetcher delegate;
   private final Cache<Currency, NavigableMap<LocalDate, BigDecimal>> cache;
 
-  public CachingTreasuryBillsFetcher(TreasuryBillsFetcher delegate, Duration refreshAfter) {
-    this(delegate, refreshAfter, null);
-  }
-
-  /**
-   * Same as {@link #CachingTreasuryBillsFetcher(TreasuryBillsFetcher, Duration)} but additionally publishes the
-   * Caffeine statistics as {@code cache.*} meters tagged {@code cache=t-bills}. A {@code null} registry disables the
-   * binding.
-   */
   public CachingTreasuryBillsFetcher(
       TreasuryBillsFetcher delegate,
       Duration refreshAfter,
-      MeterRegistry meterRegistry) {
+      CacheObservability cacheObservability) {
     this.delegate = delegate;
     this.cache = Caffeine.newBuilder()
         .maximumSize(Currency.values().length)
         .expireAfterWrite(refreshAfter)
         .recordStats()
         .build();
-    if (meterRegistry != null) {
-      CaffeineCacheMetrics.monitor(meterRegistry, cache, CACHE_NAME);
-    }
+    cacheObservability.registerCache(CACHE_NAME, new CaffeineCacheStatistics(cache));
   }
 
   @Override

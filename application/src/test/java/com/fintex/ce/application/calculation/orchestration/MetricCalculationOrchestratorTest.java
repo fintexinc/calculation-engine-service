@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.orchestration;
 
 import com.fintex.ce.application.config.DefaultDataProperties;
-import com.fintex.ce.calculation.CalculationDurationRecorder;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -14,6 +13,7 @@ import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
+import com.fintex.ce.port.observability.CalculationDurationRecorder;
 import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
