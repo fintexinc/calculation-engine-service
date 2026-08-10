@@ -43,8 +43,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.CIPSD;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SI;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_MTH;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -202,6 +204,80 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getTrailingTotalReturn()).hasSize(1);
     assertThat(findPeriod(result, ONE_MTH.name()).value())
         .isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
+  }
+
+  @Test
+  void shouldCalculateTrailingReturn_whenSincePerformanceStartDateRequested() {
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(XBAL, monthlyReturnsFor2024("1.0")))));
+    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
+
+    PeriodCommand command = periodCommand(
+        Set.of(SI),
+        LocalDate.parse("2024-12-31"),
+        List.of(holding(
+            XBAL,
+            FinancialInstrumentType.ETF,
+            Country.CANADA,
+            "50000")));
+
+    HttpResponse response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+
+    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getPerformanceStartDate())
+        .isEqualTo(LocalDate.of(2024, 1, 31));
+    assertThat(result.getPerformanceEndDate())
+        .isEqualTo(LocalDate.of(2024, 12, 31));
+    assertThat(result.getTrailingTotalReturn()).hasSize(1);
+
+    TimeIntervalResult interval = findPeriod(result, SI.name());
+
+    assertThat(interval.period()).isEqualTo(SI.name());
+    assertThat(interval.value())
+        .isCloseTo(new BigDecimal("0.1284704359"), within(TOLERANCE));
+  }
+
+  @Test
+  void shouldCalculateTrailingReturn_whenCustomIntervalPerformanceStartDateRequested() {
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(XBAL, monthlyReturnsFor2024("1.0")))));
+    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
+
+    PeriodCommand command = periodCommand(
+        Set.of(CIPSD),
+        LocalDate.parse("2024-12-31"),
+        List.of(holding(
+            XBAL,
+            FinancialInstrumentType.ETF,
+            Country.CANADA,
+            "50000")));
+
+    command.setCustomIntervalPsd(LocalDate.parse("2024-06-30"));
+
+    HttpResponse response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+
+    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getCustomIntervalPerformanceStartDate())
+        .isEqualTo(LocalDate.of(2024, 6, 30));
+    assertThat(result.getPerformanceStartDate())
+        .isEqualTo(LocalDate.of(2024, 1, 31));
+    assertThat(result.getPerformanceEndDate())
+        .isEqualTo(LocalDate.of(2024, 12, 31));
+    assertThat(result.getTrailingTotalReturn()).hasSize(1);
+
+    TimeIntervalResult interval = findPeriod(result, CIPSD.name());
+
+    assertThat(interval.period()).isEqualTo(CIPSD.name());
+    assertThat(interval.value())
+        .isCloseTo(new BigDecimal("0.0740075984"), within(TOLERANCE));
   }
 
   @Test
