@@ -1,12 +1,11 @@
-package com.fintex.ce.adapter.rest.observability;
+package com.fintex.ce.adapter.observability.calculation;
 
-import com.fintex.ce.application.calculation.observability.CalculationMetricStatistics;
-import com.fintex.ce.application.calculation.observability.RequestShape;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
+import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -22,8 +21,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Traces every calculation request as one Micrometer observation and delegates the per-metric numbers to
- * {@link CalculationMetricStatistics}.
+ * Micrometer implementation of {@link CalculationObservability}: traces every calculation request as one observation
+ * and delegates the per-metric numbers to {@link CalculationMetricStatistics}.
  *
  * <p>
  * Both endpoints share the observation name {@code portfolio.calculation.request} and the same low-cardinality tag set,
@@ -37,14 +36,13 @@ import lombok.RequiredArgsConstructor;
  * first.
  *
  * <p>
- * Everything observed here has already passed metric resolution and request validation: the caller wraps the dispatch,
- * not the whole request. An exception reaching these catch blocks therefore comes from a calculation that was actually
- * attempted, which is what keeps a rejected request out of the per-metric failure counts and out of the error-code
- * ranking.
+ * Everything observed here has already passed metric resolution and request validation, which the port requires of its
+ * callers. An exception reaching these catch blocks therefore comes from a calculation that was actually attempted,
+ * which is what keeps a rejected request out of the per-metric failure counts and out of the error-code ranking.
  */
 @Component
 @RequiredArgsConstructor
-public class CalculationObservability {
+public class MicrometerCalculationObservability implements CalculationObservability {
 
   static final String REQUEST_OBSERVATION_NAME = "portfolio.calculation.request";
 
@@ -57,7 +55,7 @@ public class CalculationObservability {
 
   static final String COMMAND_TAG = "command.type";
   static final String OUTCOME_TAG = "outcome";
-  static final String EXCEPTION_TAG = "exception";
+  static final String ERROR_TYPE_TAG = "error.type";
   static final String RESULT_TAG = "result.type";
 
   static final String REQUESTED_METRIC_KEY = "requested.metric";
@@ -74,6 +72,7 @@ public class CalculationObservability {
   private final ObservationRegistry observationRegistry;
   private final CalculationMetricStatistics statistics;
 
+  @Override
   public BaseCalculationResult observe(
       String metricName,
       CalculationCommand command,
@@ -93,7 +92,7 @@ public class CalculationObservability {
     try (Observation.Scope ignored = observation.openScope()) {
       BaseCalculationResult result = action.get();
       observation.lowCardinalityKeyValue(OUTCOME_TAG, SUCCESS);
-      observation.lowCardinalityKeyValue(EXCEPTION_TAG, NONE);
+      observation.lowCardinalityKeyValue(ERROR_TYPE_TAG, NONE);
       observation.lowCardinalityKeyValue(RESULT_TAG, resultType(result));
       observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, String.valueOf(warningsCount(result)));
       observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, "0");
@@ -102,7 +101,7 @@ public class CalculationObservability {
     } catch (RuntimeException exception) {
       observation.error(exception);
       observation.lowCardinalityKeyValue(OUTCOME_TAG, ERROR);
-      observation.lowCardinalityKeyValue(EXCEPTION_TAG, exception.getClass().getSimpleName());
+      observation.lowCardinalityKeyValue(ERROR_TYPE_TAG, exception.getClass().getSimpleName());
       observation.lowCardinalityKeyValue(RESULT_TAG, NONE);
       observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, "0");
       observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, "1");
@@ -113,6 +112,7 @@ public class CalculationObservability {
     }
   }
 
+  @Override
   public CompositeCalculationResult observeComposite(
       List<CalculationCommand> commands,
       Supplier<CompositeCalculationResult> action) {
@@ -131,7 +131,7 @@ public class CalculationObservability {
     try (Observation.Scope ignored = observation.openScope()) {
       CompositeCalculationResult result = action.get();
       observation.lowCardinalityKeyValue(OUTCOME_TAG, SUCCESS);
-      observation.lowCardinalityKeyValue(EXCEPTION_TAG, NONE);
+      observation.lowCardinalityKeyValue(ERROR_TYPE_TAG, NONE);
       observation.lowCardinalityKeyValue(RESULT_TAG, resultType(result));
       observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, String.valueOf(warningsCount(result)));
       observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, String.valueOf(failuresCount(result)));
@@ -140,7 +140,7 @@ public class CalculationObservability {
     } catch (RuntimeException exception) {
       observation.error(exception);
       observation.lowCardinalityKeyValue(OUTCOME_TAG, ERROR);
-      observation.lowCardinalityKeyValue(EXCEPTION_TAG, exception.getClass().getSimpleName());
+      observation.lowCardinalityKeyValue(ERROR_TYPE_TAG, exception.getClass().getSimpleName());
       observation.lowCardinalityKeyValue(RESULT_TAG, NONE);
       observation.highCardinalityKeyValue(WARNINGS_COUNT_KEY, "0");
       observation.highCardinalityKeyValue(FAILED_METRICS_COUNT_KEY, String.valueOf(observedCommands.size()));
@@ -162,7 +162,7 @@ public class CalculationObservability {
       return UNKNOWN;
     }
     return commands.stream()
-        .map(CalculationObservability::bodyMetric)
+        .map(MicrometerCalculationObservability::bodyMetric)
         .collect(Collectors.joining(","));
   }
 
@@ -175,7 +175,7 @@ public class CalculationObservability {
       return 0;
     }
     return result.getResults().values().stream()
-        .mapToInt(CalculationObservability::warningsCount)
+        .mapToInt(MicrometerCalculationObservability::warningsCount)
         .sum();
   }
 

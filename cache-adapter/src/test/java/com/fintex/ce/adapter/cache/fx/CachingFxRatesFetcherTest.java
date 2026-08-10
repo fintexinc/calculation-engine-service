@@ -3,6 +3,7 @@ package com.fintex.ce.adapter.cache.fx;
 import com.fintex.ce.adapter.cache.config.CacheDataProperties.FxRatesCacheProperties;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -166,7 +167,7 @@ class CachingFxRatesFetcherTest {
     FxRatesCacheProperties properties = new FxRatesCacheProperties();
     properties.setEnabled(true);
     properties.setMaxEntries(4096);
-    CaffeineFxRatesCache realCache = new CaffeineFxRatesCache(properties);
+    CaffeineFxRatesCache realCache = new CaffeineFxRatesCache(properties, CacheObservability.NO_OP);
     CachingFxRatesFetcher realFetcher = new CachingFxRatesFetcher(delegate, realCache);
 
     when(delegate.canonicalDirection(USD_CAD)).thenReturn(USD_CAD);

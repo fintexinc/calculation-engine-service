@@ -1,6 +1,5 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import com.fintex.ce.adapter.rest.observability.CalculationObservability;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -59,6 +58,7 @@ import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
 import com.fintex.ce.model.dto.command.PortfolioBenchmarkCommand;
 import com.fintex.ce.model.dto.command.contract.HoldingsProvider;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;

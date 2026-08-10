@@ -1,5 +1,7 @@
 package com.fintex.ce.adapter.rest.observability;
 
+import com.fintex.ce.port.observability.CalculationStatisticsReport;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

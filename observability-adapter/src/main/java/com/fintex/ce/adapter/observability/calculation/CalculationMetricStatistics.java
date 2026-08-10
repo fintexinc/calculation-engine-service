@@ -1,6 +1,5 @@
-package com.fintex.ce.application.calculation.observability;
+package com.fintex.ce.adapter.observability.calculation;
 
-import com.fintex.ce.calculation.CalculationDurationRecorder;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
@@ -8,6 +7,7 @@ import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
+import com.fintex.ce.port.observability.CalculationDurationRecorder;
 import com.fintex.wm.commons.error.Notification;
 import com.fintex.wm.commons.error.Severity;
 

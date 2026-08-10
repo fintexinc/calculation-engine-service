@@ -118,18 +118,30 @@ What `/actuator/calculationstats` is built from, and what a metrics exporter wou
 | `portfolio.calculation.warning.codes` | Counter | `calculation.metric`, `warning.code` |
 | `portfolio.calculation.holdings` / `.benchmark.holdings` | DistributionSummary | `calculation.metric` |
 | `portfolio.calculation.request` | Timer | `command.type`, `outcome`, `exception`, `result.type` |
-| `external.provider.request` | Timer | `external.service`, `http.method`, `endpoint`, `outcome`, `exception`, `upstream.status` |
+| `external.provider.request` | Timer | `external.service`, `http.method`, `endpoint`, `outcome`, `error.type`, `upstream.status` |
 | `external.provider.result.size` | DistributionSummary | `external.service`, `endpoint` |
-| `external.provider.request.failure.ratio` / `.duration.mean` | Gauge | `external.service`, `window` |
 | `http.server.requests` | Timer | Spring Boot defaults |
+| `http.client.requests` | Timer | Spring Boot defaults |
 
 Every external provider shares one meter name and is told apart by the `external.service` tag, so both an aggregate and
-a per-provider view stay expressible without a dashboard having to enumerate the providers.
+a per-provider view stay expressible without a dashboard having to enumerate the providers. The external-call meters and
+their tag vocabulary are identical to Security Master's, so one dashboard, alert or recording rule covers both services.
 
-`outcome` on `external.provider.request` is `success`, `http_error` when the provider returned a response the client
-rejected, or `error` when nothing came back at all — a connection failure, a timeout, an unparseable body. `upstream.status`
-carries the real status for `http_error` and `none` otherwise; it is intentionally not the OpenTelemetry
-`http.response.status_code` key, because a call that never reached the provider has no status to put there.
+`outcome` on `external.provider.request` is `success`, `empty` when the provider answered with no usable items,
+`http_error` when it returned a response the client rejected, or `error` when nothing came back at all — a connection
+failure, a timeout, an unparseable body. Anything other than `success` is a failure, `empty` included, because the caller
+asked for data and got none. Security Master publishes two further outcomes on the same meter, `rate_limited` and
+`cancelled`, plus an `external.provider.rate.limiter.wait` timer; it is the only one of the two services with a
+client-side rate limiter and a reactive client, so nothing here can reach them.
+
+`error.type` follows the OpenTelemetry convention and always carries an exception type, never a status code.
+`upstream.status` carries the status the provider actually returned and `none` otherwise; it is intentionally not the
+OpenTelemetry `http.response.status_code` key, because a call that never reached the provider has no status to put there.
+
+Spans and wire-level timing for outbound calls come from the framework — every client is built from the autoconfigured
+`WebClient.Builder`, so each call already produces an `http.client.requests` timer and a client span parented inside the
+caller's trace. The meters above deliberately add neither a second span nor a second wire timer; they record only what
+the transport cannot see: whether the payload carried usable data, how many items it held, and any rate-limiter wait.
 
 `portfolio.calculation.request` is the request-level timer shared by both endpoints — it deliberately has no
 `calculation.metric` tag, because a composite request is not a metric. Per-metric latency lives in
@@ -141,10 +153,11 @@ not track a minimum for timers or distributions — `p50` serves that role; the 
 `portfolio.calculation.warnings.min`, which is a purpose-built gauge.
 
 Counts, totals and means are cumulative; `max` and the percentiles come from the registry's rolling distribution window
-and so describe recent traffic. No `management.metrics.distribution.expiry` override is set: widening that window would
-only stretch how long a decaying `p95` disagrees with the cumulative `samples` count beside it. The rolling view of
-external calls is served by its own purpose-built `failure.ratio` / `duration.mean` gauges, which state their window in
-a `window` tag.
+and so describe recent traffic. `management.metrics.distribution.expiry` widens that window for the bursty outbound
+prefixes, and deliberately leaves `portfolio.calculation` alone: `calculationstats` serves cumulative counts beside those
+percentiles, so an expiry there would report a decaying `p95` next to a live `samples` count. Run counts, failure ratios
+and mean durations are all derivable from the timers by a metrics backend and are deliberately not published a second
+time as gauges.
 
 **Lifetime:** these counters live in the in-process meter registry. They reset on restart and are not currently shipped
 to an external metrics backend — no exporting `MeterRegistry` is on the classpath. Distributed traces *are* exported to
@@ -184,6 +197,8 @@ Hexagonal Architecture is used in this project.
 | `application` | Use cases, orchestration via ports |
 | `rest-adapter` | REST controllers exposing the API |
 | `web-client-adapter` | REST client for Security Master |
+| `cache-adapter` | Caching proxies over the data-fetching ports |
+| `observability-adapter` | Metrics, tracing and statistics behind the observability ports |
 | `bootstrap` | Spring Boot entry point and configuration |
 
 ### Prerequisites

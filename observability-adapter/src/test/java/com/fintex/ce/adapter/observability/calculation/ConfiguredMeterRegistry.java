@@ -1,4 +1,4 @@
-package com.fintex.ce.adapter.rest.observability;
+package com.fintex.ce.adapter.observability.calculation;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.config.MeterFilter;

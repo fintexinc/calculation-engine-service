@@ -24,18 +24,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Micrometer Observation API -->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-observation</artifactId>
-        </dependency>
-
-        <!-- Micrometer meters (request-shape distributions and counters) -->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-        </dependency>
-
         <!-- Spring Web MVC -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

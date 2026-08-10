@@ -181,15 +181,29 @@ management:
       # segment, so `external` covers external.provider.request and `portfolio.calculation` covers both
       # portfolio.calculation.request and portfolio.calculation.duration. This is the only place that decides which
       # percentiles are published.
-      #
-      # Deliberately no `expiry` override: it would make percentiles and max decay over a window while the counters
-      # beside them stay cumulative, so /actuator/calculationstats would report a p95 of zero next to a live sample
-      # count. The rolling-window view of external calls is served by its own gauges instead.
       percentiles:
         external: 0.5, 0.95, 0.99
         portfolio.calculation: 0.5, 0.95, 0.99
         http.server.requests: 0.5, 0.95, 0.99
         http.client.requests: 0.5, 0.95, 0.99
+      # Window the percentiles are computed over. Micrometer keeps a rolling histogram and reports 0 once the window
+      # rotates with no new recordings, so the window has to outlast the gaps in the traffic it measures. Outbound
+      # provider traffic is bursty, so a few minutes would read 0 almost always; a day keeps the last burst legible.
+      # Inbound request traffic is continuous, so a short window there stays both populated and current.
+      #
+      # `portfolio.calculation` is deliberately absent: /actuator/calculationstats reports cumulative counts beside
+      # these percentiles, and an expiry would have it serve a p95 of zero next to a live sample count.
+      expiry:
+        external: 24h
+        http.server.requests: 5m
+        http.client.requests: 24h
+      # Percentile estimation buckets values inside the expected range and clamps anything above the maximum, so the
+      # default 30s ceiling would report every slow call at the ceiling. Provider calls are bounded by their own
+      # timeouts, and a composite calculation can outlast a single request timeout.
+      maximum-expected-value:
+        external: 60s
+        http.client.requests: 60s
+        portfolio.calculation: 120s
   observations:
     key-values:
       application: ${spring.application.name}

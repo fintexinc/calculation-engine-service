@@ -1,9 +1,11 @@
 package com.fintex.ce.adapter.webclient.sm.client;
 
-import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability;
-import com.fintex.ce.adapter.webclient.observability.ExternalServiceObservability.ExternalCall;
+import com.fintex.ce.adapter.webclient.observability.ResponseItemCount;
 import com.fintex.ce.model.error.exceptions.ExternalServiceBadResponseException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
+import com.fintex.ce.port.observability.ExternalCallObservability;
+import com.fintex.ce.port.observability.ExternalCallObservability.ExternalCall;
+import com.fintex.ce.port.observability.ExternalService;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,6 +18,7 @@ import org.springframework.web.util.UriBuilder;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +32,11 @@ import reactor.core.publisher.Mono;
  * <li>5xx response or transport/connection error → {@link ExternalServiceUnavailableException} (HTTP 503 Service
  * Unavailable)</li>
  * </ul>
+ *
+ * <p>
+ * Every call is reported to {@link ExternalCallObservability}. The outcome is filed by this class rather than by the
+ * fetchers above it, so that no call can go unreported, and the upstream status is filed from the one place that sees
+ * the raw response — the error handler — before it is mapped to a domain exception.
  */
 @Slf4j
 @Component
@@ -37,18 +45,17 @@ import reactor.core.publisher.Mono;
 public class SecurityMasterWebClient {
 
   private static final String SERVICE_NAME = "Security Master";
-  private static final String SERVICE_TAG_VALUE = "security-master";
   private static final String GET = HttpMethod.GET.name();
   private static final String POST = HttpMethod.POST.name();
 
   private final WebClient smWebClient;
-  private final ExternalServiceObservability observability;
+  private final ExternalCallObservability observability;
 
   /**
    * Performs a POST request and returns the response body.
    */
   public <T, R> R post(String path, T request, ParameterizedTypeReference<R> responseType) {
-    return observability.observe(SERVICE_TAG_VALUE, POST, path, call -> {
+    return observe(POST, path, call -> {
       log.debug("POST request to: {}", path);
       R result = smWebClient.post()
           .uri(path)
@@ -76,7 +83,7 @@ public class SecurityMasterWebClient {
    * values. Pass {@link Map#of()} for no params.
    */
   public <R> R get(String path, Map<String, ?> queryParams, Class<R> responseType) {
-    return observability.observe(SERVICE_TAG_VALUE, GET, path, call -> {
+    return observe(GET, path, call -> {
       log.debug("GET request to: {} params={}", path, queryParams);
       R result = smWebClient.get()
           .uri(uriBuilder -> buildUri(uriBuilder, path, queryParams))
@@ -94,7 +101,7 @@ public class SecurityMasterWebClient {
    * Performs a GET request and returns the response body with parameterized type.
    */
   public <R> R get(String path, ParameterizedTypeReference<R> responseType) {
-    return observability.observe(SERVICE_TAG_VALUE, GET, path, call -> {
+    return observe(GET, path, call -> {
       log.debug("GET request to: {}", path);
       R result = smWebClient.get()
           .uri(path)
@@ -108,6 +115,18 @@ public class SecurityMasterWebClient {
     });
   }
 
+  private <R> R observe(String httpMethod, String path, Function<ExternalCall, R> action) {
+    ExternalCall call = observability.start(ExternalService.SECURITY_MASTER, httpMethod, path);
+    try {
+      R result = action.apply(call);
+      call.completed(ResponseItemCount.of(result));
+      return result;
+    } catch (RuntimeException exception) {
+      call.failed(exception);
+      throw exception;
+    }
+  }
+
   private static URI buildUri(UriBuilder uriBuilder, String path, Map<String, ?> queryParams) {
     UriBuilder b = uriBuilder.path(path);
     queryParams.forEach((k, v) -> {
@@ -118,16 +137,17 @@ public class SecurityMasterWebClient {
     return b.build();
   }
 
-  private Mono<Throwable> handleErrorResponse(String path, ClientResponse response, ExternalCall call) {
+  private static Mono<Throwable> handleErrorResponse(String path, ClientResponse response, ExternalCall call) {
     HttpStatusCode status = response.statusCode();
-    observability.upstreamStatus(call, status.value());
     return response.bodyToMono(String.class)
         .defaultIfEmpty("")
         .flatMap(body -> {
           log.error("Security Master API error: {} {} - {}", path, status, body);
-          return Mono.error(status.is4xxClientError()
+          Throwable error = status.is4xxClientError()
               ? new ExternalServiceBadResponseException(SERVICE_NAME)
-              : new ExternalServiceUnavailableException(SERVICE_NAME));
+              : new ExternalServiceUnavailableException(SERVICE_NAME);
+          call.httpFailed(status.value(), error);
+          return Mono.error(error);
         });
   }
 

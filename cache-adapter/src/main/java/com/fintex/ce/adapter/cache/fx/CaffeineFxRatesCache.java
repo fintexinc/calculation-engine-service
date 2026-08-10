@@ -1,16 +1,15 @@
 package com.fintex.ce.adapter.cache.fx;
 
 import com.fintex.ce.adapter.cache.config.CacheDataProperties.FxRatesCacheProperties;
+import com.fintex.ce.adapter.cache.observability.CaffeineCacheStatistics;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.port.observability.CacheObservability;
 
 import org.apache.commons.collections4.MapUtils;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.binder.cache.CaffeineCacheMetrics;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -49,24 +48,15 @@ public class CaffeineFxRatesCache implements FxRatesCache {
 
   /**
    * Builds a cache capped at {@link FxRatesCacheProperties#getMaxEntries()} {@code (pair, date)} rows. Each row counts
-   * toward the cap regardless of whether it holds a rate or {@link CachedRate#ABSENT}.
+   * toward the cap regardless of whether it holds a rate or {@link CachedRate#ABSENT}. The cache registers itself with
+   * {@link CacheObservability} under {@code cache=fx-rates}; pass {@link CacheObservability#NO_OP} to publish nothing.
    */
-  public CaffeineFxRatesCache(FxRatesCacheProperties properties) {
-    this(properties, null);
-  }
-
-  /**
-   * Same as {@link #CaffeineFxRatesCache(FxRatesCacheProperties)} but additionally publishes the Caffeine statistics as
-   * {@code cache.*} meters tagged {@code cache=fx-rates}. A {@code null} registry disables the binding.
-   */
-  public CaffeineFxRatesCache(FxRatesCacheProperties properties, MeterRegistry meterRegistry) {
+  public CaffeineFxRatesCache(FxRatesCacheProperties properties, CacheObservability cacheObservability) {
     this.rates = Caffeine.newBuilder()
         .maximumSize(properties.getMaxEntries())
         .recordStats()
         .build();
-    if (meterRegistry != null) {
-      CaffeineCacheMetrics.monitor(meterRegistry, rates, CACHE_NAME);
-    }
+    cacheObservability.registerCache(CACHE_NAME, new CaffeineCacheStatistics(rates));
   }
 
   @Override

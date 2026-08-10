@@ -1,5 +1,6 @@
 package com.fintex.ce.adapter.cache.tbills;
 
+import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -26,7 +27,8 @@ class CachingTreasuryBillsFetcherTest {
     NavigableMap<LocalDate, BigDecimal> cadSeries = singleEntry(LocalDate.parse("2020-01-31"),
         BigDecimal.valueOf(0.05));
     when(delegate.fetch(Currency.CAD)).thenReturn(cadSeries);
-    CachingTreasuryBillsFetcher fetcher = new CachingTreasuryBillsFetcher(delegate, Duration.ofMinutes(1));
+    CachingTreasuryBillsFetcher fetcher = new CachingTreasuryBillsFetcher(delegate, Duration.ofMinutes(1),
+        CacheObservability.NO_OP);
 
     NavigableMap<LocalDate, BigDecimal> first = fetcher.fetch(Currency.CAD);
     NavigableMap<LocalDate, BigDecimal> second = fetcher.fetch(Currency.CAD);
@@ -46,7 +48,8 @@ class CachingTreasuryBillsFetcherTest {
         BigDecimal.valueOf(0.06));
     when(delegate.fetch(Currency.CAD)).thenReturn(cadSeries);
     when(delegate.fetch(Currency.USD)).thenReturn(usdSeries);
-    CachingTreasuryBillsFetcher fetcher = new CachingTreasuryBillsFetcher(delegate, Duration.ofMinutes(1));
+    CachingTreasuryBillsFetcher fetcher = new CachingTreasuryBillsFetcher(delegate, Duration.ofMinutes(1),
+        CacheObservability.NO_OP);
 
     NavigableMap<LocalDate, BigDecimal> cad = fetcher.fetch(Currency.CAD);
     NavigableMap<LocalDate, BigDecimal> usd = fetcher.fetch(Currency.USD);
@@ -66,7 +69,8 @@ class CachingTreasuryBillsFetcherTest {
     NavigableMap<LocalDate, BigDecimal> a = singleEntry(LocalDate.parse("2020-01-31"), BigDecimal.valueOf(0.05));
     NavigableMap<LocalDate, BigDecimal> b = singleEntry(LocalDate.parse("2020-01-31"), BigDecimal.valueOf(0.06));
     when(delegate.fetch(Currency.CAD)).thenReturn(a, b);
-    CachingTreasuryBillsFetcher fetcher = new CachingTreasuryBillsFetcher(delegate, Duration.ofMillis(50));
+    CachingTreasuryBillsFetcher fetcher = new CachingTreasuryBillsFetcher(delegate, Duration.ofMillis(50),
+        CacheObservability.NO_OP);
 
     NavigableMap<LocalDate, BigDecimal> first = fetcher.fetch(Currency.CAD);
     Thread.sleep(100);

@@ -21,6 +21,7 @@
         <module>domain</module>
         <module>api</module>
         <module>application</module>
+        <module>observability-adapter</module>
         <module>web-client-adapter</module>
         <module>cache-adapter</module>
         <module>rest-adapter</module>
@@ -94,6 +95,11 @@
             <dependency>
                 <groupId>com.fintex</groupId>
                 <artifactId>application</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fintex</groupId>
+                <artifactId>observability-adapter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

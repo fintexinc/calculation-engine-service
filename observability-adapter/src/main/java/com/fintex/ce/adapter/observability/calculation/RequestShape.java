@@ -1,4 +1,4 @@
-package com.fintex.ce.application.calculation.observability;
+package com.fintex.ce.adapter.observability.calculation;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.CalculationCommand;

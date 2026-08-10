@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.orchestration;
 
 import com.fintex.ce.application.config.DefaultDataProperties;
-import com.fintex.ce.calculation.CalculationDurationRecorder;
 import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
@@ -16,6 +15,7 @@ import com.fintex.ce.model.dto.command.contract.HoldingsProvider;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
+import com.fintex.ce.port.observability.CalculationDurationRecorder;
 import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
