@@ -134,6 +134,55 @@ class TrailingTotalReturnsCalculationTest {
   }
 
   @Test
+  void shouldCalculateTrailingTotalReturn_forSincePerformanceStartDate() {
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(constantFactorReturns(12));
+
+    TrailingTotalReturnsCalculation calculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
+
+    TrailingTotalReturnsResult result = calculation.calculate(Set.of(TimePeriod.SI));
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getPerformanceStartDate())
+        .isEqualTo(LocalDate.of(2005, 1, 31));
+    assertThat(result.getPerformanceEndDate())
+        .isEqualTo(LocalDate.of(2005, 12, 31));
+    assertThat(result.getTrailingTotalReturn()).hasSize(1);
+
+    TimeIntervalResult interval = period(result, TimePeriod.SI);
+
+    assertThat(interval.period()).isEqualTo(TimePeriod.SI.name());
+    assertThat(interval.value())
+        .isEqualByComparingTo("0.1268250301");
+  }
+
+  @Test
+  void shouldCalculateTrailingTotalReturn_forCustomIntervalPerformanceStartDate() {
+    PeriodCalculationInput input = new PeriodCalculationInput();
+    input.setWeightedAveragePortfolioReturns(constantFactorReturns(12));
+    input.setCipsd(LocalDate.of(2005, 6, 30));
+
+    TrailingTotalReturnsCalculation calculation = TrailingTotalReturnsCalculation.mathOnly(input, Set.of());
+
+    TrailingTotalReturnsResult result = calculation.calculate(Set.of(TimePeriod.CIPSD));
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getCustomIntervalPerformanceStartDate())
+        .isEqualTo(LocalDate.of(2005, 6, 30));
+    assertThat(result.getPerformanceStartDate())
+        .isEqualTo(LocalDate.of(2005, 1, 31));
+    assertThat(result.getPerformanceEndDate())
+        .isEqualTo(LocalDate.of(2005, 12, 31));
+    assertThat(result.getTrailingTotalReturn()).hasSize(1);
+
+    TimeIntervalResult interval = period(result, TimePeriod.CIPSD);
+
+    assertThat(interval.period()).isEqualTo(TimePeriod.CIPSD.name());
+    assertThat(interval.value())
+        .isEqualByComparingTo("0.0721353521");
+  }
+
+  @Test
   void shouldThrowMissingTBillRate_whenTBillsHaveGapWithinPeriodWindow() {
     NavigableMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
     NavigableMap<LocalDate, BigDecimal> tBills = new TreeMap<>();
