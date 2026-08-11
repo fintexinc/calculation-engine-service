@@ -18,6 +18,7 @@ import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
+import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
@@ -28,6 +29,8 @@ import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
+import com.fintex.ce.port.observability.CalculationDurationRecorder;
+import com.fintex.ce.port.observability.CalculationObservability;
 import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -59,15 +62,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import io.micrometer.observation.ObservationRegistry;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationController.BASE_PATH;
@@ -102,7 +105,8 @@ class PortfolioCalculationControllerTest {
         .<CalculationService<?, ?, ?>>map(this::createMockService)
         .toList();
 
-    var controller = controller(serviceList, new RequestValidationFacade(List.of()));
+    var controller = controller(serviceList, new RequestValidationFacade(List.of()),
+        new RecordingCalculationObservability());
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -205,18 +209,51 @@ class PortfolioCalculationControllerTest {
   }
 
   private static PortfolioCalculationController controller(List<CalculationService<?, ?, ?>> services,
-      RequestValidationFacade validationFacade) {
+      RequestValidationFacade validationFacade, CalculationObservability observability) {
     SecurityAttributesFetcher fetcher = mock(SecurityAttributesFetcher.class);
     lenient().when(fetcher.fetch(any(), anyCollection(), any())).thenReturn(SecurityData.EMPTY);
     lenient().when(fetcher.fetch(any(), any(CompositeSecurityAttribute.class), any())).thenReturn(Map.of());
     CalculationOrchestrator orchestrator = new MetricCalculationOrchestrator(
         services,
         fetcher,
-        new DefaultDataProperties(List.of(DataProvider.MORNINGSTAR, DataProvider.FMP)));
+        new DefaultDataProperties(List.of(DataProvider.MORNINGSTAR, DataProvider.FMP)),
+        CalculationDurationRecorder.NO_OP);
     LocalValidatorFactoryBean beanValidator = new LocalValidatorFactoryBean();
     beanValidator.afterPropertiesSet();
-    return new PortfolioCalculationController(orchestrator, validationFacade,
-        new CalculationObservability(ObservationRegistry.create()), beanValidator);
+    return new PortfolioCalculationController(orchestrator, validationFacade, observability, beanValidator);
+  }
+
+  /**
+   * Records what the controller actually handed over to be observed. The per-metric numbers themselves are the
+   * observability adapter's business and are covered there; what has to be pinned here is the boundary — which requests
+   * reach the port at all, and with which outcome.
+   */
+  private static final class RecordingCalculationObservability implements CalculationObservability {
+
+    private final List<String> observedMetrics = new ArrayList<>();
+    private final List<String> failedMetrics = new ArrayList<>();
+
+    @Override
+    public BaseCalculationResult observe(
+        String metricName,
+        CalculationCommand command,
+        Supplier<BaseCalculationResult> action) {
+      observedMetrics.add(metricName);
+      try {
+        return action.get();
+      } catch (RuntimeException exception) {
+        failedMetrics.add(metricName);
+        throw exception;
+      }
+    }
+
+    @Override
+    public CompositeCalculationResult observeComposite(
+        List<CalculationCommand> commands,
+        Supplier<CompositeCalculationResult> action) {
+      commands.forEach(command -> observedMetrics.add(command.getMetric().getValue()));
+      return action.get();
+    }
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
@@ -370,6 +407,7 @@ class PortfolioCalculationControllerTest {
     private MockMvc validatingMockMvc;
     private ObjectMapper om;
     private Map<CalculationMetric, CalculationService<?, ?, ?>> calculationServices;
+    private RecordingCalculationObservability observability;
 
     @BeforeEach
     void setUp() {
@@ -403,7 +441,8 @@ class PortfolioCalculationControllerTest {
         calculationServices.put(m, svc);
       }
 
-      var controller = controller(services, facade);
+      observability = new RecordingCalculationObservability();
+      var controller = controller(services, facade, observability);
       LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
       validator.afterPropertiesSet();
       validatingMockMvc = MockMvcBuilders.standaloneSetup(controller)
@@ -495,6 +534,52 @@ class PortfolioCalculationControllerTest {
 
       verify(calculationServices.get(CalculationMetric.STANDARD_DEVIATION), org.mockito.Mockito.never())
           .perform(any(), any());
+    }
+
+    /**
+     * The per-metric statistics describe calculations, not HTTP traffic. A request rejected before dispatch never
+     * reached a calculator, so handing it to the observability port would let malformed input raise the failure rate of
+     * a metric that is working. Both halves are asserted together because a controller that never observes anything
+     * would satisfy the first half on its own.
+     */
+    @Test
+    void shouldObserveOnlyDispatchedCalculations_whenARequestIsRejectedBeforeTheCalculationRuns() throws Exception {
+      PeriodCommand rejected = new PeriodCommand();
+      rejected.setMetric(CalculationMetric.STANDARD_DEVIATION);
+      rejected.setCurrency(Currency.CAD);
+      rejected.setHoldings(List.of(dummyHolding()));
+      rejected.setPeriods(Set.of(TimePeriod.YTD));
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/standard-deviation")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(rejected)))
+          .andExpect(status().isBadRequest());
+
+      assertThat(observability.observedMetrics)
+          .as("a rejected request is not a calculation execution")
+          .isEmpty();
+
+      PeriodCommand dispatched = new PeriodCommand();
+      dispatched.setMetric(CalculationMetric.SHARPE_RATIO);
+      dispatched.setCurrency(Currency.CAD);
+      dispatched.setHoldings(List.of(dummyHolding()));
+      dispatched.setPeriods(Set.of(TimePeriod.ONE_YR));
+      doThrow(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.toException("Security Master"))
+          .when(calculationServices.get(CalculationMetric.SHARPE_RATIO)).perform(any(), any());
+
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/sharpe-ratio")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(dispatched)))
+          .andExpect(status().isServiceUnavailable());
+
+      assertThat(observability.observedMetrics)
+          .as("a calculation that ran and failed is exactly what the port is there to see")
+          .containsExactly(CalculationMetric.SHARPE_RATIO.getValue());
+      assertThat(observability.failedMetrics)
+          .as("the failure has to reach the port, otherwise it lands in no failure count at all")
+          .containsExactly(CalculationMetric.SHARPE_RATIO.getValue());
     }
 
     @Test
@@ -719,6 +804,28 @@ class PortfolioCalculationControllerTest {
       return new PortfolioHolding(
           BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
           new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenPortfolioHoldingsAreEmpty() throws Exception {
+      PeriodCommand cmd = new PeriodCommand();
+      cmd.setMetric(CalculationMetric.TRAILING_TOTAL_RETURNS);
+      cmd.setCurrency(Currency.CAD);
+      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
+      cmd.setHoldings(List.of());
+      // Any portfolio-based endpoint would exercise the same @NotEmpty holdings validation.
+      // trailing-total-returns is used here only as a representative endpoint.
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/trailing-total-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.notifications[0].code")
+              .value(ErrorCode.Codes.FIELD_NOT_EMPTY))
+          .andExpect(jsonPath("$.notifications[0].message")
+              .value("holdings must not be empty"))
+          .andExpect(jsonPath("$.notifications[0].fieldName")
+              .value("holdings"));
     }
 
     @Test

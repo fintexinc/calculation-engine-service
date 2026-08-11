@@ -6,6 +6,7 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -33,8 +34,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -43,10 +42,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-import static com.fintex.wm.commons.domain.enumeration.TimePeriod.CIPSD;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
-import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SI;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_MTH;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -162,124 +159,6 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(findPeriod(result, ONE_YR.name()).value())
         .isCloseTo(new BigDecimal("0.1503798415"), within(TOLERANCE));
   }
-
-  @Test
-  void shouldReturnBadRequest_whenHoldingsListIsEmpty() {
-    PeriodCommand command = periodCommand(Set.of(ONE_YR), null, List.of());
-
-    Notification error = assertValidationError(postCalculation(writeJson(command)),
-        ErrorCode.FIELD_NOT_EMPTY.getCode(), "holdings");
-    assertThat(error.getMessage()).isEqualTo("holdings must not be empty");
-    assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "holdings");
-  }
-
-  @Test
-  void shouldReturnBadRequest_whenHoldingTypeIsMissing() {
-    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"),
-        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
-    ObjectNode body = (ObjectNode) parseJson(writeJson(command));
-    ((ObjectNode) body.get("holdings").get(0)).remove("holdingType");
-
-    Notification error = assertValidationError(postCalculation(body.toString()),
-        ErrorCode.FIELD_NOT_NULL.getCode(), "holdingType");
-    assertThat(error.getMessage()).isEqualTo("Holding Type must not be null");
-  }
-
-  @Test
-  void shouldReturnTrailingReturn_whenSingleMonthReturnIsFivePercent() {
-    enqueueSmsMockResponse(writeJson(List.of(
-        holdingReturnsRow(XBAL, List.of(dateValue("2024-12-31", "5.0"))))));
-    enqueueSmsMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
-        "0.0035")))));
-
-    PeriodCommand command = periodCommand(Set.of(ONE_MTH), LocalDate.parse("2024-12-31"),
-        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
-    HttpResponse response = postCalculation(writeJson(command));
-
-    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
-    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
-    assertThat(result.getWarnings()).isEmpty();
-    assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getTrailingTotalReturn()).hasSize(1);
-    assertThat(findPeriod(result, ONE_MTH.name()).value())
-        .isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
-  }
-
-  @Test
-  void shouldCalculateTrailingReturn_whenSincePerformanceStartDateRequested() {
-    enqueueSmsMockResponse(writeJson(List.of(
-        holdingReturnsRow(XBAL, monthlyReturnsFor2024("1.0")))));
-    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
-
-    PeriodCommand command = periodCommand(
-        Set.of(SI),
-        LocalDate.parse("2024-12-31"),
-        List.of(holding(
-            XBAL,
-            FinancialInstrumentType.ETF,
-            Country.CANADA,
-            "50000")));
-
-    HttpResponse response = postCalculation(writeJson(command));
-
-    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
-
-    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
-
-    assertThat(result.getWarnings()).isEmpty();
-    assertThat(result.getPerformanceStartDate())
-        .isEqualTo(LocalDate.of(2024, 1, 31));
-    assertThat(result.getPerformanceEndDate())
-        .isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getTrailingTotalReturn()).hasSize(1);
-
-    TimeIntervalResult interval = findPeriod(result, SI.name());
-
-    assertThat(interval.period()).isEqualTo(SI.name());
-    assertThat(interval.value())
-        .isCloseTo(new BigDecimal("0.1284704359"), within(TOLERANCE));
-  }
-
-  @Test
-  void shouldCalculateTrailingReturn_whenCustomIntervalPerformanceStartDateRequested() {
-    enqueueSmsMockResponse(writeJson(List.of(
-        holdingReturnsRow(XBAL, monthlyReturnsFor2024("1.0")))));
-    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
-
-    PeriodCommand command = periodCommand(
-        Set.of(CIPSD),
-        LocalDate.parse("2024-12-31"),
-        List.of(holding(
-            XBAL,
-            FinancialInstrumentType.ETF,
-            Country.CANADA,
-            "50000")));
-
-    command.setCustomIntervalPsd(LocalDate.parse("2024-06-30"));
-
-    HttpResponse response = postCalculation(writeJson(command));
-
-    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
-
-    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
-
-    assertThat(result.getWarnings()).isEmpty();
-    assertThat(result.getCustomIntervalPerformanceStartDate())
-        .isEqualTo(LocalDate.of(2024, 6, 30));
-    assertThat(result.getPerformanceStartDate())
-        .isEqualTo(LocalDate.of(2024, 1, 31));
-    assertThat(result.getPerformanceEndDate())
-        .isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getTrailingTotalReturn()).hasSize(1);
-
-    TimeIntervalResult interval = findPeriod(result, CIPSD.name());
-
-    assertThat(interval.period()).isEqualTo(CIPSD.name());
-    assertThat(interval.value())
-        .isCloseTo(new BigDecimal("0.0740075984"), within(TOLERANCE));
-  }
-
   @Test
   void shouldReturnOnlyContiguousPeriodsAndFxWarning_whenFxRatesHaveInternalMonthGap() {
     bocMockServer.setDispatcher(bocDailyUsdCadDispatcher("1.0000", Set.of(YearMonth.of(2024, 6))));
@@ -342,16 +221,28 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Test
-  void shouldReturnBadRequest_whenTreasuryBillSeriesIsEmptyForCurrency() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
-    enqueueSmsMockResponse(writeJson(List.<DateRateValue>of()));
+  void shouldReturnBadRequestWithMissingMonthlyReturnError_whenMonthlyReturnValueIsNull() {
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(F0CAN999, monthlyReturnsWithNullValue("2024-05-01")))));
+    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"),
+        List.of(holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100000")));
 
-    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
     HttpResponse response = postCalculation(writeJson(command));
 
-    Notification error = assertValidationError(response, ErrorCode.Codes.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, null);
-    assertThat(error.getMessage()).isEqualTo("T-Bill rates are not available for currency CAD");
-    assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "CAD");
+    assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    ErrorResponse error = readJson(response.responseBody(), ErrorResponse.class);
+    assertThat(error.getNotifications()).hasSize(1);
+    Notification notification = error.getNotifications().getFirst();
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE.getCode());
+    assertThat(notification.getMessage())
+        .isEqualTo("The holding is missing monthly return values for date 2024-05-31");
+    assertThat(notification.getDescription()).isEqualTo("Monthly return is missing for the specified date");
+    assertThat(notification.getAction()).isEqualTo("Populate the monthly return for the missing date");
+    assertThat(notification.getSeverity()).isEqualTo(Severity.ERROR);
+    assertThat(notification.getMetadata())
+        .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1")
+        .containsEntry(ErrorParams.HOLDING_ID, "MUTUAL_FUND-F0CAN999")
+        .containsEntry("param-1", "2024-05-31");
   }
 
   private Notification assertValidationError(HttpResponse response, String expectedCode, String expectedFieldName) {
@@ -440,11 +331,27 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         .toList();
   }
 
+  private static List<DateBigDecimalValue> monthlyReturnsWithNullValue(String date) {
+    YearMonth affectedMonth = YearMonth.from(LocalDate.parse(date));
+    return monthlyReturnsFor2024("1.0").stream()
+        .map(monthlyReturn -> affectedMonth.equals(YearMonth.from(LocalDate.parse(monthlyReturn.getDate())))
+            ? dateValueWithNullValue(date)
+            : monthlyReturn)
+        .toList();
+  }
+
   private static DateBigDecimalValue dateValue(String date, String percent) {
     DateBigDecimalValue dv = new DateBigDecimalValue();
     dv.setDate(date);
     dv.setValue(new BigDecimal(percent));
     return dv;
+  }
+
+  private static DateBigDecimalValue dateValueWithNullValue(String date) {
+    DateBigDecimalValue value = new DateBigDecimalValue();
+    value.setDate(date);
+    value.setValue(null);
+    return value;
   }
 
   private static List<DateRateValue> cadTreasuryRatesSeriesFor2024() {

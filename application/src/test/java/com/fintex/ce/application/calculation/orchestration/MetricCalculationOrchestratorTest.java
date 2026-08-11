@@ -13,6 +13,7 @@ import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
+import com.fintex.ce.port.observability.CalculationDurationRecorder;
 import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
@@ -31,7 +32,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +70,8 @@ class MetricCalculationOrchestratorTest {
   @Mock
   private CalculationService<CalculationCommand, Object, BaseCalculationResult> sharpeRatioService;
 
+  private final RecordingDurationRecorder durationRecorder = new RecordingDurationRecorder();
+
   private MetricCalculationOrchestrator orchestrator;
 
   @BeforeEach
@@ -82,7 +87,8 @@ class MetricCalculationOrchestratorTest {
     orchestrator = new MetricCalculationOrchestrator(
         List.<CalculationService<?, ?, ?>>of(assetAllocationService, sharpeRatioService),
         securityAttributesFetcher,
-        new DefaultDataProperties(DEFAULT_PROVIDERS));
+        new DefaultDataProperties(DEFAULT_PROVIDERS),
+        durationRecorder);
   }
 
   @Test
@@ -393,8 +399,49 @@ class MetricCalculationOrchestratorTest {
     List<CalculationService<?, ?, ?>> services = List.<CalculationService<?, ?, ?>>of(sharpeRatioService, duplicate);
     DefaultDataProperties defaults = new DefaultDataProperties(DEFAULT_PROVIDERS);
 
-    assertThatThrownBy(() -> new MetricCalculationOrchestrator(services, securityAttributesFetcher, defaults))
+    assertThatThrownBy(
+        () -> new MetricCalculationOrchestrator(services, securityAttributesFetcher, defaults, durationRecorder))
         .isInstanceOf(CalculationException.class);
+  }
+
+  @Test
+  void shouldTimeEachMemberMetricSeparately_whenCompositeRequestPartiallyFails() {
+    PortfolioHoldingsCommand allocationCommand = allocationCommand();
+    PeriodCommand sharpeCommand = sharpeCommand(null);
+    BaseCalculationResult allocationResult = new BaseCalculationResult() {};
+    when(securityAttributesFetcher.fetch(anyList(), anyCollection(), anyList())).thenReturn(SecurityData.EMPTY);
+    when(assetAllocationService.perform(eq(allocationCommand), any())).thenReturn(allocationResult);
+    when(sharpeRatioService.perform(eq(sharpeCommand), any()))
+        .thenThrow(ErrorCode.MISSING_MONTHLY_RETURNS.toException("XIU"));
+
+    orchestrator.calculateAll(List.of(allocationCommand, sharpeCommand));
+
+    assertThat(durationRecorder.successes)
+        .as("a metric that produced a result is timed as a success")
+        .containsOnlyKeys(CalculationMetric.ASSET_ALLOCATIONS);
+    assertThat(durationRecorder.failures)
+        .as("a metric that threw is timed separately, so its latency never lands in the success distribution")
+        .containsOnlyKeys(CalculationMetric.SHARPE_RATIO);
+    assertThat(durationRecorder.successes.get(CalculationMetric.ASSET_ALLOCATIONS))
+        .isGreaterThanOrEqualTo(Duration.ZERO);
+    assertThat(durationRecorder.failures.get(CalculationMetric.SHARPE_RATIO))
+        .isGreaterThanOrEqualTo(Duration.ZERO);
+  }
+
+  private static final class RecordingDurationRecorder implements CalculationDurationRecorder {
+
+    private final Map<CalculationMetric, Duration> successes = new EnumMap<>(CalculationMetric.class);
+    private final Map<CalculationMetric, Duration> failures = new EnumMap<>(CalculationMetric.class);
+
+    @Override
+    public void recordSuccess(CalculationMetric metric, Duration duration) {
+      successes.put(metric, duration);
+    }
+
+    @Override
+    public void recordFailure(CalculationMetric metric, Duration duration) {
+      failures.put(metric, duration);
+    }
   }
 
   private static PortfolioHoldingsCommand allocationCommand() {

@@ -7,6 +7,17 @@ import java.util.List;
 import java.util.Set;
 import lombok.Data;
 
+/**
+ * Settings for {@link RequestLoggingFilter}. Payload, header and query-string logging default to off; override per
+ * environment to opt in.
+ *
+ * <p>
+ * {@code excludedPaths} is matched as a prefix and as a substring, and covers {@code /actuator} as a whole rather than
+ * the individual endpoints. Which management endpoints are reachable is decided by
+ * {@code management.endpoints.web.exposure.include}, and all of them are infrastructure traffic: naming them one by one
+ * here means every endpoint added later silently starts being buffered and logged as if a client had asked for a
+ * calculation.
+ */
 @Data
 @Component
 @ConfigurationProperties(prefix = "logging.http")
@@ -65,8 +76,7 @@ public class HttpLoggingProperties {
   private boolean maskEmails = false;
 
   private Set<String> excludedPaths = Set.of(
-      "/actuator/health",
-      "/actuator/info",
+      "/actuator",
       "/swagger-ui",
       "/api-docs");
 

@@ -1,5 +1,7 @@
 package com.fintex.ce.adapter.cache.tbills;
 
+import com.fintex.ce.adapter.cache.observability.CaffeineCacheStatistics;
+import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -21,20 +23,32 @@ import lombok.extern.slf4j.Slf4j;
  * The cache size is bounded to the number of supported {@link Currency} values, so the cache is effectively permanent
  * once populated; only {@code expireAfterWrite} drives evictions.
  * </p>
+ *
+ * <p>
+ * The cache registers itself with {@link CacheObservability} so its effectiveness is reportable under
+ * {@code cache=t-bills}. The dependency is required rather than optional: pass {@link CacheObservability#NO_OP} to
+ * publish nothing, which is a decision made at the point of wiring instead of a consequence of a missing bean.
+ * </p>
  */
 @Slf4j
 public class CachingTreasuryBillsFetcher implements TreasuryBillsFetcher {
 
+  public static final String CACHE_NAME = "t-bills";
+
   private final TreasuryBillsFetcher delegate;
   private final Cache<Currency, NavigableMap<LocalDate, BigDecimal>> cache;
 
-  public CachingTreasuryBillsFetcher(TreasuryBillsFetcher delegate, Duration refreshAfter) {
+  public CachingTreasuryBillsFetcher(
+      TreasuryBillsFetcher delegate,
+      Duration refreshAfter,
+      CacheObservability cacheObservability) {
     this.delegate = delegate;
     this.cache = Caffeine.newBuilder()
         .maximumSize(Currency.values().length)
         .expireAfterWrite(refreshAfter)
         .recordStats()
         .build();
+    cacheObservability.registerCache(CACHE_NAME, new CaffeineCacheStatistics(cache));
   }
 
   @Override

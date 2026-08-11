@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.cache.tbills;
 
 import com.fintex.ce.adapter.cache.config.CacheDataProperties;
+import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,7 +28,11 @@ public class TreasuryBillsCacheConfig {
   @ConditionalOnProperty(prefix = "cache.data.t-bills", name = "enabled", havingValue = "true")
   public TreasuryBillsFetcher cachingTreasuryBillsFetcher(
       @Qualifier(DELEGATE_BEAN_NAME) TreasuryBillsFetcher delegate,
-      CacheDataProperties properties) {
-    return new CachingTreasuryBillsFetcher(delegate, properties.getTBills().getRefreshAfter());
+      CacheDataProperties properties,
+      CacheObservability cacheObservability) {
+    return new CachingTreasuryBillsFetcher(
+        delegate,
+        properties.getTBills().getRefreshAfter(),
+        cacheObservability);
   }
 }

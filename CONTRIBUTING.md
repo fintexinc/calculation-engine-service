@@ -317,6 +317,8 @@ mvn test
 | `application`        | Use cases, orchestration (uses ports only)                                    | Minimal         |
 | `rest-adapter`       | Exposes REST API to consumers (driving adapter)                               | Yes             |
 | `web-client-adapter` | Retrieves data from Security Master via REST (partly implemented, many stubs) | Yes             |
+| `cache-adapter`      | Optional caching proxies over the data-fetching ports                         | Yes             |
+| `observability-adapter` | Micrometer implementations of the observability ports                      | Yes             |
 | `bootstrap`          | Spring Boot entry point, wiring, bean configs                                 | Yes             |
 
 **Architecture rules:**
@@ -324,6 +326,40 @@ mvn test
 - Domain must not import Spring or adapters
 - Adapters must not call each other directly
 - Application layer uses ports, not concrete adapters
+
+### Observability Conventions
+
+These conventions are shared with the Security Master Service. Anything an outbound-call dashboard or alert reads is
+identical in both, so keep them in step — a change here needs the same change there.
+
+| Concern | Convention |
+|---------|------------|
+| Port location | `api/…/port/observability`, named `<Concern>Observability` |
+| Port shape | A handle: `start(...)` returns a call/run object that is told its outcome. First outcome reported wins |
+| Adapter location | `observability-adapter/…/adapter/observability/<concern>`, named `Micrometer<Concern>Observability` |
+| Other adapter classes | `<Concern>Statistics` for a read model, `<Concern>Meters` for a class that only publishes gauges |
+| No-op wiring | `NO_OP` constant on the port, chosen explicitly at the point of wiring — never a fallback when the real bean is missing |
+| Test doubles | Hand-written recording fakes for asserting what was reported; `NO_OP` for contexts that publish nothing |
+| Meter naming | One meter name per measurement, dimensioned by tags. Never one name per provider |
+| Tag values | Always from an enum, a type, or a bounded template, so cardinality is bounded by construction. Enum-derived values are lower case; type-derived values (`error.type`, `command.type`, `result.type`) carry the type's simple name |
+| Outcome tag | `outcome`, never `status` |
+| Error tag | `error.type`, always an exception type — never a status code |
+| Upstream status | `upstream.status`, the status the provider returned or `none`. Never `http.response.status_code` |
+| Endpoint tag | `endpoint`, a templated or enum-bounded path with the query string dropped |
+| Derived values | Ratios, means and run counts are derivable from a timer and are not published as extra gauges |
+| Spans for HTTP | Come from the autoconfigured `WebClient.Builder`. Never add a second span or wire timer for the same call |
+| Percentiles | Configured only in `management.metrics.distribution`, never per meter in code |
+
+An enum reaches a tag through its own identifier — `ExternalService.id()`, `CalculationMetric.getValue()` — so nothing has
+to lower-case it on the way. Where an enum comes from a module that exposes only `name()`, the adapter lower-cases it
+instead; that is why Security Master has a `TagValue` helper and this service does not need one. A new enum used as a tag
+value should carry its own identifier rather than grow a second place that formats it.
+
+The external-call port shares its shape, meter names, tag keys and outcome vocabulary with Security Master's — a name that
+appears in both must never mean two different things, so a change to any of them needs the same change there. What each
+service *declares* is only what its clients can actually report: Security Master adds `rate_limited` and `cancelled`
+because it has a client-side rate limiter and a reactive client. Do not add an outcome or a meter with no call site that
+produces it, and do not let the shared parts drift.
 
 ### Code Review
 

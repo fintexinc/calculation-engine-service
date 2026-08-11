@@ -16,6 +16,16 @@
     <description>Spring Boot entry point and configuration</description>
     <packaging>jar</packaging>
 
+    <properties>
+        <!--
+          Every test class in this module boots a full Spring context and `reuseForks=false` gives each one its own JVM,
+          so the parent's forkCount of 8 means 8 applications starting at once. On a two-core CI agent that starves the
+          JVMs badly enough that HTTP calls inside a running test exceed their client timeout. Override on a bigger
+          machine with -DforkCount=8.
+        -->
+        <forkCount>2</forkCount>
+    </properties>
+
     <dependencies>
         <!-- Application module (brings api and domain transitively) -->
         <dependency>
@@ -25,6 +35,11 @@
         </dependency>
 
         <!-- All adapter modules -->
+        <dependency>
+            <groupId>com.fintex</groupId>
+            <artifactId>observability-adapter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.fintex</groupId>
             <artifactId>web-client-adapter</artifactId>

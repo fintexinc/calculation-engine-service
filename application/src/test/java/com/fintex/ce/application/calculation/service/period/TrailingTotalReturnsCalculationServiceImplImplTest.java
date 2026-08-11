@@ -81,14 +81,26 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
 
     PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.EUR);
-    when(service.buildPeriodCalculationInput(any(), any(), any())).thenReturn(new PeriodCalculationInput());
-    when(treasuryBillsFetcher.fetch(Currency.EUR)).thenReturn(new TreeMap<>());
+    when(service.buildPeriodCalculationInput(any(), any(), any()))
+        .thenReturn(new PeriodCalculationInput());
+    when(treasuryBillsFetcher.fetch(Currency.EUR))
+        .thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(service).perform(any(), any());
 
-    CalculationException ex = assertThrows(CalculationException.class,
+    CalculationException ex = assertThrows(
+        CalculationException.class,
         () -> service.perform(req, PortfolioBenchmarkReturns.EMPTY));
-    assertEquals(ErrorCode.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, ex.getErrorCode());
+
+    assertEquals(
+        ErrorCode.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY,
+        ex.getErrorCode());
+    assertEquals(
+        "T-Bill rates are not available for currency EUR",
+        ex.getMessage());
+    assertEquals(
+        Currency.EUR,
+        ex.getMetadata().get("param-1"));
   }
 
 }

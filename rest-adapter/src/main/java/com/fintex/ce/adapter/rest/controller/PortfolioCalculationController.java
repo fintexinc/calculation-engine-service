@@ -58,6 +58,7 @@ import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
 import com.fintex.ce.model.dto.command.PortfolioBenchmarkCommand;
 import com.fintex.ce.model.dto.command.contract.HoldingsProvider;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
@@ -67,7 +68,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.micrometer.observation.Observation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -92,6 +92,12 @@ import static java.util.stream.Collectors.groupingBy;
  * {@link CalculationOrchestrator}. For composite requests the shared top-level holdings, data providers and currency
  * are propagated into every nested command that does not carry its own value, so the per-command validation chain keeps
  * working unchanged.
+ *
+ * <p>
+ * A request is resolved and validated before it is handed to {@link CalculationObservability}, so the observed scope
+ * begins where the calculation does. A request rejected at the boundary never reached a calculator, and counting it as
+ * a failed execution would mean a client sending malformed requests could raise the failure rate of a metric that is
+ * working perfectly.
  */
 @Slf4j
 @RestController
@@ -141,22 +147,14 @@ public class PortfolioCalculationController {
   public BaseCalculationResult calculate(
       @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable String metricName,
       @RequestBody @Valid CalculationCommand command) {
-    return calculationObservability.observe(metricName, command, observation -> {
-      CalculationMetric metric = CalculationMetric.from(metricName);
-      if (command.getMetric() != null && command.getMetric() != metric) {
-        throw ErrorCode.METRIC_MISMATCH.toException(metricName, command.getMetric().getValue());
-      }
-      command.setMetric(metric);
-
-      observation.event(Observation.Event.of(CalculationObservability.VALIDATION_STARTED_EVENT));
-      validateCommand(command);
-      observation.event(Observation.Event.of(CalculationObservability.VALIDATION_COMPLETED_EVENT));
-
-      observation.event(Observation.Event.of(CalculationObservability.SERVICE_STARTED_EVENT));
-      BaseCalculationResult result = calculationOrchestrator.calculate(command);
-      observation.event(Observation.Event.of(CalculationObservability.SERVICE_COMPLETED_EVENT));
-      return result;
-    });
+    CalculationMetric metric = CalculationMetric.from(metricName);
+    if (command.getMetric() != null && command.getMetric() != metric) {
+      throw ErrorCode.METRIC_MISMATCH.toException(metricName, command.getMetric().getValue());
+    }
+    command.setMetric(metric);
+    validateCommand(command);
+    return calculationObservability.observe(metricName, command,
+        () -> calculationOrchestrator.calculate(command));
   }
 
   @Operation(summary = "Execute several portfolio calculations in one request", description = """
@@ -173,19 +171,12 @@ public class PortfolioCalculationController {
   @PostMapping
   public CompositeCalculationResult calculateComposite(@RequestBody @Valid CompositeCalculationRequest request) {
     List<CalculationCommand> commands = request.getCommands();
-    return calculationObservability.observeComposite(commands, observation -> {
-      observation.event(Observation.Event.of(CalculationObservability.VALIDATION_STARTED_EVENT));
-      commands.forEach(this::requireMetric);
-      requireUniqueMetrics(commands);
-      commands.forEach(command -> propagateSharedInputs(request, command));
-      commands.forEach(this::validateCommand);
-      observation.event(Observation.Event.of(CalculationObservability.VALIDATION_COMPLETED_EVENT));
-
-      observation.event(Observation.Event.of(CalculationObservability.SERVICE_STARTED_EVENT));
-      CompositeCalculationResult result = calculationOrchestrator.calculateAll(commands);
-      observation.event(Observation.Event.of(CalculationObservability.SERVICE_COMPLETED_EVENT));
-      return result;
-    });
+    commands.forEach(this::requireMetric);
+    requireUniqueMetrics(commands);
+    commands.forEach(command -> propagateSharedInputs(request, command));
+    commands.forEach(this::validateCommand);
+    return calculationObservability.observeComposite(commands,
+        () -> calculationOrchestrator.calculateAll(commands));
   }
 
   private void requireMetric(CalculationCommand command) {

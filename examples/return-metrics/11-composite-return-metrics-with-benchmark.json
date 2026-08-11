@@ -1,0 +1,151 @@
+{
+  "currency": "CAD",
+  "dataProviders": ["MORNINGSTAR"],
+  "holdings": [
+    {
+      "holdingType": "ETF",
+      "country": "CANADA",
+      "value": 28000.00,
+      "securityIdentifier": {
+        "id": "VAMO",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "CANADA",
+      "value": 17000.00,
+      "securityIdentifier": {
+        "id": "GMOM",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 26000.00,
+      "securityIdentifier": {
+        "id": "DIV",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 13000.00,
+      "securityIdentifier": {
+        "id": "IFV",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "CASH",
+      "value": 6000.00,
+      "currency": "CAD",
+      "securityIdentifier": {
+        "id": "CASH-CAD",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "CASH",
+      "value": 4000.00,
+      "currency": "USD",
+      "securityIdentifier": {
+        "id": "CASH-USD",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "GIC",
+      "value": 10000.00,
+      "currency": "CAD",
+      "name": "CIBC 3-Year GIC",
+      "investmentDate": "2022-12-30",
+      "clientIntRate": 4.55,
+      "interestFreq": "ANNUAL",
+      "term": 1095,
+      "securityIdentifier": {
+        "id": "GIC-CIBC-3Y",
+        "idType": "TICKER"
+      }
+    }
+  ],
+  "commands": [
+    {
+      "metric": "trailing-total-returns",
+      "customPerformanceEndDate": "2025-09-30",
+      "timeIntervalPeriods": ["ONE_MTH", "TWO_MTH", "THREE_MTH", "FOUR_MTH", "FIVE_MTH", "SIX_MTH"],
+      "benchmarkHoldings": [
+        {
+          "holdingType": "ETF",
+          "country": "CANADA",
+          "value": 55000.00,
+          "securityIdentifier": {
+            "id": "VAMO",
+            "idType": "TICKER"
+          }
+        },
+        {
+          "holdingType": "ETF",
+          "country": "USA",
+          "value": 45000.00,
+          "securityIdentifier": {
+            "id": "HEWJ",
+            "idType": "TICKER"
+          }
+        }
+      ]
+    },
+    {
+      "metric": "growth-of-10k",
+      "customPsd": "2025-06-30",
+      "customPed": "2025-09-30",
+      "benchmarkHoldings": [
+        {
+          "holdingType": "ETF",
+          "country": "CANADA",
+          "value": 55000.00,
+          "securityIdentifier": {
+            "id": "VAMO",
+            "idType": "TICKER"
+          }
+        },
+        {
+          "holdingType": "ETF",
+          "country": "USA",
+          "value": 45000.00,
+          "securityIdentifier": {
+            "id": "HEWJ",
+            "idType": "TICKER"
+          }
+        }
+      ]
+    },
+    {
+      "metric": "sharpe-ratio",
+      "customPerformanceEndDate": "2025-09-30",
+      "timeIntervalPeriods": ["12", "24"],
+      "benchmarkHoldings": [
+        {
+          "holdingType": "ETF",
+          "country": "CANADA",
+          "value": 55000.00,
+          "securityIdentifier": {
+            "id": "VAMO",
+            "idType": "TICKER"
+          }
+        },
+        {
+          "holdingType": "ETF",
+          "country": "USA",
+          "value": 45000.00,
+          "securityIdentifier": {
+            "id": "HEWJ",
+            "idType": "TICKER"
+          }
+        }
+      ]
+    }
+  ]
+}

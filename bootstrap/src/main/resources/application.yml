@@ -9,9 +9,6 @@ spring:
         composite-indicator:
           enabled: false
 
-otel:
-  propagators: tracecontext,baggage,b3
-
 cache:
   data:
     fx-rates:
@@ -172,6 +169,41 @@ management:
     enabled: true
     sampling:
       probability: 1.0
+    # Adopt a parent service's trace id whether it sends W3C traceparent or either B3 form, and emit W3C downstream.
+    # Mirrors `otel.propagators` so inbound correlation behaves the same with and without the Azure Monitor exporter.
+    propagation:
+      consume: w3c,b3,b3_multi
+      produce: w3c
+  metrics:
+    distribution:
+      # Client-side percentiles: the registry computes p50/p95/p99 itself, so they are readable from
+      # /actuator/calculationstats and from whatever the meters are exported to. Prefixes match by dot-separated
+      # segment, so `external` covers external.provider.request and `portfolio.calculation` covers both
+      # portfolio.calculation.request and portfolio.calculation.duration. This is the only place that decides which
+      # percentiles are published.
+      percentiles:
+        external: 0.5, 0.95, 0.99
+        portfolio.calculation: 0.5, 0.95, 0.99
+        http.server.requests: 0.5, 0.95, 0.99
+        http.client.requests: 0.5, 0.95, 0.99
+      # Window the percentiles are computed over. Micrometer keeps a rolling histogram and reports 0 once the window
+      # rotates with no new recordings, so the window has to outlast the gaps in the traffic it measures. Outbound
+      # provider traffic is bursty, so a few minutes would read 0 almost always; a day keeps the last burst legible.
+      # Inbound request traffic is continuous, so a short window there stays both populated and current.
+      #
+      # `portfolio.calculation` is deliberately absent: /actuator/calculationstats reports cumulative counts beside
+      # these percentiles, and an expiry would have it serve a p95 of zero next to a live sample count.
+      expiry:
+        external: 24h
+        http.server.requests: 5m
+        http.client.requests: 24h
+      # Percentile estimation buckets values inside the expected range and clamps anything above the maximum, so the
+      # default 30s ceiling would report every slow call at the ceiling. Provider calls are bounded by their own
+      # timeouts, and a composite calculation can outlast a single request timeout.
+      maximum-expected-value:
+        external: 60s
+        http.client.requests: 60s
+        portfolio.calculation: 120s
   observations:
     key-values:
       application: ${spring.application.name}
@@ -185,7 +217,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        # `metrics` stays unexposed: it enumerates every meter name and tag value, which is why
+        # ActuatorExposureConfigurationTest pins it shut. `calculationstats` is the curated read model over the same
+        # meters and is safe to serve; read raw meters through the exporter, not over HTTP.
+        include: health, info, calculationstats
   endpoint:
     health:
       show-details: never
@@ -217,3 +252,6 @@ springdoc:
     version: openapi_3_0
   swagger-ui:
     path: /api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui
+  # Documents the exposed actuator endpoints (health, info, calculationstats) in the same OpenAPI document, so the
+  # observability surface is discoverable from Swagger UI. Only endpoints in the exposure list above appear here.
+  show-actuator: true

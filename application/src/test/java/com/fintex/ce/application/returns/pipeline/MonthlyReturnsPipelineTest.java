@@ -57,7 +57,7 @@ class MonthlyReturnsPipelineTest {
   @Test
   void shouldThrow_whenPortfolioValidateCutAndFxPipelineLeavesFatalError() {
     RecordingProcessor injectFatal = new RecordingProcessor(
-        snapshot -> snapshot.withAddedErrors(List.of(ErrorCode.CPED_AFTER_PORTFOLIO_PED.toException())),
+        snapshot -> snapshot.withAddedErrors(List.of(ErrorCode.CPED_BEFORE_PORTFOLIO_PSD.toException())),
         true);
     PortfolioValidateCutAndFxPipeline pipeline = new PortfolioValidateCutAndFxPipeline(
         new ProcessorsRunner(List.of(injectFatal)));

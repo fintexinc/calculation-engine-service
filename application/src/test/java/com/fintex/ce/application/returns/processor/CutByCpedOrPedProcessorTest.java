@@ -54,6 +54,19 @@ class CutByCpedOrPedProcessorTest {
   }
 
   @Test
+  void shouldCapCpedAtPed_whenCpedIsAfterPed() {
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = snapshotWithSeries(LocalDate.parse("2020-01-31"),
+        LocalDate.parse("2024-02-29"));
+    ProcessingContext context = ProcessingContext.of(null, LocalDate.parse("2024-12-31"), FxContext.empty());
+
+    ReturnsSnapshot<HoldingMonthlyReturns> result = processor.process(snapshot, context);
+
+    assertThat(result.returnsMap().get(HOLDING).lastKey()).isEqualTo(LocalDate.parse("2024-02-29"));
+    assertThat(result.performanceEndDate()).isEqualTo(LocalDate.parse("2024-02-29"));
+    assertThat(result.performanceStartDate()).isEqualTo(snapshot.performanceStartDate());
+  }
+
+  @Test
   void shouldReturnSameSnapshot_whenBothCpedAndPedAreNull() {
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = ReturnsSnapshot.empty();
     ProcessingContext context = ProcessingContext.of(null, null, FxContext.empty());

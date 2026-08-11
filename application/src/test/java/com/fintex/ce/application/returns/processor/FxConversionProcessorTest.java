@@ -62,7 +62,7 @@ class FxConversionProcessorTest {
 
   @Test
   void shouldThrow_whenSnapshotHasFatalError() {
-    BasePceException fatal = ErrorCode.CPED_AFTER_PORTFOLIO_PED.toExceptionForId("fatal");
+    BasePceException fatal = ErrorCode.CPED_BEFORE_PORTFOLIO_PSD.toExceptionForId("fatal");
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = snapshot(Map.of(HOLDING_USD, Currency.USD))
         .withErrors(List.of(fatal));
     ProcessingContext context = ProcessingContext.of(null, null,
@@ -71,6 +71,24 @@ class FxConversionProcessorTest {
     assertThatThrownBy(() -> processor.process(snapshot, context))
         .isInstanceOf(CalculationsFailedException.class);
     verify(fxRateService, never()).convertReturns(any(), any(), any(), any(), any());
+  }
+
+  @Test
+  void shouldConvert_whenSnapshotHasAllowedEndDateWarning() {
+    BasePceException nonFatal = ErrorCode.CPED_AFTER_PORTFOLIO_PED.toExceptionForId("cped");
+    ReturnsSnapshot<HoldingMonthlyReturns> snapshot = snapshot(Map.of(HOLDING_USD, Currency.USD))
+        .withErrors(List.of(nonFatal));
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> converted = Map.of(HOLDING_USD,
+        treeMap(Map.entry(JAN, BigDecimal.valueOf(1.5))));
+    when(fxRateService.convertReturns(any(), any(), any(), any(), any())).thenReturn(converted);
+    ProcessingContext context = ProcessingContext.of(null, null, new FxContext(Map.of(), Currency.CAD));
+
+    ReturnsSnapshot<HoldingMonthlyReturns> result = processor.process(snapshot, context);
+
+    assertThat(result.errors()).containsExactly(nonFatal);
+    assertThat(result.returnsMap()).isEqualTo(converted);
+    assertThat(result.holdingCurrencyMap()).containsEntry(HOLDING_USD, Currency.CAD);
+    verify(fxRateService).convertReturns(any(), any(), any(), any(), any());
   }
 
   @Test

@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.cache.fx;
 
 import com.fintex.ce.adapter.cache.config.CacheDataProperties;
+import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,8 +25,8 @@ public class FxRatesCacheConfig {
 
   @Bean
   @ConditionalOnProperty(prefix = "cache.data.fx-rates", name = "enabled", havingValue = "true")
-  public FxRatesCache fxRatesCache(CacheDataProperties properties) {
-    return new CaffeineFxRatesCache(properties.getFxRates());
+  public FxRatesCache fxRatesCache(CacheDataProperties properties, CacheObservability cacheObservability) {
+    return new CaffeineFxRatesCache(properties.getFxRates(), cacheObservability);
   }
 
   @Bean

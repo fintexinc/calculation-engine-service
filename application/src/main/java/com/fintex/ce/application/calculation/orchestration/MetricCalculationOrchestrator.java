@@ -15,6 +15,7 @@ import com.fintex.ce.model.dto.command.contract.HoldingsProvider;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
+import com.fintex.ce.port.observability.CalculationDurationRecorder;
 import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
@@ -24,6 +25,7 @@ import com.fintex.wm.commons.error.Notification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Duration;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -58,11 +60,13 @@ public class MetricCalculationOrchestrator implements CalculationOrchestrator {
   private final Map<CalculationMetric, CalculationService<?, ?, ?>> serviceMap;
   private final SecurityAttributesFetcher securityAttributesFetcher;
   private final DefaultDataProperties defaultDataProperties;
+  private final CalculationDurationRecorder durationRecorder;
 
   public MetricCalculationOrchestrator(
       List<CalculationService<?, ?, ?>> calculationServices,
       SecurityAttributesFetcher securityAttributesFetcher,
-      DefaultDataProperties defaultDataProperties) {
+      DefaultDataProperties defaultDataProperties,
+      CalculationDurationRecorder durationRecorder) {
     this.serviceMap = calculationServices.stream()
         .collect(Collectors.toMap(CalculationService::getMetric, Function.identity(),
             (existing, duplicate) -> {
@@ -70,6 +74,7 @@ public class MetricCalculationOrchestrator implements CalculationOrchestrator {
             }));
     this.securityAttributesFetcher = securityAttributesFetcher;
     this.defaultDataProperties = defaultDataProperties;
+    this.durationRecorder = durationRecorder;
   }
 
   @Override
@@ -150,7 +155,19 @@ public class MetricCalculationOrchestrator implements CalculationOrchestrator {
   private BaseCalculationResult execute(CalculationService<?, ?, ?> service, CalculationCommand command,
       SecurityData securityData) {
     CalculationService<CalculationCommand, Object, ?> typedService = (CalculationService<CalculationCommand, Object, ?>) service;
-    return typedService.perform(command, typedService.prepareData(securityData));
+    long startedAt = System.nanoTime();
+    try {
+      BaseCalculationResult result = typedService.perform(command, typedService.prepareData(securityData));
+      durationRecorder.recordSuccess(command.getMetric(), elapsedSince(startedAt));
+      return result;
+    } catch (RuntimeException exception) {
+      durationRecorder.recordFailure(command.getMetric(), elapsedSince(startedAt));
+      throw exception;
+    }
+  }
+
+  private static Duration elapsedSince(long startedAtNanos) {
+    return Duration.ofNanos(System.nanoTime() - startedAtNanos);
   }
 
   private CalculationService<?, ?, ?> requireService(CalculationCommand command) {

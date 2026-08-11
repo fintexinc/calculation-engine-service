@@ -1,8 +1,10 @@
 package com.fintex.ce.adapter.cache.fx;
 
 import com.fintex.ce.adapter.cache.config.CacheDataProperties.FxRatesCacheProperties;
+import com.fintex.ce.adapter.cache.observability.CaffeineCacheStatistics;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
+import com.fintex.ce.port.observability.CacheObservability;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -40,17 +42,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CaffeineFxRatesCache implements FxRatesCache {
 
+  public static final String CACHE_NAME = "fx-rates";
+
   private final Cache<RateKey, CachedRate> rates;
 
   /**
    * Builds a cache capped at {@link FxRatesCacheProperties#getMaxEntries()} {@code (pair, date)} rows. Each row counts
-   * toward the cap regardless of whether it holds a rate or {@link CachedRate#ABSENT}.
+   * toward the cap regardless of whether it holds a rate or {@link CachedRate#ABSENT}. The cache registers itself with
+   * {@link CacheObservability} under {@code cache=fx-rates}; pass {@link CacheObservability#NO_OP} to publish nothing.
    */
-  public CaffeineFxRatesCache(FxRatesCacheProperties properties) {
+  public CaffeineFxRatesCache(FxRatesCacheProperties properties, CacheObservability cacheObservability) {
     this.rates = Caffeine.newBuilder()
         .maximumSize(properties.getMaxEntries())
         .recordStats()
         .build();
+    cacheObservability.registerCache(CACHE_NAME, new CaffeineCacheStatistics(rates));
   }
 
   @Override

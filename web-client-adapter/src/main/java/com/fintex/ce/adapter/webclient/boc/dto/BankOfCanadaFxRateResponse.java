@@ -1,5 +1,7 @@
 package com.fintex.ce.adapter.webclient.boc.dto;
 
+import com.fintex.ce.adapter.webclient.observability.CountedResponse;
+
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,9 +15,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BankOfCanadaFxRateResponse {
+public class BankOfCanadaFxRateResponse implements CountedResponse {
 
   private List<Observation> observations;
+
+  @Override
+  public int itemCount() {
+    return observations == null ? 0 : observations.size();
+  }
 
   @Data
   @NoArgsConstructor

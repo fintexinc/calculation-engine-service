@@ -6,6 +6,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.error.Severity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
+import static com.fintex.ce.model.error.ErrorCode.CPED_AFTER_PORTFOLIO_PED;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static com.fintex.ce.model.error.ErrorParams.HOLDING_ID;
@@ -166,9 +168,28 @@ public record ReturnsSnapshot<T extends ReturnsData>(
 
   public List<Notification> getErrorsAsWarnings() {
     Stream<Notification> errorsAsNotifications = errors.stream()
-        .map(error -> error.getErrorCode()
-            .toNotification(error.getId(), error.getFieldName(), error.getMessage(), error.getMetadata()));
+        .map(ReturnsSnapshot::toWarningNotification);
     return Stream.concat(warnings.stream(), errorsAsNotifications).toList();
+  }
+
+  private static Notification toWarningNotification(BasePceException error) {
+    Notification notification = error.getErrorCode()
+        .toNotification(error.getId(), error.getFieldName(), error.getMessage(), error.getMetadata());
+    if (error.getErrorCode() != CPED_AFTER_PORTFOLIO_PED) {
+      return notification;
+    }
+    return Notification.builder()
+        .category(notification.getCategory())
+        .code(notification.getCode())
+        .message(notification.getMessage())
+        .description(notification.getDescription())
+        .action(notification.getAction())
+        .metadata(notification.getMetadata())
+        .uuid(notification.getUuid())
+        .timestamp(notification.getTimestamp())
+        .severity(Severity.WARNING)
+        .fieldName(notification.getFieldName())
+        .build();
   }
 
   private static <T extends ReturnsData> ReturnsSnapshot<T> build(Map<PortfolioHolding, T> sourceData,

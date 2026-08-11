@@ -65,11 +65,16 @@ public abstract class BenchmarkWeightedAverageWithCpsdAndCpedAbstractService<C e
     MonthlyReturnsContext<HoldingMonthlyReturns> alignedBenchmark = benchmarkContext.trimToRange(commonStart,
         commonEnd);
 
-    CpsdCpedScaleParams params = new CpsdCpedScaleParams(command.getCustomPsd(), command.getCustomPed(), scale);
+    CpsdCpedScaleParams portfolioParams = new CpsdCpedScaleParams(command.getCustomPsd(), command.getCustomPed(),
+        scale);
+    LocalDate benchmarkCped = portfolioContext.isCustomPedAfterPerformanceEndDate(command.getCustomPed())
+        ? commonEnd
+        : command.getCustomPed();
+    CpsdCpedScaleParams benchmarkParams = new CpsdCpedScaleParams(command.getCustomPsd(), benchmarkCped, scale);
     WeightedAverageResult<HoldingMonthlyReturns> portfolioResult = collector.tryCatch(
-        () -> portfolioWeightedAverageWithCpsdAndCped.run(alignedPortfolio, params));
+        () -> portfolioWeightedAverageWithCpsdAndCped.run(alignedPortfolio, portfolioParams));
     WeightedAverageResult<HoldingMonthlyReturns> benchmarkResult = collector.tryCatch(
-        () -> benchmarkWeightedAverageWithCpsdAndCped.run(alignedBenchmark, params));
+        () -> benchmarkWeightedAverageWithCpsdAndCped.run(alignedBenchmark, benchmarkParams));
     collector.throwIfAny();
 
     BenchmarkPeriodCalculationInput result = new BenchmarkPeriodCalculationInput();
