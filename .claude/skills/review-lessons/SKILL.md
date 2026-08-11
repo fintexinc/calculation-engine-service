@@ -35,6 +35,11 @@ Red flags — STOP and investigate the production code instead of the test:
 - [ ] **[correctness] Moved an operation earlier in the lifecycle** (into a constructor, eager field init, or an
   earlier call)? Re-verify every edge case the *later* position used to handle — especially empty
   collections and short-circuit gates that previously ran before it.
+- [ ] **[correctness] Validating required data on nested nodes after a presentation filter?** Ensure optional display
+  fields (such as name/label) cannot filter out a node before structural validation runs; validate and expand first,
+  then filter terminal output.
+- [ ] **[correctness] Applying `limit`/`findFirst` before required validation in a lazy stream?** Later elements will
+  never execute the validation stage; validate the complete bounded input first, then short-circuit the output stream.
 - [ ] **[null/empty-safety] `firstKey()`/`lastKey()`/`first()`/`last()` on a `NavigableMap`/`SortedMap`/`SortedSet`**
   that can be empty? Guard emptiness first — they throw `NoSuchElementException`.
 - [ ] **[convention] Checking a collection or map for empty/null?** Use

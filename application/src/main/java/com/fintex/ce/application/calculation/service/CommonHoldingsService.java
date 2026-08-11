@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
@@ -58,6 +59,8 @@ import static java.util.stream.Collectors.toSet;
 public class CommonHoldingsService
     implements
       SingleAttributeCalculationService<TopCommonHoldingsCommand, CommonTopHoldings, TopCommonHoldingsResult> {
+
+  private static final Pattern RECURSIVE_HOLDING_TYPE_PATTERN = Pattern.compile("FO|FE|FS|EX|F.*");
 
   private final HoldingCurrencyConverter currencyConverter;
   private final TopHoldingsProperties properties;
@@ -210,9 +213,12 @@ public class CommonHoldingsService
         .flatMap(e -> {
           List<CommonHolding> firstLevel = Optional.ofNullable(e.getValue().getHoldings()).orElse(List.of());
           BigDecimal portfolioWeight = allocations.get(e.getKey());
-          return firstLevel.stream()
-              .filter(this::hasNameOrCompanyName)
-              .flatMap(child -> expand(e.getKey(), portfolioWeight, child, 0, new HashSet<>()).leaves())
+          List<HoldingComponent> expanded = firstLevel.stream()
+              .map(child -> expand(e.getKey(), portfolioWeight, child, 0, new HashSet<>()))
+              .toList();
+          return expanded.stream()
+              .flatMap(HoldingComponent::leaves)
+              .filter(leaf -> hasNameOrCompanyName(leaf.source()))
               .limit(properties.getMaxLeavesPerHolding());
         })
         .filter(leaf -> accumulateTypes.contains(leaf.type()))
@@ -244,11 +250,13 @@ public class CommonHoldingsService
     }
     BigDecimal effectiveWeight = inheritedWeight.multiply(node.getWeight(), MATH_CONTEXT);
 
-    if (shouldDescend(node, depth)) {
+    if (requiresUnderlyingHoldings(node, depth)) {
+      if (CollectionUtils.isEmpty(node.getUnderlyingHoldings())) {
+        throw ErrorCode.HOLDING_MISSING_UNDERLYING_HOLDINGS.toExceptionForHolding(portfolioHolding);
+      }
       Set<String> nextVisited = new HashSet<>(visited);
       nextVisited.add(identityKey(node));
       List<HoldingComponent> children = node.getUnderlyingHoldings().stream()
-          .filter(this::hasNameOrCompanyName)
           .filter(grand -> !nextVisited.contains(identityKey(grand)))
           .map(grand -> expand(portfolioHolding, effectiveWeight, grand, depth + 1, nextVisited))
           .toList();
@@ -258,19 +266,17 @@ public class CommonHoldingsService
     return new LeafHolding(portfolioHolding, effectiveWeight, node);
   }
 
-  private boolean shouldDescend(CommonHolding node, int depth) {
+  private boolean requiresUnderlyingHoldings(CommonHolding node, int depth) {
     return depth < properties.getMaxRecursionDepth()
-        && matchesRecursionType(node.getType())
-        && !CollectionUtils.isEmpty(node.getUnderlyingHoldings());
+        && isFundOrEtf(node.getType());
   }
 
   /**
-   * Recursion taxonomy per spec: descend into anything starting with {@code F} (fund-of-fund, fund-of-ETF, fund-of-
-   * segregated, fund-of-pooled, etc.) plus the explicit {@code EX} (exchange-traded). The spec's
-   * <code>(FO|FE|FS|EX|[F].*$)</code> reduces to this pair.
+   * Holding taxonomy per spec: funds start with {@code F} (fund-of-fund, fund-of-ETF, fund-of-segregated, fund-of-
+   * pooled, etc.) and ETFs use {@code EX}. The spec's <code>(FO|FE|FS|EX|[F].*$)</code> reduces to this pair.
    */
-  private boolean matchesRecursionType(String type) {
-    return type != null && (type.startsWith("F") || "EX".equals(type));
+  private boolean isFundOrEtf(String type) {
+    return type != null && RECURSIVE_HOLDING_TYPE_PATTERN.matcher(type).matches();
   }
 
   /**
