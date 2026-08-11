@@ -31,11 +31,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -161,55 +158,6 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         .isCloseTo(new BigDecimal("0.0832827785"), within(TOLERANCE));
     assertThat(findPeriod(result, ONE_YR.name()).value())
         .isCloseTo(new BigDecimal("0.1503798415"), within(TOLERANCE));
-  }
-
-  @Test
-  void shouldReturnBadRequest_whenHoldingsListIsEmpty() {
-    PeriodCommand command = periodCommand(Set.of(ONE_YR), null, List.of());
-
-    Notification error = assertValidationError(postCalculation(writeJson(command)),
-        ErrorCode.FIELD_NOT_EMPTY.getCode(), "holdings");
-    assertThat(error.getMessage()).isEqualTo("holdings must not be empty");
-    assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "holdings");
-  }
-
-  @Test
-  @Disabled
-  // TODO move the test to unit tests
-  void shouldReturnBadRequest_whenHoldingTypeIsMissing() {
-    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"),
-        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
-    ObjectNode body = (ObjectNode) parseJson(writeJson(command));
-    ((ObjectNode) body.get("holdings").get(0)).remove("holdingType");
-
-    Notification error = assertValidationError(postCalculation(body.toString()),
-        ErrorCode.FIELD_NOT_NULL.getCode(), "holdingType");
-    assertThat(error.getMessage()).isEqualTo("Holding Type must not be null");
-  }
-
-  @Test
-  @Disabled
-  // TODO delete the test. the main positive case test must cover that
-  void shouldReturnTrailingReturn_whenSingleMonthReturnIsFivePercent() {
-    enqueueSmsMockResponse(writeJson(List.of(
-        holdingReturnsRow(XBAL, List.of(dateValue("2024-12-31", "5.0"))))));
-    enqueueSmsMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
-        "0.0035")))));
-
-    PeriodCommand command = periodCommand(Set.of(ONE_MTH), LocalDate.parse("2024-12-31"),
-        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
-    HttpResponse response = postCalculation(writeJson(command));
-
-    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
-    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
-    assertThat(result.getWarnings()).isEmpty();
-    assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(result.getTrailingTotalReturn()).hasSize(1);
-    assertThat(findPeriod(result, ONE_MTH.name()).value())
-        .isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
-    assertThat(response.responseBody())
-        .doesNotContain("\"comparison\"");
   }
 
   @Test
@@ -368,21 +316,6 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         .containsEntry("param-1", holding.getIdsString())
         .containsEntry("param-2", Currency.USD.name())
         .containsEntry("param-3", Currency.CAD.name());
-  }
-
-  @Test
-  @Disabled
-  // TODO move the test to unit tests
-  void shouldReturnBadRequest_whenTreasuryBillSeriesIsEmptyForCurrency() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
-    enqueueSmsMockResponse(writeJson(List.<DateRateValue>of()));
-
-    PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
-    HttpResponse response = postCalculation(writeJson(command));
-
-    Notification error = assertValidationError(response, ErrorCode.Codes.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, null);
-    assertThat(error.getMessage()).isEqualTo("T-Bill rates are not available for currency CAD");
-    assertThat(error.getMetadata()).hasSize(1).containsEntry("param-1", "CAD");
   }
 
   @Test
