@@ -807,6 +807,28 @@ class PortfolioCalculationControllerTest {
     }
 
     @Test
+    void shouldReturnBadRequest_whenPortfolioHoldingsAreEmpty() throws Exception {
+      PeriodCommand cmd = new PeriodCommand();
+      cmd.setMetric(CalculationMetric.TRAILING_TOTAL_RETURNS);
+      cmd.setCurrency(Currency.CAD);
+      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
+      cmd.setHoldings(List.of());
+      // Any portfolio-based endpoint would exercise the same @NotEmpty holdings validation.
+      // trailing-total-returns is used here only as a representative endpoint.
+      validatingMockMvc.perform(
+          post(BASE_PATH + "/trailing-total-returns")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(om.writeValueAsString(cmd)))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.notifications[0].code")
+              .value(ErrorCode.Codes.FIELD_NOT_EMPTY))
+          .andExpect(jsonPath("$.notifications[0].message")
+              .value("holdings must not be empty"))
+          .andExpect(jsonPath("$.notifications[0].fieldName")
+              .value("holdings"));
+    }
+
+    @Test
     void shouldReturnBadRequest_whenPortfolioCommandCurrencyIsMissing() throws Exception {
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.SHARPE_RATIO);
