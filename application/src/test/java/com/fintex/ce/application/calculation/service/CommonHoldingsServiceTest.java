@@ -9,6 +9,8 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
 import com.fintex.ce.model.dto.command.TopCommonHoldingsCommand;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -135,6 +137,83 @@ class CommonHoldingsServiceTest {
     assertCalculationFails(command, sms, "HOLDING_MISSING_UNDERLYING_HOLDINGS");
   }
 
+  @ParameterizedTest(name = "[{index}] {0}")
+  @MethodSource("fundOrEtfWithoutUnderlyingHoldings")
+  void shouldThrowTch001_whenDescendedFundOrEtfHasNoUnderlyingHoldings(String description,
+      CommonHolding fundOrEtf) {
+    PortfolioHolding parent = etfHolding("AAA", 1000);
+    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, fundOrEtf));
+    TopCommonHoldingsCommand command = command(List.of(parent), 10);
+
+    assertMissingUnderlyingHoldings(command, sms, parent);
+  }
+
+  private static Stream<Arguments> fundOrEtfWithoutUnderlyingHoldings() {
+    CommonHolding fund = equityHolding("Underlying Fund", "1.0");
+    fund.setType("FO");
+
+    CommonHolding etf = equityHolding("Underlying ETF", "1.0");
+    etf.setType("EX");
+    etf.setUnderlyingHoldings(List.of());
+
+    CommonHolding namelessFund = new CommonHolding();
+    namelessFund.setType("FO");
+    namelessFund.setWeight(BigDecimal.ONE);
+
+    return Stream.of(
+        Arguments.of("fund has null holdings", fund),
+        Arguments.of("ETF has empty holdings", etf),
+        Arguments.of("nameless fund has null holdings", namelessFund));
+  }
+
+  @Test
+  void shouldValidateEveryNestedFund_whenLeafLimitIsReached() {
+    properties.setMaxLeavesPerHolding(1);
+    PortfolioHolding parent = etfHolding("AAA", 1000);
+    CommonHolding fund = equityHolding("Underlying Fund", "0.5");
+    fund.setType("FO");
+    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD,
+        equityHolding("First Equity", "0.5"), fund));
+    TopCommonHoldingsCommand command = command(List.of(parent), 10);
+
+    assertMissingUnderlyingHoldings(command, sms, parent);
+  }
+
+  @Test
+  void shouldTreatNestedEquityAsLeaf_whenItHasNoUnderlyingHoldings() {
+    PortfolioHolding parent = etfHolding("AAA", 1000);
+    CommonHolding equity = equityHolding("Nested Equity", "1.0");
+    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, equity));
+
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getCommonHoldings()).hasSize(1);
+    assertThat(result.getCommonHoldings().getFirst().getName()).isEqualTo("Nested Equity");
+    assertThat(result.getCommonHoldings().getFirst().getAllocation()).isEqualByComparingTo(BigDecimal.ONE);
+  }
+
+  @Test
+  void shouldTreatFundAsLeaf_whenItIsAtMaxRecursionDepthAndHasNoUnderlyingHoldings() {
+    properties.setMaxRecursionDepth(1);
+    PortfolioHolding parent = etfHolding("AAA", 1000);
+    CommonHolding level1Fund = equityHolding("Level1 Fund", "1.0");
+    level1Fund.setType("FO");
+    CommonHolding level0Fund = equityHolding("Level0 Fund", "1.0");
+    level0Fund.setType("FO");
+    level0Fund.setUnderlyingHoldings(List.of(level1Fund));
+    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, level0Fund));
+    TopCommonHoldingsCommand command = command(List.of(parent), 10);
+    command.setAccumulateHoldingTypes(Set.of("FO"));
+
+    TopCommonHoldingsResult result = service.perform(command, sms);
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getCommonHoldings()).hasSize(1);
+    assertThat(result.getCommonHoldings().getFirst().getName()).isEqualTo("Level1 Fund");
+    assertThat(result.getCommonHoldings().getFirst().getAllocation()).isEqualByComparingTo(BigDecimal.ONE);
+  }
+
   @Test
   void shouldThrowSmsNoData_whenSmsReturnsNothingForMandatoryHolding() {
     PortfolioHolding parent = etfHolding("AAA", 1000);
@@ -213,6 +292,7 @@ class CommonHoldingsServiceTest {
       "FE, true",
       "FS, true",
       "FX, true",
+      "F,  true",
       "EX, true",
       "E,  false",
       "B,  false",
@@ -360,6 +440,20 @@ class CommonHoldingsServiceTest {
     assertThatThrownBy(() -> service.perform(command, securityData))
         .isInstanceOf(CalculationException.class)
         .satisfies(ex -> assertThat(((CalculationException) ex).getErrorCode().name()).isEqualTo(expectedErrorCode));
+  }
+
+  private void assertMissingUnderlyingHoldings(TopCommonHoldingsCommand command,
+      Map<PortfolioHolding, CommonTopHoldings> securityData, PortfolioHolding parent) {
+    assertThatThrownBy(() -> service.perform(command, securityData))
+        .isInstanceOfSatisfying(CalculationException.class, exception -> {
+          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.HOLDING_MISSING_UNDERLYING_HOLDINGS);
+          assertThat(exception.getMessage()).isEqualTo(ErrorCode.HOLDING_MISSING_UNDERLYING_HOLDINGS
+              .getFormattedMessage());
+          assertThat(exception.getId()).isEqualTo(parent.getIdsString());
+          assertThat(exception.getMetadata())
+              .containsOnlyKeys(ErrorParams.HOLDING_ID)
+              .containsEntry(ErrorParams.HOLDING_ID, parent.getIdsString());
+        });
   }
 
   private TopCommonHoldingsCommand command(List<PortfolioHolding> holdings, int numOfTop) {
