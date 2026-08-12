@@ -59,6 +59,9 @@ Red flags — STOP and investigate the production code instead of the test:
 - [ ] **[architecture] Changed a cross-metric behavior?** Enumerate every metric in that family and implement the shared
   workflow in an application service or template-method base. Extracting only a calculator utility while wiring one
   metric leaves behavior inconsistent and keeps business orchestration in the wrong layer.
+- [ ] **[test-quality] Changing metric-specific tests?** Check the support backlog and existing class-level
+  `@Disabled` reason first. Leave unsupported metric suites untouched instead of enabling or rewriting tests for
+  behavior the product does not expose.
 - [ ] **[test-quality] Behavior-preserving refactor?** Add a test for the specific pre-existing behavior you intend
   to keep, so a regression turns a test red instead of shipping silently.
 - [ ] **[test-quality] Does each assertion fail when the named behavior is broken?** Trace the exercised path and
