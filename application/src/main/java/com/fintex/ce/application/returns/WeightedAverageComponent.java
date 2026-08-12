@@ -6,6 +6,7 @@ import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,6 +33,9 @@ public class WeightedAverageComponent {
   public NavigableMap<LocalDate, BigDecimal> calculateWeightedAverage(
       Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns,
       ReturnFactorScale returnFactorScale) {
+    if (CollectionUtils.isEmpty(returns)) {
+      return new TreeMap<>();
+    }
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> endingPortfolioWeight = calculateEndingPortfolioWeight(
         returns);
     return new TreeMap<>(calculateTotalPortfolioReturnFactor(returns, endingPortfolioWeight, returnFactorScale));

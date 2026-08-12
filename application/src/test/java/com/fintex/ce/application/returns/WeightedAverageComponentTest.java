@@ -1,164 +1,104 @@
 package com.fintex.ce.application.returns;
 
-import com.fintex.ce.application.calculation.metric.formula.SumProduct;
-import com.fintex.ce.application.util.ComparisonUtils;
-import com.fintex.ce.application.util.PortfolioUtils;
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.Set;
+import java.util.NavigableMap;
 import java.util.TreeMap;
-import java.util.function.Function;
+import java.util.stream.Stream;
 
-import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.Mockito.anyCollection;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.same;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class WeightedAverageComponentTest {
 
+  private static final LocalDate DECEMBER = LocalDate.parse("2023-12-31");
+  private static final LocalDate JANUARY = LocalDate.parse("2024-01-31");
+  private static final LocalDate FEBRUARY = LocalDate.parse("2024-02-29");
+
+  private final WeightedAverageComponent component = new WeightedAverageComponent();
+
   @Test
-  void shouldCollectMonthlyWeightEntries_whenCheckResult() {
-    final var component = mock(WeightedAverageComponent.class);
-    final var holding = mock(PortfolioHolding.class);
-    final var date = LocalDate.of(2020, 10, 10);
-    final var oldValue = new BigDecimal("2.2");
-    final var expectedNewValue = new BigDecimal("1.1");
+  void shouldCalculateValueWeightedReturns_whenHoldingsHaveDifferentValuesAndReturns() {
+    PortfolioHolding firstHolding = holding("FIRST", "100");
+    PortfolioHolding secondHolding = holding("SECOND", "300");
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
+        firstHolding, returns("10", "20"),
+        secondHolding, returns("30", "40"));
 
-    final var map = Map.of(holding, expectedNewValue);
+    NavigableMap<LocalDate, BigDecimal> result = component.calculateWeightedAverage(returns, ReturnFactorScale.AS_IS);
 
-    doCallRealMethod().when(component).collectMonthlyWeightEntries(any());
-
-    final Function<Map.Entry<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>, TreeMap<LocalDate, BigDecimal>> actualFunction = component
-        .collectMonthlyWeightEntries(map);
-
-    final Map<LocalDate, BigDecimal> actual = actualFunction.apply(Map.entry(holding, new TreeMap<>(Map.of(date,
-        oldValue))));
-
-    assertEquals(expectedNewValue, actual.get(date));
+    assertThat(result).hasSize(2);
+    assertThat(result.get(JANUARY)).isEqualByComparingTo("25");
+    assertThat(result.get(FEBRUARY)).isEqualByComparingTo("35");
   }
 
   @Test
-  void shouldCalculateEndingPortfolioWeight_whenVefiryCalculateInitialPortfolioWeight() {
-    try (var portfolioUtilsMock = mockStatic(PortfolioUtils.class)) {
-      final var component = mock(WeightedAverageComponent.class);
+  void shouldApplyRequestedScale_whenReturnsArePercentageValues() {
+    PortfolioHolding holding = holding("ONLY", "100");
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
+        holding, returns("10", "-20"));
 
-      final var holding = mock(PortfolioHolding.class);
-      final var pBaseTotalReturn = Map.of(holding, new TreeMap<>(Map.of(LOCAL_DATE_NOW, BigDecimal.ONE)));
+    NavigableMap<LocalDate, BigDecimal> result = component.calculateWeightedAverage(
+        returns, ReturnFactorScale.SCALE_OF_TWO);
 
-      when(component.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
-
-      doCallRealMethod().when(component).calculateEndingPortfolioWeight(anyMap());
-
-      component.calculateEndingPortfolioWeight(pBaseTotalReturn);
-
-      portfolioUtilsMock.verify(() -> PortfolioUtils.calculateInitialPortfolioWeight(eq(Set.of(holding))));
-    }
+    assertThat(result).containsOnlyKeys(JANUARY, FEBRUARY);
+    assertThat(result.get(JANUARY)).isEqualByComparingTo("1.1");
+    assertThat(result.get(FEBRUARY)).isEqualByComparingTo("0.8");
   }
 
   @Test
-  void shouldCalculateEndingPortfolioWeight_whenVerifyCollectMonthlyWeightEntries() {
-    try (var portfolioUtilsMock = mockStatic(PortfolioUtils.class)) {
-      final var component = mock(WeightedAverageComponent.class);
+  void shouldCalculateInitialValueWeights_whenEndingWeightsAreRequested() {
+    PortfolioHolding firstHolding = holding("FIRST", "100");
+    PortfolioHolding secondHolding = holding("SECOND", "300");
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
+        firstHolding, returns("10", "20"),
+        secondHolding, returns("30", "40"));
 
-      var map = mock(TreeMap.class);
-      portfolioUtilsMock.when(() -> PortfolioUtils.calculateInitialPortfolioWeight(anyCollection())).thenReturn(map);
-      when(component.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> result = component.calculateEndingPortfolioWeight(returns);
 
-      doCallRealMethod().when(component).calculateEndingPortfolioWeight(anyMap());
-
-      component.calculateEndingPortfolioWeight(Map.of());
-
-      verify(component).collectMonthlyWeightEntries(same(map));
-    }
+    assertThat(result).containsOnlyKeys(firstHolding, secondHolding);
+    assertWeightSeries(result.get(firstHolding), "0.25");
+    assertWeightSeries(result.get(secondHolding), "0.75");
   }
 
-  @Test
-  void shouldCalculateTotalPortfolioReturnFactor_whenVerifyCalculate() {
-    try (var sumProductMockedConstruction = mockConstruction(SumProduct.class,
-        (sumProductMock, setting) -> {
-          when(sumProductMock.setMap2KeyFinder(any())).thenReturn(sumProductMock);
-          when(sumProductMock.calculate()).thenReturn(new TreeMap());
-        })) {
-      final var component = mock(WeightedAverageComponent.class);
+  @ParameterizedTest
+  @MethodSource("unavailableReturns")
+  void shouldReturnEmptySeries_whenNoHoldingReturnsAreProvided(
+      Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns) {
+    NavigableMap<LocalDate, BigDecimal> result = component.calculateWeightedAverage(
+        returns, ReturnFactorScale.AS_IS);
 
-      when(component.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
-
-      doCallRealMethod().when(component).calculateTotalPortfolioReturnFactor(anyMap(), anyMap(),
-          any(ReturnFactorScale.class));
-
-      component.calculateTotalPortfolioReturnFactor(Map.of(), Map.of(), ReturnFactorScale.AS_IS);
-
-      assertEquals(1, sumProductMockedConstruction.constructed().size());
-      final var sumProduct = sumProductMockedConstruction.constructed().get(0);
-      verify(sumProduct).calculate();
-    }
+    assertThat(result).isEmpty();
   }
 
-  @Test
-  void shouldCalculateTotalPortfolioReturnFactor_whenCheckResult() {
-    final var map = new TreeMap<>(Map.of(LOCAL_DATE_NOW, new BigDecimal(20)));
-
-    try (var sumProductMockedConstruction = mockConstruction(SumProduct.class,
-        (sumProductMock, setting) -> {
-          when(sumProductMock.setMap2KeyFinder(any())).thenReturn(sumProductMock);
-          when(sumProductMock.calculate()).thenReturn(map);
-        })) {
-
-      final var component = mock(WeightedAverageComponent.class);
-
-      when(component.collectMonthlyWeightEntries(anyMap())).thenReturn(i -> i.getValue());
-
-      doCallRealMethod().when(component).calculateTotalPortfolioReturnFactor(anyMap(), anyMap(),
-          any(ReturnFactorScale.class));
-
-      final var actual = component.calculateTotalPortfolioReturnFactor(Map.of(), Map.of(),
-          ReturnFactorScale.SCALE_OF_TWO);
-
-      Assertions.assertNotNull(actual);
-      ComparisonUtils.compareMaps(Map.of(LOCAL_DATE_NOW, new BigDecimal("1.2")), actual);
-    }
+  private static PortfolioHolding holding(String id, String value) {
+    return new PortfolioHolding(new BigDecimal(value), FinancialInstrumentType.ETF, Country.CANADA,
+        new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 
-  @Test
-  void shouldCalculateWeightedAverage_whenVerifyCalculateEndingPortfolioWeight() {
-    final var component = mock(WeightedAverageComponent.class);
-    final var returns = mock(Map.class);
-
-    doCallRealMethod().when(component).calculateWeightedAverage(anyMap(), any(ReturnFactorScale.class));
-
-    component.calculateWeightedAverage(returns, ReturnFactorScale.AS_IS);
-
-    verify(component).calculateEndingPortfolioWeight(returns);
+  private static TreeMap<LocalDate, BigDecimal> returns(String january, String february) {
+    return new TreeMap<>(Map.of(
+        JANUARY, new BigDecimal(january),
+        FEBRUARY, new BigDecimal(february)));
   }
 
-  @Test
-  void shouldCalculateWeightedAverage_whenVerifyCalculateTotalPortfolioReturnFacto() {
-    final var component = mock(WeightedAverageComponent.class);
-    final var returns = mock(Map.class);
-    final var endingPortfolioWeight = mock(Map.class);
+  private static Stream<Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>> unavailableReturns() {
+    return Stream.of(null, Map.of());
+  }
 
-    when(component.calculateEndingPortfolioWeight(anyMap())).thenReturn(endingPortfolioWeight);
-
-    doCallRealMethod().when(component).calculateWeightedAverage(anyMap(), any(ReturnFactorScale.class));
-
-    component.calculateWeightedAverage(returns, ReturnFactorScale.AS_IS);
-
-    verify(component).calculateTotalPortfolioReturnFactor(returns, endingPortfolioWeight, ReturnFactorScale.AS_IS);
+  private static void assertWeightSeries(TreeMap<LocalDate, BigDecimal> weights, String expectedWeight) {
+    assertThat(weights).containsOnlyKeys(DECEMBER, JANUARY, FEBRUARY);
+    assertThat(weights.values()).allSatisfy(weight -> assertThat(weight).isEqualByComparingTo(expectedWeight));
   }
 }
