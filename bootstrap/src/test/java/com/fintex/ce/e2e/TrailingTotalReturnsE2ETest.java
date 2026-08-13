@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.equityOfCountry;
+import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.holdingOfCountry;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
@@ -461,12 +463,12 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static PortfolioHolding holding(SecurityIdentifier securityIdentifier, FinancialInstrumentType type,
       Country country, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, country, securityIdentifier);
+    return holdingOfCountry(securityIdentifier, type, country, value);
   }
 
   private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type,
       Country country, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, country, equityId(ticker, exchange));
+    return equityOfCountry(ticker, exchange, type, country, value);
   }
 
   private static Dispatcher bocDailyUsdCadDispatcher(String rate) {
