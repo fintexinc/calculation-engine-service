@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.webclient.boc.integration;
 
 import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaWebClientConfig;
+import com.fintex.ce.adapter.webclient.resilience.ExternalCallResilienceConfig;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.port.observability.ExternalCallObservability;
@@ -119,7 +120,7 @@ class BankOfCanadaFxRateIntegrationTest {
 
   @SpringBootConfiguration
   @EnableAutoConfiguration
-  @Import(BankOfCanadaWebClientConfig.class)
+  @Import({BankOfCanadaWebClientConfig.class, ExternalCallResilienceConfig.class})
   @ComponentScan(basePackages = {
       "com.fintex.ce.adapter.webclient.boc",
       "com.fintex.ce.adapter.webclient.observability"

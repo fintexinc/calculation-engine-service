@@ -56,6 +56,12 @@ abstract class AbstractPortfolioCalculationE2ETest {
 
   private static final String basePath = "/api/v1/portfolio/calculations";
 
+  /**
+   * Mirrors {@code resilience4j.retry.configs.default.max-attempts}: a transient SMS failure is attempted this many
+   * times before the engine gives up, so tests that exhaust the retries must enqueue this many failing responses.
+   */
+  private static final int SMS_RETRY_MAX_ATTEMPTS = 3;
+
   protected static MockWebServer smsMockServer;
 
   protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
@@ -160,42 +166,58 @@ abstract class AbstractPortfolioCalculationE2ETest {
   }
 
   @Test
-  void shouldReturnServiceUnavailable_whenExternalSecurityMasterIsUnavailable() {
-    smsMockServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AFTER_REQUEST));
+  void shouldReturnServiceUnavailableAfterRetries_whenExternalSecurityMasterIsUnavailable() {
+    for (int attempt = 0; attempt < SMS_RETRY_MAX_ATTEMPTS; attempt++) {
+      smsMockServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AFTER_REQUEST));
+    }
+    int requestsBefore = smsMockServer.getRequestCount();
 
     var response = postCalculation(requestBodyForSmsUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
     assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.getCode());
     assertThat(response.responseBody()).contains("Security Master");
+    assertThat(smsMockServer.getRequestCount() - requestsBefore)
+        .as("a transport failure is transient, so every configured attempt must reach the server")
+        .isEqualTo(SMS_RETRY_MAX_ATTEMPTS);
   }
 
   @Test
-  void shouldReturnServiceUnavailable_whenExternalSecurityMasterReturnsServerError() {
-    smsMockServer.enqueue(new MockResponse()
-        .setResponseCode(500)
-        .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-        .setBody("{\"error\":\"upstream failure\"}"));
+  void shouldReturnServiceUnavailableAfterRetries_whenExternalSecurityMasterReturnsServerError() {
+    for (int attempt = 0; attempt < SMS_RETRY_MAX_ATTEMPTS; attempt++) {
+      smsMockServer.enqueue(new MockResponse()
+          .setResponseCode(500)
+          .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+          .setBody("{\"error\":\"upstream failure\"}"));
+    }
+    int requestsBefore = smsMockServer.getRequestCount();
 
     var response = postCalculation(requestBodyForSmsUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
     assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.getCode());
     assertThat(response.responseBody()).contains("Security Master");
+    assertThat(smsMockServer.getRequestCount() - requestsBefore)
+        .as("a server error is transient, so every configured attempt must reach the server")
+        .isEqualTo(SMS_RETRY_MAX_ATTEMPTS);
   }
 
   @Test
-  void shouldReturnBadGateway_whenExternalSecurityMasterReturnsClientError() {
+  void shouldReturnBadGatewayWithoutRetrying_whenExternalSecurityMasterReturnsClientError() {
     smsMockServer.enqueue(new MockResponse()
         .setResponseCode(400)
         .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
         .setBody("{\"error\":\"bad request\"}"));
+    int requestsBefore = smsMockServer.getRequestCount();
 
     var response = postCalculation(requestBodyForSmsUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_GATEWAY.value());
     assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_BAD_RESPONSE.getCode());
     assertThat(response.responseBody()).contains("Security Master");
+    assertThat(smsMockServer.getRequestCount() - requestsBefore)
+        .as("a rejected request is this service's own bug, so repeating it cannot help")
+        .isEqualTo(1);
   }
 
   /**

@@ -10,3 +10,12 @@ external-services:
         attributes: /api/v1/wealth/securities/attributes
         reference:
           treasury-rates: /api/v1/wealth/reference/treasury-rates
+
+# The slice-IT contexts auto-configure the Resilience4j registries without bootstrap's application.yml, and an
+# unconfigured time limiter falls back to Resilience4j's own 1-second default — tight enough for a busy CI agent to
+# miss. Kept generous: these tests assert behaviour, not deadlines.
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 30s

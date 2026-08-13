@@ -19,3 +19,17 @@ external-services:
   security-master:
     rest:
       base-url: http://127.0.0.1:1
+
+# Retries stay on (the e2e suite asserts them) but back off in milliseconds, so a test that exhausts all attempts
+# costs milliseconds instead of seconds. The circuit breaker never opens here: the failure scenarios each class runs
+# would otherwise count against a shared breaker and could fail later tests in the same JVM by test order alone.
+# Breaker behaviour itself is covered by unit tests in web-client-adapter.
+resilience4j:
+  retry:
+    configs:
+      default:
+        wait-duration: 25ms
+  circuitbreaker:
+    configs:
+      default:
+        minimum-number-of-calls: 1000000

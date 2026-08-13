@@ -164,6 +164,77 @@ default:
     max-recursion-depth: 5
     max-leaves-per-holding: 10000
 
+resilience4j:
+  retry:
+    configs:
+      default:
+        # Three attempts total. Retrying is only worth it for a failure the provider recovers from on its own, and past
+        # a couple of attempts a slow failure costs the caller more latency than a fourth try is likely to redeem.
+        max-attempts: 3
+        wait-duration: 500ms
+        # Exponential with jitter, because one portfolio calculation fans out to the same provider in parallel: a fixed
+        # delay would send every failed call back at the same instant and reproduce the load that caused the failure.
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        enable-randomized-wait: true
+        randomized-wait-factor: 0.5
+        retry-exception-predicate: com.fintex.ce.adapter.webclient.resilience.TransientCallFailures
+    instances:
+      SECURITY_MASTER:
+        base-config: default
+      BANK_OF_CANADA:
+        base-config: default
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 50
+        # Below this many calls the breaker stays closed whatever the failure rate, so a handful of failures in a burst
+        # of calculations cannot open it on a sample too small to mean anything.
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        # Measured per attempt, not per logical call: a provider answering but taking this long holds the calling
+        # thread without ever raising an error, so each such attempt is counted as a failure in its own right. Attempts
+        # individually under this threshold can still add up to a slow logical call — that budget is capped separately
+        # by resilience4j.timelimiter below.
+        slow-call-duration-threshold: 20s
+        slow-call-rate-threshold: 100
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 5
+        # Recovery without any caller having to arrive first, so a quiet period while the breaker was open does not
+        # leave it open for the next calculation to discover.
+        automatic-transition-from-open-to-half-open-enabled: true
+        record-failure-predicate: com.fintex.ce.adapter.webclient.resilience.TransientCallFailures
+        register-health-indicator: true
+    instances:
+      SECURITY_MASTER:
+        base-config: default
+      # Bank of Canada is called a few times per calculation for FX rates rather than in bulk, so its window and
+      # threshold are scaled down below the shared default to the traffic it actually sees; the 50-call window would
+      # take too long to fill.
+      BANK_OF_CANADA:
+        base-config: default
+        sliding-window-size: 10
+        minimum-number-of-calls: 3
+        slow-call-duration-threshold: 5s
+  timelimiter:
+    configs:
+      default:
+        # Deadline for the whole logical call — every retry attempt plus the backoff between them. The per-attempt
+        # response timeout on each HTTP client cannot cap this: it multiplies by the number of attempts, so without
+        # this ceiling the worst case handed to the caller is that timeout times every retry. Sized to one full
+        # 60-second Security Master attempt plus room for fast-failing retries; a second slow attempt is cut off
+        # rather than doubling the caller's wait. This is also the fallback for any instance not listed below —
+        # Resilience4j's own default would be 1 second, which no real call here can meet.
+        timeout-duration: 90s
+    instances:
+      SECURITY_MASTER:
+        base-config: default
+      BANK_OF_CANADA:
+        base-config: default
+        # Scaled to Bank of Canada's 30-second per-attempt timeout the same way the default is to Security Master's.
+        timeout-duration: 45s
+
 management:
   tracing:
     enabled: true
@@ -220,7 +291,12 @@ management:
         # `metrics` stays unexposed: it enumerates every meter name and tag value, which is why
         # ActuatorExposureConfigurationTest pins it shut. `calculationstats` is the curated read model over the same
         # meters and is safe to serve; read raw meters through the exporter, not over HTTP.
-        include: health, info, calculationstats
+        #
+        # `circuitbreakers` and `retries` serve the current state of each resilience instance, which is bounded and safe
+        # to read. The matching `*events` endpoints stay shut for the same reason as `metrics`: they replay a rolling
+        # buffer carrying the upstream exception messages of individual calls, which belongs in the logs and the
+        # exporter.
+        include: health, info, calculationstats, circuitbreakers, retries
   endpoint:
     health:
       show-details: never
@@ -231,9 +307,21 @@ management:
           include: readinessState, sms
         liveness:
           include: livenessState
+      # An open breaker is reported as its own status rather than as DOWN: it means a provider is unreachable, not that
+      # this service is, and DOWN would answer the probe with 503 and take the pod out of rotation over someone else's
+      # outage. Slotting the two breaker statuses below OUT_OF_SERVICE keeps them visible without ever masking a real
+      # failure elsewhere, and neither maps to an error status code. Left out of the order, they would be treated as
+      # unknown codes and sort as the least severe status there is, so an open breaker would never surface at all. The
+      # order has to live here — `management.health.status.order` is not bound to anything and is silently ignored.
+      status:
+        order: DOWN,OUT_OF_SERVICE,CIRCUIT_OPEN,CIRCUIT_HALF_OPEN,UP,UNKNOWN
   health:
     diskspace:
       enabled: false
+    # The breaker states reach /actuator/health as one composite indicator. It is deliberately kept out of the
+    # `readiness` group above: a provider outage must not remove this pod from rotation, only report itself.
+    circuitbreakers:
+      enabled: true
 
 logging:
   pattern:
