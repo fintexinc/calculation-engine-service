@@ -1,6 +1,7 @@
 package com.fintex.ce.model.domain.calculation.holding;
 
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,7 +29,7 @@ public interface HoldingComponent {
     return source().aggregator();
   }
 
-  default String type() {
+  default HoldingType type() {
     return source().getType();
   }
 }

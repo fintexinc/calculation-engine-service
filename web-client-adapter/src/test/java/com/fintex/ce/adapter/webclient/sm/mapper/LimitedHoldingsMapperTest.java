@@ -8,6 +8,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.holding.Holdings;
 import com.fintex.wm.commons.domain.holding.SecurityHolding;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -45,7 +46,7 @@ class LimitedHoldingsMapperTest {
     CommonHolding nvidia = result.getHoldings().get(0);
     assertThat(nvidia.getName()).isEqualTo("NVIDIA Corp");
     assertThat(nvidia.getCompanyName()).isEqualTo("NVIDIA Corp");
-    assertThat(nvidia.getType()).isEqualTo("E");
+    assertThat(nvidia.getType()).isEqualTo(HoldingType.E);
     // SM sends weighting on a percent (0-100) scale; the calculation expects a ratio (0-1).
     assertThat(nvidia.getWeight()).isEqualByComparingTo("0.0887516");
     assertThat(nvidia.getPrimaryIdentifier().getIdType()).isEqualTo(FiIdentifierType.MORNINGSTAR_ID);
@@ -128,6 +129,19 @@ class LimitedHoldingsMapperTest {
 
     assertThat(mapped.getPrimaryIdentifier().getIdType()).isEqualTo(FiIdentifierType.TICKER);
     assertThat(mapped.getPrimaryIdentifier().getId()).isEqualTo("RY.TO");
+  }
+
+  /** The vendor's code set is wider than the vocabulary, so an unmapped code must arrive untyped, not fail the row. */
+  @Test
+  void shouldLeaveTypeNull_whenSmsSendsACodeOutsideTheVocabulary() {
+    var holding = securityHolding("Unmapped Code", "1.00", null, null);
+    holding.setType("??");
+
+    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), createHolding("SEC-011")).getHoldings().get(0);
+
+    assertThat(mapped.getName()).isEqualTo("Unmapped Code");
+    assertThat(mapped.getType()).isNull();
+    assertThat(mapped.getWeight()).isEqualByComparingTo("0.01");
   }
 
   @Test

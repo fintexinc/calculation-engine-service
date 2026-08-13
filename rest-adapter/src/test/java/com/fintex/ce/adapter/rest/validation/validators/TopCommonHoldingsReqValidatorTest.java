@@ -7,16 +7,16 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -27,22 +27,19 @@ class TopCommonHoldingsReqValidatorTest {
   private final TopCommonHoldingsReqValidator validator = new TopCommonHoldingsReqValidator(new HoldingsValidator(
       new HoldingsValidationProperties()));
 
+  /**
+   * Every member of {@link HoldingType} at once — far more than the twelve the count check used to cap, which is the
+   * point: the request no longer carries free-form strings, so that check could not fail and is gone. What replaces it
+   * is the type itself, and an unrecognised code is rejected while the body is read, before any validator sees the
+   * command.
+   */
   @Test
-  void shouldThrow_whenAccumulateHoldingTypesExceedsTwelve() {
-    Set<String> thirteenTypes = IntStream.rangeClosed(1, 13)
-        .mapToObj(i -> "TYPE_" + i)
-        .collect(Collectors.toSet());
-
+  void shouldNotThrow_whenEveryHoldingTypeIsRequested() {
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
     command.setHoldings(List.of(createHolding("ID1")));
-    command.setAccumulateHoldingTypes(thirteenTypes);
+    command.setAccumulateHoldingTypes(EnumSet.allOf(HoldingType.class));
 
-    assertThatThrownBy(() -> validator.validate(command))
-        .isInstanceOf(ValidationException.class)
-        .satisfies(ex -> {
-          ValidationException rve = (ValidationException) ex;
-          assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX);
-        });
+    assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
 
   @Test
@@ -92,7 +89,7 @@ class TopCommonHoldingsReqValidatorTest {
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
     command.setHoldings(List.of(createHolding("ID1"), createHolding("ID2"), gicHolding));
-    command.setAccumulateHoldingTypes(Set.of("TYPE_1", "TYPE_2"));
+    command.setAccumulateHoldingTypes(Set.of(HoldingType.E, HoldingType.B));
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
   }
