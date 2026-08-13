@@ -1,7 +1,6 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -27,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.holdingOfCountry;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.THREE_MTH;
@@ -229,9 +229,8 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
     command.setPeriods(Set.of(ONE_YR));
     command.setCustomPed(LocalDate.parse("2024-12-31"));
     command.setHoldings(List.of(
-        new PortfolioHolding(new BigDecimal("60000.00"), FinancialInstrumentType.ETF, Country.CANADA, XBAL),
-        new PortfolioHolding(new BigDecimal("40000.00"), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-            CCM4752)));
+        holdingOfCountry(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "60000.00"),
+        holdingOfCountry(CCM4752, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "40000.00")));
     return command;
   }
 

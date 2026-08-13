@@ -54,7 +54,7 @@ public class CashMonthlyReturnsGenerator {
         .map(CashHolding::getCurrency)
         .distinct()
         .collect(Collectors.toMap(Function.identity(),
-            currency -> TBillsValidator.requireNonEmpty(treasuryBillsFetcher.fetch(currency), currency)));
+            currency -> TBillsValidator.requireCompleteCalendarMonths(treasuryBillsFetcher.fetch(currency), currency)));
 
     return cashHoldings.stream()
         .collect(Collectors.toMap(Function.identity(),

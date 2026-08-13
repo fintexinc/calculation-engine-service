@@ -73,6 +73,22 @@ class CashMonthlyReturnsGeneratorTest {
     verify(treasuryBillsFetcher).fetch(Currency.CAD);
   }
 
+  @Test
+  void shouldThrowMissingTBillRate_whenCurrencyTBillReturnsHaveCalendarGap() {
+    when(treasuryBillsFetcher.fetch(Currency.CAD))
+        .thenReturn(returns("2024-01-31", "0.40", "2024-03-31", "0.50"));
+
+    assertThatThrownBy(() -> generator.generateCashMonthlyReturns(List.of(CAD_CASH)))
+        .isInstanceOfSatisfying(CalculationException.class, exception -> {
+          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_TBILL_RATE);
+          assertThat(exception).hasMessage("Missing T-Bill rate for date 2024-02-29");
+          assertThat(exception.getMetadata())
+              .containsOnlyKeys("param-1")
+              .containsEntry("param-1", "2024-02-29");
+        });
+    verify(treasuryBillsFetcher).fetch(Currency.CAD);
+  }
+
   private static CashHolding cash(Currency currency, String value) {
     return CashHolding.builder()
         .value(new BigDecimal(value))
