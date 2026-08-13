@@ -10,7 +10,6 @@ import com.fintex.ce.model.error.ErrorCode;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,12 +36,9 @@ public class TopCommonHoldingsReqValidator implements RequestValidator {
     if (!(command instanceof TopCommonHoldingsCommand tch)) {
       return;
     }
-    int sizeOfAccumulateHoldingTypes = CollectionUtils.isEmpty(tch.getAccumulateHoldingTypes())
-        ? 0
-        : tch.getAccumulateHoldingTypes().size();
-    if (sizeOfAccumulateHoldingTypes > 12) {
-      throw ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX.toValidationException();
-    }
+    // The accumulate types used to be free-form strings capped at twelve entries; they are now HoldingType, so the set
+    // cannot hold more members than the provider's vocabulary has and an unrecognised code is a 400 from
+    // deserialization — naming the field and the accepted values — instead of a value that silently matches no holding.
     if (checkGicHoldingName(tch.getHoldings())) {
       throw ErrorCode.GIC_HOLDING_NAME_EMPTY.toValidationException();
     }

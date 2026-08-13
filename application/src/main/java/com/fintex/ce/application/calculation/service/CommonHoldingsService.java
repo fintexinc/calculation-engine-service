@@ -3,7 +3,6 @@ package com.fintex.ce.application.calculation.service;
 import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter.Conversion;
 import com.fintex.ce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
 import com.fintex.ce.application.config.TopHoldingsProperties;
-import com.fintex.ce.application.constant.AccumulateHoldingType;
 import com.fintex.ce.application.constant.HoldingTypeGroup;
 import com.fintex.ce.application.util.SecurityDataValidator;
 import com.fintex.ce.calculation.SingleAttributeCalculationService;
@@ -26,6 +25,7 @@ import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
 
@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
@@ -59,8 +58,6 @@ import static java.util.stream.Collectors.toSet;
 public class CommonHoldingsService
     implements
       SingleAttributeCalculationService<TopCommonHoldingsCommand, CommonTopHoldings, TopCommonHoldingsResult> {
-
-  private static final Pattern RECURSIVE_HOLDING_TYPE_PATTERN = Pattern.compile("FO|FE|FS|EX|F.*");
 
   private final HoldingCurrencyConverter currencyConverter;
   private final TopHoldingsProperties properties;
@@ -90,7 +87,7 @@ public class CommonHoldingsService
     WeightedValues weighted = weightHoldingValuesByTargetCurrency(command.getHoldings(), rawHoldings);
     Map<PortfolioHolding, BigDecimal> allocations = calculateInitialPortfolioWeightFromValues(weighted.values());
 
-    Set<String> accumulateTypes = getAccumulativeTypes(command);
+    Set<HoldingType> accumulateTypes = getAccumulativeTypes(command);
     Map<HoldingAggregator, List<LeafHolding>> leaves = calculateTopCommonHoldings(rawHoldings, allocations,
         accumulateTypes);
 
@@ -212,7 +209,7 @@ public class CommonHoldingsService
   private Map<HoldingAggregator, List<LeafHolding>> calculateTopCommonHoldings(
       Map<PortfolioHolding, CommonTopHoldings> rawHoldings,
       Map<PortfolioHolding, BigDecimal> allocations,
-      Set<String> accumulateTypes) {
+      Set<HoldingType> accumulateTypes) {
     return rawHoldings.entrySet().stream()
         .flatMap(e -> {
           List<CommonHolding> firstLevel = Optional.ofNullable(e.getValue().getHoldings()).orElse(List.of());
@@ -270,17 +267,19 @@ public class CommonHoldingsService
     return new LeafHolding(portfolioHolding, effectiveWeight, node);
   }
 
+  /**
+   * Asks the shared vocabulary instead of matching the shape of the code, because this predicate has to agree with the
+   * one SM used when it filled the data in: its {@code HoldingsResolver} decides whether a holding carries nested
+   * holdings through {@link HoldingType#isHasUnderlyingHoldings()}. A type CE expands but SM never resolves fails every
+   * portfolio that holds it with {@link ErrorCode#HOLDING_MISSING_UNDERLYING_HOLDINGS}, and the spec's
+   * <code>(FO|FE|FS|EX|[F].*$)</code> did exactly that to {@code FD} — an {@code F*} code that never nests in the
+   * extracts — and would do it again for the next non-nesting {@code F*} code the vendor adds. A holding whose code is
+   * outside the vocabulary arrives untyped and is a leaf here for the same reason: that is what SM assumed for it.
+   */
   private boolean requiresUnderlyingHoldings(CommonHolding node, int depth) {
     return depth < properties.getMaxRecursionDepth()
-        && isFundOrEtf(node.getType());
-  }
-
-  /**
-   * Holding taxonomy per spec: funds start with {@code F} (fund-of-fund, fund-of-ETF, fund-of-segregated, fund-of-
-   * pooled, etc.) and ETFs use {@code EX}. The spec's <code>(FO|FE|FS|EX|[F].*$)</code> reduces to this pair.
-   */
-  private boolean isFundOrEtf(String type) {
-    return type != null && RECURSIVE_HOLDING_TYPE_PATTERN.matcher(type).matches();
+        && node.getType() != null
+        && node.getType().isHasUnderlyingHoldings();
   }
 
   /**
@@ -295,7 +294,7 @@ public class CommonHoldingsService
     return "name:" + String.join("|",
         Optional.ofNullable(holding.getName()).orElse(""),
         Optional.ofNullable(holding.getCompanyName()).orElse(""),
-        Optional.ofNullable(holding.getType()).orElse(""));
+        Optional.ofNullable(holding.getType()).map(HoldingType::name).orElse(""));
   }
 
   private boolean hasNameOrCompanyName(CommonHolding holding) {
@@ -312,13 +311,16 @@ public class CommonHoldingsService
         : command.getNumOfTopCommonHoldings();
   }
 
-  private Set<String> getAccumulativeTypes(TopCommonHoldingsCommand command) {
-    if (!CollectionUtils.isEmpty(command.getAccumulateHoldingTypes())) {
-      return command.getAccumulateHoldingTypes();
-    }
-    return properties.getAccumulateTypes().stream()
-        .map(AccumulateHoldingType::code)
-        .collect(Collectors.toUnmodifiableSet());
+  /**
+   * The request wins over the configured default when it names any type. A leaf whose vendor code is outside the
+   * {@link HoldingType} vocabulary arrives untyped and can never match either set. See
+   * {@link com.fintex.ce.application.config.TopHoldingsProperties#getAccumulateTypes()} for why the default is the
+   * subset it is.
+   */
+  private Set<HoldingType> getAccumulativeTypes(TopCommonHoldingsCommand command) {
+    return CollectionUtils.isEmpty(command.getAccumulateHoldingTypes())
+        ? properties.getAccumulateTypes()
+        : command.getAccumulateHoldingTypes();
   }
 
   private Map<HoldingAggregator, BigDecimal> filterTopCommon(int numberOfTopCommonHoldings,
@@ -353,8 +355,7 @@ public class CommonHoldingsService
   }
 
   private boolean isLeafStock(PortfolioHolding parent, CommonHolding child) {
-    return isStockHolding(parent) && child.getCompanyName() != null && CommonHolding.EQUITY_TYPE.equals(child
-        .getType());
+    return isStockHolding(parent) && child.getCompanyName() != null && child.getType() == CommonHolding.EQUITY_TYPE;
   }
 
   /**
