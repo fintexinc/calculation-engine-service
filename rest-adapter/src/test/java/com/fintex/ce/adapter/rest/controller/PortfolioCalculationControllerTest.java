@@ -38,8 +38,11 @@ import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.error.ErrorResponse;
+import com.fintex.wm.commons.error.Severity;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -456,18 +459,69 @@ class PortfolioCalculationControllerTest {
      * Posted as raw JSON on purpose: a period is now a typed enum, so an unusable value cannot be put on the command
      * object at all and this rejection has moved into deserialization. Raw JSON is the only way to exercise the path a
      * real caller would take.
+     *
+     * <p>
+     * The metric carries its canonical value rather than the constant name, because the discriminator is resolved
+     * through {@code CalculationMetric.from} and a name it does not know is itself a 400 — which would have made this
+     * pass without the period ever being read. The payload is asserted for the same reason: the status alone cannot say
+     * which value was rejected, and an empty holdings list answers 400 as well.
+     *
+     * <p>
+     * {@code TimePeriod} accepts a member name or a month count through its own {@code @JsonCreator}, so an unusable
+     * value arrives as a creator failure rather than as the enum mismatch that carries the field and the allowed set —
+     * hence the generic unreadable-body code here, unlike the accumulate-types case below.
      */
     @Test
     void shouldReturnBadRequest_whenPeriodIsNotAKnownPeriod() throws Exception {
       String body = """
-          {"metric":"STANDARD_DEVIATION","currency":"CAD","holdings":[],
+          {"metric":"standard-deviation","currency":"CAD","holdings":[],
            "timeIntervalPeriods":["INVALID_PERIOD"]}""";
 
-      validatingMockMvc.perform(
+      MvcResult result = validatingMockMvc.perform(
           post(BASE_PATH + "/standard-deviation")
               .contentType(MediaType.APPLICATION_JSON)
               .content(body))
-          .andExpect(status().isBadRequest());
+          .andExpect(status().isBadRequest())
+          .andReturn();
+
+      ErrorResponse error = om.readValue(result.getResponse().getContentAsString(), ErrorResponse.class);
+      assertThat(error.getNotifications()).singleElement().satisfies(notification -> {
+        assertThat(notification.getCode()).isEqualTo(ErrorCode.Codes.BAD_INPUT);
+        assertThat(notification.getMessage()).isEqualTo(ErrorCode.BAD_INPUT.getMessage());
+      });
+    }
+
+    /**
+     * The rejection that replaced the deleted "at most twelve accumulate types" check: the field is typed on
+     * {@link HoldingType}, so a code outside the provider's vocabulary never reaches the aggregation, where it used to
+     * match nothing and silently change the answer. Posted as raw JSON because a value that cannot be put on the
+     * command object is exactly what this path is about, and the whole payload is asserted — the code, the message
+     * naming the field and the accepted values, and the field itself — since a caller that cannot tell which field it
+     * got wrong is the reason this is not the generic bad-input answer.
+     */
+    @Test
+    void shouldReturnBadRequestNamingTheField_whenAccumulateHoldingTypeIsNotAHoldingTypeCode() throws Exception {
+      String body = """
+          {"metric":"top-common-holdings","currency":"CAD","holdings":[],
+           "accumulateHoldingTypes":["NOT_A_CODE"]}""";
+
+      MvcResult result = validatingMockMvc.perform(
+          post(BASE_PATH + "/top-common-holdings")
+              .contentType(MediaType.APPLICATION_JSON)
+              .content(body))
+          .andExpect(status().isBadRequest())
+          .andReturn();
+
+      ErrorResponse error = om.readValue(result.getResponse().getContentAsString(), ErrorResponse.class);
+      assertThat(error.getNotifications()).singleElement().satisfies(notification -> {
+        assertThat(notification.getCode()).isEqualTo(ErrorCode.Codes.FIELD_VALUE_NOT_ALLOWED);
+        assertThat(notification.getFieldName()).isEqualTo("accumulateHoldingTypes");
+        assertThat(notification.getMessage())
+            .startsWith("accumulateHoldingTypes must be one of: ")
+            // Constant names, not vendor codes: TYPE_12 is what a caller must send for the numeric code 12.
+            .contains(HoldingType.E.name(), HoldingType.BT.name(), HoldingType.TYPE_12.name());
+        assertThat(notification.getSeverity()).isEqualTo(Severity.ERROR);
+      });
     }
 
     /** A real period, but shorter than the twelve months a standard deviation needs — rejected by the subset check. */

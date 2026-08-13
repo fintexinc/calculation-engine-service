@@ -157,6 +157,8 @@ default:
     risk-calculations: "12,36,60,120,240"
     best-worst-periods: 12,36,60,120
   top-common-holdings:
+    # Bound to HoldingType, so a typo fails startup rather than silently matching no holding. Which codes belong here
+    # is a product decision — see TopHoldingsProperties#getAccumulateTypes for what this subset leaves out and why.
     accumulate-types:
       - E
       - ER

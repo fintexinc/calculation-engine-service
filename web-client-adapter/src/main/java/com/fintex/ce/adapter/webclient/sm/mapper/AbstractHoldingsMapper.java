@@ -9,6 +9,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.datapoint.DatapointMetadata;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.holding.Holding;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.holding.SecurityHolding;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.IdentifiersDatapoint;
@@ -75,7 +76,8 @@ public abstract class AbstractHoldingsMapper<R extends DatapointMetadata>
     CommonHolding holding = new CommonHolding();
     holding.setName(extractEnglishName(sh.getName()));
     holding.setCompanyName(sh.getCompanyName());
-    holding.setType(sh.getType());
+    // Lenient on purpose: the vendor's code set is wider than the vocabulary, so an unmapped code arrives untyped.
+    holding.setType(HoldingType.fromCodeOrNull(sh.getType()));
     holding.setValue(sh.getMarketValue());
     // SM returns weighting on a percent (0-100) scale; the calculation expects a unitless ratio (0-1).
     holding.setWeight(BigDecimalUtils.percentageToRatio(sh.getWeighting()));

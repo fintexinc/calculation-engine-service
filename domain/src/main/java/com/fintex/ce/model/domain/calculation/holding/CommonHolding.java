@@ -1,5 +1,6 @@
 package com.fintex.ce.model.domain.calculation.holding;
 
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import java.math.BigDecimal;
@@ -13,11 +14,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CommonHolding {
 
-  public static final String EQUITY_TYPE = "E";
+  public static final HoldingType EQUITY_TYPE = HoldingType.E;
 
   private String name;
   private String companyName;
-  private String type;
+  /** Provider's holding-type code; null when SM saw a code outside the {@link HoldingType} vocabulary. */
+  private HoldingType type;
   private BigDecimal value;
   private List<CommonHolding> underlyingHoldings;
   /**
@@ -29,7 +31,7 @@ public class CommonHolding {
   private BigDecimal weight;
 
   public HoldingAggregator aggregator() {
-    if (EQUITY_TYPE.equalsIgnoreCase(type) && companyName != null && !companyName.isEmpty()) {
+    if (type == EQUITY_TYPE && companyName != null && !companyName.isEmpty()) {
       return new HoldingAggregator(null, companyName);
     }
     return new HoldingAggregator(name, null);

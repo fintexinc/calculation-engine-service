@@ -1,5 +1,7 @@
 package com.fintex.ce.model.dto.command;
 
+import com.fintex.wm.commons.domain.holding.HoldingType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Set;
@@ -13,6 +15,6 @@ import lombok.ToString;
 public class TopCommonHoldingsCommand extends PortfolioHoldingsCommand {
   @Schema(description = "Maximum number of top common holdings to return")
   private Integer numOfTopCommonHoldings;
-  @Schema(description = "Holding types to accumulate in the analysis")
-  private Set<String> accumulateHoldingTypes;
+  @Schema(description = "Holding types to accumulate in the analysis; defaults to the configured set when absent")
+  private Set<HoldingType> accumulateHoldingTypes;
 }

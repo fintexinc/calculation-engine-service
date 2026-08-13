@@ -19,14 +19,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
 
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -91,9 +97,43 @@ public class GlobalExceptionHandler {
     if (cause != null) {
       return handlePceException(cause);
     }
-    log.error("Request body is missing or unreadable", e);
-    Notification notification = ErrorCode.BAD_INPUT.toNotification();
+    Notification notification = valueOutsideVocabulary(e).orElseGet(() -> {
+      log.error("Request body is missing or unreadable", e);
+      return ErrorCode.BAD_INPUT.toNotification();
+    });
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(List.of(notification)));
+  }
+
+  /**
+   * A value outside a closed vocabulary is answered with the field that carries it and the values it accepts, instead
+   * of the generic unreadable-body code. A request can hold several typed fields, so "bad input data" leaves the caller
+   * guessing which one it got wrong and what the alternatives are — and for an enum both are known exactly. Anything
+   * other than an enum target keeps the generic answer: there the parser is objecting to syntax, not to a value outside
+   * a known set.
+   */
+  private static Optional<Notification> valueOutsideVocabulary(HttpMessageNotReadableException e) {
+    if (!(e.getCause() instanceof InvalidFormatException invalid)
+        || invalid.getTargetType() == null
+        || !invalid.getTargetType().isEnum()) {
+      return Optional.empty();
+    }
+    String field = fieldPath(invalid);
+    String allowed = Arrays.stream(invalid.getTargetType().getEnumConstants())
+        .map(String::valueOf)
+        .collect(Collectors.joining(", "));
+    log.warn("Rejected value '{}' for field '{}', which accepts: {}", invalid.getValue(), field, allowed);
+    return Optional.of(ErrorCode.FIELD_VALUE_NOT_ALLOWED.toNotificationForField(field, field, allowed));
+  }
+
+  /**
+   * The dotted path Jackson walked to the offending value, with collection indices left out: the field is what a caller
+   * can act on, and an index into a set it sent is noise.
+   */
+  private static String fieldPath(InvalidFormatException invalid) {
+    return invalid.getPath().stream()
+        .map(JsonMappingException.Reference::getFieldName)
+        .filter(Objects::nonNull)
+        .collect(Collectors.joining("."));
   }
 
   @ExceptionHandler(IllegalArgumentException.class)

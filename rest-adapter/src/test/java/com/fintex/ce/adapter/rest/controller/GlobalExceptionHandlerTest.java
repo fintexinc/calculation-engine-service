@@ -53,7 +53,7 @@ class GlobalExceptionHandlerTest {
 
   @Test
   void calculationException_returnsMatchingHttpStatus() {
-    CalculationException exception = ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX.toException();
+    CalculationException exception = ErrorCode.GIC_HOLDING_NAME_EMPTY.toException();
 
     ResponseEntity<ErrorResponse> response = handler.handlePceException(exception);
 
@@ -61,7 +61,7 @@ class GlobalExceptionHandlerTest {
     assertThat(response.getBody()).isNotNull();
     assertThat(response.getBody().getNotifications()).hasSize(1);
     Notification notification = response.getBody().getNotifications().get(0);
-    assertThat(notification.getCode()).isEqualTo(ErrorCode.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX.getCode());
+    assertThat(notification.getCode()).isEqualTo(ErrorCode.GIC_HOLDING_NAME_EMPTY.getCode());
     assertThat(notification.getSeverity()).isEqualTo(Severity.ERROR);
   }
 

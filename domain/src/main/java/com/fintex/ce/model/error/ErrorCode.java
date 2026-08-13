@@ -793,14 +793,6 @@ public enum ErrorCode {
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),
 
-  ACCUMULATE_HOLDING_TYPES_EXCEED_MAX(
-      Codes.ACCUMULATE_HOLDING_TYPES_EXCEED_MAX,
-      "AccumulateHoldingTypes can contain a maximum of 12 holding types",
-      "Too many holding types were requested for accumulation",
-      "Reduce the number of accumulate holding types to 12 or fewer",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
   GIC_HOLDING_NAME_EMPTY(
       Codes.GIC_HOLDING_NAME_EMPTY,
       "Name parameter for GicHolding can not be empty.",
@@ -1013,6 +1005,14 @@ public enum ErrorCode {
       "%s must not be empty",
       "A required field is empty",
       "Provide a non-empty value for the indicated field",
+      HttpStatus.BAD_REQUEST,
+      Severity.ERROR),
+
+  FIELD_VALUE_NOT_ALLOWED(
+      Codes.FIELD_VALUE_NOT_ALLOWED,
+      "%s must be one of: %s",
+      "A field carries a value outside the vocabulary it accepts",
+      "Send one of the listed values for the indicated field",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR);
 
@@ -1259,7 +1259,6 @@ public enum ErrorCode {
 
     // Top Common Holdings
     public static final String HOLDING_MISSING_UNDERLYING_HOLDINGS = "TCH-001";
-    public static final String ACCUMULATE_HOLDING_TYPES_EXCEED_MAX = "TCH-003";
     public static final String GIC_HOLDING_NAME_EMPTY = "TCH-005";
     public static final String HOLDING_MISSING_WEIGHTING_FROM_FDS = "TCH-006";
 
@@ -1299,5 +1298,6 @@ public enum ErrorCode {
     public static final String FIELD_NOT_NULL = "VAL-001";
     public static final String FIELD_NOT_BLANK = "VAL-002";
     public static final String FIELD_NOT_EMPTY = "VAL-003";
+    public static final String FIELD_VALUE_NOT_ALLOWED = "VAL-005";
   }
 }
