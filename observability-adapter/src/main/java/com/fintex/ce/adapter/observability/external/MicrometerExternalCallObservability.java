@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.observability.external;
 
 import com.fintex.ce.port.observability.ExternalCallObservability;
-import com.fintex.ce.port.observability.ExternalService;
+import com.fintex.wm.commons.domain.ExternalWebService;
 
 import org.springframework.stereotype.Component;
 
@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>
  * One meter name per measurement, dimensioned by the {@code external.service} and {@code endpoint} tags, so a single
  * dashboard or alert covers every provider and adding a provider needs no new query. Tag values come from
- * {@link ExternalService}, {@link ExternalCallOutcome} and the endpoint templates the callers pass, so cardinality is
- * bounded by construction.
+ * {@link ExternalWebService}, {@link ExternalCallOutcome} and the endpoint templates the callers pass, so cardinality
+ * is bounded by construction.
  *
  * <p>
  * {@code error.type} follows the OpenTelemetry convention and always carries an exception type, never a status code;
@@ -67,7 +67,7 @@ public class MicrometerExternalCallObservability implements ExternalCallObservab
   }
 
   @Override
-  public ExternalCall start(ExternalService service, String httpMethod, String endpoint) {
+  public ExternalCall start(ExternalWebService service, String httpMethod, String endpoint) {
     return new MicrometerExternalCall(service, valueOrUnknown(httpMethod), endpointTag(endpoint));
   }
 
@@ -114,7 +114,7 @@ public class MicrometerExternalCallObservability implements ExternalCallObservab
     private final long startNanos = System.nanoTime();
     private final AtomicBoolean outcomeReported = new AtomicBoolean();
 
-    private MicrometerExternalCall(ExternalService service, String httpMethod, String endpoint) {
+    private MicrometerExternalCall(ExternalWebService service, String httpMethod, String endpoint) {
       this.endpointTags = Tags.of(SERVICE_TAG, service.id(), ENDPOINT_TAG, endpoint);
       this.callTags = endpointTags.and(METHOD_TAG, httpMethod);
     }

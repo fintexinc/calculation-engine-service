@@ -1,18 +1,18 @@
 package com.fintex.ce.adapter.webclient.sm.client;
 
 import com.fintex.ce.adapter.webclient.observability.ResponseItemCount;
+import com.fintex.ce.adapter.webclient.resilience.ExternalCallErrorMapper;
+import com.fintex.ce.adapter.webclient.resilience.ExternalCallResilience;
 import com.fintex.ce.model.error.exceptions.ExternalServiceBadResponseException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
 import com.fintex.ce.port.observability.ExternalCallObservability;
 import com.fintex.ce.port.observability.ExternalCallObservability.ExternalCall;
-import com.fintex.ce.port.observability.ExternalService;
+import com.fintex.wm.commons.domain.ExternalWebService;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 
@@ -26,17 +26,26 @@ import reactor.core.publisher.Mono;
 
 /**
  * Generic WebClient for Security Master API calls. Provides generic HTTP methods that can be used by specific fetchers.
- * Failures are split by cause:
+ * Every call runs through {@link ExternalCallResilience}: transient failures — transport errors, timeouts, 5xx, 408 and
+ * 429 — are retried and counted against the circuit breaker, while any other 4xx fails straight through as this
+ * service's own bug. Failures of the whole logical call are then split by cause:
  * <ul>
  * <li>4xx response → {@link ExternalServiceBadResponseException} (HTTP 502 Bad Gateway)</li>
- * <li>5xx response or transport/connection error → {@link ExternalServiceUnavailableException} (HTTP 503 Service
- * Unavailable)</li>
+ * <li>5xx response, transport/connection error or an open circuit breaker → {@link ExternalServiceUnavailableException}
+ * (HTTP 503 Service Unavailable)</li>
  * </ul>
  *
  * <p>
+ * Retries apply to POST as well as GET. That is safe here only because Security Master's POST endpoints are read-only
+ * queries — POST carries a request body too large for a URL, it never mutates state. An endpoint that does mutate state
+ * must not be called through this client without revisiting that assumption, since a retried mutation is a duplicate
+ * one.
+ *
+ * <p>
  * Every call is reported to {@link ExternalCallObservability}. The outcome is filed by this class rather than by the
- * fetchers above it, so that no call can go unreported, and the upstream status is filed from the one place that sees
- * the raw response — the error handler — before it is mapped to a domain exception.
+ * fetchers above it, so that no call can go unreported. The raw status stays visible until the resilience operators
+ * have run out of attempts, so the mapping to a domain exception — and the filing of the upstream status — happens
+ * exactly once, for the final outcome of the logical call rather than for every attempt.
  */
 @Slf4j
 @Component
@@ -44,11 +53,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class SecurityMasterWebClient {
 
-  private static final String SERVICE_NAME = "Security Master";
   private static final String GET = HttpMethod.GET.name();
   private static final String POST = HttpMethod.POST.name();
 
   private final WebClient smWebClient;
+  private final ExternalCallResilience securityMasterCallResilience;
   private final ExternalCallObservability observability;
 
   /**
@@ -57,14 +66,11 @@ public class SecurityMasterWebClient {
   public <T, R> R post(String path, T request, ParameterizedTypeReference<R> responseType) {
     return observe(POST, path, call -> {
       log.debug("POST request to: {}", path);
-      R result = smWebClient.post()
+      R result = execute(path, call, smWebClient.post()
           .uri(path)
           .bodyValue(request)
           .retrieve()
-          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response, call))
-          .bodyToMono(responseType)
-          .onErrorMap(SecurityMasterWebClient::handleError)
-          .block();
+          .bodyToMono(responseType));
       log.debug("POST response from: {} - status OK", path);
       return result;
     });
@@ -85,13 +91,10 @@ public class SecurityMasterWebClient {
   public <R> R get(String path, Map<String, ?> queryParams, Class<R> responseType) {
     return observe(GET, path, call -> {
       log.debug("GET request to: {} params={}", path, queryParams);
-      R result = smWebClient.get()
+      R result = execute(path, call, smWebClient.get()
           .uri(uriBuilder -> buildUri(uriBuilder, path, queryParams))
           .retrieve()
-          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response, call))
-          .bodyToMono(responseType)
-          .onErrorMap(SecurityMasterWebClient::handleError)
-          .block();
+          .bodyToMono(responseType));
       log.debug("GET response from: {} - status OK", path);
       return result;
     });
@@ -103,20 +106,24 @@ public class SecurityMasterWebClient {
   public <R> R get(String path, ParameterizedTypeReference<R> responseType) {
     return observe(GET, path, call -> {
       log.debug("GET request to: {}", path);
-      R result = smWebClient.get()
+      R result = execute(path, call, smWebClient.get()
           .uri(path)
           .retrieve()
-          .onStatus(HttpStatusCode::isError, response -> handleErrorResponse(path, response, call))
-          .bodyToMono(responseType)
-          .onErrorMap(SecurityMasterWebClient::handleError)
-          .block();
+          .bodyToMono(responseType));
       log.debug("GET response from: {} - status OK", path);
       return result;
     });
   }
 
+  private <R> R execute(String path, ExternalCall call, Mono<R> request) {
+    return securityMasterCallResilience.decorate(request)
+        .onErrorMap(error -> ExternalCallErrorMapper.toDomainError(ExternalWebService.SECURITY_MASTER, path, error,
+            call))
+        .block();
+  }
+
   private <R> R observe(String httpMethod, String path, Function<ExternalCall, R> action) {
-    ExternalCall call = observability.start(ExternalService.SECURITY_MASTER, httpMethod, path);
+    ExternalCall call = observability.start(ExternalWebService.SECURITY_MASTER, httpMethod, path);
     try {
       R result = action.apply(call);
       call.completed(ResponseItemCount.of(result));
@@ -137,23 +144,4 @@ public class SecurityMasterWebClient {
     return b.build();
   }
 
-  private static Mono<Throwable> handleErrorResponse(String path, ClientResponse response, ExternalCall call) {
-    HttpStatusCode status = response.statusCode();
-    return response.bodyToMono(String.class)
-        .defaultIfEmpty("")
-        .flatMap(body -> {
-          log.error("Security Master API error: {} {} - {}", path, status, body);
-          Throwable error = status.is4xxClientError()
-              ? new ExternalServiceBadResponseException(SERVICE_NAME)
-              : new ExternalServiceUnavailableException(SERVICE_NAME);
-          call.httpFailed(status.value(), error);
-          return Mono.error(error);
-        });
-  }
-
-  private static Throwable handleError(Throwable error) {
-    return error instanceof ExternalServiceBadResponseException || error instanceof ExternalServiceUnavailableException
-        ? error
-        : new ExternalServiceUnavailableException(SERVICE_NAME, error);
-  }
 }

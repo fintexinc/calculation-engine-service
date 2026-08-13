@@ -1,5 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.integration;
 
+import com.fintex.ce.adapter.webclient.resilience.ExternalCallResilienceConfig;
 import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterWebClientConfig;
 import com.fintex.ce.adapter.webclient.sm.fetcher.SecurityAttributeFetcherConfig;
 import com.fintex.ce.port.observability.ExternalCallObservability;
@@ -26,7 +27,8 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootConfiguration
 @EnableAutoConfiguration
-@Import({SecurityMasterWebClientConfig.class, SecurityAttributeFetcherConfig.class})
+@Import({SecurityMasterWebClientConfig.class, SecurityAttributeFetcherConfig.class,
+    ExternalCallResilienceConfig.class})
 @ComponentScan(basePackages = {"com.fintex.ce.adapter.webclient.sm.client",
     "com.fintex.ce.adapter.webclient.sm.fetcher",
     "com.fintex.ce.adapter.webclient.observability",
