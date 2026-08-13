@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.observability.external;
 
 import com.fintex.ce.port.observability.ExternalCallObservability.ExternalCall;
-import com.fintex.ce.port.observability.ExternalService;
+import com.fintex.wm.commons.domain.ExternalWebService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,9 +26,9 @@ class MicrometerExternalCallObservabilityTest {
 
   @Test
   void shouldReportSuccessWithNoError_whenProviderReturnedItems() {
-    observability.start(ExternalService.BANK_OF_CANADA, GET, BOC_ENDPOINT).completed(22);
+    observability.start(ExternalWebService.BANK_OF_CANADA, GET, BOC_ENDPOINT).completed(22);
 
-    Timer timer = requestTimer(ExternalCallOutcome.SUCCESS, ExternalService.BANK_OF_CANADA, BOC_ENDPOINT);
+    Timer timer = requestTimer(ExternalCallOutcome.SUCCESS, ExternalWebService.BANK_OF_CANADA, BOC_ENDPOINT);
     assertThat(timer).isNotNull();
     assertThat(timer.count()).isEqualTo(1);
     assertThat(timer.getId().getTag(MicrometerExternalCallObservability.METHOD_TAG)).isEqualTo(GET);
@@ -44,39 +44,39 @@ class MicrometerExternalCallObservabilityTest {
    */
   @Test
   void shouldReportEmptyApartFromSuccess_whenProviderReturnedNoItems() {
-    observability.start(ExternalService.SECURITY_MASTER, GET, SM_ENDPOINT).completed(0);
+    observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT).completed(0);
 
-    assertThat(requestTimer(ExternalCallOutcome.EMPTY, ExternalService.SECURITY_MASTER, SM_ENDPOINT))
+    assertThat(requestTimer(ExternalCallOutcome.EMPTY, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT))
         .isNotNull();
-    assertThat(requestTimer(ExternalCallOutcome.SUCCESS, ExternalService.SECURITY_MASTER, SM_ENDPOINT))
+    assertThat(requestTimer(ExternalCallOutcome.SUCCESS, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT))
         .as("an empty payload must not be able to hide inside the success count")
         .isNull();
   }
 
   @Test
   void shouldRecordResultSizePerServiceAndEndpoint_whenProvidersReturnItems() {
-    observability.start(ExternalService.BANK_OF_CANADA, GET, BOC_ENDPOINT + "?start_date=2024-01-01").completed(22);
-    observability.start(ExternalService.BANK_OF_CANADA, GET, BOC_ENDPOINT + "?start_date=2024-02-01").completed(0);
-    observability.start(ExternalService.SECURITY_MASTER, GET, SM_ENDPOINT).completed(7);
+    observability.start(ExternalWebService.BANK_OF_CANADA, GET, BOC_ENDPOINT + "?start_date=2024-01-01").completed(22);
+    observability.start(ExternalWebService.BANK_OF_CANADA, GET, BOC_ENDPOINT + "?start_date=2024-02-01").completed(0);
+    observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT).completed(7);
 
-    DistributionSummary bocSizes = resultSize(ExternalService.BANK_OF_CANADA, BOC_ENDPOINT);
+    DistributionSummary bocSizes = resultSize(ExternalWebService.BANK_OF_CANADA, BOC_ENDPOINT);
     assertThat(bocSizes).isNotNull();
     assertThat(bocSizes.count())
         .as("the query string must not split one endpoint into two meters")
         .isEqualTo(2);
     assertThat(bocSizes.totalAmount()).isEqualTo(22.0);
 
-    DistributionSummary smSizes = resultSize(ExternalService.SECURITY_MASTER, SM_ENDPOINT);
+    DistributionSummary smSizes = resultSize(ExternalWebService.SECURITY_MASTER, SM_ENDPOINT);
     assertThat(smSizes).isNotNull();
     assertThat(smSizes.totalAmount()).isEqualTo(7.0);
   }
 
   @Test
   void shouldReportErrorWithoutAStatus_whenNothingCameBackFromTheProvider() {
-    observability.start(ExternalService.SECURITY_MASTER, GET, SM_ENDPOINT)
+    observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT)
         .failed(new IllegalStateException("connection reset"));
 
-    Timer timer = requestTimer(ExternalCallOutcome.ERROR, ExternalService.SECURITY_MASTER, SM_ENDPOINT);
+    Timer timer = requestTimer(ExternalCallOutcome.ERROR, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT);
     assertThat(timer).isNotNull();
     assertThat(timer.getId().getTag(MicrometerExternalCallObservability.ERROR_TYPE_TAG))
         .isEqualTo(IllegalStateException.class.getSimpleName());
@@ -92,10 +92,10 @@ class MicrometerExternalCallObservabilityTest {
   @ParameterizedTest
   @ValueSource(ints = {400, 404, 429, 500, 503})
   void shouldReportHttpErrorWithTheRealStatus_whenProviderReturnedAnErrorResponse(int status) {
-    observability.start(ExternalService.SECURITY_MASTER, GET, SM_ENDPOINT)
+    observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT)
         .httpFailed(status, new IllegalArgumentException("mapped to a domain exception by the client"));
 
-    Timer timer = requestTimer(ExternalCallOutcome.HTTP_ERROR, ExternalService.SECURITY_MASTER, SM_ENDPOINT);
+    Timer timer = requestTimer(ExternalCallOutcome.HTTP_ERROR, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT);
     assertThat(timer).isNotNull();
     assertThat(timer.getId().getTag(MicrometerExternalCallObservability.STATUS_TAG))
         .as("the status must be the one the provider actually returned, not a stand-in")
@@ -112,13 +112,13 @@ class MicrometerExternalCallObservabilityTest {
    */
   @Test
   void shouldKeepTheFirstOutcome_whenTheMappedExceptionFollowsAReportedStatus() {
-    ExternalCall call = observability.start(ExternalService.SECURITY_MASTER, GET, SM_ENDPOINT);
+    ExternalCall call = observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT);
     call.httpFailed(503, new IllegalStateException("mapped by the client"));
     call.failed(new IllegalStateException("the same failure, propagating"));
 
-    assertThat(requestTimer(ExternalCallOutcome.HTTP_ERROR, ExternalService.SECURITY_MASTER, SM_ENDPOINT).count())
+    assertThat(requestTimer(ExternalCallOutcome.HTTP_ERROR, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT).count())
         .isEqualTo(1);
-    assertThat(requestTimer(ExternalCallOutcome.ERROR, ExternalService.SECURITY_MASTER, SM_ENDPOINT))
+    assertThat(requestTimer(ExternalCallOutcome.ERROR, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT))
         .as("a response the provider did return must not also be counted as one that never arrived")
         .isNull();
     assertThat(meterRegistry.find(MicrometerExternalCallObservability.REQUEST_METER).timers())
@@ -130,7 +130,7 @@ class MicrometerExternalCallObservabilityTest {
   @NullAndEmptySource
   @ValueSource(strings = {"   "})
   void shouldTagMethodAndEndpointAsUnknown_whenTheyAreMissing(String missing) {
-    observability.start(ExternalService.SECURITY_MASTER, missing, missing).completed(1);
+    observability.start(ExternalWebService.SECURITY_MASTER, missing, missing).completed(1);
 
     Timer timer = meterRegistry.find(MicrometerExternalCallObservability.REQUEST_METER)
         .tag(MicrometerExternalCallObservability.METHOD_TAG, MicrometerExternalCallObservability.UNKNOWN)
@@ -146,7 +146,7 @@ class MicrometerExternalCallObservabilityTest {
         .isEmpty();
   }
 
-  private Timer requestTimer(ExternalCallOutcome outcome, ExternalService service, String endpoint) {
+  private Timer requestTimer(ExternalCallOutcome outcome, ExternalWebService service, String endpoint) {
     return meterRegistry.find(MicrometerExternalCallObservability.REQUEST_METER)
         .tag(MicrometerExternalCallObservability.SERVICE_TAG, service.id())
         .tag(MicrometerExternalCallObservability.ENDPOINT_TAG, endpoint)
@@ -154,7 +154,7 @@ class MicrometerExternalCallObservabilityTest {
         .timer();
   }
 
-  private DistributionSummary resultSize(ExternalService service, String endpoint) {
+  private DistributionSummary resultSize(ExternalWebService service, String endpoint) {
     return meterRegistry.find(MicrometerExternalCallObservability.RESULT_SIZE_METER)
         .tag(MicrometerExternalCallObservability.SERVICE_TAG, service.id())
         .tag(MicrometerExternalCallObservability.ENDPOINT_TAG, endpoint)

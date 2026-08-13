@@ -1,5 +1,7 @@
 package com.fintex.ce.port.observability;
 
+import com.fintex.wm.commons.domain.ExternalWebService;
+
 /**
  * How this service reports an outbound call to an external data provider. Clients report what only they can know —
  * whether the response carried usable data, how many items came back and how the call failed — and stay free of any
@@ -41,7 +43,7 @@ public interface ExternalCallObservability {
    * Begins observing a call. The endpoint must be the templated path, or one whose dynamic segments are bounded by an
    * enum, rather than an expanded one, so that the number of distinct values it can take stays bounded.
    */
-  ExternalCall start(ExternalService service, String httpMethod, String endpoint);
+  ExternalCall start(ExternalWebService service, String httpMethod, String endpoint);
 
   /**
    * A call in flight, carrying the provider, method and endpoint settled at {@link #start} so an outcome can never be
