@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.service;
 
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.application.config.TopHoldingsProperties;
-import com.fintex.ce.application.constant.AccumulateHoldingType;
 import com.fintex.ce.model.domain.calculation.holding.CommonHolding;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -14,6 +13,7 @@ import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -57,7 +57,7 @@ class CommonHoldingsServiceTest {
     });
     HoldingCurrencyConverter converter = new HoldingCurrencyConverter(fxRateService, new FxProperties());
     properties = new TopHoldingsProperties();
-    properties.setAccumulateTypes(EnumSet.of(AccumulateHoldingType.E));
+    properties.setAccumulateTypes(EnumSet.of(HoldingType.E));
     service = new CommonHoldingsService(converter, properties);
   }
 
@@ -150,14 +150,14 @@ class CommonHoldingsServiceTest {
 
   private static Stream<Arguments> fundOrEtfWithoutUnderlyingHoldings() {
     CommonHolding fund = equityHolding("Underlying Fund", "1.0");
-    fund.setType("FO");
+    fund.setType(HoldingType.FO);
 
     CommonHolding etf = equityHolding("Underlying ETF", "1.0");
-    etf.setType("EX");
+    etf.setType(HoldingType.EX);
     etf.setUnderlyingHoldings(List.of());
 
     CommonHolding namelessFund = new CommonHolding();
-    namelessFund.setType("FO");
+    namelessFund.setType(HoldingType.FO);
     namelessFund.setWeight(BigDecimal.ONE);
 
     return Stream.of(
@@ -171,7 +171,7 @@ class CommonHoldingsServiceTest {
     properties.setMaxLeavesPerHolding(1);
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding fund = equityHolding("Underlying Fund", "0.5");
-    fund.setType("FO");
+    fund.setType(HoldingType.FO);
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD,
         equityHolding("First Equity", "0.5"), fund));
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
@@ -190,6 +190,7 @@ class CommonHoldingsServiceTest {
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getCommonHoldings()).hasSize(1);
     assertThat(result.getCommonHoldings().getFirst().getName()).isEqualTo("Nested Equity");
+    assertThat(result.getCommonHoldings().getFirst().getHoldingType()).isEqualTo(HoldingType.E);
     assertThat(result.getCommonHoldings().getFirst().getAllocation()).isEqualByComparingTo(BigDecimal.ONE);
   }
 
@@ -198,13 +199,13 @@ class CommonHoldingsServiceTest {
     properties.setMaxRecursionDepth(1);
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding level1Fund = equityHolding("Level1 Fund", "1.0");
-    level1Fund.setType("FO");
+    level1Fund.setType(HoldingType.FO);
     CommonHolding level0Fund = equityHolding("Level0 Fund", "1.0");
-    level0Fund.setType("FO");
+    level0Fund.setType(HoldingType.FO);
     level0Fund.setUnderlyingHoldings(List.of(level1Fund));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, level0Fund));
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
-    command.setAccumulateHoldingTypes(Set.of("FO"));
+    command.setAccumulateHoldingTypes(Set.of(HoldingType.FO));
 
     TopCommonHoldingsResult result = service.perform(command, mic);
 
@@ -212,6 +213,27 @@ class CommonHoldingsServiceTest {
     assertThat(result.getCommonHoldings()).hasSize(1);
     assertThat(result.getCommonHoldings().getFirst().getName()).isEqualTo("Level1 Fund");
     assertThat(result.getCommonHoldings().getFirst().getAllocation()).isEqualByComparingTo(BigDecimal.ONE);
+  }
+
+  /**
+   * The descent predicate must read the shared vocabulary rather than the shape of the code: a type the vocabulary does
+   * not mark as nesting, and one MIC therefore never resolves underlying holdings for, counts as a leaf instead of
+   * failing the whole portfolio with TCH-001.
+   */
+  @Test
+  void shouldTreatHoldingAsLeaf_whenTheVocabularyDoesNotMarkItsTypeAsNesting() {
+    PortfolioHolding parent = etfHolding("AAA", 1000);
+    CommonHolding nonNestingCode = equityHolding("Non-nesting P", "0.5");
+    nonNestingCode.setType(HoldingType.P);
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent,
+        topHoldings(Currency.CAD, nonNestingCode, equityHolding("Nested Equity", "0.5")));
+
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), mic);
+
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getCommonHoldings()).hasSize(1);
+    assertThat(result.getCommonHoldings().getFirst().getName()).isEqualTo("Nested Equity");
+    assertThat(result.getCommonHoldings().getFirst().getAllocation()).isEqualByComparingTo(new BigDecimal("0.5"));
   }
 
   @Test
@@ -266,16 +288,24 @@ class CommonHoldingsServiceTest {
     assertThat(result.getCommonHoldings().get(0).getAllocation()).isEqualByComparingTo("1.0");
   }
 
+  /**
+   * Configured with the same six codes production ships, rather than with every {@link HoldingType}: the point is that
+   * the configured subset decides. {@code BG} is agency MBS — a real code the dictionary knows and this subset excludes
+   * — and {@code null} is how a code outside the vocabulary arrives, so the two false cases separate "not configured"
+   * from "not a holding type".
+   */
   @ParameterizedTest(name = "[{index}] type={0} accumulated={1}")
-  @CsvSource({
-      "E,  true",
-      "B,  true",
-      "BC, true",
-      "ER, true",
-      "X,  false"
+  @CsvSource(nullValues = "null", value = {
+      "E,    true",
+      "B,    true",
+      "BC,   true",
+      "ER,   true",
+      "BG,   false",
+      "null, false"
   })
-  void shouldHonourAccumulateTypesFromYaml(String type, boolean accumulated) {
-    properties.setAccumulateTypes(EnumSet.allOf(AccumulateHoldingType.class));
+  void shouldHonourAccumulateTypesFromYaml(HoldingType type, boolean accumulated) {
+    properties.setAccumulateTypes(EnumSet.of(HoldingType.E, HoldingType.ER, HoldingType.B, HoldingType.BC,
+        HoldingType.BD, HoldingType.BT));
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding leaf = equityHolding("Alpha Corp", "1.0");
     leaf.setType(type);
@@ -286,19 +316,27 @@ class CommonHoldingsServiceTest {
     assertThat(result.getCommonHoldings()).hasSize(accumulated ? 1 : 0);
   }
 
+  /**
+   * The truth table of the descent predicate, and it is the shared vocabulary's, not the shape of the code: {@code FD}
+   * is an {@code F*} code the dictionary knows and flags as non-nesting, {@code null} is how a code outside the
+   * dictionary arrives — and the regex this replaced descended into both.
+   */
   @ParameterizedTest(name = "[{index}] type={0} descend={1}")
-  @CsvSource({
-      "FO, true",
-      "FE, true",
-      "FS, true",
-      "FX, true",
-      "F,  true",
-      "EX, true",
-      "E,  false",
-      "B,  false",
-      "X,  false"
+  @CsvSource(nullValues = "null", value = {
+      "FC,   true",
+      "FE,   true",
+      "FH,   true",
+      "FM,   true",
+      "FO,   true",
+      "FS,   true",
+      "FV,   true",
+      "EX,   true",
+      "FD,   false",
+      "E,    false",
+      "B,    false",
+      "null, false"
   })
-  void shouldDescend_onlyForFundLikeAndExchangeTypes(String childType, boolean shouldDescend) {
+  void shouldDescend_onlyForTypesTheVocabularyMarksAsNesting(HoldingType childType, boolean shouldDescend) {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding deepEquity = equityHolding("Deep Equity", "1.0");
     CommonHolding middle = equityHolding("Middle", "0.5");
@@ -311,7 +349,7 @@ class CommonHoldingsServiceTest {
     if (shouldDescend) {
       assertThat(result.getCommonHoldings()).extracting(TopCommonHoldingData::getName)
           .containsExactly("Deep Equity");
-    } else if ("E".equals(childType)) {
+    } else if (childType == HoldingType.E) {
       // Middle node IS an equity and accumulated as a leaf itself.
       assertThat(result.getCommonHoldings()).extracting(TopCommonHoldingData::getName)
           .containsExactly("Middle");
@@ -327,10 +365,10 @@ class CommonHoldingsServiceTest {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding deepEquity = equityHolding("Deep Equity", "0.9");
     CommonHolding level1Fund = equityHolding("Level1 Fund", "1.0");
-    level1Fund.setType("FO");
+    level1Fund.setType(HoldingType.FO);
     level1Fund.setUnderlyingHoldings(List.of(deepEquity));
     CommonHolding level0Fund = equityHolding("Level0 Fund", "1.0");
-    level0Fund.setType("FO");
+    level0Fund.setType(HoldingType.FO);
     level0Fund.setUnderlyingHoldings(List.of(level1Fund));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, level0Fund));
 
@@ -345,10 +383,10 @@ class CommonHoldingsServiceTest {
   void shouldDetectCycle_whenChildIdentifierMatchesAncestor() {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding cycleChild = equityHolding("Cycle Child", "1.0");
-    cycleChild.setType("FO");
+    cycleChild.setType(HoldingType.FO);
     cycleChild.setPrimaryIdentifier(new SecurityIdentifier("CYCLE", FiIdentifierType.MORNINGSTAR_ID));
     CommonHolding ancestor = equityHolding("Cycle Ancestor", "1.0");
-    ancestor.setType("FO");
+    ancestor.setType(HoldingType.FO);
     ancestor.setPrimaryIdentifier(new SecurityIdentifier("CYCLE", FiIdentifierType.MORNINGSTAR_ID));
     ancestor.setUnderlyingHoldings(List.of(cycleChild));
     cycleChild.setUnderlyingHoldings(List.of(ancestor));
@@ -390,13 +428,13 @@ class CommonHoldingsServiceTest {
 
   private static Stream<Arguments> missingNameAndCompanyNameCases() {
     CommonHolding nullNameAndCompany = new CommonHolding();
-    nullNameAndCompany.setType("E");
+    nullNameAndCompany.setType(HoldingType.E);
     nullNameAndCompany.setWeight(new BigDecimal("0.5"));
 
     CommonHolding emptyNameAndCompany = new CommonHolding();
     emptyNameAndCompany.setName("");
     emptyNameAndCompany.setCompanyName("");
-    emptyNameAndCompany.setType("E");
+    emptyNameAndCompany.setType(HoldingType.E);
     emptyNameAndCompany.setWeight(new BigDecimal("0.5"));
 
     return Stream.of(
@@ -486,7 +524,7 @@ class CommonHoldingsServiceTest {
     CommonHolding h = new CommonHolding();
     h.setName(name);
     h.setCompanyName(name);
-    h.setType("E");
+    h.setType(HoldingType.E);
     h.setWeight(new BigDecimal(weight));
     return h;
   }
