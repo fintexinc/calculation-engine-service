@@ -10,7 +10,8 @@ public enum CountryRegionType {
   CANADA("Canada"),
   UNITED_STATES("United States"),
   INTERNATIONAL_DEVELOPED("International-Developed"),
-  EMERGING_MARKET("Emerging Market");
+  EMERGING_MARKET("Emerging Market"),
+  OTHER("Other");
 
   private final String region;
 
