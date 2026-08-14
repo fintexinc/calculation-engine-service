@@ -54,6 +54,22 @@ class FixedIncomeCountryExposureServiceTest {
     assertThat(result.getWarnings()).isEmpty();
   }
 
+  @Test
+  void shouldBucketSupranationalIntoOther_whenNonCountryExposurePresent() {
+    var bond = bond("XBB", "100");
+    var data = Map.of(bond, exposure(Map.of(
+        Country.CANADA, new BigDecimal("0.6"),
+        Country.USA, new BigDecimal("0.2"),
+        Country.SUPRANATIONAL, new BigDecimal("0.2"))));
+
+    var result = service.perform(command(bond), data);
+
+    assertThat(result.getCountryExposure().get(CountryRegionType.CANADA)).isEqualByComparingTo("0.6");
+    assertThat(result.getCountryExposure().get(CountryRegionType.UNITED_STATES)).isEqualByComparingTo("0.2");
+    assertThat(result.getCountryExposure().get(CountryRegionType.OTHER)).isEqualByComparingTo("0.2");
+    assertThat(result.getWarnings()).isEmpty();
+  }
+
   /**
    * TMI-552: unified with the other breakdowns, fixed-income country exposure now normalizes to 100% (previously it
    * surfaced the raw weighted values without rescaling).
