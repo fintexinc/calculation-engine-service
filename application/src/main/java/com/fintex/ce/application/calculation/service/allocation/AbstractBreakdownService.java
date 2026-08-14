@@ -16,6 +16,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static com.fintex.ce.application.util.CalculationUtils.reScale;
 import static com.fintex.ce.application.util.DecimalUtils.toUserScale;
@@ -52,6 +53,8 @@ import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
 public abstract class AbstractBreakdownService<D, R extends BaseCalculationResult, T extends Enum<T>>
     implements
       CalculationService<PortfolioHoldingsCommand, D, R> {
+
+  private static final BigDecimal NEAR_ZERO_THRESHOLD = new BigDecimal("0.00001");
 
   protected final PortfolioWeightCalculator portfolioWeightCalculator;
   private final Class<T> bucketType;
@@ -139,6 +142,47 @@ public abstract class AbstractBreakdownService<D, R extends BaseCalculationResul
    */
   protected Map<T, BigDecimal> normalize(Map<T, BigDecimal> netProducts) {
     return reScale(netProducts);
+  }
+
+  /**
+   * Clamps aggregated values whose magnitude is below {@code 1e-5} to zero, for the metrics that report their buckets
+   * without rescaling. Morningstar carries tiny residues in buckets like {@code OTHER} or {@code CASH} for derivatives
+   * accounting and percentage-rounding offsets; surfacing them as ~1e-6 slices of a client-facing chart is noise, while
+   * real positions are always orders of magnitude larger. Metrics that rescale to 100% do not need this — the residue
+   * disappears into the denominator — so this is a {@link #postProcess} helper rather than part of the pipeline.
+   */
+  protected final Map<T, BigDecimal> denoiseNearZero(Map<T, BigDecimal> netProducts) {
+    Map<T, BigDecimal> denoised = new EnumMap<>(bucketType);
+    for (Map.Entry<T, BigDecimal> entry : netProducts.entrySet()) {
+      BigDecimal value = entry.getValue();
+      denoised.put(entry.getKey(),
+          value == null || value.abs().compareTo(NEAR_ZERO_THRESHOLD) < 0 ? BigDecimal.ZERO : value);
+    }
+    return denoised;
+  }
+
+  /**
+   * Picks which of the two data a holding may carry applies to it, for the breakdowns whose buckets arrive under one
+   * attribute for a composite security and another for an individual company — a distribution over sectors for a fund,
+   * the single sector it belongs to for a company.
+   *
+   * <p>
+   * The distribution wins only when it actually carries data, which is what {@code populated} answers. Security Master
+   * serves an allocation attribute for any security declaring even one of its columns, and every security declares
+   * {@code currency} — so a stock does come back under the distribution attribute, with its currency and no
+   * allocations. Preferring the distribution on presence alone would discard the bucket the stock does have and report
+   * it as missing data instead.
+   *
+   * <p>
+   * Absence stays absence: when neither attribute answered, the result is {@code null} and the caller reports the
+   * holding as unresolved rather than as resolved-but-undistributed. The unpopulated distribution is returned ahead of
+   * a missing fallback for the same reason — the two facts carry different warnings.
+   */
+  protected static <A> A preferPopulated(A distribution, A fallback, Predicate<A> populated) {
+    if (distribution != null && populated.test(distribution)) {
+      return distribution;
+    }
+    return fallback != null ? fallback : distribution;
   }
 
   /**

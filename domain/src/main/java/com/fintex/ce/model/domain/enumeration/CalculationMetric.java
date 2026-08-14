@@ -126,6 +126,9 @@ public enum CalculationMetric {
   @Schema(description = "Equity sector allocation breakdown")
   EQUITY_SECTOR("equity-sector", PortfolioHoldingsCommand.class),
 
+  @Schema(description = "Consolidated sector breakdown across the whole portfolio, equity and fixed income together")
+  SECTOR_EXPOSURE("sector-exposure", PortfolioHoldingsCommand.class),
+
   @Schema(description = "Equity country exposure breakdown")
   EQUITY_COUNTRY_EXPOSURE("equity-country-exposure", PortfolioHoldingsCommand.class),
 

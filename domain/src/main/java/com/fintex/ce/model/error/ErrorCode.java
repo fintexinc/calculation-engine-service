@@ -202,6 +202,14 @@ public enum ErrorCode {
       HttpStatus.OK,
       Severity.WARNING),
 
+  MISSING_SECTOR_ALLOCATION(
+      Codes.MISSING_SECTOR_ALLOCATION,
+      "The holding %s is missing values for Sector Allocation",
+      "The consolidated Sector Allocation is absent in the data provider response",
+      "Populate Sector Allocation in the source data",
+      HttpStatus.OK,
+      Severity.WARNING),
+
   MISSING_MANAGEMENT_EXPENSE_RATIO(
       Codes.MISSING_MANAGEMENT_EXPENSE_RATIO,
       "The holding %s is missing Management Expense Ratio",
@@ -1171,6 +1179,7 @@ public enum ErrorCode {
     public static final String MISSING_UNDERLYING_HOLDING_ID_VALUE = "FDS-030";
     public static final String MISSING_FIXED_INCOME_GEOGRAPHIC_EXPOSURE = "FDS-031";
     public static final String MISSING_GEOGRAPHIC_EXPOSURE = "FDS-032";
+    public static final String MISSING_SECTOR_ALLOCATION = "FDS-033";
 
     // FX
     public static final String FX_RATES_UNAVAILABLE = "FX-001";

@@ -4,6 +4,8 @@ import com.fintex.ce.model.domain.enumeration.InterestFreq;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -56,6 +58,13 @@ public final class GicHolding extends PortfolioHolding implements MonthlyReturnG
     return interestFreq;
   }
 
+  /**
+   * Derived from {@link #getTerm()}, so it is deliberately kept off the wire: a holding is an inbound request object,
+   * and both this and {@link #isLessThanOneYearOld()} throw when {@code term} is absent. Serializing them would turn a
+   * request that validation is meant to reject with a 400 ({@code NotEmptyGicTermReqValidator}) into a
+   * {@code NullPointerException} raised inside Jackson, and neither value is part of the request contract.
+   */
+  @JsonIgnore
   public AssetAllocationRegionType getAssetAllocationRegionType() {
     if (isLessThanOneYearOld()) {
       return AssetAllocationRegionType.CASH;
@@ -63,6 +72,13 @@ public final class GicHolding extends PortfolioHolding implements MonthlyReturnG
     return AssetAllocationRegionType.FIXED_INCOME;
   }
 
+  /**
+   * Left to throw on an absent {@code term} rather than defaulting: a GIC with no term is rejected at the request
+   * boundary, so reaching here without one is a wiring mistake — a metric that buckets GICs missing from
+   * {@code NotEmptyGicTermReqValidator.supportedMetrics()} — and a silent default would hide it behind a plausible
+   * bucket. See {@link #getAssetAllocationRegionType()} for why it is not serialized.
+   */
+  @JsonIgnore
   public boolean isLessThanOneYearOld() {
     return getTerm().intValue() < 365;
   }

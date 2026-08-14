@@ -86,6 +86,15 @@ Red flags — STOP and investigate the production code instead of the test:
   introduces new negatives (or only a new positive), confirm the inherited suite still supplies the other side; if the
   class extends `Abstract*` directly with no shared positive, add one. Check the executed method list
   (surefire XML), not just the concrete `.java` file, since inherited tests are invisible in the source.
+- [ ] **[correctness] Reporting values without a final rescale** (a metric whose buckets are absolute
+  proportions, so nothing normalizes the total afterwards)? Then every per-item vector you multiply a
+  share by must be normalized **locally**, in your own code. Do not rely on an upstream "it already
+  sums to 1" — check the upstream code: normalization there is often conditional (e.g. rescale only
+  when the sum is below 1), so a vector summing above 1 silently pushes the reported total past 100%.
+- [ ] **[contract/behavior] Mapping an upstream taxonomy onto your own buckets?** Keep "real exposure with
+  no bucket of its own" (vendor `Other`, `Commodity`) separate from "upstream could not classify this"
+  (its `UNCLASSIFIED`/unmapped fallback). The first belongs in `OTHER`, the second with the data gaps in
+  `UNKNOWN` — folding them together tells the reader a gap is a real position.
 
 ## Adding a new entry
 
