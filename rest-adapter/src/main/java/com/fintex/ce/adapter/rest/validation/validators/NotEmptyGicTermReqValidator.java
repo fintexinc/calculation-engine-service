@@ -26,6 +26,7 @@ public class NotEmptyGicTermReqValidator extends AbstractGicFieldReqValidator<Bi
         ASSET_ALLOCATIONS,
         ASSET_ALLOCATIONS_EM,
         EQUITY_SECTOR,
+        SECTOR_EXPOSURE,
         EQUITY_COUNTRY_EXPOSURE,
         EQUITY_STYLEBOX_EXPOSURE,
         EQUITY_GEOGRAPHIC_EXPOSURE,

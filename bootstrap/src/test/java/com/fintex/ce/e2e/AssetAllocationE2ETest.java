@@ -41,8 +41,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -148,7 +146,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldAggregateWeightedAllocations_acrossMixedHoldingsAndCurrencies() {
-    bocMockServer.setDispatcher(constantBocRateDispatcher("1.5000"));
+    bocMockServer.setDispatcher(BocMockResponses.constantUsdCadRateDispatcher("1.5000"));
     smsMockServer.setDispatcher(routingDispatcher(
         List.of(
             geographyRow("AAPL", FiIdentifierType.TICKER_MIC, SecurityRegion.USA, Currency.USD),
@@ -294,17 +292,6 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
           return jsonResponse(compositeBody);
         }
         return new MockResponse().setResponseCode(404);
-      }
-    };
-  }
-
-  private static Dispatcher constantBocRateDispatcher(String rate) {
-    String body = "{\"observations\":[{\"d\":\"" + LocalDate.now(ZoneOffset.UTC)
-        + "\",\"FXUSDCAD\":{\"v\":\"" + rate + "\"}}]}";
-    return new Dispatcher() {
-      @Override
-      public MockResponse dispatch(RecordedRequest request) {
-        return jsonResponse(body);
       }
     };
   }

@@ -1,0 +1,105 @@
+{
+  "metric": "sector-exposure",
+  "holdings": [
+    {
+      "holdingType": "CASH",
+      "value": 10000.00,
+      "securityIdentifier": {
+        "id": "CASH-CAD",
+        "idType": "TICKER"
+      },
+      "currency": "CAD"
+    },
+    {
+      "holdingType": "GIC",
+      "value": 5000.00,
+      "securityIdentifier": {
+        "id": "GIC-RBC-3Y",
+        "idType": "TICKER"
+      },
+      "currency": "CAD",
+      "investmentDate": "2024-09-01",
+      "clientIntRate": 4.75,
+      "interestFreq": "ANNUAL",
+      "term": 1095,
+      "name": "RBC 3-Year GIC"
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 8000.00,
+      "securityIdentifier": {
+        "id": "RY.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 7200.00,
+      "securityIdentifier": {
+        "id": "TD.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 5500.00,
+      "securityIdentifier": {
+        "id": "BMO.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 4800.00,
+      "securityIdentifier": {
+        "id": "BN.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "STOCK",
+      "country": "CANADA",
+      "value": 3500.00,
+      "securityIdentifier": {
+        "id": "SHOP.TO",
+        "idType": "TICKER_MIC",
+        "exchangeId": "TSX"
+      }
+    },
+    {
+      "holdingType": "ETF",
+      "country": "USA",
+      "value": 6500.00,
+      "securityIdentifier": {
+        "id": "IFV",
+        "idType": "TICKER"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
+      "value": 12000.00,
+      "securityIdentifier": {
+        "id": "F0CAN05QNU",
+        "idType": "MORNINGSTAR_ID"
+      }
+    },
+    {
+      "holdingType": "MUTUAL_FUND",
+      "country": "CANADA",
+      "value": 4000.00,
+      "securityIdentifier": {
+        "id": "F0CAN05QWX",
+        "idType": "MORNINGSTAR_ID"
+      }
+    }
+  ]
+}

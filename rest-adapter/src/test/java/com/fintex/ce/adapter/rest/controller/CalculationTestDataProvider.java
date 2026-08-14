@@ -16,6 +16,7 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
+import com.fintex.ce.model.domain.result.allocation.ConsolidatedSectorExposureResult;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
 import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
@@ -80,6 +81,7 @@ import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
+import com.fintex.wm.commons.domain.allocation.SectorAllocationType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -191,6 +193,9 @@ class CalculationTestDataProvider {
             AssetAllocationEMResult.class),
         breakdown(CalculationMetric.EQUITY_SECTOR, init(new EquitySectorResult(), r -> r.setEquitySector(Map.of(
             EquitySectorAllocationType.TECHNOLOGY, BigDecimal.valueOf(30.0)))), EquitySectorResult.class),
+        breakdown(CalculationMetric.SECTOR_EXPOSURE, init(new ConsolidatedSectorExposureResult(),
+            r -> r.setSectorExposure(Map.of(SectorAllocationType.GOVERNMENT_BONDS, BigDecimal.valueOf(0.25)))),
+            ConsolidatedSectorExposureResult.class),
         breakdown(CalculationMetric.EQUITY_COUNTRY_EXPOSURE, init(new EquityCountryExposureResult(), r -> r
             .setEquityCountryExposure(Map.of(CountryRegionType.CANADA, BigDecimal.valueOf(60.0)))),
             EquityCountryExposureResult.class),
