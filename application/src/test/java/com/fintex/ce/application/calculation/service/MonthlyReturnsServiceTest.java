@@ -1,8 +1,10 @@
 package com.fintex.ce.application.calculation.service;
 
+import com.fintex.ce.application.returns.CashMonthlyReturnsGenerator;
 import com.fintex.ce.application.returns.MonthlyReturnsGenerator;
 import com.fintex.ce.application.returns.ReturnsSnapshot;
 import com.fintex.ce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.ErrorParams;
@@ -14,6 +16,7 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -30,14 +33,26 @@ import static org.mockito.Mockito.when;
 
 class MonthlyReturnsServiceTest {
 
+  private static final LocalDate JANUARY_END = LocalDate.parse("2024-01-31");
+  private static final LocalDate FEBRUARY_END = LocalDate.parse("2024-02-29");
+  private static final LocalDate MARCH_END = LocalDate.parse("2024-03-31");
+
   private static final PortfolioHolding ETF = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
       new SecurityIdentifier("ETF-A", FiIdentifierType.TICKER));
   private static final PortfolioHolding STOCK = new PortfolioHolding(null, FinancialInstrumentType.STOCK, Country.USA,
       new SecurityIdentifier("STK-B", FiIdentifierType.TICKER));
-  private static final PortfolioHolding CASH = new PortfolioHolding(null, FinancialInstrumentType.CASH,
-      new SecurityIdentifier("CASH", FiIdentifierType.TICKER));
+  private static final CashHolding CASH = CashHolding.builder()
+      .holdingType(FinancialInstrumentType.CASH)
+      .currency(Currency.CAD)
+      .build();
 
   private final MonthlyReturnsGenerator generator = mock(MonthlyReturnsGenerator.class);
+  private final CashMonthlyReturnsGenerator cashMonthlyReturnsGenerator = mock(CashMonthlyReturnsGenerator.class);
+
+  @BeforeEach
+  void setUp() {
+    when(cashMonthlyReturnsGenerator.generateCashMonthlyReturns(anyList())).thenReturn(Map.of());
+  }
 
   @Test
   void shouldThrowNoSecurityDataForHolding_whenHoldingMissingFromSecurityMasterResponse() {
@@ -67,8 +82,8 @@ class MonthlyReturnsServiceTest {
   @Test
   void shouldThrowMissingMonthlyReturnForDate_whenHoldingHistoryContainsCalendarGap() {
     HoldingMonthlyReturns returns = holdingMonthlyReturns(Currency.USD,
-        Map.entry(LocalDate.parse("2024-01-31"), BigDecimal.valueOf(0.01)),
-        Map.entry(LocalDate.parse("2024-03-31"), BigDecimal.valueOf(0.02)));
+        Map.entry(JANUARY_END, BigDecimal.valueOf(0.01)),
+        Map.entry(MARCH_END, BigDecimal.valueOf(0.02)));
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
     MonthlyReturnsService service = service();
 
@@ -79,27 +94,38 @@ class MonthlyReturnsServiceTest {
           assertThat(exception.getMetadata())
               .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1")
               .containsEntry(ErrorParams.HOLDING_ID, ErrorParams.holdingId(ETF))
-              .containsEntry("param-1", "2024-02-29");
+              .containsEntry("param-1", FEBRUARY_END.toString());
         });
   }
 
   @Test
-  void shouldSkipCashAndGicTypes_whenValidatingMonthlyReturnsPresence() {
+  void shouldMergeCashReturns_whenCashIsOmittedFromSecurityMasterResponse() {
+    HoldingMonthlyReturns cashReturns = holdingMonthlyReturns(Currency.CAD,
+        Map.entry(JANUARY_END, BigDecimal.valueOf(0.4)),
+        Map.entry(FEBRUARY_END, BigDecimal.valueOf(0.5)));
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
+    when(cashMonthlyReturnsGenerator.generateCashMonthlyReturns(anyList())).thenReturn(Map.of(CASH, cashReturns));
     MonthlyReturnsService service = service();
 
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = service.getMonthlyReturns(List.of(CASH), Map.of());
 
-    assertThat(snapshot.returnsMap()).isEmpty();
+    assertThat(snapshot.returnsMap()).containsOnlyKeys(CASH);
+    assertThat(snapshot.returnsMap().get(CASH)).containsExactly(
+        Map.entry(JANUARY_END, BigDecimal.valueOf(0.4)),
+        Map.entry(FEBRUARY_END, BigDecimal.valueOf(0.5)));
+    assertThat(snapshot.holdingCurrencyMap()).containsOnly(Map.entry(CASH, Currency.CAD));
+    assertThat(snapshot.performanceStartDate()).isEqualTo(JANUARY_END);
+    assertThat(snapshot.performanceEndDate()).isEqualTo(FEBRUARY_END);
     assertThat(snapshot.errors()).isEmpty();
+    assertThat(snapshot.warnings()).isEmpty();
   }
 
   @Test
   void shouldMergeFetcherAndGeneratorOutputs_whenGetMonthlyReturns() {
     HoldingMonthlyReturns etfReturns = holdingMonthlyReturns(Currency.USD,
-        Map.entry(LocalDate.parse("2020-01-31"), BigDecimal.valueOf(0.01)));
+        Map.entry(JANUARY_END, BigDecimal.valueOf(0.01)));
     HoldingMonthlyReturns stockReturns = holdingMonthlyReturns(Currency.USD,
-        Map.entry(LocalDate.parse("2020-01-31"), BigDecimal.valueOf(0.02)));
+        Map.entry(JANUARY_END, BigDecimal.valueOf(0.02)));
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of(STOCK, stockReturns));
     MonthlyReturnsService service = service();
 
@@ -110,7 +136,7 @@ class MonthlyReturnsServiceTest {
   }
 
   private MonthlyReturnsService service() {
-    return new MonthlyReturnsService(generator);
+    return new MonthlyReturnsService(generator, cashMonthlyReturnsGenerator);
   }
 
   @SafeVarargs

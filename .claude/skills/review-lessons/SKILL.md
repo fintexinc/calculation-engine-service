@@ -51,8 +51,14 @@ Red flags — STOP and investigate the production code instead of the test:
 - [ ] **[correctness] Tagging an outcome from an exception type at an observability boundary?** Verify the exception
   can still reach that boundary — a client that maps transport/HTTP exceptions to domain exceptions first makes the
   `instanceof` branch dead, and the tag then reports a fabricated constant (e.g. every failure as `500`).
+- [ ] **[architecture] Changed a cross-metric behavior?** Enumerate every metric in that family and implement the shared
+  workflow in an application service or template-method base. Extracting only a calculator utility while wiring one
+  metric leaves behavior inconsistent and keeps business orchestration in the wrong layer.
 - [ ] **[test-quality] Behavior-preserving refactor?** Add a test for the specific pre-existing behavior you intend
   to keep, so a regression turns a test red instead of shipping silently.
+- [ ] **[test-quality] Does each assertion fail when the named behavior is broken?** Trace the exercised path and
+  exclude incidental causes such as deserialization filters, empty defaults, or earlier short-circuits that can make
+  the expected value appear without reaching the behavior under test.
 - [ ] **[test-quality] Asserting an error outcome — a thrown domain exception (unit) OR an HTTP error response
   (e2e `ErrorResponse`/`Notification`)?** Assert the full payload — the error code **and** the
   formatted message **and** the metadata/`param-N` map — not just the code, so a regression that

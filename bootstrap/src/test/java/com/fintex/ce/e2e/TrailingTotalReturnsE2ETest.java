@@ -159,6 +159,104 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(findPeriod(result, ONE_YR.name()).value())
         .isCloseTo(new BigDecimal("0.1503798415"), within(TOLERANCE));
   }
+
+  @Test
+  void shouldReturnComparison_whenBenchmarkHoldingsAreProvided() {
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(XBAL, List.of(dateValue("2024-12-31", "5.0"))))));
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(VCNS, List.of(dateValue("2024-12-31", "2.5"))))));
+    enqueueSmsMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
+        "0.0035")))));
+    PeriodCommand command = periodCommand(Set.of(ONE_MTH), LocalDate.parse("2024-12-31"),
+        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
+    command.setBenchmarkHoldings(List.of(holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
+
+    HttpResponse response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
+    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(portfolio -> {
+      assertThat(portfolio.period()).isEqualTo(ONE_MTH.name());
+      assertThat(portfolio.value()).isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
+    });
+    assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
+      assertThat(comparison.period()).isEqualTo(ONE_MTH);
+      assertThat(comparison.portfolio()).isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
+      assertThat(comparison.benchmark()).isCloseTo(new BigDecimal("0.025"), within(TOLERANCE));
+      assertThat(comparison.percentDifference()).isCloseTo(new BigDecimal("100"), within(TOLERANCE));
+    });
+  }
+
+  @Test
+  void shouldPreservePortfolioHistory_whenBenchmarkHistoryIsShorter() {
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(XBAL, List.of(
+            dateValue("2024-10-31", "1.0"),
+            dateValue("2024-11-30", "2.0"),
+            dateValue("2024-12-31", "3.0"))))));
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(VCNS, List.of(dateValue("2024-12-31", "2.5"))))));
+    enqueueSmsMockResponse(writeJson(List.of(
+        new DateRateValue(LocalDate.parse("2024-10-31"), new BigDecimal("0.0033")),
+        new DateRateValue(LocalDate.parse("2024-11-30"), new BigDecimal("0.0034")),
+        new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal("0.0035")))));
+    PeriodCommand command = periodCommand(Set.of(THREE_MTH), LocalDate.parse("2024-12-31"),
+        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
+    command.setBenchmarkHoldings(List.of(holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
+
+    HttpResponse response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
+    assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 10, 31));
+    assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
+    assertThat(findPeriod(result, THREE_MTH.name()).value())
+        .isCloseTo(new BigDecimal("0.061106"), within(TOLERANCE));
+    assertThat(result.getWarnings()).extracting(Notification::getCode)
+        .containsExactly(ErrorCode.Codes.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD);
+    assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
+      assertThat(comparison.period()).isEqualTo(THREE_MTH);
+      assertThat(comparison.portfolio()).isCloseTo(new BigDecimal("0.061106"), within(TOLERANCE));
+      assertThat(comparison.benchmark()).isNull();
+      assertThat(comparison.percentDifference()).isNull();
+    });
+  }
+
+  @Test
+  void shouldPreservePortfolioReturn_whenBenchmarkReturnsAreUnavailable() {
+    enqueueSmsMockResponse(writeJson(List.of(
+        holdingReturnsRow(XBAL, List.of(dateValue("2024-12-31", "5.0"))))));
+    enqueueSmsMockResponse(writeJson(List.of()));
+    enqueueSmsMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
+        "0.0035")))));
+    PeriodCommand command = periodCommand(Set.of(ONE_MTH), LocalDate.parse("2024-12-31"),
+        List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
+    PortfolioHolding benchmarkHolding = holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "50000");
+    command.setBenchmarkHoldings(List.of(benchmarkHolding));
+
+    HttpResponse response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+    TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
+    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(portfolio -> {
+      assertThat(portfolio.period()).isEqualTo(ONE_MTH.name());
+      assertThat(portfolio.value()).isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
+    });
+    assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
+      assertThat(comparison.period()).isEqualTo(ONE_MTH);
+      assertThat(comparison.portfolio()).isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
+      assertThat(comparison.benchmark()).isNull();
+      assertThat(comparison.percentDifference()).isNull();
+    });
+    assertThat(result.getWarnings()).singleElement().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.NO_SECURITY_DATA_FOR_HOLDING);
+      assertThat(warning.getMessage()).isEqualTo("No data returned for holding " + benchmarkHolding.getIdsString());
+      assertThat(warning.getMetadata()).containsEntry("holdingId", benchmarkHolding.getIdsString());
+    });
+  }
+
   @Test
   void shouldReturnOnlyContiguousPeriodsAndFxWarning_whenFxRatesHaveInternalMonthGap() {
     bocMockServer.setDispatcher(bocDailyUsdCadDispatcher("1.0000", Set.of(YearMonth.of(2024, 6))));

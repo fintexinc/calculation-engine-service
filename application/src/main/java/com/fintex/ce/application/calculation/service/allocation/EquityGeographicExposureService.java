@@ -35,8 +35,9 @@ public class EquityGeographicExposureService
       .or(FIXED_INCOME_PREDICATE)
       .negate();
 
-  public EquityGeographicExposureService(PortfolioWeightCalculator portfolioWeightCalculator) {
-    super(portfolioWeightCalculator);
+  public EquityGeographicExposureService(PortfolioWeightCalculator portfolioWeightCalculator,
+      StockGeographyRegionResolver stockRegionResolver) {
+    super(portfolioWeightCalculator, stockRegionResolver);
   }
 
   @Override

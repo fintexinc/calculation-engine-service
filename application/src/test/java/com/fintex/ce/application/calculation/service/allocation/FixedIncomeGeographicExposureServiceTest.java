@@ -24,7 +24,7 @@ class FixedIncomeGeographicExposureServiceTest
 
   @Override
   protected AbstractGeographicExposureService<FixedIncomeGeographicExposureResult> createService() {
-    return new FixedIncomeGeographicExposureService(portfolioWeightCalculator);
+    return new FixedIncomeGeographicExposureService(portfolioWeightCalculator, stockRegionResolver);
   }
 
   @Override

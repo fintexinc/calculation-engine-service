@@ -1,5 +1,6 @@
 package com.fintex.ce.application.calculation.service;
 
+import com.fintex.ce.application.returns.CashMonthlyReturnsGenerator;
 import com.fintex.ce.application.returns.MonthlyReturnsGenerator;
 import com.fintex.ce.application.returns.ReturnsSnapshot;
 import com.fintex.ce.application.util.SecurityDataValidator;
@@ -24,7 +25,8 @@ import static java.util.stream.Collectors.joining;
 /**
  * Application-layer entry point for monthly-returns data sourcing. Consumes the pre-fetched monthly-returns map
  * supplied by the orchestrator, restricts it to the requested holdings (the map may cover a superset, e.g. portfolio
- * plus benchmark), merges in locally-synthesized GIC returns, validates the result, and wraps it in a
+ * plus benchmark), merges in the locally-sourced CASH ({@link CashMonthlyReturnsGenerator}, T-Bill based) and GIC
+ * ({@link MonthlyReturnsGenerator}, interest-rate based) returns, validates the result, and wraps it in a
  * {@link ReturnsSnapshot}.
  *
  * <p>
@@ -43,12 +45,14 @@ import static java.util.stream.Collectors.joining;
 public class MonthlyReturnsService {
 
   private final MonthlyReturnsGenerator monthlyReturnsGenerator;
+  private final CashMonthlyReturnsGenerator cashMonthlyReturnsGenerator;
 
   public ReturnsSnapshot<HoldingMonthlyReturns> getMonthlyReturns(List<PortfolioHolding> holdings,
       Map<PortfolioHolding, HoldingMonthlyReturns> monthlyReturns) {
     Map<PortfolioHolding, HoldingMonthlyReturns> sourceData = FilterUtils.restrictToHoldings(monthlyReturns,
         holdings);
     sourceData.putAll(monthlyReturnsGenerator.generateGicMonthlyReturns(holdings));
+    sourceData.putAll(cashMonthlyReturnsGenerator.generateCashMonthlyReturns(holdings));
     validateMonthlyReturnsPresent(holdings, sourceData);
     return ReturnsSnapshot.forMonthlyReturns(sourceData);
   }
@@ -69,8 +73,8 @@ public class MonthlyReturnsService {
    * {@link ErrorCode#MISSING_MONTHLY_RETURNS}.</li>
    * </ul>
    * Holdings of types in {@link FilterUtils#LOCALLY_SOURCED_TYPES} (CASH, GIC) are excluded from both checks: GIC
-   * returns are synthesized locally by {@code MonthlyReturnsGenerator}; CASH carries no returns and gets zero weight
-   * downstream.
+   * returns are synthesized locally by {@code MonthlyReturnsGenerator}; CASH returns are sourced from currency-specific
+   * Treasury Bill series.
    */
   private void validateMonthlyReturnsPresent(List<PortfolioHolding> holdings,
       Map<PortfolioHolding, HoldingMonthlyReturns> sourceData) {

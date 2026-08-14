@@ -23,6 +23,7 @@ import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
 import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
 import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
+import com.fintex.ce.model.domain.result.exposure.ConsolidatedGeographicExposureResult;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
 import com.fintex.ce.model.domain.result.exposure.EquityGeographicExposureResult;
@@ -122,7 +123,7 @@ class CalculationTestDataProvider {
   static Stream<Arguments> calculationMetricArguments() {
     return Stream.of(
         period(CalculationMetric.TRAILING_TOTAL_RETURNS, init(new TrailingTotalReturnsResult(), r -> r
-            .setTrailingTotalReturn(TIME_INTERVALS)), TrailingTotalReturnsResult.class),
+            .setTrailingTotalReturn(List.copyOf(TIME_INTERVALS))), TrailingTotalReturnsResult.class),
         period(CalculationMetric.LEADING_TOTAL_RETURNS, init(new LeadingTotalReturnsResult(), r -> r
             .setLeadingTotalReturn(TIME_INTERVALS)), LeadingTotalReturnsResult.class),
         period(CalculationMetric.EXCESS_RETURNS, init(new ExcessReturnsResult(), r -> r.setExcessReturns(
@@ -198,6 +199,9 @@ class CalculationTestDataProvider {
             EquityStyleboxExposureResult.class),
         breakdown(CalculationMetric.EQUITY_GEOGRAPHIC_EXPOSURE, init(new EquityGeographicExposureResult(), r -> r
             .setGeographicExposure(Map.of(GeographicRegionType.OTHER, BigDecimal.valueOf(70.0)))),
+            GeographicExposureResult.class),
+        breakdown(CalculationMetric.GEOGRAPHIC_EXPOSURE, init(new ConsolidatedGeographicExposureResult(), r -> r
+            .setGeographicExposure(Map.of(GeographicRegionType.CANADA, BigDecimal.valueOf(45.0)))),
             GeographicExposureResult.class),
         breakdown(CalculationMetric.EQUITY_MARKET_CAPITALIZATION, init(new EquityMarketCapResult(), r -> r
             .setEquityMarketCapitalization(Map.of(EquityMarketCapitalizationType.GIANT, BigDecimal.valueOf(55.0)))),

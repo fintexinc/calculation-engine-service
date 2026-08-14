@@ -135,6 +135,9 @@ public enum CalculationMetric {
   @Schema(description = "Equity geographic exposure breakdown by region")
   EQUITY_GEOGRAPHIC_EXPOSURE("equity-geographic-exposure", PortfolioHoldingsCommand.class),
 
+  @Schema(description = "Consolidated geographic exposure breakdown by region across the whole portfolio")
+  GEOGRAPHIC_EXPOSURE("geographic-exposure", PortfolioHoldingsCommand.class),
+
   @Schema(description = "Equity market capitalization breakdown (large/mid/small cap)")
   EQUITY_MARKET_CAPITALIZATION("equity-market-capitalization", PortfolioHoldingsCommand.class),
 

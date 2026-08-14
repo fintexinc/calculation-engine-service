@@ -305,7 +305,7 @@ class TrailingTotalReturnsCalculationTest {
     doCallRealMethod().when(calculation).defineResponseType(anySet());
     TrailingTotalReturnsResult actual = calculation.defineResponseType(pairs);
 
-    assertEquals(expected, actual.getTrailingTotalReturn());
+    assertThat(actual.getTrailingTotalReturn()).containsExactlyInAnyOrderElementsOf(expected);
   }
 
   @Test

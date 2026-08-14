@@ -82,8 +82,10 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 2, 29));
     assertThat(result.getGrowth10k()).hasSize(3);
     assertGrowthPoint(result.getGrowth10k().get(0), "2023-12-31", "10000");
-    assertGrowthPoint(result.getGrowth10k().get(1), "2024-01-31", "10358.0242797949");
-    assertGrowthPoint(result.getGrowth10k().get(2), "2024-02-29", "10293.6308701015");
+    assertGrowthPoint(result.getGrowth10k().get(1), "2024-01-31", "10338.9322554409");
+    assertGrowthPoint(result.getGrowth10k().get(2), "2024-02-29", "10294.7136234902");
+    assertThat(result.getComparison()).isNull();
+    assertThat(responseBody).doesNotContain("\"comparison\"");
   }
 
   protected static ReturnCommand richPortfolioCommand() {
@@ -106,7 +108,7 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
     assertThat(point.value()).isEqualByComparingTo(new BigDecimal(expectedValue));
   }
 
-  private static MonthlyReturns twoMonthReturns(String janPercent, String febPercent) {
+  protected static MonthlyReturns twoMonthReturns(String janPercent, String febPercent) {
     return monthlyReturns(
         returns("2024-01-31", janPercent, "2024-02-29", febPercent),
         DataProvider.MORNINGSTAR,
@@ -115,7 +117,7 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
 
   private static List<DateRateValue> cadTreasuryRates() {
     return List.of(
-        new DateRateValue(LocalDate.of(2024, 1, 31), BigDecimal.valueOf(0.0030)),
-        new DateRateValue(LocalDate.of(2024, 2, 29), BigDecimal.valueOf(0.0031)));
+        new DateRateValue(LocalDate.of(2024, 1, 31), BigDecimal.ONE),
+        new DateRateValue(LocalDate.of(2024, 2, 29), BigDecimal.valueOf(2)));
   }
 }
