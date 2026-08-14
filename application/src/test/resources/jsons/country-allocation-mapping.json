@@ -10,6 +10,11 @@
     "region": "UNITED_STATES"
   },
   {
+    "countryId": "XSU",
+    "countryName": "Supranational",
+    "region": "OTHER"
+  },
+  {
     "countryId": "ABW",
     "countryName": "Aruba",
     "region": "EMERGING_MARKET"
@@ -47,7 +52,7 @@
   {
     "countryId": "ARE",
     "countryName": "United Arab Emirates",
-    "region": "INTERNATIONAL_DEVELOPED"
+    "region": "EMERGING_MARKET"
   },
   {
     "countryId": "ARG",
@@ -226,7 +231,7 @@
   },
   {
     "countryId": "CIV",
-    "countryName": "Cote d'lovire",
+    "countryName": "Côte d'Ivoire",
     "region": "EMERGING_MARKET"
   },
   {
@@ -926,7 +931,7 @@
   },
   {
     "countryId": "PSE",
-    "countryName": "\"Palestine",
+    "countryName": "Palestine",
     "region": null
   },
   {
@@ -986,7 +991,7 @@
   },
   {
     "countryId": "SHN",
-    "countryName": "\"Saint Helena",
+    "countryName": "Saint Helena",
     "region": null
   },
   {
