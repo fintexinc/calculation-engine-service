@@ -45,8 +45,6 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
     extends
       AbstractBreakdownService<AssetAllocationData, R, AssetAllocationRegionType> {
 
-  private static final BigDecimal NEAR_ZERO_THRESHOLD = new BigDecimal("0.00001");
-
   protected AbstractAssetAllocationService(PortfolioWeightCalculator portfolioWeightCalculator) {
     super(portfolioWeightCalculator, AssetAllocationRegionType.class);
   }
@@ -104,7 +102,7 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
   @Override
   protected final Map<AssetAllocationRegionType, BigDecimal> postProcess(
       Map<AssetAllocationRegionType, BigDecimal> netProducts) {
-    return denoise(collapseBuckets(netProducts));
+    return denoiseNearZero(collapseBuckets(netProducts));
   }
 
   /**
@@ -124,16 +122,6 @@ public abstract class AbstractAssetAllocationService<R extends BaseCalculationRe
   protected Map<AssetAllocationRegionType, BigDecimal> collapseBuckets(
       Map<AssetAllocationRegionType, BigDecimal> netProducts) {
     return netProducts;
-  }
-
-  private Map<AssetAllocationRegionType, BigDecimal> denoise(Map<AssetAllocationRegionType, BigDecimal> netProducts) {
-    Map<AssetAllocationRegionType, BigDecimal> denoised = new EnumMap<>(AssetAllocationRegionType.class);
-    for (Map.Entry<AssetAllocationRegionType, BigDecimal> entry : netProducts.entrySet()) {
-      BigDecimal value = entry.getValue();
-      denoised.put(entry.getKey(),
-          value == null || value.abs().compareTo(NEAR_ZERO_THRESHOLD) < 0 ? BigDecimal.ZERO : value);
-    }
-    return denoised;
   }
 
   private Map<AssetAllocationRegionType, BigDecimal> stockAllocation(PortfolioHolding holding, Geography geography,

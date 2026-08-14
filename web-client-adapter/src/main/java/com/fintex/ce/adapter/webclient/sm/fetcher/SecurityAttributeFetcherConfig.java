@@ -8,6 +8,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.CreditQualityMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquityCountryAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquityMarketCapitalizationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquitySectorAllocationMapper;
+import com.fintex.ce.adapter.webclient.sm.mapper.EquitySectorMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.EquityStyleboxExposureMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.FeesMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.FixedIncomeSectorAllocationMapper;
@@ -17,6 +18,7 @@ import com.fintex.ce.adapter.webclient.sm.mapper.LimitedHoldingsMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.MaturityAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.MonthlyReturnsMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.SalesChargeMapper;
+import com.fintex.ce.adapter.webclient.sm.mapper.SectorAllocationMapper;
 import com.fintex.ce.adapter.webclient.sm.mapper.YieldMapper;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.CreditQuality;
@@ -26,6 +28,7 @@ import com.fintex.ce.model.domain.calculation.allocation.FixedIncomeBondSector;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
+import com.fintex.ce.model.domain.calculation.allocation.HoldingSectorAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
 import com.fintex.ce.model.domain.calculation.exposure.EquityStyleboxExposure;
@@ -40,9 +43,11 @@ import com.fintex.wm.commons.domain.allocation.AssetAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationWithCurrency;
+import com.fintex.wm.commons.domain.allocation.EquitySectorWithCurrency;
 import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.GeographicAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.Maturities;
+import com.fintex.wm.commons.domain.allocation.SectorAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.financial.Fees;
@@ -142,6 +147,17 @@ public class SecurityAttributeFetcherConfig {
         EquitySectorAllocationWithCurrency.class, EquitySector.class, mapper);
   }
 
+  /**
+   * The scalar counterpart of the binding above, for a security whose sector is one value rather than a distribution.
+   * Same CE domain type on purpose: the mapper widens the single sector into a one-bucket allocation, so a metric
+   * reading either attribute reads the same shape and needs no branch of its own.
+   */
+  @Bean
+  CompositeAttributeBinding<EquitySector, EquitySectorWithCurrency> equitySectorBinding(EquitySectorMapper mapper) {
+    return new CompositeAttributeBinding<>(CompositeSecurityAttribute.EQUITY_SECTOR,
+        EquitySectorWithCurrency.class, EquitySector.class, mapper);
+  }
+
   @Bean
   CompositeAttributeBinding<EquityStyleboxExposure, StyleBoxes> equityStyleboxExposureBinding(
       EquityStyleboxExposureMapper mapper) {
@@ -154,6 +170,13 @@ public class SecurityAttributeFetcherConfig {
       FixedIncomeSectorAllocationMapper mapper) {
     return new CompositeAttributeBinding<>(CompositeSecurityAttribute.FIXED_INCOME_SECTOR_ALLOCATION,
         FixedIncomeSectorAllocationWithCurrency.class, FixedIncomeBondSector.class, mapper);
+  }
+
+  @Bean
+  CompositeAttributeBinding<HoldingSectorAllocation, SectorAllocationWithCurrency> sectorAllocationBinding(
+      SectorAllocationMapper mapper) {
+    return new CompositeAttributeBinding<>(CompositeSecurityAttribute.SECTOR_ALLOCATION,
+        SectorAllocationWithCurrency.class, HoldingSectorAllocation.class, mapper);
   }
 
   @Bean

@@ -8,6 +8,7 @@ import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
+import com.fintex.ce.model.domain.result.allocation.ConsolidatedSectorExposureResult;
 import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
 import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
@@ -132,7 +133,8 @@ public class PortfolioCalculationController {
       RollingCorrelationResult.class, UpsideCaptureResult.class,
       DownsideCaptureResult.class,
       AssetAllocationResult.class, AssetAllocationEMResult.class,
-      EquitySectorResult.class, EquityCountryExposureResult.class,
+      EquitySectorResult.class, ConsolidatedSectorExposureResult.class,
+      EquityCountryExposureResult.class,
       EquityStyleboxExposureResult.class, GeographicExposureResult.class,
       EquityMarketCapResult.class, CountryExposureResult.class,
       FixedIncomeSectorResult.class, FixedIncomeStyleboxExposureResult.class,
