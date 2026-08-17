@@ -1,0 +1,10 @@
+description = "Use case implementations and business orchestration"
+
+dependencies {
+    api(project(":api"))
+    api(libs.spring.context)
+    api(libs.spring.boot)
+
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.mockito.junit.jupiter)
+}

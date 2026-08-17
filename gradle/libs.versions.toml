@@ -1,0 +1,74 @@
+[versions]
+spring-boot = "3.5.8"
+spring-dependency-management = "1.1.7"
+spotless = "7.0.2"
+jib = "3.4.4"
+lombok = "8.11"
+git-properties = "2.4.2"
+
+# Internal dependencies. Deliberately still the version main builds against, not the 0.1.0-tangerine-SNAPSHOT
+# that catalog-investment-commons publishes from its own tangerine-release branch: that line is a narrower
+# subset — it carries no SalesChargeType and no FixedIncomeStyleBoxType — and these sources will not compile
+# against it until TMI-620 deletes the metrics that use them. Switching the pin belongs to that ticket, so
+# that this branch differs from main by its build system alone.
+cic = "0.0.1-SNAPSHOT"
+
+# External dependencies whose versions the Spring Boot BOM does not manage.
+springdoc = "2.8.6"
+swagger-annotations = "2.2.29"
+commons-lang3 = "3.20.0"
+guava = "32.1.3-jre"
+azure-monitor-opentelemetry = "1.2.0"
+
+# Test dependencies. Mockito and AssertJ are pinned above the BOM, as they were in the Maven build.
+mockito = "5.18.0"
+assertj = "3.27.3"
+okhttp-mockwebserver = "4.12.0"
+commons-math3 = "3.6.1"
+
+[libraries]
+catalog-investment-commons = { module = "com.fintex.wm:catalog-investment-commons", version.ref = "cic" }
+
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+
+slf4j-api = { module = "org.slf4j:slf4j-api" }
+
+spring-context = { module = "org.springframework:spring-context" }
+spring-boot = { module = "org.springframework.boot:spring-boot" }
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+micrometer-core = { module = "io.micrometer:micrometer-core" }
+micrometer-observation = { module = "io.micrometer:micrometer-observation" }
+micrometer-tracing-bridge-otel = { module = "io.micrometer:micrometer-tracing-bridge-otel" }
+azure-monitor-opentelemetry-autoconfigure = { module = "com.azure:azure-monitor-opentelemetry-autoconfigure", version.ref = "azure-monitor-opentelemetry" }
+
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commons-lang3" }
+
+springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+swagger-annotations-jakarta = { module = "io.swagger.core.v3:swagger-annotations-jakarta", version.ref = "swagger-annotations" }
+
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp-mockwebserver" }
+commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commons-math3" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
+lombok = { id = "io.freefair.lombok", version.ref = "lombok" }
+git-properties = { id = "com.gorylenko.gradle-git-properties", version.ref = "git-properties" }

@@ -34,7 +34,7 @@ Pure logic, no data fetching.
 - **`UpDownSideCalculationAbstract`** — capture ratios 
 
 ### Code convention rules
-- **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `mvn spotless:apply`
+- **Formatting:** Spotless with Eclipse formatter (`eclipse-java-formatter.xml`), 2-space indent, 120 char lines. Run `./gradlew spotlessApply`
 - **BigDecimal:** `BigDecimal.valueOf()` for literals, never `new BigDecimal(double)`. `new BigDecimal(String)` is fine
 - **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
 - **Stream to list:** prefer `.toList()` (returns an unmodifiable list) over `.collect(Collectors.toList())`. Only use `Collectors.toList()` when the result must be mutable
@@ -60,10 +60,10 @@ the Eclipse formatter. Before creating a pull request:
 
 ```bash
 # Format all code
-mvn spotless:apply
+./gradlew spotlessApply
 
 # Check formatting without applying changes
-mvn spotless:check
+./gradlew spotlessCheck
 ```
 
 The CI pipeline includes a formatting check that will fail if code is not properly formatted.
@@ -282,8 +282,8 @@ Developers can forget to squash commits before merge.
 
 Before creating a pull request, ensure:
 
-- [ ] Code is formatted: `mvn spotless:apply`
-- [ ] All tests pass: `mvn test`
+- [ ] Code is formatted: `./gradlew spotlessApply`
+- [ ] All tests pass: `./gradlew test`
 - [ ] Branch is rebased onto latest main
 - [ ] Commits follow Conventional Commits format
 - [ ] Commits include ticket references
@@ -299,13 +299,13 @@ Before creating a pull request, ensure:
 
 ```bash
 # Build entire project
-mvn clean install
+./gradlew clean build
 
 # Run with specific profile
-mvn spring-boot:run -pl bootstrap -Dspring-boot.run.profiles=devlocal
+./gradlew :bootstrap:bootRun --args='--spring.profiles.active=devlocal'
 
 # Run tests
-mvn test
+./gradlew test
 ```
 
 ### Module Structure (Hexagonal Architecture)
