@@ -204,7 +204,7 @@ Hexagonal Architecture is used in this project.
 ### Prerequisites
 
 - JDK 21
-- Maven 3.6.2+
+- No local Gradle install: the wrapper (`./gradlew`) provisions it
 - Security Master Service (running locally or via Docker)
 
 ### Running the Service
@@ -212,13 +212,13 @@ Hexagonal Architecture is used in this project.
 Build:
 
 ```bash
-./mvnw clean install
+./gradlew clean build
 ```
 
 Run:
 
 ```bash
-./mvnw spring-boot:run -pl bootstrap -Dspring-boot.run.profiles=dev
+./gradlew :bootstrap:bootRun --args='--spring.profiles.active=dev'
 ```
 
 ### Running Security Master Service
@@ -234,7 +234,7 @@ cd ce-environment
 docker compose up
 ```
 
-This reads variables from `ce-environment/.env`. The `DB_URL` in the `.env` file uses `localhost` which works for local Maven runs. Docker Compose overrides it with `host.docker.internal` so the container can reach the host database.
+This reads variables from `ce-environment/.env`. The `DB_URL` in the `.env` file uses `localhost` which works for local runs. Docker Compose overrides it with `host.docker.internal` so the container can reach the host database.
 
 `ce-environment/.env` variables:
 
@@ -270,7 +270,7 @@ Runner configuration properties:
 To disable the runner (e.g., when running Security Master via Docker instead):
 
 ```bash
-./mvnw spring-boot:run -pl bootstrap -Dspring-boot.run.profiles=dev -Dsms.runner.enabled=false
+./gradlew :bootstrap:bootRun --args='--spring.profiles.active=dev' -Dsms.runner.enabled=false
 ```
 
 ### Environment Variables

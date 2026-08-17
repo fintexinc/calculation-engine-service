@@ -1,0 +1,10 @@
+description = "Micrometer implementations of the observability ports (metrics, tracing, statistics)"
+
+dependencies {
+    api(project(":api"))
+    api(libs.micrometer.observation)
+    api(libs.micrometer.core)
+    api(libs.spring.context)
+
+    testImplementation(libs.junit.jupiter.params)
+}
