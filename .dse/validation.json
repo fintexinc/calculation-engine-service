@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "timeout_seconds": 1800,
+  "timeouts": {
+    "lint": 600,
+    "typecheck": 600,
+    "test": 900,
+    "build": 900,
+    "sast": 120,
+    "secret_scan": 120
+  },
+  "commands": {
+    "lint": [
+      "sh",
+      "-c",
+      "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; ./mvnw -B -q spotless:check"
+    ],
+    "typecheck": [
+      "sh",
+      "-c",
+      "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; ./mvnw -B -q -DskipTests compile"
+    ],
+    "test": [
+      "sh",
+      "-c",
+      "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; ./mvnw -B test"
+    ],
+    "build": [
+      "sh",
+      "-c",
+      "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; ./mvnw -B -q -DskipTests package"
+    ]
+  },
+  "sast_severity_gate": "MEDIUM",
+  "preview": {
+    "image": "eclipse-temurin:21-jdk",
+    "artifact_glob": "bootstrap/target/*.jar",
+    "port": 8181,
+    "ready_timeout_s": 1050,
+    "env": {
+      "SPRING_PROFILES_ACTIVE": "dev",
+      "SM_REST_BASE_URL": "http://security-master.invalid",
+      "AZURE_MONITOR_ENABLED": "false",
+      "AZURE_MONITOR_LIVE_METRICS_ENABLED": "false"
+    }
+  }
+}
