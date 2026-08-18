@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 /**
  * Leaf role of the Composite pattern: the immutable result of expanding one branch of the underlying-holdings tree down
  * to a terminal node. Carries the effective weight of that node within its portfolio parent. Keeping it separate from
- * the SM-mapped {@link CommonHolding} prevents the recursion from mutating the mapped tree as a side effect. A leaf has
- * no children, so {@link #leaves()} yields only itself.
+ * the MIC-mapped {@link CommonHolding} prevents the recursion from mutating the mapped tree as a side effect. A leaf
+ * has no children, so {@link #leaves()} yields only itself.
  */
 public record LeafHolding(PortfolioHolding holding, BigDecimal weight, CommonHolding source)
     implements

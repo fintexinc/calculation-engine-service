@@ -1,22 +1,6 @@
-manual:
-  fds-url: https://security-master-service.fintex.com/graphql
-
-  rest:
-    application-url: http://localhost:8080
-    application-1x5-url: http://localhost:9000
-    application-1x3-url: http://localhost:9000
-    content-type: application/json
-
-    api-v1x5:
-      leading-returns: /api/fact-calculation
-      max-drawdown: /api/fact-calculation
-
-  versions:
-    enable-ce-1.0: true
-
-# When SM_REST_BASE_URL is unset; SM fetcher ITs override via @DynamicPropertySource (MockWebServer).
+# When MIC_REST_BASE_URL is unset; MIC fetcher ITs override via @DynamicPropertySource (MockWebServer).
 external-services:
-  security-master:
+  market-investment-catalogue:
     rest:
       base-url: http://127.0.0.1:1
 

@@ -64,12 +64,12 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(equitySectorCommand(CalculationMetric.EQUITY_SECTOR));
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(equitySectorCommand(CalculationMetric.EQUITY_SECTOR));
   }
 
@@ -79,7 +79,7 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
    * empty — the stock path has its own scenario below.
    */
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(Map.of(
         CompositeSecurityAttribute.EQUITY_SECTOR_ALLOCATION, List.of(
             sectorAllocationRow(FIRST_ETF_IDENTIFIER, "0.80", "0.00"),
@@ -126,7 +126,7 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnBadRequest_whenTickerMicHoldingMissingExchangeId() {
-    int smsRequestsBefore = smsMockServer.getRequestCount();
+    int micRequestsBefore = micMockServer.getRequestCount();
 
     var response = postCalculation(writeJson(tickerMicWithoutExchangeCommand()));
 
@@ -139,17 +139,17 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(notification.getFieldName()).isEqualTo("securityIdentifier.exchangeId");
     assertThat(notification.getMessage()).isEqualTo("Security Identifier Exchange ID must not be blank");
 
-    // The malformed body must be rejected locally before any Security Master call is made.
-    assertThat(smsMockServer.getRequestCount()).isEqualTo(smsRequestsBefore);
+    // The malformed body must be rejected locally before any Market Investment Catalogue call is made.
+    assertThat(micMockServer.getRequestCount()).isEqualTo(micRequestsBefore);
   }
 
   /**
    * TMI-475 end to end: a stock reaches its sector through the scalar {@code EQUITY_SECTOR} attribute, and the ETF
    * beside it through the distribution, so a mixed portfolio buckets both. The stock also gets an
-   * {@code EQUITY_SECTOR_ALLOCATION} row carrying its currency and no allocations, which is what Security Master
-   * actually answers — that attribute is served for any security declaring one of its columns, and every security
-   * declares {@code currency}. Treating that row as data would bucket the stock as UNKNOWN, so the empty distribution
-   * must not displace the sector.
+   * {@code EQUITY_SECTOR_ALLOCATION} row carrying its currency and no allocations, which is what Market Investment
+   * Catalogue actually answers — that attribute is served for any security declaring one of its columns, and every
+   * security declares {@code currency}. Treating that row as data would bucket the stock as UNKNOWN, so the empty
+   * distribution must not displace the sector.
    *
    * <p>
    * The ETF's distribution already sums to 1 and the two holdings are equal in value, so the expected split is exact:
@@ -157,7 +157,7 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
    */
   @Test
   void shouldBucketTheStockByItsOwnSector_whenPortfolioMixesAnEtfAndAStock() {
-    smsMockServer.setDispatcher(attributesDispatcher(writeJson(Map.of(
+    micMockServer.setDispatcher(attributesDispatcher(writeJson(Map.of(
         CompositeSecurityAttribute.EQUITY_SECTOR_ALLOCATION, List.of(
             sectorAllocationRow(FIRST_ETF_IDENTIFIER, "0.50", "0.50"),
             currencyOnlySectorAllocationRow(STOCK_IDENTIFIER)),

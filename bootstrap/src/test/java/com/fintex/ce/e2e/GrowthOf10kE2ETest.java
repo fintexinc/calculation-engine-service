@@ -45,10 +45,10 @@ class GrowthOf10kE2ETest extends AbstractGrowthOf10kE2ETest {
 
   @Test
   void shouldReturnComparison_whenBenchmarkHoldingsAreProvided() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         securityAttributeResult(XBAL, twoMonthReturns("5.0", "-2.0")),
         securityAttributeResult(F0CAN999, twoMonthReturns("1.0", "2.0")))));
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         securityAttributeResult(VCNS, twoMonthReturns("2.0", "1.0")),
         securityAttributeResult(CCM4752, twoMonthReturns("0.5", "-1.0")))));
     ReturnCommand command = commandFor(Currency.CAD, List.of(

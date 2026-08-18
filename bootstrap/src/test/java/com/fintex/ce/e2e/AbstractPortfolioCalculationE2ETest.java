@@ -57,12 +57,12 @@ abstract class AbstractPortfolioCalculationE2ETest {
   private static final String basePath = "/api/v1/portfolio/calculations";
 
   /**
-   * Mirrors {@code resilience4j.retry.configs.default.max-attempts}: a transient SMS failure is attempted this many
+   * Mirrors {@code resilience4j.retry.configs.default.max-attempts}: a transient MIC failure is attempted this many
    * times before the engine gives up, so tests that exhaust the retries must enqueue this many failing responses.
    */
-  private static final int SMS_RETRY_MAX_ATTEMPTS = 3;
+  private static final int MIC_RETRY_MAX_ATTEMPTS = 3;
 
-  protected static MockWebServer smsMockServer;
+  protected static MockWebServer micMockServer;
 
   protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
 
@@ -71,11 +71,11 @@ abstract class AbstractPortfolioCalculationE2ETest {
 
   protected abstract String metricPath();
 
-  protected abstract String requestBodyForSmsUnavailableScenario();
+  protected abstract String requestBodyForMicUnavailableScenario();
 
-  protected abstract String requestBodyForPositiveSmsScenario();
+  protected abstract String requestBodyForPositiveMicScenario();
 
-  protected abstract String smsPositiveResponseBody();
+  protected abstract String micPositiveResponseBody();
 
   protected abstract String requestBodyForMismatchedMetricScenario();
 
@@ -84,8 +84,8 @@ abstract class AbstractPortfolioCalculationE2ETest {
   protected record HttpResponse(HttpStatusCode status, String responseBody) {
   }
 
-  protected void enqueueSmsMockResponse(String body) {
-    smsMockServer.enqueue(
+  protected void enqueueMicMockResponse(String body) {
+    micMockServer.enqueue(
         new MockResponse()
             .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
             .setBody(body));
@@ -122,26 +122,26 @@ abstract class AbstractPortfolioCalculationE2ETest {
         .build();
   }
 
-  private static void ensureSmsMockServerStarted() throws IOException {
-    if (smsMockServer == null) {
-      smsMockServer = new MockWebServer();
-      smsMockServer.start();
+  private static void ensureMicMockServerStarted() throws IOException {
+    if (micMockServer == null) {
+      micMockServer = new MockWebServer();
+      micMockServer.start();
     }
   }
 
   @BeforeAll
-  static void startSmsMockServerBeforeAll() throws IOException {
-    ensureSmsMockServerStarted();
+  static void startMicMockServerBeforeAll() throws IOException {
+    ensureMicMockServerStarted();
   }
 
   /**
-   * Reset this class's {@link #smsMockServer} queue before every test so a response enqueued by one test can never leak
+   * Reset this class's {@link #micMockServer} queue before every test so a response enqueued by one test can never leak
    * into the next test in the same class (the server is shared by all tests within a class). Cross-class isolation is
    * handled separately by {@code reuseForks=false}, which gives each test class its own JVM and thus its own server.
    */
   @BeforeEach
-  void resetSmsMockServerQueue() {
-    smsMockServer.setDispatcher(new QueueDispatcher());
+  void resetMicMockServerQueue() {
+    micMockServer.setDispatcher(new QueueDispatcher());
   }
 
   /**
@@ -150,89 +150,89 @@ abstract class AbstractPortfolioCalculationE2ETest {
    * prevents mock state from leaking or racing across classes. No {@code @AfterAll} shutdown is needed: the server is
    * reclaimed when the per-class JVM exits.
    */
-  private static String smsMockBaseUrl() {
+  private static String micMockBaseUrl() {
     try {
-      ensureSmsMockServerStarted();
-      return smsMockServer.url("/").toString().replaceAll("/$", "");
+      ensureMicMockServerStarted();
+      return micMockServer.url("/").toString().replaceAll("/$", "");
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
   }
 
   @DynamicPropertySource
-  static void registerSecurityMasterBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.security-master.rest.base-url",
-        AbstractPortfolioCalculationE2ETest::smsMockBaseUrl);
+  static void registerMarketInvestmentCatalogueBaseUrl(DynamicPropertyRegistry registry) {
+    registry.add("external-services.market-investment-catalogue.rest.base-url",
+        AbstractPortfolioCalculationE2ETest::micMockBaseUrl);
   }
 
   @Test
-  void shouldReturnServiceUnavailableAfterRetries_whenExternalSecurityMasterIsUnavailable() {
-    for (int attempt = 0; attempt < SMS_RETRY_MAX_ATTEMPTS; attempt++) {
-      smsMockServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AFTER_REQUEST));
+  void shouldReturnServiceUnavailableAfterRetries_whenExternalMarketInvestmentCatalogueIsUnavailable() {
+    for (int attempt = 0; attempt < MIC_RETRY_MAX_ATTEMPTS; attempt++) {
+      micMockServer.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AFTER_REQUEST));
     }
-    int requestsBefore = smsMockServer.getRequestCount();
+    int requestsBefore = micMockServer.getRequestCount();
 
-    var response = postCalculation(requestBodyForSmsUnavailableScenario());
+    var response = postCalculation(requestBodyForMicUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
     assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.getCode());
-    assertThat(response.responseBody()).contains("Security Master");
-    assertThat(smsMockServer.getRequestCount() - requestsBefore)
+    assertThat(response.responseBody()).contains("Market Investment Catalogue");
+    assertThat(micMockServer.getRequestCount() - requestsBefore)
         .as("a transport failure is transient, so every configured attempt must reach the server")
-        .isEqualTo(SMS_RETRY_MAX_ATTEMPTS);
+        .isEqualTo(MIC_RETRY_MAX_ATTEMPTS);
   }
 
   @Test
-  void shouldReturnServiceUnavailableAfterRetries_whenExternalSecurityMasterReturnsServerError() {
-    for (int attempt = 0; attempt < SMS_RETRY_MAX_ATTEMPTS; attempt++) {
-      smsMockServer.enqueue(new MockResponse()
+  void shouldReturnServiceUnavailableAfterRetries_whenExternalMarketInvestmentCatalogueReturnsServerError() {
+    for (int attempt = 0; attempt < MIC_RETRY_MAX_ATTEMPTS; attempt++) {
+      micMockServer.enqueue(new MockResponse()
           .setResponseCode(500)
           .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
           .setBody("{\"error\":\"upstream failure\"}"));
     }
-    int requestsBefore = smsMockServer.getRequestCount();
+    int requestsBefore = micMockServer.getRequestCount();
 
-    var response = postCalculation(requestBodyForSmsUnavailableScenario());
+    var response = postCalculation(requestBodyForMicUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
     assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.getCode());
-    assertThat(response.responseBody()).contains("Security Master");
-    assertThat(smsMockServer.getRequestCount() - requestsBefore)
+    assertThat(response.responseBody()).contains("Market Investment Catalogue");
+    assertThat(micMockServer.getRequestCount() - requestsBefore)
         .as("a server error is transient, so every configured attempt must reach the server")
-        .isEqualTo(SMS_RETRY_MAX_ATTEMPTS);
+        .isEqualTo(MIC_RETRY_MAX_ATTEMPTS);
   }
 
   @Test
-  void shouldReturnBadGatewayWithoutRetrying_whenExternalSecurityMasterReturnsClientError() {
-    smsMockServer.enqueue(new MockResponse()
+  void shouldReturnBadGatewayWithoutRetrying_whenExternalMarketInvestmentCatalogueReturnsClientError() {
+    micMockServer.enqueue(new MockResponse()
         .setResponseCode(400)
         .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
         .setBody("{\"error\":\"bad request\"}"));
-    int requestsBefore = smsMockServer.getRequestCount();
+    int requestsBefore = micMockServer.getRequestCount();
 
-    var response = postCalculation(requestBodyForSmsUnavailableScenario());
+    var response = postCalculation(requestBodyForMicUnavailableScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_GATEWAY.value());
     assertThat(response.responseBody()).contains(ErrorCode.EXTERNAL_SERVICE_BAD_RESPONSE.getCode());
-    assertThat(response.responseBody()).contains("Security Master");
-    assertThat(smsMockServer.getRequestCount() - requestsBefore)
+    assertThat(response.responseBody()).contains("Market Investment Catalogue");
+    assertThat(micMockServer.getRequestCount() - requestsBefore)
         .as("a rejected request is this service's own bug, so repeating it cannot help")
         .isEqualTo(1);
   }
 
   /**
-   * Subclasses that trigger extra Security Master calls (e.g. treasury rates for trailing returns) override this to
-   * enqueue all required mock responses in order.
+   * Subclasses that trigger extra Market Investment Catalogue calls (e.g. treasury rates for trailing returns) override
+   * this to enqueue all required mock responses in order.
    */
-  protected void enqueueForPositiveSmsScenario() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
+  protected void enqueueForPositiveMicScenario() {
+    enqueueMicMockResponse(micPositiveResponseBody());
   }
 
   @Test
-  void shouldReturnOk_whenSmsReturnsAvailableResponse() {
-    enqueueForPositiveSmsScenario();
+  void shouldReturnOk_whenMicReturnsAvailableResponse() {
+    enqueueForPositiveMicScenario();
 
-    var response = postCalculation(requestBodyForPositiveSmsScenario());
+    var response = postCalculation(requestBodyForPositiveMicScenario());
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     assertPositiveResponseBody(response.responseBody());

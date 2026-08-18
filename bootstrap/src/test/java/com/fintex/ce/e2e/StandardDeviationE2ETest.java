@@ -52,17 +52,17 @@ class StandardDeviationE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(standardDeviationCommand());
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(standardDeviationCommand());
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(List.of(holdingReturnsRow(monthlyReturns())));
   }
 
@@ -85,7 +85,7 @@ class StandardDeviationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnBadRequestWithMissingMonthlyReturnError_whenHoldingReturnsContainGaps() {
-    enqueueSmsMockResponse(writeJson(List.of(holdingReturnsRow(monthlyReturnsWithGaps()))));
+    enqueueMicMockResponse(writeJson(List.of(holdingReturnsRow(monthlyReturnsWithGaps()))));
 
     HttpResponse response = postCalculation(writeJson(standardDeviationCommand()));
 

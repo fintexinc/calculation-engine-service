@@ -1,10 +1,10 @@
 [versions]
 spring-boot = "3.5.8"
 spring-dependency-management = "1.1.7"
-spotless = "7.0.2"
+spotless = "8.10.0"
 jib = "3.4.4"
 lombok = "8.11"
-git-properties = "2.4.2"
+git-properties = "4.0.1"
 
 # Internal dependencies. The Tangerine line consumes the commons build published from that library's own
 # tangerine-release branch, which is a narrower subset — no SalesChargeType, no FixedIncomeStyleBoxType.

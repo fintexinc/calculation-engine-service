@@ -1,5 +1,5 @@
 ---
-description: "Senior financial-analyst validation of a loaded ticket: should we implement it, do we have the data, and what options exist given the Morningstar/FMP-via-SMS data model"
+description: "Senior financial-analyst validation of a loaded ticket: should we implement it, do we have the data, and what options exist given the Morningstar/FMP-via-MIC data model"
 allowed-tools: ["Bash", "Read", "Grep", "Glob", "AskUserQuestion"]
 ---
 
@@ -12,8 +12,8 @@ implementation.
 
 This command is **read-only and advisory**. It has no `Edit`/`Write` access by design. It must
 **never** modify code, commit, open a PR, or make **network** calls to any external service
-(SMS / FMP / the Morningstar API). It **may and should read the local Morningstar CSV files** that
-the bundled SMS instance loads (see below) — those are local files, not a service call — to
+(MIC / FMP / the Morningstar API). It **may and should read the local Morningstar CSV files** that
+the bundled MIC instance loads (see below) — those are local files, not a service call — to
 confirm the ticket's data actually exists. Its whole output is an assessment the developer reads.
 
 Answer three questions, in order, then print a summary table:
@@ -28,41 +28,41 @@ Answer three questions, in order, then print a summary table:
 
 Getting this right is the point of the command — do not skip it.
 
-- **This service reads only SMS.** calculation-engine-service does **not** read FMP or the
+- **This service reads only MIC.** calculation-engine-service does **not** read FMP or the
   Morningstar CSVs directly. There is no FMP HTTP client and no Morningstar CSV reader in this
-  repo. All security data arrives from **Security Master Service (SMS)** over REST
-  (`SM_REST_BASE_URL`, see `bootstrap/src/main/resources/application.yml`), via
+  repo. All security data arrives from **Market Investment Catalogue Service (MIC)** over REST
+  (`MIC_REST_BASE_URL`, see `bootstrap/src/main/resources/application.yml`), via
   `POST /api/v1/wealth/securities/attributes`.
-- **Morningstar and FMP are upstream sources *of SMS*, selected by a provider list.** This
-  service sends a preferred-provider list to SMS and SMS decides which upstream supplies each
+- **Morningstar and FMP are upstream sources *of MIC*, selected by a provider list.** This
+  service sends a preferred-provider list to MIC and MIC decides which upstream supplies each
   attribute:
   - `bootstrap/src/main/resources/application.yml` → `data-providers: MORNINGSTAR, FMP`.
-  - `web-client-adapter/.../sm/fetcher/CompositeSecurityMasterFetcher.java` builds
+  - `web-client-adapter/.../mic/fetcher/CompositeMarketInvestmentCatalogueFetcher.java` builds
     `IdsAndDataProvidersRequest.builder().dataProviders(providers)` — the list is a *request
-    parameter to SMS*, not a switch that calls FMP/Morningstar here.
+    parameter to MIC*, not a switch that calls FMP/Morningstar here.
   - The `FMP_API_URL` / `FMP_API_KEY` / `MORNINGSTAR_CSV_BASE_PATH` env vars live in
-    `ce-environment/.env` and configure the **bundled SMS instance**, not this service.
+    `ce-environment/.env` and configure the **bundled MIC instance**, not this service.
 
-**Therefore, "do we have the data?" is really: does an SMS *attribute* exist for the field the
+**Therefore, "do we have the data?" is really: does an MIC *attribute* exist for the field the
 ticket needs, is it bound in the fetcher registry, and is there a mapper that turns it into a CE
-domain type?** Provider reasoning (Morningstar vs FMP) is about *which upstream SMS would resolve
+domain type?** Provider reasoning (Morningstar vs FMP) is about *which upstream MIC would resolve
 that attribute from* and the provider-specific quirks this repo already encodes.
 
-### SMS attribute → mapper → metric-family reference (verify against current code)
+### MIC attribute → mapper → metric-family reference (verify against current code)
 
-Binding registry: `web-client-adapter/.../sm/fetcher/SecurityAttributeFetcherConfig.java`
-(each `CompositeAttributeBinding` maps a `CompositeSecurityAttribute` → SMS response → CE domain
+Binding registry: `web-client-adapter/.../mic/fetcher/SecurityAttributeFetcherConfig.java`
+(each `CompositeAttributeBinding` maps a `CompositeSecurityAttribute` → MIC response → CE domain
 type → mapper). Treat this table as a starting map, then **confirm it against the current
 `SecurityAttributeFetcherConfig` and the named mapper** — bindings drift as the codebase evolves.
 
-| Data need in the ticket | SMS attribute | Mapper |
+| Data need in the ticket | MIC attribute | Mapper |
 |---|---|---|
 | Monthly total-return series | `MONTHLY_RETURNS` | `MonthlyReturnsMapper` |
 | Risk-free / T-Bill series | (T-Bill fetch) | `SmsTreasuryBillsFetcherImpl` (`/treasury-rates/{currency}`) |
 | Management fee / MER | `FEES` | `FeesMapper` (carries per-field provider tags) |
 | Sales charge | `SALES_CHARGE` | `SalesChargeMapper` |
 | Income / dividend yield | `INCOME` | `YieldMapper` |
-| Asset allocation | `ASSET_ALLOCATION` | `AssetAllocationSecurityMasterMapper` |
+| Asset allocation | `ASSET_ALLOCATION` | `AssetAllocationMarketInvestmentCatalogueMapper` |
 | Equity sector weights | `EQUITY_SECTOR_ALLOCATION` | `EquitySectorAllocationMapper` |
 | Fixed-income sector alloc. | `FIXED_INCOME_SECTOR_ALLOCATION` | `FixedIncomeSectorAllocationMapper` |
 | Equity country allocation | `EQUITY_COUNTRY_ALLOCATION` | `EquityCountryAllocationMapper` |
@@ -91,12 +91,12 @@ to confirm they still hold):
 
 ### Locating the Morningstar CSV data (the source of truth for Step 2)
 
-The bundled SMS instance loads Morningstar CSV snapshots from `MORNINGSTAR_CSV_BASE_PATH`
+The bundled MIC instance loads Morningstar CSV snapshots from `MORNINGSTAR_CSV_BASE_PATH`
 (declared in `ce-environment/.env` — note that value is a machine-specific absolute path). To find
 the CSVs from this repo, resolve the base directory in this order and use the first that exists:
 
 ```bash
-# 1. Sibling SMS checkout (usual local layout)
+# 1. Sibling MIC checkout (usual local layout)
 ls -d ../security-master-service-v2/file-storage-adapter/src/main/resources/morningstar 2>/dev/null
 # 2. Whatever ce-environment/.env points at (strip the MORNINGSTAR_CSV_BASE_PATH= prefix; it may be
 #    a Windows path that does not resolve on this machine)
@@ -112,7 +112,7 @@ Inside the base dir, data is snapshotted **per date**: subfolders named `YYYYMMD
 Morningstar's raw field names (e.g. `MStarID, FundName, Ticker, Return1Yr, ReturnYTD,
 ReturnSinceInception, AnnualReturnYear1..10, MonthEndDate, CategoryName, ...`).
 
-**If no base dir resolves**, say so explicitly and fall back to reasoning from the SMS
+**If no base dir resolves**, say so explicitly and fall back to reasoning from the MIC
 fetchers/mappers only — and mark Step 2's verdict as **unverified against source data**.
 
 ---
@@ -166,8 +166,8 @@ this step confirms or refutes it against the source of truth.
 
 1. Which metric / command / `CalculationService` does the ticket touch? (map the metric name via
    `CalculationMetric`).
-2. Which SMS **attribute** supplies the field, is it **bound** in `SecurityAttributeFetcherConfig`,
-   and which **mapper** turns it into a CE domain type? Which upstream would SMS resolve it from,
+2. Which MIC **attribute** supplies the field, is it **bound** in `SecurityAttributeFetcherConfig`,
+   and which **mapper** turns it into a CE domain type? Which upstream would MIC resolve it from,
    and does the repo encode a provider quirk (fees/MER, identifier priority, residual clamps)?
 
 **B. Source-data analysis (the new, primary check — inspect the CSVs):**
@@ -233,7 +233,7 @@ reject the ticket — do not propose building on data that is not there.
 Offer **2–3 concrete approaches**. For each:
 
 - **What it does** — the change in this service (which service/validator/mapper), and whether it
-  needs anything **from SMS** (a new/extended attribute, a provider-list change) or new Morningstar
+  needs anything **from MIC** (a new/extended attribute, a provider-list change) or new Morningstar
   columns that are not in the current snapshots.
 - **Provider / data angle** — which upstream (Morningstar vs FMP) supplies the field and the
   **concrete coverage you observed in the CSVs** (which fund types/regions have it populated, which
@@ -266,7 +266,7 @@ Then:
   implementation (the `brainstorming` skill for a spec, or the `coder` skill to build it) — **only
   if the developer says so**.
 - If the verdict is **Needs clarification**, data is **Missing / premise wrong**, or **Unverified**,
-  list the exact blocking questions / SMS or CSV dependencies the developer should resolve first —
+  list the exact blocking questions / MIC or CSV dependencies the developer should resolve first —
   do not offer to implement.
 
 Never start implementing from within this command.

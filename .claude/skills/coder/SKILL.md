@@ -11,7 +11,7 @@ description: >
 # Coding Guidelines
 
 Portfolio calculation microservice: Java 21, Spring Boot 3.4.6, multi-module Maven, Hexagonal Architecture.
-Fetches data from Security Master (SM) via REST, performs financial calculations.
+Fetches data from Market Investment Catalogue (MIC) via REST, performs financial calculations.
 **No database, no GraphQL.** (Caching goes through the `cache-adapter` module.)
 
 **Before finishing a change, scan the `review-lessons` skill** — a checklist of concrete defects
@@ -54,7 +54,7 @@ The project implements the Hexagonal Architecture with Spring Boot with the foll
 | `api`                | Port interfaces, shared utilities, service interfaces     | No      |
 | `application`        | Calculation orchestration, service impls, response mappers| Minimal |
 | `rest-adapter`       | REST controllers, request/response DTOs, validation chain | Yes     |
-| `web-client-adapter` | SM REST fetchers, mappers, stubs                          | Yes     |
+| `web-client-adapter` | MIC REST fetchers, mappers, stubs                          | Yes     |
 | `bootstrap`          | Spring Boot entry point, bean wiring, config              | Yes     |
 
 **Rules:**
@@ -93,7 +93,7 @@ Pure logic, no data fetching.
 - **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
 - **Stream to list:** prefer `.toList()` (returns an unmodifiable list) over `.collect(Collectors.toList())`. Only use `Collectors.toList()` when the result must be mutable
 - **Optional**: Return `Optional<T>` for optional values when it makes sense
-- **Null check**: Validate SM data at adapter boundary with `Objects.requireNonNull`
+- **Null check**: Validate MIC data at adapter boundary with `Objects.requireNonNull`
 - **Not null collections**: Never return null collections — use `List.of()`
 - **Collection null/empty checks:** use `org.springframework.util.CollectionUtils.isEmpty(col)` instead of `col == null || col.isEmpty()`. Never perform the same `null || isEmpty` check twice in a row — collapse to a single `CollectionUtils.isEmpty` call
 - **Object construction:** prefer immutable data classes. Construct via the canonical/all-args constructor, a single-field constructor (or named static factory `ofX(...)` when types would collide) for the dominant case, or a Lombok `@Builder` / `@SuperBuilder` for multi-field cases; avoid setter-based construction and never mix builder calls with post-build setters. For pure value carriers, use `record`s.
@@ -111,15 +111,15 @@ Pure logic, no data fetching.
 - **Max 5-7 deps** per class; max 3 nesting levels (early returns)
 - **Tests:** JUnit 5 + Mockito, no Spring context for unit tests. Naming: `shouldDoSomething_whenCondition`. Don't use `sut` for the system-under-test variable — pick a descriptive name from the type under test (e.g. `calculation`, `service`, `fetcher`, `mapper`).
 
-## 4) External Calls (SM)
+## 4) External Calls (MIC)
 
 **Never call external web services in loops (N+1)** — always batch.
 **Always use Resilience4j for resilience patterns**
 
 ```java
-@CircuitBreaker(name = "securityMaster", fallbackMethod = "fetchFallback")
-@Retry(name = "securityMaster")
-@Bulkhead(name = "securityMaster")
+@CircuitBreaker(name = "marketInvestmentCatalogue", fallbackMethod = "fetchFallback")
+@Retry(name = "marketInvestmentCatalogue")
+@Bulkhead(name = "marketInvestmentCatalogue")
 ```
 
 No hardcoded timeouts, URLs, retry counts — configure in `application.yaml`.
@@ -154,7 +154,7 @@ void shouldFetchFromSM_whenSecurityIdIsValid() { ... }
 1. Does similar code exist? -> Extend/reuse
 2. Can this be abstracted? -> Template Method hierarchy
 3. Correct module? -> Domain has no Spring
-4. Batch SM calls? -> No loops
+4. Batch MIC calls? -> No loops
 5. Resilience configured? -> CircuitBreaker, Retry, Bulkhead
 6. Config in YAML? -> No hardcoded values
 

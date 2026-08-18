@@ -477,7 +477,7 @@ public enum ErrorCode {
   TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY(
       Codes.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY,
       "T-Bill rates are not available for currency %s",
-      "The metric requires a T-Bill (risk-free rate) series but Security Master provides no rates for the requested currency",
+      "The metric requires a T-Bill (risk-free rate) series but the Market Investment Catalogue provides no rates for the requested currency",
       "Use a supported currency (CAD or USD) or ensure T-Bill rates are available for the requested currency",
       HttpStatus.BAD_REQUEST,
       Severity.ERROR),

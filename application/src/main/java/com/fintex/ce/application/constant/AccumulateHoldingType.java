@@ -1,7 +1,7 @@
 package com.fintex.ce.application.constant;
 
 /**
- * SM holding-type codes eligible to be accumulated as Top-N candidates. The enum {@code name()} is the exact SMS code
+ * MIC holding-type codes eligible to be accumulated as Top-N candidates. The enum {@code name()} is the exact MIC code
  * compared against {@code CommonHolding.type} during aggregation, so YAML and request payloads can bind by name.
  */
 public enum AccumulateHoldingType {

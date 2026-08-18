@@ -9,7 +9,7 @@ Notice **potential** performance smells across the stack and know the standard f
 
 **Golden rule:** measure first (JMH / profiler / prod metrics / query plans), optimize only proven hot paths, never trade away readability for a micro-gain. "Looks slow" is not a measurement.
 
-**This repo's reality:** no database — the dominant cost is **interservice calls** to SMS and Bank of Canada, plus in-memory calculation over holdings. The DB and concurrency sections below still apply the moment that surface is introduced.
+**This repo's reality:** no database — the dominant cost is **interservice calls** to MIC and Bank of Canada, plus in-memory calculation over holdings. The DB and concurrency sections below still apply the moment that surface is introduced.
 
 ## Categories at a glance
 
@@ -42,7 +42,7 @@ Also: sort once instead of re-sorting in a loop; cache an expensive pure result 
 - **`String +=` in a loop** → `StringBuilder` / `String.join`. (Simple non-loop concatenation is fine since Java 9.)
 - **Missing capacity hint** (`new ArrayList<>(size)`) → free win only when size is known.
 - **Streams**: prefer for readability (CLAUDE.md mandates Stream API); only rewrite to loops when a profiler flags a >100k-iteration hot path. **Parallel streams** only for CPU-bound work on large collections, never with shared mutable state.
-- **Never put a blocking call in a `parallelStream()`** — external service (SMS/BoC), DB, or any I/O. Parallel streams run on the shared **common `ForkJoinPool`** (sized to CPU cores), so a blocking task there starves *every other* parallel stream in the JVM and gives none of the throughput you actually want for I/O.
+- **Never put a blocking call in a `parallelStream()`** — external service (MIC/BoC), DB, or any I/O. Parallel streams run on the shared **common `ForkJoinPool`** (sized to CPU cores), so a blocking task there starves *every other* parallel stream in the JVM and gives none of the throughput you actually want for I/O.
 
 ```java
 // 🔴 blocks common ForkJoinPool threads, starves the whole JVM's parallel work
@@ -53,7 +53,7 @@ try (var exec = Executors.newVirtualThreadPerTaskExecutor()) {
   // ... collect fs
 }
 ```
-parallelStream is for **CPU-bound** work only. (Better still for SMS: batch into one call — see §4.)
+parallelStream is for **CPU-bound** work only. (Better still for MIC: batch into one call — see §4.)
 
 ## 3. Database (when a DB is added)
 - **N+1 queries** — a query per row inside a loop. Fix with a fetch-join or a single batched `IN (...)` query.
@@ -63,7 +63,7 @@ parallelStream is for **CPU-bound** work only. (Better still for SMS: batch into
 - **Bad query building** — parameterize (no string concat → also SQL-injection); don't build queries inside a loop; for deep pages prefer keyset pagination over large `OFFSET`.
 
 ## 4. Interservice communication (critical here)
-**N+1 fan-out and missing Resilience4j/timeouts on SMS/BoC calls are owned by `code-reviewer` and `coder` §4 — not restated here.** What this skill adds on top:
+**N+1 fan-out and missing Resilience4j/timeouts on MIC/BoC calls are owned by `code-reviewer` and `coder` §4 — not restated here.** What this skill adds on top:
 - **Chatty sequential calls** — independent calls awaited one-by-one. Parallelize with virtual threads / `CompletableFuture` on a dedicated executor — **not `parallelStream()`** (blocking on the common ForkJoinPool, see §2).
 - **No caching of stable upstream data** — repeatedly fetching data that rarely changes → cache with a TTL (see `cache-adapter`).
 
@@ -106,5 +106,5 @@ grep -rn "new ConcurrentHashMap<>()"    --include="*.java"   # inspect ONLY thos
 ```
 
 ## Related
-- **`code-reviewer`** — external-call fan-out, N+1, and Resilience4j on SMS/BoC calls
+- **`code-reviewer`** — external-call fan-out, N+1, and Resilience4j on MIC/BoC calls
 - **`clean-code`** — premature optimization is an antipattern: measure first

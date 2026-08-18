@@ -7,7 +7,7 @@ import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.port.observability.CacheObservability;
 import com.fintex.ce.port.observability.CacheStatistics;
-import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
+import com.fintex.ce.port.webclient.mic.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;

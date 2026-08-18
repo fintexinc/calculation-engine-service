@@ -58,7 +58,7 @@ import okhttp3.mockwebserver.RecordedRequest;
  * End-to-end coverage for the {@code /asset-allocations} endpoint. Beyond the inherited single-ETF positive case, this
  * class exercises the full stack on portfolios that mix cash, GIC, stocks, ETFs, and funds across multiple currencies —
  * verifying weighted aggregation after FX normalization to CAD, geography lookups for stocks, asset-allocation lookups
- * for funds/ETFs, and warning emission when SMS or Bank of Canada return incomplete data. Request bodies are built from
+ * for funds/ETFs, and warning emission when MIC or Bank of Canada return incomplete data. Request bodies are built from
  * the same DTO classes the controller deserializes, so renames or shape changes break the test at compile time. The FX
  * cache is disabled here so every test sees the dispatcher state it installs; caching behaviour is covered by
  * {@link FxRatesCachingEnabledE2ETest}.
@@ -105,19 +105,19 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(allocationsCommand(
         etf("XBAL", FinancialInstrumentType.ETF, Country.CANADA, 50_000),
         etf("VCNS", FinancialInstrumentType.ETF, Country.CANADA, 50_000)));
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(allocationsCommand(etf("XBAL", FinancialInstrumentType.ETF, Country.CANADA, 50_000)));
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(Map.of(
         CompositeSecurityAttribute.ASSET_ALLOCATION,
         List.of(allocationRow("XBAL", FiIdentifierType.TICKER, Currency.CAD,
@@ -147,7 +147,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   @Test
   void shouldAggregateWeightedAllocations_acrossMixedHoldingsAndCurrencies() {
     bocMockServer.setDispatcher(BocMockResponses.constantUsdCadRateDispatcher("1.5000"));
-    smsMockServer.setDispatcher(routingDispatcher(
+    micMockServer.setDispatcher(routingDispatcher(
         List.of(
             geographyRow("AAPL", FiIdentifierType.TICKER_MIC, SecurityRegion.USA, Currency.USD),
             geographyRow("RY.TO", FiIdentifierType.TICKER_MIC, SecurityRegion.CANADA, Currency.CAD)),
@@ -174,7 +174,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldEmitWarnings_whenStockHasNoGeographyAndFundHasNoAllocations() {
-    smsMockServer.setDispatcher(routingDispatcher(
+    micMockServer.setDispatcher(routingDispatcher(
         List.of(geographyRow("RY.TO", FiIdentifierType.TICKER_MIC, SecurityRegion.CANADA, Currency.CAD)),
         List.of(allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
             allocationValue(AssetAllocationRegionType.US_EQUITIES, "1.0")))));
@@ -193,7 +193,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   @Test
   void shouldEmitFxWarning_whenBankOfCanadaReturnsNoObservations() {
     bocMockServer.setDispatcher(emptyBocObservationsDispatcher());
-    smsMockServer.setDispatcher(routingDispatcher(
+    micMockServer.setDispatcher(routingDispatcher(
         List.of(geographyRow("AAPL", FiIdentifierType.TICKER_MIC, SecurityRegion.USA, Currency.USD)),
         List.of()));
 

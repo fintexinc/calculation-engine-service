@@ -78,7 +78,7 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
   }
 
   /**
-   * The region buckets arrive already rolled up by Security Master and are reported unchanged. Rolling
+   * The region buckets arrive already rolled up by Market Investment Catalogue and are reported unchanged. Rolling
    * {@code COUNTRY_ALLOCATION} up here instead would drop the exposure of any country label the catalog cannot resolve
    * — those rows reach the mapper with a null type — and renormalize the remaining regions over it.
    */
@@ -273,8 +273,8 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
   }
 
   /**
-   * Security Master publishes no region breakdown for an individual stock, so the stock branch resolves one region from
-   * the security's geography — hence {@code GEOGRAPHY} is required alongside the allocation attribute.
+   * Market Investment Catalogue publishes no region breakdown for an individual stock, so the stock branch resolves one
+   * region from the security's geography — hence {@code GEOGRAPHY} is required alongside the allocation attribute.
    */
   @Test
   void shouldAttributeStockToItsBusinessCountryRegion_whenHoldingIsSingleStock() {
@@ -384,9 +384,9 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
   }
 
   /**
-   * Security Master rescales the breakdown to fractions summing to one, but the metric does not depend on that: the
-   * inherited normalization re-bases whatever scale arrives, so a percentage-scaled row still reports the same
-   * distribution.
+   * Market Investment Catalogue rescales the breakdown to fractions summing to one, but the metric does not depend on
+   * that: the inherited normalization re-bases whatever scale arrives, so a percentage-scaled row still reports the
+   * same distribution.
    */
   @Test
   void shouldRescaleToOneHundredPercent_whenValuesArePercentagesRatherThanFractions() {

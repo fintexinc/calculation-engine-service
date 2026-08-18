@@ -1,7 +1,7 @@
 package com.fintex.ce.adapter.cache.tbills;
 
 import com.fintex.ce.port.observability.CacheObservability;
-import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
+import com.fintex.ce.port.webclient.mic.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;

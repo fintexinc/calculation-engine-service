@@ -84,7 +84,7 @@ public class CommonHoldingsService
       Map<PortfolioHolding, CommonTopHoldings> data) {
     Map<PortfolioHolding, CommonTopHoldings> rawHoldings = FilterUtils.restrictToHoldings(data, command.getHoldings());
 
-    SecurityDataValidator.requireDataForEveryHolding(rawHoldings, command.getHoldings(), this::isSentToSms);
+    SecurityDataValidator.requireDataForEveryHolding(rawHoldings, command.getHoldings(), this::isSentToMic);
     requireUnderlyingHoldingsForEveryFund(rawHoldings);
 
     WeightedValues weighted = weightHoldingValuesByTargetCurrency(command.getHoldings(), rawHoldings);
@@ -117,7 +117,7 @@ public class CommonHoldingsService
   /**
    * Converts each holding's request {@code value} from its source currency to the default target currency before the
    * portfolio-weight denominator is summed. Mirrors the Fees pipeline: currency comes from the holding for cash/GIC,
-   * and from the SM {@code TopHoldings.currency} field for everything else. Missing currency on a non-cash/GIC holding
+   * and from the MIC {@code TopHoldings.currency} field for everything else. Missing currency on a non-cash/GIC holding
    * is a hard error, because summing mixed currencies as if they were the same would silently corrupt every weight in
    * the result.
    */
@@ -130,7 +130,7 @@ public class CommonHoldingsService
     }
     Conversion conversion = currencyConverter.convert(input);
     for (PortfolioHolding holding : conversion.missingCurrency()) {
-      if (isSentToSms(holding)) {
+      if (isSentToMic(holding)) {
         throw ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS.toExceptionForHolding(holding);
       }
     }
@@ -230,14 +230,14 @@ public class CommonHoldingsService
   }
 
   /**
-   * Recursively expands a holding subtree, multiplying the inherited weight by each node's SM weighting. Returns the
+   * Recursively expands a holding subtree, multiplying the inherited weight by each node's MIC weighting. Returns the
    * {@link HoldingComponent} for the node: a {@link CompositeHolding} when the node is a descended fund (its
    * {@link HoldingComponent#leaves()} flattens to the terminal contributions) or a {@link LeafHolding} when the node is
    * terminal. Recursion stops at the configured max depth or when the same node identity is revisited on the current
    * branch (cycle guard for data we don't control).
    *
    * <p>
-   * Leaf-stock short-circuit: when the request holding IS a stock, SM echoes the same equity back as its single
+   * Leaf-stock short-circuit: when the request holding IS a stock, MIC echoes the same equity back as its single
    * underlying. The portfolio allocation already represents the full weight of that equity, so the node's own ratio is
    * not a decomposition factor and is intentionally skipped — unlike the general case below, which multiplies through.
    */
@@ -366,18 +366,18 @@ public class CommonHoldingsService
   }
 
   /**
-   * Holdings the engine sends to Security Master and therefore expects back in the response. Cash and GIC are skipped
-   * upstream (see {@link FilterUtils#LOCALLY_SOURCED_TYPES}); everything else (stocks, fixed income, all fund-like
-   * instruments) must be returned.
+   * Holdings the engine sends to Market Investment Catalogue and therefore expects back in the response. Cash and GIC
+   * are skipped upstream (see {@link FilterUtils#LOCALLY_SOURCED_TYPES}); everything else (stocks, fixed income, all
+   * fund-like instruments) must be returned.
    */
-  private boolean isSentToSms(PortfolioHolding holding) {
+  private boolean isSentToMic(PortfolioHolding holding) {
     return !FilterUtils.LOCALLY_SOURCED_TYPES.contains(holding.getHoldingType());
   }
 
   /**
    * Spec rule: mutual funds / ETFs / pooled funds with an empty underlying-holdings list -> TCH-001 error. Restricted
    * to fund-like types because direct stock or fixed-income holdings legitimately have no underlying-holdings list. The
-   * complementary case (the holding wasn't returned by SM at all) is covered by
+   * complementary case (the holding wasn't returned by MIC at all) is covered by
    * {@link SecurityDataValidator#requireDataForEveryHolding}.
    */
   private void requireUnderlyingHoldingsForEveryFund(Map<PortfolioHolding, CommonTopHoldings> rawHoldings) {

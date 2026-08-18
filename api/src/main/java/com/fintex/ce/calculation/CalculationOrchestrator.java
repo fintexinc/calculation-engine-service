@@ -8,9 +8,10 @@ import java.util.List;
 
 /**
  * Entry point for executing portfolio calculations on already-validated commands. The orchestrator resolves the
- * metric's {@link CalculationService} from {@code command.getMetric()}, fetches the Security Master attributes the
- * service declares, prepares the service's typed data and dispatches — for a single command as well as for a composite
- * request calculating several metrics at once. Request validation and observability are owned by the REST adapter.
+ * metric's {@link CalculationService} from {@code command.getMetric()}, fetches the Market Investment Catalogue
+ * attributes the service declares, prepares the service's typed data and dispatches — for a single command as well as
+ * for a composite request calculating several metrics at once. Request validation and observability are owned by the
+ * REST adapter.
  */
 public interface CalculationOrchestrator {
 

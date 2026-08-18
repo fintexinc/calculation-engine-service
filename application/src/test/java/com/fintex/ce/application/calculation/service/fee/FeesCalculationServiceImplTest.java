@@ -388,7 +388,7 @@ class FeesCalculationServiceImplTest {
   }
 
   private static FeeData fee(String mer, String managementFee, String ner, String ger) {
-    // Default currency CAD: SMS always returns a currency for a fund row, and the FX path now hard-fails when it's
+    // Default currency CAD: MIC always returns a currency for a fund row, and the FX path now hard-fails when it's
     // missing. Tests that want a different source currency build their own FeeData inline.
     return FeeData.builder()
         .managementExpenseRatio(mer == null ? null : new BigDecimal(mer))

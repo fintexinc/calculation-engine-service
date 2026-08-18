@@ -55,7 +55,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void shouldThrowNoSecurityDataForHolding_whenHoldingMissingFromSecurityMasterResponse() {
+  void shouldThrowNoSecurityDataForHolding_whenHoldingMissingFromMarketInvestmentCatalogueResponse() {
     when(generator.generateGicMonthlyReturns(anyList())).thenReturn(Map.of());
     MonthlyReturnsService service = service();
 
@@ -99,7 +99,7 @@ class MonthlyReturnsServiceTest {
   }
 
   @Test
-  void shouldMergeCashReturns_whenCashIsOmittedFromSecurityMasterResponse() {
+  void shouldMergeCashReturns_whenCashIsOmittedFromMarketInvestmentCatalogueResponse() {
     HoldingMonthlyReturns cashReturns = holdingMonthlyReturns(Currency.CAD,
         Map.entry(JANUARY_END, BigDecimal.valueOf(0.4)),
         Map.entry(FEBRUARY_END, BigDecimal.valueOf(0.5)));

@@ -8,8 +8,8 @@ import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import java.util.Map;
 
 /**
- * Prepared Security Master fee data for the {@code mer-benchmark-comparison} metric: the portfolio holdings' fee data
- * and the benchmark holdings' fee data, fetched into separate sections of {@code SecurityData}.
+ * Prepared Market Investment Catalogue fee data for the {@code mer-benchmark-comparison} metric: the portfolio
+ * holdings' fee data and the benchmark holdings' fee data, fetched into separate sections of {@code SecurityData}.
  */
 public record MerComparisonData(
     Map<PortfolioHolding, FeeData> portfolio,

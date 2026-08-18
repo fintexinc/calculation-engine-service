@@ -1,6 +1,6 @@
 package com.fintex.ce;
 
-import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
+import com.fintex.ce.port.webclient.mic.SecurityAttributesFetcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

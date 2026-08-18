@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 
 /**
  * Per-security geographic allocation breakdown plus the currency in which the underlying values are quoted. The
- * currency is sourced from the SMS geographic-allocation response (GeographicAllocationWithCurrency) and is used by
+ * currency is sourced from the MIC geographic-allocation response (GeographicAllocationWithCurrency) and is used by
  * callers that need to normalize holding market values across currencies before weighting.
  */
 @Data

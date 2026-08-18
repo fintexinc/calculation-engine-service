@@ -74,7 +74,7 @@ class AnnualReturnsWithFxE2ETest extends AbstractAnnualReturnsE2ETest {
 
   @Test
   void shouldConvertUsdHoldingsToCad_whenTargetCurrencyDiffers() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         securityAttributeResult(VTI, fullYear2024Returns()),
         securityAttributeResult(SPY, fullYear2024Returns()))));
 

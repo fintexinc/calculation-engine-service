@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Shared e2e infrastructure for the {@code annual-returns} metric. Common {@link ReturnCommand} fixtures live in
  * {@link AbstractReturnCommandE2ETest}. Annual-returns requires a full Jan-Dec calendar year of monthly returns per
- * holding, so the positive SMS response supplies all twelve 2024 month-ends (see {@link #fullYear2024Returns()}).
+ * holding, so the positive MIC response supplies all twelve 2024 month-ends (see {@link #fullYear2024Returns()}).
  *
  * <p>
  * Every holding in the positive scenario is given the <em>same</em> monthly-return series, so the value-weighted
@@ -48,19 +48,19 @@ abstract class AbstractAnnualReturnsE2ETest extends AbstractReturnCommandE2ETest
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(commandFor(Currency.CAD, List.of(
         etfCanada(XBAL, "45234.67"),
         etfCanada(VCNS, "18765.43"))));
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(annualPortfolioCommand());
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(List.of(
         securityAttributeResult(XBAL, fullYear2024Returns()),
         securityAttributeResult(VCNS, fullYear2024Returns()),

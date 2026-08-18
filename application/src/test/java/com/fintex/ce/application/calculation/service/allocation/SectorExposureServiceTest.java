@@ -52,10 +52,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Since TMI-558 the sleeve reconciliation happens in Security Master, which publishes one vector per security summing
- * to 1. What is left for this service, and what these tests cover, is everything Security Master cannot do: holdings it
- * has no security for (cash, GICs), holdings it returned nothing for, FX weighting across currencies, and the
- * portfolio-level invariant that the buckets total 100% without a final rescale.
+ * Since TMI-558 the sleeve reconciliation happens in Market Investment Catalogue, which publishes one vector per
+ * security summing to 1. What is left for this service, and what these tests cover, is everything Market Investment
+ * Catalogue cannot do: holdings it has no security for (cash, GICs), holdings it returned nothing for, FX weighting
+ * across currencies, and the portfolio-level invariant that the buckets total 100% without a final rescale.
  */
 class SectorExposureServiceTest {
 
@@ -101,8 +101,8 @@ class SectorExposureServiceTest {
   }
 
   /**
-   * Exposure Security Master could not put a sector on travels as its own bucket rather than being spread over the
-   * sectors that did resolve, and reaches the client donut unchanged.
+   * Exposure Market Investment Catalogue could not put a sector on travels as its own bucket rather than being spread
+   * over the sectors that did resolve, and reaches the client donut unchanged.
    */
   @Test
   void shouldPreserveUnsectoredAndUnexplainedShares_whenVendorReportsThem() {
@@ -122,9 +122,10 @@ class SectorExposureServiceTest {
   }
 
   /**
-   * Security Master balances every published vector to exactly 1, but this metric reports its buckets without a final
-   * rescale, so a vector that arrived summing to more than 1 would push the portfolio past 100% with nothing downstream
-   * to catch it. The local rescale keeps that invariant independent of the upstream release in production.
+   * Market Investment Catalogue balances every published vector to exactly 1, but this metric reports its buckets
+   * without a final rescale, so a vector that arrived summing to more than 1 would push the portfolio past 100% with
+   * nothing downstream to catch it. The local rescale keeps that invariant independent of the upstream release in
+   * production.
    */
   @Test
   void shouldContributeExactlyOneWholeHolding_whenVendorDistributionDoesNotSumToOne() {
@@ -145,9 +146,9 @@ class SectorExposureServiceTest {
 
   /**
    * Once the datum has arrived, a stock is one bucket and needs no handling of its own — the same shape a fund's
-   * distribution has, with all the weight on one entry. How it arrives is the pair of tests below: Security Master
-   * publishes a company's sector on the scalar {@code EQUITY_SECTOR} attribute, not in the consolidated column, which
-   * it fills for composite securities only.
+   * distribution has, with all the weight on one entry. How it arrives is the pair of tests below: Market Investment
+   * Catalogue publishes a company's sector on the scalar {@code EQUITY_SECTOR} attribute, not in the consolidated
+   * column, which it fills for composite securities only.
    */
   @Test
   void shouldContributeFullWeightToOneSector_whenHoldingIsStock() {
@@ -182,7 +183,7 @@ class SectorExposureServiceTest {
   }
 
   @Test
-  void shouldWarnSecurityNotFoundAndBucketUnknown_whenSecurityMasterHasNoRecord() {
+  void shouldWarnSecurityNotFoundAndBucketUnknown_whenMarketInvestmentCatalogueHasNoRecord() {
     var fund = fund("GHOST-1", "100");
 
     var result = service.perform(command(fund), distributions(Map.of()));
@@ -296,10 +297,11 @@ class SectorExposureServiceTest {
   }
 
   /**
-   * The stock path as Security Master actually answers it: the company's sector on the scalar attribute, translated
-   * from the equity taxonomy onto the consolidated one, and the consolidated attribute answering with the currency
-   * alone because it is filled for composite securities only. The empty consolidated row must not displace the sector —
-   * that is what used to send every individual stock into {@code UNKNOWN} and leave the pie short of the money in it.
+   * The stock path as Market Investment Catalogue actually answers it: the company's sector on the scalar attribute,
+   * translated from the equity taxonomy onto the consolidated one, and the consolidated attribute answering with the
+   * currency alone because it is filled for composite securities only. The empty consolidated row must not displace the
+   * sector — that is what used to send every individual stock into {@code UNKNOWN} and leave the pie short of the money
+   * in it.
    */
   @Test
   void shouldBucketTheStockByItsScalarSector_whenTheConsolidatedAttributeIsEmptyForIt() {

@@ -81,25 +81,25 @@ class CalculationStatisticsEndpointE2ETest {
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
 
-  private static MockWebServer smsMockServer;
+  private static MockWebServer micMockServer;
 
   @Autowired
   private WebTestClient webTestClient;
 
   @BeforeAll
-  static void startSmsMockServer() throws IOException {
-    if (smsMockServer == null) {
-      smsMockServer = new MockWebServer();
-      smsMockServer.start();
+  static void startMicMockServer() throws IOException {
+    if (micMockServer == null) {
+      micMockServer = new MockWebServer();
+      micMockServer.start();
     }
   }
 
   @DynamicPropertySource
-  static void registerSecurityMasterBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.security-master.rest.base-url", () -> {
+  static void registerMarketInvestmentCatalogueBaseUrl(DynamicPropertyRegistry registry) {
+    registry.add("external-services.market-investment-catalogue.rest.base-url", () -> {
       try {
-        startSmsMockServer();
-        return smsMockServer.url("/").toString().replaceAll("/$", "");
+        startMicMockServer();
+        return micMockServer.url("/").toString().replaceAll("/$", "");
       } catch (IOException e) {
         throw new IllegalStateException(e);
       }
@@ -108,13 +108,13 @@ class CalculationStatisticsEndpointE2ETest {
 
   @Test
   void shouldReportPerMetricStatistics_whenCalculationsSucceededAndFailedIncludingACompositeRequest() {
-    smsMockServer.setDispatcher(alwaysRespond(new MockResponse()
+    micMockServer.setDispatcher(alwaysRespond(new MockResponse()
         .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
         .setBody(writeJson(allocationAttributes()))));
     assertThat(postSingle(ALLOCATIONS, writeJson(allocationsCommand())))
         .isEqualTo(HttpStatus.OK.value());
 
-    smsMockServer.setDispatcher(alwaysRespond(new MockResponse()
+    micMockServer.setDispatcher(alwaysRespond(new MockResponse()
         .setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
         .setBody("{\"error\":\"upstream failure\"}")));

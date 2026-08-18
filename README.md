@@ -44,15 +44,15 @@ Spring Boot Actuator exposes liveness and readiness probes — no custom control
 
 | Endpoint | Returns | Meaning |
 |----------|---------|---------|
-| `GET /actuator/health` | `200 {"status":"UP"}` / `503 {"status":"DOWN"}` | Composite of all registered indicators (SMS + Bank of Canada + built-ins) |
-| `GET /actuator/health/liveness` | `200` / `503` | Process is alive (JVM up). Independent of downstream availability — never fails because of SMS/BoC outages. |
-| `GET /actuator/health/readiness` | `200` / `503` | Service is ready to serve calculations. Gated on **SMS reachability** — every metric depends on it. Bank of Canada is *not* gated (only affects FX-conversion paths). |
+| `GET /actuator/health` | `200 {"status":"UP"}` / `503 {"status":"DOWN"}` | Composite of all registered indicators (MIC + Bank of Canada + built-ins) |
+| `GET /actuator/health/liveness` | `200` / `503` | Process is alive (JVM up). Independent of downstream availability — never fails because of MIC/BoC outages. |
+| `GET /actuator/health/readiness` | `200` / `503` | Service is ready to serve calculations. Gated on **MIC reachability** — every metric depends on it. Bank of Canada is *not* gated (only affects FX-conversion paths). |
 
 Probe mechanics:
 
 - A short fail-fast 3-second connect/read timeout is applied to the indicator HTTP calls (see `HealthCheckRestClientFactory`), so a hung downstream fails the probe quickly rather than holding up the K8s probe window.
-- Endpoint paths called by the indicators are configurable: `external-services.security-master.rest.health-check-path` (default `/actuator/health`) and `external-services.bank-of-canada.health-check-path` (default `/lists/series/json`).
-- `management.endpoint.health.show-details: never` — bodies don't leak SMS/BoC URLs or exception stacks (the actuator endpoint isn't behind auth).
+- Endpoint paths called by the indicators are configurable: `external-services.market-investment-catalogue.rest.health-check-path` (default `/actuator/health`) and `external-services.bank-of-canada.health-check-path` (default `/lists/series/json`).
+- `management.endpoint.health.show-details: never` — bodies don't leak MIC/BoC URLs or exception stacks (the actuator endpoint isn't behind auth).
 
 Sample Kubernetes probe block:
 
@@ -97,7 +97,7 @@ What to read, in order of usefulness:
 2. **`metrics[].topErrorCodes`** — *why* a metric fails, as `ErrorCode` values (see `docs/error-codes.md`). Failures
    that carry no domain code fall back to the exception's simple name.
 3. **`metrics[].duration.p95Millis` / `p99Millis`** — latency of the calculation itself, excluding request validation
-   and Security Master fetching. Failed runs are recorded separately and never skew these, so a metric that fails fast
+   and Market Investment Catalogue fetching. Failed runs are recorded separately and never skew these, so a metric that fails fast
    does not look fast.
 4. **`metrics[].warnings.mean` and `.max`** — data-quality pressure. A rising mean means the provider data is
    degrading even though requests still return `200`.
@@ -125,12 +125,12 @@ What `/actuator/calculationstats` is built from, and what a metrics exporter wou
 
 Every external provider shares one meter name and is told apart by the `external.service` tag, so both an aggregate and
 a per-provider view stay expressible without a dashboard having to enumerate the providers. The external-call meters and
-their tag vocabulary are identical to Security Master's, so one dashboard, alert or recording rule covers both services.
+their tag vocabulary are identical to Market Investment Catalogue's, so one dashboard, alert or recording rule covers both services.
 
 `outcome` on `external.provider.request` is `success`, `empty` when the provider answered with no usable items,
 `http_error` when it returned a response the client rejected, or `error` when nothing came back at all — a connection
 failure, a timeout, an unparseable body. Anything other than `success` is a failure, `empty` included, because the caller
-asked for data and got none. Security Master publishes two further outcomes on the same meter, `rate_limited` and
+asked for data and got none. Market Investment Catalogue publishes two further outcomes on the same meter, `rate_limited` and
 `cancelled`, plus an `external.provider.rate.limiter.wait` timer; it is the only one of the two services with a
 client-side rate limiter and a reactive client, so nothing here can reach them.
 
@@ -177,14 +177,14 @@ Spans are exported to Azure Application Insights when a connection string is pre
 | `otel.propagators` | `tracecontext,baggage,b3` | Accepted/emitted trace context formats |
 
 Every log line carries `traceId`, `spanId` and `requestId`. `requestId` is taken from the inbound `X-Request-ID` header
-(generated when absent), echoed back on the response, and forwarded to Security Master, so one identifier ties a client
+(generated when absent), echoed back on the response, and forwarded to Market Investment Catalogue, so one identifier ties a client
 report to both services' logs.
 
 ### Dependencies
 
 | Dependency | Purpose |
 |------------|---------|
-| Security Master Service | Provides security data: allocations, sectors, exposures, credit quality, maturity |
+| Market Investment Catalogue Service | Provides security data: allocations, sectors, exposures, credit quality, maturity |
 
 ### Module Structure
 
@@ -196,7 +196,7 @@ Hexagonal Architecture is used in this project.
 | `api` | Port interfaces and shared DTOs (no Spring) |
 | `application` | Use cases, orchestration via ports |
 | `rest-adapter` | REST controllers exposing the API |
-| `web-client-adapter` | REST client for Security Master |
+| `web-client-adapter` | REST client for Market Investment Catalogue |
 | `cache-adapter` | Caching proxies over the data-fetching ports |
 | `observability-adapter` | Metrics, tracing and statistics behind the observability ports |
 | `bootstrap` | Spring Boot entry point and configuration |
@@ -205,7 +205,7 @@ Hexagonal Architecture is used in this project.
 
 - JDK 21
 - No local Gradle install: the wrapper (`./gradlew`) provisions it
-- Security Master Service (running locally or via Docker)
+- Market Investment Catalogue Service (running locally or via Docker)
 
 ### Running the Service
 
@@ -221,13 +221,13 @@ Run:
 ./gradlew :bootstrap:bootRun --args='--spring.profiles.active=dev'
 ```
 
-### Running Security Master Service
+### Running Market Investment Catalogue Service
 
-There are two ways to run the Security Master dependency locally.
+There are two ways to run the Market Investment Catalogue dependency locally.
 
 #### Option 1: Docker Compose
 
-The `ce-environment/` folder contains a Docker Compose setup with the Security Master service and its database configuration.
+The `ce-environment/` folder contains a Docker Compose setup with the Market Investment Catalogue service and its database configuration.
 
 ```bash
 cd ce-environment
@@ -240,8 +240,8 @@ This reads variables from `ce-environment/.env`. The `DB_URL` in the `.env` file
 
 | Variable | Description                                           |
 |----------|-------------------------------------------------------|
-| `SM_REST_BASE_URL` | Security Master base URL used by calculation-engine   |
-| `DB_URL` | JDBC connection string for Security Master's database |
+| `MIC_REST_BASE_URL` | Market Investment Catalogue base URL used by calculation-engine   |
+| `DB_URL` | JDBC connection string for Market Investment Catalogue's database |
 | `DB_USERNAME` | Database username                                     |
 | `DB_PASSWORD` | Database password                                     |
 | `DB_DIALECT` | Hibernate database dialect                            |
@@ -252,7 +252,7 @@ This reads variables from `ce-environment/.env`. The `DB_URL` in the `.env` file
 
 #### Option 2: Automatic Runner (dev profile)
 
-When running calculation-engine with the `dev` profile, `SecurityMasterServiceRunner` automatically starts Security Master as a subprocess using Maven.
+When running calculation-engine with the `dev` profile, `MarketInvestmentCatalogueServiceRunner` automatically starts Market Investment Catalogue as a subprocess using Maven.
 
 It expects the `security-master-service-v2` repository to be cloned next to this project. 
 On startup, it loads the env file, launches `mvn spring-boot:run` in that directory, and stops the process when calculation-engine shuts down.
@@ -261,20 +261,20 @@ Runner configuration properties:
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `sms.runner.enabled` | `true` | Enable/disable the automatic runner |
-| `sms.runner.path` | `../security-master-service-v2` | Path to Security Master project |
-| `sms.runner.env-file` | `environment-v2/.env` | Env file relative to Security Master project root |
+| `mic.runner.enabled` | `true` | Enable/disable the automatic runner |
+| `mic.runner.path` | `../security-master-service-v2` | Path to Market Investment Catalogue project |
+| `mic.runner.env-file` | `environment-v2/.env` | Env file relative to Market Investment Catalogue project root |
 
 **IMPORTANT**: `environment-ce/.env` overrides `environment-v2/.env` properties.
 
-To disable the runner (e.g., when running Security Master via Docker instead):
+To disable the runner (e.g., when running Market Investment Catalogue via Docker instead):
 
 ```bash
-./gradlew :bootstrap:bootRun --args='--spring.profiles.active=dev' -Dsms.runner.enabled=false
+./gradlew :bootstrap:bootRun --args='--spring.profiles.active=dev' -Dmic.runner.enabled=false
 ```
 
 ### Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `SM_REST_BASE_URL` | Security Master REST API base URL (e.g., `http://localhost:8080`) |
+| `MIC_REST_BASE_URL` | Market Investment Catalogue REST API base URL (e.g., `http://localhost:8080`) |

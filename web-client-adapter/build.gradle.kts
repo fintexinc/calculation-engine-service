@@ -1,4 +1,4 @@
-description = "Retrieves data FROM Security Master via REST API"
+description = "Retrieves data FROM the Market Investment Catalogue via REST API"
 
 dependencies {
     api(project(":api"))

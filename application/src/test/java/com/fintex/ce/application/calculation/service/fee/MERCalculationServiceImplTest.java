@@ -102,8 +102,8 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void fundHoldingMissingFromSmsResponse_throwsSmsNoDataForHolding() {
-    // SMS returned data for one fund but not the other — strict check refuses to silently treat the missing one as 0%.
+  void fundHoldingMissingFromMicResponse_throwsMicNoDataForHolding() {
+    // MIC returned data for one fund but not the other — strict check refuses to silently treat the missing one as 0%.
     PortfolioHolding present = holding("CIG-PRESENT", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     PortfolioHolding missing = holding("US-MISSING", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
@@ -117,8 +117,8 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void duplicateFundIdsWithDifferentValues_passCheck_whenSmsReturnsOneRowForTheId() {
-    // Same fund held twice with different market values — SMS dedupes by identifier and returns one row.
+  void duplicateFundIdsWithDifferentValues_passCheck_whenMicReturnsOneRowForTheId() {
+    // Same fund held twice with different market values — MIC dedupes by identifier and returns one row.
     // The strict check must accept both holdings because the fetcher fans the row out to each requested holding.
     PortfolioHolding fundA = holding("CIG-DUP", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     PortfolioHolding fundB = holding("CIG-DUP", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "300");
@@ -134,8 +134,8 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void zeroMerHoldingMissingFromSms_isExempt_andCountedAtZeroPct() {
-    // A stock isn't expected to have an SMS /fees row — strict check exempts ZERO_MER_TYPES, holding contributes 0%.
+  void zeroMerHoldingMissingFromMic_isExempt_andCountedAtZeroPct() {
+    // A stock isn't expected to have an MIC /fees row — strict check exempts ZERO_MER_TYPES, holding contributes 0%.
     PortfolioHolding fund = holding("CIG-OK", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
@@ -149,8 +149,8 @@ class MERCalculationServiceImplTest {
   }
 
   @Test
-  void usFund_usesNerFirst_noWarnings_evenWhenSmsAlsoReportsMer() {
-    // US chain starts at NER (MER is excluded — it's a Canadian metric). MER value in SMS is ignored without warning.
+  void usFund_usesNerFirst_noWarnings_evenWhenMicAlsoReportsMer() {
+    // US chain starts at NER (MER is excluded — it's a Canadian metric). MER value in MIC is ignored without warning.
     PortfolioHolding usFund = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         usFund, fee("0.020", null, "0.018", null));
@@ -177,7 +177,7 @@ class MERCalculationServiceImplTest {
 
   @Test
   void caFund_onlyNerPresent_throws_becauseNerIsNotInCanadianChain() {
-    // NER is a US regulatory metric and is not part of the Canadian fee chain — even if SMS returns one for a CA fund,
+    // NER is a US regulatory metric and is not part of the Canadian fee chain — even if MIC returns one for a CA fund,
     // the resolver ignores it and throws MISSING_FUND_FEE_DATA when no applicable source is populated.
     PortfolioHolding caFund = holding("CIG-NER-ONLY", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
@@ -247,7 +247,7 @@ class MERCalculationServiceImplTest {
 
   @Test
   void fund_merAndManagementFeePresent_usesMerWithoutWarnings() {
-    // Most common real-data case: SMS populates both MER and managementFee. Use MER, no warnings.
+    // Most common real-data case: MIC populates both MER and managementFee. Use MER, no warnings.
     PortfolioHolding fund = holding("CIG-007", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee("0.0151", "0.01", null, null));
@@ -386,7 +386,7 @@ class MERCalculationServiceImplTest {
   }
 
   private static FeeData fee(String mer, String managementFee, String ner, String ger) {
-    // Default currency CAD: SMS always returns a currency for a fund row, and the FX path now hard-fails when it's
+    // Default currency CAD: MIC always returns a currency for a fund row, and the FX path now hard-fails when it's
     // missing on a MER-bearing holding. Tests that want a different source currency build their own FeeData inline.
     return FeeData.builder()
         .managementExpenseRatio(mer == null ? null : new BigDecimal(mer))

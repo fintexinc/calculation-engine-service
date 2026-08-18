@@ -25,11 +25,11 @@ import static com.fintex.ce.util.FilterUtils.STOCK_PREDICATE;
 
 /**
  * Shared base for the geographic exposure services, on the {@link AbstractBreakdownService} template. Resolves each
- * relevant holding's per-region exposure from the correct Security Master endpoint: stocks via
- * {@link Geography#getBusinessCountry()} (Security Master does not publish a per-bucket geographic-allocation breakdown
- * for individual stocks — only one region applies, so a single 100% bucket is emitted), funds / ETFs / bonds via the
- * typed {@link HoldingGeographicAllocation}. Currency for stocks comes from {@link Geography#getCurrency()}, for funds
- * from {@link HoldingGeographicAllocation#getCurrency()}.
+ * relevant holding's per-region exposure from the correct Market Investment Catalogue endpoint: stocks via
+ * {@link Geography#getBusinessCountry()} (Market Investment Catalogue does not publish a per-bucket
+ * geographic-allocation breakdown for individual stocks — only one region applies, so a single 100% bucket is emitted),
+ * funds / ETFs / bonds via the typed {@link HoldingGeographicAllocation}. Currency for stocks comes from
+ * {@link Geography#getCurrency()}, for funds from {@link HoldingGeographicAllocation#getCurrency()}.
  *
  * <p>
  * Each subclass picks its region-allocation attribute — equity sleeve, fixed-income sleeve or whole security — and

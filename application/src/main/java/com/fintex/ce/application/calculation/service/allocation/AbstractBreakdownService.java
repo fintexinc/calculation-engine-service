@@ -167,11 +167,11 @@ public abstract class AbstractBreakdownService<D, R extends BaseCalculationResul
    * the single sector it belongs to for a company.
    *
    * <p>
-   * The distribution wins only when it actually carries data, which is what {@code populated} answers. Security Master
-   * serves an allocation attribute for any security declaring even one of its columns, and every security declares
-   * {@code currency} — so a stock does come back under the distribution attribute, with its currency and no
-   * allocations. Preferring the distribution on presence alone would discard the bucket the stock does have and report
-   * it as missing data instead.
+   * The distribution wins only when it actually carries data, which is what {@code populated} answers. Market
+   * Investment Catalogue serves an allocation attribute for any security declaring even one of its columns, and every
+   * security declares {@code currency} — so a stock does come back under the distribution attribute, with its currency
+   * and no allocations. Preferring the distribution on presence alone would discard the bucket the stock does have and
+   * report it as missing data instead.
    *
    * <p>
    * Absence stays absence: when neither attribute answered, the result is {@code null} and the caller reports the

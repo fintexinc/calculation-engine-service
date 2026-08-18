@@ -106,24 +106,24 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(periodCommand(Set.of(ONE_MTH, THREE_MTH, SIX_MTH, ONE_YR), LocalDate.parse("2024-12-31"),
         richPortfolioHoldings()));
   }
 
   @Override
-  protected void enqueueForPositiveSmsScenario() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
-    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
+  protected void enqueueForPositiveMicScenario() {
+    enqueueMicMockResponse(micPositiveResponseBody());
+    enqueueMicMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(List.of(
         holdingReturnsRow(XBAL, monthlyReturnsFor2024("1.0")),
         holdingReturnsRow(VCNS, monthlyReturnsFor2024("1.2")),
@@ -162,11 +162,11 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnComparison_whenBenchmarkHoldingsAreProvided() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         holdingReturnsRow(XBAL, List.of(dateValue("2024-12-31", "5.0"))))));
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         holdingReturnsRow(VCNS, List.of(dateValue("2024-12-31", "2.5"))))));
-    enqueueSmsMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
+    enqueueMicMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
         "0.0035")))));
     PeriodCommand command = periodCommand(Set.of(ONE_MTH), LocalDate.parse("2024-12-31"),
         List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
@@ -191,14 +191,14 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldPreservePortfolioHistory_whenBenchmarkHistoryIsShorter() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         holdingReturnsRow(XBAL, List.of(
             dateValue("2024-10-31", "1.0"),
             dateValue("2024-11-30", "2.0"),
             dateValue("2024-12-31", "3.0"))))));
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         holdingReturnsRow(VCNS, List.of(dateValue("2024-12-31", "2.5"))))));
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         new DateRateValue(LocalDate.parse("2024-10-31"), new BigDecimal("0.0033")),
         new DateRateValue(LocalDate.parse("2024-11-30"), new BigDecimal("0.0034")),
         new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal("0.0035")))));
@@ -226,10 +226,10 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldPreservePortfolioReturn_whenBenchmarkReturnsAreUnavailable() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         holdingReturnsRow(XBAL, List.of(dateValue("2024-12-31", "5.0"))))));
-    enqueueSmsMockResponse(writeJson(List.of()));
-    enqueueSmsMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
+    enqueueMicMockResponse(writeJson(List.of()));
+    enqueueMicMockResponse(writeJson(List.of(new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal(
         "0.0035")))));
     PeriodCommand command = periodCommand(Set.of(ONE_MTH), LocalDate.parse("2024-12-31"),
         List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
@@ -261,8 +261,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   void shouldReturnOnlyContiguousPeriodsAndFxWarning_whenFxRatesHaveInternalMonthGap() {
     bocMockServer.setDispatcher(bocDailyUsdCadDispatcher("1.0000", Set.of(YearMonth.of(2024, 6))));
     PortfolioHolding holding = holding(VTI, FinancialInstrumentType.ETF, Country.USA, "50000");
-    enqueueSmsMockResponse(writeJson(List.of(holdingReturnsRow(VTI, monthlyReturnsFor2024("1.0")))));
-    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
+    enqueueMicMockResponse(writeJson(List.of(holdingReturnsRow(VTI, monthlyReturnsFor2024("1.0")))));
+    enqueueMicMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
 
     HttpResponse response = postCalculation(writeJson(
         periodCommand(Set.of(THREE_MTH, SIX_MTH), LocalDate.parse("2024-12-31"), List.of(holding))));
@@ -298,7 +298,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
   void shouldReturnFxRatesUnavailableBusinessError_whenAllRequiredFxRatesAreUnavailable() {
     bocMockServer.setDispatcher(bocUnavailableDispatcher());
     PortfolioHolding holding = holding(VTI, FinancialInstrumentType.ETF, Country.USA, "50000");
-    enqueueSmsMockResponse(writeJson(List.of(holdingReturnsRow(VTI, monthlyReturnsFor2024("1.0")))));
+    enqueueMicMockResponse(writeJson(List.of(holdingReturnsRow(VTI, monthlyReturnsFor2024("1.0")))));
 
     HttpResponse response = postCalculation(writeJson(
         periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), List.of(holding))));
@@ -320,7 +320,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnBadRequestWithMissingMonthlyReturnError_whenMonthlyReturnValueIsNull() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         holdingReturnsRow(F0CAN999, monthlyReturnsWithNullValue("2024-05-01")))));
     PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"),
         List.of(holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100000")));

@@ -35,27 +35,27 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(commandFor(Currency.CAD, List.of(
         etfCanada(XBAL, "45234.67"),
         etfCanada(VCNS, "18765.43"))));
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     ReturnCommand command = richPortfolioCommand();
     command.setCustomPed(LocalDate.of(2024, 12, 31));
     return writeJson(command);
   }
 
   @Override
-  protected void enqueueForPositiveSmsScenario() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
-    enqueueSmsMockResponse(writeJson(cadTreasuryRates()));
+  protected void enqueueForPositiveMicScenario() {
+    enqueueMicMockResponse(micPositiveResponseBody());
+    enqueueMicMockResponse(writeJson(cadTreasuryRates()));
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(List.of(
         securityAttributeResult(XBAL, twoMonthReturns("5.0", "-2.0")),
         securityAttributeResult(VCNS, twoMonthReturns("3.0", "1.0")),

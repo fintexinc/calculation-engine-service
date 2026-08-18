@@ -61,7 +61,7 @@ class Growth10kWithFxE2ETest extends AbstractGrowthOf10kE2ETest {
 
   @Test
   void shouldConvertUsdHoldingsToCad_whenTargetCurrencyDiffers() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         securityAttributeResult(
             VTI,
             monthlyReturns(

@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MicrometerExternalCallObservabilityTest {
 
   private static final String BOC_ENDPOINT = "/observations/FXUSDCAD/json";
-  private static final String SM_ENDPOINT = "/api/v1/wealth/securities";
+  private static final String MIC_ENDPOINT = "/api/v1/wealth/securities";
   private static final String GET = "GET";
 
   private final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
@@ -44,11 +44,11 @@ class MicrometerExternalCallObservabilityTest {
    */
   @Test
   void shouldReportEmptyApartFromSuccess_whenProviderReturnedNoItems() {
-    observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT).completed(0);
+    observability.start(ExternalWebService.MARKET_INVESTMENT_CATALOGUE, GET, MIC_ENDPOINT).completed(0);
 
-    assertThat(requestTimer(ExternalCallOutcome.EMPTY, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT))
+    assertThat(requestTimer(ExternalCallOutcome.EMPTY, ExternalWebService.MARKET_INVESTMENT_CATALOGUE, MIC_ENDPOINT))
         .isNotNull();
-    assertThat(requestTimer(ExternalCallOutcome.SUCCESS, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT))
+    assertThat(requestTimer(ExternalCallOutcome.SUCCESS, ExternalWebService.MARKET_INVESTMENT_CATALOGUE, MIC_ENDPOINT))
         .as("an empty payload must not be able to hide inside the success count")
         .isNull();
   }
@@ -57,7 +57,7 @@ class MicrometerExternalCallObservabilityTest {
   void shouldRecordResultSizePerServiceAndEndpoint_whenProvidersReturnItems() {
     observability.start(ExternalWebService.BANK_OF_CANADA, GET, BOC_ENDPOINT + "?start_date=2024-01-01").completed(22);
     observability.start(ExternalWebService.BANK_OF_CANADA, GET, BOC_ENDPOINT + "?start_date=2024-02-01").completed(0);
-    observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT).completed(7);
+    observability.start(ExternalWebService.MARKET_INVESTMENT_CATALOGUE, GET, MIC_ENDPOINT).completed(7);
 
     DistributionSummary bocSizes = resultSize(ExternalWebService.BANK_OF_CANADA, BOC_ENDPOINT);
     assertThat(bocSizes).isNotNull();
@@ -66,17 +66,17 @@ class MicrometerExternalCallObservabilityTest {
         .isEqualTo(2);
     assertThat(bocSizes.totalAmount()).isEqualTo(22.0);
 
-    DistributionSummary smSizes = resultSize(ExternalWebService.SECURITY_MASTER, SM_ENDPOINT);
-    assertThat(smSizes).isNotNull();
-    assertThat(smSizes.totalAmount()).isEqualTo(7.0);
+    DistributionSummary micSizes = resultSize(ExternalWebService.MARKET_INVESTMENT_CATALOGUE, MIC_ENDPOINT);
+    assertThat(micSizes).isNotNull();
+    assertThat(micSizes.totalAmount()).isEqualTo(7.0);
   }
 
   @Test
   void shouldReportErrorWithoutAStatus_whenNothingCameBackFromTheProvider() {
-    observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT)
+    observability.start(ExternalWebService.MARKET_INVESTMENT_CATALOGUE, GET, MIC_ENDPOINT)
         .failed(new IllegalStateException("connection reset"));
 
-    Timer timer = requestTimer(ExternalCallOutcome.ERROR, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT);
+    Timer timer = requestTimer(ExternalCallOutcome.ERROR, ExternalWebService.MARKET_INVESTMENT_CATALOGUE, MIC_ENDPOINT);
     assertThat(timer).isNotNull();
     assertThat(timer.getId().getTag(MicrometerExternalCallObservability.ERROR_TYPE_TAG))
         .isEqualTo(IllegalStateException.class.getSimpleName());
@@ -92,10 +92,11 @@ class MicrometerExternalCallObservabilityTest {
   @ParameterizedTest
   @ValueSource(ints = {400, 404, 429, 500, 503})
   void shouldReportHttpErrorWithTheRealStatus_whenProviderReturnedAnErrorResponse(int status) {
-    observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT)
+    observability.start(ExternalWebService.MARKET_INVESTMENT_CATALOGUE, GET, MIC_ENDPOINT)
         .httpFailed(status, new IllegalArgumentException("mapped to a domain exception by the client"));
 
-    Timer timer = requestTimer(ExternalCallOutcome.HTTP_ERROR, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT);
+    Timer timer = requestTimer(ExternalCallOutcome.HTTP_ERROR, ExternalWebService.MARKET_INVESTMENT_CATALOGUE,
+        MIC_ENDPOINT);
     assertThat(timer).isNotNull();
     assertThat(timer.getId().getTag(MicrometerExternalCallObservability.STATUS_TAG))
         .as("the status must be the one the provider actually returned, not a stand-in")
@@ -112,13 +113,14 @@ class MicrometerExternalCallObservabilityTest {
    */
   @Test
   void shouldKeepTheFirstOutcome_whenTheMappedExceptionFollowsAReportedStatus() {
-    ExternalCall call = observability.start(ExternalWebService.SECURITY_MASTER, GET, SM_ENDPOINT);
+    ExternalCall call = observability.start(ExternalWebService.MARKET_INVESTMENT_CATALOGUE, GET, MIC_ENDPOINT);
     call.httpFailed(503, new IllegalStateException("mapped by the client"));
     call.failed(new IllegalStateException("the same failure, propagating"));
 
-    assertThat(requestTimer(ExternalCallOutcome.HTTP_ERROR, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT).count())
+    assertThat(requestTimer(ExternalCallOutcome.HTTP_ERROR, ExternalWebService.MARKET_INVESTMENT_CATALOGUE,
+        MIC_ENDPOINT).count())
         .isEqualTo(1);
-    assertThat(requestTimer(ExternalCallOutcome.ERROR, ExternalWebService.SECURITY_MASTER, SM_ENDPOINT))
+    assertThat(requestTimer(ExternalCallOutcome.ERROR, ExternalWebService.MARKET_INVESTMENT_CATALOGUE, MIC_ENDPOINT))
         .as("a response the provider did return must not also be counted as one that never arrived")
         .isNull();
     assertThat(meterRegistry.find(MicrometerExternalCallObservability.REQUEST_METER).timers())
@@ -130,7 +132,7 @@ class MicrometerExternalCallObservabilityTest {
   @NullAndEmptySource
   @ValueSource(strings = {"   "})
   void shouldTagMethodAndEndpointAsUnknown_whenTheyAreMissing(String missing) {
-    observability.start(ExternalWebService.SECURITY_MASTER, missing, missing).completed(1);
+    observability.start(ExternalWebService.MARKET_INVESTMENT_CATALOGUE, missing, missing).completed(1);
 
     Timer timer = meterRegistry.find(MicrometerExternalCallObservability.REQUEST_METER)
         .tag(MicrometerExternalCallObservability.METHOD_TAG, MicrometerExternalCallObservability.UNKNOWN)

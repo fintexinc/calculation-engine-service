@@ -39,7 +39,7 @@ Pure logic, no data fetching.
 - **Collections:** Stream API with `Collectors` — never for-loops/forEach with manual add/put
 - **Stream to list:** prefer `.toList()` (returns an unmodifiable list) over `.collect(Collectors.toList())`. Only use `Collectors.toList()` when the result must be mutable
 - **Optional**: Return `Optional<T>` for optional values when it makes sense
-- **Null check**: Validate SM data at adapter boundary with `Objects.requireNonNull`
+- **Null check**: Validate MIC data at adapter boundary with `Objects.requireNonNull`
 - **Not null collections**: Never return null collections — use `List.of()`
 - **Collection null/empty checks:** use `org.springframework.util.CollectionUtils.isEmpty(col)` instead of `col == null || col.isEmpty()`. Never perform the same `null || isEmpty` check twice in a row — collapse to a single `CollectionUtils.isEmpty` call
 - **Object construction:** prefer immutable data classes. Construct via the canonical/all-args constructor, a single-field constructor (or named static factory `ofX(...)` when types would collide) for the dominant case, or a Lombok `@Builder` / `@SuperBuilder` for multi-field cases; avoid setter-based construction and never mix builder calls with post-build setters. For pure value carriers, use `record`s.
@@ -169,10 +169,10 @@ refs: CE-123
 ```
 
 ```
-fix(web-client): add circuit breaker to SM endpoint
+fix(web-client): add circuit breaker to MIC endpoint
 
 Added Resilience4j annotations to prevent cascading failures
-when Security Master is unavailable.
+when Market Investment Catalogue is unavailable.
 
 fixes: CE-456, CE-457
 ```
@@ -290,7 +290,7 @@ Before creating a pull request, ensure:
 - [ ] PR contains 1-2 main commits
 - [ ] PR description explains what and why (not how)
 - [ ] No N+1 external service calls
-- [ ] Resilience4j annotations on SM calls
+- [ ] Resilience4j annotations on MIC calls
 - [ ] No hardcoded configuration values
 
 ## Development Workflow
@@ -316,7 +316,7 @@ Before creating a pull request, ensure:
 | `api`                | Port interfaces (input/output) + shared DTOs                                  | No              |
 | `application`        | Use cases, orchestration (uses ports only)                                    | Minimal         |
 | `rest-adapter`       | Exposes REST API to consumers (driving adapter)                               | Yes             |
-| `web-client-adapter` | Retrieves data from Security Master via REST (partly implemented, many stubs) | Yes             |
+| `web-client-adapter` | Retrieves data from Market Investment Catalogue via REST (partly implemented, many stubs) | Yes             |
 | `cache-adapter`      | Optional caching proxies over the data-fetching ports                         | Yes             |
 | `observability-adapter` | Micrometer implementations of the observability ports                      | Yes             |
 | `bootstrap`          | Spring Boot entry point, wiring, bean configs                                 | Yes             |
@@ -329,7 +329,7 @@ Before creating a pull request, ensure:
 
 ### Observability Conventions
 
-These conventions are shared with the Security Master Service. Anything an outbound-call dashboard or alert reads is
+These conventions are shared with the Market Investment Catalogue Service. Anything an outbound-call dashboard or alert reads is
 identical in both, so keep them in step — a change here needs the same change there.
 
 | Concern | Convention |
@@ -352,12 +352,12 @@ identical in both, so keep them in step — a change here needs the same change 
 
 An enum reaches a tag through its own identifier — `ExternalService.id()`, `CalculationMetric.getValue()` — so nothing has
 to lower-case it on the way. Where an enum comes from a module that exposes only `name()`, the adapter lower-cases it
-instead; that is why Security Master has a `TagValue` helper and this service does not need one. A new enum used as a tag
+instead; that is why Market Investment Catalogue has a `TagValue` helper and this service does not need one. A new enum used as a tag
 value should carry its own identifier rather than grow a second place that formats it.
 
-The external-call port shares its shape, meter names, tag keys and outcome vocabulary with Security Master's — a name that
+The external-call port shares its shape, meter names, tag keys and outcome vocabulary with Market Investment Catalogue's — a name that
 appears in both must never mean two different things, so a change to any of them needs the same change there. What each
-service *declares* is only what its clients can actually report: Security Master adds `rate_limited` and `cancelled`
+service *declares* is only what its clients can actually report: Market Investment Catalogue adds `rate_limited` and `cancelled`
 because it has a client-side rate limiter and a reactive client. Do not add an outcome or a meter with no call site that
 produces it, and do not let the shared parts drift.
 

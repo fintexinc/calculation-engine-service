@@ -27,10 +27,10 @@ import static com.fintex.wm.commons.domain.enumeration.TimePeriod.YTD;
  * Which {@link TimePeriod} values each kind of request may name.
  *
  * <p>
- * {@link TimePeriod} is the vocabulary shared with Security Master, so it is deliberately wider than any single
- * request: it carries every period a datapoint can be keyed by, including lengths this service has no use for and
- * length-less members only some metrics can resolve. Admissibility therefore belongs to the contract rather than to the
- * enum — a fee projection cannot answer "year to date", and a rolling window shorter than a year is not a window.
+ * {@link TimePeriod} is the vocabulary shared with Market Investment Catalogue, so it is deliberately wider than any
+ * single request: it carries every period a datapoint can be keyed by, including lengths this service has no use for
+ * and length-less members only some metrics can resolve. Admissibility therefore belongs to the contract rather than to
+ * the enum — a fee projection cannot answer "year to date", and a rolling window shorter than a year is not a window.
  *
  * <p>
  * Every set here is an unmodifiable {@link EnumSet}, and nothing reads it in order. Membership is the only question

@@ -8,10 +8,10 @@ description: Java security checklist covering OWASP Top 10, input validation, in
 OWASP-informed checklist for Java services.
 
 ## Fit for this repo first
-This is a **headless analytics backend**: no end-user auth, no user DB, no server-rendered HTML. It has one REST endpoint and makes **outbound** calls to SMS and Bank of Canada. So the security surface that actually matters here is, in order:
+This is a **headless analytics backend**: no end-user auth, no user DB, no server-rendered HTML. It has one REST endpoint and makes **outbound** calls to MIC and Bank of Canada. So the security surface that actually matters here is, in order:
 
-1. **Input validation at the boundary** — validate every request field and every value SMS returns.
-2. **Outbound-call safety (SSRF)** — SMS/Bank-of-Canada URLs come from config, not request input; never build them from untrusted data.
+1. **Input validation at the boundary** — validate every request field and every value MIC returns.
+2. **Outbound-call safety (SSRF)** — MIC/Bank-of-Canada URLs come from config, not request input; never build them from untrusted data.
 3. **Secrets** — no hardcoded credentials; config references env vars only.
 4. **No internal leakage** — error responses and logs must not expose stack traces, secrets, or sensitive payloads.
 5. **Safe deserialization** — Jackson only, no polymorphic default typing on untrusted input.
@@ -34,7 +34,7 @@ The auth/session/XSS material further down is the general checklist — apply it
 | A10 | SSRF | Validate/allowlist outbound URLs |
 
 ## Input validation (the primary control here)
-Validate at the boundary with Bean Validation (`@Valid` + `@NotNull`/`@Size`/`@Pattern`) on request DTOs, and with `Objects.requireNonNull` on SMS responses (CLAUDE.md: "validate SMS data at the adapter boundary").
+Validate at the boundary with Bean Validation (`@Valid` + `@NotNull`/`@Size`/`@Pattern`) on request DTOs, and with `Objects.requireNonNull` on MIC responses (CLAUDE.md: "validate MIC data at the adapter boundary").
 
 **Allowlist, not blocklist** — permit known-good, don't chase bad patterns:
 ```java
@@ -43,7 +43,7 @@ if (!SAFE_ID.matcher(input).matches()) throw new ValidationException("Invalid id
 ```
 
 ## SSRF / outbound calls
-Base URLs for SMS and Bank of Canada must come from configuration, never from request payloads. If any path/host segment is ever derived from input, validate against an allowlist of hosts. Keep Resilience4j on these calls (CLAUDE.md) — it also bounds abuse.
+Base URLs for MIC and Bank of Canada must come from configuration, never from request payloads. If any path/host segment is ever derived from input, validate against an allowlist of hosts. Keep Resilience4j on these calls (CLAUDE.md) — it also bounds abuse.
 
 ## Injection (if any query/native call is added)
 Always parameterize — JPA named params, Criteria API, or `PreparedStatement`. **Never** string-concatenate a value into a query. This applies even to logging/filtering DSLs.
@@ -53,7 +53,7 @@ Always parameterize — JPA named params, Criteria API, or `PreparedStatement`. 
 // ❌ hardcoded
 private static final String API_KEY = "sk-123...";
 // ✅ env-var backed config
-@Value("${sms.api-key}") private String apiKey;   // application.yml: ${SMS_API_KEY}
+@Value("${mic.api-key}") private String apiKey;   // application.yml: ${MIC_API_KEY}
 ```
 `.gitignore`: `.env`, `*.pem`, `*.key`, `*secret*`, `application-local.yml`. Never commit real credentials.
 
@@ -75,7 +75,7 @@ JSON via Jackson only; never `ObjectInputStream` on untrusted bytes. Do **not** 
 `mvn dependency-check:check` (fail build on high CVSS); keep dependencies current.
 
 ## General checklist (apply the parts that fit)
-- [ ] Request + SMS data validated (allowlist patterns, `requireNonNull` at boundary)
+- [ ] Request + MIC data validated (allowlist patterns, `requireNonNull` at boundary)
 - [ ] Outbound URLs from config, not input; Resilience4j present
 - [ ] No hardcoded secrets; config uses env vars
 - [ ] Error responses & logs leak no stack traces / secrets / payloads

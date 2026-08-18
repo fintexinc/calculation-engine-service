@@ -92,21 +92,21 @@ external-services:
               - FXCHFCAD   # daily CHF/CAD rate (2017+)
             start-date: "2017-01-01"
             frequency: DAILY
-  security-master:
+  market-investment-catalogue:
     api-type: rest  # "rest" (default) or "graphql"
     rest:
-      base-url: ${SM_REST_BASE_URL}
+      base-url: ${MIC_REST_BASE_URL}
       timeout: 60000
-      # Ceiling on a buffered SM response body, in bytes. Well above Spring's 256 KB default: LIMITED_HOLDINGS carries a
+      # Ceiling on a buffered MIC response body, in bytes. Well above Spring's 256 KB default: LIMITED_HOLDINGS carries a
       # fund's holdings looked through to leaf instruments (~2.7 MB for the heaviest security measured) and a whole
-      # portfolio is fetched at once. Coupled to SM's max-holdings-percentage-per-security - raise both together.
+      # portfolio is fetched at once. Coupled to MIC's max-holdings-percentage-per-security - raise both together.
       max-in-memory-size: 33554432
       health-check-path: /actuator/health
       endpoints:
         # Single generic endpoint returning any combination of security attributes; supersedes the per-attribute endpoints.
         attributes: /api/v1/wealth/securities/attributes
         reference:
-          # SMS exposes combined US + CAD T-Bill monthly returns at this endpoint; PCE selects the side it needs.
+          # MIC exposes combined US + CAD T-Bill monthly returns at this endpoint; PCE selects the side it needs.
           treasury-rates: /api/v1/wealth/reference/treasury-rates
 
 calculation:
@@ -180,7 +180,7 @@ resilience4j:
         randomized-wait-factor: 0.5
         retry-exception-predicate: com.fintex.ce.adapter.webclient.resilience.TransientCallFailures
     instances:
-      SECURITY_MASTER:
+      MARKET_INVESTMENT_CATALOGUE:
         base-config: default
       BANK_OF_CANADA:
         base-config: default
@@ -207,7 +207,7 @@ resilience4j:
         record-failure-predicate: com.fintex.ce.adapter.webclient.resilience.TransientCallFailures
         register-health-indicator: true
     instances:
-      SECURITY_MASTER:
+      MARKET_INVESTMENT_CATALOGUE:
         base-config: default
       # Bank of Canada is called a few times per calculation for FX rates rather than in bulk, so its window and
       # threshold are scaled down below the shared default to the traffic it actually sees; the 50-call window would
@@ -223,16 +223,16 @@ resilience4j:
         # Deadline for the whole logical call — every retry attempt plus the backoff between them. The per-attempt
         # response timeout on each HTTP client cannot cap this: it multiplies by the number of attempts, so without
         # this ceiling the worst case handed to the caller is that timeout times every retry. Sized to one full
-        # 60-second Security Master attempt plus room for fast-failing retries; a second slow attempt is cut off
+        # 60-second Market Investment Catalogue attempt plus room for fast-failing retries; a second slow attempt is cut off
         # rather than doubling the caller's wait. This is also the fallback for any instance not listed below —
         # Resilience4j's own default would be 1 second, which no real call here can meet.
         timeout-duration: 90s
     instances:
-      SECURITY_MASTER:
+      MARKET_INVESTMENT_CATALOGUE:
         base-config: default
       BANK_OF_CANADA:
         base-config: default
-        # Scaled to Bank of Canada's 30-second per-attempt timeout the same way the default is to Security Master's.
+        # Scaled to Bank of Canada's 30-second per-attempt timeout the same way the default is to Market Investment Catalogue's.
         timeout-duration: 45s
 
 management:
@@ -304,7 +304,7 @@ management:
         enabled: true
       group:
         readiness:
-          include: readinessState, sms
+          include: readinessState, mic
         liveness:
           include: livenessState
       # An open breaker is reported as its own status rather than as DOWN: it means a provider is unreachable, not that

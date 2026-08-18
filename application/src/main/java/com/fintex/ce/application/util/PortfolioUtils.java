@@ -68,8 +68,8 @@ public class PortfolioUtils {
   }
 
   /**
-   * Currency for a cash or GIC holding, read directly off the typed holding rather than a fetched SM allocation, since
-   * cash/GIC values never come from an SM security response. Empty for any other holding type.
+   * Currency for a cash or GIC holding, read directly off the typed holding rather than a fetched MIC allocation, since
+   * cash/GIC values never come from an MIC security response. Empty for any other holding type.
    */
   public static Optional<Currency> cashOrGicCurrency(final PortfolioHolding holding) {
     if (FilterUtils.CASH_PREDICATE.test(holding)) {
@@ -83,7 +83,7 @@ public class PortfolioUtils {
 
   /**
    * Currency for a holding used in a weight computation: cash/GIC holdings resolve directly off the typed holding (see
-   * {@link #cashOrGicCurrency}), everything else falls back to {@code currencyOf} applied to its fetched SM data.
+   * {@link #cashOrGicCurrency}), everything else falls back to {@code currencyOf} applied to its fetched MIC data.
    */
   public static <D> Currency currencyFor(final PortfolioHolding holding, final Map<PortfolioHolding, D> rawData,
       final Function<D, Currency> currencyOf) {

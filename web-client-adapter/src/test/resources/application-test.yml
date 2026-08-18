@@ -1,7 +1,7 @@
-# SM REST slice ITs: paths align with bootstrap application.yml (required for @Value on fetcher beans).
-# base-url is overridden by @DynamicPropertySource (MockWebServer); placeholder for local/CI without SM_REST_BASE_URL.
+# MIC REST slice ITs: paths align with bootstrap application.yml (required for @Value on fetcher beans).
+# base-url is overridden by @DynamicPropertySource (MockWebServer); placeholder for local/CI without MIC_REST_BASE_URL.
 external-services:
-  security-master:
+  market-investment-catalogue:
     api-type: rest
     rest:
       base-url: http://127.0.0.1:1

@@ -8,9 +8,9 @@ import java.util.Map;
 import lombok.EqualsAndHashCode;
 
 /**
- * Thrown by web-client adapters when a downstream external service (Security Master, Bank of Canada, etc.) responds
- * with a 4xx client-error status, indicating that the outbound request was malformed, unauthorized or unacceptable.
- * Maps to {@link ErrorCode#EXTERNAL_SERVICE_BAD_RESPONSE} (HTTP 502 Bad Gateway) at the REST boundary.
+ * Thrown by web-client adapters when a downstream external service (Market Investment Catalogue, Bank of Canada, etc.)
+ * responds with a 4xx client-error status, indicating that the outbound request was malformed, unauthorized or
+ * unacceptable. Maps to {@link ErrorCode#EXTERNAL_SERVICE_BAD_RESPONSE} (HTTP 502 Bad Gateway) at the REST boundary.
  */
 @EqualsAndHashCode(callSuper = true)
 public class ExternalServiceBadResponseException extends BasePceException {

@@ -10,9 +10,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Immutable per-holding Security Master data passed into calculation services. Portfolio and benchmark data live in two
- * separate sections — the same security may appear in both the portfolio and the benchmark holdings, so the two sides
- * must never share one lookup table. Each section holds one per-holding map per fetched
+ * Immutable per-holding Market Investment Catalogue data passed into calculation services. Portfolio and benchmark data
+ * live in two separate sections — the same security may appear in both the portfolio and the benchmark holdings, so the
+ * two sides must never share one lookup table. Each section holds one per-holding map per fetched
  * {@link CompositeSecurityAttribute}; a missing attribute yields an empty map, so consumers treat "attribute not
  * fetched" and "no data returned" uniformly. The values are the CE domain objects the attribute maps to (e.g.
  * {@code HoldingAssetAllocation} for {@code ASSET_ALLOCATION}); the accessors cast to the caller's expected domain

@@ -30,13 +30,14 @@ import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
  * single whole-security datapoint answers "where is my money invested".
  *
  * <p>
- * <b>Why the source is {@code GEOGRAPHIC_ALLOCATION}.</b> Security Master buckets the vendor's whole-security country
- * exposure into regions at ingest, the same mapping it applies to the two sleeve breakdowns. Rolling the country
- * datapoint up here instead would not give the same answer: Security Master keeps a country label the catalog cannot
- * resolve by bucketing it into {@link GeographicRegionType#OTHER}, whereas {@code COUNTRY_ALLOCATION} carries such an
- * entry with a {@code null} type, which the mapper drops — so a downstream rollup silently loses that exposure and
- * renormalizes the remaining regions over it. Supranational issuers alone (present in ~3000 of the 4796 balanced
- * securities in the provider extract) make that a routine loss rather than an edge case.
+ * <b>Why the source is {@code GEOGRAPHIC_ALLOCATION}.</b> Market Investment Catalogue buckets the vendor's
+ * whole-security country exposure into regions at ingest, the same mapping it applies to the two sleeve breakdowns.
+ * Rolling the country datapoint up here instead would not give the same answer: Market Investment Catalogue keeps a
+ * country label the catalog cannot resolve by bucketing it into {@link GeographicRegionType#OTHER}, whereas
+ * {@code COUNTRY_ALLOCATION} carries such an entry with a {@code null} type, which the mapper drops — so a downstream
+ * rollup silently loses that exposure and renormalizes the remaining regions over it. Supranational issuers alone
+ * (present in ~3000 of the 4796 balanced securities in the provider extract) make that a routine loss rather than an
+ * edge case.
  *
  * <p>
  * <b>Why the denominator is every holding but cash and GIC.</b> Unlike the two per-sleeve services this metric must not

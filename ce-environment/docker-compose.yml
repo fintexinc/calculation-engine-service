@@ -1,7 +1,7 @@
 services:
-  security-master:
+  market-investment-catalogue:
     image: security-master:2.0.0-SNAPSHOT
-    container_name: security-master
+    container_name: market-investment-catalogue
     ports:
       - "8090:8080"
     env_file:

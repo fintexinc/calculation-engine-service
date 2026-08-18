@@ -56,14 +56,14 @@ import okhttp3.mockwebserver.RecordedRequest;
 /**
  * End-to-end coverage for the {@code /sector-exposure} endpoint. The point of the metric is that one distribution
  * covers the whole portfolio, so the assertions here are about the buckets totalling 100% across every holding type —
- * including cash and GICs, which the per-sleeve sector metrics drop, and which Security Master has no security for. The
- * shared positive scenario carries all of them at once and in two currencies, since a breakdown that is right per
- * holding can still be wrong in the denominator.
+ * including cash and GICs, which the per-sleeve sector metrics drop, and which Market Investment Catalogue has no
+ * security for. The shared positive scenario carries all of them at once and in two currencies, since a breakdown that
+ * is right per holding can still be wrong in the denominator.
  *
  * <p>
- * Since TMI-558 the Security Master fixtures carry the consolidated {@code SECTOR_ALLOCATION} vector — equity sectors
- * and bond buckets already sized against the whole security — rather than the two per-sleeve vectors plus an asset mix
- * this service used to reconcile itself.
+ * Since TMI-558 the Market Investment Catalogue fixtures carry the consolidated {@code SECTOR_ALLOCATION} vector —
+ * equity sectors and bond buckets already sized against the whole security — rather than the two per-sleeve vectors
+ * plus an asset mix this service used to reconcile itself.
  */
 @Tag("e2e")
 class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
@@ -116,7 +116,7 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(sectorExposureCommand(CalculationMetric.SECTOR_EXPOSURE, etf(BALANCED_ETF, 50_000)));
   }
 
@@ -124,24 +124,25 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
    * A portfolio shaped like a client's rather than the minimum the shared scenario needs: every holding type the metric
    * can meet, across two currencies. A mutual fund and a segregated fund by Morningstar id, a balanced ETF and a bond
    * ETF by ticker, an individual stock by ticker-and-exchange, cash, and two GICs on either side of the one-year line —
-   * so the attribute path, the cash and GIC buckets Security Master has no security for, and the unresolved-holding
-   * path all run in this one request, and FX weighting runs with them.
+   * so the attribute path, the cash and GIC buckets Market Investment Catalogue has no security for, and the
+   * unresolved-holding path all run in this one request, and FX weighting runs with them.
    *
    * <p>
-   * A security's currency is whatever Security Master reports on its attribute row — {@link PortfolioHolding} carries
-   * no currency of its own — so which holdings are USD is decided in {@link #smsPositiveResponseBody()}, while cash and
-   * GICs carry theirs on the holding.
+   * A security's currency is whatever Market Investment Catalogue reports on its attribute row —
+   * {@link PortfolioHolding} carries no currency of its own — so which holdings are USD is decided in
+   * {@link #micPositiveResponseBody()}, while cash and GICs carry theirs on the holding.
    *
    * <p>
    * The stock is the holding that exercises both attributes at once, which is what one actually produces: Security
    * Master fills the consolidated vector for composite securities only — {@code SectorAllocationSetter} runs in the
    * fund, ETF, index and SMA chains — so a stock answers that attribute with its currency alone, while its sector comes
    * back on the scalar {@code EQUITY_SECTOR} one. The weight therefore reaches the sector rather than {@code UNKNOWN},
-   * and the currency-only row must not be mistaken for data. A holding Security Master has no record of at all is the
-   * other path, covered by {@link #shouldWarnAndBucketUnknown_whenSecurityIsUnknownToSecurityMaster()}.
+   * and the currency-only row must not be mistaken for data. A holding Market Investment Catalogue has no record of at
+   * all is the other path, covered by
+   * {@link #shouldWarnAndBucketUnknown_whenSecurityIsUnknownToMarketInvestmentCatalogue()}.
    */
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(sectorExposureCommand(CalculationMetric.SECTOR_EXPOSURE,
         fund(EQUITY_FUND, FinancialInstrumentType.MUTUAL_FUND, 40_000),
         fund(SEGREGATED_FUND, FinancialInstrumentType.SEGREGATED_FUND, 20_000),
@@ -154,13 +155,14 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   /**
-   * The four funds as Security Master publishes them since TMI-558: one vector per security, equity sectors and bond
-   * buckets already sized against the whole security, each row carrying the currency its values are quoted in. The
-   * segregated fund and the bond ETF are quoted in USD, so their weights are FX-converted while the two CAD rows are
-   * not. The stock's row carries its currency and no distribution — see {@link #requestBodyForPositiveSmsScenario()}.
+   * The four funds as Market Investment Catalogue publishes them since TMI-558: one vector per security, equity sectors
+   * and bond buckets already sized against the whole security, each row carrying the currency its values are quoted in.
+   * The segregated fund and the bond ETF are quoted in USD, so their weights are FX-converted while the two CAD rows
+   * are not. The stock's row carries its currency and no distribution — see
+   * {@link #requestBodyForPositiveMicScenario()}.
    */
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return compositeBody(
         List.of(
             sectorRow(EQUITY_FUND, FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
@@ -187,8 +189,8 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
    * about the batching.
    */
   @Override
-  protected void enqueueForPositiveSmsScenario() {
-    smsMockServer.setDispatcher(attributesDispatcher(smsPositiveResponseBody()));
+  protected void enqueueForPositiveMicScenario() {
+    micMockServer.setDispatcher(attributesDispatcher(micPositiveResponseBody()));
   }
 
   @Override
@@ -235,15 +237,15 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   /**
-   * A security Security Master has no record of takes its whole weight to UNKNOWN with a warning naming it, so the
-   * donut still totals 100% and the client can tell how much of the portfolio the breakdown does not describe. The one
-   * scenario kept here beyond the shared positive one: it is the only path where a warning has to survive the wire, and
-   * the per-holding bucketing rules it shares with the resolved-but-undistributed case are pinned in
+   * A security Market Investment Catalogue has no record of takes its whole weight to UNKNOWN with a warning naming it,
+   * so the donut still totals 100% and the client can tell how much of the portfolio the breakdown does not describe.
+   * The one scenario kept here beyond the shared positive one: it is the only path where a warning has to survive the
+   * wire, and the per-holding bucketing rules it shares with the resolved-but-undistributed case are pinned in
    * {@code SectorExposureServiceTest}.
    */
   @Test
-  void shouldWarnAndBucketUnknown_whenSecurityIsUnknownToSecurityMaster() {
-    enqueueSmsMockResponse(compositeBody(List.of(sectorRow(BALANCED_ETF,
+  void shouldWarnAndBucketUnknown_whenSecurityIsUnknownToMarketInvestmentCatalogue() {
+    enqueueMicMockResponse(compositeBody(List.of(sectorRow(BALANCED_ETF,
         sectorValue(SectorAllocationType.ENERGY, "1.0"))), List.of()));
 
     var response = postCalculation(writeJson(sectorExposureCommand(CalculationMetric.SECTOR_EXPOSURE,
@@ -339,9 +341,9 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   /**
-   * A row exactly as Security Master serves the attribute for a security whose consolidated vector it does not fill:
-   * the currency alone, with no {@code sectorAllocation} at all — not an empty one — since the attribute is assembled
-   * from whichever of its fields the security's table carries.
+   * A row exactly as Market Investment Catalogue serves the attribute for a security whose consolidated vector it does
+   * not fill: the currency alone, with no {@code sectorAllocation} at all — not an empty one — since the attribute is
+   * assembled from whichever of its fields the security's table carries.
    */
   private static SecurityAttributeResult<SectorAllocationWithCurrency> undistributedSectorRow(
       SecurityIdentifier identifier, Currency currency) {
