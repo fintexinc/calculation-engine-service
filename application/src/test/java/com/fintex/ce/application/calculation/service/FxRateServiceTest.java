@@ -272,7 +272,7 @@ class FxRateServiceTest {
   }
 
   private Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> getReturns(PortfolioHolding etfHolding) {
-    // Returns are in percent form (1 = 1%, 2 = 2%) — same convention as Security Master's monthly returns
+    // Returns are in percent form (1 = 1%, 2 = 2%) — same convention as Market Investment Catalogue's monthly returns
     // payload (`MonthlyReturnsMapper` stores values verbatim).
     HashMap<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = new HashMap<>();
     TreeMap<LocalDate, BigDecimal> returnsPerHolding = new TreeMap<>();

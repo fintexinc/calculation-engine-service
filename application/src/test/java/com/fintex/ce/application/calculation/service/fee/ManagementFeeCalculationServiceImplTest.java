@@ -79,12 +79,12 @@ class ManagementFeeCalculationServiceImplTest {
   }
 
   /**
-   * Regression: previously, if SMS returned any row for a non-fund holding (even an empty one with just a currency),
+   * Regression: previously, if MIC returned any row for a non-fund holding (even an empty one with just a currency),
    * resolveFees would skip it and weightedAverage would drop it from the WHOLE_PORTFOLIO denominator — silently
    * collapsing WHOLE_PORTFOLIO into FUNDS_ONLY. The ZERO_MER_TYPES branch in resolveFees prevents this.
    */
   @Test
-  void wholePortfolio_dilutesEvenWhenSmsReturnsRowForNonFundHolding() {
+  void wholePortfolio_dilutesEvenWhenMicReturnsRowForNonFundHolding() {
     PortfolioHolding fund = holding("CIG-DIL", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "100");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
@@ -92,7 +92,7 @@ class ManagementFeeCalculationServiceImplTest {
             .managementFee(new BigDecimal("0.020"))
             .currency(Currency.CAD)
             .build(),
-        // SMS returns a row for the stock too — empty fee fields but currency present.
+        // MIC returns a row for the stock too — empty fee fields but currency present.
         stock, FeeData.builder().currency(Currency.USD).build());
 
     ManagementFeeResult result = service.perform(commandFor(List.of(fund, stock), FUNDS_ONLY, WHOLE_PORTFOLIO),

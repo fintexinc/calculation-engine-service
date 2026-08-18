@@ -188,10 +188,10 @@ class EquitySectorExposureServiceTest {
   }
 
   /**
-   * The two attributes the metric asks for, as Security Master actually answers them for a stock: its sector on
-   * EQUITY_SECTOR, and EQUITY_SECTOR_ALLOCATION present but empty, because that attribute is answered by every security
-   * declaring any of its columns and each one declares {@code currency}. The empty distribution must not displace the
-   * sector.
+   * The two attributes the metric asks for, as Market Investment Catalogue actually answers them for a stock: its
+   * sector on EQUITY_SECTOR, and EQUITY_SECTOR_ALLOCATION present but empty, because that attribute is answered by
+   * every security declaring any of its columns and each one declares {@code currency}. The empty distribution must not
+   * displace the sector.
    */
   @Test
   void shouldKeepTheScalarSector_whenTheDistributionAttributeAnswersWithNoBuckets() {
@@ -229,9 +229,9 @@ class EquitySectorExposureServiceTest {
   }
 
   /**
-   * The other side of the merge rule: a holding Security Master answered for, but with no buckets and no scalar sector
-   * either, must stay in the prepared map. Dropping it would turn "resolved, nothing distributed" into "not found", and
-   * the client would be told the wrong thing about its own data.
+   * The other side of the merge rule: a holding Market Investment Catalogue answered for, but with no buckets and no
+   * scalar sector either, must stay in the prepared map. Dropping it would turn "resolved, nothing distributed" into
+   * "not found", and the client would be told the wrong thing about its own data.
    */
   @Test
   void shouldReportUndistributedRatherThanUnresolved_whenOnlyAnEmptyDistributionCameBack() {

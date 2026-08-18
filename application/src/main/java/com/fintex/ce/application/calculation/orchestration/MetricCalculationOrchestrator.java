@@ -16,7 +16,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.BasePceException;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
 import com.fintex.ce.port.observability.CalculationDurationRecorder;
-import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
+import com.fintex.ce.port.webclient.mic.SecurityAttributesFetcher;
 import com.fintex.ce.util.FilterUtils;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
@@ -41,15 +41,16 @@ import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Entry point for executing already-validated portfolio calculations. For every request — one command or a composite of
- * several — it resolves each metric's {@link CalculationService}, fetches the Security Master attributes the services
- * declare, prepares each service's typed data via {@link CalculationService#prepareData} and dispatches. Data providers
- * are resolved uniformly: the command's providers when present, otherwise the configured defaults; commands sharing the
- * same resolved providers share their Security Master calls. Portfolio and benchmark holdings are fetched separately —
- * one call covering all required attributes for the portfolio holdings, plus one call covering the attributes required
- * by the benchmark-carrying commands for the benchmark holdings. The two results stay in separate sections of the
- * {@link SecurityData} — the same security may appear in both holdings lists, so the sides never share a lookup table.
- * Composite requests isolate failures per metric: a failing calculation is reported as notifications while the
- * remaining metrics still return their results, and a failed fetch fails only the metrics that depend on it.
+ * several — it resolves each metric's {@link CalculationService}, fetches the Market Investment Catalogue attributes
+ * the services declare, prepares each service's typed data via {@link CalculationService#prepareData} and dispatches.
+ * Data providers are resolved uniformly: the command's providers when present, otherwise the configured defaults;
+ * commands sharing the same resolved providers share their Market Investment Catalogue calls. Portfolio and benchmark
+ * holdings are fetched separately — one call covering all required attributes for the portfolio holdings, plus one call
+ * covering the attributes required by the benchmark-carrying commands for the benchmark holdings. The two results stay
+ * in separate sections of the {@link SecurityData} — the same security may appear in both holdings lists, so the sides
+ * never share a lookup table. Composite requests isolate failures per metric: a failing calculation is reported as
+ * notifications while the remaining metrics still return their results, and a failed fetch fails only the metrics that
+ * depend on it.
  */
 @Slf4j
 @Service
@@ -132,10 +133,10 @@ public class MetricCalculationOrchestrator implements CalculationOrchestrator {
    * Only a client-level (4xx) domain error is isolated per metric: it is a data or input problem specific to that
    * metric, reported under {@code failures} while the other metrics still return their results. Everything else is a
    * server-side failure that must surface with its own 5xx status instead of being hidden inside an otherwise
-   * successful (HTTP 200) composite response — a downstream 5xx from Security Master (bad gateway / unavailable), an
-   * aggregate calculation failure carrying any such 5xx, and, critically, any unexpected non-domain runtime exception
-   * (e.g. a bug in a calculator) which would otherwise be masked as a per-metric {@code INTERNAL_SERVER_ERROR}
-   * notification.
+   * successful (HTTP 200) composite response — a downstream 5xx from Market Investment Catalogue (bad gateway /
+   * unavailable), an aggregate calculation failure carrying any such 5xx, and, critically, any unexpected non-domain
+   * runtime exception (e.g. a bug in a calculator) which would otherwise be masked as a per-metric
+   * {@code INTERNAL_SERVER_ERROR} notification.
    */
   private static boolean isServerError(RuntimeException exception) {
     if (exception instanceof CalculationsFailedException calculationsFailed) {

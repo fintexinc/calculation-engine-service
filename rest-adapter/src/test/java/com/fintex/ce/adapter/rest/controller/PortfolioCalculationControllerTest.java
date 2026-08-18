@@ -28,7 +28,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.port.observability.CalculationDurationRecorder;
 import com.fintex.ce.port.observability.CalculationObservability;
-import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
+import com.fintex.ce.port.webclient.mic.SecurityAttributesFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
@@ -556,7 +556,7 @@ class PortfolioCalculationControllerTest {
       dispatched.setCurrency(Currency.CAD);
       dispatched.setHoldings(List.of(dummyHolding()));
       dispatched.setPeriods(Set.of(TimePeriod.ONE_YR));
-      doThrow(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.toException("Security Master"))
+      doThrow(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.toException("Market Investment Catalogue"))
           .when(calculationServices.get(CalculationMetric.SHARPE_RATIO)).perform(any(), any());
 
       validatingMockMvc.perform(

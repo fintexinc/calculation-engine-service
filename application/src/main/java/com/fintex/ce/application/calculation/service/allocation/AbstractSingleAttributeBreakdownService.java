@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link AbstractBreakdownService} specialised for the common case of a metric backed by exactly ONE Security Master
- * attribute: the consumed data is a {@code Map<PortfolioHolding, A>} of that attribute's per-holding domain object.
- * Implementing {@link SingleAttributeCalculationService} supplies {@code requiredAttributes()} / {@code prepareData}
- * for free, so a metric only declares its {@link #requiredAttribute()} and provides {@link #currencyOf} and
- * {@link #toBuckets}.
+ * {@link AbstractBreakdownService} specialised for the common case of a metric backed by exactly ONE Market Investment
+ * Catalogue attribute: the consumed data is a {@code Map<PortfolioHolding, A>} of that attribute's per-holding domain
+ * object. Implementing {@link SingleAttributeCalculationService} supplies {@code requiredAttributes()} /
+ * {@code prepareData} for free, so a metric only declares its {@link #requiredAttribute()} and provides
+ * {@link #currencyOf} and {@link #toBuckets}.
  *
  * @param <A>
  *          the attribute's per-holding domain type
@@ -55,8 +55,8 @@ public abstract class AbstractSingleAttributeBreakdownService<A, R extends BaseC
   protected abstract Currency currencyOf(A attribute);
 
   /**
-   * Maps a holding's attribute datum onto the bucket enum. {@code attribute} is {@code null} when Security Master
-   * returned nothing for the holding; implementations warn and return a fallback {@link #singleBucket}.
+   * Maps a holding's attribute datum onto the bucket enum. {@code attribute} is {@code null} when Market Investment
+   * Catalogue returned nothing for the holding; implementations warn and return a fallback {@link #singleBucket}.
    */
   protected abstract Map<T, BigDecimal> toBuckets(PortfolioHolding holding, A attribute, List<Notification> warnings);
 }

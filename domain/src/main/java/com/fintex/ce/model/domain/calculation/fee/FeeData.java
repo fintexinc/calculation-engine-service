@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 /**
- * Combined fee data: management expense ratio, expense ratios, and management fee. Maps from the SMS /fees response.
+ * Combined fee data: management expense ratio, expense ratios, and management fee. Maps from the MIC /fees response.
  *
  * <p>
  * <b>Units.</b> All fee fields here are stored in <i>ratio</i> form (e.g. {@code 0.0151} for 1.51%), not the percentage
- * form Security Master sends over the wire ({@code 1.51}). The conversion happens once in {@code FeesMapper#ratio} at
- * the adapter boundary (which delegates to {@link com.fintex.ce.model.util.BigDecimalUtils#percentageToRatio}); every
- * consumer of {@code FeeData} (the resolver, weighted average, dollar-fee sum, FUNDS_ONLY_STRICT null check) can rely
- * on this and does not need to scale.
+ * form Market Investment Catalogue sends over the wire ({@code 1.51}). The conversion happens once in
+ * {@code FeesMapper#ratio} at the adapter boundary (which delegates to
+ * {@link com.fintex.ce.model.util.BigDecimalUtils#percentageToRatio}); every consumer of {@code FeeData} (the resolver,
+ * weighted average, dollar-fee sum, FUNDS_ONLY_STRICT null check) can rely on this and does not need to scale.
  */
 @SuperBuilder
 @AllArgsConstructor

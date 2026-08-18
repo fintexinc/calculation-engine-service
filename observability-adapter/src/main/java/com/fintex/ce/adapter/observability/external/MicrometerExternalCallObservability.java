@@ -39,8 +39,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * data point.
  *
  * <p>
- * The meter names and tag keys are shared with the Security Master Service, which publishes one meter more —
- * {@code external.provider.rate.limiter.wait} — because it is the only one of the two with a client-side rate limiter.
+ * The meter names and tag keys are shared with the Market Investment Catalogue Service, which publishes one meter more
+ * — {@code external.provider.rate.limiter.wait} — because it is the only one of the two with a client-side rate
+ * limiter.
  */
 @Component
 public class MicrometerExternalCallObservability implements ExternalCallObservability {

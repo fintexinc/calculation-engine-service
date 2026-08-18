@@ -2,7 +2,7 @@ server:
   port: 8181
 
 external-services:
-  security-master:
+  market-investment-catalogue:
     rest:
       log-body: true
       log-requests: true
@@ -16,6 +16,6 @@ logging:
     include-query-string: true
     include-payload: true
 
-sms:
+mic:
   runner:
     enabled: false

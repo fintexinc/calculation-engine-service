@@ -13,7 +13,7 @@ import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
+import com.fintex.ce.port.webclient.mic.TreasuryBillsFetcher;
 
 import org.springframework.stereotype.Service;
 

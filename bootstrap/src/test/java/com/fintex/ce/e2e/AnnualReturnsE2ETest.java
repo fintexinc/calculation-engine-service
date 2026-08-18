@@ -43,7 +43,7 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
 
   @Test
   void shouldReturnBadRequest_whenNoCompleteCalendarYear() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         securityAttributeResult(XBAL, monthlyReturnsFor("2025-09-30T00:00:00", OCT_2024_TO_SEP_2025)))));
     ReturnCommand command = commandFor(Currency.CAD, List.of(etfCanada(XBAL, "45234.67")));
 
@@ -55,10 +55,10 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
 
   @Test
   void shouldReturnComparison_whenBenchmarkHoldingsAreProvided() {
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         securityAttributeResult(XBAL, fullYear2024Returns()),
         securityAttributeResult(F0CAN999, fullYear2024Returns()))));
-    enqueueSmsMockResponse(writeJson(List.of(
+    enqueueMicMockResponse(writeJson(List.of(
         securityAttributeResult(VCNS, benchmarkFullYear2024Returns()),
         securityAttributeResult(CCM4752, benchmarkFullYear2024Returns()))));
     ReturnCommand command = commandFor(Currency.CAD, List.of(

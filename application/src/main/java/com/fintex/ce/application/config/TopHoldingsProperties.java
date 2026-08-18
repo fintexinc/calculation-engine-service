@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Top Holdings calculation configuration. {@code accumulateTypes} are the SM holding-type codes counted as candidates
+ * Top Holdings calculation configuration. {@code accumulateTypes} are the MIC holding-type codes counted as candidates
  * for the Top-N aggregation; {@code defaultNumOfTopCommonHoldings} is the response size used when the request omits
  * {@code numOfTopCommonHoldings}; {@code maxRecursionDepth} bounds the underlying-holdings tree walk;
- * {@code maxLeavesPerHolding} caps the number of leaves emitted per portfolio holding so a malformed SM response cannot
- * OOM the service.
+ * {@code maxLeavesPerHolding} caps the number of leaves emitted per portfolio holding so a malformed MIC response
+ * cannot OOM the service.
  */
 @Getter
 @Setter

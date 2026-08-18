@@ -8,7 +8,7 @@ import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
-import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
+import com.fintex.ce.port.webclient.mic.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 
 import org.junit.jupiter.api.Test;
@@ -86,7 +86,7 @@ class SharpeRatioCalculationServiceImplTest {
     final PeriodCommand req = mock(PeriodCommand.class);
     when(req.getCurrency()).thenReturn(Currency.EUR);
     when(service.buildPeriodCalculationInput(any(), any(), any())).thenReturn(context);
-    // EUR is not supported by the SMS producer → fetch returns an empty series → TBillsValidator throws.
+    // EUR is not supported by the MIC producer → fetch returns an empty series → TBillsValidator throws.
     when(tBillsFetcher.fetch(Currency.EUR)).thenReturn(new TreeMap<>());
 
     doCallRealMethod().when(service).perform(any(), any());

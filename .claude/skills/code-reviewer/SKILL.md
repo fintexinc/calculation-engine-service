@@ -10,7 +10,7 @@ description: >
 
 # Code Review Guidelines
 
-Portfolio calculation engine: fetches data from Security Master (SM) via REST, performs financial
+Portfolio calculation engine: fetches data from Market Investment Catalogue (MIC) via REST, performs financial
 calculations. **No database, no GraphQL.** (Caching goes through the `cache-adapter` module.)
 
 Trigger `api-contract-review`, `performance-smell-detection`, `clean-code`, `security-audit`, `testing-guideline` skills to review code.
@@ -52,26 +52,26 @@ public class EtfEndpoint extends AbstractEndpoint<EtfResponse> {
 
 ```java
 // BAD
-items.forEach(i -> smClient.fetch(i.getId()));
+items.forEach(i -> micClient.fetch(i.getId()));
 // GOOD
-smClient.fetchBatch(ids);
+micClient.fetchBatch(ids);
 ```
 
 ### Missing Timeouts/Resilience
 
-All SM calls need: `@CircuitBreaker`, `@Retry`, `@Bulkhead`
+All MIC calls need: `@CircuitBreaker`, `@Retry`, `@Bulkhead`
 
 ```java
 // Required pattern
-@CircuitBreaker(name = "securityMaster", fallbackMethod = "fallback")
-@Retry(name = "securityMaster")
-@Bulkhead(name = "securityMaster")
+@CircuitBreaker(name = "marketInvestmentCatalogue", fallbackMethod = "fallback")
+@Retry(name = "marketInvestmentCatalogue")
+@Bulkhead(name = "marketInvestmentCatalogue")
 public Data fetch(String id) { }
 ```
 
 ### Null Pointer Risks
 
-- Accessing fields from SM response without null checks
+- Accessing fields from MIC response without null checks
 - `Optional.get()` without `isPresent()` or `orElse`
 - Missing `Objects.requireNonNull` for required parameters
 
@@ -86,7 +86,7 @@ public Data fetch(String id) { }
 
 ### Architecture Violations
 
-- Domain importing Spring/adapters/SM DTOs
+- Domain importing Spring/adapters/MIC DTOs
 - Adapter calling another adapter directly
 - Business logic in REST controller
 - Application layer using adapters directly instead of ports
@@ -109,14 +109,14 @@ Timeouts, URLs, retry counts must be in `application.yaml`, not code:
 ```java
 // BAD
 private static final int TIMEOUT_MS = 30000;
-private static final String SM_URL = "http://sm-service/api";
+private static final String MIC_URL = "http://mic-service/api";
 
 // GOOD - use @ConfigurationProperties or @Value
 ```
 
 ### Missing Fallback
 
-External service calls without fallback method for when SM is unavailable.
+External service calls without fallback method for when MIC is unavailable.
 
 ---
 
@@ -124,7 +124,7 @@ External service calls without fallback method for when SM is unavailable.
 
 - Too many dependencies (>5-7) → split the class
 - Generic exception catching → use specific types
-- SM exceptions not translated to domain exceptions
+- MIC exceptions not translated to domain exceptions
 - Magic strings instead of constants/enums
 - Repeated code blocks that should be utility methods
 - Missing input validation at REST controller
@@ -136,7 +136,7 @@ External service calls without fallback method for when SM is unavailable.
 ### Domain Layer
 
 - [ ] No Spring/infrastructure imports
-- [ ] No SM DTOs - only domain models
+- [ ] No MIC DTOs - only domain models
 - [ ] Calculations extend existing `*CalculationAbstract`
 - [ ] Value objects are immutable
 
@@ -148,7 +148,7 @@ External service calls without fallback method for when SM is unavailable.
 
 ### Web Client Adapter
 
-- [ ] New fetchers extend `AbstractSecurityMasterFetcher` (not creating standalone implementations)
+- [ ] New fetchers extend `AbstractMarketInvestmentCatalogueFetcher` (not creating standalone implementations)
 - [ ] Resilience4j annotations present (CircuitBreaker, Retry, Bulkhead)
 - [ ] Fallback methods implemented
 - [ ] Errors translated to domain exceptions
@@ -161,7 +161,7 @@ External service calls without fallback method for when SM is unavailable.
 - [ ] Request validation present
 - [ ] No business logic
 - [ ] Proper HTTP status codes
-- [ ] No SM data exposed directly
+- [ ] No MIC data exposed directly
 
 ---
 
@@ -170,8 +170,8 @@ External service calls without fallback method for when SM is unavailable.
 When reviewing PRs that touch calculations/endpoints/tests, you MUST verify:
 
 - **E2E tests are complex-case first**: prefer fewer requests that cover more branches/lines in one scenario.
-- **Holdings + SMS fixtures are diverse**: multiple security types, identifier types, currencies, and periods.
-- **Build requests and SMS responses using DTOs/domain classes** — never string-build JSON bodies.
+- **Holdings + MIC fixtures are diverse**: multiple security types, identifier types, currencies, and periods.
+- **Build requests and MIC responses using DTOs/domain classes** — never string-build JSON bodies.
 - **Parse responses to DTOs** — never use `JsonNode` for assertions.
 - **Use normal imports** — do not use fully qualified class names in test or production code when a simple import suffices.
 - **Assert important fields with specific expected values**: PSD/PED, warnings/notifications codes, numeric outputs
@@ -204,8 +204,8 @@ If any of these are violated, treat as at least **High** severity (block merge) 
 ## Key Questions During Review
 
 1. **Can these classes be abstracted?** → Look for duplicate code across similar classes
-2. **Is there a hierarchy?** → Securities, SM fetchers should have abstract parents
-3. **N+1 calls?** → Any SM fetch inside a loop?
+2. **Is there a hierarchy?** → Securities, MIC fetchers should have abstract parents
+3. **N+1 calls?** → Any MIC fetch inside a loop?
 4. **Resilience?** → CircuitBreaker, Retry, Bulkhead on external calls?
 5. **Layer violations?** → Domain must be pure, adapters must not call each other
 6. **Magic strings?** → Should be constants or enums

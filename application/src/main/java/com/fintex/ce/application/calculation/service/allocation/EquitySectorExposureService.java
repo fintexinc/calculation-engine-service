@@ -32,8 +32,8 @@ import static com.fintex.ce.model.error.ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC;
  * <p>
  * Two attributes, the way {@link AbstractGeographicExposureService} asks for its allocation plus {@code GEOGRAPHY}: a
  * fund carries a distribution over sectors, whereas an individual company carries the one sector it belongs to, and
- * Security Master serves those as {@code EQUITY_SECTOR_ALLOCATION} and {@code EQUITY_SECTOR} respectively. Asking for
- * both is what lets a mixed portfolio bucket its stocks instead of reporting them as missing data.
+ * Market Investment Catalogue serves those as {@code EQUITY_SECTOR_ALLOCATION} and {@code EQUITY_SECTOR} respectively.
+ * Asking for both is what lets a mixed portfolio bucket its stocks instead of reporting them as missing data.
  */
 @Service
 public class EquitySectorExposureService

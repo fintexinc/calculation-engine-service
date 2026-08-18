@@ -27,8 +27,8 @@ import reactor.core.Exceptions;
  *
  * <p>
  * The failure is classified in one place and then fails the caller, because a calculation cannot be served from partial
- * data. This is the deliberate counterpart to the Security Master Service, which classifies the same causes in one
- * place and then answers with an empty result, because an import has to survive one provider being unavailable.
+ * data. This is the deliberate counterpart to the Market Investment Catalogue Service, which classifies the same causes
+ * in one place and then answers with an empty result, because an import has to survive one provider being unavailable.
  *
  * <p>
  * The cause is unwrapped first, so the same classification applies whether it arrives through a reactive operator or is

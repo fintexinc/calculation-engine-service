@@ -24,9 +24,10 @@ import java.util.List;
 
 /**
  * Shared e2e infrastructure for {@link ReturnCommand}-based metrics (growth-of-10k, annual-returns). Both metrics use
- * the same command type, the same Security Master call ({@code List<SecurityAttributeResult<MonthlyReturns>>}) and the
- * same holding shapes, so their fixtures live here rather than being duplicated per metric. Subclasses supply the
- * metric-specific request bodies, SMS responses and assertions required by {@link AbstractPortfolioCalculationE2ETest}.
+ * the same command type, the same Market Investment Catalogue call
+ * ({@code List<SecurityAttributeResult<MonthlyReturns>>}) and the same holding shapes, so their fixtures live here
+ * rather than being duplicated per metric. Subclasses supply the metric-specific request bodies, MIC responses and
+ * assertions required by {@link AbstractPortfolioCalculationE2ETest}.
  */
 abstract class AbstractReturnCommandE2ETest extends AbstractPortfolioCalculationE2ETest {
 

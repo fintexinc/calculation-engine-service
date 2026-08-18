@@ -39,12 +39,12 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
-    return requestBodyForPositiveSmsScenario();
+  protected String requestBodyForMicUnavailableScenario() {
+    return requestBodyForPositiveMicScenario();
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     var command = new TopCommonHoldingsCommand();
     command.setMetric(CalculationMetric.TOP_COMMON_HOLDINGS);
     command.setNumOfTopCommonHoldings(5);
@@ -56,7 +56,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     var response = List.of(
         securityAttributeResult(
             new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER),

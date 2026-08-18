@@ -43,10 +43,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * to either default will surface here as a failing expectation rather than silently reshaping the response.
  *
  * <p>
- * Portfolio and benchmark attributes are fetched in two separate Security Master calls, in that order, so every
- * positive scenario enqueues two mock responses. The inherited failure scenarios enqueue only one: the portfolio fetch
- * fails first and the orchestrator then skips the benchmark call rather than re-hitting a Security Master that has just
- * failed.
+ * Portfolio and benchmark attributes are fetched in two separate Market Investment Catalogue calls, in that order, so
+ * every positive scenario enqueues two mock responses. The inherited failure scenarios enqueue only one: the portfolio
+ * fetch fails first and the orchestrator then skips the benchmark call rather than re-hitting a Market Investment
+ * Catalogue that has just failed.
  */
 @Tag("e2e")
 class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest {
@@ -68,26 +68,26 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(comparisonCommand(FUNDS_ONLY, WHOLE_PORTFOLIO));
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(mixedPortfolioCommand());
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return feeResponse(new Fee(MIXED_ETF, "2.00"), new Fee(MIXED_FUND, "1.00"));
   }
 
   @Override
-  protected void enqueueForPositiveSmsScenario() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
+  protected void enqueueForPositiveMicScenario() {
+    enqueueMicMockResponse(micPositiveResponseBody());
     // a two-fund benchmark, so its rate is value-weighted rather than one fund's own MER:
     // 0.01 x 300k + 0.015 x 100k = 4,500 over 400k = 0.01125
-    enqueueSmsMockResponse(feeResponse(new Fee(BENCHMARK_TICKER, "1.00"), new Fee(BENCHMARK_GROWTH, "1.50")));
+    enqueueMicMockResponse(feeResponse(new Fee(BENCHMARK_TICKER, "1.00"), new Fee(BENCHMARK_GROWTH, "1.50")));
   }
 
   @Override
@@ -146,8 +146,8 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
 
   @Test
   void shouldReportNegativeSavingsAtEveryHorizon_whenTheBenchmarkFundIsDearerThanThePortfolio() {
-    enqueueSmsMockResponse(feeResponse(PORTFOLIO_TICKER, "1.00"));
-    enqueueSmsMockResponse(feeResponse(BENCHMARK_TICKER, "2.50"));
+    enqueueMicMockResponse(feeResponse(PORTFOLIO_TICKER, "1.00"));
+    enqueueMicMockResponse(feeResponse(BENCHMARK_TICKER, "2.50"));
 
     var response = postCalculation(writeJson(comparisonCommand(FUNDS_ONLY)));
 
@@ -170,8 +170,8 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
 
   @Test
   void shouldProjectTheRequestedHorizons_whenTheRequestSuppliesThemInsteadOfTheConfiguredDefaults() {
-    enqueueSmsMockResponse(feeResponse(PORTFOLIO_TICKER, "2.00"));
-    enqueueSmsMockResponse(feeResponse(BENCHMARK_TICKER, "1.00"));
+    enqueueMicMockResponse(feeResponse(PORTFOLIO_TICKER, "2.00"));
+    enqueueMicMockResponse(feeResponse(BENCHMARK_TICKER, "1.00"));
     MerComparisonCommand command = comparisonCommand(FUNDS_ONLY);
     command.setProjectionPeriods(new LinkedHashSet<>(List.of(THREE_YR, FIVE_YR)));
 
@@ -199,7 +199,8 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
 
     var response = postCalculation(writeJson(command));
 
-    // rejected at the boundary, so Security Master is never called and the caller gets the field-level reason
+    // rejected at the boundary, so Market Investment Catalogue is never called and the caller gets the field-level
+    // reason
     assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     assertThat(response.responseBody())
         .contains(ErrorCode.TIME_INTERVAL_PERIOD_NOT_SUPPORTED.getCode())
@@ -266,8 +267,9 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
   }
 
   /**
-   * Security Master reports fee fields in percentage form (2.00 meaning 2%); the adapter converts them to ratios. The
-   * currency datapoint is mandatory for a MER-bearing holding — without it the FX step hard-fails with CUR-003.
+   * Market Investment Catalogue reports fee fields in percentage form (2.00 meaning 2%); the adapter converts them to
+   * ratios. The currency datapoint is mandatory for a MER-bearing holding — without it the FX step hard-fails with
+   * CUR-003.
    */
   private static String feeResponse(String ticker, String merPercent) {
     return feeResponse(new Fee(ticker, merPercent));
@@ -276,34 +278,34 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
   private static String feeResponse(Fee... fees) {
     List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
     return writeJson(Arrays.stream(fees)
-        .map(fee -> new SmsSecurityDataResponse(
+        .map(fee -> new MicSecurityDataResponse(
             new SecurityIdentifier(fee.ticker(), FiIdentifierType.TICKER),
-            new SmsFeeData(
-                new SmsDatapoint(new BigDecimal(fee.merPercent()), providers),
-                new SmsCurrencyDatapoint(Currency.CAD, providers))))
+            new MicFeeData(
+                new MicDatapoint(new BigDecimal(fee.merPercent()), providers),
+                new MicCurrencyDatapoint(Currency.CAD, providers))))
         .toList());
   }
 
   /**
-   * One fund's MER as Security Master states it, in percentage form. The zero-fee stock is deliberately absent from
-   * every response: only MER-bearing holdings require fee data, and a holding contributing no fee needs no currency
-   * either, so its market value reaches the whole-portfolio base unconverted — which in this single-currency test is
-   * exactly its stated value.
+   * One fund's MER as Market Investment Catalogue states it, in percentage form. The zero-fee stock is deliberately
+   * absent from every response: only MER-bearing holdings require fee data, and a holding contributing no fee needs no
+   * currency either, so its market value reaches the whole-portfolio base unconverted — which in this single-currency
+   * test is exactly its stated value.
    */
   private record Fee(String ticker, String merPercent) {
   }
 
-  private record SmsSecurityDataResponse(SecurityIdentifier identifier, SmsFeeData data) {
+  private record MicSecurityDataResponse(SecurityIdentifier identifier, MicFeeData data) {
   }
 
-  private record SmsFeeData(SmsDatapoint managementExpenseRatio, SmsCurrencyDatapoint currency) {
+  private record MicFeeData(MicDatapoint managementExpenseRatio, MicCurrencyDatapoint currency) {
   }
 
-  private record SmsDatapoint(BigDecimal value, List<DataProvider> dataProviders) {
+  private record MicDatapoint(BigDecimal value, List<DataProvider> dataProviders) {
   }
 
   // wm-commons CurrencyDatapoint stores the value in a field literally named "type", so the JSON must say
   // {"type": "CAD"} for the engine to receive it.
-  private record SmsCurrencyDatapoint(Currency type, List<DataProvider> dataProviders) {
+  private record MicCurrencyDatapoint(Currency type, List<DataProvider> dataProviders) {
   }
 }

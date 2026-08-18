@@ -20,7 +20,7 @@ There is **one controller** — `PortfolioCalculationController` — serving `PO
 **Request (command DTO)**
 - [ ] New command fields are **optional with a default** — a required field breaks existing callers.
 - [ ] Validation is a `RequestValidator` registered for the metric via `supportedMetrics()`, collecting errors through `PceExceptionCollector` and throwing them all at once (not fail-fast, not in the controller).
-- [ ] Security identifiers validated (id + idType present/non-blank) at the boundary for holdings that need an SMS lookup — follow `HoldingsValidationHelper` (rest-adapter).
+- [ ] Security identifiers validated (id + idType present/non-blank) at the boundary for holdings that need an MIC lookup — follow `HoldingsValidationHelper` (rest-adapter).
 - [ ] Command is an immutable value carrier (`record` / `@Builder`, no setters).
 
 **Response (result DTO)**

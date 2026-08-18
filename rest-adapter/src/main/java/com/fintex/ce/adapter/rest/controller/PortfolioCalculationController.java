@@ -59,10 +59,10 @@ import static java.util.stream.Collectors.groupingBy;
 
 /**
  * REST entry point for portfolio calculations. The controller owns the request lifecycle — metric resolution, request
- * validation and observability — and delegates the actual calculation, including Security Master data fetching, to the
- * {@link CalculationOrchestrator}. For composite requests the shared top-level holdings, data providers and currency
- * are propagated into every nested command that does not carry its own value, so the per-command validation chain keeps
- * working unchanged.
+ * validation and observability — and delegates the actual calculation, including Market Investment Catalogue data
+ * fetching, to the {@link CalculationOrchestrator}. For composite requests the shared top-level holdings, data
+ * providers and currency are propagated into every nested command that does not carry its own value, so the per-command
+ * validation chain keeps working unchanged.
  *
  * <p>
  * A request is resolved and validated before it is handed to {@link CalculationObservability}, so the observed scope
@@ -114,7 +114,7 @@ public class PortfolioCalculationController {
 
       Portfolio holdings, data providers and target currency are declared once at the top level and shared by every
       nested command; a nested command may still override them with its own values. Each command carries its 'metric'
-      discriminator plus metric-specific parameters and may appear at most once. The Security Master attributes
+      discriminator plus metric-specific parameters and may appear at most once. The Market Investment Catalogue attributes
       required by the requested metrics are fetched together in as few round trips as possible before the individual
       calculations run. Successful metrics are returned under 'results'; metrics whose calculation failed are returned
       under 'failures' with the corresponding notifications, so one failing metric does not discard the other results.

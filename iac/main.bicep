@@ -47,8 +47,8 @@ param cpuCore string = '0.5'
 @description('Memory allocated to container')
 param memory string = '1Gi'
 
-@description('Security Master Service')
-param securityMasterServiceUrl string = 'https://security-master-service.ashybay-bfa8feae.canadacentral.azurecontainerapps.io'
+@description('Market Investment Catalogue Service')
+param marketInvestmentCatalogueServiceUrl string = 'https://security-master-service.ashybay-bfa8feae.canadacentral.azurecontainerapps.io'
 
 @description('FMP API Key')
 @secure()
@@ -99,8 +99,8 @@ var baseEnvVars = [
     value: '-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC'
   }
   {
-    name: 'SM_REST_BASE_URL'
-    value: securityMasterServiceUrl
+    name: 'MIC_REST_BASE_URL'
+    value: marketInvestmentCatalogueServiceUrl
   }
 ]
 

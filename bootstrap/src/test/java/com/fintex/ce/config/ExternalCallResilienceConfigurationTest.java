@@ -54,7 +54,7 @@ class ExternalCallResilienceConfigurationTest {
       .withUserConfiguration(ExternalCallResilienceConfig.class);
 
   @ParameterizedTest
-  @EnumSource(value = ExternalWebService.class, names = {"SECURITY_MASTER", "BANK_OF_CANADA"})
+  @EnumSource(value = ExternalWebService.class, names = {"MARKET_INVESTMENT_CATALOGUE", "BANK_OF_CANADA"})
   void shouldRegisterARetryABreakerAndADeadline_forEveryServiceTheClientsResolve(ExternalWebService service) {
     contextRunner.run(context -> {
       assertThat(circuitBreakerConfig(context, service)).isNotNull();
@@ -70,7 +70,7 @@ class ExternalCallResilienceConfigurationTest {
    */
   @ParameterizedTest
   @CsvSource({
-      "SECURITY_MASTER, external-services.security-master.rest.timeout",
+      "MARKET_INVESTMENT_CATALOGUE, external-services.market-investment-catalogue.rest.timeout",
       "BANK_OF_CANADA, external-services.bank-of-canada.timeout"})
   void shouldBudgetTheWholeCallAboveOneFullAttempt_forEveryService(ExternalWebService service,
       String perAttemptTimeoutProperty) {
@@ -84,7 +84,7 @@ class ExternalCallResilienceConfigurationTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = ExternalWebService.class, names = {"SECURITY_MASTER", "BANK_OF_CANADA"})
+  @EnumSource(value = ExternalWebService.class, names = {"MARKET_INVESTMENT_CATALOGUE", "BANK_OF_CANADA"})
   void shouldRetryMoreThanOnceAndBackOffExponentially_forEveryService(ExternalWebService service) {
     contextRunner.run(context -> {
       RetryConfig config = retryConfig(context, service);
@@ -96,7 +96,7 @@ class ExternalCallResilienceConfigurationTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = ExternalWebService.class, names = {"SECURITY_MASTER", "BANK_OF_CANADA"})
+  @EnumSource(value = ExternalWebService.class, names = {"MARKET_INVESTMENT_CATALOGUE", "BANK_OF_CANADA"})
   void shouldRetryAndRecordServerErrorsOnly_forEveryService(ExternalWebService service) {
     contextRunner.run(context -> {
       WebClientResponseException serverError = responseException(HttpStatus.SERVICE_UNAVAILABLE);
@@ -110,7 +110,7 @@ class ExternalCallResilienceConfigurationTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = ExternalWebService.class, names = {"SECURITY_MASTER", "BANK_OF_CANADA"})
+  @EnumSource(value = ExternalWebService.class, names = {"MARKET_INVESTMENT_CATALOGUE", "BANK_OF_CANADA"})
   void shouldRequireASampleBeforeOpeningAndReclosingOnItsOwn_forEveryService(ExternalWebService service) {
     contextRunner.run(context -> {
       CircuitBreakerConfig config = circuitBreakerConfig(context, service);
@@ -127,10 +127,12 @@ class ExternalCallResilienceConfigurationTest {
   void shouldScaleTheBankOfCanadaWindowToItsOwnTraffic_ratherThanFallBackToTheSharedDefault() {
     contextRunner.run(context -> {
       CircuitBreakerConfig bankOfCanada = circuitBreakerConfig(context, ExternalWebService.BANK_OF_CANADA);
-      CircuitBreakerConfig securityMaster = circuitBreakerConfig(context, ExternalWebService.SECURITY_MASTER);
+      CircuitBreakerConfig marketInvestmentCatalogue = circuitBreakerConfig(context,
+          ExternalWebService.MARKET_INVESTMENT_CATALOGUE);
 
-      assertThat(bankOfCanada.getSlidingWindowSize()).isLessThan(securityMaster.getSlidingWindowSize());
-      assertThat(bankOfCanada.getMinimumNumberOfCalls()).isLessThan(securityMaster.getMinimumNumberOfCalls());
+      assertThat(bankOfCanada.getSlidingWindowSize()).isLessThan(marketInvestmentCatalogue.getSlidingWindowSize());
+      assertThat(bankOfCanada.getMinimumNumberOfCalls()).isLessThan(marketInvestmentCatalogue
+          .getMinimumNumberOfCalls());
     });
   }
 

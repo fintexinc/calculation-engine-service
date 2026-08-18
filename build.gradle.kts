@@ -35,9 +35,21 @@ subprojects {
         maven {
             name = "fintexincorporated"
             url = uri("https://pkgs.dev.azure.com/fintexincorporated/_packaging/fintexincorporated/maven/v1")
-            credentials(PasswordCredentials::class)
-            authentication {
-                create<BasicAuthentication>("basic")
+            // Gradle validates a repository's credentials as soon as any resolution consults it, so declaring
+            // them unconditionally makes every task that resolves anything — spotless included, whose tools
+            // come from Central — fail for a developer who has not configured the feed. Declared only when
+            // present: without them the feed is anonymous and the internal artifact resolves from mavenLocal,
+            // which is where a locally published commons build lands anyway.
+            val feedUser = providers.gradleProperty("fintexincorporatedUsername").orNull
+            val feedPassword = providers.gradleProperty("fintexincorporatedPassword").orNull
+            if (feedUser != null && feedPassword != null) {
+                credentials {
+                    username = feedUser
+                    password = feedPassword
+                }
+                authentication {
+                    create<BasicAuthentication>("basic")
+                }
             }
         }
     }

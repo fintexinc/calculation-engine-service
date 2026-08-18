@@ -36,7 +36,7 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     var command = new AverageMerCommand();
     command.setMetric(CalculationMetric.MER);
     command.setParameterTypes(List.of(FeeAggregationMode.FUNDS_ONLY, FeeAggregationMode.WHOLE_PORTFOLIO));
@@ -48,7 +48,7 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     var command = new AverageMerCommand();
     command.setMetric(CalculationMetric.MER);
     command.setParameterTypes(List.of(FeeAggregationMode.FUNDS_ONLY, FeeAggregationMode.WHOLE_PORTFOLIO));
@@ -60,28 +60,28 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
-    // SMS returns fee fields in percentage form (e.g. 2.25 meaning 2.25%). FeesMapper converts to ratio form
+  protected String micPositiveResponseBody() {
+    // MIC returns fee fields in percentage form (e.g. 2.25 meaning 2.25%). FeesMapper converts to ratio form
     // (0.0225) for the rest of the engine — the expected output below is in ratio form. The currency datapoint is
     // required for MER-bearing holdings — without it, the FX-conversion step hard-fails with CUR-003.
     List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
     var responseBody = List.of(
-        new SmsSecurityDataResponse(
+        new MicSecurityDataResponse(
             new SecurityIdentifier("ETF-A", FiIdentifierType.TICKER),
-            new SmsFeeData(
+            new MicFeeData(
                 null,
-                new SmsDatapoint(new BigDecimal("1.00"), providers),
+                new MicDatapoint(new BigDecimal("1.00"), providers),
                 null,
                 null,
-                new SmsCurrencyDatapoint(Currency.CAD, providers))),
-        new SmsSecurityDataResponse(
+                new MicCurrencyDatapoint(Currency.CAD, providers))),
+        new MicSecurityDataResponse(
             new SecurityIdentifier("ETF-B", FiIdentifierType.TICKER),
-            new SmsFeeData(
+            new MicFeeData(
                 null,
-                new SmsDatapoint(new BigDecimal("2.00"), providers),
+                new MicDatapoint(new BigDecimal("2.00"), providers),
                 null,
                 null,
-                new SmsCurrencyDatapoint(Currency.CAD, providers))));
+                new MicCurrencyDatapoint(Currency.CAD, providers))));
     return toJson(responseBody);
   }
 
@@ -112,16 +112,16 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   void shouldRejectUsEtf_whenBothNetAndGrossExpenseRatiosAreMissing() {
     List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
     String holdingId = "US-ETF-NO-EXPENSE-RATIOS";
-    var smsResponse = List.of(
-        new SmsSecurityDataResponse(
+    var micResponse = List.of(
+        new MicSecurityDataResponse(
             new SecurityIdentifier(holdingId, FiIdentifierType.TICKER),
-            new SmsFeeData(
+            new MicFeeData(
                 null,
                 null,
                 null,
                 null,
-                new SmsCurrencyDatapoint(Currency.USD, providers))));
-    enqueueSmsMockResponse(toJson(smsResponse));
+                new MicCurrencyDatapoint(Currency.USD, providers))));
+    enqueueMicMockResponse(toJson(micResponse));
 
     var command = new AverageMerCommand();
     command.setMetric(CalculationMetric.MER);
@@ -152,19 +152,19 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
     List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
     BigDecimal managementFeePercentage = new BigDecimal("1.00");
     BigDecimal expectedManagementFeeRatio = managementFeePercentage.movePointLeft(2).setScale(10);
-    var smsResponse = List.of(
-        new SmsSecurityDataResponse(
+    var micResponse = List.of(
+        new MicSecurityDataResponse(
             new SecurityIdentifier(
                 "ETF-MISSING-MER",
                 FiIdentifierType.TICKER),
-            new SmsFeeData(
-                new SmsDatapoint(managementFeePercentage, providers),
+            new MicFeeData(
+                new MicDatapoint(managementFeePercentage, providers),
                 null,
                 null,
                 null,
-                new SmsCurrencyDatapoint(Currency.CAD, providers))));
+                new MicCurrencyDatapoint(Currency.CAD, providers))));
 
-    enqueueSmsMockResponse(toJson(smsResponse));
+    enqueueMicMockResponse(toJson(micResponse));
     var command = new AverageMerCommand();
     command.setMetric(CalculationMetric.MER);
     command.setParameterTypes(
@@ -228,23 +228,23 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
     }
   }
 
-  private record SmsSecurityDataResponse(SecurityIdentifier identifier, SmsFeeData data) {
+  private record MicSecurityDataResponse(SecurityIdentifier identifier, MicFeeData data) {
   }
 
-  private record SmsFeeData(
-      SmsDatapoint managementFee,
-      SmsDatapoint managementExpenseRatio,
-      SmsDatapoint netExpenseRatio,
-      SmsDatapoint grossExpenseRatio,
-      SmsCurrencyDatapoint currency) {
+  private record MicFeeData(
+      MicDatapoint managementFee,
+      MicDatapoint managementExpenseRatio,
+      MicDatapoint netExpenseRatio,
+      MicDatapoint grossExpenseRatio,
+      MicCurrencyDatapoint currency) {
   }
 
-  private record SmsDatapoint(BigDecimal value, List<DataProvider> dataProviders) {
+  private record MicDatapoint(BigDecimal value, List<DataProvider> dataProviders) {
   }
 
   // wm-commons CurrencyDatapoint stores the value in a field literally named "type" (not "value" as for
   // FloatDatapoint).
   // Jackson deserialization is property-name driven, so the JSON must say {"type": "CAD"} for the engine to receive it.
-  private record SmsCurrencyDatapoint(Currency type, List<DataProvider> dataProviders) {
+  private record MicCurrencyDatapoint(Currency type, List<DataProvider> dataProviders) {
   }
 }

@@ -94,25 +94,25 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings()));
   }
 
   @Override
-  protected void enqueueForPositiveSmsScenario() {
+  protected void enqueueForPositiveMicScenario() {
     // The orchestrator fetches the portfolio monthly returns first, then SharpeRatioCalculationServiceImpl fetches the
     // T-Bill series, so the returns response must be enqueued before the treasury-rates response.
-    enqueueSmsMockResponse(smsPositiveResponseBody());
-    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
+    enqueueMicMockResponse(micPositiveResponseBody());
+    enqueueMicMockResponse(writeJson(cadTreasuryRatesSeriesFor2024()));
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(List.of(
         holdingReturnsRow(XBAL, monthlyReturnsFor2024("1.0")),
         holdingReturnsRow(VCNS, monthlyReturnsFor2024("1.2")),
@@ -144,8 +144,8 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnBadRequest_whenTBillRateMissingForMonthInsideRequestedWindow() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
-    enqueueSmsMockResponse(writeJson(cadTreasuryRatesSeriesFor2024WithGapIn("2024-07-31")));
+    enqueueMicMockResponse(micPositiveResponseBody());
+    enqueueMicMockResponse(writeJson(cadTreasuryRatesSeriesFor2024WithGapIn("2024-07-31")));
 
     PeriodCommand command = periodCommand(Set.of(ONE_YR), LocalDate.parse("2024-12-31"), richPortfolioHoldings());
     HttpResponse response = postCalculation(writeJson(command));

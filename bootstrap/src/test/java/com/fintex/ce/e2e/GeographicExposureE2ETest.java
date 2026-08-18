@@ -53,8 +53,8 @@ import okhttp3.mockwebserver.RecordedRequest;
 /**
  * End-to-end coverage for the consolidated {@code /geographic-exposure} endpoint. Exercises the full stack on
  * portfolios mixing mutual funds, ETFs, individual stocks, cash and GICs: the whole-security region breakdown is
- * fetched from Security Master and reported as given, stocks are resolved through their geography, and cash and GICs
- * drop out while the reported regions still total 100%. Request bodies are built from the same DTO classes the
+ * fetched from Market Investment Catalogue and reported as given, stocks are resolved through their geography, and cash
+ * and GICs drop out while the reported regions still total 100%. Request bodies are built from the same DTO classes the
  * controller deserializes, so shape changes break the test at compile time.
  */
 @Tag("e2e")
@@ -70,7 +70,7 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(exposureCommand(
         fund("F00000ZJN3", 50_000),
         fund("F00000ZJN4", 50_000)));
@@ -90,7 +90,7 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
    * {@code GeographicExposureServiceTest}, where the rate is stubbed.
    */
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(exposureCommand(
         fund("F00000ZJN3", 40_000),
         fund("F00000ZJN4", 20_000),
@@ -102,7 +102,7 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(Map.of(
         CompositeSecurityAttribute.GEOGRAPHIC_ALLOCATION,
         List.of(
@@ -130,8 +130,8 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
    * {@code /attributes} call from a dispatcher keeps the test about the metric rather than about the batching.
    */
   @Override
-  protected void enqueueForPositiveSmsScenario() {
-    smsMockServer.setDispatcher(attributesDispatcher(smsPositiveResponseBody()));
+  protected void enqueueForPositiveMicScenario() {
+    micMockServer.setDispatcher(attributesDispatcher(micPositiveResponseBody()));
   }
 
   @Override
@@ -173,7 +173,7 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
    */
   @Test
   void shouldStillTotalOneHundredPercent_whenPortfolioWeightsDoNotTerminate() {
-    smsMockServer.setDispatcher(routingDispatcher(
+    micMockServer.setDispatcher(routingDispatcher(
         List.of(
             allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
                 regionValue(GeographicRegionType.US, "0.50"),
@@ -196,14 +196,15 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   /**
-   * A region bucket Security Master could not attribute to a known country — supranational issuers are the routine case
-   * — must survive the whole pipeline in OTHER. Rolling the country datapoint up inside this service instead would drop
-   * it: those entries arrive with a null country type and the mapper discards them, after which the remaining regions
-   * are renormalized over the hole. That is the defect this metric's source was changed to avoid, so it is pinned here.
+   * A region bucket Market Investment Catalogue could not attribute to a known country — supranational issuers are the
+   * routine case — must survive the whole pipeline in OTHER. Rolling the country datapoint up inside this service
+   * instead would drop it: those entries arrive with a null country type and the mapper discards them, after which the
+   * remaining regions are renormalized over the hole. That is the defect this metric's source was changed to avoid, so
+   * it is pinned here.
    */
   @Test
-  void shouldKeepUnattributableExposureInOther_whenSecurityMasterBucketedItThere() {
-    smsMockServer.setDispatcher(routingDispatcher(
+  void shouldKeepUnattributableExposureInOther_whenMarketInvestmentCatalogueBucketedItThere() {
+    micMockServer.setDispatcher(routingDispatcher(
         List.of(
             allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
                 regionValue(GeographicRegionType.CANADA, "0.70"),
@@ -221,8 +222,8 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Test
-  void shouldReportUnknownAndWarn_whenSecurityMasterHasNoGeographicAllocationForFund() {
-    smsMockServer.setDispatcher(routingDispatcher(
+  void shouldReportUnknownAndWarn_whenMarketInvestmentCatalogueHasNoGeographicAllocationForFund() {
+    micMockServer.setDispatcher(routingDispatcher(
         List.of(allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
             regionValue(GeographicRegionType.US, "1.0"))),
         List.of(
@@ -315,9 +316,9 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   /**
-   * The whole-security attribute row as Security Master serves it: the region breakdown paired with the currency the
-   * security's values are denominated in, which is why this metric needs no second attribute to weight across
-   * currencies.
+   * The whole-security attribute row as Market Investment Catalogue serves it: the region breakdown paired with the
+   * currency the security's values are denominated in, which is why this metric needs no second attribute to weight
+   * across currencies.
    */
   private static SecurityAttributeResult<GeographicAllocationWithCurrency> allocationRow(String id,
       FiIdentifierType idType, Currency currency, GeographicAllocationValue... values) {

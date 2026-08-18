@@ -6,9 +6,9 @@ package com.fintex.ce.adapter.observability.external;
  * actually exhibit.
  *
  * <p>
- * The vocabulary is shared with the Security Master Service, which adds {@code rate_limited} and {@code cancelled} for
- * the two outcomes only a rate-limited reactive client can reach. A value is added here when a client can actually
- * report it, so that no outcome exists in the tag space without a path that produces it.
+ * The vocabulary is shared with the Market Investment Catalogue Service, which adds {@code rate_limited} and
+ * {@code cancelled} for the two outcomes only a rate-limited reactive client can reach. A value is added here when a
+ * client can actually report it, so that no outcome exists in the tag space without a path that produces it.
  */
 enum ExternalCallOutcome {
 

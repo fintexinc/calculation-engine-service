@@ -47,12 +47,12 @@ import static com.fintex.ce.util.FilterUtils.GIC_PREDICATE;
  * <p>
  * <b>Why the distribution is read rather than derived.</b> Reconciling the two sector vectors needs the security's
  * sleeve split, and the split can only be derived where the provider's raw figures are: the equity vector arrives as a
- * percentage of the whole security while the fixed-income one is normalised inside its own sleeve, and Security Master
- * used to rescale both away before the calculation engine saw them. TMI-558 moved that reconciliation upstream into
- * {@code SECTOR_ALLOCATION}, which is published as a single vector over the whole security, summing to 1, with whatever
- * the two vectors do not account for reported as {@link SectorAllocationType#UNKNOWN}. Deriving it here as well would
- * be a second, less informed copy of the same arithmetic — the calculation engine sees only the rescaled outputs, not
- * the provider's raw columns.
+ * percentage of the whole security while the fixed-income one is normalised inside its own sleeve, and Market
+ * Investment Catalogue used to rescale both away before the calculation engine saw them. TMI-558 moved that
+ * reconciliation upstream into {@code SECTOR_ALLOCATION}, which is published as a single vector over the whole
+ * security, summing to 1, with whatever the two vectors do not account for reported as
+ * {@link SectorAllocationType#UNKNOWN}. Deriving it here as well would be a second, less informed copy of the same
+ * arithmetic — the calculation engine sees only the rescaled outputs, not the provider's raw columns.
  *
  * <p>
  * <b>Why two attributes all the same.</b> A security that has no distribution to reconcile — an individual company,
@@ -169,7 +169,8 @@ public class SectorExposureService
       warnings.add(MISSING_SECTOR_ALLOCATION.toNotificationForHolding(holding));
       return singleBucket(SectorAllocationType.UNKNOWN);
     }
-    // A no-op while Security Master honours its contract — it balances the vector to exactly 1 before publishing it.
+    // A no-op while Market Investment Catalogue honours its contract — it balances the vector to exactly 1 before
+    // publishing it.
     // Kept because this metric reports its buckets without a final rescale: a vector that arrived summing to 1.05
     // would push the reported portfolio past 100% with nothing downstream to catch it, so the invariant the class
     // javadoc rests on is enforced where it is relied upon rather than assumed of an upstream release.

@@ -19,9 +19,9 @@ import java.util.Optional;
  * Resolves the single geographic region of an individual stock from the {@code GEOGRAPHY} attribute.
  *
  * <p>
- * Individual stocks are a special case for every region breakdown: Security Master publishes a per-bucket geographic
- * allocation only for funds / ETFs / bonds, because a single company belongs to exactly one region. So a stock
- * contributes one 100% bucket rather than a distribution.
+ * Individual stocks are a special case for every region breakdown: Market Investment Catalogue publishes a per-bucket
+ * geographic allocation only for funds / ETFs / bonds, because a single company belongs to exactly one region. So a
+ * stock contributes one 100% bucket rather than a distribution.
  *
  * <p>
  * Extracted from {@link AbstractGeographicExposureService}, where this logic originally lived as private methods, so

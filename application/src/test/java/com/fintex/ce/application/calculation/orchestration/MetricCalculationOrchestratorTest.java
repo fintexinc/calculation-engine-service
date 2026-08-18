@@ -14,7 +14,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.model.error.exceptions.ExternalServiceUnavailableException;
 import com.fintex.ce.port.observability.CalculationDurationRecorder;
-import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
+import com.fintex.ce.port.webclient.mic.SecurityAttributesFetcher;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -59,7 +59,7 @@ class MetricCalculationOrchestratorTest {
   private static final List<DataProvider> DEFAULT_PROVIDERS = List.of(DataProvider.MORNINGSTAR, DataProvider.FMP);
 
   /** The service name the fetcher reports in its failures; asserted on rather than re-typed per test. */
-  private static final String SECURITY_MASTER = "Security Master";
+  private static final String MARKET_INVESTMENT_CATALOGUE = "Market Investment Catalogue";
 
   @Mock
   private SecurityAttributesFetcher securityAttributesFetcher;
@@ -293,7 +293,7 @@ class MetricCalculationOrchestratorTest {
   void shouldPropagateAsServiceUnavailable_whenSingleCommandFetchFails() {
     PeriodCommand command = sharpeCommand(null);
     when(securityAttributesFetcher.fetch(anyList(), any(CompositeSecurityAttribute.class), anyList()))
-        .thenThrow(new ExternalServiceUnavailableException(SECURITY_MASTER));
+        .thenThrow(new ExternalServiceUnavailableException(MARKET_INVESTMENT_CATALOGUE));
 
     assertThatThrownBy(() -> orchestrator.calculate(command))
         .isInstanceOf(ExternalServiceUnavailableException.class)
@@ -306,7 +306,7 @@ class MetricCalculationOrchestratorTest {
     PortfolioHoldingsCommand allocationCommand = allocationCommand();
     PeriodCommand sharpeCommand = sharpeCommand(null);
     when(securityAttributesFetcher.fetch(anyList(), anyCollection(), anyList()))
-        .thenThrow(new ExternalServiceUnavailableException(SECURITY_MASTER));
+        .thenThrow(new ExternalServiceUnavailableException(MARKET_INVESTMENT_CATALOGUE));
 
     assertThatThrownBy(() -> orchestrator.calculateAll(List.of(allocationCommand, sharpeCommand)))
         .isInstanceOf(ExternalServiceUnavailableException.class)
@@ -321,12 +321,13 @@ class MetricCalculationOrchestratorTest {
     PortfolioHolding portfolioHolding = command.getHoldings().getFirst();
     when(securityAttributesFetcher.fetch(eq(List.of(portfolioHolding)),
         eq(CompositeSecurityAttribute.MONTHLY_RETURNS), eq(DEFAULT_PROVIDERS)))
-        .thenThrow(new ExternalServiceUnavailableException(SECURITY_MASTER));
+        .thenThrow(new ExternalServiceUnavailableException(MARKET_INVESTMENT_CATALOGUE));
 
     assertThatThrownBy(() -> orchestrator.calculate(command))
         .isInstanceOf(ExternalServiceUnavailableException.class);
 
-    // the portfolio failure is what the caller sees regardless, so re-hitting a Security Master that has just failed
+    // the portfolio failure is what the caller sees regardless, so re-hitting a Market Investment Catalogue that has
+    // just failed
     // would only double the load it is under to fetch data no caller can reach
     verify(securityAttributesFetcher, never()).fetch(eq(List.of(benchmarkHolding)),
         any(CompositeSecurityAttribute.class), anyList());
@@ -338,7 +339,7 @@ class MetricCalculationOrchestratorTest {
     PeriodCommand sharpeCommand = sharpeCommand(holding("BENCH"));
     when(securityAttributesFetcher.fetch(anyList(), anyCollection(), anyList())).thenReturn(SecurityData.EMPTY);
     when(securityAttributesFetcher.fetch(anyList(), eq(CompositeSecurityAttribute.MONTHLY_RETURNS), anyList()))
-        .thenThrow(new ExternalServiceUnavailableException(SECURITY_MASTER));
+        .thenThrow(new ExternalServiceUnavailableException(MARKET_INVESTMENT_CATALOGUE));
 
     assertThatThrownBy(() -> orchestrator.calculateAll(List.of(allocationCommand, sharpeCommand)))
         .isInstanceOf(ExternalServiceUnavailableException.class);
@@ -372,7 +373,7 @@ class MetricCalculationOrchestratorTest {
     PeriodCommand sharpeCommand = sharpeCommand(null);
     when(securityAttributesFetcher.fetch(anyList(), anyCollection(), anyList())).thenReturn(SecurityData.EMPTY);
     when(sharpeRatioService.perform(eq(sharpeCommand), any()))
-        .thenThrow(new ExternalServiceUnavailableException(SECURITY_MASTER));
+        .thenThrow(new ExternalServiceUnavailableException(MARKET_INVESTMENT_CATALOGUE));
 
     assertThatThrownBy(() -> orchestrator.calculateAll(List.of(allocationCommand, sharpeCommand)))
         .isInstanceOf(ExternalServiceUnavailableException.class)

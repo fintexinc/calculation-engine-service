@@ -44,7 +44,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
   private static final SecurityIdentifier XBAL = new SecurityIdentifier("XBAL", FiIdentifierType.TICKER);
   private static final SecurityIdentifier CCM4752 = new SecurityIdentifier("CCM4752", FiIdentifierType.FUNDSERV);
 
-  /** Month-end bounds of the weighted-average portfolio returns produced by {@link #smsPositiveResponseBody()}. */
+  /** Month-end bounds of the weighted-average portfolio returns produced by {@link #micPositiveResponseBody()}. */
   private static final LocalDate RETURNS_FIRST_MONTH_END = LocalDate.of(2024, 1, 31);
   private static final LocalDate RETURNS_LAST_MONTH_END = LocalDate.of(2024, 12, 31);
 
@@ -66,17 +66,17 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   @Override
-  protected String requestBodyForSmsUnavailableScenario() {
+  protected String requestBodyForMicUnavailableScenario() {
     return writeJson(periodCommand(CalculationMetric.MAX_DRAWDOWN));
   }
 
   @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String requestBodyForPositiveMicScenario() {
     return writeJson(periodCommand(CalculationMetric.MAX_DRAWDOWN));
   }
 
   @Override
-  protected String smsPositiveResponseBody() {
+  protected String micPositiveResponseBody() {
     return writeJson(List.of(
         holdingReturnsRow(XBAL, monthlyReturns(XBAL_RETURNS_2024)),
         holdingReturnsRow(CCM4752, monthlyReturns(FUND_RETURNS_2024))));
@@ -110,7 +110,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnBadRequest_whenCipsdIsBeforeAvailableReturnsRange() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
+    enqueueMicMockResponse(micPositiveResponseBody());
 
     PeriodCommand command = periodCommand(CalculationMetric.MAX_DRAWDOWN);
     command.setCustomIntervalPsd(LocalDate.of(2023, 1, 31));
@@ -125,7 +125,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Test
   void shouldReturnOk_whenCipsdIsWithinReturnsRange_thenIncludesSinceCipsdEntry() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
+    enqueueMicMockResponse(micPositiveResponseBody());
 
     LocalDate cipsd = LocalDate.of(2024, 6, 30);
     PeriodCommand command = periodCommand(CalculationMetric.MAX_DRAWDOWN);
@@ -147,7 +147,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
    */
   @Test
   void shouldReturnEntryPerPeriod_whenMultiplePeriodsWithinRange() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
+    enqueueMicMockResponse(micPositiveResponseBody());
 
     PeriodCommand command = periodCommand(CalculationMetric.MAX_DRAWDOWN);
     command.setPeriods(Set.of(THREE_MTH, SIX_MTH, ONE_YR));
@@ -169,7 +169,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
    */
   @Test
   void shouldReturnWarning_whenRequestedPeriodExceedsAvailableHistory() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
+    enqueueMicMockResponse(micPositiveResponseBody());
 
     PeriodCommand command = periodCommand(CalculationMetric.MAX_DRAWDOWN);
     command.setPeriods(Set.of(THREE_YR)); // only 12 months of returns are available
@@ -208,7 +208,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
    */
   @Test
   void shouldReturnBadRequest_whenPeriodIsNotAKnownPeriod() {
-    enqueueSmsMockResponse(smsPositiveResponseBody());
+    enqueueMicMockResponse(micPositiveResponseBody());
 
     String body = writeJson(periodCommand(CalculationMetric.MAX_DRAWDOWN))
         .replace("\"ONE_YR\"", "\"not-a-period\"");

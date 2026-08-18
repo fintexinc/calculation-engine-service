@@ -35,7 +35,7 @@ import static com.fintex.wm.commons.domain.enumeration.TimePeriod.YTD;
  * <p>
  * Spring Boot registers every {@code Module} bean with the auto-configured {@code ObjectMapper}, so declaring this as a
  * component is all the wiring it needs. Serialization is untouched: a period still goes out as its constant name, the
- * form Security Master already uses.
+ * form Market Investment Catalogue already uses.
  */
 @Component
 public class TimePeriodJacksonModule extends SimpleModule {

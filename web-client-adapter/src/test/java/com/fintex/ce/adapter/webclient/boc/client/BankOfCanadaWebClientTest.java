@@ -40,9 +40,9 @@ import okhttp3.mockwebserver.MockWebServer;
  * Each scenario also pins what the observability port sees: one outcome per logical call, never one per attempt.
  *
  * <p>
- * The same scenarios are pinned for Security Master. Both clients wrap one shared decoration and one shared error
- * mapper, so a change that quietly protects only the provider that happens to be covered is the failure this class
- * exists to prevent.
+ * The same scenarios are pinned for Market Investment Catalogue. Both clients wrap one shared decoration and one shared
+ * error mapper, so a change that quietly protects only the provider that happens to be covered is the failure this
+ * class exists to prevent.
  */
 class BankOfCanadaWebClientTest {
 

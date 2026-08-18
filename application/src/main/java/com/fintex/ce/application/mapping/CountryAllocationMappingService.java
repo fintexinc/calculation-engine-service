@@ -30,10 +30,10 @@ public class CountryAllocationMappingService {
   }
 
   /**
-   * Maps responses from FDS to defined country regions
+   * Maps responses from MIC to defined country regions
    *
    * @param holdingAllocations
-   *          map of holdings and their responses from FDS
+   *          map of holdings and their responses from MIC
    * @param errorCode
    *          error code when response is empty
    * @return holdings grouped by region, paired with any warnings produced during mapping

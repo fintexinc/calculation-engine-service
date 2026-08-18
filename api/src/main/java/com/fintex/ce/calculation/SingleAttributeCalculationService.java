@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Calculation service depending on exactly one Security Master attribute. Implementations declare the attribute via
- * {@link #requiredAttribute()} and receive its per-holding domain data directly in
+ * Calculation service depending on exactly one Market Investment Catalogue attribute. Implementations declare the
+ * attribute via {@link #requiredAttribute()} and receive its per-holding domain data directly in
  * {@link #perform(CalculationCommand, Object)}; attribute declaration and data preparation are defaulted.
  *
  * @param <C>

@@ -9,9 +9,9 @@ import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import java.util.List;
 
 /**
- * Base interface for all calculation services. A service is a pure consumer of Security Master data: it declares the
- * attributes it depends on via {@link #requiredAttributes()} and receives its data as one strongly typed parameter. The
- * orchestrator fetches the declared attributes and converts them into the service's data type through
+ * Base interface for all calculation services. A service is a pure consumer of Market Investment Catalogue data: it
+ * declares the attributes it depends on via {@link #requiredAttributes()} and receives its data as one strongly typed
+ * parameter. The orchestrator fetches the declared attributes and converts them into the service's data type through
  * {@link #prepareData(SecurityData)} before invoking {@link #perform}; calculation logic never sees the raw fetched
  * attributes. Services depending on exactly one attribute should implement {@link SingleAttributeCalculationService},
  * which defaults both declaration and data preparation.

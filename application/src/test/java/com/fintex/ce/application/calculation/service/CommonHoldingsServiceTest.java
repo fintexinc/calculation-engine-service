@@ -66,14 +66,14 @@ class CommonHoldingsServiceTest {
     PortfolioHolding parentA = etfHolding("AAA", 60_000);
     PortfolioHolding parentB = etfHolding("BBB", 40_000);
 
-    Map<PortfolioHolding, CommonTopHoldings> sms = new LinkedHashMap<>();
-    sms.put(parentA, topHoldings(Currency.CAD,
+    Map<PortfolioHolding, CommonTopHoldings> mic = new LinkedHashMap<>();
+    mic.put(parentA, topHoldings(Currency.CAD,
         equityHolding("Alpha Corp", "0.20"),
         equityHolding("Bravo Corp", "0.18"),
         equityHolding("Charlie Corp", "0.16"),
         equityHolding("Delta Corp", "0.14"),
         equityHolding("Echo Corp", "0.12")));
-    sms.put(parentB, topHoldings(Currency.CAD,
+    mic.put(parentB, topHoldings(Currency.CAD,
         equityHolding("Alpha Corp", "0.25"),
         equityHolding("Bravo Corp", "0.20"),
         equityHolding("Golf Corp", "0.15"),
@@ -82,7 +82,7 @@ class CommonHoldingsServiceTest {
 
     TopCommonHoldingsCommand command = command(List.of(parentA, parentB), 5);
 
-    TopCommonHoldingsResult result = service.perform(command, sms);
+    TopCommonHoldingsResult result = service.perform(command, mic);
 
     assertThat(result.getCommonHoldings()).hasSize(5);
     List<String> names = result.getCommonHoldings().stream().map(TopCommonHoldingData::getName).toList();
@@ -97,9 +97,9 @@ class CommonHoldingsServiceTest {
     PortfolioHolding cad = etfHolding("CAD-ETF", 50_000);
     PortfolioHolding usd = etfHolding("USD-ETF", 50_000);
 
-    Map<PortfolioHolding, CommonTopHoldings> sms = new LinkedHashMap<>();
-    sms.put(cad, topHoldings(Currency.CAD, equityHolding("Alpha Corp", "0.50")));
-    sms.put(usd, topHoldings(Currency.USD, equityHolding("Alpha Corp", "0.50")));
+    Map<PortfolioHolding, CommonTopHoldings> mic = new LinkedHashMap<>();
+    mic.put(cad, topHoldings(Currency.CAD, equityHolding("Alpha Corp", "0.50")));
+    mic.put(usd, topHoldings(Currency.USD, equityHolding("Alpha Corp", "0.50")));
 
     when(fxRateService.spotRates(anySet(), any(), any())).thenAnswer(inv -> Map.of(
         Currency.CAD, BigDecimal.ONE,
@@ -107,7 +107,7 @@ class CommonHoldingsServiceTest {
 
     TopCommonHoldingsCommand command = command(List.of(cad, usd), 5);
 
-    TopCommonHoldingsResult result = service.perform(command, sms);
+    TopCommonHoldingsResult result = service.perform(command, mic);
 
     // CAD: 50000 -> 50000 CAD weight 1/3
     // USD: 50000 -> 100000 CAD weight 2/3
@@ -117,24 +117,24 @@ class CommonHoldingsServiceTest {
   }
 
   @Test
-  void shouldThrowMissingCurrencyFromFds_whenSmsOmitsCurrency() {
+  void shouldThrowMissingCurrencyFromFds_whenMicOmitsCurrency() {
     PortfolioHolding parent = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent,
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent,
         topHoldings(null, equityHolding("Alpha Corp", "0.50")));
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, sms, "HOLDING_MISSING_CURRENCY_FROM_FDS");
+    assertCalculationFails(command, mic, "HOLDING_MISSING_CURRENCY_FROM_FDS");
   }
 
   @Test
   void shouldThrowTch001_whenMandatoryHoldingHasNoUnderlyings() {
     PortfolioHolding parent = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD));
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, sms, "HOLDING_MISSING_UNDERLYING_HOLDINGS");
+    assertCalculationFails(command, mic, "HOLDING_MISSING_UNDERLYING_HOLDINGS");
   }
 
   @ParameterizedTest(name = "[{index}] {0}")
@@ -142,10 +142,10 @@ class CommonHoldingsServiceTest {
   void shouldThrowTch001_whenDescendedFundOrEtfHasNoUnderlyingHoldings(String description,
       CommonHolding fundOrEtf) {
     PortfolioHolding parent = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, fundOrEtf));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, fundOrEtf));
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertMissingUnderlyingHoldings(command, sms, parent);
+    assertMissingUnderlyingHoldings(command, mic, parent);
   }
 
   private static Stream<Arguments> fundOrEtfWithoutUnderlyingHoldings() {
@@ -172,20 +172,20 @@ class CommonHoldingsServiceTest {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding fund = equityHolding("Underlying Fund", "0.5");
     fund.setType("FO");
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD,
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD,
         equityHolding("First Equity", "0.5"), fund));
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertMissingUnderlyingHoldings(command, sms, parent);
+    assertMissingUnderlyingHoldings(command, mic, parent);
   }
 
   @Test
   void shouldTreatNestedEquityAsLeaf_whenItHasNoUnderlyingHoldings() {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding equity = equityHolding("Nested Equity", "1.0");
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, equity));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, equity));
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), mic);
 
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getCommonHoldings()).hasSize(1);
@@ -202,11 +202,11 @@ class CommonHoldingsServiceTest {
     CommonHolding level0Fund = equityHolding("Level0 Fund", "1.0");
     level0Fund.setType("FO");
     level0Fund.setUnderlyingHoldings(List.of(level1Fund));
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, level0Fund));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, level0Fund));
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
     command.setAccumulateHoldingTypes(Set.of("FO"));
 
-    TopCommonHoldingsResult result = service.perform(command, sms);
+    TopCommonHoldingsResult result = service.perform(command, mic);
 
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getCommonHoldings()).hasSize(1);
@@ -215,7 +215,7 @@ class CommonHoldingsServiceTest {
   }
 
   @Test
-  void shouldThrowSmsNoData_whenSmsReturnsNothingForMandatoryHolding() {
+  void shouldThrowMicNoData_whenMicReturnsNothingForMandatoryHolding() {
     PortfolioHolding parent = etfHolding("AAA", 1000);
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
@@ -226,7 +226,7 @@ class CommonHoldingsServiceTest {
   @Test
   void shouldFallbackToDefaults_whenCommandValuesAreNullOrEmpty() {
     PortfolioHolding parent = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent,
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent,
         topHoldings(Currency.CAD, equityHolding("Alpha Corp", "1.0")));
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
@@ -234,7 +234,7 @@ class CommonHoldingsServiceTest {
     // numOfTopCommonHoldings = null -> default 10
     // accumulateHoldingTypes = null -> default Set.of(E)
 
-    TopCommonHoldingsResult result = service.perform(command, sms);
+    TopCommonHoldingsResult result = service.perform(command, mic);
 
     assertThat(result.getCommonHoldings()).hasSize(1);
     assertThat(result.getCommonHoldings().get(0).getName()).isEqualTo("Alpha Corp");
@@ -245,11 +245,11 @@ class CommonHoldingsServiceTest {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding child = equityHolding("Alpha Corp", "0.5");
     child.setWeight(null);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, child));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, child));
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, sms, "HOLDING_MISSING_WEIGHTING_FROM_FDS");
+    assertCalculationFails(command, mic, "HOLDING_MISSING_WEIGHTING_FROM_FDS");
   }
 
   @ParameterizedTest(name = "[{index}] {0} -> isOfType STOCK = leaf short-circuit applies")
@@ -257,9 +257,9 @@ class CommonHoldingsServiceTest {
   void shouldShortCircuit_whenRequestHoldingIsAnyStockVariant(FinancialInstrumentType stockType) {
     PortfolioHolding stock = portfolioHolding("STK", 1000, stockType);
     CommonHolding selfEquity = equityHolding("Alpha Corp", "0.42");
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(stock, topHoldings(Currency.CAD, selfEquity));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(stock, topHoldings(Currency.CAD, selfEquity));
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(stock), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(stock), 10), mic);
 
     // Leaf-stock short-circuit: child weight 0.42 is ignored — inherited weight (100%) is used directly.
     assertThat(result.getCommonHoldings()).hasSize(1);
@@ -279,9 +279,9 @@ class CommonHoldingsServiceTest {
     PortfolioHolding parent = etfHolding("AAA", 1000);
     CommonHolding leaf = equityHolding("Alpha Corp", "1.0");
     leaf.setType(type);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, leaf));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, leaf));
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), mic);
 
     assertThat(result.getCommonHoldings()).hasSize(accumulated ? 1 : 0);
   }
@@ -304,9 +304,9 @@ class CommonHoldingsServiceTest {
     CommonHolding middle = equityHolding("Middle", "0.5");
     middle.setType(childType);
     middle.setUnderlyingHoldings(List.of(deepEquity));
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, middle));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, middle));
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), mic);
 
     if (shouldDescend) {
       assertThat(result.getCommonHoldings()).extracting(TopCommonHoldingData::getName)
@@ -332,9 +332,9 @@ class CommonHoldingsServiceTest {
     CommonHolding level0Fund = equityHolding("Level0 Fund", "1.0");
     level0Fund.setType("FO");
     level0Fund.setUnderlyingHoldings(List.of(level1Fund));
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, level0Fund));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, level0Fund));
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), mic);
 
     // depth=0 descends into level0; depth=1 NOT descended → level1Fund itself is emitted as a leaf.
     // level1Fund type "FO" is not in accumulate set (only "E") so result is empty — proves no deeper descent happened.
@@ -352,10 +352,10 @@ class CommonHoldingsServiceTest {
     ancestor.setPrimaryIdentifier(new SecurityIdentifier("CYCLE", FiIdentifierType.MORNINGSTAR_ID));
     ancestor.setUnderlyingHoldings(List.of(cycleChild));
     cycleChild.setUnderlyingHoldings(List.of(ancestor));
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, ancestor));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, ancestor));
 
     // No StackOverflowError; cycle guard short-circuits at the repeated identity.
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), mic);
 
     assertThat(result.getCommonHoldings()).isEmpty();
   }
@@ -367,9 +367,9 @@ class CommonHoldingsServiceTest {
     alphaA.setPrimaryIdentifier(new SecurityIdentifier("Z-LAST", FiIdentifierType.TICKER));
     CommonHolding alphaB = equityHolding("Alpha", "0.5");
     alphaB.setPrimaryIdentifier(new SecurityIdentifier("A-FIRST", FiIdentifierType.TICKER));
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, alphaA, alphaB));
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, alphaA, alphaB));
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), mic);
 
     assertThat(result.getCommonHoldings()).hasSize(1);
     // Lexicographically smallest identifier wins — A-FIRST is the chosen representative.
@@ -380,10 +380,10 @@ class CommonHoldingsServiceTest {
   @MethodSource("missingNameAndCompanyNameCases")
   void shouldSkipChildren_withoutNameOrCompanyName(String desc, CommonHolding child) {
     PortfolioHolding parent = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD, child,
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, child,
         equityHolding("Valid Equity", "0.5")));
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), 10), mic);
 
     assertThat(result.getCommonHoldings()).extracting(TopCommonHoldingData::getName).containsExactly("Valid Equity");
   }
@@ -408,29 +408,29 @@ class CommonHoldingsServiceTest {
   @CsvSource({"1, 1", "2, 2", "10, 3"})
   void shouldLimitTopCommonHoldings_byNumOfTop(int numOfTop, int expectedSize) {
     PortfolioHolding parent = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(parent, topHoldings(Currency.CAD,
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD,
         equityHolding("Alpha", "0.5"),
         equityHolding("Bravo", "0.3"),
         equityHolding("Charlie", "0.2")));
 
-    TopCommonHoldingsResult result = service.perform(command(List.of(parent), numOfTop), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(parent), numOfTop), mic);
 
     assertThat(result.getCommonHoldings()).hasSize(expectedSize);
   }
 
   @ParameterizedTest
   @ValueSource(strings = {"CASH", "GIC"})
-  void shouldNotRequireSmsCurrency_forLocallySourcedHoldingTypes(String typeName) {
-    // The fetcher won't return these (sent-to-SMS predicate excludes them), so currency must come from elsewhere.
+  void shouldNotRequireMicCurrency_forLocallySourcedHoldingTypes(String typeName) {
+    // The fetcher won't return these (sent-to-MIC predicate excludes them), so currency must come from elsewhere.
     // Currently the service still calls currencyFor() which falls into the default branch and returns null —
-    // and since these are NOT sent to SMS, the missing-currency throw is skipped. The conversion just omits them.
-    PortfolioHolding nonSmsHolding = portfolioHolding("X", 1000, FinancialInstrumentType.valueOf(typeName));
+    // and since these are NOT sent to MIC, the missing-currency throw is skipped. The conversion just omits them.
+    PortfolioHolding nonMicHolding = portfolioHolding("X", 1000, FinancialInstrumentType.valueOf(typeName));
     PortfolioHolding etf = etfHolding("AAA", 1000);
-    Map<PortfolioHolding, CommonTopHoldings> sms = Map.of(etf,
+    Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(etf,
         topHoldings(Currency.CAD, equityHolding("Alpha", "1.0")));
 
     // Should not throw.
-    TopCommonHoldingsResult result = service.perform(command(List.of(etf, nonSmsHolding), 10), sms);
+    TopCommonHoldingsResult result = service.perform(command(List.of(etf, nonMicHolding), 10), mic);
 
     assertThat(result.getCommonHoldings()).hasSize(1);
   }

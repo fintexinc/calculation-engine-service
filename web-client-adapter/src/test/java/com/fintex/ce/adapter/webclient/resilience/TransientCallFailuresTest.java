@@ -78,7 +78,7 @@ class TransientCallFailuresTest {
   @Test
   void shouldTreatAsPermanent_whenNoRequestWasEverSentBecauseTheBreakerIsOpen() {
     assertThat(transientFailures.test(CallNotPermittedException.createCallNotPermittedException(
-        CircuitBreaker.ofDefaults("securityMaster")))).isFalse();
+        CircuitBreaker.ofDefaults("marketInvestmentCatalogue")))).isFalse();
   }
 
   @Test

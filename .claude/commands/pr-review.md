@@ -189,7 +189,7 @@ them:
 
 - [ ] PR description explains **what and why** (not how)
 
-The architectural/resilience gates (N+1 external calls, Resilience4j on SMS calls, hardcoded
+The architectural/resilience gates (N+1 external calls, Resilience4j on MIC calls, hardcoded
 configuration) are checked by the `code-reviewer` skill in step 7.
 
 ---
@@ -209,7 +209,7 @@ Pull Request Checklist
 - [ ] PR contains 1-2 main commits                  → step 5
 - [ ] code-reviewer skill run, no Critical/High     → step 7
 - [ ] No N+1 external service calls                 → step 7
-- [ ] Resilience4j annotations on SM calls          → step 7
+- [ ] Resilience4j annotations on MIC calls          → step 7
 - [ ] No hardcoded configuration values             → step 7
 - [ ] PR description explains what and why (not how) → step 8 (manual)
 ```

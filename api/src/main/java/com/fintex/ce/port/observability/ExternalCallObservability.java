@@ -12,9 +12,9 @@ import com.fintex.wm.commons.domain.ExternalWebService;
  * instrumentation on the web client, and reporting them a second time would double count them.
  *
  * <p>
- * The meter names and tag vocabulary behind this port are shared with the Security Master Service, so one dashboard
- * covers both. Only the outcomes this service can actually reach are declared here; Security Master reports rate
- * limiting and cancellation as well, because it has a client-side limiter and a reactive client.
+ * The meter names and tag vocabulary behind this port are shared with the Market Investment Catalogue Service, so one
+ * dashboard covers both. Only the outcomes this service can actually reach are declared here; Market Investment
+ * Catalogue reports rate limiting and cancellation as well, because it has a client-side limiter and a reactive client.
  *
  * <p>
  * {@link #NO_OP} exists for contexts that deliberately publish nothing — a slim test context wiring a client without

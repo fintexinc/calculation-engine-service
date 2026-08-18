@@ -20,9 +20,10 @@ import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 public class ExternalCallResilienceConfig {
 
   @Bean
-  public ExternalCallResilience securityMasterCallResilience(CircuitBreakerRegistry circuitBreakers,
+  public ExternalCallResilience marketInvestmentCatalogueCallResilience(CircuitBreakerRegistry circuitBreakers,
       RetryRegistry retries, TimeLimiterRegistry timeLimiters) {
-    return ExternalCallResilience.of(ExternalWebService.SECURITY_MASTER, circuitBreakers, retries, timeLimiters);
+    return ExternalCallResilience.of(ExternalWebService.MARKET_INVESTMENT_CATALOGUE, circuitBreakers, retries,
+        timeLimiters);
   }
 
   @Bean

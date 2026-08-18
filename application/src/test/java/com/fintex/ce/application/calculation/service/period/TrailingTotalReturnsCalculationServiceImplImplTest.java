@@ -16,7 +16,7 @@ import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
-import com.fintex.ce.port.webclient.sm.TreasuryBillsFetcher;
+import com.fintex.ce.port.webclient.mic.TreasuryBillsFetcher;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.error.Notification;
 

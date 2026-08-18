@@ -218,7 +218,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   }
 
   @Test
-  void fundHolding_usesAllocationsFromSms() {
+  void fundHolding_usesAllocationsFromMic() {
     PortfolioHolding fund = mutualFund("RBF605");
     HoldingAssetAllocation allocation = HoldingAssetAllocation.builder()
         .allocations(Map.of(
@@ -320,7 +320,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   }
 
   @Test
-  void smsNoise_inOtherBucketIsClampedToZero() {
+  void micNoise_inOtherBucketIsClampedToZero() {
     PortfolioHolding fund = mutualFund("RBF999");
     HoldingAssetAllocation noisyAllocation = HoldingAssetAllocation.builder()
         .allocations(Map.of(
@@ -336,7 +336,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
   }
 
   @Test
-  void smsNoise_realAllocationsAboveThresholdSurvive() {
+  void micNoise_realAllocationsAboveThresholdSurvive() {
     PortfolioHolding fund = mutualFund("RBF999");
     HoldingAssetAllocation allocation = HoldingAssetAllocation.builder()
         .allocations(Map.of(

@@ -8,8 +8,8 @@ import java.util.Map;
 import lombok.EqualsAndHashCode;
 
 /**
- * Thrown by web-client adapters when a downstream external service (Security Master, Bank of Canada, etc.) is
- * unreachable, times out, or responds with an error status. Maps to {@link ErrorCode#EXTERNAL_SERVICE_UNAVAILABLE}
+ * Thrown by web-client adapters when a downstream external service (Market Investment Catalogue, Bank of Canada, etc.)
+ * is unreachable, times out, or responds with an error status. Maps to {@link ErrorCode#EXTERNAL_SERVICE_UNAVAILABLE}
  * (HTTP 503) at the REST boundary.
  */
 @EqualsAndHashCode(callSuper = true)

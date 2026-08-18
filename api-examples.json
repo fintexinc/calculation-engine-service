@@ -1,5 +1,5 @@
 {
-  "description": "JSON request examples for supported calculation metrics (metrics with real Security Master fetcher implementations)",
+  "description": "JSON request examples for supported calculation metrics (metrics with real Market Investment Catalogue fetcher implementations)",
   "baseUrl": "http://localhost:8181/api/v1/portfolio/calculations",
   "examples": [
     {
@@ -52,7 +52,7 @@
     },
     {
       "metric": "asset-allocations",
-      "fetcher": "AssetAllocationSecurityMasterFetcher",
+      "fetcher": "AssetAllocationMarketInvestmentCatalogueFetcher",
       "command": "PortfolioHoldingsCommand",
       "request": {
         "metric": "asset-allocations",
