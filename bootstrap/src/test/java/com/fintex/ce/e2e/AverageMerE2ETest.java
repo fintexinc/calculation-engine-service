@@ -2,6 +2,7 @@ package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.dto.command.AverageMerCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -24,8 +25,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.etfCa;
-import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.holdingOfCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("e2e")
@@ -42,8 +41,8 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
     command.setMetric(CalculationMetric.MER);
     command.setParameterTypes(List.of(FeeAggregationMode.FUNDS_ONLY, FeeAggregationMode.WHOLE_PORTFOLIO));
     command.setHoldings(List.of(
-        etfCa("XBAL", 50_000),
-        etfCa("VCNS", 75_000)));
+        holding("XBAL", 50_000),
+        holding("VCNS", 75_000)));
     command.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return toJson(command);
   }
@@ -54,8 +53,8 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
     command.setMetric(CalculationMetric.MER);
     command.setParameterTypes(List.of(FeeAggregationMode.FUNDS_ONLY, FeeAggregationMode.WHOLE_PORTFOLIO));
     command.setHoldings(List.of(
-        etfCa("ETF-A", 300_000),
-        etfCa("ETF-B", 100_000)));
+        holding("ETF-A", 300_000),
+        holding("ETF-B", 100_000)));
     command.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return toJson(command);
   }
@@ -90,7 +89,7 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
   protected String requestBodyForMismatchedMetricScenario() {
     var command = new PeriodCommand();
     command.setMetric(CalculationMetric.SHARPE_RATIO);
-    command.setHoldings(List.of(etfCa("XBAL", 50_000)));
+    command.setHoldings(List.of(holding("XBAL", 50_000)));
     command.setCurrency(Currency.CAD);
     return toJson(command);
   }
@@ -131,11 +130,10 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
             FeeAggregationMode.FUNDS_ONLY,
             FeeAggregationMode.WHOLE_PORTFOLIO));
     command.setHoldings(
-        List.of(holdingOfCountry(
-            new SecurityIdentifier(holdingId, FiIdentifierType.TICKER),
-            FinancialInstrumentType.ETF,
-            Country.USA,
-            BigDecimal.valueOf(100_000))));
+        List.of(usEtfHolding(
+            holdingId,
+            FiIdentifierType.TICKER,
+            100_000)));
     command.setDataProviders(providers);
 
     var response = postCalculation(toJson(command));
@@ -174,7 +172,7 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
             FeeAggregationMode.FUNDS_ONLY,
             FeeAggregationMode.WHOLE_PORTFOLIO));
     command.setHoldings(
-        List.of(etfCa("ETF-MISSING-MER", 100_000)));
+        List.of(holding("ETF-MISSING-MER", 100_000)));
     command.setDataProviders(providers);
 
     var response = postCalculation(toJson(command));
@@ -193,6 +191,25 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
         .extracting(notification -> notification.getCode())
         .containsExactly(
             ErrorCode.Codes.MISSING_MANAGEMENT_EXPENSE_RATIO);
+  }
+
+  private static PortfolioHolding holding(String id, long value) {
+    return new PortfolioHolding(
+        BigDecimal.valueOf(value),
+        FinancialInstrumentType.ETF,
+        Country.CANADA,
+        new SecurityIdentifier(id, FiIdentifierType.TICKER));
+  }
+
+  private static PortfolioHolding usEtfHolding(
+      String id,
+      FiIdentifierType identifierType,
+      long value) {
+    return new PortfolioHolding(
+        BigDecimal.valueOf(value),
+        FinancialInstrumentType.ETF,
+        Country.USA,
+        new SecurityIdentifier(id, identifierType));
   }
 
   private static String toJson(Object value) {

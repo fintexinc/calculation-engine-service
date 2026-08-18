@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.holdingOfCountry;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -244,15 +243,15 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
         .metric(metric)
         .dataProviders(List.of(DataProvider.MORNINGSTAR))
         .holdings(List.of(
-            holdingOfCountry(FIRST_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA, BigDecimal.valueOf(
-                10_000)),
-            holdingOfCountry(SECOND_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA, BigDecimal.valueOf(
-                20_000)),
-            holdingOfCountry(THIRD_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA, BigDecimal.valueOf(
-                30_000)),
-            holdingOfCountry(FOURTH_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA,
-                BigDecimal.valueOf(40_000))))
+            etfHolding(10_000, FIRST_ETF_IDENTIFIER),
+            etfHolding(20_000, SECOND_ETF_IDENTIFIER),
+            etfHolding(30_000, THIRD_ETF_IDENTIFIER),
+            etfHolding(40_000, FOURTH_ETF_IDENTIFIER)))
         .build();
+  }
+
+  private static PortfolioHolding etfHolding(long value, SecurityIdentifier identifier) {
+    return new PortfolioHolding(BigDecimal.valueOf(value), FinancialInstrumentType.ETF, Country.CANADA, identifier);
   }
 
   private static SecurityAttributeResult<EquitySectorAllocationWithCurrency> sectorAllocationRow(

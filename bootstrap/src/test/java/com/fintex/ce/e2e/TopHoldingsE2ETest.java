@@ -1,6 +1,7 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingData;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.holdingOfCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("e2e")
@@ -49,10 +49,8 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
     command.setMetric(CalculationMetric.TOP_COMMON_HOLDINGS);
     command.setNumOfTopCommonHoldings(5);
     command.setHoldings(List.of(
-        holdingOfCountry(new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER), FinancialInstrumentType.ETF,
-            Country.CANADA, BigDecimal.valueOf(60_000)),
-        holdingOfCountry(new SecurityIdentifier("BBB_PARENT", FiIdentifierType.FUNDSERV), FinancialInstrumentType.ETF,
-            Country.CANADA, BigDecimal.valueOf(40_000))));
+        holding(new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER), 60_000),
+        holding(new SecurityIdentifier("BBB_PARENT", FiIdentifierType.FUNDSERV), 40_000)));
     command.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return writeJson(command);
   }
@@ -88,11 +86,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
   protected String requestBodyForMismatchedMetricScenario() {
     var command = new ReturnCommand();
     command.setMetric(CalculationMetric.GROWTH_OF_10K);
-    command.setHoldings(List.of(holdingOfCountry(
-        new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER),
-        FinancialInstrumentType.ETF,
-        Country.CANADA,
-        BigDecimal.valueOf(50_000))));
+    command.setHoldings(List.of(holding(new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER), 50_000)));
     command.setCurrency(Currency.CAD);
     return writeJson(command);
   }
@@ -127,6 +121,14 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(byName.get("Delta Corp").getParentHolding()).hasSize(1);
     assertThat(byName.get("Echo Corp").getNumOfFunds()).isEqualTo(1);
     assertThat(byName.get("Echo Corp").getParentHolding()).hasSize(1);
+  }
+
+  private static PortfolioHolding holding(SecurityIdentifier securityIdentifier, int value) {
+    return new PortfolioHolding(
+        BigDecimal.valueOf(value),
+        FinancialInstrumentType.ETF,
+        Country.CANADA,
+        securityIdentifier);
   }
 
   private static Holdings holdings(SecurityHolding... allocations) {

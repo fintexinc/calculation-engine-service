@@ -2,6 +2,7 @@ package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
+import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.fee.FeeComparison;
 import com.fintex.ce.model.domain.result.fee.FeeSpendComparison;
 import com.fintex.ce.model.domain.result.fee.MerComparisonResult;
@@ -26,8 +27,6 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.etfCa;
-import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.holdingOfCountry;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
@@ -95,7 +94,7 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
   protected String requestBodyForMismatchedMetricScenario() {
     var command = new PeriodCommand();
     command.setMetric(CalculationMetric.SHARPE_RATIO);
-    command.setHoldings(List.of(etfCa(PORTFOLIO_TICKER, PORTFOLIO_VALUE.longValue())));
+    command.setHoldings(List.of(holding(PORTFOLIO_TICKER)));
     command.setCurrency(Currency.CAD);
     return writeJson(command);
   }
@@ -227,8 +226,8 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
     var command = new MerComparisonCommand();
     command.setMetric(CalculationMetric.MER_BENCHMARK_COMPARISON);
     command.setParameterTypes(List.of(modes));
-    command.setHoldings(List.of(etfCa(PORTFOLIO_TICKER, PORTFOLIO_VALUE.longValue())));
-    command.setBenchmarkHoldings(List.of(etfCa(BENCHMARK_TICKER, PORTFOLIO_VALUE.longValue())));
+    command.setHoldings(List.of(holding(PORTFOLIO_TICKER)));
+    command.setBenchmarkHoldings(List.of(holding(BENCHMARK_TICKER)));
     command.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return command;
   }
@@ -243,20 +242,27 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
     command.setMetric(CalculationMetric.MER_BENCHMARK_COMPARISON);
     command.setParameterTypes(List.of(FUNDS_ONLY, FUNDS_ONLY_STRICT, WHOLE_PORTFOLIO));
     command.setHoldings(List.of(
-        holdingOfCountry(new SecurityIdentifier(MIXED_ETF, FiIdentifierType.TICKER), FinancialInstrumentType.ETF,
-            Country.CANADA, BigDecimal.valueOf(200_000)),
-        holdingOfCountry(new SecurityIdentifier(MIXED_FUND, FiIdentifierType.TICKER),
-            FinancialInstrumentType.MUTUAL_FUND,
-            Country.CANADA, BigDecimal.valueOf(50_000)),
-        holdingOfCountry(new SecurityIdentifier(MIXED_STOCK, FiIdentifierType.TICKER), FinancialInstrumentType.STOCK,
-            Country.CANADA, BigDecimal.valueOf(250_000))));
+        holding(MIXED_ETF, 200_000, FinancialInstrumentType.ETF),
+        holding(MIXED_FUND, 50_000, FinancialInstrumentType.MUTUAL_FUND),
+        holding(MIXED_STOCK, 250_000, FinancialInstrumentType.STOCK)));
     command.setBenchmarkHoldings(List.of(
-        holdingOfCountry(new SecurityIdentifier(BENCHMARK_TICKER, FiIdentifierType.TICKER),
-            FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.valueOf(300_000)),
-        holdingOfCountry(new SecurityIdentifier(BENCHMARK_GROWTH, FiIdentifierType.TICKER),
-            FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.valueOf(100_000))));
+        holding(BENCHMARK_TICKER, 300_000, FinancialInstrumentType.MUTUAL_FUND),
+        holding(BENCHMARK_GROWTH, 100_000, FinancialInstrumentType.MUTUAL_FUND)));
     command.setDataProviders(List.of(DataProvider.MORNINGSTAR));
     return command;
+  }
+
+  private static PortfolioHolding holding(String ticker) {
+    return holding(ticker, PORTFOLIO_VALUE.intValue(), FinancialInstrumentType.ETF);
+  }
+
+  /** Country is mandatory: the engine rejects a holding whose country is not one it supports, and null is not. */
+  private static PortfolioHolding holding(String ticker, int value, FinancialInstrumentType type) {
+    return new PortfolioHolding(
+        BigDecimal.valueOf(value),
+        type,
+        Country.CANADA,
+        new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
   }
 
   /**

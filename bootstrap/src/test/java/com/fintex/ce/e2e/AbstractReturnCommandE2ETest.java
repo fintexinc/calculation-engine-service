@@ -22,8 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.fintex.ce.e2e.PortfolioHoldingBuildHelper.holdingOfCountry;
-
 /**
  * Shared e2e infrastructure for {@link ReturnCommand}-based metrics (growth-of-10k, annual-returns). Both metrics use
  * the same command type, the same Security Master call ({@code List<SecurityAttributeResult<MonthlyReturns>>}) and the
@@ -55,24 +53,40 @@ abstract class AbstractReturnCommandE2ETest extends AbstractPortfolioCalculation
   }
 
   protected static PortfolioHolding etfCanada(SecurityIdentifier securityIdentifier, String value) {
-    return holdingOfCountry(securityIdentifier, FinancialInstrumentType.ETF, Country.CANADA, value);
+    return new PortfolioHolding(
+        new BigDecimal(value),
+        FinancialInstrumentType.ETF,
+        Country.CANADA,
+        securityIdentifier);
   }
 
   protected static PortfolioHolding usEtf(SecurityIdentifier securityIdentifier, String value) {
-    return holdingOfCountry(securityIdentifier, FinancialInstrumentType.ETF, Country.USA, value);
+    return new PortfolioHolding(
+        new BigDecimal(value),
+        FinancialInstrumentType.ETF,
+        Country.USA,
+        securityIdentifier);
   }
 
   protected static PortfolioHolding stockCanada(EquitySecurityIdentifier securityIdentifier, String value) {
-    return holdingOfCountry(securityIdentifier, FinancialInstrumentType.STOCK, Country.CANADA, value);
+    return new PortfolioHolding(
+        new BigDecimal(value),
+        FinancialInstrumentType.STOCK,
+        Country.CANADA,
+        securityIdentifier);
   }
 
   protected static PortfolioHolding fund(SecurityIdentifier morningstarId, FinancialInstrumentType type,
       Country country, String value) {
-    return holdingOfCountry(morningstarId, type, country, value);
+    return new PortfolioHolding(new BigDecimal(value), type, country, morningstarId);
   }
 
   protected static PortfolioHolding fundServ(SecurityIdentifier fundservId, String value) {
-    return holdingOfCountry(fundservId, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, value);
+    return new PortfolioHolding(
+        new BigDecimal(value),
+        FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA,
+        fundservId);
   }
 
   protected static CashHolding cash(Currency currency, String value) {
