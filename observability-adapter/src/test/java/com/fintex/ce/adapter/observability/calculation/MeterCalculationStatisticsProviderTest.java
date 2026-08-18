@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MeterCalculationStatisticsProviderTest {
 
-  private static final String ALPHA = CalculationMetric.ALPHA.getValue();
-  private static final String BETA = CalculationMetric.BETA.getValue();
+  private static final String MAX_DRAWDOWN = CalculationMetric.MAX_DRAWDOWN.getValue();
+  private static final String STANDARD_DEVIATION = CalculationMetric.STANDARD_DEVIATION.getValue();
 
   private static final ErrorCode SHARED_ERROR = ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE;
   private static final List<ErrorCode> ALPHA_ONLY_ERRORS = List.of(
@@ -40,20 +40,20 @@ class MeterCalculationStatisticsProviderTest {
 
   @Test
   void shouldRankMostFailingMetricFirst_whenSeveralMetricsExecuted() {
-    statistics.recordSingleSuccess(ALPHA, resultWith(warning("FDS-001")), new RequestShape(10, 1));
-    statistics.recordSingleSuccess(ALPHA, resultWith(warning("FDS-001"), warning("FDS-002")),
+    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("FDS-001")), new RequestShape(10, 1));
+    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("FDS-001"), warning("FDS-002")),
         new RequestShape(10, 1));
-    statistics.recordSingleFailure(ALPHA, ErrorCode.METRIC_MISMATCH.toException("alpha", "beta"),
+    statistics.recordSingleFailure(MAX_DRAWDOWN, ErrorCode.METRIC_MISMATCH.toException("alpha", "beta"),
         new RequestShape(10, 1));
-    statistics.recordSingleFailure(BETA, new IllegalStateException("boom"), new RequestShape(4, 0));
-    statistics.recordSingleFailure(BETA, new IllegalStateException("boom"), new RequestShape(4, 0));
-    statistics.recordSingleFailure(BETA, ErrorCode.METRIC_REQUIRED.toException(), new RequestShape(4, 0));
-    statistics.recordSuccess(CalculationMetric.ALPHA, Duration.ofMillis(30));
-    statistics.recordSuccess(CalculationMetric.ALPHA, Duration.ofMillis(70));
+    statistics.recordSingleFailure(STANDARD_DEVIATION, new IllegalStateException("boom"), new RequestShape(4, 0));
+    statistics.recordSingleFailure(STANDARD_DEVIATION, new IllegalStateException("boom"), new RequestShape(4, 0));
+    statistics.recordSingleFailure(STANDARD_DEVIATION, ErrorCode.METRIC_REQUIRED.toException(), new RequestShape(4, 0));
+    statistics.recordSuccess(CalculationMetric.MAX_DRAWDOWN, Duration.ofMillis(30));
+    statistics.recordSuccess(CalculationMetric.MAX_DRAWDOWN, Duration.ofMillis(70));
 
     CalculationStatisticsReport report = provider.statistics();
 
-    assertThat(report.metrics()).extracting(MetricStatistics::metric).containsExactly(BETA, ALPHA);
+    assertThat(report.metrics()).extracting(MetricStatistics::metric).containsExactly(STANDARD_DEVIATION, MAX_DRAWDOWN);
 
     MetricStatistics beta = report.metrics().get(0);
     assertThat(beta.executions()).isEqualTo(3);
@@ -101,25 +101,25 @@ class MeterCalculationStatisticsProviderTest {
    */
   @Test
   void shouldRankOverallCodesFromCompleteTallies_whenACodeIsBelowTheCutOffForEveryMetric() {
-    recordFailures(ALPHA, ALPHA_ONLY_ERRORS, 3);
-    recordFailures(BETA, BETA_ONLY_ERRORS, 3);
-    recordFailures(ALPHA, List.of(SHARED_ERROR), 2);
-    recordFailures(BETA, List.of(SHARED_ERROR), 2);
-    recordWarnings(ALPHA, ALPHA_ONLY_WARNINGS, 3);
-    recordWarnings(BETA, BETA_ONLY_WARNINGS, 3);
-    recordWarnings(ALPHA, List.of(SHARED_WARNING), 2);
-    recordWarnings(BETA, List.of(SHARED_WARNING), 2);
+    recordFailures(MAX_DRAWDOWN, ALPHA_ONLY_ERRORS, 3);
+    recordFailures(STANDARD_DEVIATION, BETA_ONLY_ERRORS, 3);
+    recordFailures(MAX_DRAWDOWN, List.of(SHARED_ERROR), 2);
+    recordFailures(STANDARD_DEVIATION, List.of(SHARED_ERROR), 2);
+    recordWarnings(MAX_DRAWDOWN, ALPHA_ONLY_WARNINGS, 3);
+    recordWarnings(STANDARD_DEVIATION, BETA_ONLY_WARNINGS, 3);
+    recordWarnings(MAX_DRAWDOWN, List.of(SHARED_WARNING), 2);
+    recordWarnings(STANDARD_DEVIATION, List.of(SHARED_WARNING), 2);
 
     CalculationStatisticsReport report = provider.statistics();
 
-    assertThat(codes(metric(report, ALPHA).topErrorCodes()))
+    assertThat(codes(metric(report, MAX_DRAWDOWN).topErrorCodes()))
         .as("five codes beat it within this metric, so it is cut from the per-metric list")
         .hasSize(5)
         .doesNotContain(SHARED_ERROR.getCode());
-    assertThat(codes(metric(report, BETA).topErrorCodes()))
+    assertThat(codes(metric(report, STANDARD_DEVIATION).topErrorCodes()))
         .hasSize(5)
         .doesNotContain(SHARED_ERROR.getCode());
-    assertThat(codes(metric(report, ALPHA).topWarningCodes()))
+    assertThat(codes(metric(report, MAX_DRAWDOWN).topWarningCodes()))
         .hasSize(5)
         .doesNotContain(SHARED_WARNING);
 

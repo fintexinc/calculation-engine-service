@@ -21,10 +21,7 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.domain.security.SecurityData;
-import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
-import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
-import com.fintex.ce.model.dto.command.IncomeForecastCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.ce.model.error.ErrorCode;
@@ -430,13 +427,7 @@ class PortfolioCalculationControllerTest {
         CalculationService<?, ?, ?> svc = mock(CalculationService.class);
         lenient().when(svc.getMetric()).thenReturn(m);
         lenient().when(svc.requiredAttributes()).thenReturn(List.of());
-        Object result = switch (m) {
-          case BEST_WORST_PERIODS -> new com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult();
-          case DISTRIBUTION_OF_MONTHLY_RETURNS ->
-            new com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult();
-          default -> new BaseCalculationResult() {};
-        };
-        stubCalculationResult(svc, (BaseCalculationResult) result);
+        stubCalculationResult(svc, new BaseCalculationResult() {});
         services.add(svc);
         calculationServices.put(m, svc);
       }
@@ -650,156 +641,6 @@ class PortfolioCalculationControllerTest {
           .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void shouldReturnBadRequest_whenBestWorstPeriodExceedsLimit() throws Exception {
-      BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
-      cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
-      cmd.setCurrency(Currency.CAD);
-      cmd.setHoldings(List.of());
-      cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
-      cmd.setCustomPed(LocalDate.of(2024, 12, 31));
-      cmd.setBestWorstTimeIntervalPeriods(Set.of(301L));
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/best-worst-periods")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(cmd)))
-          .andExpect(status().isBadRequest())
-          .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("BWP-002")));
-    }
-
-    @Test
-    void shouldReturnBadRequest_whenCustomNumberOfBinsBelowMinimum() throws Exception {
-      DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
-      cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      cmd.setCurrency(Currency.CAD);
-      cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
-      cmd.setCustomNumberOfBins(4);
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/distribution-of-monthly-returns")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(cmd)))
-          .andExpect(status().isBadRequest())
-          .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("DIS-001")));
-    }
-
-    @Test
-    void shouldReturnBadRequest_whenCustomNumberOfBinsAboveMaximum() throws Exception {
-      DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
-      cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      cmd.setCurrency(Currency.CAD);
-      cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
-      cmd.setCustomNumberOfBins(31);
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/distribution-of-monthly-returns")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(cmd)))
-          .andExpect(status().isBadRequest())
-          .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("DIS-002")));
-    }
-
-    @Test
-    void shouldReturnBadRequest_whenIncomeForecastTimeIntervalIsZero() throws Exception {
-      IncomeForecastCommand cmd = new IncomeForecastCommand();
-      cmd.setMetric(CalculationMetric.INCOME_FORECAST);
-      cmd.setTimeIntervalPeriods(0);
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/income-forecast")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(cmd)))
-          .andExpect(status().isBadRequest())
-          .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("TIP-003")));
-    }
-
-    @Test
-    void shouldReturnBadRequest_whenIncomeForecastTimeIntervalIsNegative() throws Exception {
-      IncomeForecastCommand cmd = new IncomeForecastCommand();
-      cmd.setMetric(CalculationMetric.INCOME_FORECAST);
-      cmd.setTimeIntervalPeriods(-12);
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/income-forecast")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(cmd)))
-          .andExpect(status().isBadRequest())
-          .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("TIP-003")));
-    }
-
-    @Test
-    void shouldReturnBadRequest_whenBestWorstPeriodIsZero() throws Exception {
-      BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
-      cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
-      cmd.setCurrency(Currency.CAD);
-      cmd.setHoldings(List.of());
-      cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
-      cmd.setCustomPed(LocalDate.of(2024, 12, 31));
-      cmd.setBestWorstTimeIntervalPeriods(Set.of(0L));
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/best-worst-periods")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(cmd)))
-          .andExpect(status().isBadRequest())
-          .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("BWP-001")));
-    }
-
-    @Test
-    void shouldPassValidation_whenBestWorstPeriodIsAtBoundaryValues() throws Exception {
-      BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
-      cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
-      cmd.setCurrency(Currency.CAD);
-      cmd.setHoldings(List.of(dummyHolding()));
-      cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
-      cmd.setCustomPed(LocalDate.of(2024, 12, 31));
-      cmd.setBestWorstTimeIntervalPeriods(Set.of(1L, 300L));
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/best-worst-periods")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(cmd)))
-          .andExpect(status().isOk());
-    }
-
-    @Test
-    void shouldPassValidation_whenNumberOfBinsIsAtBoundaryValues() throws Exception {
-      DistributionOfReturnsCommand lowerBoundCmd = new DistributionOfReturnsCommand();
-      lowerBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      lowerBoundCmd.setCurrency(Currency.CAD);
-      lowerBoundCmd.setHoldings(List.of(dummyHolding()));
-      lowerBoundCmd.setPeriods(Set.of(TimePeriod.ONE_YR));
-      lowerBoundCmd.setCustomNumberOfBins(5);
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/distribution-of-monthly-returns")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(lowerBoundCmd)))
-          .andExpect(status().isOk());
-
-      DistributionOfReturnsCommand upperBoundCmd = new DistributionOfReturnsCommand();
-      upperBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      upperBoundCmd.setCurrency(Currency.CAD);
-      upperBoundCmd.setHoldings(List.of(dummyHolding()));
-      upperBoundCmd.setPeriods(Set.of(TimePeriod.ONE_YR));
-      upperBoundCmd.setCustomNumberOfBins(30);
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/distribution-of-monthly-returns")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(upperBoundCmd)))
-          .andExpect(status().isOk());
-    }
-
     private static PortfolioHolding dummyHolding() {
       return new PortfolioHolding(
           BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
@@ -859,23 +700,5 @@ class PortfolioCalculationControllerTest {
               org.hamcrest.Matchers.containsString("must not be null")));
     }
 
-    @Test
-    void shouldReturnAllViolations_whenMultipleJakartaConstraintsFailOnOneRequest() throws Exception {
-      DistributionOfReturnsCommand cmd = new DistributionOfReturnsCommand();
-      cmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
-      cmd.setHoldings(List.of());
-      cmd.setPeriods(Set.of(TimePeriod.ONE_YR));
-      cmd.setCustomNumberOfBins(999);
-
-      validatingMockMvc.perform(
-          post(BASE_PATH + "/distribution-of-monthly-returns")
-              .contentType(MediaType.APPLICATION_JSON)
-              .content(om.writeValueAsString(cmd)))
-          .andExpect(status().isBadRequest())
-          .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("DIS-002")))
-          .andExpect(content().string(
-              org.hamcrest.Matchers.containsString("must not be null")));
-    }
   }
 }

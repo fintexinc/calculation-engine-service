@@ -5,7 +5,6 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.enumeration.SupportedPeriods;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
-import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
@@ -46,27 +45,14 @@ class SupportedPeriodsReqValidatorTest {
 
   private static final List<RequestValidator> REPORTING_PERIOD_VALIDATORS = List.of(
       new TrailingPeriodsReqValidator(),
-      new LeadingPeriodsReqValidator(),
       new StandardDeviationPeriodsReqValidator(),
       new TwelveMonthMinimumPeriodsReqValidator());
-
-  private static final List<RequestValidator> ROLLING_WINDOW_VALIDATORS = List.of(
-      new RollingTwelveMonthMinimumPeriodsReqValidator(),
-      new RollingFixedLengthPeriodsReqValidator());
 
   @Test
   void shouldClaimEveryReportingPeriodMetricExactlyOnce() {
     List<CalculationMetric> claimed = claimedBy(REPORTING_PERIOD_VALIDATORS);
 
     assertThat(claimed).containsExactlyInAnyOrderElementsOf(CalculationMetric.PERIOD_METRICS);
-    assertThat(claimed).doesNotHaveDuplicates();
-  }
-
-  @Test
-  void shouldClaimEveryRollingWindowMetricExactlyOnce() {
-    List<CalculationMetric> claimed = claimedBy(ROLLING_WINDOW_VALIDATORS);
-
-    assertThat(claimed).containsExactlyInAnyOrderElementsOf(CalculationMetric.ROLLING_METRICS);
     assertThat(claimed).doesNotHaveDuplicates();
   }
 
@@ -95,23 +81,21 @@ class SupportedPeriodsReqValidatorTest {
   @Test
   void shouldAcceptAnAbsentPeriodSet_becauseTheDefaultsApplyInstead() {
     PeriodCommand noPeriods = new PeriodCommand();
-    RollingCalculationCommand noWindow = new RollingCalculationCommand();
 
-    assertThatCode(() -> new LeadingPeriodsReqValidator().validate(noPeriods)).doesNotThrowAnyException();
-    assertThatCode(() -> new RollingFixedLengthPeriodsReqValidator().validate(noWindow)).doesNotThrowAnyException();
+    assertThatCode(() -> new StandardDeviationPeriodsReqValidator().validate(noPeriods)).doesNotThrowAnyException();
   }
 
   @Test
   void shouldNameTheOffendingPeriodTheClaimedMetricsAndListTheAdmissibleOnesAsALadder() {
     CalculationCommand command = periodCommand(ONE_YR, CIPSD);
 
-    assertThatThrownBy(() -> new LeadingPeriodsReqValidator().validate(command))
+    assertThatThrownBy(() -> new StandardDeviationPeriodsReqValidator().validate(command))
         .isInstanceOf(ValidationException.class)
         .satisfies(thrown -> {
           ValidationException exception = (ValidationException) thrown;
           assertThat(exception.getMessage()).startsWith(
               "Time interval period 'CIPSD' is not supported for metrics "
-                  + CalculationMetric.LEADING_TOTAL_RETURNS.getValue()
+                  + CalculationMetric.STANDARD_DEVIATION.getValue()
                   + ". Supported periods: ");
           assertThat(exception.getMetadata()).containsEntry("param-1", "CIPSD");
           assertThat(listedPeriods(exception.getMessage()))
@@ -124,36 +108,26 @@ class SupportedPeriodsReqValidatorTest {
     return Stream.of(
         Arguments.of("trailing returns take a request-defined window", new TrailingPeriodsReqValidator(),
             periodCommand(SEVEN_MTH, YTD, SI, CIPSD)),
-        Arguments.of("leading returns take any fixed length", new LeadingPeriodsReqValidator(),
+        Arguments.of("standard deviation takes any fixed length", new StandardDeviationPeriodsReqValidator(),
             periodCommand(ONE_MTH, ONE_YR, TWENTY_YR)),
         Arguments.of("risk metrics take a year or more", new TwelveMonthMinimumPeriodsReqValidator(),
-            periodCommand(ONE_YR, TEN_YR)),
-        Arguments.of("rolling returns take a window shorter than a year", new RollingFixedLengthPeriodsReqValidator(),
-            rollingCommand(SIX_MTH, ONE_YR)),
-        Arguments.of("rolling statistics take a window of a year or more",
-            new RollingTwelveMonthMinimumPeriodsReqValidator(), rollingCommand(ONE_YR, TWENTY_YR)));
+            periodCommand(ONE_YR, TEN_YR)));
   }
 
   private static Stream<Arguments> inadmissible() {
     return Stream.of(
         Arguments.of("trailing returns and a period that spans no time at all", new TrailingPeriodsReqValidator(),
             periodCommand(ONE_YR, OVERALL)),
-        Arguments.of("leading returns and year to date", new LeadingPeriodsReqValidator(), periodCommand(YTD)),
-        Arguments.of("leading returns and since inception", new LeadingPeriodsReqValidator(), periodCommand(SI)),
-        Arguments.of("leading returns and a request-defined window", new LeadingPeriodsReqValidator(),
+        Arguments.of("standard deviation and year to date", new StandardDeviationPeriodsReqValidator(),
+            periodCommand(YTD)),
+        Arguments.of("standard deviation and since inception", new StandardDeviationPeriodsReqValidator(),
+            periodCommand(SI)),
+        Arguments.of("standard deviation and a request-defined window", new StandardDeviationPeriodsReqValidator(),
             periodCommand(ONE_YR, CIPSD)),
         Arguments.of("risk metrics and half a year", new TwelveMonthMinimumPeriodsReqValidator(),
             periodCommand(SIX_MTH)),
         Arguments.of("risk metrics and year to date", new TwelveMonthMinimumPeriodsReqValidator(),
-            periodCommand(ONE_YR, YTD)),
-        Arguments.of("rolling returns and year to date", new RollingFixedLengthPeriodsReqValidator(),
-            rollingCommand(ONE_YR, YTD)),
-        Arguments.of("rolling correlation and a request-defined window", new RollingFixedLengthPeriodsReqValidator(),
-            rollingCommand(CIPSD)),
-        Arguments.of("rolling statistics and half a year", new RollingTwelveMonthMinimumPeriodsReqValidator(),
-            rollingCommand(SIX_MTH)),
-        Arguments.of("rolling statistics and since inception", new RollingTwelveMonthMinimumPeriodsReqValidator(),
-            rollingCommand(ONE_YR, SI)));
+            periodCommand(ONE_YR, YTD)));
   }
 
   private static List<CalculationMetric> claimedBy(final List<RequestValidator> validators) {
@@ -163,12 +137,6 @@ class SupportedPeriodsReqValidatorTest {
   private static CalculationCommand periodCommand(final TimePeriod... periods) {
     PeriodCommand command = new PeriodCommand();
     command.setPeriods(new LinkedHashSet<>(List.of(periods)));
-    return command;
-  }
-
-  private static CalculationCommand rollingCommand(final TimePeriod... windows) {
-    RollingCalculationCommand command = new RollingCalculationCommand();
-    command.setRollingPeriods(new LinkedHashSet<>(List.of(windows)));
     return command;
   }
 

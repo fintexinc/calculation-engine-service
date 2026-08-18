@@ -111,12 +111,6 @@
       "metric": "fixed-income-bond-sector"
     },
     {
-      "metric": "fixed-income-credit-quality"
-    },
-    {
-      "metric": "maturity-allocation"
-    },
-    {
       "metric": "fixed-income-geographic-exposure"
     },
     {

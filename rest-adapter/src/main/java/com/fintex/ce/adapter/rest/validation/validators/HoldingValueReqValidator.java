@@ -18,8 +18,8 @@ public class HoldingValueReqValidator
     extends
       AbstractHoldingsValidationReqValidator<HoldingsProvider> {
 
-  private static final Set<CalculationMetric> METRICS_WITHOUT_HOLDING_VALUE_VALIDATION = Set.of(CORRELATION,
-      ROLLING_CORRELATION, COMMON_PERFORMANCE_DATES, NUMBER_OF_UNIQUE_HOLDINGS);
+  private static final Set<CalculationMetric> METRICS_WITHOUT_HOLDING_VALUE_VALIDATION = Set.of(
+      COMMON_PERFORMANCE_DATES, NUMBER_OF_UNIQUE_HOLDINGS);
 
   public HoldingValueReqValidator(HoldingsValidator holdingsValidator) {
     super(HoldingsProvider.class, HoldingsProvider::getHoldings, holdingsValidator::validateHoldingValues);

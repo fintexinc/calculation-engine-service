@@ -1,8 +1,0 @@
-package com.fintex.ce.model.domain.enumeration;
-
-public enum DailyResultType {
-  REINVEST_WITH_PAC_AND_WITHDRAWAL,
-  NO_REINVEST_WITH_PAC_AND_WITHDRAWAL,
-  REINVEST_WITHOUT_PAC_AND_WITHDRAWAL,
-  NO_REINVEST_WITHOUT_PAC_AND_WITHDRAWAL,
-}

@@ -242,11 +242,11 @@ class MetricCalculationOrchestratorTest {
   @Test
   void shouldThrowException_whenMetricHasNoRegisteredService() {
     PortfolioHoldingsCommand command = allocationCommand();
-    command.setMetric(CalculationMetric.YIELD);
+    command.setMetric(CalculationMetric.NUMBER_OF_UNIQUE_HOLDINGS);
 
     assertThatThrownBy(() -> orchestrator.calculate(command))
         .isInstanceOf(CalculationException.class)
-        .hasMessageContaining("yield");
+        .hasMessageContaining("number-of-unique-holdings");
   }
 
   @Test

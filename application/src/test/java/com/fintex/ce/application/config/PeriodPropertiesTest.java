@@ -21,6 +21,7 @@ import java.util.Set;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.CIPSD;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
+import static com.fintex.wm.commons.domain.enumeration.TimePeriod.OVERALL;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SEVEN_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SI;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
@@ -42,14 +43,10 @@ class PeriodPropertiesTest {
 
   @Test
   void shouldBindTheCommaSeparatedFormTheYmlUses() {
-    // the six keys are single strings, not yml lists, and must keep working that way so an existing diff stays valid
+    // both keys are single strings, not yml lists, and must keep working that way so an existing diff stays valid
     PeriodProperties bound = bind(Map.of(
         "default.periods.risk-calculations", "12,36,60,120",
-        "default.periods.rolling-calculations", "12, 36, 60, 120",
-        "default.periods.trailing-total-returns", "1,3,6,12,36,60,120,YTD,SI",
-        "default.periods.leading-total-returns", "1,3,6,12,36,60,120",
-        "default.periods.information-ratio-returns", "12, 36, 60, 120",
-        "default.periods.best-worst-periods", "12,36,60,120"));
+        "default.periods.trailing-total-returns", "1,3,6,12,36,60,120,YTD,SI"));
 
     assertThat(bound.getRiskCalculations()).containsExactly(ONE_YR, THREE_YR, TimePeriod.FIVE_YR, TEN_YR);
     assertThat(bound.getTrailingTotalReturns())
@@ -83,21 +80,6 @@ class PeriodPropertiesTest {
     properties.setTrailingTotalReturns(new LinkedHashSet<>(Set.of(ONE_YR, YTD, SI, CIPSD)));
 
     assertThatCode(properties::afterPropertiesSet).doesNotThrowAnyException();
-  }
-
-  /**
-   * Leading returns are the exception among the return metrics: they count forward from the first observation, so a
-   * length the data or the request resolves from the end of the series cannot be applied to them.
-   */
-  @Test
-  void shouldFailValidation_whenLeadingReturnsNamesADataDefinedPeriod() {
-    PeriodProperties properties = propertiesWith(ONE_YR);
-    properties.setLeadingTotalReturns(new LinkedHashSet<>(List.of(ONE_YR, SI)));
-
-    assertThatThrownBy(properties::afterPropertiesSet)
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("default.periods.leading-total-returns")
-        .hasMessageContaining(SI.name());
   }
 
   @ParameterizedTest
@@ -145,11 +127,11 @@ class PeriodPropertiesTest {
   @Test
   void shouldValidateEverySetNotJustTheFirst() {
     PeriodProperties properties = propertiesWith(ONE_YR);
-    properties.setBestWorstPeriods(new LinkedHashSet<>(Set.of(SEVEN_MTH)));
+    properties.setTrailingTotalReturns(new LinkedHashSet<>(Set.of(OVERALL)));
 
     assertThatThrownBy(properties::afterPropertiesSet)
         .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("default.periods.best-worst-periods");
+        .hasMessageContaining("default.periods.trailing-total-returns");
   }
 
   /** Mirrors the runtime wiring: {@link TimePeriodConverter} is what lets a month count bind to the enum. */
@@ -172,22 +154,17 @@ class PeriodPropertiesTest {
 
   private static Map<String, Object> allKeys() {
     Map<String, Object> properties = new LinkedHashMap<>();
-    for (String key : new String[] {"risk-calculations", "rolling-calculations", "trailing-total-returns",
-        "leading-total-returns", "information-ratio-returns", "best-worst-periods"}) {
+    for (String key : new String[] {"risk-calculations", "trailing-total-returns"}) {
       properties.put("default.periods." + key, "12");
     }
     return properties;
   }
 
-  /** Every set populated so validation reaches the one under test rather than tripping on an empty sibling. */
+  /** Both sets populated so validation reaches the one under test rather than tripping on an empty sibling. */
   private static PeriodProperties propertiesWith(TimePeriod... riskPeriods) {
     var properties = new PeriodProperties();
     properties.setRiskCalculations(new LinkedHashSet<>(Set.of(riskPeriods)));
-    properties.setRollingCalculations(new LinkedHashSet<>(Set.of(ONE_YR)));
     properties.setTrailingTotalReturns(new LinkedHashSet<>(Set.of(ONE_YR)));
-    properties.setLeadingTotalReturns(new LinkedHashSet<>(Set.of(ONE_YR)));
-    properties.setInformationRatioReturns(new LinkedHashSet<>(Set.of(ONE_YR)));
-    properties.setBestWorstPeriods(new LinkedHashSet<>(Set.of(ONE_YR)));
     return properties;
   }
 }
