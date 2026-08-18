@@ -1,10 +1,16 @@
 package com.fintex.ce.application.calculation.metric.core;
 
+import com.fintex.ce.application.calculation.metric.DownsideCaptureCalculation;
 import com.fintex.ce.application.calculation.metric.UpsideCaptureCalculation;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
+import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.util.DateTimeUtils;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,8 +19,10 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.fintex.ce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
@@ -24,6 +32,7 @@ import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.any;
@@ -49,6 +58,27 @@ class UpDownSideCalculationAbstractTest {
     TreeMap<LocalDate, BigDecimal> actual = calculation.getPortfolioDetermination();
 
     assertEquals(Map.of(LOCAL_DATE_NOW.minusMonths(1), new BigDecimal("0.910000000000000")), actual);
+  }
+
+  @ParameterizedTest(name = "[{index}] {0}")
+  @MethodSource("captureCalculationFactories")
+  void shouldThrowMissingPortfolioReturn_whenCaptureWindowContainsQualifyingBenchmarkDateWithoutPortfolioReturn(
+      String calculationName,
+      Function<BenchmarkPeriodCalculationInput, UpDownSideCalculationAbstract<?>> calculationFactory,
+      BigDecimal benchmarkReturn) {
+    LocalDate missingDate = LocalDate.parse("2024-01-31");
+    TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(missingDate, 12, benchmarkReturn);
+    TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(LocalDate.parse("2024-02-29"), 11,
+        benchmarkReturn);
+    portfolioReturns.put(LocalDate.parse("2023-12-31"), benchmarkReturn);
+    UpDownSideCalculationAbstract<?> calculation = calculationFactory.apply(benchmarkInput(portfolioReturns,
+        benchmarkReturns));
+
+    assertThat(calculation.getPortfolioDetermination()).doesNotContainKey(missingDate);
+    assertThatThrownBy(() -> calculation.calculatePeriodForNumberOfMonths(12))
+        .as(calculationName)
+        .isInstanceOfSatisfying(CalculationException.class,
+            exception -> assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE));
   }
 
   @Test
@@ -204,6 +234,16 @@ class UpDownSideCalculationAbstractTest {
     BigDecimal actual = calculation.calculateCaptureReturnFor(60, determination);
 
     assertEquals(ZERO, actual);
+  }
+
+  private static Stream<Arguments> captureCalculationFactories() {
+    return Stream.of(
+        Arguments.of("upside",
+            (Function<BenchmarkPeriodCalculationInput, UpDownSideCalculationAbstract<?>>) input -> new UpsideCaptureCalculation(
+                input, Set.of(ONE_YR)), ONE),
+        Arguments.of("downside",
+            (Function<BenchmarkPeriodCalculationInput, UpDownSideCalculationAbstract<?>>) input -> new DownsideCaptureCalculation(
+                input, Set.of(ONE_YR)), ONE.negate()));
   }
 
   private static BenchmarkPeriodCalculationInput benchmarkInput(

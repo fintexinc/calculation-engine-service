@@ -6,11 +6,8 @@ import com.fintex.wm.commons.domain.currency.Currency;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.NavigableMap;
 import lombok.experimental.UtilityClass;
-
-import static com.fintex.ce.application.util.ReturnSeriesAlignmentValidator.formatDates;
 
 /**
  * Pre-condition checks for T-Bill series consumed by metric services. The {@code TreasuryBillsFetcher} pre-populates
@@ -32,15 +29,5 @@ public final class TBillsValidator {
       throw new CalculationException(ErrorCode.TBILL_SERIES_NOT_AVAILABLE_FOR_CURRENCY, currency);
     }
     return tBills;
-  }
-
-  public static NavigableMap<LocalDate, BigDecimal> requireCompleteCalendarMonths(
-      NavigableMap<LocalDate, BigDecimal> tBills, Currency currency) {
-    NavigableMap<LocalDate, BigDecimal> validatedTBills = requireNonEmpty(tBills, currency);
-    List<LocalDate> missingDates = ReturnSeriesAlignmentValidator.findMissingCalendarMonthEnds(validatedTBills);
-    if (!missingDates.isEmpty()) {
-      throw ErrorCode.MISSING_TBILL_RATE.toException(formatDates(missingDates));
-    }
-    return validatedTBills;
   }
 }

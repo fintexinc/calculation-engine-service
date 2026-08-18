@@ -20,6 +20,14 @@ import static java.util.stream.Collectors.joining;
 @UtilityClass
 public class ReturnSeriesAlignmentValidator {
 
+  public static void requirePortfolioCoverage(NavigableMap<LocalDate, BigDecimal> portfolioReturns,
+      int numberOfMonths) {
+    List<LocalDate> missingPortfolioDates = findMissingDates(portfolioReturns, numberOfMonths);
+    if (!missingPortfolioDates.isEmpty()) {
+      throw ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE.toException(formatDates(missingPortfolioDates));
+    }
+  }
+
   public static List<LocalDate> findMissingCalendarMonthEnds(NavigableMap<LocalDate, BigDecimal> returns) {
     if (CollectionUtils.isEmpty(returns)) {
       return List.of();
@@ -38,12 +46,27 @@ public class ReturnSeriesAlignmentValidator {
     if (CollectionUtils.isEmpty(portfolioReturns) || numberOfMonths <= 0) {
       return;
     }
+    List<LocalDate> missingPortfolioDates = findMissingDates(portfolioReturns, numberOfMonths);
+    if (!missingPortfolioDates.isEmpty()) {
+      throw ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE.toException(formatDates(missingPortfolioDates));
+    }
+
     List<LocalDate> missingBenchmarkDates = expectedDatesEndingAt(portfolioReturns.lastKey(), numberOfMonths).stream()
         .filter(date -> !benchmarkReturns.containsKey(date))
         .toList();
     if (!missingBenchmarkDates.isEmpty()) {
       throw ErrorCode.MISSING_BENCHMARK_RETURN_FOR_DATE.toException(formatDates(missingBenchmarkDates));
     }
+  }
+
+  private static List<LocalDate> findMissingDates(NavigableMap<LocalDate, BigDecimal> returns,
+      int numberOfMonths) {
+    if (CollectionUtils.isEmpty(returns) || numberOfMonths <= 0) {
+      return List.of();
+    }
+    return expectedDatesEndingAt(returns.lastKey(), numberOfMonths).stream()
+        .filter(date -> !returns.containsKey(date))
+        .toList();
   }
 
   private static List<LocalDate> expectedDatesEndingAt(LocalDate endDate, int numberOfMonths) {
@@ -57,7 +80,7 @@ public class ReturnSeriesAlignmentValidator {
         .toList();
   }
 
-  public static String formatDates(List<LocalDate> dates) {
+  private static String formatDates(List<LocalDate> dates) {
     return dates.stream()
         .map(LocalDate::toString)
         .collect(joining(", "));

@@ -1,5 +1,6 @@
 package com.fintex.ce.application.util;
 
+import com.fintex.ce.model.domain.enumeration.MetricRole;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.util.DateTimeUtils;
@@ -34,8 +35,7 @@ class ReturnSeriesAlignmentValidatorTest {
   void shouldNotThrowException_whenPortfolioReturnsAreEmpty() {
     TreeMap<LocalDate, BigDecimal> portfolioReturns = new TreeMap<>();
 
-    assertThatCode(() -> ReturnSeriesAlignmentValidator.requirePortfolioBenchmarkCoverage(portfolioReturns,
-        new TreeMap<>(), TWELVE_MONTHS))
+    assertThatCode(() -> ReturnSeriesAlignmentValidator.requirePortfolioCoverage(portfolioReturns, TWELVE_MONTHS))
         .doesNotThrowAnyException();
   }
 
@@ -51,26 +51,37 @@ class ReturnSeriesAlignmentValidatorTest {
 
   @ParameterizedTest(name = "{0}")
   @MethodSource("coverageGapCases")
-  void shouldReportMissingBenchmarkDates_whenCoverageHasGaps(String description, LocalDate startDate, int windowMonths,
-      List<String> missingDates) {
+  void shouldReportMissingDates_whenCoverageHasGaps(String description, LocalDate startDate, int windowMonths,
+      MetricRole roleWithGap, List<String> missingDates, ErrorCode expectedErrorCode) {
     TreeMap<LocalDate, BigDecimal> portfolioReturns = monthlyReturns(startDate, windowMonths);
     TreeMap<LocalDate, BigDecimal> benchmarkReturns = monthlyReturns(startDate, windowMonths);
-    missingDates.forEach(date -> benchmarkReturns.remove(LocalDate.parse(date)));
+    TreeMap<LocalDate, BigDecimal> seriesToBreak = roleWithGap == MetricRole.PORTFOLIO
+        ? portfolioReturns
+        : benchmarkReturns;
+    missingDates.forEach(date -> seriesToBreak.remove(LocalDate.parse(date)));
 
     assertThatThrownBy(() -> ReturnSeriesAlignmentValidator.requirePortfolioBenchmarkCoverage(portfolioReturns,
         benchmarkReturns, windowMonths))
         .isInstanceOfSatisfying(CalculationException.class, exception -> {
-          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_BENCHMARK_RETURN_FOR_DATE);
+          assertThat(exception.getErrorCode()).isEqualTo(expectedErrorCode);
           missingDates.forEach(date -> assertThat(exception).hasMessageContaining(date));
         });
   }
 
   private static Stream<Arguments> coverageGapCases() {
     return Stream.of(
+        arguments("all missing portfolio dates over twelve-month window", LocalDate.parse("2024-01-31"),
+            TWELVE_MONTHS, MetricRole.PORTFOLIO, List.of("2024-01-31", "2024-06-30"),
+            ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE),
         arguments("all missing benchmark dates over twelve-month window", LocalDate.parse("2024-01-31"),
-            TWELVE_MONTHS, List.of("2024-01-31", "2024-06-30")),
+            TWELVE_MONTHS, MetricRole.BENCHMARK, List.of("2024-01-31", "2024-06-30"),
+            ErrorCode.MISSING_BENCHMARK_RETURN_FOR_DATE),
+        arguments("missing portfolio date inside two-hundred-forty-month window", LocalDate.parse("2005-01-31"),
+            TWENTY_YEAR_MONTHS, MetricRole.PORTFOLIO, List.of("2015-06-30"),
+            ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE),
         arguments("missing benchmark date inside two-hundred-forty-month window", LocalDate.parse("2005-01-31"),
-            TWENTY_YEAR_MONTHS, List.of("2015-06-30")));
+            TWENTY_YEAR_MONTHS, MetricRole.BENCHMARK, List.of("2015-06-30"),
+            ErrorCode.MISSING_BENCHMARK_RETURN_FOR_DATE));
   }
 
   private static TreeMap<LocalDate, BigDecimal> monthlyReturns(LocalDate startDate, int count) {
