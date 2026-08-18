@@ -6,12 +6,10 @@ jib = "3.4.4"
 lombok = "8.11"
 git-properties = "2.4.2"
 
-# Internal dependencies. Deliberately still the version main builds against, not the 0.1.0-tangerine-SNAPSHOT
-# that catalog-investment-commons publishes from its own tangerine-release branch: that line is a narrower
-# subset — it carries no SalesChargeType and no FixedIncomeStyleBoxType — and these sources will not compile
-# against it until TMI-620 deletes the metrics that use them. Switching the pin belongs to that ticket, so
-# that this branch differs from main by its build system alone.
-cic = "0.0.1-SNAPSHOT"
+# Internal dependencies. The Tangerine line consumes the commons build published from that library's own
+# tangerine-release branch, which is a narrower subset — no SalesChargeType, no FixedIncomeStyleBoxType.
+# The pin could not move before this commit: the metrics reading those types are the ones deleted here.
+cic = "0.1.0-tangerine-SNAPSHOT"
 
 # External dependencies whose versions the Spring Boot BOM does not manage.
 springdoc = "2.8.6"

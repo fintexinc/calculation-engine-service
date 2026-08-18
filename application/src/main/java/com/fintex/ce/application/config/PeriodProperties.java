@@ -37,15 +37,7 @@ public class PeriodProperties implements InitializingBean {
 
   private Set<TimePeriod> riskCalculations = new LinkedHashSet<>();
 
-  private Set<TimePeriod> rollingCalculations = new LinkedHashSet<>();
-
   private Set<TimePeriod> trailingTotalReturns = new LinkedHashSet<>();
-
-  private Set<TimePeriod> leadingTotalReturns = new LinkedHashSet<>();
-
-  private Set<TimePeriod> informationRatioReturns = new LinkedHashSet<>();
-
-  private Set<TimePeriod> bestWorstPeriods = new LinkedHashSet<>();
 
   /**
    * Refuses to start on a default set that is empty or that names a period the metric family cannot answer.
@@ -77,14 +69,7 @@ public class PeriodProperties implements InitializingBean {
   private Map<String, ConfiguredSet> byKey() {
     Map<String, ConfiguredSet> byKey = new LinkedHashMap<>();
     byKey.put("risk-calculations", new ConfiguredSet(riskCalculations, SupportedPeriods.TWELVE_MONTH_MINIMUM));
-    byKey.put("rolling-calculations", new ConfiguredSet(rollingCalculations, SupportedPeriods.TWELVE_MONTH_MINIMUM));
     byKey.put("trailing-total-returns", new ConfiguredSet(trailingTotalReturns, SupportedPeriods.TRAILING_RETURNS));
-    // fixed lengths only: leading returns count forward from the first observation, so a length resolved from the end
-    // of the series would answer a window nobody named. Same reason LeadingPeriodsReqValidator narrows the request.
-    byKey.put("leading-total-returns", new ConfiguredSet(leadingTotalReturns, SupportedPeriods.FIXED_LENGTH));
-    byKey.put("information-ratio-returns",
-        new ConfiguredSet(informationRatioReturns, SupportedPeriods.TWELVE_MONTH_MINIMUM));
-    byKey.put("best-worst-periods", new ConfiguredSet(bestWorstPeriods, SupportedPeriods.TWELVE_MONTH_MINIMUM));
     return byKey;
   }
 

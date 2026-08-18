@@ -3,12 +3,12 @@ package com.fintex.ce.application.util;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
+import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
-import com.fintex.wm.commons.domain.rating.CreditQualityRatingType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,8 +17,8 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 
+import static com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType.BASIC_MATERIALS;
 import static com.fintex.wm.commons.domain.currency.Currency.CAD;
-import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.AAA;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
@@ -45,7 +45,8 @@ class PortfolioUtilsTest {
 
   @Test
   void areAllValuesInMapEmpty_checkResultWhenAllValuesInMapAreEmpty() {
-    final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> map = Map.of(new PortfolioHolding(null, null,
+    final Map<PortfolioHolding, Map<EquitySectorAllocationType, BigDecimal>> map = Map.of(new PortfolioHolding(null,
+        null,
         null), Map.of());
     final boolean actual = PortfolioUtils.areAllValuesInMapEmpty(map);
 
@@ -54,9 +55,10 @@ class PortfolioUtilsTest {
 
   @Test
   void areAllValuesInMapEmpty_checkResultWhenNotAllValuesInMapAreEmpty() {
-    final Map<PortfolioHolding, Map<CreditQualityRatingType, BigDecimal>> map = Map.of(new PortfolioHolding(null, null,
+    final Map<PortfolioHolding, Map<EquitySectorAllocationType, BigDecimal>> map = Map.of(new PortfolioHolding(null,
+        null,
         null), Map.of(),
-        new PortfolioHolding(ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, null), Map.of(AAA,
+        new PortfolioHolding(ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, null), Map.of(BASIC_MATERIALS,
             ONE));
     final boolean actual = PortfolioUtils.areAllValuesInMapEmpty(map);
 

@@ -25,9 +25,6 @@ public class CpsdGreaterThanCpedReqValidator extends AbstractDateNotAfterReqVali
 
   @Override
   public List<CalculationMetric> supportedMetrics() {
-    return List.of(
-        ROLLING_TOTAL_RETURNS, ROLLING_STANDARD_DEVIATION, ROLLING_SHARPE_RATIO,
-        ROLLING_CORRELATION, ANNUAL_RETURNS, GROWTH_OF_10K, BEST_WORST_PERIODS,
-        DISTRIBUTION_OF_MONTHLY_RETURNS);
+    return List.of(ANNUAL_RETURNS, GROWTH_OF_10K);
   }
 }

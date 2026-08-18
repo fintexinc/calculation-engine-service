@@ -1,7 +1,6 @@
 package com.fintex.ce.application.calculation.metric.core;
 
-import com.fintex.ce.application.calculation.metric.BetaCalculation;
-import com.fintex.ce.application.calculation.metric.ExcessReturnsCalculation;
+import com.fintex.ce.application.calculation.metric.StandardDeviationCalculation;
 import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
@@ -576,18 +575,18 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldReturnPeriodStartDate_whenOffsetProvided() {
-    ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
-    doCallRealMethod().when(excessReturnsCalculation).getPeriodStartDate(anyInt(), any());
-    LocalDate periodStartDate = excessReturnsCalculation.getPeriodStartDate(12, getPortfolioReturns());
+    StandardDeviationCalculation calculation = mock(StandardDeviationCalculation.class);
+    doCallRealMethod().when(calculation).getPeriodStartDate(anyInt(), any());
+    LocalDate periodStartDate = calculation.getPeriodStartDate(12, getPortfolioReturns());
 
     assertEquals(toLastDayOfMonth(LocalDate.of(2020, 12, 1).minusMonths(11)), periodStartDate);
   }
 
   @Test
   void shouldReturnSubMapFromStartDate_whenFilteringReturns() {
-    ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
-    doCallRealMethod().when(excessReturnsCalculation).getSubMapByPeriodStartDate(any(), any());
-    SortedMap<LocalDate, BigDecimal> subMap = excessReturnsCalculation
+    StandardDeviationCalculation calculation = mock(StandardDeviationCalculation.class);
+    doCallRealMethod().when(calculation).getSubMapByPeriodStartDate(any(), any());
+    SortedMap<LocalDate, BigDecimal> subMap = calculation
         .getSubMapByPeriodStartDate(toLastDayOfMonth(LocalDate.of(2020, 12, 1).minusMonths(2)), getPortfolioReturns());
 
     assertEquals(3, subMap.size());
@@ -597,15 +596,15 @@ class PeriodCalculationAbstractTest {
 
   @Test
   void shouldConvertTotalReturnsToMonthlyChanges_whenOverridingReturns() {
-    BetaCalculation betaCalculation = mock(BetaCalculation.class);
+    StandardDeviationCalculation calculation = mock(StandardDeviationCalculation.class);
     LocalDate date = LocalDate.of(2020, 12, 1);
     TreeMap<LocalDate, BigDecimal> portfolioTotalReturns = new TreeMap<>(Map.of(toLastDayOfMonth(date), BigDecimal
         .valueOf(1.01094319080371),
         toLastDayOfMonth(date.minusMonths(1)), BigDecimal.valueOf(1.02297440154456)));
-    when(betaCalculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
-    doCallRealMethod().when(betaCalculation).overrideTotalReturns(any());
+    when(calculation.getPortfolioTotalReturns()).thenReturn(portfolioTotalReturns);
+    doCallRealMethod().when(calculation).overrideTotalReturns(any());
 
-    NavigableMap<LocalDate, BigDecimal> totalReturns = betaCalculation.overrideTotalReturns(
+    NavigableMap<LocalDate, BigDecimal> totalReturns = calculation.overrideTotalReturns(
         portfolioTotalReturns);
 
     assertEquals(2, totalReturns.size());

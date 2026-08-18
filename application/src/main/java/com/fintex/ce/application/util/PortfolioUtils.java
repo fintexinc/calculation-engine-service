@@ -1,6 +1,5 @@
 package com.fintex.ce.application.util;
 
-import com.fintex.ce.model.domain.calculation.yield.HoldingIncomeForecast;
 import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
@@ -40,23 +39,6 @@ public class PortfolioUtils {
     BigDecimal sum = convertedValues.values().stream().reduce(ZERO, BigDecimal::add);
     return convertedValues.entrySet().stream()
         .collect(toMap(Map.Entry::getKey, e -> DecimalUtils.divide(e.getValue(), sum)));
-  }
-
-  public static void setHoldingResponseDetails(final PortfolioHolding holding,
-      final HoldingIncomeForecast holdingIncomeForecast) {
-    SecurityIdentifier secId = holding.getSecurityIdentifier();
-    if (secId == null) {
-      return;
-    }
-
-    if (secId instanceof EquitySecurityIdentifier eqId) {
-      holdingIncomeForecast.setTicker(secId.getId());
-      holdingIncomeForecast.setExchangeCode(eqId.getExchangeId());
-    } else if (FilterUtils.CANADA_MUTUAL_PREDICATE.test(holding)) {
-      holdingIncomeForecast.setFundServeCode(secId.getId());
-    } else {
-      holdingIncomeForecast.setIdentifier(secId.getId());
-    }
   }
 
   /**

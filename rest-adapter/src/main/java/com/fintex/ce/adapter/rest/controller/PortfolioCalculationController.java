@@ -7,53 +7,23 @@ import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
-import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
 import com.fintex.ce.model.domain.result.allocation.ConsolidatedSectorExposureResult;
-import com.fintex.ce.model.domain.result.allocation.CreditQualityResult;
-import com.fintex.ce.model.domain.result.allocation.EquityMarketCapResult;
 import com.fintex.ce.model.domain.result.allocation.EquitySectorResult;
 import com.fintex.ce.model.domain.result.allocation.FixedIncomeSectorResult;
-import com.fintex.ce.model.domain.result.allocation.MaturityAllocationResult;
 import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
-import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
-import com.fintex.ce.model.domain.result.distribution.DistributionOfReturnsResult;
 import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
-import com.fintex.ce.model.domain.result.exposure.EquityStyleboxExposureResult;
-import com.fintex.ce.model.domain.result.exposure.FixedIncomeStyleboxExposureResult;
 import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
-import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
 import com.fintex.ce.model.domain.result.holding.NumberOfUniqueHoldingsResult;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
-import com.fintex.ce.model.domain.result.income.IncomeForecastResult;
-import com.fintex.ce.model.domain.result.income.YieldResult;
-import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
-import com.fintex.ce.model.domain.result.returns.ExcessReturnsResult;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
-import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
-import com.fintex.ce.model.domain.result.returns.MeanResult;
 import com.fintex.ce.model.domain.result.returns.TrailingTotalReturnsResult;
-import com.fintex.ce.model.domain.result.risk.AlphaResult;
-import com.fintex.ce.model.domain.result.risk.BetaResult;
-import com.fintex.ce.model.domain.result.risk.DownsideCaptureResult;
-import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
-import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
-import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 import com.fintex.ce.model.domain.result.risk.MaxDrawdownResult;
-import com.fintex.ce.model.domain.result.risk.RSquaredResult;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
-import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
-import com.fintex.ce.model.domain.result.risk.TrackingErrorResult;
-import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
-import com.fintex.ce.model.domain.result.risk.UpsideCaptureResult;
-import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
-import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
-import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
-import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
 import com.fintex.ce.model.dto.command.PortfolioBenchmarkCommand;
@@ -118,32 +88,12 @@ public class PortfolioCalculationController {
       + "The request body schema depends on the metric — period-based metrics require time intervals, "
       + "breakdown metrics require holdings, and fee metrics require parameter types.")
   @ApiResponse(responseCode = "200", description = "Calculation result", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(oneOf = {
-      TrailingTotalReturnsResult.class, LeadingTotalReturnsResult.class,
-      RollingTotalReturnsResult.class, ExcessReturnsResult.class,
-      AnnualReturnResult.class, Growth10KResult.class,
-      BestWorstPeriodsResult.class, DistributionOfReturnsResult.class,
-      StandardDeviationResult.class, RollingStandardDeviationResult.class,
-      MeanResult.class, SharpeRatioResult.class,
-      RollingSharpeRatioResult.class, SortinoRatioResult.class,
-      MaxDrawdownResult.class, DownsideDeviationResult.class,
-      MarRatioResult.class, TreynorRatioResult.class,
-      InformationRatioResult.class, TrackingErrorResult.class,
-      AlphaResult.class, BetaResult.class,
-      RSquaredResult.class, CorrelationResult.class,
-      RollingCorrelationResult.class, UpsideCaptureResult.class,
-      DownsideCaptureResult.class,
-      AssetAllocationResult.class, AssetAllocationEMResult.class,
-      EquitySectorResult.class, ConsolidatedSectorExposureResult.class,
-      EquityCountryExposureResult.class,
-      EquityStyleboxExposureResult.class, GeographicExposureResult.class,
-      EquityMarketCapResult.class, CountryExposureResult.class,
-      FixedIncomeSectorResult.class, FixedIncomeStyleboxExposureResult.class,
-      MaturityAllocationResult.class, ClassificationAllocationResult.class,
-      AverageMerResult.class, ManagementFeeResult.class,
-      SalesChargeResult.class,
-      IncomeForecastResult.class, YieldResult.class,
-      CommonPerformanceDatesResult.class, TopCommonHoldingsResult.class,
-      CreditQualityResult.class, NumberOfUniqueHoldingsResult.class
+      TrailingTotalReturnsResult.class, AnnualReturnResult.class, Growth10KResult.class,
+      StandardDeviationResult.class, SharpeRatioResult.class, MaxDrawdownResult.class, AssetAllocationResult.class,
+      AssetAllocationEMResult.class, EquitySectorResult.class, ConsolidatedSectorExposureResult.class,
+      EquityCountryExposureResult.class, GeographicExposureResult.class, CountryExposureResult.class,
+      FixedIncomeSectorResult.class, AverageMerResult.class, ManagementFeeResult.class,
+      CommonPerformanceDatesResult.class, TopCommonHoldingsResult.class, NumberOfUniqueHoldingsResult.class
   })))
   @PostMapping("/{metricName}")
   public BaseCalculationResult calculate(

@@ -117,7 +117,7 @@ class MicrometerCalculationObservabilityTest {
         observationRegistry(observationHandler), statistics());
     List<CalculationCommand> commands = List.of(
         periodCommand(CalculationMetric.TRAILING_TOTAL_RETURNS),
-        periodCommand(CalculationMetric.ALPHA));
+        periodCommand(CalculationMetric.MAX_DRAWDOWN));
 
     observability.observeComposite(commands, () -> CompositeCalculationResult.builder()
         .results(Map.of())
@@ -135,7 +135,7 @@ class MicrometerCalculationObservabilityTest {
               .noneMatch(keyValue -> keyValue.getKey().equals("calculation.metric")
                   || keyValue.getValue().equals(MicrometerCalculationObservability.COMPOSITE));
           assertThat(highCardinalityValue(context, MicrometerCalculationObservability.REQUESTED_METRIC_KEY))
-              .isEqualTo("trailing-total-returns,alpha");
+              .isEqualTo("trailing-total-returns,max-drawdown");
           assertThat(highCardinalityValue(context, MicrometerCalculationObservability.REQUESTED_METRICS_COUNT_KEY))
               .isEqualTo("2");
           assertThat(highCardinalityValue(context, MicrometerCalculationObservability.PORTFOLIO_HOLDINGS_COUNT_KEY))

@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.dto.command.ReturnCommand;
-import com.fintex.ce.model.dto.command.RollingCalculationCommand;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.currency.Currency;
 
@@ -19,7 +18,7 @@ class CpsdGreaterThanCpedReqValidatorTest {
 
   @Test
   void shouldThrow_whenCustomPsdIsAfterCustomPed() {
-    RollingCalculationCommand command = new RollingCalculationCommand();
+    ReturnCommand command = new ReturnCommand();
     command.setCustomPsd(LocalDate.of(2025, 6, 30));
     command.setCustomPed(LocalDate.of(2025, 1, 31));
     command.setCurrency(Currency.CAD);
@@ -50,7 +49,7 @@ class CpsdGreaterThanCpedReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenCustomPsdIsBeforeCustomPed() {
-    RollingCalculationCommand command = new RollingCalculationCommand();
+    ReturnCommand command = new ReturnCommand();
     command.setCustomPsd(LocalDate.of(2025, 1, 31));
     command.setCustomPed(LocalDate.of(2025, 6, 30));
     command.setCurrency(Currency.CAD);
@@ -60,7 +59,7 @@ class CpsdGreaterThanCpedReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenDatesAreNull() {
-    RollingCalculationCommand command = new RollingCalculationCommand();
+    ReturnCommand command = new ReturnCommand();
     command.setCustomPsd(null);
     command.setCustomPed(null);
     command.setCurrency(Currency.CAD);
@@ -70,7 +69,7 @@ class CpsdGreaterThanCpedReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenOnlyOneDateIsSet() {
-    RollingCalculationCommand commandWithPsdOnly = new RollingCalculationCommand();
+    ReturnCommand commandWithPsdOnly = new ReturnCommand();
     commandWithPsdOnly.setCustomPsd(LocalDate.of(2025, 6, 30));
     commandWithPsdOnly.setCustomPed(null);
     commandWithPsdOnly.setCurrency(Currency.CAD);

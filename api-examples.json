@@ -98,43 +98,6 @@
       }
     },
     {
-      "metric": "maturity-allocation",
-      "fetcher": "MaturityAllocationFetcher",
-      "command": "PortfolioHoldingsCommand",
-      "request": {
-        "metric": "maturity-allocation",
-        "holdings": [
-          {
-            "holdingType": "ETF", "country": "CANADA",
-            "value": 40000,
-            "securityIdentifier": { "id": "NVHE.U", "idType": "TICKER" }
-          },
-          {
-            "holdingType": "MUTUAL_FUND", "country": "CANADA",
-            "value": 30000,
-            "securityIdentifier": { "id": "VCC403", "idType": "FUNDSERV" }
-          }
-        ],
-        "dataProviders": ["MORNINGSTAR"]
-      }
-    },
-    {
-      "metric": "fixed-income-credit-quality",
-      "fetcher": "CreditQualityRestFetcher",
-      "command": "PortfolioHoldingsCommand",
-      "request": {
-        "metric": "fixed-income-credit-quality",
-        "holdings": [
-          {
-            "holdingType": "ETF", "country": "CANADA",
-            "value": 40000,
-            "securityIdentifier": { "id": "NVHE.U", "idType": "TICKER" }
-          }
-        ],
-        "dataProviders": ["MORNINGSTAR"]
-      }
-    },
-    {
       "metric": "mer",
       "fetcher": "FeesFetcher",
       "command": "AverageMerCommand",
@@ -172,44 +135,5 @@
         "parameterTypes": ["scaled", "absolute"],
         "dataProviders": ["MORNINGSTAR"]
       }
-    },
-    {
-      "metric": "sales-charge",
-      "fetcher": "SalesChargeFetcher",
-      "command": "PortfolioHoldingsCommand",
-      "request": {
-        "metric": "sales-charge",
-        "holdings": [
-          {
-            "holdingType": "MUTUAL_FUND", "country": "CANADA",
-            "value": 50000,
-            "securityIdentifier": { "id": "CCM4752", "idType": "FUNDSERV" }
-          }
-        ],
-        "dataProviders": ["MORNINGSTAR"]
-      }
-    },
-    {
-      "metric": "yield",
-      "fetcher": "YieldFetcher",
-      "command": "YieldCommand",
-      "request": {
-        "metric": "yield",
-        "holdings": [
-          {
-            "holdingType": "MUTUAL_FUND", "country": "CANADA",
-            "value": 50000,
-            "securityIdentifier": { "id": "CCM4752", "idType": "FUNDSERV" }
-          },
-          {
-            "holdingType": "ETF", "country": "CANADA",
-            "value": 25000,
-            "securityIdentifier": { "id": "NVHE.U", "idType": "TICKER" }
-          }
-        ],
-        "timeIntervalPeriods": 12,
-        "dataProviders": ["MORNINGSTAR"]
-      }
-    }
-  ]
+    }  ]
 }
