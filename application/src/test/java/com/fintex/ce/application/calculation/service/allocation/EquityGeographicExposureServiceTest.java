@@ -8,13 +8,19 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Geography;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.fundCa;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static java.math.BigDecimal.ONE;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +35,8 @@ class EquityGeographicExposureServiceTest
 
   @Override
   protected PortfolioHolding typeSpecificRelevantHolding() {
-    return canadaStock("RY", 100);
+    return holding(new SecurityIdentifier("RY", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.CANADA, 100);
   }
 
   @Override
@@ -53,7 +60,8 @@ class EquityGeographicExposureServiceTest
 
   @Override
   protected PortfolioHolding excludedSecurityHolding() {
-    return fixedIncome("BOND", 200);
+    return holdingWithoutCountry(new SecurityIdentifier("BOND", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.FIXED_INCOME, BigDecimal.valueOf(200));
   }
 
   @Override
@@ -63,9 +71,11 @@ class EquityGeographicExposureServiceTest
 
   @Test
   void shouldResolveStockRegionsViaGeographyData_andAttributeByBusinessCountry() {
-    PortfolioHolding usStock = usStock("AAPL", 200);
-    PortfolioHolding canadaStock = canadaStock("RY", 200);
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+    PortfolioHolding usStock = holding(new SecurityIdentifier("AAPL", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 200);
+    PortfolioHolding canadaStock = holding(new SecurityIdentifier("RY", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.CANADA, 200);
+    PortfolioHolding fund = fundCa("RBF605", 100);
 
     GeographicExposureData data = data(Map.of(
         fund, allocation(Map.of(GeographicRegionType.EUROPE, ONE), Currency.CAD)),
@@ -85,10 +95,14 @@ class EquityGeographicExposureServiceTest
 
   @Test
   void shouldMapNonNorthAmericanBusinessCountriesToTheirRegion() {
-    PortfolioHolding japanStock = usStock("4875.T", 100);
-    PortfolioHolding germanyStock = usStock("TL0.DE", 100);
-    PortfolioHolding brazilStock = usStock("AURA33.SA", 100);
-    PortfolioHolding southAfricaStock = usStock("ZAFR.JO", 100);
+    PortfolioHolding japanStock = holding(new SecurityIdentifier("4875.T", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
+    PortfolioHolding germanyStock = holding(new SecurityIdentifier("TL0.DE", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
+    PortfolioHolding brazilStock = holding(new SecurityIdentifier("AURA33.SA", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
+    PortfolioHolding southAfricaStock = holding(new SecurityIdentifier("ZAFR.JO", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
 
     GeographicExposureData data = data(Map.of(), Map.of(
         japanStock, geography(Country.JAPAN, Currency.JPY),
@@ -109,8 +123,9 @@ class EquityGeographicExposureServiceTest
 
   @Test
   void shouldEmitMissingBusinessCountryWarning_whenStockGeographyIsMissing() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
-    PortfolioHolding unmappedStock = usStock("UNKNOWN", 100);
+    PortfolioHolding fund = fundCa("RBF605", 100);
+    PortfolioHolding unmappedStock = holding(new SecurityIdentifier("UNKNOWN", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
 
     GeographicExposureData data = data(Map.of(
         fund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD)), Map.of());

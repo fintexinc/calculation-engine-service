@@ -16,7 +16,6 @@ import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.ErrorResponse;
@@ -34,6 +33,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.equity;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -184,9 +185,8 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
         .metric(CalculationMetric.EQUITY_SECTOR)
         .dataProviders(List.of(DataProvider.MORNINGSTAR))
         .holdings(List.of(
-            etfHolding(50_000, FIRST_ETF_IDENTIFIER),
-            new PortfolioHolding(BigDecimal.valueOf(50_000), FinancialInstrumentType.STOCK, Country.CANADA,
-                STOCK_IDENTIFIER)))
+            holding(FIRST_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA, 50_000),
+            holding(STOCK_IDENTIFIER, FinancialInstrumentType.STOCK, Country.CANADA, 50_000)))
         .build();
   }
 
@@ -225,12 +225,8 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static PortfolioHoldingsCommand tickerMicWithoutExchangeCommand() {
-    PortfolioHolding stock = new PortfolioHolding(
-        BigDecimal.valueOf(50_000), FinancialInstrumentType.STOCK, Country.CANADA,
-        EquitySecurityIdentifier.builder()
-            .id("CNQ")
-            .idType(FiIdentifierType.TICKER_MIC)
-            .build());
+    PortfolioHolding stock = equity(
+        "CNQ", null, FinancialInstrumentType.STOCK, Country.CANADA, 50_000);
     return PortfolioHoldingsCommand.builder()
         .metric(CalculationMetric.EQUITY_SECTOR)
         .dataProviders(List.of(DataProvider.MORNINGSTAR))
@@ -243,15 +239,11 @@ class EquitySectorE2ETest extends AbstractPortfolioCalculationE2ETest {
         .metric(metric)
         .dataProviders(List.of(DataProvider.MORNINGSTAR))
         .holdings(List.of(
-            etfHolding(10_000, FIRST_ETF_IDENTIFIER),
-            etfHolding(20_000, SECOND_ETF_IDENTIFIER),
-            etfHolding(30_000, THIRD_ETF_IDENTIFIER),
-            etfHolding(40_000, FOURTH_ETF_IDENTIFIER)))
+            holding(FIRST_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA, 10_000),
+            holding(SECOND_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA, 20_000),
+            holding(THIRD_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA, 30_000),
+            holding(FOURTH_ETF_IDENTIFIER, FinancialInstrumentType.ETF, Country.CANADA, 40_000)))
         .build();
-  }
-
-  private static PortfolioHolding etfHolding(long value, SecurityIdentifier identifier) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), FinancialInstrumentType.ETF, Country.CANADA, identifier);
   }
 
   private static SecurityAttributeResult<EquitySectorAllocationWithCurrency> sectorAllocationRow(

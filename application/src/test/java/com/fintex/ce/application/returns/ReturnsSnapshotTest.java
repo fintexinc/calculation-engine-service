@@ -21,17 +21,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReturnsSnapshotTest {
 
-  private static final PortfolioHolding HOLDING_USD = new PortfolioHolding(null, null,
-      new SecurityIdentifier("USD-A", FiIdentifierType.TICKER));
-  private static final PortfolioHolding HOLDING_CAD = new PortfolioHolding(null, null,
-      new SecurityIdentifier("CAD-B", FiIdentifierType.TICKER));
-  private static final PortfolioHolding HOLDING_BAD = new PortfolioHolding(null, null,
-      new SecurityIdentifier("BAD-C", FiIdentifierType.TICKER));
+  private static final PortfolioHolding HOLDING_USD = holdingWithoutCountry(
+      new SecurityIdentifier("USD-A", FiIdentifierType.TICKER), null, null);
+  private static final PortfolioHolding HOLDING_CAD = holdingWithoutCountry(
+      new SecurityIdentifier("CAD-B", FiIdentifierType.TICKER), null, null);
+  private static final PortfolioHolding HOLDING_BAD = holdingWithoutCountry(
+      new SecurityIdentifier("BAD-C", FiIdentifierType.TICKER), null, null);
 
   @Test
   void shouldReturnEmptySnapshotWithImmutableMaps_whenEmpty() {

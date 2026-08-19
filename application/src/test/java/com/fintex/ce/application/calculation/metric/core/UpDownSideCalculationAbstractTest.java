@@ -3,8 +3,6 @@ package com.fintex.ce.application.calculation.metric.core;
 import com.fintex.ce.application.calculation.metric.DownsideCaptureCalculation;
 import com.fintex.ce.application.calculation.metric.UpsideCaptureCalculation;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.util.DateTimeUtils;
 
 import org.junit.jupiter.api.Test;
@@ -32,7 +30,6 @@ import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.any;
@@ -62,7 +59,7 @@ class UpDownSideCalculationAbstractTest {
 
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("captureCalculationFactories")
-  void shouldThrowMissingPortfolioReturn_whenCaptureWindowContainsQualifyingBenchmarkDateWithoutPortfolioReturn(
+  void shouldCalculateCaptureRatio_whenCaptureWindowContainsQualifyingBenchmarkDateWithoutPortfolioReturn(
       String calculationName,
       Function<BenchmarkPeriodCalculationInput, UpDownSideCalculationAbstract<?>> calculationFactory,
       BigDecimal benchmarkReturn) {
@@ -74,11 +71,10 @@ class UpDownSideCalculationAbstractTest {
     UpDownSideCalculationAbstract<?> calculation = calculationFactory.apply(benchmarkInput(portfolioReturns,
         benchmarkReturns));
 
+    BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(12);
+
     assertThat(calculation.getPortfolioDetermination()).doesNotContainKey(missingDate);
-    assertThatThrownBy(() -> calculation.calculatePeriodForNumberOfMonths(12))
-        .as(calculationName)
-        .isInstanceOfSatisfying(CalculationException.class,
-            exception -> assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE));
+    assertThat(actual).as(calculationName).isEqualByComparingTo(HUNDRED);
   }
 
   @Test

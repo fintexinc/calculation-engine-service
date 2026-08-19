@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,10 +38,10 @@ import static org.mockito.Mockito.when;
 
 class FxConversionProcessorTest {
 
-  private static final PortfolioHolding HOLDING_USD = new PortfolioHolding(null, null,
-      new SecurityIdentifier("USD-A", FiIdentifierType.TICKER));
-  private static final PortfolioHolding HOLDING_EUR = new PortfolioHolding(null, null,
-      new SecurityIdentifier("EUR-A", FiIdentifierType.TICKER));
+  private static final PortfolioHolding HOLDING_USD = holdingWithoutCountry(
+      new SecurityIdentifier("USD-A", FiIdentifierType.TICKER), null, null);
+  private static final PortfolioHolding HOLDING_EUR = holdingWithoutCountry(
+      new SecurityIdentifier("EUR-A", FiIdentifierType.TICKER), null, null);
   private static final LocalDate JAN = LocalDate.parse("2020-01-31");
   private static final LocalDate FEB = LocalDate.parse("2020-02-29");
   private static final LocalDate MAR = LocalDate.parse("2020-03-31");
@@ -142,8 +143,8 @@ class FxConversionProcessorTest {
 
   @Test
   void shouldKeepHoldingsAlreadyInTargetCurrency_whenSomeHoldingsMatchTarget() {
-    PortfolioHolding cadHolding = new PortfolioHolding(null, null,
-        new SecurityIdentifier("CAD-A", FiIdentifierType.TICKER));
+    PortfolioHolding cadHolding = holdingWithoutCountry(
+        new SecurityIdentifier("CAD-A", FiIdentifierType.TICKER), null, null);
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = snapshot(Map.of(
         HOLDING_USD, Currency.USD,
         cadHolding, Currency.CAD));
@@ -161,8 +162,8 @@ class FxConversionProcessorTest {
 
   @Test
   void shouldRetainLatestContiguousMonths_whenConversionHasMissingFxMonths() {
-    PortfolioHolding cadHolding = new PortfolioHolding(null, null,
-        new SecurityIdentifier("CAD-A", FiIdentifierType.TICKER));
+    PortfolioHolding cadHolding = holdingWithoutCountry(
+        new SecurityIdentifier("CAD-A", FiIdentifierType.TICKER), null, null);
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = new ReturnsSnapshot<>(
         Map.of(HOLDING_USD, Currency.USD, cadHolding, Currency.CAD),
         Map.of(

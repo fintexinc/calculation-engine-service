@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -37,14 +39,13 @@ class MonthlyReturnsServiceTest {
   private static final LocalDate FEBRUARY_END = LocalDate.parse("2024-02-29");
   private static final LocalDate MARCH_END = LocalDate.parse("2024-03-31");
 
-  private static final PortfolioHolding ETF = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
-      new SecurityIdentifier("ETF-A", FiIdentifierType.TICKER));
-  private static final PortfolioHolding STOCK = new PortfolioHolding(null, FinancialInstrumentType.STOCK, Country.USA,
-      new SecurityIdentifier("STK-B", FiIdentifierType.TICKER));
-  private static final CashHolding CASH = CashHolding.builder()
-      .holdingType(FinancialInstrumentType.CASH)
-      .currency(Currency.CAD)
-      .build();
+  private static final PortfolioHolding ETF = holding(
+      new SecurityIdentifier("ETF-A", FiIdentifierType.TICKER), FinancialInstrumentType.ETF, Country.USA,
+      (BigDecimal) null);
+  private static final PortfolioHolding STOCK = holding(
+      new SecurityIdentifier("STK-B", FiIdentifierType.TICKER), FinancialInstrumentType.STOCK, Country.USA,
+      (BigDecimal) null);
+  private static final CashHolding CASH = cash(Currency.CAD, (BigDecimal) null);
 
   private final MonthlyReturnsGenerator generator = mock(MonthlyReturnsGenerator.class);
   private final CashMonthlyReturnsGenerator cashMonthlyReturnsGenerator = mock(CashMonthlyReturnsGenerator.class);

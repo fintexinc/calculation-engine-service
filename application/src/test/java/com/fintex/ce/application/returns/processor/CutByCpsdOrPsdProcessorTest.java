@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CutByCpsdOrPsdProcessorTest {
 
-  private static final PortfolioHolding HOLDING = new PortfolioHolding(null, null,
-      new SecurityIdentifier("A", FiIdentifierType.TICKER));
+  private static final PortfolioHolding HOLDING = holdingWithoutCountry(
+      new SecurityIdentifier("A", FiIdentifierType.TICKER), null, null);
 
   private final CutByCpsdOrPsdProcessor processor = new CutByCpsdOrPsdProcessor();
 

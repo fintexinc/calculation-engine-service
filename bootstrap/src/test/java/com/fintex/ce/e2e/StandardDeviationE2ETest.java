@@ -1,7 +1,6 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -33,6 +32,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
@@ -119,10 +119,8 @@ class StandardDeviationE2ETest extends AbstractPortfolioCalculationE2ETest {
     command.setMetric(CalculationMetric.STANDARD_DEVIATION);
     command.setCurrency(Currency.CAD);
     command.setPeriods(Set.of(TimePeriod.ONE_YR));
-    command.setHoldings(List.of(new PortfolioHolding(new BigDecimal("100000"),
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        BMO_SUSTAINABLE_OPPORTUNITIES)));
+    command.setHoldings(List.of(holding(BMO_SUSTAINABLE_OPPORTUNITIES,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100000")));
     return command;
   }
 

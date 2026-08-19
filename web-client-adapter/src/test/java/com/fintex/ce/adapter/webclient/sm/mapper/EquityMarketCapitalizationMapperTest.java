@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.HoldingEquityMarketCap;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalization;
 import com.fintex.wm.commons.domain.allocation.EquityMarketCapitalizationType;
@@ -19,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EquityMarketCapitalizationMapperTest {
@@ -36,7 +36,8 @@ class EquityMarketCapitalizationMapperTest {
         createEntry(EquityMarketCapitalizationType.MICRO, "3.50")));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("VTI"));
+    HoldingEquityMarketCap result = mapper.map(smsResponse, holding(new SecurityIdentifier("VTI", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getRatings()).hasSize(5);
     assertThat(result.getRatings().get(EquityMarketCapitalizationType.GIANT)).isEqualByComparingTo("45.67");
@@ -51,7 +52,8 @@ class EquityMarketCapitalizationMapperTest {
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyRatings_whenResponseIsNullOrHasNoValues(
       EquityMarketCapitalization smsResponse) {
-    HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("TEST.ID"));
+    HoldingEquityMarketCap result = mapper.map(smsResponse, holding(new SecurityIdentifier("TEST.ID", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getRatings()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -85,7 +87,8 @@ class EquityMarketCapitalizationMapperTest {
     var smsResponse = new EquityMarketCapitalization();
     smsResponse.setAllocations(List.of(validEntry, nullTypeEntry, nullValueEntry));
 
-    HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("TEST.ID"));
+    HoldingEquityMarketCap result = mapper.map(smsResponse, holding(new SecurityIdentifier("TEST.ID", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getRatings()).hasSize(1);
     assertThat(result.getRatings()).containsKey(EquityMarketCapitalizationType.GIANT);
@@ -98,7 +101,8 @@ class EquityMarketCapitalizationMapperTest {
     smsResponse.setAllocations(List.of());
     smsResponse.setDataProviders(null);
 
-    HoldingEquityMarketCap result = mapper.map(smsResponse, createHolding("SEC-001"));
+    HoldingEquityMarketCap result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-001", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
   }
@@ -111,8 +115,4 @@ class EquityMarketCapitalizationMapperTest {
     return entry;
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, null));
-  }
 }

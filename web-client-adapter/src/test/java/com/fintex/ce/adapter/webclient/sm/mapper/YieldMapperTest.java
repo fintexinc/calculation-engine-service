@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.yield.Yield;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
 import com.fintex.wm.commons.domain.enumeration.Country;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class YieldMapperTest {
@@ -29,7 +29,8 @@ class YieldMapperTest {
     var smsResponse = new Income();
     smsResponse.setDividendYield(dividendYield);
 
-    Yield result = mapper.map(smsResponse, createHolding("SEC-001"));
+    Yield result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-001", null), FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getDividendYield()).isEqualByComparingTo("0.035");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -37,7 +38,8 @@ class YieldMapperTest {
 
   @Test
   void shouldReturnEmptyYield_whenResponseIsNull() {
-    Yield result = mapper.map(null, createHolding("SEC-002"));
+    Yield result = mapper.map(null, holding(new SecurityIdentifier("SEC-002", null), FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getDividendYield()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -48,7 +50,8 @@ class YieldMapperTest {
     var smsResponse = new Income();
     smsResponse.setDividendYield(null);
 
-    Yield result = mapper.map(smsResponse, createHolding("SEC-003"));
+    Yield result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-003", null), FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getDividendYield()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -63,15 +66,11 @@ class YieldMapperTest {
     var smsResponse = new Income();
     smsResponse.setDividendYield(dividendYield);
 
-    Yield result = mapper.map(smsResponse, createHolding("SEC-004"));
+    Yield result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-004", null), FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getDividendYield()).isEqualByComparingTo("0.025");
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    var identifier = new SecurityIdentifier();
-    identifier.setId(securityId);
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA, identifier);
-  }
 }

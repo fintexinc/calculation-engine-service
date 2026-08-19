@@ -1,6 +1,7 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.enumeration.InterestFreq;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
@@ -19,6 +20,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -37,8 +41,8 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
   @Override
   protected String requestBodyForSmsUnavailableScenario() {
     return writeJson(commandFor(Currency.CAD, List.of(
-        etfCanada(XBAL, "45234.67"),
-        etfCanada(VCNS, "18765.43"))));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "18765.43"))));
   }
 
   @Override
@@ -90,12 +94,13 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
 
   protected static ReturnCommand richPortfolioCommand() {
     return commandFor(Currency.CAD, List.of(
-        etfCanada(XBAL, "45234.67"),
-        etfCanada(VCNS, "18765.43"),
-        stockCanada(RY_TO, "9234.12"),
-        fund(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "15678.90"),
-        fundServ(CCM4752, "11234.56"),
-        gic(Currency.CAD, "25000.00", "365", "12.0"),
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "18765.43"),
+        holding(RY_TO, FinancialInstrumentType.STOCK, Country.CANADA, "9234.12"),
+        holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "15678.90"),
+        holding(CCM4752, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "11234.56"),
+        gic(null, Currency.CAD, new BigDecimal("25000.00"), new BigDecimal("365"), new BigDecimal("12.0"),
+            InterestFreq.MONTHLY, LocalDate.of(2024, 1, 1)),
         cash(Currency.CAD, "10000.00")));
   }
 

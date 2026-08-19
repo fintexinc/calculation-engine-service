@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
@@ -10,9 +9,6 @@ import com.fintex.wm.commons.domain.allocation.AssetAllocationWithCurrency;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.TreeSet;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AssetAllocationSecurityMasterMapperTest {
@@ -34,7 +31,7 @@ class AssetAllocationSecurityMasterMapperTest {
         new AssetAllocationValue(AssetAllocationRegionType.CASH, new BigDecimal("9.5"), new TreeSet<>())),
         Currency.USD, DataProvider.MORNINGSTAR);
 
-    HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
+    HoldingAssetAllocation result = mapper.map(smsResponse, etf("SEC-001", Country.CANADA, 1));
 
     assertThat(result.getAllocations()).hasSize(3);
     assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("60.5"));
@@ -46,7 +43,7 @@ class AssetAllocationSecurityMasterMapperTest {
 
   @Test
   void shouldReturnEmptyAllocationsAndProvidersAndNullCurrency_whenResponseIsNull() {
-    HoldingAssetAllocation result = mapper.map(null, createHolding("SEC-002"));
+    HoldingAssetAllocation result = mapper.map(null, etf("SEC-002", Country.CANADA, 1));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -59,7 +56,7 @@ class AssetAllocationSecurityMasterMapperTest {
         List.of(new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE, new TreeSet<>())),
         null, null);
 
-    HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
+    HoldingAssetAllocation result = mapper.map(smsResponse, etf("SEC-003", Country.CANADA, 1));
 
     assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE);
     assertThat(result.getProviders()).isEmpty();
@@ -73,7 +70,7 @@ class AssetAllocationSecurityMasterMapperTest {
         new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("20.0"), new TreeSet<>())),
         Currency.CAD, null);
 
-    HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
+    HoldingAssetAllocation result = mapper.map(smsResponse, etf("SEC-004", Country.CANADA, 1));
 
     assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("30.0"));
     assertThat(result.getCurrency()).isEqualTo(Currency.CAD);
@@ -87,7 +84,7 @@ class AssetAllocationSecurityMasterMapperTest {
         new AssetAllocationValue(AssetAllocationRegionType.FIXED_INCOME, BigDecimal.TEN, new TreeSet<>())),
         null, null);
 
-    HoldingAssetAllocation result = mapper.map(smsResponse, createHolding("SEC-005"));
+    HoldingAssetAllocation result = mapper.map(smsResponse, etf("SEC-005", Country.CANADA, 1));
 
     assertThat(result.getAllocations()).containsOnly(
         org.assertj.core.api.Assertions.entry(AssetAllocationRegionType.FIXED_INCOME, BigDecimal.TEN));
@@ -109,8 +106,4 @@ class AssetAllocationSecurityMasterMapperTest {
     return wrapper;
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, FiIdentifierType.TICKER));
-  }
 }

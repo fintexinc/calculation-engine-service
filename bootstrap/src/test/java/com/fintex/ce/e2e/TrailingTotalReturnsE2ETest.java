@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.equity;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_MTH;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
@@ -170,7 +172,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         "0.0035")))));
     PeriodCommand command = periodCommand(Set.of(ONE_MTH), LocalDate.parse("2024-12-31"),
         List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
-    command.setBenchmarkHoldings(List.of(holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
+    command.setBenchmarkHoldings(List.of(
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
 
     HttpResponse response = postCalculation(writeJson(command));
 
@@ -204,7 +207,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         new DateRateValue(LocalDate.parse("2024-12-31"), new BigDecimal("0.0035")))));
     PeriodCommand command = periodCommand(Set.of(THREE_MTH), LocalDate.parse("2024-12-31"),
         List.of(holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
-    command.setBenchmarkHoldings(List.of(holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
+    command.setBenchmarkHoldings(List.of(
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "50000")));
 
     HttpResponse response = postCalculation(writeJson(command));
 
@@ -457,16 +461,6 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     return IntStream.range(0, MONTH_ENDS_2024.length)
         .mapToObj(i -> new DateRateValue(LocalDate.parse(MONTH_ENDS_2024[i]), BigDecimal.valueOf(30L + i, 4)))
         .toList();
-  }
-
-  private static PortfolioHolding holding(SecurityIdentifier securityIdentifier, FinancialInstrumentType type,
-      Country country, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, country, securityIdentifier);
-  }
-
-  private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type,
-      Country country, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, country, equityId(ticker, exchange));
   }
 
   private static Dispatcher bocDailyUsdCadDispatcher(String rate) {

@@ -2,7 +2,6 @@ package com.fintex.ce.e2e;
 
 import com.fintex.ce.PortfolioCalculationEngineApplication;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
@@ -18,8 +17,6 @@ import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -47,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -223,28 +221,20 @@ class CalculationStatisticsEndpointE2ETest {
   private static PortfolioHoldingsCommand allocationsCommand() {
     return PortfolioHoldingsCommand.builder()
         .metric(CalculationMetric.ASSET_ALLOCATIONS)
-        .holdings(List.of(etf()))
+        .holdings(List.of(etfCa("XBAL", 50_000)))
         .dataProviders(List.of(DataProvider.MORNINGSTAR))
         .build();
   }
 
   private static CompositeCalculationRequest compositeRequest() {
     return CompositeCalculationRequest.builder()
-        .holdings(List.of(etf()))
+        .holdings(List.of(etfCa("XBAL", 50_000)))
         .dataProviders(List.of(DataProvider.MORNINGSTAR))
         .currency(Currency.CAD)
         .commands(List.of(
             PortfolioHoldingsCommand.builder().metric(CalculationMetric.ASSET_ALLOCATIONS).build(),
             PortfolioHoldingsCommand.builder().metric(CalculationMetric.EQUITY_SECTOR).build()))
         .build();
-  }
-
-  private static PortfolioHolding etf() {
-    return new PortfolioHolding(
-        BigDecimal.valueOf(50_000),
-        FinancialInstrumentType.ETF,
-        Country.CANADA,
-        new SecurityIdentifier("XBAL", FiIdentifierType.TICKER));
   }
 
   private static Map<CompositeSecurityAttribute, Object> allocationAttributes() {

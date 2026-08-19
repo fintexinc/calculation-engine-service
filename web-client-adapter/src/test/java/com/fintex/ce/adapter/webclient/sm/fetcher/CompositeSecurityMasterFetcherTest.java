@@ -8,7 +8,6 @@ import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.dto.request.CompositeAttributesRequest;
@@ -26,10 +25,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,7 +59,7 @@ class CompositeSecurityMasterFetcherTest {
 
   @Test
   void shouldFetchAndMapAttributes_whenSmReturnsData() {
-    PortfolioHolding holding = holding("XIU");
+    PortfolioHolding holding = etf("XIU", Country.CANADA, 1);
     when(client.post(eq(ENDPOINT), any(), any(ParameterizedTypeReference.class))).thenReturn(Map.of(
         CompositeSecurityAttribute.FEES, List.of(attributeResult("XIU", "fee-payload")),
         CompositeSecurityAttribute.GEOGRAPHY, List.of(attributeResult("XIU", "geo-payload"))));
@@ -76,7 +75,7 @@ class CompositeSecurityMasterFetcherTest {
 
   @Test
   void shouldSendCompositeAttributesRequest_whenFetching() {
-    PortfolioHolding holding = holding("XIU");
+    PortfolioHolding holding = etf("XIU", Country.CANADA, 1);
     when(client.post(eq(ENDPOINT), any(), any(ParameterizedTypeReference.class))).thenReturn(Map.of());
 
     fetcher.fetch(List.of(holding), List.of(CompositeSecurityAttribute.FEES), PROVIDERS);
@@ -101,7 +100,7 @@ class CompositeSecurityMasterFetcherTest {
 
   @Test
   void shouldReturnEmptySecurityData_whenAttributesEmpty() {
-    SecurityData result = fetcher.fetch(List.of(holding("XIU")), List.of(), PROVIDERS);
+    SecurityData result = fetcher.fetch(List.of(etf("XIU", Country.CANADA, 1)), List.of(), PROVIDERS);
 
     assertThat(result.asMap()).isEmpty();
     verifyNoInteractions(client);
@@ -109,7 +108,7 @@ class CompositeSecurityMasterFetcherTest {
 
   @Test
   void shouldThrowException_whenAttributeHasNoBinding() {
-    List<PortfolioHolding> holdings = List.of(holding("XIU"));
+    List<PortfolioHolding> holdings = List.of(etf("XIU", Country.CANADA, 1));
     List<CompositeSecurityAttribute> attributes = List.of(CompositeSecurityAttribute.MONTHLY_RETURNS);
 
     assertThatThrownBy(() -> fetcher.fetch(holdings, attributes, PROVIDERS))
@@ -119,7 +118,7 @@ class CompositeSecurityMasterFetcherTest {
 
   @Test
   void shouldIgnoreUnrequestedAttributes_whenSmReturnsMore() {
-    PortfolioHolding holding = holding("XIU");
+    PortfolioHolding holding = etf("XIU", Country.CANADA, 1);
     when(client.post(eq(ENDPOINT), any(), any(ParameterizedTypeReference.class))).thenReturn(Map.of(
         CompositeSecurityAttribute.FEES, List.of(attributeResult("XIU", "fee-payload")),
         CompositeSecurityAttribute.GEOGRAPHY, List.of(attributeResult("XIU", "geo-payload"))));
@@ -131,7 +130,7 @@ class CompositeSecurityMasterFetcherTest {
 
   @Test
   void shouldFetchSingleAttributeFromDedicatedEndpoint_whenOneAttributeRequested() {
-    PortfolioHolding holding = holding("XIU");
+    PortfolioHolding holding = etf("XIU", Country.CANADA, 1);
     String expectedPath = ENDPOINT + "/" + CompositeSecurityAttribute.FEES.getAttributeName();
     when(client.post(eq(expectedPath), any(), any(ParameterizedTypeReference.class)))
         .thenReturn(List.of(attributeResult("XIU", "fee-payload")));
@@ -153,7 +152,7 @@ class CompositeSecurityMasterFetcherTest {
 
   @Test
   void shouldThrowException_whenSingleAttributeHasNoBinding() {
-    List<PortfolioHolding> holdings = List.of(holding("XIU"));
+    List<PortfolioHolding> holdings = List.of(etf("XIU", Country.CANADA, 1));
 
     assertThatThrownBy(() -> fetcher.fetch(holdings, CompositeSecurityAttribute.MONTHLY_RETURNS, PROVIDERS))
         .isInstanceOf(CalculationException.class);
@@ -165,7 +164,7 @@ class CompositeSecurityMasterFetcherTest {
     when(client.post(eq(ENDPOINT), any(), any(ParameterizedTypeReference.class))).thenReturn(null);
 
     SecurityData result = fetcher.fetch(
-        List.of(holding("XIU")), List.of(CompositeSecurityAttribute.FEES), PROVIDERS);
+        List.of(etf("XIU", Country.CANADA, 1)), List.of(CompositeSecurityAttribute.FEES), PROVIDERS);
 
     assertThat(result.asMap()).isEmpty();
   }
@@ -177,8 +176,4 @@ class CompositeSecurityMasterFetcherTest {
     return result;
   }
 
-  private static PortfolioHolding holding(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
-  }
 }

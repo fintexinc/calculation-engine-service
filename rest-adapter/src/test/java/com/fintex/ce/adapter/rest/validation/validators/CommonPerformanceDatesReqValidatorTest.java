@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,11 +32,7 @@ class CommonPerformanceDatesReqValidatorTest {
 
   @Test
   void shouldThrow_whenBenchmarkHasCashWithNullCurrency() {
-    CashHolding cashHolding = CashHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(null)
-        .build();
+    CashHolding cashHolding = cash(null, BigDecimal.TEN);
 
     var cmd = new MultiplePortfoliosCommand();
     cmd.setBenchmarkHoldings(List.of(cashHolding));
@@ -50,11 +48,7 @@ class CommonPerformanceDatesReqValidatorTest {
 
   @Test
   void shouldThrow_whenPortfolioHasCashWithNullCurrency() {
-    CashHolding cashHolding = CashHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(null)
-        .build();
+    CashHolding cashHolding = cash(null, BigDecimal.TEN);
 
     var cmd = new MultiplePortfoliosCommand();
     cmd.setBenchmarkHoldings(Collections.emptyList());
@@ -70,16 +64,9 @@ class CommonPerformanceDatesReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenAllHoldingsAreValid() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-    CashHolding cashHolding = CashHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(Currency.CAD)
-        .build();
+    PortfolioHolding holding = holding(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN);
+    CashHolding cashHolding = cash(Currency.CAD, BigDecimal.TEN);
 
     var cmd = new MultiplePortfoliosCommand();
     cmd.setBenchmarkHoldings(List.of(holding));

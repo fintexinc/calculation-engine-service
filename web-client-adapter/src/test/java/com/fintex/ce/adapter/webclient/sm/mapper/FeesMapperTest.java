@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
 import com.fintex.wm.commons.domain.enumeration.Country;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -54,7 +54,8 @@ class FeesMapperTest {
     smsResponse.setGrossExpenseRatio(grossExpenseRatio);
     smsResponse.setActual12B1Fee(actual12B1Fee);
 
-    FeeData result = mapper.map(smsResponse, createHolding("SEC-001"));
+    FeeData result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-001", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getManagementFee()).isEqualByComparingTo("0.0125");
     assertThat(result.getManagementFeeProvider()).isEqualTo(DataProvider.MORNINGSTAR);
@@ -70,7 +71,8 @@ class FeesMapperTest {
 
   @Test
   void returnsAllNullFeeData_whenResponseIsNull() {
-    FeeData result = mapper.map(null, createHolding("SEC-002"));
+    FeeData result = mapper.map(null, holding(new SecurityIdentifier("SEC-002", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getManagementFee()).isNull();
     assertThat(result.getManagementExpenseRatio()).isNull();
@@ -83,7 +85,8 @@ class FeesMapperTest {
   void returnsAllNullFeeData_whenResponseHasNullDatapoints() {
     var smsResponse = new Fees();
 
-    FeeData result = mapper.map(smsResponse, createHolding("SEC-003"));
+    FeeData result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-003", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getManagementFee()).isNull();
     assertThat(result.getManagementExpenseRatio()).isNull();
@@ -98,7 +101,8 @@ class FeesMapperTest {
     var smsResponse = new Fees();
     smsResponse.setManagementExpenseRatio(mer);
 
-    FeeData result = mapper.map(smsResponse, createHolding("SEC-004"));
+    FeeData result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-004", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getManagementExpenseRatio()).isEqualByComparingTo("0.019");
     assertThat(result.getManagementExpenseRatioProvider()).isEqualTo(DataProvider.MORNINGSTAR);
@@ -107,9 +111,4 @@ class FeesMapperTest {
     assertThat(result.getGrossExpenseRatio()).isNull();
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    var identifier = new SecurityIdentifier();
-    identifier.setId(securityId);
-    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, identifier);
-  }
 }

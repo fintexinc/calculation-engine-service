@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -71,14 +72,6 @@ class CashMonthlyReturnsGeneratorTest {
               .containsEntry("param-1", Currency.CAD);
         });
     verify(treasuryBillsFetcher).fetch(Currency.CAD);
-  }
-
-  private static CashHolding cash(Currency currency, String value) {
-    return CashHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(currency)
-        .build();
   }
 
   private static NavigableMap<LocalDate, BigDecimal> returns(String... dateValuePairs) {

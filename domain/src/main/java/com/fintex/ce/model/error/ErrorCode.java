@@ -416,14 +416,6 @@ public enum ErrorCode {
       HttpStatus.OK,
       Severity.WARNING),
 
-  MISSING_PORTFOLIO_RETURN_FOR_DATE(
-      Codes.MISSING_PORTFOLIO_RETURN_FOR_DATE,
-      "Portfolio is missing monthly return values for date %s",
-      "Portfolio monthly return coverage must exactly match every month in the requested calculation interval",
-      "Populate the missing portfolio monthly return or request a period covered by the portfolio data",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
-
   MISSING_BENCHMARK_RETURN_FOR_DATE(
       Codes.MISSING_BENCHMARK_RETURN_FOR_DATE,
       "Benchmark is missing monthly return values for date %s",
@@ -1205,7 +1197,6 @@ public enum ErrorCode {
     public static final String NO_COMPLETE_CALENDAR_YEAR = "RET-010";
     public static final String INCOMPLETE_YEAR_SKIPPED = "RET-011";
     public static final String DEGENERATE_GROWTH_DATA = "RET-012";
-    public static final String MISSING_PORTFOLIO_RETURN_FOR_DATE = "RET-013";
     public static final String MISSING_BENCHMARK_RETURN_FOR_DATE = "RET-014";
     public static final String PERIOD_RESULT_NOT_AVAILABLE = "RET-015";
     public static final String CIPSD_OUTSIDE_DATA_RANGE_ERROR = "RET-016";

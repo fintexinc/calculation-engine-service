@@ -8,13 +8,21 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Geography;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.fundCa;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static java.math.BigDecimal.ONE;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +37,8 @@ class FixedIncomeGeographicExposureServiceTest
 
   @Override
   protected PortfolioHolding typeSpecificRelevantHolding() {
-    return fixedIncome("BOND", 100);
+    return holdingWithoutCountry(new SecurityIdentifier("BOND", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.FIXED_INCOME, BigDecimal.valueOf(100));
   }
 
   @Override
@@ -54,7 +63,8 @@ class FixedIncomeGeographicExposureServiceTest
 
   @Override
   protected PortfolioHolding excludedSecurityHolding() {
-    return usStock("AAPL", 200);
+    return holding(new SecurityIdentifier("AAPL", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 200);
   }
 
   @Override
@@ -64,9 +74,11 @@ class FixedIncomeGeographicExposureServiceTest
 
   @Test
   void shouldExcludeBothUsAndCanadaStocks_fromExposureAggregation() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
-    PortfolioHolding usStock = usStock("AAPL", 200);
-    PortfolioHolding canadaStock = canadaStock("RY", 200);
+    PortfolioHolding fund = fundCa("RBF605", 100);
+    PortfolioHolding usStock = holding(new SecurityIdentifier("AAPL", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 200);
+    PortfolioHolding canadaStock = holding(new SecurityIdentifier("RY", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.CANADA, 200);
 
     GeographicExposureData data = data(Map.of(
         fund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD)),
@@ -82,10 +94,11 @@ class FixedIncomeGeographicExposureServiceTest
 
   @Test
   void shouldIncludeFixedIncomeAndEtf_inGeographicAllocationPath() {
-    PortfolioHolding bond = fixedIncome("BOND", 200);
-    PortfolioHolding usEtf = usEtf("BND", 100);
-    PortfolioHolding canadaEtf = canadaEtf("ZCN", 100);
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+    PortfolioHolding bond = holdingWithoutCountry(new SecurityIdentifier("BOND", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.FIXED_INCOME, BigDecimal.valueOf(200));
+    PortfolioHolding usEtf = etf("BND", Country.USA, 100);
+    PortfolioHolding canadaEtf = etfCa("ZCN", 100);
+    PortfolioHolding fund = fundCa("RBF605", 100);
 
     GeographicExposureData data = data(Map.of(
         bond, allocation(Map.of(GeographicRegionType.EUROPE, ONE), Currency.EUR),

@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EquityStyleboxExposureMapperTest {
@@ -33,7 +34,8 @@ class EquityStyleboxExposureMapperTest {
         new StyleBoxValue(StyleBoxType.MID_GROWTH, new BigDecimal("3.8"))));
     styleBoxes.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    PortfolioHolding holding = createHolding("XIU.TO", FinancialInstrumentType.ETF);
+    PortfolioHolding holding = holdingWithoutCountry(new SecurityIdentifier("XIU.TO", null),
+        FinancialInstrumentType.ETF, (BigDecimal) null);
 
     EquityStyleboxExposure result = mapper.map(styleBoxes, holding);
 
@@ -48,7 +50,8 @@ class EquityStyleboxExposureMapperTest {
   @ParameterizedTest
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyBoxValues_whenResponseIsNullOrHasNoBoxValues(StyleBoxes smsResponse) {
-    PortfolioHolding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
+    PortfolioHolding holding = holdingWithoutCountry(new SecurityIdentifier("TEST.ID", null),
+        FinancialInstrumentType.FUND, (BigDecimal) null);
 
     EquityStyleboxExposure result = mapper.map(smsResponse, holding);
 
@@ -79,7 +82,8 @@ class EquityStyleboxExposureMapperTest {
     var styleBoxes = new StyleBoxes();
     styleBoxes.setBoxValues(List.of(validEntry, nullTypeEntry, nullValueEntry));
 
-    EquityStyleboxExposure result = mapper.map(styleBoxes, createHolding("TEST.ID", FinancialInstrumentType.ETF));
+    EquityStyleboxExposure result = mapper.map(styleBoxes, holdingWithoutCountry(new SecurityIdentifier("TEST.ID",
+        null), FinancialInstrumentType.ETF, (BigDecimal) null));
 
     assertThat(result.getBoxValues()).hasSize(1);
     assertThat(result.getBoxValues()).containsKey(StyleBoxType.SMALL_CORE);
@@ -101,7 +105,8 @@ class EquityStyleboxExposureMapperTest {
     var styleBoxes = new StyleBoxes();
     styleBoxes.setBoxValues(entries);
 
-    EquityStyleboxExposure result = mapper.map(styleBoxes, createHolding("FULL.TEST", FinancialInstrumentType.ETF));
+    EquityStyleboxExposure result = mapper.map(styleBoxes, holdingWithoutCountry(new SecurityIdentifier("FULL.TEST",
+        null), FinancialInstrumentType.ETF, (BigDecimal) null));
 
     assertThat(result.getBoxValues()).hasSize(9);
     assertThat(result.getBoxValues().get(StyleBoxType.LARGE_VALUE)).isEqualByComparingTo("15.0");
@@ -115,9 +120,4 @@ class EquityStyleboxExposureMapperTest {
     assertThat(result.getBoxValues().get(StyleBoxType.SMALL_GROWTH)).isEqualByComparingTo("1.5");
   }
 
-  private PortfolioHolding createHolding(String securityId, FinancialInstrumentType holdingType) {
-    var identifier = new SecurityIdentifier();
-    identifier.setId(securityId);
-    return new PortfolioHolding(null, holdingType, identifier);
-  }
 }

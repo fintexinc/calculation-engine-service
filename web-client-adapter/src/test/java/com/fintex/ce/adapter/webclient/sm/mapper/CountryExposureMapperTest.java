@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.allocation.CountryAllocationValue;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CountryExposureMapperTest {
@@ -29,7 +29,8 @@ class CountryExposureMapperTest {
     smsResponse.setAllocations(List.of(canada, usa));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    CountryExposure result = mapper.map(smsResponse, createHolding("SEC-001"));
+    CountryExposure result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-001", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -40,7 +41,8 @@ class CountryExposureMapperTest {
 
   @Test
   void shouldReturnEmptyAllocations_whenResponseIsNull() {
-    CountryExposure result = mapper.map(null, createHolding("SEC-002"));
+    CountryExposure result = mapper.map(null, holding(new SecurityIdentifier("SEC-002", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getAllocations()).isEmpty();
@@ -51,7 +53,8 @@ class CountryExposureMapperTest {
     var smsResponse = new CountryAllocation();
     smsResponse.setAllocations(null);
 
-    CountryExposure result = mapper.map(smsResponse, createHolding("SEC-003"));
+    CountryExposure result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-003", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -63,7 +66,8 @@ class CountryExposureMapperTest {
     smsResponse.setAllocations(List.of());
     smsResponse.setDataProviders(null);
 
-    CountryExposure result = mapper.map(smsResponse, createHolding("SEC-004"));
+    CountryExposure result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-004", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
   }
@@ -83,7 +87,8 @@ class CountryExposureMapperTest {
     var smsResponse = new CountryAllocation();
     smsResponse.setAllocations(List.of(valid, nullIso, nullValue));
 
-    CountryExposure result = mapper.map(smsResponse, createHolding("SEC-005"));
+    CountryExposure result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-005", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).hasSize(1);
     assertThat(result.getAllocations()).containsEntry(Country.CANADA, BigDecimal.valueOf(0.65));
@@ -97,7 +102,8 @@ class CountryExposureMapperTest {
     var smsResponse = new CountryAllocation();
     smsResponse.setAllocations(List.of(can1, can2));
 
-    CountryExposure result = mapper.map(smsResponse, createHolding("SEC-006"));
+    CountryExposure result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-006", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).hasSize(1);
     assertThat(result.getAllocations().get(Country.CANADA)).isEqualByComparingTo("0.65");
@@ -110,8 +116,4 @@ class CountryExposureMapperTest {
     return cv;
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, null));
-  }
 }

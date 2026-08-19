@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.fee.SalesCharge;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -11,8 +10,10 @@ import com.fintex.wm.commons.domain.sales.SalesChargeType;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,7 +30,8 @@ class SalesChargeTypeMapperTest {
     when(salesCharge.getValue()).thenReturn(SalesChargeType.DEFERRED_SALES_CHARGE);
     when(salesCharge.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
 
-    SalesCharge result = mapper.map(smsResponse, createHolding("SEC-001"));
+    SalesCharge result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-001", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getType()).isEqualTo(SalesChargeType.DEFERRED_SALES_CHARGE);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -37,7 +39,8 @@ class SalesChargeTypeMapperTest {
 
   @Test
   void shouldReturnEmptySalesCharge_whenResponseIsNull() {
-    SalesCharge result = mapper.map(null, createHolding("SEC-002"));
+    SalesCharge result = mapper.map(null, holding(new SecurityIdentifier("SEC-002", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getType()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -48,7 +51,8 @@ class SalesChargeTypeMapperTest {
     var smsResponse = mock(SalesChargeData.class);
     when(smsResponse.getSalesCharge()).thenReturn(null);
 
-    SalesCharge result = mapper.map(smsResponse, createHolding("SEC-003"));
+    SalesCharge result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-003", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getType()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -62,19 +66,11 @@ class SalesChargeTypeMapperTest {
     when(salesCharge.getValue()).thenReturn(SalesChargeType.FRONT_END_CHARGE);
     when(salesCharge.getDataProviders()).thenReturn(List.of(DataProvider.MORNINGSTAR));
 
-    SalesCharge result = mapper.map(smsResponse, createHolding("SEC-004"));
+    SalesCharge result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-004", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getType()).isEqualTo(SalesChargeType.FRONT_END_CHARGE);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    var identifier = new SecurityIdentifier();
-    identifier.setId(securityId);
-    return PortfolioHolding.builder()
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
-        .country(Country.CANADA)
-        .securityIdentifier(identifier)
-        .build();
-  }
 }
