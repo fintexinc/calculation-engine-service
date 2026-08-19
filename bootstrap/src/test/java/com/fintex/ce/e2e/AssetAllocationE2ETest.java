@@ -1,8 +1,6 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -22,7 +20,6 @@ import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Geography;
-import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
@@ -46,6 +43,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.equity;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.fund;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
@@ -107,13 +109,13 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   @Override
   protected String requestBodyForMicUnavailableScenario() {
     return writeJson(allocationsCommand(
-        etf("XBAL", FinancialInstrumentType.ETF, Country.CANADA, 50_000),
-        etf("VCNS", FinancialInstrumentType.ETF, Country.CANADA, 50_000)));
+        etf("XBAL", Country.CANADA, 50_000),
+        etf("VCNS", Country.CANADA, 50_000)));
   }
 
   @Override
   protected String requestBodyForPositiveMicScenario() {
-    return writeJson(allocationsCommand(etf("XBAL", FinancialInstrumentType.ETF, Country.CANADA, 50_000)));
+    return writeJson(allocationsCommand(etf("XBAL", Country.CANADA, 50_000)));
   }
 
   @Override
@@ -131,7 +133,7 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
     PeriodCommand command = new PeriodCommand();
     command.setMetric(CalculationMetric.SHARPE_RATIO);
     command.setCurrency(Currency.CAD);
-    command.setHoldings(List.of(etf("XBAL", FinancialInstrumentType.ETF, Country.CANADA, 50_000)));
+    command.setHoldings(List.of(etf("XBAL", Country.CANADA, 50_000)));
     return writeJson(command);
   }
 
@@ -208,10 +210,11 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static PortfolioHoldingsCommand mixedPortfolioCommand() {
     return allocationsCommand(
-        cash("CASH-CAD", Currency.CAD, 50),
-        gic("GIC-RBC-3Y", Currency.CAD, 100, 1095),
+        cash(Currency.CAD, 50),
+        gic(new SecurityIdentifier("GIC-RBC-3Y", FiIdentifierType.TICKER), Currency.CAD, BigDecimal.valueOf(100),
+            BigDecimal.valueOf(1095), null, null, null),
         equity("AAPL", "NASDAQ", FinancialInstrumentType.STOCK, Country.USA, 40),
-        etf("SPY", FinancialInstrumentType.ETF, Country.USA, 40),
+        etf("SPY", Country.USA, 40),
         equity("RY.TO", "TSX", FinancialInstrumentType.STOCK, Country.CANADA, 30),
         fund("F0CAN999", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, 200));
   }
@@ -225,7 +228,8 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static PortfolioHoldingsCommand singleUsdStockCommand() {
-    return allocationsCommand(equity("AAPL", "NASDAQ", FinancialInstrumentType.STOCK, Country.USA, 1000));
+    return allocationsCommand(
+        equity("AAPL", "NASDAQ", FinancialInstrumentType.STOCK, Country.USA, 1000));
   }
 
   private static PortfolioHoldingsCommand allocationsCommand(PortfolioHolding... holdings) {
@@ -234,42 +238,6 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
         .holdings(List.of(holdings))
         .dataProviders(MORNINGSTAR_ONLY)
         .build();
-  }
-
-  private static CashHolding cash(String id, Currency currency, long value) {
-    return CashHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.CASH)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
-        .currency(currency)
-        .build();
-  }
-
-  private static GicHolding gic(String id, Currency currency, long value, long termDays) {
-    return GicHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.GIC)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
-        .currency(currency)
-        .term(BigDecimal.valueOf(termDays))
-        .build();
-  }
-
-  private static PortfolioHolding equity(String ticker, String exchange, FinancialInstrumentType type,
-      Country country, long value) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), type, country,
-        EquitySecurityIdentifier.builder().id(ticker).idType(FiIdentifierType.TICKER_MIC).exchangeId(exchange).build());
-  }
-
-  private static PortfolioHolding etf(String ticker, FinancialInstrumentType type, Country country, long value) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), type, country,
-        new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
-  }
-
-  private static PortfolioHolding fund(String morningstarId, FinancialInstrumentType type, Country country,
-      long value) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), type, country,
-        new SecurityIdentifier(morningstarId, FiIdentifierType.MORNINGSTAR_ID));
   }
 
   private static void assertCloseTo(AssetAllocationResult result, AssetAllocationRegionType region,

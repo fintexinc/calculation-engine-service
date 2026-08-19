@@ -6,8 +6,6 @@ import com.fintex.ce.application.calculation.service.PortfolioWeightCalculator;
 import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
 import com.fintex.ce.model.domain.calculation.allocation.EquitySectorData;
-import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
@@ -17,7 +15,6 @@ import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,6 +30,9 @@ import static com.fintex.ce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_SECTOR_ALLOCATION;
 import static com.fintex.ce.model.error.ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC;
 import static com.fintex.ce.model.error.ErrorParams.HOLDING_ID;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType.ENERGY;
 import static com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType.FINANCIAL_SERVICES;
 import static com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType.TECHNOLOGY;
@@ -52,7 +52,7 @@ class EquitySectorExposureServiceTest {
 
   @Test
   void shouldAggregateSectorDistribution_whenHoldingIsFund() {
-    var fund = fund("RBF605", "100");
+    var fund = holding("RBF605", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(fund, sector(Currency.CAD, Map.of(TECHNOLOGY, new BigDecimal("0.7"),
         FINANCIAL_SERVICES, new BigDecimal("0.3"))));
 
@@ -69,7 +69,7 @@ class EquitySectorExposureServiceTest {
    */
   @Test
   void shouldContributeFullWeightToOneSector_whenHoldingIsStockWithSingleBucket() {
-    var stock = stock("T", "100");
+    var stock = holding("T", FiIdentifierType.TICKER, FinancialInstrumentType.STOCK, Country.CANADA, "100");
     var data = Map.of(stock, sector(Currency.CAD, Map.of(ENERGY, ONE)));
 
     var result = service.perform(command(stock), distributions(data));
@@ -81,8 +81,8 @@ class EquitySectorExposureServiceTest {
 
   @Test
   void shouldBlendByValue_whenPortfolioMixesFundAndStock() {
-    var fund = fund("RBF605", "100");
-    var stock = stock("T", "100");
+    var fund = holding("RBF605", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    var stock = holding("T", FiIdentifierType.TICKER, FinancialInstrumentType.STOCK, Country.CANADA, "100");
     var data = Map.of(
         fund, sector(Currency.CAD, Map.of(TECHNOLOGY, ONE)),
         stock, sector(Currency.CAD, Map.of(ENERGY, ONE)));
@@ -97,7 +97,7 @@ class EquitySectorExposureServiceTest {
 
   @Test
   void shouldWarnAndBucketUnknown_whenStockSectorMissing() {
-    var stock = stock("T", "100");
+    var stock = holding("T", FiIdentifierType.TICKER, FinancialInstrumentType.STOCK, Country.CANADA, "100");
 
     var result = service.perform(command(stock), distributions(Map.of()));
 
@@ -107,7 +107,7 @@ class EquitySectorExposureServiceTest {
 
   @Test
   void shouldWarnAndBucketUnknown_whenFundAllocationsAreEmpty() {
-    var fund = fund("RBF605", "100");
+    var fund = holding("RBF605", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(fund, sector(Currency.CAD, Map.of()));
 
     var result = service.perform(command(fund), distributions(data));
@@ -118,10 +118,8 @@ class EquitySectorExposureServiceTest {
 
   @Test
   void shouldReturnAllNullBuckets_whenOnlyCashAndGicHoldings() {
-    var cash = CashHolding.builder().value(new BigDecimal("100")).holdingType(FinancialInstrumentType.CASH)
-        .currency(Currency.CAD).build();
-    var gic = GicHolding.builder().value(new BigDecimal("100")).holdingType(FinancialInstrumentType.GIC)
-        .currency(Currency.CAD).build();
+    var cash = cash(Currency.CAD, "100");
+    var gic = gic(null, Currency.CAD, new BigDecimal("100"), null);
 
     var result = service.perform(command(cash, gic), distributions(Map.of()));
 
@@ -132,7 +130,7 @@ class EquitySectorExposureServiceTest {
   @ParameterizedTest
   @MethodSource("cashAndGicHoldings")
   void shouldExcludeHoldingFromWeighting_whenHoldingIsCashOrGic(PortfolioHolding excluded) {
-    var fund = fund("RBF605", "100");
+    var fund = holding("RBF605", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(fund, sector(Currency.CAD, Map.of(TECHNOLOGY, ONE)));
     when(fxRateService.spotRates(anySet(), any(), any())).thenReturn(Map.of());
 
@@ -145,8 +143,8 @@ class EquitySectorExposureServiceTest {
 
   @Test
   void shouldFxWeightSectors_whenHoldingsHaveDifferentCurrencies() {
-    var cadFund = fund("CAD-1", "100");
-    var usdFund = fund("USD-1", "100");
+    var cadFund = holding("CAD-1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    var usdFund = holding("USD-1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(
         cadFund, sector(Currency.CAD, Map.of(TECHNOLOGY, ONE)),
         usdFund, sector(Currency.USD, Map.of(FINANCIAL_SERVICES, ONE)));
@@ -162,8 +160,8 @@ class EquitySectorExposureServiceTest {
 
   @Test
   void shouldWeightByRawValueAndWarn_whenFxRateUnavailable() {
-    var cadFund = fund("CAD-1", "100");
-    var usdFund = fund("USD-1", "100");
+    var cadFund = holding("CAD-1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    var usdFund = holding("USD-1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(
         cadFund, sector(Currency.CAD, Map.of(TECHNOLOGY, ONE)),
         usdFund, sector(Currency.USD, Map.of(FINANCIAL_SERVICES, ONE)));
@@ -181,10 +179,8 @@ class EquitySectorExposureServiceTest {
 
   static Stream<PortfolioHolding> cashAndGicHoldings() {
     return Stream.of(
-        CashHolding.builder().value(new BigDecimal("100")).holdingType(FinancialInstrumentType.CASH)
-            .currency(Currency.CAD).build(),
-        GicHolding.builder().value(new BigDecimal("100")).holdingType(FinancialInstrumentType.GIC)
-            .currency(Currency.CAD).build());
+        cash(Currency.CAD, "100"),
+        gic(null, Currency.CAD, new BigDecimal("100"), null));
   }
 
   /**
@@ -195,7 +191,7 @@ class EquitySectorExposureServiceTest {
    */
   @Test
   void shouldKeepTheScalarSector_whenTheDistributionAttributeAnswersWithNoBuckets() {
-    var stock = stock("T", "100");
+    var stock = holding("T", FiIdentifierType.TICKER, FinancialInstrumentType.STOCK, Country.CANADA, "100");
     var securityData = SecurityData.builder()
         .with(CompositeSecurityAttribute.EQUITY_SECTOR, Map.of(stock, sector(Currency.CAD, Map.of(ENERGY, ONE))))
         .with(CompositeSecurityAttribute.EQUITY_SECTOR_ALLOCATION, Map.of(stock, sector(Currency.CAD, Map.of())))
@@ -209,7 +205,7 @@ class EquitySectorExposureServiceTest {
 
   @Test
   void shouldPreferTheDistribution_whenASecurityAnswersBothAttributesWithData() {
-    var fund = fund("RBF605", "100");
+    var fund = holding("RBF605", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var securityData = SecurityData.builder()
         .with(CompositeSecurityAttribute.EQUITY_SECTOR, Map.of(fund, sector(Currency.CAD, Map.of(ENERGY, ONE))))
         .with(CompositeSecurityAttribute.EQUITY_SECTOR_ALLOCATION,
@@ -235,7 +231,7 @@ class EquitySectorExposureServiceTest {
    */
   @Test
   void shouldReportUndistributedRatherThanUnresolved_whenOnlyAnEmptyDistributionCameBack() {
-    var fund = fund("RBF605", "100");
+    var fund = holding("RBF605", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var securityData = SecurityData.ofAttribute(CompositeSecurityAttribute.EQUITY_SECTOR_ALLOCATION,
         Map.of(fund, sector(Currency.CAD, Map.of())));
 
@@ -261,23 +257,6 @@ class EquitySectorExposureServiceTest {
 
   private static PortfolioHoldingsCommand command(PortfolioHolding... holdings) {
     return PortfolioHoldingsCommand.builder().holdings(List.of(holdings)).build();
-  }
-
-  private static PortfolioHolding fund(String id, String value) {
-    return holding(FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, id, value);
-  }
-
-  private static PortfolioHolding stock(String id, String value) {
-    return holding(FinancialInstrumentType.STOCK, Country.CANADA, id, value);
-  }
-
-  private static PortfolioHolding holding(FinancialInstrumentType type, Country country, String id, String value) {
-    return PortfolioHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(type)
-        .country(country)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
-        .build();
   }
 
   private static EquitySector sector(Currency currency, Map<EquitySectorAllocationType, BigDecimal> allocations) {

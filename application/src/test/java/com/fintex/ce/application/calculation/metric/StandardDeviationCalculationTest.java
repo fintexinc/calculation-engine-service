@@ -4,8 +4,6 @@ import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
-import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.ce.model.error.exceptions.CalculationException;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
@@ -15,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -30,7 +27,7 @@ import static com.fintex.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
 import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -175,22 +172,21 @@ class StandardDeviationCalculationTest {
     assertNull(actual);
   }
 
+  /**
+   * Pins that portfolio calendar gaps no longer raise an error: the window keeps values 3..10, 13, 14, so the
+   * annualized sample deviation is sqrt(120.9 / 11) * sqrt(12).
+   */
   @Test
-  void shouldThrowMissingPortfolioReturnError_whenRequestedWindowContainsMissingMonths() {
-    TreeMap<LocalDate, BigDecimal> returns = monthlyReturns(LocalDate.parse("2024-01-31"), 14);
+  void shouldCalculateAvailableReturns_whenPortfolioSeriesContainsCalendarGaps() {
+    TreeMap<LocalDate, BigDecimal> returns = monthlyReturnsWithIncreasingValues(LocalDate.parse("2024-01-31"), 14);
     returns.remove(LocalDate.parse("2024-11-30"));
     returns.remove(LocalDate.parse("2024-12-31"));
     StandardDeviationCalculation<StandardDeviationResult> calculation = new StandardDeviationCalculation<>(
         new PeriodCalculationInput(null, returns), Set.of());
 
-    assertThatThrownBy(() -> calculation.calculatePeriodForNumberOfMonths(TWELVE))
-        .isInstanceOfSatisfying(CalculationException.class, exception -> {
-          assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE);
-          assertThat(exception).hasMessage("The portfolio's monthly return data does not cover every month in "
-              + "the requested date range. Missing months: 2024-11-30, 2024-12-31");
-          assertThat(exception.getMetadata()).containsExactlyEntriesOf(
-              Map.of("param-1", "2024-11-30, 2024-12-31"));
-        });
+    BigDecimal actual = calculation.calculatePeriodForNumberOfMonths(TWELVE);
+
+    assertThat(actual).isCloseTo(new BigDecimal("11.484376739331938"), within(new BigDecimal("0.000000000001")));
   }
 
   @Test
@@ -268,10 +264,11 @@ class StandardDeviationCalculationTest {
     assertEquals(expected, actual.getStandardDeviation());
   }
 
-  private static TreeMap<LocalDate, BigDecimal> monthlyReturns(LocalDate startDate, int months) {
+  private static TreeMap<LocalDate, BigDecimal> monthlyReturnsWithIncreasingValues(LocalDate startDate, int months) {
     return IntStream.range(0, months)
-        .mapToObj(startDate::plusMonths)
-        .collect(Collectors.toMap(date -> toLastDayOfMonth(date), date -> ONE, (left, right) -> right, TreeMap::new));
+        .boxed()
+        .collect(Collectors.toMap(month -> toLastDayOfMonth(startDate.plusMonths(month)),
+            month -> BigDecimal.valueOf(month + 1L), (left, right) -> right, TreeMap::new));
   }
 
   private static void stubCompleteCoverage(NavigableMap<LocalDate, BigDecimal> returns) {

@@ -17,12 +17,7 @@ import com.fintex.wm.commons.domain.allocation.RegionDatapoint;
 import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
-import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Geography;
-import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.mutualFund;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.stock;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -123,10 +123,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   @Test
   void cashHolding_classifiedAs100PercentCash() {
-    CashHolding cash = CashHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.CASH)
-        .build();
+    CashHolding cash = cash(null, BigDecimal.TEN);
 
     R result = service.perform(command(cash), data(Map.of(), Map.of()));
 
@@ -136,11 +133,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   @Test
   void gicHolding_longTerm_classifiedAsFixedIncome() {
-    GicHolding gic = GicHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.GIC)
-        .term(BigDecimal.valueOf(365))
-        .build();
+    GicHolding gic = gic(null, null, BigDecimal.TEN, BigDecimal.valueOf(365));
 
     R result = service.perform(command(gic), data(Map.of(), Map.of()));
 
@@ -149,11 +142,7 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   @Test
   void gicHolding_shortTerm_classifiedAsCash() {
-    GicHolding gic = GicHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.GIC)
-        .term(BigDecimal.valueOf(100))
-        .build();
+    GicHolding gic = gic(null, null, BigDecimal.TEN, BigDecimal.valueOf(100));
 
     R result = service.perform(command(gic), data(Map.of(), Map.of()));
 
@@ -269,11 +258,8 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   @Test
   void mixedPortfolio_cashAndUsStock_weightedAggregate() {
-    CashHolding cash = CashHolding.builder()
-        .value(BigDecimal.valueOf(50))
-        .holdingType(FinancialInstrumentType.CASH)
-        .build();
-    PortfolioHolding stock = stock("AAPL").toBuilder().value(BigDecimal.valueOf(50)).build();
+    CashHolding cash = cash(null, BigDecimal.valueOf(50));
+    PortfolioHolding stock = stock("AAPL", BigDecimal.valueOf(50));
 
     Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.USA)).build();
 
@@ -287,11 +273,8 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   @Test
   void mixedPortfolio_cashAndEmergingMarketStock_weightedAggregate() {
-    CashHolding cash = CashHolding.builder()
-        .value(BigDecimal.valueOf(50))
-        .holdingType(FinancialInstrumentType.CASH)
-        .build();
-    PortfolioHolding emStock = stock("BABA").toBuilder().value(BigDecimal.valueOf(50)).build();
+    CashHolding cash = cash(null, BigDecimal.valueOf(50));
+    PortfolioHolding emStock = stock("BABA", BigDecimal.valueOf(50));
 
     Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.EMERGING_MARKETS)).build();
 
@@ -302,8 +285,8 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   @Test
   void samsungPlusEmEtf_aggregatesPerServiceConvention() {
-    PortfolioHolding samsung = stock("005930").toBuilder().value(BigDecimal.valueOf(50)).build();
-    PortfolioHolding emEtf = etf("CSEMAS").toBuilder().value(BigDecimal.valueOf(50)).build();
+    PortfolioHolding samsung = stock("005930", BigDecimal.valueOf(50));
+    PortfolioHolding emEtf = etf("CSEMAS", BigDecimal.valueOf(50));
 
     Geography koreaGeography = Geography.builder().region(regionDatapoint(SecurityRegion.EMERGING_MARKETS)).build();
 
@@ -354,12 +337,8 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   @Test
   void currencyAdjustedWeights_usdHoldingsConvertedToCadBeforeWeighting() {
-    CashHolding cadCash = CashHolding.builder()
-        .value(BigDecimal.valueOf(100))
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(Currency.CAD)
-        .build();
-    PortfolioHolding usStock = stock("AAPL").toBuilder().value(BigDecimal.valueOf(100)).build();
+    CashHolding cadCash = cash(Currency.CAD, BigDecimal.valueOf(100));
+    PortfolioHolding usStock = stock("AAPL", BigDecimal.valueOf(100));
 
     Geography usGeography = Geography.builder()
         .region(regionDatapoint(SecurityRegion.USA))
@@ -378,12 +357,8 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
 
   @Test
   void missingFxRate_fallsBackToOriginalValuesAndAddsWarning() {
-    CashHolding cadCash = CashHolding.builder()
-        .value(BigDecimal.valueOf(100))
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(Currency.CAD)
-        .build();
-    PortfolioHolding usStock = stock("AAPL").toBuilder().value(BigDecimal.valueOf(100)).build();
+    CashHolding cadCash = cash(Currency.CAD, BigDecimal.valueOf(100));
+    PortfolioHolding usStock = stock("AAPL", BigDecimal.valueOf(100));
 
     Geography usGeography = Geography.builder()
         .region(regionDatapoint(SecurityRegion.USA))
@@ -423,21 +398,6 @@ abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResul
     PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
     when(command.getHoldings()).thenReturn(List.of(holdings));
     return command;
-  }
-
-  protected static PortfolioHolding stock(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.STOCK, Country.USA,
-        EquitySecurityIdentifier.builder().id(ticker).idType(FiIdentifierType.TICKER).exchangeId("XNAS").build());
-  }
-
-  protected static PortfolioHolding etf(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.USA,
-        EquitySecurityIdentifier.builder().id(ticker).idType(FiIdentifierType.TICKER).exchangeId("XNAS").build());
-  }
-
-  protected static PortfolioHolding mutualFund(String fundserv) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-        new SecurityIdentifier(fundserv, FiIdentifierType.FUNDSERV));
   }
 
   protected static RegionDatapoint regionDatapoint(SecurityRegion region) {

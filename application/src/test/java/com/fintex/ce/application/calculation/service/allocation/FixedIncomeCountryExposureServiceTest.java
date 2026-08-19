@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.model.error.ErrorCode.MISSING_BOND_COUNTRY_EXPOSURE;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -43,7 +44,8 @@ class FixedIncomeCountryExposureServiceTest {
 
   @Test
   void shouldAggregateCountryRegions_whenHoldingHasAllocation() {
-    var bond = bond("XBB", "100");
+    var bond = holding(new SecurityIdentifier("XBB", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(bond,
         exposure(Map.of(Country.CANADA, new BigDecimal("0.7"), Country.USA, new BigDecimal("0.3"))));
 
@@ -56,7 +58,8 @@ class FixedIncomeCountryExposureServiceTest {
 
   @Test
   void shouldBucketSupranationalIntoOther_whenNonCountryExposurePresent() {
-    var bond = bond("XBB", "100");
+    var bond = holding(new SecurityIdentifier("XBB", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(bond, exposure(Map.of(
         Country.CANADA, new BigDecimal("0.6"),
         Country.USA, new BigDecimal("0.2"),
@@ -76,7 +79,8 @@ class FixedIncomeCountryExposureServiceTest {
    */
   @Test
   void shouldRescaleToOneHundredPercent_whenAllocationsDoNotSumToOne() {
-    var bond = bond("XBB", "100");
+    var bond = holding(new SecurityIdentifier("XBB", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(bond, exposure(Map.of(Country.CANADA, new BigDecimal("0.5"))));
 
     var result = service.perform(command(bond), data);
@@ -86,7 +90,8 @@ class FixedIncomeCountryExposureServiceTest {
 
   @Test
   void shouldWarnAndReturnAllNullBuckets_whenDataMissing() {
-    var bond = bond("XBB", "100");
+    var bond = holding(new SecurityIdentifier("XBB", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     var result = service.perform(command(bond), Map.of());
 
@@ -96,15 +101,6 @@ class FixedIncomeCountryExposureServiceTest {
 
   private static PortfolioHoldingsCommand command(PortfolioHolding... holdings) {
     return PortfolioHoldingsCommand.builder().holdings(List.of(holdings)).build();
-  }
-
-  private static PortfolioHolding bond(String id, String value) {
-    return PortfolioHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
-        .country(Country.CANADA)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
-        .build();
   }
 
   private static CountryExposure exposure(Map<Country, BigDecimal> allocations) {

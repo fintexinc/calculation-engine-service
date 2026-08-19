@@ -1,8 +1,6 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ConsolidatedSectorExposureResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
@@ -22,7 +20,6 @@ import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
@@ -46,6 +43,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.fund;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.stockCa;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -80,7 +82,7 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
    * of spelling out how a holding id is composed — for a {@code TICKER_MIC} identifier that is
    * {@code STOCK-<ticker>-<exchange>}, which is the identifier layer's business, not this metric's.
    */
-  private static final PortfolioHolding STOCK = stock("RY.TO", "TSX", 15_000);
+  private static final PortfolioHolding STOCK = stockCa("RY.TO", "TSX", 15_000);
 
   private static MockWebServer bocMockServer;
 
@@ -117,7 +119,7 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
   protected String requestBodyForMicUnavailableScenario() {
-    return writeJson(sectorExposureCommand(CalculationMetric.SECTOR_EXPOSURE, etf(BALANCED_ETF, 50_000)));
+    return writeJson(sectorExposureCommand(CalculationMetric.SECTOR_EXPOSURE, etfCa(BALANCED_ETF, 50_000)));
   }
 
   /**
@@ -144,14 +146,14 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   @Override
   protected String requestBodyForPositiveMicScenario() {
     return writeJson(sectorExposureCommand(CalculationMetric.SECTOR_EXPOSURE,
-        fund(EQUITY_FUND, FinancialInstrumentType.MUTUAL_FUND, 40_000),
-        fund(SEGREGATED_FUND, FinancialInstrumentType.SEGREGATED_FUND, 20_000),
-        etf(BALANCED_ETF, 30_000),
-        etf(BOND_ETF, 20_000),
+        fund(EQUITY_FUND, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, 40_000),
+        fund(SEGREGATED_FUND, FinancialInstrumentType.SEGREGATED_FUND, Country.CANADA, 20_000),
+        etfCa(BALANCED_ETF, 30_000),
+        etfCa(BOND_ETF, 20_000),
         STOCK,
         cash(Currency.USD, 10_000),
-        gic(20_000, 180),
-        gic(20_000, 1095)));
+        gic(null, Currency.CAD, BigDecimal.valueOf(20_000), BigDecimal.valueOf(180)),
+        gic(null, Currency.CAD, BigDecimal.valueOf(20_000), BigDecimal.valueOf(1095))));
   }
 
   /**
@@ -198,7 +200,7 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
     PeriodCommand command = new PeriodCommand();
     command.setMetric(CalculationMetric.SHARPE_RATIO);
     command.setCurrency(Currency.CAD);
-    command.setHoldings(List.of(etf(BALANCED_ETF, 50_000)));
+    command.setHoldings(List.of(etfCa(BALANCED_ETF, 50_000)));
     return writeJson(command);
   }
 
@@ -249,8 +251,8 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
         sectorValue(SectorAllocationType.ENERGY, "1.0"))), List.of()));
 
     var response = postCalculation(writeJson(sectorExposureCommand(CalculationMetric.SECTOR_EXPOSURE,
-        etf(BALANCED_ETF, 50_000),
-        etf("MISSING", 50_000))));
+        etfCa(BALANCED_ETF, 50_000),
+        etfCa("MISSING", 50_000))));
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     ConsolidatedSectorExposureResult result = readJson(response.responseBody(),
@@ -300,38 +302,6 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
         .metric(metric)
         .dataProviders(List.of(DataProvider.MORNINGSTAR))
         .holdings(List.of(holdings))
-        .build();
-  }
-
-  private static PortfolioHolding etf(String ticker, long value) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
-  }
-
-  private static PortfolioHolding fund(String morningstarId, FinancialInstrumentType type, long value) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), type, Country.CANADA,
-        new SecurityIdentifier(morningstarId, FiIdentifierType.MORNINGSTAR_ID));
-  }
-
-  private static PortfolioHolding stock(String ticker, String exchange, long value) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), FinancialInstrumentType.STOCK, Country.CANADA,
-        EquitySecurityIdentifier.builder().id(ticker).idType(FiIdentifierType.TICKER_MIC).exchangeId(exchange).build());
-  }
-
-  private static PortfolioHolding cash(Currency currency, long value) {
-    return CashHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(currency)
-        .build();
-  }
-
-  private static PortfolioHolding gic(long value, int termDays) {
-    return GicHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.GIC)
-        .currency(Currency.CAD)
-        .term(BigDecimal.valueOf(termDays))
         .build();
   }
 

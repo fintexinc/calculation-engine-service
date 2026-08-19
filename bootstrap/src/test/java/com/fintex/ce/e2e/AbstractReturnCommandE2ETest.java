@@ -1,15 +1,10 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.enumeration.InterestFreq;
-import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
-import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -17,7 +12,6 @@ import com.fintex.wm.commons.domain.performance.MonthlyReturns;
 import com.fintex.wm.commons.domain.value.DateBigDecimalValue;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,74 +45,6 @@ abstract class AbstractReturnCommandE2ETest extends AbstractPortfolioCalculation
     command.setCurrency(currency);
     command.setHoldings(holdings);
     return command;
-  }
-
-  protected static PortfolioHolding etfCanada(SecurityIdentifier securityIdentifier, String value) {
-    return new PortfolioHolding(
-        new BigDecimal(value),
-        FinancialInstrumentType.ETF,
-        Country.CANADA,
-        securityIdentifier);
-  }
-
-  protected static PortfolioHolding usEtf(SecurityIdentifier securityIdentifier, String value) {
-    return new PortfolioHolding(
-        new BigDecimal(value),
-        FinancialInstrumentType.ETF,
-        Country.USA,
-        securityIdentifier);
-  }
-
-  protected static PortfolioHolding stockCanada(EquitySecurityIdentifier securityIdentifier, String value) {
-    return new PortfolioHolding(
-        new BigDecimal(value),
-        FinancialInstrumentType.STOCK,
-        Country.CANADA,
-        securityIdentifier);
-  }
-
-  protected static PortfolioHolding fund(SecurityIdentifier morningstarId, FinancialInstrumentType type,
-      Country country, String value) {
-    return new PortfolioHolding(new BigDecimal(value), type, country, morningstarId);
-  }
-
-  protected static PortfolioHolding fundServ(SecurityIdentifier fundservId, String value) {
-    return new PortfolioHolding(
-        new BigDecimal(value),
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        fundservId);
-  }
-
-  protected static CashHolding cash(Currency currency, String value) {
-    return CashHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(currency)
-        .build();
-  }
-
-  protected static GicHolding gic(Currency currency, String value, String termDays, String clientIntRatePercent) {
-    return GicHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.GIC)
-        .currency(currency)
-        .investmentDate(LocalDate.of(2024, 1, 1))
-        .clientIntRate(new BigDecimal(clientIntRatePercent))
-        .interestFreq(InterestFreq.MONTHLY)
-        .term(new BigDecimal(termDays))
-        .build();
-  }
-
-  protected static GicHolding gicWithoutInterestRate(Currency currency, String value, String termDays) {
-    return GicHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.GIC)
-        .currency(currency)
-        .investmentDate(LocalDate.of(2024, 1, 1))
-        .interestFreq(InterestFreq.MONTHLY)
-        .term(new BigDecimal(termDays))
-        .build();
   }
 
   protected static MonthlyReturns monthlyReturns(List<DateBigDecimalValue> returns, DataProvider provider,
