@@ -17,10 +17,13 @@ import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.value.MultilingualString;
 
-import org.junit.jupiter.api.Disabled;
+import org.springframework.http.HttpStatus;
+
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +32,6 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("e2e")
-@Disabled("Temporarily disabled until Top Holdings document-aligned behavior is implemented. " +
-    "JIRA: https://fintexinc.atlassian.net/browse/TMI-398")
 class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @Override
@@ -123,6 +124,108 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(byName.get("Echo Corp").getParentHolding()).hasSize(1);
   }
 
+  @Test
+  void shouldAggregateSharedHoldingBeyondTopTwentyFiveAcrossPortfolioHoldings() {
+    SecurityIdentifier parentAId = new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER);
+    SecurityIdentifier parentBId = new SecurityIdentifier("BBB_PARENT", FiIdentifierType.FUNDSERV);
+
+    List<SecurityHolding> parentBHoldings = new ArrayList<>();
+
+    // Use distinct, intentionally unordered weights so the expected result
+    // order proves that holdings are sorted by calculated allocation rather
+    // than preserving the MIC input order.
+    String[] weights = {
+        "18.0", "24.0", "15.0", "22.0", "20.0",
+        "26.0", "17.0", "25.0", "19.0", "23.0",
+        "21.0", "16.0", "14.0", "13.0", "12.0",
+        "11.0", "10.0", "9.0", "8.0", "7.0",
+        "6.0", "5.0", "4.0", "3.0", "2.0"
+    };
+
+    // Add 25 holdings with weights higher than Shared Corp,
+    // placing Shared Corp outside Parent B's top 25.
+    for (int i = 1; i <= 25; i++) {
+      parentBHoldings.add(allocation(
+          "Filler Corp " + i,
+          "E",
+          weights[i - 1],
+          "10000"));
+    }
+
+    // Shared Corp is the 26th holding in Parent B.
+    parentBHoldings.add(allocation(
+        "Shared Corp",
+        "E",
+        "1.0",
+        "5000"));
+
+    var micResponse = List.of(
+        securityAttributeResult(
+            parentAId,
+            holdings(
+                allocation(
+                    "Shared Corp",
+                    "E",
+                    "20.0",
+                    "50000"))),
+        securityAttributeResult(
+            parentBId,
+            holdings(
+                parentBHoldings.toArray(SecurityHolding[]::new))));
+
+    enqueueMicMockResponse(writeJson(micResponse));
+
+    var command = new TopCommonHoldingsCommand();
+    command.setMetric(CalculationMetric.TOP_COMMON_HOLDINGS);
+    command.setNumOfTopCommonHoldings(10);
+    command.setHoldings(List.of(
+        holding(parentAId, 60_000),
+        holding(parentBId, 40_000)));
+    command.setDataProviders(List.of(DataProvider.MORNINGSTAR));
+
+    HttpResponse response = postCalculation(writeJson(command));
+
+    assertThat(response.status().value())
+        .isEqualTo(HttpStatus.OK.value());
+
+    TopCommonHoldingsResult result = readJson(response.responseBody(), TopCommonHoldingsResult.class);
+
+    assertThat(result.getWarnings()).isEmpty();
+
+    // Verify the whole Top 10 result is ordered by calculated allocation
+    // rather than by the MIC input order.
+    assertThat(result.getCommonHoldings())
+        .extracting(TopCommonHoldingData::getName)
+        .containsExactly(
+            "Shared Corp",
+            "Filler Corp 6",
+            "Filler Corp 8",
+            "Filler Corp 2",
+            "Filler Corp 10",
+            "Filler Corp 4",
+            "Filler Corp 11",
+            "Filler Corp 5",
+            "Filler Corp 9",
+            "Filler Corp 1");
+
+    TopCommonHoldingData sharedHolding = result.getCommonHoldings().stream()
+        .filter(holding -> "Shared Corp".equals(holding.getName()))
+        .findFirst()
+        .orElseThrow();
+
+    // Parent A: 60% × 20% = 12%
+    // Parent B: 40% × 1% = 0.4%
+    // Total: 12.4% = 0.124
+    assertThat(sharedHolding.getAllocation())
+        .isEqualByComparingTo("0.124");
+
+    assertThat(sharedHolding.getNumOfFunds())
+        .isEqualTo(2);
+
+    assertThat(sharedHolding.getParentHolding())
+        .hasSize(2);
+  }
+
   private static PortfolioHolding holding(SecurityIdentifier securityIdentifier, int value) {
     return new PortfolioHolding(
         BigDecimal.valueOf(value),
@@ -132,11 +235,11 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
   }
 
   private static Holdings holdings(SecurityHolding... allocations) {
-    var th = new Holdings();
-    th.setAllocation(List.of(allocations));
-    th.setDataProviders(List.of(DataProvider.MORNINGSTAR));
-    th.setCurrency(Currency.CAD);
-    return th;
+    var h = new Holdings();
+    h.setAllocation(List.of(allocations));
+    h.setCurrency(Currency.CAD);
+    h.setDataProviders(List.of(DataProvider.MORNINGSTAR));
+    return h;
   }
 
   private static SecurityHolding allocation(

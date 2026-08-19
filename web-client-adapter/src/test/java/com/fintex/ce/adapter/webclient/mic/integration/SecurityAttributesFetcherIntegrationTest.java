@@ -313,6 +313,50 @@ class SecurityAttributesFetcherIntegrationTest {
   }
 
   @Test
+  void shouldPreserveHoldingsBeyondTopTwentyFive_whenMicReturnsLimitedHoldings() throws Exception {
+    PortfolioHolding etf = holding("ETF-WITH-MANY-HOLDINGS");
+
+    List<SecurityHolding> holdings = IntStream.rangeClosed(1, 41)
+        .mapToObj(index -> securityHolding(
+            "Holding " + index,
+            String.valueOf(50 - index),
+            "ID-" + index))
+        .toList();
+
+    enqueueArrayResponse(List.of(
+        attributeRow(
+            "ETF-WITH-MANY-HOLDINGS",
+            limitedHoldings(
+                Currency.CAD,
+                holdings.toArray(SecurityHolding[]::new)))));
+
+    Map<PortfolioHolding, CommonTopHoldings> mapped = securityAttributesFetcher.fetch(
+        List.of(etf),
+        CompositeSecurityAttribute.LIMITED_HOLDINGS,
+        List.of(DataProvider.MORNINGSTAR));
+
+    RecordedRequest recorded = micMockServer.takeRequest();
+
+    assertThat(recorded.getMethod()).isEqualTo("POST");
+    assertThat(recorded.getPath())
+        .isEqualTo(
+            ATTRIBUTES_PATH + "/"
+                + CompositeSecurityAttribute.LIMITED_HOLDINGS.getAttributeName());
+
+    assertThat(mapped).containsOnlyKeys(etf);
+
+    assertThat(mapped.get(etf).getHoldings())
+        .hasSize(41);
+
+    assertThat(mapped.get(etf).getHoldings())
+        .extracting(holding -> holding.getPrimaryIdentifier().getId())
+        .containsExactly(
+            IntStream.rangeClosed(1, 41)
+                .mapToObj(index -> "ID-" + index)
+                .toArray(String[]::new));
+  }
+
+  @Test
   void shouldPreserveNullHoldingFields_whenMicOmitsCurrencyAndWeight() throws Exception {
     PortfolioHolding missingCurrency = holding("NO-CURRENCY");
     PortfolioHolding missingWeight = holding("NO-WEIGHT");
