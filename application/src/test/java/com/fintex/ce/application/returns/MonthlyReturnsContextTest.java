@@ -16,13 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MonthlyReturnsContextTest {
 
-  private static final PortfolioHolding SPY = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
-      new SecurityIdentifier("SPY", FiIdentifierType.TICKER));
+  private static final PortfolioHolding SPY = holding(
+      new SecurityIdentifier("SPY", FiIdentifierType.TICKER), FinancialInstrumentType.ETF, Country.USA,
+      (BigDecimal) null);
 
   @Test
   void shouldReplaceSnapshot_whenWithSnapshot() {

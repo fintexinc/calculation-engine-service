@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -44,7 +46,11 @@ class UniqueHoldingsReqValidatorTest {
                 gicHolding(Currency.CAD, new BigDecimal("365.0"), new BigDecimal("2.50"), "GIC B")),
             ErrorCode.DUPLICATE_GIC_HOLDING),
         Arguments.of(
-            List.of(fundHolding("ID1", BigDecimal.TEN), fundHolding("ID1", BigDecimal.ONE)),
+            List.of(
+                holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+                    BigDecimal.TEN),
+                holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+                    BigDecimal.ONE)),
             ErrorCode.DUPLICATE_HOLDING));
   }
 
@@ -65,7 +71,8 @@ class UniqueHoldingsReqValidatorTest {
   @Test
   void shouldThrow_whenBenchmarkHoldingsContainDuplicates() {
     PeriodCommand command = new PeriodCommand();
-    command.setHoldings(List.of(fundHolding("ID1", BigDecimal.TEN)));
+    command.setHoldings(List.of(holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA, BigDecimal.TEN)));
     command.setBenchmarkHoldings(List.of(cashHolding(Currency.CAD), cashHolding(Currency.CAD)));
 
     assertThatThrownBy(() -> validator.validate(command))
@@ -80,7 +87,11 @@ class UniqueHoldingsReqValidatorTest {
   void shouldThrow_whenMultiplePortfoliosCommandContainsPortfolioWithDuplicates() {
     MultiplePortfoliosCommand command = new MultiplePortfoliosCommand();
     command.setPortfolios(Set.of(new MultiplePortfoliosCommand.Portfolio(
-        List.of(fundHolding("ID1", BigDecimal.TEN), fundHolding("ID1", BigDecimal.ONE)))));
+        List.of(
+            holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+                BigDecimal.TEN),
+            holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+                BigDecimal.ONE)))));
 
     assertThatThrownBy(() -> validator.validate(command))
         .isInstanceOf(ValidationException.class)
@@ -102,10 +113,12 @@ class UniqueHoldingsReqValidatorTest {
         gicHolding(Currency.CAD, BigDecimal.valueOf(730), BigDecimal.valueOf(2.5), "GIC B"),
         gicHolding(Currency.CAD, BigDecimal.valueOf(365), BigDecimal.valueOf(3.5), "GIC C"),
         gicHolding(Currency.USD, BigDecimal.valueOf(365), BigDecimal.valueOf(2.5), "GIC D"),
-        fundHolding("ID1", BigDecimal.TEN),
-        fundHolding("ID2", BigDecimal.TEN),
-        new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-            new SecurityIdentifier("ID1", FiIdentifierType.FUNDSERV)));
+        holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+            BigDecimal.TEN),
+        holding("ID2", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+            BigDecimal.TEN),
+        holding(new SecurityIdentifier("ID1", FiIdentifierType.FUNDSERV),
+            FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN));
 
     PeriodCommand command = new PeriodCommand();
     command.setHoldings(holdings);
@@ -136,11 +149,7 @@ class UniqueHoldingsReqValidatorTest {
   }
 
   private static CashHolding cashHolding(Currency currency) {
-    return CashHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(currency)
-        .build();
+    return cash(currency, BigDecimal.TEN);
   }
 
   private static GicHolding gicHolding(Currency currency, BigDecimal term, BigDecimal clientIntRate, String name) {
@@ -152,10 +161,5 @@ class UniqueHoldingsReqValidatorTest {
         .clientIntRate(clientIntRate)
         .name(name)
         .build();
-  }
-
-  private static PortfolioHolding fundHolding(String id, BigDecimal value) {
-    return new PortfolioHolding(value, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-        new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 }

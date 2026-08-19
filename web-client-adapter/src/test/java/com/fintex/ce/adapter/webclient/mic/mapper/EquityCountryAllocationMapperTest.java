@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.mic.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.EquityCountryAllocation;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.allocation.CountryAllocationValue;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EquityCountryAllocationMapperTest {
@@ -34,7 +34,8 @@ class EquityCountryAllocationMapperTest {
     micResponse.setAllocations(List.of(canada, usa));
     micResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    EquityCountryAllocation result = mapper.map(micResponse, createHolding("SEC-001"));
+    EquityCountryAllocation result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-001", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
     assertThat(result.getAllocations()).hasSize(2);
@@ -44,7 +45,8 @@ class EquityCountryAllocationMapperTest {
 
   @Test
   void shouldReturnEmptyAllocations_whenResponseIsNull() {
-    EquityCountryAllocation result = mapper.map(null, createHolding("SEC-002"));
+    EquityCountryAllocation result = mapper.map(null, holding(new SecurityIdentifier("SEC-002", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getAllocations()).isEmpty();
@@ -55,7 +57,8 @@ class EquityCountryAllocationMapperTest {
     var micResponse = new CountryAllocation();
     micResponse.setAllocations(null);
 
-    EquityCountryAllocation result = mapper.map(micResponse, createHolding("SEC-003"));
+    EquityCountryAllocation result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-003", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -67,14 +70,10 @@ class EquityCountryAllocationMapperTest {
     micResponse.setAllocations(List.of());
     micResponse.setDataProviders(null);
 
-    EquityCountryAllocation result = mapper.map(micResponse, createHolding("SEC-004"));
+    EquityCountryAllocation result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-004", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    var identifier = new SecurityIdentifier();
-    identifier.setId(securityId);
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA, identifier);
-  }
 }

@@ -13,16 +13,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PerformancePeriodCalculatorTest {
 
-  private static final PortfolioHolding HOLDING_A = new PortfolioHolding(null, null,
-      new SecurityIdentifier("A", FiIdentifierType.TICKER));
-  private static final PortfolioHolding HOLDING_B = new PortfolioHolding(null, null,
-      new SecurityIdentifier("B", FiIdentifierType.TICKER));
-  private static final PortfolioHolding HOLDING_C = new PortfolioHolding(null, null,
-      new SecurityIdentifier("C", FiIdentifierType.TICKER));
+  private static final PortfolioHolding HOLDING_A = holdingWithoutCountry(
+      new SecurityIdentifier("A", FiIdentifierType.TICKER), null, null);
+  private static final PortfolioHolding HOLDING_B = holdingWithoutCountry(
+      new SecurityIdentifier("B", FiIdentifierType.TICKER), null, null);
+  private static final PortfolioHolding HOLDING_C = holdingWithoutCountry(
+      new SecurityIdentifier("C", FiIdentifierType.TICKER), null, null);
 
   @Test
   void shouldReturnLatestStartingHoldingFirstDate_whenFindPerformanceStartDate() {

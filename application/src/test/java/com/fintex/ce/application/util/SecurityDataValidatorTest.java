@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -19,7 +20,8 @@ class SecurityDataValidatorTest {
 
   @Test
   void passes_whenAllMandatoryHoldingsHaveRawDataEntry() {
-    final var fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, "100");
+    final var fund = holdingWithoutCountry(new SecurityIdentifier("CIG-001", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.MUTUAL_FUND, new BigDecimal("100"));
     final var rawData = Map.of(fund, "fee-data");
 
     assertThatCode(() -> SecurityDataValidator.requireDataForEveryHolding(rawData, List.of(fund), h -> true))
@@ -28,8 +30,10 @@ class SecurityDataValidatorTest {
 
   @Test
   void throws_whenMandatoryHoldingHasNoRawDataEntry() {
-    final var present = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, "100");
-    final var missing = holding("US-MISSING", FinancialInstrumentType.MUTUAL_FUND, "100");
+    final var present = holdingWithoutCountry(new SecurityIdentifier("CIG-001", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.MUTUAL_FUND, new BigDecimal("100"));
+    final var missing = holdingWithoutCountry(new SecurityIdentifier("US-MISSING", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.MUTUAL_FUND, new BigDecimal("100"));
     final var rawData = Map.of(present, "fee-data");
 
     assertThatThrownBy(
@@ -41,8 +45,10 @@ class SecurityDataValidatorTest {
 
   @Test
   void exemptHoldings_areSkipped_evenWhenAbsentFromRawData() {
-    final var fund = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, "100");
-    final var stock = holding("AAPL", FinancialInstrumentType.STOCK, "100");
+    final var fund = holdingWithoutCountry(new SecurityIdentifier("CIG-001", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.MUTUAL_FUND, new BigDecimal("100"));
+    final var stock = holdingWithoutCountry(new SecurityIdentifier("AAPL", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.STOCK, new BigDecimal("100"));
     final var rawData = Map.of(fund, "fee-data");
 
     // Only fund holdings are mandatory — the stock is exempt and its absence from rawData is fine.
@@ -59,16 +65,10 @@ class SecurityDataValidatorTest {
     // identifier. The data source dedupes by identifier so the rawData map might only carry one entry for the shared
     // id. The validator must still accept both because the identifier IS represented in the response.
     final var sharedId = new SecurityIdentifier("CIG-DUP", FiIdentifierType.MORNINGSTAR_ID);
-    final var fundA = PortfolioHolding.builder()
-        .value(new BigDecimal("100"))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
-        .securityIdentifier(sharedId)
-        .build();
-    final var fundB = PortfolioHolding.builder()
-        .value(new BigDecimal("300"))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
-        .securityIdentifier(sharedId)
-        .build();
+    final var fundA = holdingWithoutCountry(sharedId, FinancialInstrumentType.MUTUAL_FUND,
+        new BigDecimal("100"));
+    final var fundB = holdingWithoutCountry(sharedId, FinancialInstrumentType.MUTUAL_FUND,
+        new BigDecimal("300"));
     final var rawData = Map.of(fundA, "fee-data"); // only one entry, despite two holdings requested
 
     assertThatCode(() -> SecurityDataValidator.requireDataForEveryHolding(
@@ -88,11 +88,4 @@ class SecurityDataValidatorTest {
         .isInstanceOf(CalculationException.class);
   }
 
-  private static PortfolioHolding holding(String id, FinancialInstrumentType type, String value) {
-    return PortfolioHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(type)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.MORNINGSTAR_ID))
-        .build();
-  }
 }

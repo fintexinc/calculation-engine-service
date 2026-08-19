@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,7 +34,8 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-02-28", "-0.0080")));
     micResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    HoldingMonthlyReturns result = mapper.map(micResponse, createHolding("SEC-001"));
+    HoldingMonthlyReturns result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-001", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -46,7 +48,8 @@ class MonthlyReturnsMapperTest {
 
   @Test
   void shouldReturnEmptyReturns_whenResponseIsNull() {
-    HoldingMonthlyReturns result = mapper.map(null, createHolding("SEC-002"));
+    HoldingMonthlyReturns result = mapper.map(null, holding(new SecurityIdentifier("SEC-002", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getReturns()).isEmpty();
@@ -57,7 +60,8 @@ class MonthlyReturnsMapperTest {
     var micResponse = new MonthlyReturns();
     micResponse.setReturns(null);
 
-    HoldingMonthlyReturns result = mapper.map(micResponse, createHolding("SEC-003"));
+    HoldingMonthlyReturns result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-003", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getReturns()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -69,7 +73,8 @@ class MonthlyReturnsMapperTest {
     micResponse.setReturns(List.of());
     micResponse.setDataProviders(null);
 
-    HoldingMonthlyReturns result = mapper.map(micResponse, createHolding("SEC-004"));
+    HoldingMonthlyReturns result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-004", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
   }
@@ -85,7 +90,8 @@ class MonthlyReturnsMapperTest {
     var micResponse = new MonthlyReturns();
     micResponse.setReturns(List.of(valid, nullDate));
 
-    HoldingMonthlyReturns result = mapper.map(micResponse, createHolding("SEC-005"));
+    HoldingMonthlyReturns result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-005", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getReturns())
         .containsOnlyKeys(LocalDate.of(2025, 3, 31))
@@ -99,7 +105,8 @@ class MonthlyReturnsMapperTest {
         createDateValueWithNullValue("2025-12-01"),
         createDateValueWithNullValue("2025-04-01"),
         createDateValueWithNullValue("2025-01-01")));
-    PortfolioHolding holding = createHolding("SEC-006");
+    PortfolioHolding holding = holding(new SecurityIdentifier("SEC-006", null), FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null);
 
     assertThatThrownBy(() -> mapper.map(micResponse, holding))
         .isInstanceOfSatisfying(CalculationException.class, exception -> {
@@ -121,7 +128,8 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-01-31", "0.0100"),
         createDateValue("2025-01-31", "0.0200")));
 
-    HoldingMonthlyReturns result = mapper.map(micResponse, createHolding("SEC-007"));
+    HoldingMonthlyReturns result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-007", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getReturns()).hasSize(1);
     assertThat(result.getReturns().get(LocalDate.of(2025, 1, 31)))
@@ -136,7 +144,8 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-01-31", "0.01"),
         createDateValue("2025-02-28", "0.02")));
 
-    HoldingMonthlyReturns result = mapper.map(micResponse, createHolding("SEC-008"));
+    HoldingMonthlyReturns result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-008", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getReturns().firstKey()).isEqualTo(LocalDate.of(2025, 1, 31));
     assertThat(result.getReturns().lastKey()).isEqualTo(LocalDate.of(2025, 3, 31));
@@ -150,7 +159,8 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-01-01", "3.60137"),
         createDateValue("2025-02-01", "-2.02298")));
 
-    HoldingMonthlyReturns result = mapper.map(micResponse, createHolding("SEC-009"));
+    HoldingMonthlyReturns result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-009", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getReturns()).containsOnlyKeys(
         LocalDate.of(2024, 12, 31),
@@ -165,7 +175,8 @@ class MonthlyReturnsMapperTest {
         createDateValue("2025-01-01", "0.0100"),
         createDateValue("2025-01-15", "0.0200")));
 
-    HoldingMonthlyReturns result = mapper.map(micResponse, createHolding("SEC-010"));
+    HoldingMonthlyReturns result = mapper.map(micResponse, holding(new SecurityIdentifier("SEC-010", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getReturns()).hasSize(1);
     assertThat(result.getReturns().get(LocalDate.of(2025, 1, 31)))
@@ -176,8 +187,8 @@ class MonthlyReturnsMapperTest {
   void shouldThrowCountryNotSupported_whenCountryHasNoCurrencyMapping() {
     var micResponse = new MonthlyReturns();
     micResponse.setReturns(List.of());
-    PortfolioHolding ukHolding = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.UNITED_KINGDOM,
-        new SecurityIdentifier("SEC-UK", null));
+    PortfolioHolding ukHolding = holding(new SecurityIdentifier("SEC-UK", null),
+        FinancialInstrumentType.ETF, Country.UNITED_KINGDOM, (BigDecimal) null);
 
     assertThatThrownBy(() -> mapper.map(micResponse, ukHolding))
         .isInstanceOf(CalculationException.class)
@@ -199,8 +210,4 @@ class MonthlyReturnsMapperTest {
     return value;
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, null));
-  }
 }

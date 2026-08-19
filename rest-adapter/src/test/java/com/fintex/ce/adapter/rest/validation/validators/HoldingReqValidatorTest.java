@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.rest.validation.validators;
 
 import com.fintex.ce.model.domain.holding.CashHolding;
+import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.ReturnCommand;
@@ -18,6 +19,9 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,10 +33,8 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenHoldingTypeIsNull() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        null,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding holding = holdingWithoutCountry(new SecurityIdentifier("ID1", FiIdentifierType.TICKER), null,
+        BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -50,15 +52,10 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenOneHoldingIsMissingHoldingType() {
-    PortfolioHolding validHolding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-    PortfolioHolding invalidHolding = new PortfolioHolding(
-        BigDecimal.TEN,
-        null,
-        new SecurityIdentifier("ID2", FiIdentifierType.TICKER));
+    PortfolioHolding validHolding = holding(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN);
+    PortfolioHolding invalidHolding = holdingWithoutCountry(new SecurityIdentifier("ID2", FiIdentifierType.TICKER),
+        null, BigDecimal.TEN);
 
     PeriodCommand command = new PeriodCommand();
     command.setCurrency(Currency.CAD);
@@ -76,10 +73,8 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenFundHoldingIsMissingCountry() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding holding = holdingWithoutCountry(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -97,10 +92,8 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenStockHoldingIsMissingCountry() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.STOCK,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding holding = holdingWithoutCountry(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -117,11 +110,8 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenFundHoldingHasUnsupportedCountry() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.GERMANY,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding holding = holding(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.GERMANY, BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -138,7 +128,7 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenGicHoldingHasNoCountry() {
-    com.fintex.ce.model.domain.holding.GicHolding gicHolding = com.fintex.ce.model.domain.holding.GicHolding.builder()
+    GicHolding gicHolding = GicHolding.builder()
         .value(BigDecimal.TEN)
         .holdingType(FinancialInstrumentType.GIC)
         .name("GIC-1")
@@ -155,11 +145,7 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenCashHoldingHasNullCurrency() {
-    CashHolding cashHolding = CashHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(null)
-        .build();
+    CashHolding cashHolding = cash(null, BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -176,21 +162,11 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenHoldingsAreValid() {
-    PortfolioHolding holding1 = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-    PortfolioHolding holding2 = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.ETF,
-        Country.CANADA,
-        new SecurityIdentifier("ID2", FiIdentifierType.TICKER));
-    CashHolding cashHolding = CashHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(Currency.CAD)
-        .build();
+    PortfolioHolding holding1 = holding(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN);
+    PortfolioHolding holding2 = holding(new SecurityIdentifier("ID2", FiIdentifierType.TICKER),
+        FinancialInstrumentType.ETF, Country.CANADA, BigDecimal.TEN);
+    CashHolding cashHolding = cash(Currency.CAD, BigDecimal.TEN);
 
     PeriodCommand command = new PeriodCommand();
     command.setCurrency(Currency.CAD);
@@ -201,11 +177,8 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenSecurityIdentifierIdIsEmpty() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        new SecurityIdentifier("", FiIdentifierType.FUNDSERV));
+    PortfolioHolding holding = holding(new SecurityIdentifier("", FiIdentifierType.FUNDSERV),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -223,11 +196,8 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenSecurityIdentifierIdIsBlank() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.STOCK,
-        Country.USA,
-        new SecurityIdentifier("   ", FiIdentifierType.TICKER));
+    PortfolioHolding holding = holding(new SecurityIdentifier("   ", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -244,11 +214,8 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenSecurityIdentifierIdTypeIsNull() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        new SecurityIdentifier("ID1", null));
+    PortfolioHolding holding = holding(new SecurityIdentifier("ID1", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -266,11 +233,8 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldThrow_whenSecurityIdentifierIsNull_forSecurityHolding() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        null);
+    PortfolioHolding holding = holding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);
@@ -288,11 +252,7 @@ class HoldingReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenCashHoldingHasNoSecurityIdentifier() {
-    CashHolding cashHolding = CashHolding.builder()
-        .value(BigDecimal.TEN)
-        .holdingType(FinancialInstrumentType.CASH)
-        .currency(Currency.CAD)
-        .build();
+    CashHolding cashHolding = cash(Currency.CAD, BigDecimal.TEN);
 
     ReturnCommand command = new ReturnCommand();
     command.setCurrency(Currency.CAD);

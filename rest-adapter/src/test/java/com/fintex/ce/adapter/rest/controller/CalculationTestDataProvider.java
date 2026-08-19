@@ -59,6 +59,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
+
 @UtilityClass
 class CalculationTestDataProvider {
 
@@ -66,9 +68,9 @@ class CalculationTestDataProvider {
   static final LocalDate PSD = LocalDate.of(2024, 1, 1);
   static final LocalDate CUSTOM_IPSD = LocalDate.of(2024, 6, 1);
 
-  static final PortfolioHolding DUMMY_HOLDING = new PortfolioHolding(
-      BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-      new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
+  static final PortfolioHolding DUMMY_HOLDING = holding(
+      new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+      BigDecimal.ONE);
 
   static final Set<TimeIntervalResult> TIME_INTERVALS = Set.of(
       new TimeIntervalResult("12M", BigDecimal.valueOf(8.56)),

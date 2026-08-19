@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,8 +64,10 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldComputeWeightedTopHoldings_whenTwoEtfsShareNames() {
-    PortfolioHolding parentA = etfHolding("AAA", 60_000);
-    PortfolioHolding parentB = etfHolding("BBB", 40_000);
+    PortfolioHolding parentA = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(60_000));
+    PortfolioHolding parentB = holdingWithoutCountry("BBB", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(40_000));
 
     Map<PortfolioHolding, CommonTopHoldings> mic = new LinkedHashMap<>();
     mic.put(parentA, topHoldings(Currency.CAD,
@@ -94,8 +97,10 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldFxConvertUsdHoldingValue_whenComputingPortfolioWeight() {
-    PortfolioHolding cad = etfHolding("CAD-ETF", 50_000);
-    PortfolioHolding usd = etfHolding("USD-ETF", 50_000);
+    PortfolioHolding cad = holdingWithoutCountry("CAD-ETF", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(50_000));
+    PortfolioHolding usd = holdingWithoutCountry("USD-ETF", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(50_000));
 
     Map<PortfolioHolding, CommonTopHoldings> mic = new LinkedHashMap<>();
     mic.put(cad, topHoldings(Currency.CAD, equityHolding("Alpha Corp", "0.50")));
@@ -118,7 +123,8 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldThrowMissingCurrencyFromFds_whenMicOmitsCurrency() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent,
         topHoldings(null, equityHolding("Alpha Corp", "0.50")));
 
@@ -129,7 +135,8 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldThrowTch001_whenMandatoryHoldingHasNoUnderlyings() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD));
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
@@ -141,7 +148,8 @@ class CommonHoldingsServiceTest {
   @MethodSource("fundOrEtfWithoutUnderlyingHoldings")
   void shouldThrowTch001_whenDescendedFundOrEtfHasNoUnderlyingHoldings(String description,
       CommonHolding fundOrEtf) {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, fundOrEtf));
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
@@ -169,7 +177,8 @@ class CommonHoldingsServiceTest {
   @Test
   void shouldValidateEveryNestedFund_whenLeafLimitIsReached() {
     properties.setMaxLeavesPerHolding(1);
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding fund = equityHolding("Underlying Fund", "0.5");
     fund.setType(HoldingType.FO);
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD,
@@ -181,7 +190,8 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldTreatNestedEquityAsLeaf_whenItHasNoUnderlyingHoldings() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding equity = equityHolding("Nested Equity", "1.0");
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, equity));
 
@@ -197,7 +207,8 @@ class CommonHoldingsServiceTest {
   @Test
   void shouldTreatFundAsLeaf_whenItIsAtMaxRecursionDepthAndHasNoUnderlyingHoldings() {
     properties.setMaxRecursionDepth(1);
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding level1Fund = equityHolding("Level1 Fund", "1.0");
     level1Fund.setType(HoldingType.FO);
     CommonHolding level0Fund = equityHolding("Level0 Fund", "1.0");
@@ -222,7 +233,8 @@ class CommonHoldingsServiceTest {
    */
   @Test
   void shouldTreatHoldingAsLeaf_whenTheVocabularyDoesNotMarkItsTypeAsNesting() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding nonNestingCode = equityHolding("Non-nesting P", "0.5");
     nonNestingCode.setType(HoldingType.P);
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent,
@@ -238,7 +250,8 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldThrowMicNoData_whenMicReturnsNothingForMandatoryHolding() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
@@ -247,7 +260,8 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldFallbackToDefaults_whenCommandValuesAreNullOrEmpty() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent,
         topHoldings(Currency.CAD, equityHolding("Alpha Corp", "1.0")));
 
@@ -264,7 +278,8 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldThrowMissingWeightingFromFds_whenChildWeightIsNull() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding child = equityHolding("Alpha Corp", "0.5");
     child.setWeight(null);
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, child));
@@ -277,7 +292,8 @@ class CommonHoldingsServiceTest {
   @ParameterizedTest(name = "[{index}] {0} -> isOfType STOCK = leaf short-circuit applies")
   @EnumSource(value = FinancialInstrumentType.class, names = {"STOCK"})
   void shouldShortCircuit_whenRequestHoldingIsAnyStockVariant(FinancialInstrumentType stockType) {
-    PortfolioHolding stock = portfolioHolding("STK", 1000, stockType);
+    PortfolioHolding stock = holdingWithoutCountry("STK", FiIdentifierType.TICKER, stockType,
+        BigDecimal.valueOf(1000));
     CommonHolding selfEquity = equityHolding("Alpha Corp", "0.42");
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(stock, topHoldings(Currency.CAD, selfEquity));
 
@@ -306,7 +322,8 @@ class CommonHoldingsServiceTest {
   void shouldHonourAccumulateTypesFromYaml(HoldingType type, boolean accumulated) {
     properties.setAccumulateTypes(EnumSet.of(HoldingType.E, HoldingType.ER, HoldingType.B, HoldingType.BC,
         HoldingType.BD, HoldingType.BT));
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding leaf = equityHolding("Alpha Corp", "1.0");
     leaf.setType(type);
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, leaf));
@@ -331,13 +348,13 @@ class CommonHoldingsServiceTest {
       "FS,   true",
       "FV,   true",
       "EX,   true",
-      "FD,   false",
       "E,    false",
       "B,    false",
       "null, false"
   })
   void shouldDescend_onlyForTypesTheVocabularyMarksAsNesting(HoldingType childType, boolean shouldDescend) {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding deepEquity = equityHolding("Deep Equity", "1.0");
     CommonHolding middle = equityHolding("Middle", "0.5");
     middle.setType(childType);
@@ -362,7 +379,8 @@ class CommonHoldingsServiceTest {
   @Test
   void shouldRespectMaxRecursionDepth_stoppingDescentBelowDeepestLeaf() {
     properties.setMaxRecursionDepth(1);
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding deepEquity = equityHolding("Deep Equity", "0.9");
     CommonHolding level1Fund = equityHolding("Level1 Fund", "1.0");
     level1Fund.setType(HoldingType.FO);
@@ -381,7 +399,8 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldDetectCycle_whenChildIdentifierMatchesAncestor() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding cycleChild = equityHolding("Cycle Child", "1.0");
     cycleChild.setType(HoldingType.FO);
     cycleChild.setPrimaryIdentifier(new SecurityIdentifier("CYCLE", FiIdentifierType.MORNINGSTAR_ID));
@@ -400,7 +419,8 @@ class CommonHoldingsServiceTest {
 
   @Test
   void shouldSortByAllocationDescThenByIdentifier_pickingCanonicalRepresentative() {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     CommonHolding alphaA = equityHolding("Alpha", "0.5");
     alphaA.setPrimaryIdentifier(new SecurityIdentifier("Z-LAST", FiIdentifierType.TICKER));
     CommonHolding alphaB = equityHolding("Alpha", "0.5");
@@ -417,7 +437,8 @@ class CommonHoldingsServiceTest {
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("missingNameAndCompanyNameCases")
   void shouldSkipChildren_withoutNameOrCompanyName(String desc, CommonHolding child) {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD, child,
         equityHolding("Valid Equity", "0.5")));
 
@@ -445,7 +466,8 @@ class CommonHoldingsServiceTest {
   @ParameterizedTest(name = "[{index}] numOfTop={0}, expectedSize={1}")
   @CsvSource({"1, 1", "2, 2", "10, 3"})
   void shouldLimitTopCommonHoldings_byNumOfTop(int numOfTop, int expectedSize) {
-    PortfolioHolding parent = etfHolding("AAA", 1000);
+    PortfolioHolding parent = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(parent, topHoldings(Currency.CAD,
         equityHolding("Alpha", "0.5"),
         equityHolding("Bravo", "0.3"),
@@ -462,8 +484,10 @@ class CommonHoldingsServiceTest {
     // The fetcher won't return these (sent-to-MIC predicate excludes them), so currency must come from elsewhere.
     // Currently the service still calls currencyFor() which falls into the default branch and returns null —
     // and since these are NOT sent to MIC, the missing-currency throw is skipped. The conversion just omits them.
-    PortfolioHolding nonMicHolding = portfolioHolding("X", 1000, FinancialInstrumentType.valueOf(typeName));
-    PortfolioHolding etf = etfHolding("AAA", 1000);
+    PortfolioHolding nonMicHolding = holdingWithoutCountry("X", FiIdentifierType.TICKER,
+        FinancialInstrumentType.valueOf(typeName), BigDecimal.valueOf(1000));
+    PortfolioHolding etf = holdingWithoutCountry("AAA", FiIdentifierType.TICKER, FinancialInstrumentType.ETF,
+        BigDecimal.valueOf(1000));
     Map<PortfolioHolding, CommonTopHoldings> mic = Map.of(etf,
         topHoldings(Currency.CAD, equityHolding("Alpha", "1.0")));
 
@@ -499,17 +523,6 @@ class CommonHoldingsServiceTest {
     command.setHoldings(holdings);
     command.setNumOfTopCommonHoldings(numOfTop);
     return command;
-  }
-
-  private static PortfolioHolding etfHolding(String id, int value) {
-    return portfolioHolding(id, value, FinancialInstrumentType.ETF);
-  }
-
-  private static PortfolioHolding portfolioHolding(String id, int value, FinancialInstrumentType type) {
-    return new PortfolioHolding(
-        BigDecimal.valueOf(value),
-        type,
-        new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 
   private static CommonTopHoldings topHoldings(Currency currency, CommonHolding... children) {

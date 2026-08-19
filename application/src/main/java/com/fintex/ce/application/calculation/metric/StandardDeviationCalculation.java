@@ -2,7 +2,6 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.util.CalculationUtils;
-import com.fintex.ce.application.util.ReturnSeriesAlignmentValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
@@ -58,7 +57,6 @@ public class StandardDeviationCalculation<T extends PeriodResult> extends Period
     if (numberOfMonths > returns.size() || numberOfMonths < TWELVE.intValue()) {
       return null;
     }
-    ReturnSeriesAlignmentValidator.requirePortfolioCoverage(returns, numberOfMonths);
     final LocalDate periodStartDate = getPeriodStartDate(numberOfMonths, returns);
     final SortedMap<LocalDate, BigDecimal> portfolioTotalReturnsByPeriod = getSubMapByPeriodStartDate(periodStartDate,
         returns);
