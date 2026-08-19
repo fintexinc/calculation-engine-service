@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -179,6 +180,14 @@ public class PortfolioCalculationController {
     commands.forEach(this::validateCommand);
     return calculationObservability.observeComposite(commands,
         () -> calculationOrchestrator.calculateAll(commands));
+  }
+
+  @Operation(summary = "List all supported calculation metrics", description = "Returns a complete list of all supported portfolio calculation metrics with their identifiers and descriptions. "
+      + "Use the metric identifier from each entry as the metricName parameter for the POST endpoints.")
+  @ApiResponse(responseCode = "200", description = "List of all supported metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(type = "array", implementation = CalculationMetricInfo.class)))
+  @GetMapping("/metrics")
+  public List<CalculationMetricInfo> listMetrics() {
+    return CalculationMetricInfo.allMetrics();
   }
 
   private void requireMetric(CalculationCommand command) {
