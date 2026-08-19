@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,6 +72,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -80,6 +82,8 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -113,6 +117,36 @@ public class PortfolioCalculationController {
   private final RequestValidationFacade validationFacade;
   private final CalculationObservability calculationObservability;
   private final Validator validator;
+
+  @Operation(summary = "List all supported calculation metrics", description = "Returns information about every supported calculation metric, including its identifier and description. "
+      + "The metric identifier can be used as the {metricName} path parameter in the POST endpoint.")
+  @ApiResponse(responseCode = "200", description = "List of all supported metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = MetricInfo.class))))
+  @GetMapping("/metrics")
+  public List<MetricInfo> listMetrics() {
+    List<MetricInfo> metrics = new ArrayList<>();
+    for (CalculationMetric metric : CalculationMetric.values()) {
+      String description = extractMetricDescription(metric);
+      metrics.add(new MetricInfo(metric.getValue(), description));
+    }
+    return metrics;
+  }
+
+  /**
+   * Extracts the description from the @Schema annotation on a CalculationMetric enum constant.
+   * If the annotation is not present or does not have a description, returns an empty string.
+   */
+  private String extractMetricDescription(CalculationMetric metric) {
+    try {
+      var field = CalculationMetric.class.getField(metric.name());
+      var schemaAnnotation = field.getAnnotation(Schema.class);
+      if (schemaAnnotation != null && !schemaAnnotation.description().isEmpty()) {
+        return schemaAnnotation.description();
+      }
+    } catch (NoSuchFieldException e) {
+      log.debug("Could not extract schema annotation for metric: {}", metric.name(), e);
+    }
+    return "";
+  }
 
   @Operation(summary = "Execute a portfolio calculation", description = "Performs the specified calculation metric on the provided portfolio holdings. "
       + "The request body schema depends on the metric — period-based metrics require time intervals, "
