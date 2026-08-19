@@ -1,5 +1,6 @@
 package com.fintex.ce.e2e;
 
+import com.fintex.ce.model.domain.enumeration.InterestFreq;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -17,6 +18,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -29,8 +32,9 @@ class GrowthOf10kE2ETest extends AbstractGrowthOf10kE2ETest {
   @Test
   void shouldReturnBadRequest_whenGicHoldingOmitsInterestRate() {
     ReturnCommand command = commandFor(Currency.CAD, List.of(
-        etfCanada(XBAL, "45234.67"),
-        gicWithoutInterestRate(Currency.CAD, "25000.00", "365")));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
+        gic(null, Currency.CAD, new BigDecimal("25000.00"), new BigDecimal("365"), null,
+            InterestFreq.MONTHLY, LocalDate.of(2024, 1, 1))));
 
     HttpResponse response = postCalculation(writeJson(command));
 
@@ -52,11 +56,11 @@ class GrowthOf10kE2ETest extends AbstractGrowthOf10kE2ETest {
         securityAttributeResult(VCNS, twoMonthReturns("2.0", "1.0")),
         securityAttributeResult(CCM4752, twoMonthReturns("0.5", "-1.0")))));
     ReturnCommand command = commandFor(Currency.CAD, List.of(
-        etfCanada(XBAL, "50000"),
-        fund(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "50000")));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "50000"),
+        holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "50000")));
     command.setBenchmarkHoldings(List.of(
-        etfCanada(VCNS, "50000"),
-        fundServ(CCM4752, "50000")));
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "50000"),
+        holding(CCM4752, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "50000")));
 
     HttpResponse response = postCalculation(writeJson(command));
 

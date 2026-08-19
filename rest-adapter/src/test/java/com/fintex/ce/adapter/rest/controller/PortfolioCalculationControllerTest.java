@@ -14,7 +14,6 @@ import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.CashHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.TimeIntervalResult;
@@ -40,7 +39,6 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.ErrorResponse;
 import com.fintex.wm.commons.error.Severity;
 
@@ -77,6 +75,8 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationController.BASE_PATH;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -545,7 +545,8 @@ class PortfolioCalculationControllerTest {
       PeriodCommand command = new PeriodCommand();
       command.setMetric(CalculationMetric.STANDARD_DEVIATION);
       command.setCurrency(Currency.CAD);
-      command.setHoldings(List.of(dummyHolding()));
+      command.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
+          FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       command.setPeriods(Set.of(TimePeriod.SIX_MTH));
       StandardDeviationResult result = new StandardDeviationResult(Set.of(new TimeIntervalResult(TimePeriod.SIX_MTH
           .name(),
@@ -574,7 +575,8 @@ class PortfolioCalculationControllerTest {
       PeriodCommand command = new PeriodCommand();
       command.setMetric(CalculationMetric.STANDARD_DEVIATION);
       command.setCurrency(Currency.CAD);
-      command.setHoldings(List.of(dummyHolding()));
+      command.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
+          FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       command.setPeriods(Set.of(TimePeriod.YTD));
 
       validatingMockMvc.perform(
@@ -601,7 +603,8 @@ class PortfolioCalculationControllerTest {
       PeriodCommand rejected = new PeriodCommand();
       rejected.setMetric(CalculationMetric.STANDARD_DEVIATION);
       rejected.setCurrency(Currency.CAD);
-      rejected.setHoldings(List.of(dummyHolding()));
+      rejected.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
+          FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       rejected.setPeriods(Set.of(TimePeriod.YTD));
 
       validatingMockMvc.perform(
@@ -617,7 +620,8 @@ class PortfolioCalculationControllerTest {
       PeriodCommand dispatched = new PeriodCommand();
       dispatched.setMetric(CalculationMetric.SHARPE_RATIO);
       dispatched.setCurrency(Currency.CAD);
-      dispatched.setHoldings(List.of(dummyHolding()));
+      dispatched.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
+          FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       dispatched.setPeriods(Set.of(TimePeriod.ONE_YR));
       doThrow(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.toException("Security Master"))
           .when(calculationServices.get(CalculationMetric.SHARPE_RATIO)).perform(any(), any());
@@ -662,7 +666,8 @@ class PortfolioCalculationControllerTest {
       PeriodCommand command = new PeriodCommand();
       command.setMetric(CalculationMetric.STANDARD_DEVIATION);
       command.setCurrency(Currency.CAD);
-      command.setHoldings(List.of(dummyHolding()));
+      command.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
+          FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       command.setPeriods(Set.of(TimePeriod.ONE_YR));
       command.setCustomIntervalPsd(cipsd);
       doThrow(ErrorCode.CIPSD_OUTSIDE_DATA_RANGE_ERROR.toException(cipsd, performanceStartDate, performanceEndDate))
@@ -686,10 +691,7 @@ class PortfolioCalculationControllerTest {
 
     @Test
     void shouldReturnBadRequest_whenCashHoldingHasNullCurrency() throws Exception {
-      PortfolioHolding cashHolding = CashHolding.builder()
-          .value(BigDecimal.valueOf(100))
-          .holdingType(FinancialInstrumentType.CASH)
-          .build();
+      PortfolioHolding cashHolding = cash(null, BigDecimal.valueOf(100));
 
       PeriodCommand cmd = new PeriodCommand();
       cmd.setMetric(CalculationMetric.TRAILING_TOTAL_RETURNS);
@@ -813,7 +815,8 @@ class PortfolioCalculationControllerTest {
       BestWorstPeriodsCommand cmd = new BestWorstPeriodsCommand();
       cmd.setMetric(CalculationMetric.BEST_WORST_PERIODS);
       cmd.setCurrency(Currency.CAD);
-      cmd.setHoldings(List.of(dummyHolding()));
+      cmd.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
+          FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       cmd.setCustomPsd(LocalDate.of(2024, 1, 31));
       cmd.setCustomPed(LocalDate.of(2024, 12, 31));
       cmd.setBestWorstTimeIntervalPeriods(Set.of(1L, 300L));
@@ -830,7 +833,8 @@ class PortfolioCalculationControllerTest {
       DistributionOfReturnsCommand lowerBoundCmd = new DistributionOfReturnsCommand();
       lowerBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       lowerBoundCmd.setCurrency(Currency.CAD);
-      lowerBoundCmd.setHoldings(List.of(dummyHolding()));
+      lowerBoundCmd.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
+          FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       lowerBoundCmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       lowerBoundCmd.setCustomNumberOfBins(5);
 
@@ -843,7 +847,8 @@ class PortfolioCalculationControllerTest {
       DistributionOfReturnsCommand upperBoundCmd = new DistributionOfReturnsCommand();
       upperBoundCmd.setMetric(CalculationMetric.DISTRIBUTION_OF_MONTHLY_RETURNS);
       upperBoundCmd.setCurrency(Currency.CAD);
-      upperBoundCmd.setHoldings(List.of(dummyHolding()));
+      upperBoundCmd.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
+          FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       upperBoundCmd.setPeriods(Set.of(TimePeriod.ONE_YR));
       upperBoundCmd.setCustomNumberOfBins(30);
 
@@ -852,12 +857,6 @@ class PortfolioCalculationControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(om.writeValueAsString(upperBoundCmd)))
           .andExpect(status().isOk());
-    }
-
-    private static PortfolioHolding dummyHolding() {
-      return new PortfolioHolding(
-          BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-          new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
     }
 
     @Test

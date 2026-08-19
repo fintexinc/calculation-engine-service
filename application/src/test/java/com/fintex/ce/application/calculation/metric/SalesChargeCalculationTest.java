@@ -7,7 +7,6 @@ import com.fintex.ce.model.domain.result.fee.SalesChargeResult;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.sales.SalesChargeType;
 
 import org.junit.jupiter.api.Disabled;
@@ -24,6 +23,7 @@ import static com.fintex.ce.application.calculation.metric.SalesChargeCalculatio
 import static com.fintex.ce.application.calculation.metric.SalesChargeCalculation.DEFAULT_SALES_CHARGE_DTO;
 import static com.fintex.ce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 import static com.fintex.ce.model.util.BigDecimalConstants.ROUNDING_MODE;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static com.fintex.wm.commons.domain.sales.SalesChargeType.DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT;
 import static com.fintex.wm.commons.domain.sales.SalesChargeType.DEFERRED_SALES_CHARGE_ON_MARKET_VALUE;
 import static com.fintex.wm.commons.domain.sales.SalesChargeType.FORMULA_ONE;
@@ -53,9 +53,15 @@ class SalesChargeTypeCalculationTest {
   @Test
   void shouldCalculateWeightsPerType_whenEachTypeContainsOneHolding() {
     final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
-    final PortfolioHolding holding1 = createHolding("RBF605", 10_000);
-    final PortfolioHolding holding2 = createHolding("RBF606", 20_000);
-    final PortfolioHolding holding3 = createHolding("RBF607", 70_000);
+    final PortfolioHolding holding1 = holding("RBF605", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        BigDecimal.valueOf(10_000));
+    final PortfolioHolding holding2 = holding("RBF606", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        BigDecimal.valueOf(20_000));
+    final PortfolioHolding holding3 = holding("RBF607", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        BigDecimal.valueOf(70_000));
     dataFromFds.put(holding1, new SalesCharge(DEFERRED_SALES_CHARGE_ON_MARKET_VALUE));
     dataFromFds.put(holding2, new SalesCharge(FRONT_END_CHARGE));
     dataFromFds.put(holding3, new SalesCharge(LOW_SALES_CHARGE));
@@ -78,17 +84,16 @@ class SalesChargeTypeCalculationTest {
     assertEquals(expected, actual);
   }
 
-  private PortfolioHolding createHolding(final String fundServCode, final int value) {
-    return new PortfolioHolding(BigDecimal.valueOf(value), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-        new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV));
-  }
-
   @Test
   void shouldCalculateWeights_whenTwoTypesContainOneHoldingEach() {
 
     final Map<PortfolioHolding, SalesCharge> dataFromFds = new HashMap<>();
-    final PortfolioHolding holding2 = createHolding("RBF606", 51_000);
-    final PortfolioHolding holding3 = createHolding("RBF607", 49_000);
+    final PortfolioHolding holding2 = holding("RBF606", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        BigDecimal.valueOf(51_000));
+    final PortfolioHolding holding3 = holding("RBF607", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        BigDecimal.valueOf(49_000));
     dataFromFds.put(holding2, new SalesCharge(VOLUME_SALES_CHARGE));
     dataFromFds.put(holding3, new SalesCharge(DEFERRED_CHARGE_ON_ORIGINAL_AMOUNT));
 
@@ -204,9 +209,8 @@ class SalesChargeTypeCalculationTest {
       final String fundServCode,
       final int value,
       final SalesChargeType frontEndCharge) {
-    final PortfolioHolding holding = new PortfolioHolding(BigDecimal.valueOf(value),
-        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-        new SecurityIdentifier(fundServCode, FiIdentifierType.FUNDSERV));
+    final PortfolioHolding holding = holding(fundServCode, FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.valueOf(value));
 
     dataFromFds.put(holding, new SalesCharge(frontEndCharge));
   }

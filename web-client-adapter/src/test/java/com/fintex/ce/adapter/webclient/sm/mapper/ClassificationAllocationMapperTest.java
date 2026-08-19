@@ -2,7 +2,6 @@ package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocation;
 import com.fintex.ce.model.domain.calculation.allocation.ClassificationAllocationType;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.SecurityClassificationAllocation;
 import com.fintex.wm.commons.domain.classification.SecurityClassificationLevelOne;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClassificationAllocationMapperTest {
@@ -40,7 +40,8 @@ class ClassificationAllocationMapperTest {
     smsResponse.setAllocations(List.of(equityCanada, fixedIncomeUs));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
+    ClassificationAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-001", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.MUTUAL_FUND);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -53,7 +54,8 @@ class ClassificationAllocationMapperTest {
 
   @Test
   void shouldReturnEmptyMap_whenResponseIsNull() {
-    ClassificationAllocation result = mapper.map(null, createHolding("SEC-002"));
+    ClassificationAllocation result = mapper.map(null, holding(new SecurityIdentifier("SEC-002", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getSecurityClassificationValues()).isEmpty();
@@ -64,7 +66,8 @@ class ClassificationAllocationMapperTest {
     var smsResponse = new SecurityClassificationAllocation();
     smsResponse.setAllocations(null);
 
-    ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
+    ClassificationAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-003", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getSecurityClassificationValues()).isEmpty();
   }
@@ -75,7 +78,8 @@ class ClassificationAllocationMapperTest {
     smsResponse.setAllocations(List.of());
     smsResponse.setDataProviders(null);
 
-    ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
+    ClassificationAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-004", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
   }
@@ -101,7 +105,8 @@ class ClassificationAllocationMapperTest {
     var smsResponse = new SecurityClassificationAllocation();
     smsResponse.setAllocations(List.of(valid, nullLevelOne, nullValue));
 
-    ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-005"));
+    ClassificationAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-005", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getSecurityClassificationValues()).hasSize(1);
     assertThat(result.getSecurityClassificationValues())
@@ -124,15 +129,12 @@ class ClassificationAllocationMapperTest {
     var smsResponse = new SecurityClassificationAllocation();
     smsResponse.setAllocations(List.of(entry1, entry2));
 
-    ClassificationAllocation result = mapper.map(smsResponse, createHolding("SEC-006"));
+    ClassificationAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-006", null),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getSecurityClassificationValues()).hasSize(1);
     assertThat(result.getSecurityClassificationValues().get(ClassificationAllocationType.EQUITY__CANADA))
         .isEqualByComparingTo("0.45");
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-        new SecurityIdentifier(securityId, null));
-  }
 }

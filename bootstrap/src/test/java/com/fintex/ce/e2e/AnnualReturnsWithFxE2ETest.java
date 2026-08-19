@@ -5,6 +5,8 @@ import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse.Observ
 import com.fintex.ce.model.domain.result.KeyValueResult;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
 import com.fintex.wm.commons.domain.currency.Currency;
+import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.Dispatcher;
@@ -79,8 +82,8 @@ class AnnualReturnsWithFxE2ETest extends AbstractAnnualReturnsE2ETest {
         securityAttributeResult(SPY, fullYear2024Returns()))));
 
     HttpResponse response = postCalculation(writeJson(commandFor(Currency.CAD, List.of(
-        usEtf(VTI, "45234.67"),
-        usEtf(SPY, "18765.43")))));
+        holding(VTI, FinancialInstrumentType.ETF, Country.USA, "45234.67"),
+        holding(SPY, FinancialInstrumentType.ETF, Country.USA, "18765.43")))));
 
     assertThat(response.status().value()).isEqualTo(200);
     AnnualReturnResult<?> result = readJson(response.responseBody(), AnnualReturnResult.class);

@@ -10,10 +10,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationsFailedException;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
 import com.fintex.wm.commons.error.Severity;
 
@@ -29,7 +26,6 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.distribution.ValueAtPercentile;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CalculationMetricStatisticsTest {
@@ -315,11 +312,7 @@ class CalculationMetricStatisticsTest {
 
   private static List<PortfolioHolding> holdingList(int size) {
     return IntStream.range(0, size)
-        .mapToObj(index -> new PortfolioHolding(
-            BigDecimal.ONE,
-            FinancialInstrumentType.ETF,
-            Country.CANADA,
-            new SecurityIdentifier("TICKER-" + index, FiIdentifierType.TICKER)))
+        .mapToObj(index -> etf("TICKER-" + index, Country.CANADA, 1))
         .toList();
   }
 }

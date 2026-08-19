@@ -2,10 +2,6 @@ package com.fintex.ce.application.returns;
 
 import com.fintex.ce.application.util.ReturnFactorScale;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,6 +14,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class WeightedAverageComponentTest {
@@ -30,8 +27,8 @@ class WeightedAverageComponentTest {
 
   @Test
   void shouldCalculateValueWeightedReturns_whenHoldingsHaveDifferentValuesAndReturns() {
-    PortfolioHolding firstHolding = holding("FIRST", "100");
-    PortfolioHolding secondHolding = holding("SECOND", "300");
+    PortfolioHolding firstHolding = etfCa("FIRST", 100);
+    PortfolioHolding secondHolding = etfCa("SECOND", 300);
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
         firstHolding, returns("10", "20"),
         secondHolding, returns("30", "40"));
@@ -45,7 +42,7 @@ class WeightedAverageComponentTest {
 
   @Test
   void shouldApplyRequestedScale_whenReturnsArePercentageValues() {
-    PortfolioHolding holding = holding("ONLY", "100");
+    PortfolioHolding holding = etfCa("ONLY", 100);
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
         holding, returns("10", "-20"));
 
@@ -59,8 +56,8 @@ class WeightedAverageComponentTest {
 
   @Test
   void shouldCalculateInitialValueWeights_whenEndingWeightsAreRequested() {
-    PortfolioHolding firstHolding = holding("FIRST", "100");
-    PortfolioHolding secondHolding = holding("SECOND", "300");
+    PortfolioHolding firstHolding = etfCa("FIRST", 100);
+    PortfolioHolding secondHolding = etfCa("SECOND", 300);
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
         firstHolding, returns("10", "20"),
         secondHolding, returns("30", "40"));
@@ -80,11 +77,6 @@ class WeightedAverageComponentTest {
         returns, ReturnFactorScale.AS_IS);
 
     assertThat(result).isEmpty();
-  }
-
-  private static PortfolioHolding holding(String id, String value) {
-    return new PortfolioHolding(new BigDecimal(value), FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 
   private static TreeMap<LocalDate, BigDecimal> returns(String january, String february) {

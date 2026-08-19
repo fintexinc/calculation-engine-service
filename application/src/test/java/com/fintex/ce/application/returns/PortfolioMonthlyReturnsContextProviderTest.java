@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,8 +30,9 @@ import static org.mockito.Mockito.when;
 
 class PortfolioMonthlyReturnsContextProviderTest {
 
-  private static final PortfolioHolding ETF = new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.USA,
-      new SecurityIdentifier("SPY", FiIdentifierType.TICKER));
+  private static final PortfolioHolding ETF = holding(
+      new SecurityIdentifier("SPY", FiIdentifierType.TICKER), FinancialInstrumentType.ETF, Country.USA,
+      (BigDecimal) null);
 
   private final MonthlyReturnsService monthlyReturnsService = mock(MonthlyReturnsService.class);
   private final FxRateService fxRateService = mock(FxRateService.class);

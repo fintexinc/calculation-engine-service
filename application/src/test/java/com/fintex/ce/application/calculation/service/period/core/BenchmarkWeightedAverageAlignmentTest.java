@@ -26,7 +26,6 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -41,6 +40,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,8 +55,10 @@ class BenchmarkWeightedAverageAlignmentTest {
   private static final LocalDate MAR_2020 = LocalDate.parse("2020-03-31");
   private static final LocalDate APR_2020 = LocalDate.parse("2020-04-30");
   private static final LocalDate MAY_2020 = LocalDate.parse("2020-05-31");
-  private static final PortfolioHolding PORTFOLIO_HOLDING = holding("PORTFOLIO");
-  private static final PortfolioHolding BENCHMARK_HOLDING = holding("BENCHMARK");
+  private static final PortfolioHolding PORTFOLIO_HOLDING = holding("PORTFOLIO", FiIdentifierType.TICKER,
+      FinancialInstrumentType.ETF, Country.USA, BigDecimal.TEN);
+  private static final PortfolioHolding BENCHMARK_HOLDING = holding("BENCHMARK", FiIdentifierType.TICKER,
+      FinancialInstrumentType.ETF, Country.USA, BigDecimal.TEN);
 
   @Test
   void shouldAlignPortfolioAndBenchmarkToCommonWindow_whenBuildingCpedBenchmarkInput() {
@@ -258,11 +260,6 @@ class BenchmarkWeightedAverageAlignmentTest {
   private static TreeMap<LocalDate, BigDecimal> series(LocalDate... dates) {
     return Arrays.stream(dates)
         .collect(Collectors.toMap(Function.identity(), date -> BigDecimal.ONE, (left, right) -> left, TreeMap::new));
-  }
-
-  private static PortfolioHolding holding(String id) {
-    return new PortfolioHolding(BigDecimal.TEN, FinancialInstrumentType.ETF, Country.USA,
-        new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})

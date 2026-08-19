@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.A;
 import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.AA;
 import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.AAA;
@@ -47,7 +48,8 @@ class CreditQualityMapperTest {
     smsResponse.setAverageCreditQualityRating("A");
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    PortfolioHolding holding = createHolding("AGG.US");
+    PortfolioHolding holding = holding(new SecurityIdentifier("AGG.US", null), FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null);
 
     CreditQuality result = mapper.map(smsResponse, holding);
 
@@ -65,7 +67,8 @@ class CreditQualityMapperTest {
   @ParameterizedTest
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyRatings_whenResponseIsNullOrHasNoRatings(CreditQualityRatings smsResponse) {
-    PortfolioHolding holding = createHolding("TEST.ID");
+    PortfolioHolding holding = holding(new SecurityIdentifier("TEST.ID", null), FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null);
 
     CreditQuality result = mapper.map(smsResponse, holding);
 
@@ -95,7 +98,8 @@ class CreditQualityMapperTest {
     var smsResponse = new CreditQualityRatings();
     smsResponse.setRatings(List.of(validRating, nullRating, nullValue));
 
-    CreditQuality result = mapper.map(smsResponse, createHolding("TEST.ID"));
+    CreditQuality result = mapper.map(smsResponse, holding(new SecurityIdentifier("TEST.ID", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getRatings()).hasSize(1);
     assertThat(result.getRatings()).containsKey(AAA);
@@ -109,7 +113,8 @@ class CreditQualityMapperTest {
     var smsResponse = new CreditQualityRatings();
     smsResponse.setRatings(List.of(validRating, unknownRating));
 
-    CreditQuality result = mapper.map(smsResponse, createHolding("TEST.ID"));
+    CreditQuality result = mapper.map(smsResponse, holding(new SecurityIdentifier("TEST.ID", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getRatings()).hasSize(1);
     assertThat(result.getRatings()).containsKey(AAA);
@@ -122,7 +127,8 @@ class CreditQualityMapperTest {
         createRating(AAA, "15.5"),
         createRating(AAA, "20.0")));
 
-    CreditQuality result = mapper.map(smsResponse, createHolding("TEST.ID"));
+    CreditQuality result = mapper.map(smsResponse, holding(new SecurityIdentifier("TEST.ID", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getRatings()).hasSize(1);
     assertThat(result.getRatings().get(AAA)).isEqualByComparingTo("15.5");
@@ -141,7 +147,8 @@ class CreditQualityMapperTest {
         createRating(BELOW_B, "5.0"),
         createRating(NOT_RATED, "5.0")));
 
-    CreditQuality result = mapper.map(smsResponse, createHolding("FULL.TEST"));
+    CreditQuality result = mapper.map(smsResponse, holding(new SecurityIdentifier("FULL.TEST", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getRatings()).hasSize(8);
     assertThat(result.getRatings().get(AAA)).isEqualByComparingTo("10.0");
@@ -158,8 +165,4 @@ class CreditQualityMapperTest {
     return new CreditQualityRatingTypeValue(rating.name(), new BigDecimal(value), List.of());
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, null));
-  }
 }

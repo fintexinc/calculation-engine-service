@@ -16,7 +16,6 @@ import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +30,7 @@ import java.util.Set;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.FIVE_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
@@ -76,8 +76,10 @@ class FeesCalculationServiceImplTest {
   @Test
   void annualFee_isSumOfValueTimesMer_overFundHoldings() {
     // 1000 @ 0.02 + 2000 @ 0.01 = 20 + 20 = 40
-    PortfolioHolding cad = holding("CIG-001", FinancialInstrumentType.MUTUAL_FUND, "1000");
-    PortfolioHolding us = holding("VTI", FinancialInstrumentType.ETF, Country.USA, "2000");
+    PortfolioHolding cad = holding("CIG-001", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding us = holding("VTI", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.ETF, Country.USA, "2000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         cad, fee("0.02", null, null, null),
         us, fee(null, null, "0.01", null));
@@ -90,7 +92,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void monthlyFee_isAnnualDividedBy12() {
-    PortfolioHolding fund = holding("CIG-002", FinancialInstrumentType.MUTUAL_FUND, "1200");
+    PortfolioHolding fund = holding("CIG-002", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1200");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee("0.10", null, null, null));
 
@@ -104,8 +107,10 @@ class FeesCalculationServiceImplTest {
   @Test
   void wholePortfolio_includesNonFundHoldingsAt0Pct() {
     // Fund 1000 × 0.02 = 20; stock contributes 0.
-    PortfolioHolding fund = holding("CIG-003", FinancialInstrumentType.MUTUAL_FUND, "1000");
-    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "1000");
+    PortfolioHolding fund = holding("CIG-003", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding stock = holding("AAPL", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.STOCK, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee("0.02", null, null, null));
 
@@ -118,7 +123,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void fundsOnlyStrict_isNull_whenAnyIncludedHoldingMissingPrimary() {
-    PortfolioHolding fund = holding("CIG-004", FinancialInstrumentType.MUTUAL_FUND, "1000");
+    PortfolioHolding fund = holding("CIG-004", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, fee(null, "0.02", null, null));
 
@@ -132,7 +138,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void parentHoldingType_isRejectedWithCleanError() {
-    PortfolioHolding parent = holding("X", FinancialInstrumentType.FUND, "1000");
+    PortfolioHolding parent = holding("X", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.FUND, Country.CANADA, "1000");
 
     assertThatThrownBy(() -> service.perform(commandFor(List.of(parent), FUNDS_ONLY), Map.of()))
         .isInstanceOf(CalculationException.class)
@@ -142,7 +149,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void allFeeFieldsNull_throws() {
-    PortfolioHolding hedge = holding("HF-001", FinancialInstrumentType.HEDGE_FUND, "1000");
+    PortfolioHolding hedge = holding("HF-001", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.HEDGE_FUND, Country.CANADA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         hedge, fee(null, null, null, null));
 
@@ -154,7 +162,8 @@ class FeesCalculationServiceImplTest {
   @Test
   void usdFund_isConvertedToCadBeforeFeeSum() {
     // USD 1000 fund × 0.02 NER = USD 20 annual fee × 1.35 USD/CAD = CAD 27.
-    PortfolioHolding usdFund = holding("VTI", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
+    PortfolioHolding usdFund = holding("VTI", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         usdFund, FeeData.builder()
             .netExpenseRatio(new BigDecimal("0.02"))
@@ -172,7 +181,8 @@ class FeesCalculationServiceImplTest {
   @Test
   void usdFund_fxUnavailable_emitsWarningAndLeavesValueUnconverted() {
     // USD 1000 fund × 0.02 NER = USD 20. With no FX rate available, value is left in USD, sum is 20, FX-001 warning.
-    PortfolioHolding usdFund = holding("VTI", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
+    PortfolioHolding usdFund = holding("VTI", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         usdFund, FeeData.builder()
             .netExpenseRatio(new BigDecimal("0.02"))
@@ -192,7 +202,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void merBearingHoldingWithMissingCurrency_throws() {
-    PortfolioHolding fund = holding("CIG-NOCURR", FinancialInstrumentType.MUTUAL_FUND, "1000");
+    PortfolioHolding fund = holding("CIG-NOCURR", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         fund, FeeData.builder()
             .managementExpenseRatio(new BigDecimal("0.02"))
@@ -209,7 +220,8 @@ class FeesCalculationServiceImplTest {
     // Intended behavior: the MER and Fees metrics share one US resolution chain (NER → GER), so Fees does NOT keep a
     // Management-Fee fallback for US funds. With NER and GER both absent the Fees request hard-fails with MER-002
     // instead of reporting a fee off the Management Fee (0.01). The Management Fee metric is unaffected.
-    PortfolioHolding etf = holding("VFINX", FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
+    PortfolioHolding etf = holding("VFINX", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.USA, "1000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         etf, fee(null, "0.01", null, null));
 
@@ -225,7 +237,8 @@ class FeesCalculationServiceImplTest {
     // Real reported security F000015AWQ for the Fees metric: NER and GER blank, ActualManagementFee = 0.00000
     // (present, not null). A present zero previously resolved to a 0 fee via the Management Fee fallback; it must now
     // fail MER-002 rather than report a fee of 0.
-    PortfolioHolding etf = holding("F000015AWQ", FinancialInstrumentType.ETF, Country.USA, "100000");
+    PortfolioHolding etf = holding("F000015AWQ", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.ETF, Country.USA, "100000");
     Map<PortfolioHolding, FeeData> securityData = Map.of(
         etf, fee(null, "0.00", null, null));
 
@@ -239,7 +252,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void emptyFundModes_areNulled_whenNoFundHoldingsPresent() {
-    PortfolioHolding stock = holding("AAPL", FinancialInstrumentType.STOCK, Country.USA, "1000");
+    PortfolioHolding stock = holding("AAPL", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.STOCK, Country.USA, "1000");
 
     FeesResult result = service.perform(commandFor(List.of(stock), FUNDS_ONLY, WHOLE_PORTFOLIO,
         FUNDS_ONLY_STRICT), Map.of());
@@ -260,8 +274,10 @@ class FeesCalculationServiceImplTest {
   @Test
   void shouldProjectEveryConfiguredHorizonPerMode_whenPortfolioHoldsFunds() {
     // 1000 @ 0.02 = 20 a year over the funds; the 3000 stock only widens the whole-portfolio denominator
-    PortfolioHolding fund = holding("CIG-010", FinancialInstrumentType.MUTUAL_FUND, "1000");
-    PortfolioHolding stock = holding("RY", FinancialInstrumentType.STOCK, "3000");
+    PortfolioHolding fund = holding("CIG-010", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
+    PortfolioHolding stock = holding("RY", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.STOCK, Country.CANADA, "3000");
 
     FeesResult result = service.perform(commandFor(List.of(fund, stock), FUNDS_ONLY, WHOLE_PORTFOLIO),
         Map.of(fund, fee("0.02", null, null, null)));
@@ -277,7 +293,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void shouldMatchTheAnnualFee_whenHorizonIsOneYear() {
-    PortfolioHolding fund = holding("CIG-011", FinancialInstrumentType.MUTUAL_FUND, "1234.56");
+    PortfolioHolding fund = holding("CIG-011", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1234.56");
 
     FeesResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY, WHOLE_PORTFOLIO),
         Map.of(fund, fee("0.0175", null, null, null)));
@@ -290,7 +307,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void shouldProjectNullsRatherThanZeros_whenTheStrictModeHasNoAnswer() {
-    PortfolioHolding fund = holding("CIG-012", FinancialInstrumentType.MUTUAL_FUND, "1000");
+    PortfolioHolding fund = holding("CIG-012", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
 
     FeesResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY, FUNDS_ONLY_STRICT),
         Map.of(fund, fee(null, "0.01", null, null)));
@@ -304,7 +322,8 @@ class FeesCalculationServiceImplTest {
   void shouldProjectOnTheConvertedValue_whenHoldingCurrencyDiffersFromReportingCurrency() {
     when(fxRateService.spotRates(anySet(), any(), any()))
         .thenReturn(Map.of(Currency.USD, new BigDecimal("1.25"), Currency.CAD, BigDecimal.ONE));
-    PortfolioHolding usFund = holding("VTI", FinancialInstrumentType.ETF, Country.USA, "1000");
+    PortfolioHolding usFund = holding("VTI", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.ETF, Country.USA, "1000");
 
     FeesResult result = service.perform(commandFor(List.of(usFund), FUNDS_ONLY),
         Map.of(usFund, FeeData.builder()
@@ -321,7 +340,8 @@ class FeesCalculationServiceImplTest {
   @Test
   void shouldGrowTheProjectionAboveTheFlatCase_whenAGrowthRateIsConfigured() {
     projectionProperties.setAnnualGrowthRate(new BigDecimal("0.06"));
-    PortfolioHolding fund = holding("CIG-013", FinancialInstrumentType.MUTUAL_FUND, "1000");
+    PortfolioHolding fund = holding("CIG-013", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
 
     FeesResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY),
         Map.of(fund, fee("0.02", null, null, null)));
@@ -335,7 +355,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void shouldReportTheRequestedHorizons_whenTheCommandSuppliesThem() {
-    PortfolioHolding fund = holding("CIG-014", FinancialInstrumentType.MUTUAL_FUND, "1000");
+    PortfolioHolding fund = holding("CIG-014", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
 
     FeesResult result = service.perform(commandWithHorizons(List.of(fund), new LinkedHashSet<>(List.of(THREE_YR,
         FIVE_YR)), FUNDS_ONLY),
@@ -350,7 +371,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void shouldKeepTheRequestedOrder_whenHorizonsArriveUnsorted() {
-    PortfolioHolding fund = holding("CIG-015", FinancialInstrumentType.MUTUAL_FUND, "1000");
+    PortfolioHolding fund = holding("CIG-015", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
 
     FeesResult result = service.perform(commandWithHorizons(List.of(fund), new LinkedHashSet<>(List.of(TWENTY_YR,
         ONE_YR, TEN_YR)), FUNDS_ONLY),
@@ -361,7 +383,8 @@ class FeesCalculationServiceImplTest {
 
   @Test
   void shouldFallBackToTheConfiguredHorizons_whenTheCommandOmitsThem() {
-    PortfolioHolding fund = holding("CIG-016", FinancialInstrumentType.MUTUAL_FUND, "1000");
+    PortfolioHolding fund = holding("CIG-016", FiIdentifierType.MORNINGSTAR_ID,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "1000");
 
     FeesResult omitted = service.perform(commandWithHorizons(List.of(fund), null, FUNDS_ONLY),
         Map.of(fund, fee("0.02", null, null, null)));
@@ -373,19 +396,6 @@ class FeesCalculationServiceImplTest {
   }
 
   // ---------- helpers ----------
-
-  private static PortfolioHolding holding(String id, FinancialInstrumentType type, String value) {
-    return holding(id, type, Country.CANADA, value);
-  }
-
-  private static PortfolioHolding holding(String id, FinancialInstrumentType type, Country country, String value) {
-    return PortfolioHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(type)
-        .country(country)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.MORNINGSTAR_ID))
-        .build();
-  }
 
   private static FeeData fee(String mer, String managementFee, String ner, String ger) {
     // Default currency CAD: SMS always returns a currency for a fund row, and the FX path now hard-fails when it's

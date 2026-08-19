@@ -26,6 +26,7 @@ import java.util.Map;
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.model.domain.calculation.allocation.FixedIncomeCreditQuality.HIGH_YIELD;
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.A;
 import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.AA;
 import static com.fintex.wm.commons.domain.rating.CreditQualityRatingType.AAA;
@@ -180,7 +181,7 @@ class FixedIncomeCreditQualityServiceTest {
     FixedIncomeCreditQualityService service = mock(FixedIncomeCreditQualityService.class);
 
     PortfolioHolding h = mock(PortfolioHolding.class);
-    PortfolioHolding h2 = new PortfolioHolding(null, FinancialInstrumentType.CASH, null);
+    PortfolioHolding h2 = holdingWithoutCountry(null, FinancialInstrumentType.CASH, null);
 
     int creditQValue = 2;
     int fixedIncomeValue = 3;

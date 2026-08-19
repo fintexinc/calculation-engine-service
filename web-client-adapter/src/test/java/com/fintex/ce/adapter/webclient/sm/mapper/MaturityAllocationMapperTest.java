@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.MaturityAllocation;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.DurationAllocationValue;
 import com.fintex.wm.commons.domain.allocation.Maturities;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MaturityAllocationMapperTest {
@@ -30,7 +30,8 @@ class MaturityAllocationMapperTest {
         createPeriod(TimeDuration.SEVEN_TO_TEN_YEARS, "54.5")));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-001"));
+    MaturityAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-001", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -45,7 +46,8 @@ class MaturityAllocationMapperTest {
 
   @Test
   void shouldReturnEmptyMap_whenResponseIsNull() {
-    MaturityAllocation result = mapper.map(null, createHolding("SEC-002"));
+    MaturityAllocation result = mapper.map(null, holding(new SecurityIdentifier("SEC-002", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getMaturityDurationValues()).isEmpty();
@@ -56,7 +58,8 @@ class MaturityAllocationMapperTest {
     var smsResponse = new Maturities();
     smsResponse.setAllocations(null);
 
-    MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-003"));
+    MaturityAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-003", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getMaturityDurationValues()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -68,7 +71,8 @@ class MaturityAllocationMapperTest {
     smsResponse.setAllocations(List.of());
     smsResponse.setDataProviders(null);
 
-    MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-004"));
+    MaturityAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-004", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
   }
@@ -88,7 +92,8 @@ class MaturityAllocationMapperTest {
     var smsResponse = new Maturities();
     smsResponse.setAllocations(List.of(valid, nullDuration, nullValue));
 
-    MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-005"));
+    MaturityAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-005", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getMaturityDurationValues()).hasSize(1);
     assertThat(result.getMaturityDurationValues())
@@ -102,7 +107,8 @@ class MaturityAllocationMapperTest {
         createPeriod(TimeDuration.THREE_TO_FIVE_YEARS, "20.0"),
         createPeriod(TimeDuration.THREE_TO_FIVE_YEARS, "15.0")));
 
-    MaturityAllocation result = mapper.map(smsResponse, createHolding("SEC-006"));
+    MaturityAllocation result = mapper.map(smsResponse, holding(new SecurityIdentifier("SEC-006", null),
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getMaturityDurationValues()).hasSize(1);
     assertThat(result.getMaturityDurationValues().get("THREE_TO_FIVE_YEARS"))
@@ -116,8 +122,4 @@ class MaturityAllocationMapperTest {
     return mdv;
   }
 
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, null));
-  }
 }

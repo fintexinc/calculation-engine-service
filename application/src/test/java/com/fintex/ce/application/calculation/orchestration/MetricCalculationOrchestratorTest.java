@@ -19,7 +19,6 @@ import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -141,7 +141,8 @@ class MetricCalculationOrchestratorTest {
 
   @Test
   void shouldFetchBenchmarkReturnsSeparately_whenCommandCarriesBenchmarkHoldings() {
-    PortfolioHolding benchmarkHolding = holding("BENCH");
+    PortfolioHolding benchmarkHolding = holdingWithoutCountry("BENCH", FiIdentifierType.TICKER,
+        FinancialInstrumentType.ETF, BigDecimal.ONE);
     PeriodCommand command = sharpeCommand(benchmarkHolding);
     PortfolioHolding portfolioHolding = command.getHoldings().getFirst();
     when(securityAttributesFetcher.fetch(eq(List.of(portfolioHolding)),
@@ -169,7 +170,8 @@ class MetricCalculationOrchestratorTest {
   void shouldFetchAllRequiredAttributesForBenchmark_whenBenchmarkServiceRequiresSeveral() {
     when(sharpeRatioService.requiredAttributes()).thenReturn(List.of(
         CompositeSecurityAttribute.MONTHLY_RETURNS, CompositeSecurityAttribute.FEES));
-    PortfolioHolding benchmarkHolding = holding("BENCH");
+    PortfolioHolding benchmarkHolding = holdingWithoutCountry("BENCH", FiIdentifierType.TICKER,
+        FinancialInstrumentType.ETF, BigDecimal.ONE);
     PeriodCommand command = sharpeCommand(benchmarkHolding);
     PortfolioHolding portfolioHolding = command.getHoldings().getFirst();
     when(securityAttributesFetcher.fetch(eq(List.of(portfolioHolding)), anyCollection(), eq(DEFAULT_PROVIDERS)))
@@ -316,7 +318,8 @@ class MetricCalculationOrchestratorTest {
 
   @Test
   void shouldSkipTheBenchmarkFetch_whenThePortfolioFetchAlreadyFailed() {
-    PortfolioHolding benchmarkHolding = holding("BENCH");
+    PortfolioHolding benchmarkHolding = holdingWithoutCountry("BENCH", FiIdentifierType.TICKER,
+        FinancialInstrumentType.ETF, BigDecimal.ONE);
     PeriodCommand command = sharpeCommand(benchmarkHolding);
     PortfolioHolding portfolioHolding = command.getHoldings().getFirst();
     when(securityAttributesFetcher.fetch(eq(List.of(portfolioHolding)),
@@ -335,7 +338,8 @@ class MetricCalculationOrchestratorTest {
   @Test
   void shouldPropagateAsServiceUnavailable_whenBenchmarkFetchFails() {
     PortfolioHoldingsCommand allocationCommand = allocationCommand();
-    PeriodCommand sharpeCommand = sharpeCommand(holding("BENCH"));
+    PeriodCommand sharpeCommand = sharpeCommand(holdingWithoutCountry("BENCH", FiIdentifierType.TICKER,
+        FinancialInstrumentType.ETF, BigDecimal.ONE));
     when(securityAttributesFetcher.fetch(anyList(), anyCollection(), anyList())).thenReturn(SecurityData.EMPTY);
     when(securityAttributesFetcher.fetch(anyList(), eq(CompositeSecurityAttribute.MONTHLY_RETURNS), anyList()))
         .thenThrow(new ExternalServiceUnavailableException(SECURITY_MASTER));
@@ -446,7 +450,8 @@ class MetricCalculationOrchestratorTest {
 
   private static PortfolioHoldingsCommand allocationCommand() {
     PortfolioHoldingsCommand command = PortfolioHoldingsCommand.builder()
-        .holdings(List.of(holding("XIU")))
+        .holdings(List.of(holdingWithoutCountry("XIU", FiIdentifierType.TICKER,
+            FinancialInstrumentType.ETF, BigDecimal.ONE)))
         .build();
     command.setMetric(CalculationMetric.ASSET_ALLOCATIONS);
     return command;
@@ -455,15 +460,12 @@ class MetricCalculationOrchestratorTest {
   private static PeriodCommand sharpeCommand(PortfolioHolding benchmarkHolding) {
     PeriodCommand command = new PeriodCommand();
     command.setMetric(CalculationMetric.SHARPE_RATIO);
-    command.setHoldings(List.of(holding("XIU")));
+    command.setHoldings(List.of(holdingWithoutCountry("XIU", FiIdentifierType.TICKER,
+        FinancialInstrumentType.ETF, BigDecimal.ONE)));
     if (benchmarkHolding != null) {
       command.setBenchmarkHoldings(List.of(benchmarkHolding));
     }
     return command;
   }
 
-  private static PortfolioHolding holding(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF,
-        new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
-  }
 }

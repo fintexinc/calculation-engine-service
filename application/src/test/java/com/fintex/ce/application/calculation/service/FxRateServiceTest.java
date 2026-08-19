@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.model.error.ErrorCode.Codes.FX_RATES_UNAVAILABLE;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,8 +57,8 @@ class FxRateServiceTest {
         new CurrencyExchangePair(Currency.USD, Currency.CAD),
         (NavigableMap<LocalDate, BigDecimal>) getUsdToCadRates());
 
-    PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
-        FiIdentifierType.TICKER));
+    PortfolioHolding etfHolding = holdingWithoutCountry(new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.USD);
     List<Notification> warnings = new ArrayList<>();
@@ -77,8 +78,8 @@ class FxRateServiceTest {
         new CurrencyExchangePair(Currency.CAD, Currency.USD),
         (NavigableMap<LocalDate, BigDecimal>) getCadToUsdRates());
 
-    PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
-        FiIdentifierType.TICKER));
+    PortfolioHolding etfHolding = holdingWithoutCountry(new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
     List<Notification> warnings = new ArrayList<>();
@@ -103,8 +104,8 @@ class FxRateServiceTest {
         new CurrencyExchangePair(Currency.CAD, Currency.USD),
         rates);
 
-    PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
-        FiIdentifierType.TICKER));
+    PortfolioHolding etfHolding = holdingWithoutCountry(new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(etfHolding, returnsPerHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
     List<Notification> warnings = new ArrayList<>();
@@ -135,8 +136,8 @@ class FxRateServiceTest {
         LocalDate.parse("2021-02-26"), BigDecimal.valueOf(2)));
     var fxRates = Map.of(new CurrencyExchangePair(Currency.CAD, Currency.USD), rates);
 
-    PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
-        FiIdentifierType.TICKER));
+    PortfolioHolding etfHolding = holdingWithoutCountry(new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER), null, null);
     TreeMap<LocalDate, BigDecimal> returnsPerHolding = new TreeMap<>(Map.of(
         JANUARY_END, BigDecimal.ONE,
         FEBRUARY_END, BigDecimal.valueOf(2)));
@@ -161,8 +162,8 @@ class FxRateServiceTest {
         new CurrencyExchangePair(Currency.CAD, Currency.USD),
         (NavigableMap<LocalDate, BigDecimal>) new TreeMap<LocalDate, BigDecimal>());
 
-    PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
-        FiIdentifierType.TICKER));
+    PortfolioHolding etfHolding = holdingWithoutCountry(new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
     List<Notification> warnings = new ArrayList<>();
@@ -177,8 +178,8 @@ class FxRateServiceTest {
   void shouldReturnEmptySeriesAndEmitWarning_whenPairIsNotInRatesMap() {
     Map<CurrencyExchangePair, NavigableMap<LocalDate, BigDecimal>> fxRates = Map.of();
 
-    PortfolioHolding etfHolding = new PortfolioHolding(null, null, new SecurityIdentifier("Ticker",
-        FiIdentifierType.TICKER));
+    PortfolioHolding etfHolding = holdingWithoutCountry(new SecurityIdentifier("Ticker",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = getReturns(etfHolding);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(etfHolding, Currency.CAD);
     List<Notification> warnings = new ArrayList<>();
@@ -191,10 +192,10 @@ class FxRateServiceTest {
 
   @Test
   void shouldFetchEachDistinctSourceCurrency_whenRatesIsCalled() {
-    PortfolioHolding usdHolding = new PortfolioHolding(null, null, new SecurityIdentifier("USD-ETF",
-        FiIdentifierType.TICKER));
-    PortfolioHolding eurHolding = new PortfolioHolding(null, null, new SecurityIdentifier("EUR-ETF",
-        FiIdentifierType.TICKER));
+    PortfolioHolding usdHolding = holdingWithoutCountry(new SecurityIdentifier("USD-ETF",
+        FiIdentifierType.TICKER), null, null);
+    PortfolioHolding eurHolding = holdingWithoutCountry(new SecurityIdentifier("EUR-ETF",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(usdHolding, Currency.USD, eurHolding, Currency.EUR);
 
     var usdCadRates = new TreeMap<LocalDate, BigDecimal>();
@@ -214,10 +215,10 @@ class FxRateServiceTest {
 
   @Test
   void shouldDeduplicateSourceCurrencies_whenMultipleHoldingsShareCurrency() {
-    PortfolioHolding firstUsdHolding = new PortfolioHolding(null, null, new SecurityIdentifier("USD-1",
-        FiIdentifierType.TICKER));
-    PortfolioHolding secondUsdHolding = new PortfolioHolding(null, null, new SecurityIdentifier("USD-2",
-        FiIdentifierType.TICKER));
+    PortfolioHolding firstUsdHolding = holdingWithoutCountry(new SecurityIdentifier("USD-1",
+        FiIdentifierType.TICKER), null, null);
+    PortfolioHolding secondUsdHolding = holdingWithoutCountry(new SecurityIdentifier("USD-2",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(firstUsdHolding, Currency.USD, secondUsdHolding,
         Currency.USD);
     when(fxRatesFetcher.fetch(any(), any())).thenReturn(new TreeMap<>());
@@ -229,8 +230,8 @@ class FxRateServiceTest {
 
   @Test
   void shouldSkipSelfCurrencyPairs_whenSourceCurrencyEqualsTargetCurrency() {
-    PortfolioHolding cadHolding = new PortfolioHolding(null, null, new SecurityIdentifier("CAD-ETF",
-        FiIdentifierType.TICKER));
+    PortfolioHolding cadHolding = holdingWithoutCountry(new SecurityIdentifier("CAD-ETF",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(cadHolding, Currency.CAD);
 
     var actual = service.rates(holdingCurrencies, Currency.CAD, RANGE);
@@ -241,10 +242,10 @@ class FxRateServiceTest {
 
   @Test
   void shouldReturnEmptyTreeMapForFailedPair_whenFetcherThrowsBasePceException() {
-    PortfolioHolding usdHolding = new PortfolioHolding(null, null, new SecurityIdentifier("USD-ETF",
-        FiIdentifierType.TICKER));
-    PortfolioHolding eurHolding = new PortfolioHolding(null, null, new SecurityIdentifier("EUR-ETF",
-        FiIdentifierType.TICKER));
+    PortfolioHolding usdHolding = holdingWithoutCountry(new SecurityIdentifier("USD-ETF",
+        FiIdentifierType.TICKER), null, null);
+    PortfolioHolding eurHolding = holdingWithoutCountry(new SecurityIdentifier("EUR-ETF",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(usdHolding, Currency.USD, eurHolding, Currency.EUR);
 
     var eurCadRates = new TreeMap<LocalDate, BigDecimal>();
@@ -261,8 +262,8 @@ class FxRateServiceTest {
 
   @Test
   void shouldReturnEmptyTreeMapForPair_whenFetcherReturnsNull() {
-    PortfolioHolding usdHolding = new PortfolioHolding(null, null, new SecurityIdentifier("USD-ETF",
-        FiIdentifierType.TICKER));
+    PortfolioHolding usdHolding = holdingWithoutCountry(new SecurityIdentifier("USD-ETF",
+        FiIdentifierType.TICKER), null, null);
     Map<PortfolioHolding, Currency> holdingCurrencies = Map.of(usdHolding, Currency.USD);
     when(fxRatesFetcher.fetch(new CurrencyExchangePair(Currency.USD, Currency.CAD), RANGE)).thenReturn(null);
 

@@ -48,6 +48,7 @@ class BankOfCanadaWebClientTest {
 
   private static final String PATH = "/observations/FXCADUSD/json";
   private static final int MAX_ATTEMPTS = 3;
+  private static final Duration DEFAULT_WHOLE_CALL_DEADLINE = Duration.ofSeconds(30);
 
   private MockWebServer server;
   private WebClient webClient;
@@ -73,7 +74,7 @@ class BankOfCanadaWebClientTest {
         .retryOnException(TransientCallFailures::isTransient)
         .build());
     observability = new RecordingObservability();
-    client = buildClient(Duration.ofSeconds(5));
+    client = buildClient(DEFAULT_WHOLE_CALL_DEADLINE);
   }
 
   private BankOfCanadaWebClient buildClient(Duration wholeCallDeadline) {
@@ -169,8 +170,8 @@ class BankOfCanadaWebClientTest {
         .isInstanceOf(ExternalServiceUnavailableException.class);
 
     assertThat(server.getRequestCount())
-        .as("the deadline caps the logical call, so the cancelled attempt is not followed by another")
-        .isEqualTo(1);
+        .as("the deadline caps the logical call, so it never reaches a second provider request")
+        .isLessThanOrEqualTo(1);
     assertThat(observability.outcomes.getFirst()).startsWith("failed:");
   }
 

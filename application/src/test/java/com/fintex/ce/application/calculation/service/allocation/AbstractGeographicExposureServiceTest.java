@@ -11,10 +11,13 @@ import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.test.PortfolioHoldingBuildHelper;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.financial.Geography;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +30,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.fundCa;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,7 +105,9 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
   void shouldReturnNullBuckets_whenOnlyCashAndGicHoldings() {
     CashHolding cashCad = cash(Currency.CAD, 1000);
     CashHolding cashUsd = cash(Currency.USD, 500);
-    GicHolding gic = gic(Currency.CAD, 500);
+    GicHolding gic = PortfolioHoldingBuildHelper.gic(
+        new SecurityIdentifier("GIC-" + Currency.CAD, FiIdentifierType.MORNINGSTAR_ID), Currency.CAD,
+        BigDecimal.valueOf(500), BigDecimal.valueOf(365));
 
     R result = service.perform(command(cashCad, cashUsd, gic), data(Map.of(), Map.of()));
 
@@ -108,7 +117,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldReturnNullBucketsAndWarn_whenDataHasNoAllocations() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 1000);
+    PortfolioHolding fund = fundCa("RBF605", 1000);
 
     R result = service.perform(command(fund), data(Map.of(), Map.of()));
 
@@ -119,8 +128,8 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldReturnUnknownBucketAndWarnPerHolding_whenAllocationMapsAreEmptyPresentAndSmHasNoRecord() {
-    PortfolioHolding presentButEmpty = canadaMutualFund("A", 100);
-    PortfolioHolding notFoundBySm = canadaMutualFund("B", 100);
+    PortfolioHolding presentButEmpty = fundCa("A", 100);
+    PortfolioHolding notFoundBySm = fundCa("B", 100);
     GeographicExposureData data = data(Map.of(presentButEmpty, allocation(Map.of(), Currency.CAD)), Map.of());
 
     R result = service.perform(command(presentButEmpty, notFoundBySm), data);
@@ -135,8 +144,8 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldReturnUnknownBucketAndWarnPerHolding_whenAllAllocationMapsAreEmpty() {
-    PortfolioHolding fundA = canadaMutualFund("A", 100);
-    PortfolioHolding fundB = canadaMutualFund("B", 200);
+    PortfolioHolding fundA = fundCa("A", 100);
+    PortfolioHolding fundB = fundCa("B", 200);
     GeographicExposureData data = data(Map.of(
         fundA, allocation(Map.of(), Currency.CAD),
         fundB, allocation(Map.of(), Currency.CAD)), Map.of());
@@ -151,7 +160,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldReturnUnknownBucketAndWarn_whenAllocationMapIsNull() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 1000);
+    PortfolioHolding fund = fundCa("RBF605", 1000);
     GeographicExposureData data = data(Map.of(fund,
         HoldingGeographicAllocation.builder().allocations(null).currency(Currency.CAD).build()), Map.of());
 
@@ -164,11 +173,13 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldComputeFullDistribution_whenHeterogeneousMultiCurrencyPortfolio() {
-    PortfolioHolding mutualFund = canadaMutualFund("RBF605", 100);
-    PortfolioHolding usEtf = usEtf("VOO", 200);
+    PortfolioHolding mutualFund = fundCa("RBF605", 100);
+    PortfolioHolding usEtf = etf("VOO", Country.USA, 200);
     PortfolioHolding typeSpecific = typeSpecificRelevantHolding();
     CashHolding cash = cash(Currency.CAD, 1000);
-    GicHolding gic = gic(Currency.USD, 500);
+    GicHolding gic = PortfolioHoldingBuildHelper.gic(
+        new SecurityIdentifier("GIC-" + Currency.USD, FiIdentifierType.MORNINGSTAR_ID), Currency.USD,
+        BigDecimal.valueOf(500), BigDecimal.valueOf(365));
 
     Map<PortfolioHolding, HoldingGeographicAllocation> fundAllocations = new HashMap<>();
     fundAllocations.put(mutualFund, allocation(Map.of(
@@ -189,8 +200,8 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldConvertNonTargetCurrenciesToCad_whenComputingPortfolioWeights() {
-    PortfolioHolding cadFund = canadaMutualFund("CAD-FUND", 100);
-    PortfolioHolding usdEtf = usEtf("USD-ETF", 100);
+    PortfolioHolding cadFund = fundCa("CAD-FUND", 100);
+    PortfolioHolding usdEtf = etf("USD-ETF", Country.USA, 100);
 
     GeographicExposureData data = data(Map.of(
         cadFund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD),
@@ -209,8 +220,8 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldUseRawValuesAndAddWarning_whenFxRateUnavailable() {
-    PortfolioHolding cadFund = canadaMutualFund("CAD-FUND", 100);
-    PortfolioHolding usdEtf = usEtf("USD-ETF", 100);
+    PortfolioHolding cadFund = fundCa("CAD-FUND", 100);
+    PortfolioHolding usdEtf = etf("USD-ETF", Country.USA, 100);
 
     GeographicExposureData data = data(Map.of(
         cadFund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD),
@@ -232,8 +243,8 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldFallBackToRawValue_whenAllocationCurrencyIsNull() {
-    PortfolioHolding fundA = canadaMutualFund("A", 100);
-    PortfolioHolding fundB = canadaMutualFund("B", 100);
+    PortfolioHolding fundA = fundCa("A", 100);
+    PortfolioHolding fundB = fundCa("B", 100);
 
     GeographicExposureData data = data(Map.of(
         fundA, allocation(Map.of(GeographicRegionType.US, ONE), null),
@@ -252,10 +263,12 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldExcludeCashAndGic_fromExposureAggregation() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+    PortfolioHolding fund = fundCa("RBF605", 100);
     CashHolding cashCad = cash(Currency.CAD, 500);
     CashHolding cashUsd = cash(Currency.USD, 250);
-    GicHolding gic = gic(Currency.CAD, 200);
+    GicHolding gic = PortfolioHoldingBuildHelper.gic(
+        new SecurityIdentifier("GIC-" + Currency.CAD, FiIdentifierType.MORNINGSTAR_ID), Currency.CAD,
+        BigDecimal.valueOf(200), BigDecimal.valueOf(365));
 
     GeographicExposureData data = data(Map.of(
         fund, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD),
@@ -271,7 +284,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldExcludeSecurityRelevantToOtherService_fromExposureAggregation() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+    PortfolioHolding fund = fundCa("RBF605", 100);
     PortfolioHolding excluded = excludedSecurityHolding();
 
     GeographicExposureData data = data(Map.of(
@@ -287,8 +300,8 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldIncludeCanadaEtf_inFundAllocationPath_notStockGeographyPath() {
-    PortfolioHolding canadaEtf = canadaEtf("XIU", 100);
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+    PortfolioHolding canadaEtf = etfCa("XIU", 100);
+    PortfolioHolding fund = fundCa("RBF605", 100);
 
     GeographicExposureData data = data(Map.of(
         canadaEtf, allocation(Map.of(GeographicRegionType.CANADA, ONE), Currency.CAD),
@@ -304,7 +317,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldRescaleToSignedNetTotal_whenAllocationsContainLongAndShortValues() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+    PortfolioHolding fund = fundCa("RBF605", 100);
     GeographicExposureData data = data(Map.of(
         fund, allocation(Map.of(
             GeographicRegionType.US, new BigDecimal("0.100"),
@@ -323,7 +336,7 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldRescaleAllocations_whenRawAllocationsDoNotSumToOne() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+    PortfolioHolding fund = fundCa("RBF605", 100);
     GeographicExposureData data = data(Map.of(
         fund, allocation(Map.of(
             GeographicRegionType.US, new BigDecimal("80"),
@@ -339,8 +352,8 @@ abstract class AbstractGeographicExposureServiceTest<R extends GeographicExposur
 
   @Test
   void shouldAggregateExposuresAcrossEveryRegion_whenAllRegionsRepresented() {
-    PortfolioHolding fundA = canadaMutualFund("A", 100);
-    PortfolioHolding fundB = canadaMutualFund("B", 100);
+    PortfolioHolding fundA = fundCa("A", 100);
+    PortfolioHolding fundB = fundCa("B", 100);
 
     GeographicExposureData data = data(Map.of(
         fundA, allocation(Map.of(

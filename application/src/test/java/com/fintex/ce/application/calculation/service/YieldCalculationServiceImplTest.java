@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
@@ -46,17 +48,17 @@ class YieldCalculationServiceImplTest {
     Map<PortfolioHolding, Yield> mockData = new HashMap<>();
     Yield yield1 = new Yield();
     yield1.setDividendYield(new BigDecimal("0.05"));
-    mockData.put(new PortfolioHolding(new BigDecimal("100"), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, null),
+    mockData.put(holding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, new BigDecimal("100")),
         yield1);
 
     Yield yield2 = new Yield();
     yield2.setDividendYield(new BigDecimal("0.10"));
-    mockData.put(new PortfolioHolding(new BigDecimal("200"), FinancialInstrumentType.HEDGE_FUND, Country.CANADA, null),
+    mockData.put(holding(null, FinancialInstrumentType.HEDGE_FUND, Country.CANADA, new BigDecimal("200")),
         yield2);
 
     Yield yield3 = new Yield();
     yield3.setDividendYield(new BigDecimal("0.06"));
-    mockData.put(new PortfolioHolding(new BigDecimal("150"), FinancialInstrumentType.GIC, null), yield3);
+    mockData.put(holdingWithoutCountry(null, FinancialInstrumentType.GIC, new BigDecimal("150")), yield3);
     return mockData;
   }
 

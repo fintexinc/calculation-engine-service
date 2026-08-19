@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.fintex.ce.model.error.ErrorCode.MISSING_EQUITY_COUNTRY_EXPOSURE;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -43,7 +44,8 @@ class EquityCountryExposureServiceTest {
 
   @Test
   void shouldAggregateCountryRegions_whenHoldingHasAllocation() {
-    var fund = fund("RBF605", "100");
+    var fund = holding(new SecurityIdentifier("RBF605", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(fund,
         alloc(Map.of(Country.CANADA, new BigDecimal("0.6"), Country.USA, new BigDecimal("0.4"))));
 
@@ -56,7 +58,8 @@ class EquityCountryExposureServiceTest {
 
   @Test
   void shouldRescaleSurvivorsToOneHundredPercent_whenAllocationsDoNotSumToOne() {
-    var fund = fund("RBF605", "100");
+    var fund = holding(new SecurityIdentifier("RBF605", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(fund,
         alloc(Map.of(Country.CANADA, new BigDecimal("0.3"), Country.USA, new BigDecimal("0.1"))));
 
@@ -69,8 +72,10 @@ class EquityCountryExposureServiceTest {
 
   @Test
   void shouldBlendByValue_acrossHoldings() {
-    var canFund = fund("CAN1", "100");
-    var usFund = fund("US1", "100");
+    var canFund = holding(new SecurityIdentifier("CAN1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    var usFund = holding(new SecurityIdentifier("US1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var data = Map.of(
         canFund, alloc(Map.of(Country.CANADA, BigDecimal.ONE)),
         usFund, alloc(Map.of(Country.USA, BigDecimal.ONE)));
@@ -84,7 +89,8 @@ class EquityCountryExposureServiceTest {
 
   @Test
   void shouldWarnAndReturnAllNullBuckets_whenDataMissing() {
-    var fund = fund("RBF605", "100");
+    var fund = holding(new SecurityIdentifier("RBF605", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     var result = service.perform(command(fund), Map.of());
 
@@ -94,15 +100,6 @@ class EquityCountryExposureServiceTest {
 
   private static PortfolioHoldingsCommand command(PortfolioHolding... holdings) {
     return PortfolioHoldingsCommand.builder().holdings(List.of(holdings)).build();
-  }
-
-  private static PortfolioHolding fund(String id, String value) {
-    return PortfolioHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
-        .country(Country.CANADA)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
-        .build();
   }
 
   private static EquityCountryAllocation alloc(Map<Country, BigDecimal> allocations) {

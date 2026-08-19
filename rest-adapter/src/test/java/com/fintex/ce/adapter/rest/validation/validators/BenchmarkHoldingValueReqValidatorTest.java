@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,7 +28,8 @@ class BenchmarkHoldingValueReqValidatorTest {
 
   @Test
   void shouldThrow_whenBenchmarkHoldingValueIsNull() {
-    PortfolioHolding holding = new PortfolioHolding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, null);
+    PortfolioHolding holding = holding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        (BigDecimal) null);
 
     PeriodCommand cmd = new PeriodCommand();
     cmd.setCurrency(Currency.CAD);
@@ -43,9 +45,8 @@ class BenchmarkHoldingValueReqValidatorTest {
 
   @Test
   void shouldThrow_whenBenchmarkHoldingValueIsNegative() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.valueOf(-1), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding holding = holding(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.valueOf(-1));
 
     PeriodCommand cmd = new PeriodCommand();
     cmd.setCurrency(Currency.CAD);
@@ -61,9 +62,8 @@ class BenchmarkHoldingValueReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenBenchmarkHoldingValuesArePositive() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding holding = holding(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN);
 
     PeriodCommand cmd = new PeriodCommand();
     cmd.setCurrency(Currency.CAD);

@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -41,11 +43,10 @@ class YieldResponseMapperTest {
 
   @Test
   void shouldCalculateWeightedAverageYield_whenMappingPortfolioDomainMap() {
-    PortfolioHolding stock = new PortfolioHolding(new BigDecimal("2"), FinancialInstrumentType.STOCK, Country.USA,
-        null);
-    PortfolioHolding gic = new PortfolioHolding(new BigDecimal("3"), FinancialInstrumentType.GIC, null);
-    PortfolioHolding skipped = new PortfolioHolding(new BigDecimal("5"), FinancialInstrumentType.STOCK, Country.CANADA,
-        null);
+    PortfolioHolding stock = holding(null, FinancialInstrumentType.STOCK, Country.USA, new BigDecimal("2"));
+    PortfolioHolding gic = holdingWithoutCountry(null, FinancialInstrumentType.GIC, new BigDecimal("3"));
+    PortfolioHolding skipped = holding(null, FinancialInstrumentType.STOCK, Country.CANADA,
+        new BigDecimal("5"));
 
     Map<PortfolioHolding, Yield> domainMap = Map.of(
         stock, yieldOf(new BigDecimal("0.1")),
@@ -62,7 +63,7 @@ class YieldResponseMapperTest {
 
   @Test
   void shouldReturnZeroYield_whenNoValidEntriesProvided() {
-    PortfolioHolding invalid = new PortfolioHolding(null, FinancialInstrumentType.STOCK, Country.USA, null);
+    PortfolioHolding invalid = holding(null, FinancialInstrumentType.STOCK, Country.USA, (BigDecimal) null);
     Map<PortfolioHolding, Yield> domainMap = Map.of(invalid, yieldOf(new BigDecimal("0.1")));
 
     YieldResult result = mapper.toResponse(domainMap, List.of());

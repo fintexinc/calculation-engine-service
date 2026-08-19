@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FixedIncomeStyleboxExposureMapperTest {
@@ -34,7 +35,8 @@ class FixedIncomeStyleboxExposureMapperTest {
     smsResponse.setBoxValues(List.of(highLimited, highModerate, mediumExtensive));
     smsResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    PortfolioHolding holding = createHolding("AGG", FinancialInstrumentType.ETF);
+    PortfolioHolding holding = holdingWithoutCountry(new SecurityIdentifier("AGG", null), FinancialInstrumentType.ETF,
+        (BigDecimal) null);
 
     FixedIncomeStyleboxExposure result = mapper.map(smsResponse, holding);
 
@@ -50,7 +52,8 @@ class FixedIncomeStyleboxExposureMapperTest {
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyBoxValues_whenResponseIsNullOrHasNoBoxValues(
       FixedIncomeStyleBoxes smsResponse) {
-    PortfolioHolding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
+    PortfolioHolding holding = holdingWithoutCountry(new SecurityIdentifier("TEST.ID", null),
+        FinancialInstrumentType.FUND, (BigDecimal) null);
 
     FixedIncomeStyleboxExposure result = mapper.map(smsResponse, holding);
 
@@ -82,8 +85,9 @@ class FixedIncomeStyleboxExposureMapperTest {
     var smsResponse = new FixedIncomeStyleBoxes();
     smsResponse.setBoxValues(List.of(validEntry, nullTypeEntry, nullValueEntry));
 
-    FixedIncomeStyleboxExposure result = mapper.map(smsResponse, createHolding("TEST.ID",
-        FinancialInstrumentType.ETF));
+    FixedIncomeStyleboxExposure result = mapper.map(smsResponse, holdingWithoutCountry(new SecurityIdentifier("TEST.ID",
+        null), FinancialInstrumentType.ETF,
+        (BigDecimal) null));
 
     assertThat(result.getBoxValues()).hasSize(1);
     assertThat(result.getBoxValues()).containsKey(FixedIncomeStyleBoxType.LOW_LIMITED);
@@ -106,8 +110,9 @@ class FixedIncomeStyleboxExposureMapperTest {
     var smsResponse = new FixedIncomeStyleBoxes();
     smsResponse.setBoxValues(entries);
 
-    FixedIncomeStyleboxExposure result = mapper.map(smsResponse, createHolding("FULL.TEST",
-        FinancialInstrumentType.ETF));
+    FixedIncomeStyleboxExposure result = mapper.map(smsResponse, holdingWithoutCountry(new SecurityIdentifier(
+        "FULL.TEST", null), FinancialInstrumentType.ETF,
+        (BigDecimal) null));
 
     assertThat(result.getBoxValues()).hasSize(9);
     assertThat(result.getBoxValues().get(FixedIncomeStyleBoxType.HIGH_LIMITED)).isEqualByComparingTo("10.0");
@@ -128,9 +133,4 @@ class FixedIncomeStyleboxExposureMapperTest {
         .build();
   }
 
-  private PortfolioHolding createHolding(String securityId, FinancialInstrumentType holdingType) {
-    var identifier = new SecurityIdentifier();
-    identifier.setId(securityId);
-    return new PortfolioHolding(null, holdingType, identifier);
-  }
 }

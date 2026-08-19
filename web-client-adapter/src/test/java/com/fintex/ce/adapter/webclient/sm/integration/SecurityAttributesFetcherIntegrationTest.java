@@ -14,7 +14,6 @@ import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.datapoint.FloatDatapoint;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.financial.Fees;
 import com.fintex.wm.commons.domain.financial.ManagementFeeDatapoint;
@@ -56,6 +55,7 @@ import java.util.NavigableMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.MockResponse;
@@ -133,7 +133,7 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldPostCompositeRequestAndMapFeesToRatios_whenCompositeFetch() throws Exception {
-    PortfolioHolding holding = holding("XIU");
+    PortfolioHolding holding = etf("XIU", Country.CANADA, 1);
     enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.FEES, List.of(
         feeRow("XIU", "1.51", DataProvider.MORNINGSTAR, "2.25", Currency.CAD))));
 
@@ -164,7 +164,7 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldPostToAttributePathAndMapFees_whenSingleAttributeFetch() throws Exception {
-    PortfolioHolding holding = holding("XIU");
+    PortfolioHolding holding = etf("XIU", Country.CANADA, 1);
     enqueueArrayResponse(List.of(feeRow("XIU", "0.80", DataProvider.FMP, "1.10", Currency.USD)));
 
     Map<PortfolioHolding, FeeData> result = securityAttributesFetcher.fetch(
@@ -185,8 +185,8 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldMapEachHoldingToItsOwnData_whenMultipleHoldingsFetched() throws Exception {
-    PortfolioHolding xiu = holding("XIU");
-    PortfolioHolding vfv = holding("VFV");
+    PortfolioHolding xiu = etf("XIU", Country.CANADA, 1);
+    PortfolioHolding vfv = etf("VFV", Country.CANADA, 1);
     enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.FEES, List.of(
         feeRow("XIU", "1.51", DataProvider.MORNINGSTAR, "2.25", Currency.CAD),
         feeRow("VFV", "0.09", DataProvider.MORNINGSTAR, "0.09", Currency.CAD))));
@@ -203,7 +203,7 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldIgnoreUnknownIdentifierRows_whenSmsReturnsUnrequestedHolding() throws Exception {
-    PortfolioHolding requested = holding("XIU");
+    PortfolioHolding requested = etf("XIU", Country.CANADA, 1);
     enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.FEES, List.of(
         feeRow("XIU", "1.51", DataProvider.MORNINGSTAR, "2.25", Currency.CAD),
         feeRow("UNKNOWN", "9.99", DataProvider.MORNINGSTAR, "9.99", Currency.CAD))));
@@ -233,7 +233,8 @@ class SecurityAttributesFetcherIntegrationTest {
         .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
     SecurityData securityData = securityAttributesFetcher.fetch(
-        List.of(holding("XIU")), List.of(CompositeSecurityAttribute.FEES), List.of(DataProvider.MORNINGSTAR));
+        List.of(etf("XIU", Country.CANADA, 1)), List.of(CompositeSecurityAttribute.FEES), List.of(
+            DataProvider.MORNINGSTAR));
 
     RecordedRequest recorded = smsMockServer.takeRequest();
     assertThat(recorded.getPath()).isEqualTo(ATTRIBUTES_PATH);
@@ -259,7 +260,7 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldPreserveBenchmarkReturnGap_whenSmsOmitsMonth() throws Exception {
-    PortfolioHolding benchmark = holding("BENCHMARK");
+    PortfolioHolding benchmark = etf("BENCHMARK", Country.CANADA, 1);
     MonthlyReturns monthlyReturns = new MonthlyReturns();
     monthlyReturns.setReturns(List.of(
         dateValue("2024-01-31", "1.25"),
@@ -288,7 +289,7 @@ class SecurityAttributesFetcherIntegrationTest {
    */
   @Test
   void shouldMapLimitedHoldings_whenSmsReturnsAggregatedHoldings() throws Exception {
-    PortfolioHolding etf = holding("AGGREGATED");
+    PortfolioHolding etf = etf("AGGREGATED", Country.CANADA, 1);
     enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.LIMITED_HOLDINGS,
         List.of(attributeRow("AGGREGATED", limitedHoldings(Currency.CAD,
             securityHolding("NVIDIA Corp", "8.87516", "0P000003RE"),
@@ -314,7 +315,7 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldPreserveHoldingsBeyondTopTwentyFive_whenSmsReturnsLimitedHoldings() throws Exception {
-    PortfolioHolding etf = holding("ETF-WITH-MANY-HOLDINGS");
+    PortfolioHolding etf = etf("ETF-WITH-MANY-HOLDINGS", Country.CANADA, 1);
 
     List<SecurityHolding> holdings = IntStream.rangeClosed(1, 41)
         .mapToObj(index -> securityHolding(
@@ -358,8 +359,8 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldPreserveNullHoldingFields_whenSmsOmitsCurrencyAndWeight() throws Exception {
-    PortfolioHolding missingCurrency = holding("NO-CURRENCY");
-    PortfolioHolding missingWeight = holding("NO-WEIGHT");
+    PortfolioHolding missingCurrency = etf("NO-CURRENCY", Country.CANADA, 1);
+    PortfolioHolding missingWeight = etf("NO-WEIGHT", Country.CANADA, 1);
     enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.LIMITED_HOLDINGS,
         List.of(
             attributeRow("NO-CURRENCY", limitedHoldings(null, securityHolding("Equity", "5.0", null))),
@@ -384,8 +385,8 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldSkipFeeData_whenSmsOmitsHoldingRow() throws Exception {
-    PortfolioHolding available = holding("FEE-AVAILABLE");
-    PortfolioHolding missing = holding("FEE-MISSING");
+    PortfolioHolding available = etf("FEE-AVAILABLE", Country.CANADA, 1);
+    PortfolioHolding missing = etf("FEE-MISSING", Country.CANADA, 1);
     enqueueCompositeResponse(Map.of(CompositeSecurityAttribute.FEES, List.of(
         feeRow("FEE-AVAILABLE", "1.51", DataProvider.MORNINGSTAR, "2.25", Currency.CAD))));
 
@@ -402,7 +403,7 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @Test
   void shouldDecodeResponse_whenPayloadExceedsTheFrameworkDefaultCodecLimit() throws Exception {
-    PortfolioHolding requested = holding("XIU");
+    PortfolioHolding requested = etf("XIU", Country.CANADA, 1);
     List<Map<String, Object>> rows = new ArrayList<>();
     rows.add(feeRow("XIU", "1.51", DataProvider.MORNINGSTAR, "2.25", Currency.CAD));
     IntStream.rangeClosed(1, FILLER_ROW_COUNT).forEach(index -> rows.add(
@@ -499,8 +500,4 @@ class SecurityAttributesFetcherIntegrationTest {
     return datapoint;
   }
 
-  private static PortfolioHolding holding(String ticker) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
-  }
 }

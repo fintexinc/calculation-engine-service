@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -50,8 +51,8 @@ abstract class AbstractAnnualReturnsE2ETest extends AbstractReturnCommandE2ETest
   @Override
   protected String requestBodyForSmsUnavailableScenario() {
     return writeJson(commandFor(Currency.CAD, List.of(
-        etfCanada(XBAL, "45234.67"),
-        etfCanada(VCNS, "18765.43"))));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "18765.43"))));
   }
 
   @Override
@@ -96,11 +97,11 @@ abstract class AbstractAnnualReturnsE2ETest extends AbstractReturnCommandE2ETest
 
   protected static ReturnCommand annualPortfolioCommand() {
     return commandFor(Currency.CAD, List.of(
-        etfCanada(XBAL, "45234.67"),
-        etfCanada(VCNS, "18765.43"),
-        stockCanada(RY_TO, "9234.12"),
-        fund(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "15678.90"),
-        fundServ(CCM4752, "11234.56")));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "18765.43"),
+        holding(RY_TO, FinancialInstrumentType.STOCK, Country.CANADA, "9234.12"),
+        holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "15678.90"),
+        holding(CCM4752, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "11234.56")));
   }
 
   protected static MonthlyReturns fullYear2024Returns() {

@@ -1,5 +1,6 @@
 package com.fintex.ce.e2e;
 
+import com.fintex.ce.model.domain.enumeration.InterestFreq;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
@@ -14,8 +15,11 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -33,8 +37,9 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
   @Test
   void shouldReturnBadRequest_whenGicHoldingOmitsInterestRate() {
     ReturnCommand command = commandFor(Currency.CAD, List.of(
-        etfCanada(XBAL, "45234.67"),
-        gicWithoutInterestRate(Currency.CAD, "25000.00", "365")));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
+        gic(null, Currency.CAD, new BigDecimal("25000.00"), new BigDecimal("365"), null,
+            InterestFreq.MONTHLY, LocalDate.of(2024, 1, 1))));
 
     Notification notification = assertSingleError(postCalculation(writeJson(command)), "GIC-001",
         "The gic holding is missing interest rate");
@@ -45,7 +50,8 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
   void shouldReturnBadRequest_whenNoCompleteCalendarYear() {
     enqueueSmsMockResponse(writeJson(List.of(
         securityAttributeResult(XBAL, monthlyReturnsFor("2025-09-30T00:00:00", OCT_2024_TO_SEP_2025)))));
-    ReturnCommand command = commandFor(Currency.CAD, List.of(etfCanada(XBAL, "45234.67")));
+    ReturnCommand command = commandFor(Currency.CAD, List.of(
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67")));
 
     Notification notification = assertSingleError(postCalculation(writeJson(command)), "RET-010",
         "No complete calendar year (Jan-Dec) found in monthly returns range [2024-10-31, 2025-09-30]; "
@@ -62,11 +68,11 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
         securityAttributeResult(VCNS, benchmarkFullYear2024Returns()),
         securityAttributeResult(CCM4752, benchmarkFullYear2024Returns()))));
     ReturnCommand command = commandFor(Currency.CAD, List.of(
-        etfCanada(XBAL, "60000"),
-        fund(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "40000")));
+        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "60000"),
+        holding(F0CAN999, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "40000")));
     command.setBenchmarkHoldings(List.of(
-        etfCanada(VCNS, "55000"),
-        fundServ(CCM4752, "45000")));
+        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "55000"),
+        holding(CCM4752, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "45000")));
 
     HttpResponse response = postCalculation(writeJson(command));
 

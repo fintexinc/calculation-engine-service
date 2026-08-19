@@ -6,7 +6,10 @@ import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Geography;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -39,7 +43,8 @@ class StockGeographyRegionResolverTest extends GeographicExposureFixtures {
   })
   void shouldMapEverySecurityRegion_whenBusinessCountryIsAbsent(SecurityRegion securityRegion,
       GeographicRegionType expectedRegion) {
-    PortfolioHolding stock = usStock("NO-COUNTRY", 100);
+    PortfolioHolding stock = holding(new SecurityIdentifier("NO-COUNTRY", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
     List<Notification> warnings = new ArrayList<>();
 
     GeographicRegionType region = resolver.resolve(stock, geographyWithRegionOnly(securityRegion, Currency.USD),
@@ -51,7 +56,8 @@ class StockGeographyRegionResolverTest extends GeographicExposureFixtures {
 
   @Test
   void shouldPreferBusinessCountryOverSecurityRegion_whenBothArePresent() {
-    PortfolioHolding stock = usStock("BOTH", 100);
+    PortfolioHolding stock = holding(new SecurityIdentifier("BOTH", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
     Geography geography = geographyWithRegionOnly(SecurityRegion.EMERGING_MARKETS, Currency.USD);
     geography.setBusinessCountry(geography(Country.GERMANY, Currency.EUR).getBusinessCountry());
     List<Notification> warnings = new ArrayList<>();
@@ -65,7 +71,8 @@ class StockGeographyRegionResolverTest extends GeographicExposureFixtures {
 
   @Test
   void shouldReturnNullAndWarnAboutMissingSecurity_whenGeographyIsAbsent() {
-    PortfolioHolding stock = usStock("UNRESOLVED", 100);
+    PortfolioHolding stock = holding(new SecurityIdentifier("UNRESOLVED", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
     List<Notification> warnings = new ArrayList<>();
 
     GeographicRegionType region = resolver.resolve(stock, null, METRIC_NAME, warnings);
@@ -78,7 +85,8 @@ class StockGeographyRegionResolverTest extends GeographicExposureFixtures {
 
   @Test
   void shouldReturnNullAndWarnAboutMissingBusinessCountry_whenNeitherCountryNorRegionResolves() {
-    PortfolioHolding stock = usStock("EMPTY-GEOGRAPHY", 100);
+    PortfolioHolding stock = holding(new SecurityIdentifier("EMPTY-GEOGRAPHY", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
     List<Notification> warnings = new ArrayList<>();
 
     GeographicRegionType region = resolver.resolve(stock, geography(null, Currency.USD), METRIC_NAME, warnings);
