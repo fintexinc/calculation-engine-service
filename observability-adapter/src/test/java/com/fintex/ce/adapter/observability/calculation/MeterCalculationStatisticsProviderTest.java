@@ -30,9 +30,19 @@ class MeterCalculationStatisticsProviderTest {
       ErrorCode.FIELD_NOT_EMPTY, ErrorCode.CPED_NOT_MONTH_END, ErrorCode.CPSD_NOT_MONTH_END,
       ErrorCode.CIPSD_NOT_MONTH_END, ErrorCode.COUNTRY_NOT_SUPPORTED);
 
-  private static final String SHARED_WARNING = "WARN-999";
-  private static final List<String> ALPHA_ONLY_WARNINGS = List.of("WRN-A1", "WRN-A2", "WRN-A3", "WRN-A4", "WRN-A5");
-  private static final List<String> BETA_ONLY_WARNINGS = List.of("WRN-B1", "WRN-B2", "WRN-B3", "WRN-B4", "WRN-B5");
+  private static final String SECTOR_WARNING = ErrorCode.Codes.MISSING_EQUITY_SECTOR_ALLOCATION;
+  private static final String MER_WARNING = ErrorCode.Codes.MISSING_MANAGEMENT_EXPENSE_RATIO;
+  private static final String SHARED_WARNING = ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC;
+  // Five distinct warnings per metric, and SHARED_WARNING distinct from all ten: the ranking assertions turn on
+  // the counts, not on which metric would really raise which code.
+  private static final List<String> ALPHA_ONLY_WARNINGS = List.of(
+      ErrorCode.Codes.UNKNOWN_TYPE_FROM_DATA_POINT, ErrorCode.Codes.MISSING_EQUITY_COUNTRY_EXPOSURE,
+      ErrorCode.Codes.MISSING_EQUITY_GEOGRAPHIC_EXPOSURE, ErrorCode.Codes.MISSING_ASSET_ALLOCATION,
+      ErrorCode.Codes.MISSING_BOND_COUNTRY_EXPOSURE);
+  private static final List<String> BETA_ONLY_WARNINGS = List.of(
+      ErrorCode.Codes.MISSING_FIXED_INCOME_BOND_SECTOR, ErrorCode.Codes.MISSING_NET_EXPENSE_RATIO,
+      ErrorCode.Codes.MISSING_GROSS_EXPENSE_RATIO, ErrorCode.Codes.MISSING_BUSINESS_COUNTRY_CODE,
+      ErrorCode.Codes.MISSING_HOLDING_IDENTIFIERS);
 
   private final SimpleMeterRegistry meterRegistry = ConfiguredMeterRegistry.withPercentiles();
   private final CalculationMetricStatistics statistics = new CalculationMetricStatistics(meterRegistry);
@@ -40,8 +50,8 @@ class MeterCalculationStatisticsProviderTest {
 
   @Test
   void shouldRankMostFailingMetricFirst_whenSeveralMetricsExecuted() {
-    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("WARN-001")), new RequestShape(10, 1));
-    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("WARN-001"), warning("WARN-002")),
+    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning(SECTOR_WARNING)), new RequestShape(10, 1));
+    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning(SECTOR_WARNING), warning(MER_WARNING)),
         new RequestShape(10, 1));
     statistics.recordSingleFailure(MAX_DRAWDOWN, ErrorCode.METRIC_MISMATCH.toException("alpha", "beta"),
         new RequestShape(10, 1));
@@ -82,7 +92,7 @@ class MeterCalculationStatisticsProviderTest {
     assertThat(alpha.duration().meanMillis()).isEqualTo(50.0);
     assertThat(alpha.duration().maxMillis()).isEqualTo(70.0);
     assertThat(alpha.duration().p99Millis()).isGreaterThan(0.0);
-    assertThat(alpha.topWarningCodes()).extracting("code").containsExactly("WARN-001", "WARN-002");
+    assertThat(alpha.topWarningCodes()).extracting("code").containsExactly(SECTOR_WARNING, MER_WARNING);
     assertThat(alpha.topErrorCodes()).extracting("code").containsExactly(ErrorCode.METRIC_MISMATCH.getCode());
 
     assertThat(report.overall().executions()).isEqualTo(6);

@@ -499,11 +499,12 @@ public enum ErrorCode {
   // ============================================
   PORTFOLIO_MISSING_CURRENCY(
       Codes.PORTFOLIO_MISSING_CURRENCY,
-      "The portfolio is missing Currency",
-      "Portfolio currency was not supplied in the request",
-      "Specify the portfolio currency in the request",
-      HttpStatus.BAD_REQUEST,
-      Severity.ERROR),
+      "Missing target currency in the request. The configured default currency %s is applied to the result",
+      "The request left the target currency out, so money amounts are reported in the service's configured "
+          + "default reporting currency",
+      "Send the target currency in the request if the result should be reported in another currency",
+      HttpStatus.OK,
+      Severity.WARNING),
 
   HOLDING_MISSING_CURRENCY(
       Codes.HOLDING_MISSING_CURRENCY,

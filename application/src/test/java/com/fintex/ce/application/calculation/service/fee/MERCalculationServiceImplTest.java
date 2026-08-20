@@ -29,6 +29,7 @@ import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ON
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
@@ -375,6 +376,31 @@ class MERCalculationServiceImplTest {
 
   // ---------- helpers ----------
 
+  @Test
+  void omittedTargetCurrency_warnsWithTheConfiguredDefault() {
+    // Leaving the currency out is allowed, and the configured default is then applied silently — the warning is
+    // what tells the user which currency the money amounts are in.
+    PortfolioHolding fund = holding("CIG-009", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    Map<PortfolioHolding, FeeData> securityData = Map.of(fund, fee("0.0151", null, null, null));
+
+    AverageMerResult result = service.perform(commandWithoutCurrency(List.of(fund), FUNDS_ONLY), securityData);
+
+    assertThat(result.getWarnings())
+        .extracting("code", "message")
+        .containsExactly(tuple("CUR-001",
+            "Missing target currency in the request. The configured default currency CAD is applied to the result"));
+  }
+
+  @Test
+  void statedTargetCurrency_doesNotWarnAboutDefaulting() {
+    PortfolioHolding fund = holding("CIG-010", FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    Map<PortfolioHolding, FeeData> securityData = Map.of(fund, fee("0.0151", null, null, null));
+
+    AverageMerResult result = service.perform(commandFor(List.of(fund), FUNDS_ONLY), securityData);
+
+    assertThat(result.getWarnings()).extracting("code").doesNotContain("CUR-001");
+  }
+
   private static PortfolioHolding holding(String id, FinancialInstrumentType type, Country country,
       String value) {
     return PortfolioHolding.builder()
@@ -398,6 +424,15 @@ class MERCalculationServiceImplTest {
   }
 
   private static AverageMerCommand commandFor(List<PortfolioHolding> holdings,
+      com.fintex.ce.model.domain.enumeration.FeeAggregationMode... modes) {
+    // Target currency is stated so these tests assert fee-chain warnings only: a command without one also
+    // warns about the applied default, which omittedTargetCurrency_warnsWithTheConfiguredDefault covers.
+    var cmd = commandWithoutCurrency(holdings, modes);
+    cmd.setTargetCurrency(Currency.CAD);
+    return cmd;
+  }
+
+  private static AverageMerCommand commandWithoutCurrency(List<PortfolioHolding> holdings,
       com.fintex.ce.model.domain.enumeration.FeeAggregationMode... modes) {
     var cmd = new AverageMerCommand();
     cmd.setHoldings(new java.util.ArrayList<>(holdings));

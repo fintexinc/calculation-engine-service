@@ -16,6 +16,7 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.http.HttpStatus;
 
@@ -141,7 +142,9 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
     assertThat(strict.getFeeRate().portfolio()).isEqualByComparingTo("0.018");
     assertHorizon(strict.getSpend().get(TWENTY_YR), "165535.1604159630", "103459.4752599769", "62075.6851559861");
 
-    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getWarnings())
+        .extracting(Notification::getCode)
+        .containsOnly(ErrorCode.Codes.PORTFOLIO_MISSING_CURRENCY);
   }
 
   @Test

@@ -14,6 +14,7 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.ErrorResponse;
+import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.http.HttpStatus;
 
@@ -105,7 +106,9 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
         .containsEntry(
             FeeAggregationMode.WHOLE_PORTFOLIO,
             new BigDecimal("0.0125000000"));
-    assertThat(result.getWarnings()).isEmpty();
+    assertThat(result.getWarnings())
+        .extracting(Notification::getCode)
+        .containsExactly(ErrorCode.Codes.PORTFOLIO_MISSING_CURRENCY);
   }
 
   @Test
@@ -190,7 +193,8 @@ class AverageMerE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getWarnings())
         .extracting(notification -> notification.getCode())
         .containsExactly(
-            ErrorCode.Codes.MISSING_MANAGEMENT_EXPENSE_RATIO);
+            ErrorCode.Codes.MISSING_MANAGEMENT_EXPENSE_RATIO,
+            ErrorCode.Codes.PORTFOLIO_MISSING_CURRENCY);
   }
 
   private static PortfolioHolding holding(String id, long value) {

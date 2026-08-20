@@ -38,6 +38,7 @@ import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ON
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_TYPE_NOT_LEAF;
+import static com.fintex.ce.model.error.ErrorCode.PORTFOLIO_MISSING_CURRENCY;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
 
@@ -145,6 +146,14 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
         command, data);
 
     List<Notification> warnings = new ArrayList<>(resolveFees(calculations));
+    // Raised here rather than inside HoldingCurrencyConverter: the fee commands are the only ones with an
+    // optional target currency, so they are the only requests that can omit one. The returns commands require it
+    // (PortfolioBenchmarkCommand#currency is @NotNull) and the allocation commands never offered the field, so
+    // warning from the converter would fire on requests that had nothing to leave out.
+    Currency reportingCurrency = currencyConverter.resolveTargetCurrency(command.getTargetCurrency());
+    if (command.getTargetCurrency() == null) {
+      warnings.add(PORTFOLIO_MISSING_CURRENCY.asNotification(reportingCurrency));
+    }
     warnings.addAll(applyValueFxConversion(calculations, command.getTargetCurrency()));
     var result = calculateAverageValue(command,
         getSpecifiedIfEmpty(command.getParameterTypes(), FUNDS_ONLY, WHOLE_PORTFOLIO),
