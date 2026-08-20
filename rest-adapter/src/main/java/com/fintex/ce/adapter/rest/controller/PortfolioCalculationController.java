@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +81,8 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -213,6 +216,35 @@ public class PortfolioCalculationController {
         && benchmarkCommand.getCurrency() == null && request.getCurrency() != null) {
       benchmarkCommand.setCurrency(request.getCurrency());
     }
+  }
+
+  @Operation(summary = "List all supported calculation metrics", description = "Returns metadata for every supported portfolio calculation metric, including the metric identifier and description.")
+  @ApiResponse(responseCode = "200", description = "Array of available metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(type = "array", implementation = MetricInfo.class)))
+  @GetMapping("/metrics")
+  public List<MetricInfo> listMetrics() {
+    return Arrays.stream(CalculationMetric.values())
+        .map(metric -> MetricInfo.builder()
+            .metric(metric.getValue())
+            .description(extractSchemaDescription(metric))
+            .build())
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Extracts the description from the @Schema annotation on a CalculationMetric enum constant. Returns an empty
+   * string if no description is found or the enum constant is not annotated.
+   */
+  private String extractSchemaDescription(CalculationMetric metric) {
+    try {
+      Field field = CalculationMetric.class.getDeclaredField(metric.name());
+      Schema schemaAnnotation = field.getAnnotation(Schema.class);
+      if (schemaAnnotation != null && schemaAnnotation.description() != null) {
+        return schemaAnnotation.description();
+      }
+    } catch (NoSuchFieldException e) {
+      log.warn("Could not find field for metric {}", metric.name(), e);
+    }
+    return "";
   }
 
   private void validateCommand(CalculationCommand command) {
