@@ -30,7 +30,7 @@ class MeterCalculationStatisticsProviderTest {
       ErrorCode.FIELD_NOT_EMPTY, ErrorCode.CPED_NOT_MONTH_END, ErrorCode.CPSD_NOT_MONTH_END,
       ErrorCode.CIPSD_NOT_MONTH_END, ErrorCode.COUNTRY_NOT_SUPPORTED);
 
-  private static final String SHARED_WARNING = "FDS-999";
+  private static final String SHARED_WARNING = "WARN-999";
   private static final List<String> ALPHA_ONLY_WARNINGS = List.of("WRN-A1", "WRN-A2", "WRN-A3", "WRN-A4", "WRN-A5");
   private static final List<String> BETA_ONLY_WARNINGS = List.of("WRN-B1", "WRN-B2", "WRN-B3", "WRN-B4", "WRN-B5");
 
@@ -40,8 +40,8 @@ class MeterCalculationStatisticsProviderTest {
 
   @Test
   void shouldRankMostFailingMetricFirst_whenSeveralMetricsExecuted() {
-    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("FDS-001")), new RequestShape(10, 1));
-    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("FDS-001"), warning("FDS-002")),
+    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("WARN-001")), new RequestShape(10, 1));
+    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("WARN-001"), warning("WARN-002")),
         new RequestShape(10, 1));
     statistics.recordSingleFailure(MAX_DRAWDOWN, ErrorCode.METRIC_MISMATCH.toException("alpha", "beta"),
         new RequestShape(10, 1));
@@ -82,7 +82,7 @@ class MeterCalculationStatisticsProviderTest {
     assertThat(alpha.duration().meanMillis()).isEqualTo(50.0);
     assertThat(alpha.duration().maxMillis()).isEqualTo(70.0);
     assertThat(alpha.duration().p99Millis()).isGreaterThan(0.0);
-    assertThat(alpha.topWarningCodes()).extracting("code").containsExactly("FDS-001", "FDS-002");
+    assertThat(alpha.topWarningCodes()).extracting("code").containsExactly("WARN-001", "WARN-002");
     assertThat(alpha.topErrorCodes()).extracting("code").containsExactly(ErrorCode.METRIC_MISMATCH.getCode());
 
     assertThat(report.overall().executions()).isEqualTo(6);

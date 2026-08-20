@@ -172,7 +172,7 @@ class MERCalculationServiceImplTest {
     AverageMerResult result = service.perform(commandFor(List.of(caFund), FUNDS_ONLY), securityData);
 
     assertThat(result.getManagementExpenseRatio().get(FUNDS_ONLY)).isEqualByComparingTo("0.012");
-    assertThat(result.getWarnings()).extracting("code").containsExactly("FDS-022");
+    assertThat(result.getWarnings()).extracting("code").containsExactly("MIC-010");
   }
 
   @Test
@@ -211,7 +211,7 @@ class MERCalculationServiceImplTest {
     AverageMerResult result = service.perform(commandFor(List.of(etf), FUNDS_ONLY), securityData);
 
     assertThat(result.getManagementExpenseRatio().get(FUNDS_ONLY)).isEqualByComparingTo("0.0125");
-    assertThat(result.getWarnings()).extracting("code").containsExactly("FDS-024");
+    assertThat(result.getWarnings()).extracting("code").containsExactly("MIC-011");
   }
 
   @Test

@@ -124,7 +124,7 @@ class CommonHoldingsServiceTest {
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, mic, "HOLDING_MISSING_CURRENCY_FROM_FDS");
+    assertCalculationFails(command, mic, "HOLDING_MISSING_CURRENCY_FROM_MIC");
   }
 
   @Test
@@ -249,7 +249,7 @@ class CommonHoldingsServiceTest {
 
     TopCommonHoldingsCommand command = command(List.of(parent), 10);
 
-    assertCalculationFails(command, mic, "HOLDING_MISSING_WEIGHTING_FROM_FDS");
+    assertCalculationFails(command, mic, "HOLDING_MISSING_WEIGHTING_FROM_MIC");
   }
 
   @ParameterizedTest(name = "[{index}] {0} -> isOfType STOCK = leaf short-circuit applies")
@@ -448,10 +448,10 @@ class CommonHoldingsServiceTest {
         .isInstanceOfSatisfying(CalculationException.class, exception -> {
           assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.HOLDING_MISSING_UNDERLYING_HOLDINGS);
           assertThat(exception.getMessage()).isEqualTo(ErrorCode.HOLDING_MISSING_UNDERLYING_HOLDINGS
-              .getFormattedMessage());
+              .getFormattedMessage(parent.getIdsString()));
           assertThat(exception.getId()).isEqualTo(parent.getIdsString());
           assertThat(exception.getMetadata())
-              .containsOnlyKeys(ErrorParams.HOLDING_ID)
+              .containsOnlyKeys(ErrorParams.PARAM_KEY_PREFIX + 1, ErrorParams.HOLDING_ID)
               .containsEntry(ErrorParams.HOLDING_ID, parent.getIdsString());
         });
   }

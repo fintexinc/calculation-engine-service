@@ -90,11 +90,13 @@ class MonthlyReturnsServiceTest {
     assertThatThrownBy(() -> service.getMonthlyReturns(List.of(ETF), Map.of(ETF, returns)))
         .isInstanceOfSatisfying(CalculationException.class, exception -> {
           assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE);
-          assertThat(exception).hasMessage("The holding is missing monthly return values for date 2024-02-29");
+          assertThat(exception)
+              .hasMessage("The holding ETF-ETF-A is missing monthly return values for date 2024-02-29");
           assertThat(exception.getMetadata())
-              .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1")
+              .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1", "param-2")
               .containsEntry(ErrorParams.HOLDING_ID, ErrorParams.holdingId(ETF))
-              .containsEntry("param-1", FEBRUARY_END.toString());
+              .containsEntry("param-1", ErrorParams.holdingId(ETF))
+              .containsEntry("param-2", FEBRUARY_END.toString());
         });
   }
 

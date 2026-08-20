@@ -131,7 +131,7 @@ public class CommonHoldingsService
     Conversion conversion = currencyConverter.convert(input);
     for (PortfolioHolding holding : conversion.missingCurrency()) {
       if (isSentToMic(holding)) {
-        throw ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS.toExceptionForHolding(holding);
+        throw ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC.toExceptionForHolding(holding);
       }
     }
     return new WeightedValues(conversion.converted(), List.copyOf(conversion.warnings()));
@@ -249,7 +249,7 @@ public class CommonHoldingsService
     }
 
     if (node.getWeight() == null) {
-      throw ErrorCode.HOLDING_MISSING_WEIGHTING_FROM_FDS.toExceptionForHolding(portfolioHolding,
+      throw ErrorCode.HOLDING_MISSING_WEIGHTING_FROM_MIC.toExceptionForHolding(portfolioHolding,
           displayName(node));
     }
     BigDecimal effectiveWeight = inheritedWeight.multiply(node.getWeight(), MATH_CONTEXT);

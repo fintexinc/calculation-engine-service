@@ -71,7 +71,7 @@ public class HoldingsValidator {
         throw buildValueMissingException(holding);
       }
       if (value.compareTo(BigDecimal.ZERO) < 0) {
-        throw ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationException();
+        throw ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationExceptionForHolding(holding);
       }
       sum = sum.add(value);
     }
@@ -99,7 +99,8 @@ public class HoldingsValidator {
         throw ErrorCode.FIELD_NOT_NULL.toValidationExceptionForField(COUNTRY_FIELD, USER_FORMATTED_COUNTRY_FIELD);
       }
       if (!properties.getSupportedSecurityCountries().contains(country)) {
-        throw ErrorCode.COUNTRY_NOT_SUPPORTED.toValidationExceptionForField(COUNTRY_FIELD, country.name());
+        throw ErrorCode.COUNTRY_NOT_SUPPORTED.toValidationExceptionForHolding(holding, country.name())
+            .withFieldName(COUNTRY_FIELD);
       }
     }
   }
@@ -165,8 +166,8 @@ public class HoldingsValidator {
         .map(CashHolding.class::cast)
         .filter(cashHolding -> Objects.isNull(cashHolding.getCurrency()))
         .findFirst()
-        .ifPresent(ignored -> {
-          throw ErrorCode.HOLDING_MISSING_CURRENCY.toValidationException();
+        .ifPresent(cashHolding -> {
+          throw ErrorCode.HOLDING_MISSING_CURRENCY.toValidationExceptionForHolding(cashHolding);
         });
   }
 
@@ -176,10 +177,6 @@ public class HoldingsValidator {
   }
 
   private static ValidationException buildValueMissingException(PortfolioHolding holding) {
-    SecurityIdentifier secId = holding.getSecurityIdentifier();
-    if (secId != null && secId.getId() != null) {
-      return ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationExceptionForId(secId.getId());
-    }
-    return ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationException();
+    return ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.toValidationExceptionForHolding(holding);
   }
 }

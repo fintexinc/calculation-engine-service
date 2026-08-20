@@ -51,6 +51,6 @@ class NotEmptyGicInterestRateReqValidatorTest extends AbstractGicFieldReqValidat
 
   @Override
   String expectedMessage() {
-    return "The gic holding is missing interest rate";
+    return "The gic holding GIC-CAD-10 is missing interest rate";
   }
 }

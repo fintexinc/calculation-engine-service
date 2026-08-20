@@ -29,7 +29,7 @@ class ReturnsErrorPolicyTest {
     List<BasePceException> allowed = List.of(
         ErrorCode.HOLDING_PSD_OUT_OF_RANGE.toExceptionForId("h1"),
         ErrorCode.MISSING_MONTHLY_RETURNS.toExceptionForId("h2"),
-        ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS.toExceptionForId("h3"),
+        ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC.toExceptionForId("h3"),
         ErrorCode.CPED_AFTER_PORTFOLIO_PED.toExceptionForId("h4"));
     ReturnsSnapshot<HoldingMonthlyReturns> snapshot = ReturnsSnapshot.<HoldingMonthlyReturns>empty().withErrors(
         allowed);
@@ -74,7 +74,7 @@ class ReturnsErrorPolicyTest {
         .containsExactlyInAnyOrder(
             ErrorCode.HOLDING_PSD_OUT_OF_RANGE,
             ErrorCode.MISSING_MONTHLY_RETURNS,
-            ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS,
+            ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC,
             ErrorCode.CPED_AFTER_PORTFOLIO_PED);
   }
 }

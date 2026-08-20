@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.fintex.ce.model.error.ErrorCode.CPED_AFTER_PORTFOLIO_PED;
-import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
+import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static com.fintex.ce.model.error.ErrorCode.MISSING_MONTHLY_RETURNS;
 
@@ -28,7 +28,7 @@ public final class ReturnsErrorPolicy {
   private static final Set<ErrorCode> ALLOWED_ERROR_CODES = Set.of(
       HOLDING_PSD_OUT_OF_RANGE,
       MISSING_MONTHLY_RETURNS,
-      HOLDING_MISSING_CURRENCY_FROM_FDS,
+      HOLDING_MISSING_CURRENCY_FROM_MIC,
       CPED_AFTER_PORTFOLIO_PED);
 
   private ReturnsErrorPolicy() {

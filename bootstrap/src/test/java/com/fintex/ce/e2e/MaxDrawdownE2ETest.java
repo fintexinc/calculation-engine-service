@@ -165,7 +165,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
   /**
    * A requested period longer than the available monthly-returns history cannot be computed, so the metric still
    * responds 200 with a null value for that period plus an
-   * {@link ErrorCode.Codes#INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD} (RET-008) warning rather than failing the request.
+   * {@link ErrorCode.Codes#INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD} (RET-004) warning rather than failing the request.
    */
   @Test
   void shouldReturnWarning_whenRequestedPeriodExceedsAvailableHistory() {
@@ -198,7 +198,7 @@ class MaxDrawdownE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   /**
    * An unsupported time-interval period is rejected up front with {@code 400 Bad Request} and
-   * {@link ErrorCode.Codes#TIME_INTERVAL_PERIOD_NOT_SUPPORTED} (TIP-011), echoing the offending token and listing what
+   * {@link ErrorCode.Codes#TIME_INTERVAL_PERIOD_NOT_SUPPORTED} (TIP-004), echoing the offending token and listing what
    * would have been accepted.
    *
    * <p>

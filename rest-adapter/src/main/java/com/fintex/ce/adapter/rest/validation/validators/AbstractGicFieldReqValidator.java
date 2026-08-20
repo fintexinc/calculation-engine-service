@@ -37,7 +37,7 @@ public abstract class AbstractGicFieldReqValidator<V> implements RequestValidato
     }
     for (PortfolioHolding holding : holdings) {
       if (holding instanceof GicHolding gic && isNull(fieldAccessor.apply(gic))) {
-        throw errorCode.toValidationException();
+        throw errorCode.toValidationExceptionForHolding(gic);
       }
     }
   }

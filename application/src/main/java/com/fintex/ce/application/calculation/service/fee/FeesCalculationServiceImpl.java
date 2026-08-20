@@ -39,7 +39,7 @@ import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
  * <p>
  * FX: each MER-bearing holding's {@code marketValue} is converted to the default target currency via
  * {@link HoldingCurrencyConverter} before the sum. Missing currency on a MER-bearing holding → hard error
- * ({@link com.fintex.ce.model.error.ErrorCode#HOLDING_MISSING_CURRENCY_FROM_FDS}). Rate unavailable → emit
+ * ({@link com.fintex.ce.model.error.ErrorCode#HOLDING_MISSING_CURRENCY_FROM_MIC}). Rate unavailable → emit
  * {@link com.fintex.ce.model.error.ErrorCode#FX_RATES_UNAVAILABLE} and leave the value in its native currency. Zero-fee
  * holdings (stocks, cash, GIC, fixed income) are skipped — they contribute 0 either way.
  */

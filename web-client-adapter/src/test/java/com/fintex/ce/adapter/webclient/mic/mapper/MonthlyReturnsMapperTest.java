@@ -105,11 +105,12 @@ class MonthlyReturnsMapperTest {
         .isInstanceOfSatisfying(CalculationException.class, exception -> {
           assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE);
           assertThat(exception).hasMessage(
-              "The holding is missing monthly return values for date 2025-01-31, 2025-04-30, 2025-12-31");
+              "The holding ETF-SEC-006 is missing monthly return values for date 2025-01-31, 2025-04-30, 2025-12-31");
           assertThat(exception.getMetadata())
-              .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1")
+              .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1", "param-2")
               .containsEntry(ErrorParams.HOLDING_ID, ErrorParams.holdingId(holding))
-              .containsEntry("param-1", "2025-01-31, 2025-04-30, 2025-12-31");
+              .containsEntry("param-1", ErrorParams.holdingId(holding))
+              .containsEntry("param-2", "2025-01-31, 2025-04-30, 2025-12-31");
         });
   }
 

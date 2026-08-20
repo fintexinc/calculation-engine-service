@@ -74,7 +74,7 @@ class HoldingValueReqValidatorTest {
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL);
-          assertThat(rve.getId()).isEqualTo("FUND1");
+          assertThat(rve.getId()).isEqualTo("MUTUAL_FUND-FUND1");
         });
   }
 
