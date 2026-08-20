@@ -36,7 +36,7 @@ import static java.math.BigDecimal.ZERO;
  * pure chain-walker: the concrete chains (and the error raised when a chain is exhausted) live in the strategies.
  *
  * <pre>
- *   CANADA →  MER  →  Management Fee  →  error (MER-005)
+ *   CANADA →  MER  →  Management Fee  →  error (MER-001)
  *   USA    →  NER  →  GER  →  error (MER-002)
  * </pre>
  *
@@ -114,6 +114,6 @@ public class MerFeeResolver implements FeeResolver {
       }
       source.warningIfMissing(holding).ifPresent(warnings::add);
     }
-    throw strategy.exhaustedError().toExceptionForHolding(holding, holding.getIdsString());
+    throw strategy.exhaustedError().toExceptionForHolding(holding);
   }
 }

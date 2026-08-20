@@ -88,8 +88,8 @@ class GlobalExceptionHandlerTest {
   @Test
   void methodArgumentNotValid_mapsKnownErrorCode() {
     var bindingResult = new BeanPropertyBindingResult(new Object(), "command");
-    bindingResult.addError(new FieldError("command", "bestWorstTimeIntervalPeriods",
-        null, false, null, null, ErrorCode.BEST_WORST_TIME_INTERVAL_TOO_LARGE.name()));
+    bindingResult.addError(new FieldError("command", "holdings",
+        null, false, null, null, ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.name()));
     var exception = mock(MethodArgumentNotValidException.class);
     when(exception.getMessage()).thenReturn("validation failed");
     when(exception.getBindingResult()).thenReturn(bindingResult);
@@ -100,7 +100,7 @@ class GlobalExceptionHandlerTest {
     assertThat(response.getBody()).isNotNull();
     assertThat(response.getBody().getNotifications()).hasSize(1);
     assertThat(response.getBody().getNotifications().get(0).getCode())
-        .isEqualTo(ErrorCode.BEST_WORST_TIME_INTERVAL_TOO_LARGE.getCode());
+        .isEqualTo(ErrorCode.HOLDING_VALUE_NEGATIVE_OR_NULL.getCode());
   }
 
   @Test

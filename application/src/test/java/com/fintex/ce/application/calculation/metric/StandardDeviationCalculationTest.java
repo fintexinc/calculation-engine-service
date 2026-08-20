@@ -186,8 +186,8 @@ class StandardDeviationCalculationTest {
     assertThatThrownBy(() -> calculation.calculatePeriodForNumberOfMonths(TWELVE))
         .isInstanceOfSatisfying(CalculationException.class, exception -> {
           assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.MISSING_PORTFOLIO_RETURN_FOR_DATE);
-          assertThat(exception).hasMessage(
-              "Portfolio is missing monthly return values for date 2024-11-30, 2024-12-31");
+          assertThat(exception).hasMessage("The portfolio's monthly return data does not cover every month in "
+              + "the requested date range. Missing months: 2024-11-30, 2024-12-31");
           assertThat(exception.getMetadata()).containsExactlyEntriesOf(
               Map.of("param-1", "2024-11-30, 2024-12-31"));
         });

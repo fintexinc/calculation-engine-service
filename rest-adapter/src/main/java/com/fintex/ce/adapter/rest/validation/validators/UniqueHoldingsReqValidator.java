@@ -90,8 +90,7 @@ public class UniqueHoldingsReqValidator implements RequestValidator {
         .filter(holding -> Objects.nonNull(holding.getSecurityIdentifier()))
         .toList();
     findFirstDuplicateBy(securityHoldings, PortfolioHolding::getSecurityIdentifier).ifPresent(holding -> {
-      throw ErrorCode.DUPLICATE_HOLDING.toValidationExceptionForHolding(holding,
-          holding.getSecurityIdentifier().getId());
+      throw ErrorCode.DUPLICATE_HOLDING.toValidationExceptionForHolding(holding);
     });
   }
 

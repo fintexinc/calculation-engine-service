@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import static com.fintex.ce.application.util.CollectorUtils.toMap;
 import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
 import static com.fintex.ce.model.error.ErrorCode.CPED_AFTER_PORTFOLIO_PED;
-import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
+import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static com.fintex.ce.model.error.ErrorParams.HOLDING_ID;
 
@@ -213,7 +213,7 @@ public record ReturnsSnapshot<T extends ReturnsData>(
       Map<PortfolioHolding, T> sourceData, List<BasePceException> errorsSink) {
     sourceData.entrySet().stream()
         .filter(entry -> Currency.fromValueOrNull(entry.getValue().getCurrency()) == null)
-        .forEach(entry -> errorsSink.add(HOLDING_MISSING_CURRENCY_FROM_FDS.toExceptionForHolding(entry.getKey())));
+        .forEach(entry -> errorsSink.add(HOLDING_MISSING_CURRENCY_FROM_MIC.toExceptionForHolding(entry.getKey())));
     return new LinkedHashMap<>(extractHoldingCurrencyMap(sourceData));
   }
 

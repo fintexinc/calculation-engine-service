@@ -70,7 +70,8 @@ class HoldingsValidatorTest {
           ValidationException validationException = (ValidationException) ex;
           assertThat(validationException.getErrorCode()).isEqualTo(ErrorCode.COUNTRY_NOT_SUPPORTED);
           assertThat(validationException.getFieldName()).isEqualTo(COUNTRY_FIELD);
-          assertThat(validationException.getMessage()).isEqualTo("The holding country USA is not supported");
+          assertThat(validationException.getMessage()).isEqualTo(
+              "The holding MUTUAL_FUND-ID1 has an unsupported country USA");
         });
   }
 

@@ -351,7 +351,7 @@ class MerBenchmarkComparisonServiceTest {
         data(Map.of(portfolioFund, fee("0.02")), Map.of(benchmark, fee(null, "0.0075"))));
 
     assertThat(result.getComparison().get(FUNDS_ONLY).getFeeRate().benchmark()).isEqualByComparingTo("0.0075");
-    assertThat(result.getWarnings()).extracting("code").contains("FDS-022");
+    assertThat(result.getWarnings()).extracting("code").contains("MIC-010");
   }
 
   private MerBenchmarkComparisonService serviceWithGrowthRate(String growthRate) {

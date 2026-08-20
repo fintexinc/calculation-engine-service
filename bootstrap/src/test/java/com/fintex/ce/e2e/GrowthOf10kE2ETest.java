@@ -40,7 +40,7 @@ class GrowthOf10kE2ETest extends AbstractGrowthOf10kE2ETest {
     Notification notification = error.getNotifications().getFirst();
     assertThat(notification.getCode()).isEqualTo("GIC-001");
     assertThat(notification.getSeverity().name()).isEqualTo("ERROR");
-    assertThat(notification.getMessage()).isEqualTo("The gic holding is missing interest rate");
+    assertThat(notification.getMessage()).isEqualTo("The gic holding GIC-CAD-25000.00 is missing interest rate");
   }
 
   @Test

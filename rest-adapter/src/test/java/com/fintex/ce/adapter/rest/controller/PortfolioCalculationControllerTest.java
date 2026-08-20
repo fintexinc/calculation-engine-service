@@ -519,7 +519,7 @@ class PortfolioCalculationControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(om.writeValueAsString(command)))
           .andExpect(status().isBadRequest())
-          .andExpect(content().string(org.hamcrest.Matchers.containsString("TIP-011")))
+          .andExpect(content().string(org.hamcrest.Matchers.containsString("TIP-004")))
           .andExpect(content().string(org.hamcrest.Matchers.containsString(
               "Time interval period 'YTD' is not supported")));
 
@@ -610,7 +610,7 @@ class PortfolioCalculationControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(om.writeValueAsString(command)))
           .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.notifications[0].code").value("RET-016"))
+          .andExpect(jsonPath("$.notifications[0].code").value("RET-012"))
           .andExpect(jsonPath("$.notifications[0].severity").value("ERROR"))
           .andExpect(jsonPath("$.notifications[0].message").value(
               "CIPSD 2025-10-31 is outside the available monthly returns range [1998-05-31, 2025-09-30]"))

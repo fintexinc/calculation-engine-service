@@ -742,12 +742,12 @@ class PeriodCalculationAbstractTest {
   static Stream<Arguments> insufficientDataWarningCases() {
     return Stream.of(
         // Fixed-length periods.
-        Arguments.of("fixed-length period exceeds available months", 1, ONE_YR.name(), null, 1, "RET-008"),
-        Arguments.of("fixed-length period fits available months", 12, ONE_YR.name(), null, 1, "RET-015"),
+        Arguments.of("fixed-length period exceeds available months", 1, ONE_YR.name(), null, 1, "RET-004"),
+        Arguments.of("fixed-length period fits available months", 12, ONE_YR.name(), null, 1, "RET-011"),
         Arguments.of("value is not null (period not exceeded)", 1, ONE_YR.name(), ONE, 0, null),
         // With 13 entries the resolved YTD month count is always ≤ 12 ≤ 13, so it fits. Confirms length-less periods
         // are resolved from the series (this would warn if resolution fell through to the mock's 0 default).
-        Arguments.of("length-less YTD fits available months", 13, YTD.name(), null, 1, "RET-015"),
+        Arguments.of("length-less YTD fits available months", 13, YTD.name(), null, 1, "RET-011"),
         // CIPSD is gated by the date's position rather than by a month count, so the count-based path skips it. With no
         // CIPSD set, the dedicated out-of-range path is also a no-op.
         Arguments.of("CIPSD with no date set is skipped", 1, CIPSD.name(), null, 0, null));
@@ -777,7 +777,7 @@ class PeriodCalculationAbstractTest {
     calculation.addInsufficientDataWarnings(result, periodValues);
 
     assertEquals(1, result.getWarnings().size());
-    assertEquals("RET-009", result.getWarnings().get(0).getCode());
+    assertEquals("RET-005", result.getWarnings().get(0).getCode());
   }
 
   @Test
@@ -804,7 +804,7 @@ class PeriodCalculationAbstractTest {
     calculation.addInsufficientDataWarnings(result, periodValues);
 
     assertEquals(1, result.getWarnings().size());
-    assertEquals("RET-009", result.getWarnings().get(0).getCode());
+    assertEquals("RET-005", result.getWarnings().get(0).getCode());
   }
 
   @Test
@@ -831,7 +831,7 @@ class PeriodCalculationAbstractTest {
     calculation.addInsufficientDataWarnings(result, periodValues);
 
     assertEquals(1, result.getWarnings().size());
-    assertEquals("RET-015", result.getWarnings().get(0).getCode());
+    assertEquals("RET-011", result.getWarnings().get(0).getCode());
   }
 
   private TreeMap<LocalDate, BigDecimal> getPortfolioReturns() {

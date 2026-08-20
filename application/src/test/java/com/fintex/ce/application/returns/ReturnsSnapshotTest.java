@@ -74,7 +74,7 @@ class ReturnsSnapshotTest {
 
     assertThat(snapshot.errors())
         .extracting(BasePceException::getErrorCode)
-        .containsExactly(ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS);
+        .containsExactly(ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC);
     assertThat(snapshot.holdingCurrencyMap()).isEmpty();
   }
 

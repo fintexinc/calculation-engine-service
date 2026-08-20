@@ -87,7 +87,7 @@ class UniqueHoldingsReqValidatorTest {
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.DUPLICATE_HOLDING);
-          assertThat(rve.getMessage()).isEqualTo("Duplicate holding with id ID1 found in request");
+          assertThat(rve.getMessage()).isEqualTo("Duplicate holding with id MUTUAL_FUND-ID1 found in request");
           assertThat(rve.getId()).isEqualTo("MUTUAL_FUND-ID1");
           assertThat(rve.getMetadata()).containsEntry(ErrorParams.HOLDING_ID, "MUTUAL_FUND-ID1");
         });

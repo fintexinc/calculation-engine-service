@@ -170,7 +170,7 @@ class HoldingReqValidatorTest {
         .satisfies(ex -> {
           ValidationException rve = (ValidationException) ex;
           assertThat(rve.getErrorCode()).isEqualTo(ErrorCode.HOLDING_MISSING_CURRENCY);
-          assertThat(rve.getMessage()).isEqualTo("The holding is missing Currency");
+          assertThat(rve.getMessage()).isEqualTo("The holding CASH-10 is missing Currency");
         });
   }
 

@@ -2,6 +2,7 @@ package com.fintex.ce.e2e;
 
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
+import com.fintex.ce.model.error.ErrorParams;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
@@ -37,8 +38,10 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
         gicWithoutInterestRate(Currency.CAD, "25000.00", "365")));
 
     Notification notification = assertSingleError(postCalculation(writeJson(command)), "GIC-001",
-        "The gic holding is missing interest rate");
-    assertThat(notification.getMetadata()).isEmpty();
+        "The gic holding GIC-CAD-25000.00 is missing interest rate");
+    assertThat(notification.getMetadata())
+        .containsEntry(ErrorParams.HOLDING_ID, "GIC-CAD-25000.00")
+        .containsEntry(ErrorParams.PARAM_KEY_PREFIX + 1, "GIC-CAD-25000.00");
   }
 
   @Test
@@ -47,7 +50,7 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
         securityAttributeResult(XBAL, monthlyReturnsFor("2025-09-30T00:00:00", OCT_2024_TO_SEP_2025)))));
     ReturnCommand command = commandFor(Currency.CAD, List.of(etfCanada(XBAL, "45234.67")));
 
-    Notification notification = assertSingleError(postCalculation(writeJson(command)), "RET-010",
+    Notification notification = assertSingleError(postCalculation(writeJson(command)), "RET-006",
         "No complete calendar year (Jan-Dec) found in monthly returns range [2024-10-31, 2025-09-30]; "
             + "annual returns cannot be computed");
     assertThat(notification.getMetadata()).containsKeys("param-1", "param-2");

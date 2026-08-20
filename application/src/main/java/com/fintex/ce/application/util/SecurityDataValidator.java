@@ -17,7 +17,7 @@ import static com.fintex.ce.model.error.ErrorCode.NO_SECURITY_DATA_FOR_HOLDING;
  * Pre-condition checks on security-data fetcher responses. Fee / income / returns endpoints all share the same failure
  * mode: the data source happily returns HTTP 200 with a partial result set when it doesn't recognise a security or the
  * configured data provider has no record for it. Silently treating those missing rows as "data not available" pushes
- * the gap downstream where it surfaces as a misleading error (e.g. {@code MER-005 — all fee fields are null}) or,
+ * the gap downstream where it surfaces as a misleading error (e.g. {@code MER-001 — all fee fields are null}) or,
  * worse, as a quietly under-reported result. This validator fails fast at the boundary with
  * {@link com.fintex.ce.model.error.ErrorCode#NO_SECURITY_DATA_FOR_HOLDING} (HTTP 400) so the caller knows which
  * holdings the data source couldn't supply.
@@ -53,7 +53,7 @@ public final class SecurityDataValidator {
       }
       SecurityIdentifier id = holding.getSecurityIdentifier();
       if (id == null || !received.contains(id)) {
-        throw NO_SECURITY_DATA_FOR_HOLDING.toExceptionForHolding(holding, holding.getIdsString());
+        throw NO_SECURITY_DATA_FOR_HOLDING.toExceptionForHolding(holding);
       }
     }
   }

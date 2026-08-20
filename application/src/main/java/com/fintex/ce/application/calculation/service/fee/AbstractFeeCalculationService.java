@@ -36,7 +36,7 @@ import static com.fintex.ce.application.util.SecurityDataValidator.requireDataFo
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
-import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_FDS;
+import static com.fintex.ce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC;
 import static com.fintex.ce.model.error.ErrorCode.HOLDING_TYPE_NOT_LEAF;
 import static com.fintex.ce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
@@ -193,7 +193,7 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
 
     for (PortfolioHolding holding : conversion.missingCurrency()) {
       if (feeContributesToNumerator(calcByHolding.get(holding))) {
-        throw HOLDING_MISSING_CURRENCY_FROM_FDS.toExceptionForHolding(holding);
+        throw HOLDING_MISSING_CURRENCY_FROM_MIC.toExceptionForHolding(holding);
       }
     }
     conversion.converted().forEach((holding, value) -> calcByHolding.get(holding).setMarketValue(value));
@@ -231,7 +231,7 @@ public abstract class AbstractFeeCalculationService<R extends BaseCalculationRes
     for (PortfolioHolding holding : holdings) {
       FinancialInstrumentType type = holding.getHoldingType();
       if (type == null || (!MER_BEARING_TYPES.contains(type) && !ZERO_MER_TYPES.contains(type))) {
-        throw HOLDING_TYPE_NOT_LEAF.toExceptionForHolding(holding, holding.getIdsString(), type);
+        throw HOLDING_TYPE_NOT_LEAF.toExceptionForHolding(holding, type);
       }
     }
   }

@@ -333,14 +333,15 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     Notification notification = error.getNotifications().getFirst();
     assertThat(notification.getCode()).isEqualTo(ErrorCode.MISSING_MONTHLY_RETURN_FOR_DATE.getCode());
     assertThat(notification.getMessage())
-        .isEqualTo("The holding is missing monthly return values for date 2024-05-31");
+        .isEqualTo("The holding MUTUAL_FUND-F0CAN999 is missing monthly return values for date 2024-05-31");
     assertThat(notification.getDescription()).isEqualTo("Monthly return is missing for the specified date");
     assertThat(notification.getAction()).isEqualTo("Populate the monthly return for the missing date");
     assertThat(notification.getSeverity()).isEqualTo(Severity.ERROR);
     assertThat(notification.getMetadata())
-        .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1")
+        .containsOnlyKeys(ErrorParams.HOLDING_ID, "param-1", "param-2")
         .containsEntry(ErrorParams.HOLDING_ID, "MUTUAL_FUND-F0CAN999")
-        .containsEntry("param-1", "2024-05-31");
+        .containsEntry("param-1", "MUTUAL_FUND-F0CAN999")
+        .containsEntry("param-2", "2024-05-31");
   }
 
   private Notification assertValidationError(HttpResponse response, String expectedCode, String expectedFieldName) {
