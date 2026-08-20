@@ -57,6 +57,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fintex.ce.adapter.rest.controller.MetricInfo;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -71,6 +73,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationController.BASE_PATH;
@@ -82,6 +85,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -193,6 +197,39 @@ class PortfolioCalculationControllerTest {
             .contentType(MediaType.TEXT_PLAIN)
             .content("not json"))
         .andExpect(status().isUnsupportedMediaType());
+  }
+
+  @Test
+  void shouldReturnAllMetrics_whenListingMetrics() throws Exception {
+    MvcResult result = mockMvc.perform(
+        get(BASE_PATH + "/metrics")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andReturn();
+
+    String responseBody = result.getResponse().getContentAsString();
+    MetricInfo[] metrics = objectMapper.readValue(responseBody, MetricInfo[].class);
+
+    // Verify the response contains every CalculationMetric value
+    Set<String> metricNames = Arrays.stream(metrics)
+        .map(MetricInfo::getMetricName)
+        .collect(Collectors.toSet());
+    Set<String> expectedMetrics = Arrays.stream(CalculationMetric.values())
+        .map(CalculationMetric::getValue)
+        .collect(Collectors.toSet());
+
+    assertThat(metricNames)
+        .as("Response should contain every supported metric")
+        .isEqualTo(expectedMetrics);
+
+    // Verify each metric has both name and description
+    assertThat(metrics)
+        .as("Each metric should have name and description")
+        .allSatisfy(metric -> {
+          assertThat(metric.getMetricName()).isNotBlank();
+          assertThat(metric.getDescription()).isNotBlank();
+        });
   }
 
   private CalculationService<?, ?, ?> createMockService(CalculationMetric metric) {

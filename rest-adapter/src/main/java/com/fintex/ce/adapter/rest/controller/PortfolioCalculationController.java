@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +81,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -179,6 +181,31 @@ public class PortfolioCalculationController {
     commands.forEach(this::validateCommand);
     return calculationObservability.observeComposite(commands,
         () -> calculationOrchestrator.calculateAll(commands));
+  }
+
+  @Operation(summary = "List all supported portfolio calculation metrics", description = "Returns a list of every supported portfolio calculation metric with its identifier and description.")
+  @ApiResponse(responseCode = "200", description = "List of supported metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MetricInfo[].class)))
+  @GetMapping("/metrics")
+  public List<MetricInfo> listMetrics() {
+    return Arrays.stream(CalculationMetric.values())
+        .map(metric -> MetricInfo.builder()
+            .metricName(metric.getValue())
+            .description(extractDescription(metric))
+            .build())
+        .collect(Collectors.toList());
+  }
+
+  private String extractDescription(CalculationMetric metric) {
+    try {
+      var field = CalculationMetric.class.getField(metric.name());
+      var schema = field.getAnnotation(Schema.class);
+      if (schema != null && !schema.description().isEmpty()) {
+        return schema.description();
+      }
+    } catch (NoSuchFieldException e) {
+      log.debug("Could not find field for metric {}", metric.name(), e);
+    }
+    return metric.getUserFriendlyName();
   }
 
   private void requireMetric(CalculationCommand command) {
