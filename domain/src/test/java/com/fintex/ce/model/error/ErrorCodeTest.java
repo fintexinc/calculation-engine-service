@@ -5,6 +5,7 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
+import com.fintex.wm.commons.error.Severity;
 
 import org.junit.jupiter.api.Test;
 
@@ -55,6 +56,16 @@ class ErrorCodeTest {
     assertThat(exception.getMessage())
         .isEqualTo("The holding MUTUAL_FUND-CIG-001 must have a value greater than or equal to 0 and must not be null");
     assertThat(exception.getMetadata()).containsEntry(ErrorParams.HOLDING_ID, "MUTUAL_FUND-CIG-001");
+  }
+
+  @Test
+  void portfolioMissingCurrency_isAWarningThatNamesTheAppliedDefault() {
+    Notification notification = ErrorCode.PORTFOLIO_MISSING_CURRENCY.asNotification("CAD");
+
+    assertThat(notification.getCode()).isEqualTo("CUR-001");
+    assertThat(notification.getSeverity()).isEqualTo(Severity.WARNING);
+    assertThat(notification.getMessage()).isEqualTo(
+        "Missing target currency in the request. The configured default currency CAD is applied to the result");
   }
 
   @Test

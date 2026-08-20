@@ -63,9 +63,7 @@ public class HoldingCurrencyConverter {
    * pass an optional request field straight through.
    */
   public Conversion convert(Map<PortfolioHolding, CurrencyValue> input, Currency targetCurrency) {
-    Currency target = targetCurrency != null
-        ? targetCurrency
-        : fxProperties.getDefaultTargetCurrency();
+    Currency target = resolveTargetCurrency(targetCurrency);
 
     List<PortfolioHolding> missingCurrency = valued(input)
         .filter(entry -> entry.getValue().currency() == null)
@@ -92,6 +90,16 @@ public class HoldingCurrencyConverter {
       converted.put(holding, input.get(holding).value().multiply(rate));
     }
     return new Conversion(converted, warnings, missingCurrency);
+  }
+
+  /**
+   * The currency a conversion reports in: the requested one, or the configured
+   * {@link FxProperties#getDefaultTargetCurrency()} when the request omitted it. Exposed so a caller that has to tell
+   * the user which default was applied (CUR-001) names the same currency the conversion used, instead of repeating the
+   * fallback and drifting from it.
+   */
+  public Currency resolveTargetCurrency(Currency requested) {
+    return requested != null ? requested : fxProperties.getDefaultTargetCurrency();
   }
 
   /**

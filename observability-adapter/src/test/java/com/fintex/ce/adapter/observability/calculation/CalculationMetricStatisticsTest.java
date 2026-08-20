@@ -47,20 +47,26 @@ class CalculationMetricStatisticsTest {
   private static final String STANDARD_DEVIATION = CalculationMetric.STANDARD_DEVIATION.getValue();
   private static final String SHARPE = CalculationMetric.SHARPE_RATIO.getValue();
 
+  // Real catalog codes, referenced through Codes so a renumbering cannot silently strand these fixtures on a
+  // code that no longer exists. Both are warnings, which is what the warning counters record.
+  private static final String SECTOR_WARNING = ErrorCode.Codes.MISSING_EQUITY_SECTOR_ALLOCATION;
+  private static final String TBILL_ERROR = ErrorCode.Codes.MISSING_TBILL_RATE;
+  private static final String MER_WARNING = ErrorCode.Codes.MISSING_MANAGEMENT_EXPENSE_RATIO;
+
   private final SimpleMeterRegistry meterRegistry = ConfiguredMeterRegistry.withPercentiles();
   private final CalculationMetricStatistics statistics = new CalculationMetricStatistics(meterRegistry);
 
   @Test
   void shouldRecordSuccessAndWarningCodes_whenSingleCalculationCompletes() {
-    BaseCalculationResult result = resultWith(warning("WARN-001"), warning("WARN-001"), warning("WARN-002"));
+    BaseCalculationResult result = resultWith(warning(SECTOR_WARNING), warning(SECTOR_WARNING), warning(MER_WARNING));
 
     statistics.recordSingleSuccess(MAX_DRAWDOWN, result, new RequestShape(7, 2));
 
     assertThat(executions(MAX_DRAWDOWN, CalculationMetricStatistics.SUCCESS))
         .isEqualTo(1);
     assertThat(executions(MAX_DRAWDOWN, CalculationMetricStatistics.ERROR)).isZero();
-    assertThat(warningCode(MAX_DRAWDOWN, "WARN-001")).isEqualTo(2);
-    assertThat(warningCode(MAX_DRAWDOWN, "WARN-002")).isEqualTo(1);
+    assertThat(warningCode(MAX_DRAWDOWN, SECTOR_WARNING)).isEqualTo(2);
+    assertThat(warningCode(MAX_DRAWDOWN, MER_WARNING)).isEqualTo(1);
     assertThat(warnings(MAX_DRAWDOWN)).isNotNull();
     assertThat(warnings(MAX_DRAWDOWN).count()).isEqualTo(1);
     assertThat(warnings(MAX_DRAWDOWN).totalAmount()).isEqualTo(3.0);
@@ -72,10 +78,10 @@ class CalculationMetricStatisticsTest {
 
   @Test
   void shouldTrackMinMeanAndMaxWarnings_whenMetricRunsSeveralTimes() {
-    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning("WARN-001")), new RequestShape(1, 0));
+    statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(warning(SECTOR_WARNING)), new RequestShape(1, 0));
     statistics.recordSingleSuccess(MAX_DRAWDOWN, resultWith(), new RequestShape(1, 0));
     statistics.recordSingleSuccess(MAX_DRAWDOWN,
-        resultWith(warning("WARN-001"), warning("WARN-001"), warning("WARN-001"), warning("WARN-001")),
+        resultWith(warning(SECTOR_WARNING), warning(SECTOR_WARNING), warning(SECTOR_WARNING), warning(SECTOR_WARNING)),
         new RequestShape(1, 0));
 
     assertThat(warnings(MAX_DRAWDOWN).count()).isEqualTo(3);
@@ -83,7 +89,7 @@ class CalculationMetricStatisticsTest {
     assertThat(warnings(MAX_DRAWDOWN).mean()).isEqualTo(5.0 / 3);
     assertThat(warnings(MAX_DRAWDOWN).max()).isEqualTo(4.0);
     assertThat(warningsMin(MAX_DRAWDOWN)).isZero();
-    assertThat(warningCode(MAX_DRAWDOWN, "WARN-001")).isEqualTo(5);
+    assertThat(warningCode(MAX_DRAWDOWN, SECTOR_WARNING)).isEqualTo(5);
   }
 
   @Test
@@ -94,12 +100,12 @@ class CalculationMetricStatisticsTest {
         command(CalculationMetric.SHARPE_RATIO, 4, 1));
 
     Map<CalculationMetric, BaseCalculationResult> results = new LinkedHashMap<>();
-    results.put(CalculationMetric.MAX_DRAWDOWN, resultWith(warning("WARN-001"), warning("WARN-001")));
+    results.put(CalculationMetric.MAX_DRAWDOWN, resultWith(warning(SECTOR_WARNING), warning(SECTOR_WARNING)));
     results.put(CalculationMetric.STANDARD_DEVIATION, resultWith());
 
     CompositeCalculationResult result = CompositeCalculationResult.builder()
         .results(results)
-        .failures(Map.of(CalculationMetric.SHARPE_RATIO, List.of(error("CALC-100"), warning("WARN-002"))))
+        .failures(Map.of(CalculationMetric.SHARPE_RATIO, List.of(error(TBILL_ERROR), warning(MER_WARNING))))
         .build();
 
     statistics.recordComposite(commands, result);
@@ -119,9 +125,9 @@ class CalculationMetricStatisticsTest {
     assertThat(executions(SHARPE, CalculationMetricStatistics.SUCCESS))
         .isZero();
 
-    assertThat(errorCode(SHARPE, "CALC-100")).isEqualTo(1);
-    assertThat(warningCode(SHARPE, "WARN-002")).isEqualTo(1);
-    assertThat(warningCode(MAX_DRAWDOWN, "WARN-001")).isEqualTo(2);
+    assertThat(errorCode(SHARPE, TBILL_ERROR)).isEqualTo(1);
+    assertThat(warningCode(SHARPE, MER_WARNING)).isEqualTo(1);
+    assertThat(warningCode(MAX_DRAWDOWN, SECTOR_WARNING)).isEqualTo(2);
 
     assertThat(warnings(MAX_DRAWDOWN).max()).isEqualTo(2.0);
     assertThat(warnings(STANDARD_DEVIATION).count()).isEqualTo(1);
