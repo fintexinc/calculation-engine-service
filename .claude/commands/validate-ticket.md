@@ -83,9 +83,11 @@ to confirm they still hold):
   Morningstar/FMP-sourced fee data populates MER only for certain US fund types (e.g. `ETF_US`).
   A ticket about missing/zero MER on US funds lives here.
 - **Morningstar is the preferred holdings identifier:** `application.yml` sets
-  `holdings-identifier-type: MORNINGSTAR_ID` ("best data availability"); identifier priority is
-  `MORNINGSTAR_ID → TICKER → FUNDSERV → ISIN → CUSIP` (see `TopHoldingsMapper`,
-  `domain/.../holding/CommonHolding.java`).
+  `holdings-identifier-types: MORNINGSTAR_ID, ISIN, CUSIP` — the types `number-of-unique-holdings`
+  deduplicates on, in priority order: a security is counted on the first of these it carries, so several
+  identifiers for one underlying holding cannot inflate the count. TICKER is excluded. A separate and longer
+  chain, `MORNINGSTAR_ID → TICKER → FUNDSERV → ISIN → CUSIP`, applies to top-common-holdings (see
+  `TopHoldingsMapper`, `domain/.../holding/CommonHolding.java`) — the two are unrelated.
 - **Morningstar feed quirk:** `application/.../service/allocation/AbstractAssetAllocationService.java`
   clamps near-zero residual allocation values that Morningstar reports.
 

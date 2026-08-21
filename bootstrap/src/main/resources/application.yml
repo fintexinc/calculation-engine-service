@@ -137,9 +137,13 @@ calculation:
 
 default:
   data-providers: MORNINGSTAR, FMP
-  # by which type of ids to count the unique number of holdings in a portfolio
-  # MORNINGSTAR_ID is chosen due to the best availability of the data
-  holdings-identifier-type: MORNINGSTAR_ID
+  # Identifier types used to count the unique number of holdings in a portfolio, in priority order: a
+  # security is counted on the first of these that it carries, so several identifiers for one underlying
+  # holding cannot inflate the count.
+  # TICKER is deliberately excluded: it is not globally unique, and it is the sole identifier on 2 of 149,673
+  # measured holdings rows.
+  # Comma-separated to allow injection into an ordered List via @Value.
+  holdings-identifier-types: MORNINGSTAR_ID, ISIN, CUSIP
   periods:
     # Values are TimePeriod members (catalog-investment-commons), given either by name or by their length in months.
     # YTD = year to date, SI = since inception — both resolve their length from the data rather than carrying one.

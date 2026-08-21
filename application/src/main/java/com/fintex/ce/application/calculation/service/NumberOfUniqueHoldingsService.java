@@ -31,11 +31,11 @@ public class NumberOfUniqueHoldingsService
     implements
       SingleAttributeCalculationService<PortfolioHoldingsCommand, HoldingIdentifiers, NumberOfUniqueHoldingsResult> {
 
-  private final FiIdentifierType defaultComparisonIdType;
+  private final List<FiIdentifierType> comparisonIdTypes;
 
   public NumberOfUniqueHoldingsService(
-      @Value("${default.holdings-identifier-type}") FiIdentifierType defaultComparisonIdType) {
-    this.defaultComparisonIdType = defaultComparisonIdType;
+      @Value("${default.holdings-identifier-types}") List<FiIdentifierType> comparisonIdTypes) {
+    this.comparisonIdTypes = comparisonIdTypes;
   }
 
   @Override
@@ -103,13 +103,35 @@ public class NumberOfUniqueHoldingsService
     return warnings;
   }
 
+  /**
+   * The identifiers of one security to count, narrowed to a single type so that a producer sending several identifiers
+   * for the same underlying holding cannot inflate the result. The first configured type with a usable value wins,
+   * which is why {@code comparisonIdTypes} is ordered; a type present only with null values is skipped so the
+   * null-value warning still reports against a type that had nothing better behind it.
+   */
   private List<SecurityIdentifier> configuredTypeIdentifiers(HoldingIdentifiers identifiers) {
-    return Optional.ofNullable(identifiers)
+    List<SecurityIdentifier> present = Optional.ofNullable(identifiers)
         .map(HoldingIdentifiers::getHoldingIds)
         .orElseGet(List::of)
         .stream()
         .filter(Objects::nonNull)
-        .filter(id -> defaultComparisonIdType.equals(id.getIdType()))
+        .filter(id -> comparisonIdTypes.contains(id.getIdType()))
+        .toList();
+
+    return comparisonIdTypes.stream()
+        .map(type -> ofType(present, type))
+        .filter(tier -> tier.stream().anyMatch(id -> id.getId() != null))
+        .findFirst()
+        .orElseGet(() -> comparisonIdTypes.stream()
+            .map(type -> ofType(present, type))
+            .filter(tier -> !tier.isEmpty())
+            .findFirst()
+            .orElseGet(List::of));
+  }
+
+  private static List<SecurityIdentifier> ofType(List<SecurityIdentifier> identifiers, FiIdentifierType type) {
+    return identifiers.stream()
+        .filter(id -> type.equals(id.getIdType()))
         .toList();
   }
 }
