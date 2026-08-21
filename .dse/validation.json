@@ -2,8 +2,7 @@
   "version": 1,
   "install": [
     "./mvnw",
-    "dependency:resolve",
-    "-DskipTests=true"
+    "dependency:resolve"
   ],
   "commands": {
     "lint": [
