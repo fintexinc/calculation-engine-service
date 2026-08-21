@@ -31,8 +31,16 @@
       "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; ./mvnw -B -q -Dmaven.test.skip=true package"
     ]
   },
+  "reports": {
+    "junit": "target/surefire-reports/TEST-*.xml"
+  },
   "sast_severity_gate": "MEDIUM",
   "preview": {
+    "start": [
+      "sh",
+      "-c",
+      "java -jar bootstrap/target/*.jar"
+    ],
     "image": "eclipse-temurin:21-jdk",
     "artifact_glob": "bootstrap/target/*.jar",
     "port": 8181,
