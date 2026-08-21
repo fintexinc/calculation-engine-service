@@ -2,7 +2,9 @@ package com.fintex.ce.adapter.rest.controller;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 
 /**
@@ -10,7 +12,6 @@ import lombok.Getter;
  * discover available metrics and their descriptions.
  */
 @Getter
-@AllArgsConstructor
 @Schema(description = "Information about a supported portfolio calculation metric")
 public class MetricInfo {
 
@@ -19,4 +20,10 @@ public class MetricInfo {
 
   @Schema(description = "Short description of the metric", example = "Trailing total return over specified periods")
   private final String description;
+
+  @JsonCreator
+  public MetricInfo(@JsonProperty("id") String id, @JsonProperty("description") String description) {
+    this.id = id;
+    this.description = description;
+  }
 }

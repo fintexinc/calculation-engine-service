@@ -196,11 +196,14 @@ public class PortfolioCalculationController {
     try {
       var field = CalculationMetric.class.getField(metric.name());
       var schemaAnnotation = field.getAnnotation(Schema.class);
-      if (schemaAnnotation != null && !schemaAnnotation.description().isBlank()) {
-        return schemaAnnotation.description();
+      if (schemaAnnotation != null) {
+        String description = schemaAnnotation.description();
+        if (description != null && !description.isBlank()) {
+          return description;
+        }
       }
-    } catch (NoSuchFieldException e) {
-      log.warn("Could not extract description for metric: {}", metric.name());
+    } catch (Exception e) {
+      log.warn("Could not extract description for metric: {}", metric.name(), e);
     }
     return "";
   }
