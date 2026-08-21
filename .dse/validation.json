@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "install": [
+    "./mvnw",
+    "dependency:resolve",
+    "-DskipTests=true"
+  ],
+  "commands": {
+    "lint": [
+      "./mvnw",
+      "spotless:check"
+    ],
+    "test": [
+      "./mvnw",
+      "test"
+    ],
+    "build": [
+      "sh",
+      "-c",
+      "./mvnw install -DskipTests && ./mvnw -f bootstrap/pom.xml jib:dockerBuild -Djib.from.image=mcr.microsoft.com/openjdk/jdk:21-azurelinux -Djib.from.auth.username=anonymous -Djib.to.image=portfolio-calculation-engine:latest"
+    ]
+  },
+  "reports": {
+    "junit": "target/surefire-reports/TEST-*.xml"
+  },
+  "preview": {
+    "start": [
+      "sh",
+      "-c",
+      "java -jar bootstrap/target/*.jar"
+    ]
+  }
+}
