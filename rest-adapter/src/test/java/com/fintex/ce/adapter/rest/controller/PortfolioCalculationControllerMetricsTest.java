@@ -1,13 +1,13 @@
 package com.fintex.ce.adapter.rest.controller;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
+import com.fintex.ce.calculation.CalculationOrchestrator;
+import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.domain.security.SecurityData;
 import com.fintex.ce.port.observability.CalculationObservability;
 import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import com.fintex.ce.model.domain.security.SecurityData;
-import com.fintex.ce.calculation.CalculationOrchestrator;
-import com.fintex.ce.calculation.CalculationService;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -52,8 +52,7 @@ class PortfolioCalculationControllerMetricsTest {
         .registerModule(new JavaTimeModule())
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    EnumMap<CalculationMetric, CalculationService<?, ?, ?>> mockServices =
-        new EnumMap<>(CalculationMetric.class);
+    EnumMap<CalculationMetric, CalculationService<?, ?, ?>> mockServices = new EnumMap<>(CalculationMetric.class);
 
     List<CalculationService<?, ?, ?>> serviceList = Arrays.stream(CalculationMetric.values())
         .<CalculationService<?, ?, ?>>map(metric -> {
