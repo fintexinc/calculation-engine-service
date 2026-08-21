@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,16 +29,19 @@ import static org.mockito.Mockito.mock;
 
 class NumberOfUniqueHoldingsServiceTest {
 
+  private static final List<FiIdentifierType> PERMITTED_ID_TYPES = List.of(
+      FiIdentifierType.MORNINGSTAR_ID, FiIdentifierType.ISIN, FiIdentifierType.CUSIP);
+
   @Test
   void shouldReturnNumberOfUniqueHoldingsMetric_whenGetMetricInvoked() {
-    var service = new NumberOfUniqueHoldingsService(FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(List.of(FiIdentifierType.MORNINGSTAR_ID));
 
     assertEquals(CalculationMetric.NUMBER_OF_UNIQUE_HOLDINGS, service.getMetric());
   }
 
   @Test
   void shouldRequireHoldingIdentifiersAttribute_whenRequiredAttributesInvoked() {
-    var service = new NumberOfUniqueHoldingsService(FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(List.of(FiIdentifierType.MORNINGSTAR_ID));
 
     assertEquals(List.of(CompositeSecurityAttribute.HOLDING_IDENTIFIERS), service.requiredAttributes());
     assertEquals(CompositeSecurityAttribute.HOLDING_IDENTIFIERS, service.requiredAttribute());
@@ -45,7 +49,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldReturnResultWithEmptyWarningsAndZeroCount_whenSecurityDataIsEmpty() {
-    var service = new NumberOfUniqueHoldingsService(FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(List.of(FiIdentifierType.MORNINGSTAR_ID));
 
     NumberOfUniqueHoldingsResult result = service.perform(commandFor(Map.of()), Map.of());
 
@@ -57,7 +61,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldEmitAggregatedMissingIdentifiersWarning_withCountOfSecurities() {
-    var service = new NumberOfUniqueHoldingsService(FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(List.of(FiIdentifierType.MORNINGSTAR_ID));
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
     PortfolioHolding h3 = mock(PortfolioHolding.class);
@@ -77,7 +81,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldEmitAggregatedNullIdValueWarning_withCountOfUnderlyingHoldings() {
-    var service = new NumberOfUniqueHoldingsService(FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(List.of(FiIdentifierType.MORNINGSTAR_ID));
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
     Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
@@ -99,7 +103,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldEmitBothAggregatedWarnings_whenBothFailureModesOccur() {
-    var service = new NumberOfUniqueHoldingsService(FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(List.of(FiIdentifierType.MORNINGSTAR_ID));
     PortfolioHolding h1 = mock(PortfolioHolding.class);
     PortfolioHolding h2 = mock(PortfolioHolding.class);
     Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
@@ -118,7 +122,7 @@ class NumberOfUniqueHoldingsServiceTest {
 
   @Test
   void shouldCountUnresolvedHoldingIndividuallyAndEmitSecurityNotFoundWarning_whenSmHasNoRecordOfIdentifier() {
-    var service = new NumberOfUniqueHoldingsService(FiIdentifierType.MORNINGSTAR_ID);
+    var service = new NumberOfUniqueHoldingsService(List.of(FiIdentifierType.MORNINGSTAR_ID));
     PortfolioHolding resolved = mock(PortfolioHolding.class);
     PortfolioHolding unresolved = mock(PortfolioHolding.class);
     Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
@@ -135,6 +139,69 @@ class NumberOfUniqueHoldingsServiceTest {
     assertEquals(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC, result.getWarnings().get(0).getCode());
   }
 
+  @Test
+  void shouldCountOnTheFirstConfiguredTypePresent_whenNoMorningstarIdIsPresent() {
+    var service = new NumberOfUniqueHoldingsService(PERMITTED_ID_TYPES);
+    PortfolioHolding holding = mock(PortfolioHolding.class);
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
+        holding, holdingIdentifiers(
+            id("US0378331005", FiIdentifierType.ISIN),
+            id("037833100", FiIdentifierType.CUSIP)));
+
+    NumberOfUniqueHoldingsResult result = service.perform(commandFor(fetched), fetched);
+
+    // ISIN is the first configured type this security carries, so the CUSIP is not counted alongside it: the two
+    // could be the same instrument and a flat identifier list cannot tell.
+    assertThat(result.getNumberOfUniqueHoldings()).isEqualTo(1L);
+    assertThat(result.getWarnings()).isEmpty();
+  }
+
+  @Test
+  void shouldCountOnce_whenOneHoldingCarriesSeveralConfiguredIdentifiers() {
+    var service = new NumberOfUniqueHoldingsService(PERMITTED_ID_TYPES);
+    PortfolioHolding holding = mock(PortfolioHolding.class);
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
+        holding, holdingIdentifiers(
+            id("0P0000APPL", FiIdentifierType.MORNINGSTAR_ID),
+            id("US0378331005", FiIdentifierType.ISIN),
+            id("037833100", FiIdentifierType.CUSIP)));
+
+    NumberOfUniqueHoldingsResult result = service.perform(commandFor(fetched), fetched);
+
+    assertThat(result.getNumberOfUniqueHoldings()).isEqualTo(1L);
+    assertThat(result.getWarnings()).isEmpty();
+  }
+
+  @Test
+  void shouldDeduplicateAcrossSecurities_whenSameIsinRecurs() {
+    var service = new NumberOfUniqueHoldingsService(PERMITTED_ID_TYPES);
+    PortfolioHolding h1 = mock(PortfolioHolding.class);
+    PortfolioHolding h2 = mock(PortfolioHolding.class);
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
+        h1, holdingIdentifiers(id("US0378331005", FiIdentifierType.ISIN)),
+        h2, holdingIdentifiers(id("US0378331005", FiIdentifierType.ISIN)));
+
+    NumberOfUniqueHoldingsResult result = service.perform(commandFor(fetched), fetched);
+
+    assertThat(result.getNumberOfUniqueHoldings()).isEqualTo(1L);
+    assertThat(result.getWarnings()).isEmpty();
+  }
+
+  @Test
+  void shouldIgnoreTickerIdentifiers_whenTheyAreTheOnlyOnesPresent() {
+    var service = new NumberOfUniqueHoldingsService(PERMITTED_ID_TYPES);
+    PortfolioHolding holding = mock(PortfolioHolding.class);
+    Map<PortfolioHolding, HoldingIdentifiers> fetched = Map.of(
+        holding, holdingIdentifiers(id("AAPL", FiIdentifierType.TICKER)));
+
+    NumberOfUniqueHoldingsResult result = service.perform(commandFor(fetched), fetched);
+
+    assertThat(result.getNumberOfUniqueHoldings()).isEqualTo(1L);
+    assertThat(result.getWarnings())
+        .extracting(Notification::getCode)
+        .containsExactly(ErrorCode.Codes.MISSING_HOLDING_IDENTIFIERS);
+  }
+
   @ParameterizedTest(name = "[{index}] {0}")
   @MethodSource("countingScenarios")
   void shouldCountDistinctHoldingIdsAndEmitWarningsForHoldingsWithNoMatchingIds_whenPerformInvoked(
@@ -143,7 +210,7 @@ class NumberOfUniqueHoldingsServiceTest {
       Map<PortfolioHolding, HoldingIdentifiers> fetched,
       Long expectedCount,
       int expectedWarnings) {
-    var service = new NumberOfUniqueHoldingsService(configuredType);
+    var service = new NumberOfUniqueHoldingsService(List.of(configuredType));
 
     NumberOfUniqueHoldingsResult result = service.perform(commandFor(fetched), fetched);
 
