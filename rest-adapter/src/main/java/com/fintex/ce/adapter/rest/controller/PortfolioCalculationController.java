@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +81,9 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -181,6 +185,18 @@ public class PortfolioCalculationController {
         () -> calculationOrchestrator.calculateAll(commands));
   }
 
+  @Operation(summary = "List all supported portfolio calculation metrics", description = "Returns an array of all available portfolio calculation metrics with their identifiers and descriptions.")
+  @ApiResponse(responseCode = "200", description = "List of supported metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(type = "array", implementation = MetricInfo.class)))
+  @GetMapping("/metrics")
+  public List<MetricInfo> listMetrics() {
+    List<MetricInfo> metrics = new ArrayList<>();
+    for (CalculationMetric metric : CalculationMetric.values()) {
+      String description = extractDescription(metric);
+      metrics.add(new MetricInfo(metric.getValue(), description));
+    }
+    return metrics;
+  }
+
   private void requireMetric(CalculationCommand command) {
     if (command == null || command.getMetric() == null) {
       throw ErrorCode.METRIC_REQUIRED.toException();
@@ -221,5 +237,19 @@ public class PortfolioCalculationController {
       throw new ConstraintViolationException(violations);
     }
     validationFacade.validate(command);
+  }
+
+  private String extractDescription(CalculationMetric metric) {
+    try {
+      // Find the field corresponding to this enum constant
+      Field field = CalculationMetric.class.getDeclaredField(metric.name());
+      Schema annotation = field.getAnnotation(Schema.class);
+      if (annotation != null && !annotation.description().isEmpty()) {
+        return annotation.description();
+      }
+    } catch (NoSuchFieldException e) {
+      log.debug("Could not find field for metric {}", metric.name(), e);
+    }
+    return "";
   }
 }

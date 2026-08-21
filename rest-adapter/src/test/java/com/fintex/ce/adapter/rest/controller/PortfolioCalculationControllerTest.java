@@ -82,6 +82,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -193,6 +194,39 @@ class PortfolioCalculationControllerTest {
             .contentType(MediaType.TEXT_PLAIN)
             .content("not json"))
         .andExpect(status().isUnsupportedMediaType());
+  }
+
+  @Test
+  void shouldReturnAllMetrics_whenListMetricsEndpointIsCalled() throws Exception {
+    MvcResult mvcResult = mockMvc.perform(
+        get(BASE_PATH + "/metrics")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andReturn();
+
+    String responseBody = mvcResult.getResponse().getContentAsString();
+    List<MetricInfo> metrics = Arrays.asList(
+        objectMapper.readValue(responseBody, MetricInfo[].class));
+
+    // Verify that all CalculationMetric enum values are included
+    assertThat(metrics).hasSizeGreaterThanOrEqual(CalculationMetric.values().length);
+
+    // Extract the metric IDs from the response
+    List<String> responseMetricIds = metrics.stream()
+        .map(MetricInfo::getMetricId)
+        .toList();
+
+    // Verify that all enum values are present
+    for (CalculationMetric metric : CalculationMetric.values()) {
+      assertThat(responseMetricIds).contains(metric.getValue());
+    }
+
+    // Verify that each metric has a description
+    for (MetricInfo metric : metrics) {
+      assertThat(metric.getMetricId()).isNotNull().isNotEmpty();
+      assertThat(metric.getDescription()).isNotNull();
+    }
   }
 
   private CalculationService<?, ?, ?> createMockService(CalculationMetric metric) {
