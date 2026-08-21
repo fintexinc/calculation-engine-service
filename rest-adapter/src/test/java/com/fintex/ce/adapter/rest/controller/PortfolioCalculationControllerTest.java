@@ -1,5 +1,6 @@
 package com.fintex.ce.adapter.rest.controller;
 
+import com.fintex.ce.adapter.rest.controller.MetricInfo;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.adapter.rest.validation.RequestValidator;
 import com.fintex.ce.adapter.rest.validation.validators.CipsdGreaterThanCpedReqValidator;
@@ -57,6 +58,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -82,6 +84,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -193,6 +196,42 @@ class PortfolioCalculationControllerTest {
             .contentType(MediaType.TEXT_PLAIN)
             .content("not json"))
         .andExpect(status().isUnsupportedMediaType());
+  }
+
+  @Test
+  void shouldReturnAllMetrics_whenMetricsEndpointIsCalled() throws Exception {
+    MvcResult result = mockMvc.perform(
+        get(BASE_PATH + "/metrics")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andReturn();
+
+    String responseBody = result.getResponse().getContentAsString();
+    List<MetricInfo> metrics = objectMapper.readValue(responseBody, new TypeReference<List<MetricInfo>>() {});
+
+    assertThat(metrics)
+        .hasSize(CalculationMetric.values().length)
+        .extracting(MetricInfo::getId)
+        .containsExactlyInAnyOrder(
+            Arrays.stream(CalculationMetric.values())
+                .map(CalculationMetric::getValue)
+                .toArray(String[]::new));
+
+    // Verify that each metric has a description
+    assertThat(metrics)
+        .allSatisfy(info -> assertThat(info.getDescription())
+            .as("Metric %s should have a description", info.getId())
+            .isNotBlank());
+
+    // Spot-check a few specific metrics
+    var trailingReturnsMetric = metrics.stream()
+        .filter(m -> m.getId().equals("trailing-total-returns"))
+        .findFirst();
+    assertThat(trailingReturnsMetric)
+        .isPresent()
+        .get()
+        .satisfies(m -> assertThat(m.getDescription()).contains("Trailing total return"));
   }
 
   private CalculationService<?, ?, ?> createMockService(CalculationMetric metric) {

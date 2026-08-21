@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +81,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -179,6 +181,28 @@ public class PortfolioCalculationController {
     commands.forEach(this::validateCommand);
     return calculationObservability.observeComposite(commands,
         () -> calculationOrchestrator.calculateAll(commands));
+  }
+
+  @Operation(summary = "List all supported calculation metrics", description = "Returns a list of all available portfolio calculation metrics with their identifiers and descriptions.")
+  @ApiResponse(responseCode = "200", description = "List of available metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MetricInfo.class, type = "array")))
+  @GetMapping("/metrics")
+  public List<MetricInfo> listMetrics() {
+    return Arrays.stream(CalculationMetric.values())
+        .map(metric -> new MetricInfo(metric.getValue(), extractDescription(metric)))
+        .toList();
+  }
+
+  private String extractDescription(CalculationMetric metric) {
+    try {
+      var field = CalculationMetric.class.getField(metric.name());
+      var schemaAnnotation = field.getAnnotation(Schema.class);
+      if (schemaAnnotation != null && !schemaAnnotation.description().isBlank()) {
+        return schemaAnnotation.description();
+      }
+    } catch (NoSuchFieldException e) {
+      log.warn("Could not extract description for metric: {}", metric.name());
+    }
+    return "";
   }
 
   private void requireMetric(CalculationCommand command) {
