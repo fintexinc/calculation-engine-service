@@ -9,8 +9,8 @@ import lombok.Value;
  * Describes a supported portfolio calculation metric.
  *
  * <p>
- * Used to list available metrics in the metrics discovery endpoint. The identifier matches the
- * value accepted by the POST /{metricName} endpoint.
+ * Used to list available metrics in the metrics discovery endpoint. The identifier matches the value accepted by the
+ * POST /{metricName} endpoint.
  */
 @Value
 @RequiredArgsConstructor

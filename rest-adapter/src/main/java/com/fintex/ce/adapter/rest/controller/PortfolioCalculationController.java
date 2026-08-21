@@ -238,8 +238,8 @@ public class PortfolioCalculationController {
   }
 
   /**
-   * Extracts the description from a CalculationMetric's @Schema annotation.
-   * Returns the description text if present, or an empty string if not available.
+   * Extracts the description from a CalculationMetric's @Schema annotation. Returns the description text if present, or
+   * an empty string if not available.
    */
   private static String extractSchemaDescription(CalculationMetric metric) {
     try {
