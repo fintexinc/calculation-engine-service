@@ -15,11 +15,9 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Information about a supported portfolio calculation metric")
 public class MetricInfo {
 
-  @Schema(description = "Metric identifier used as the path parameter in POST /{metricName} requests",
-      example = "trailing-total-returns")
+  @Schema(description = "Metric identifier used as the path parameter in POST /{metricName} requests", example = "trailing-total-returns")
   private String metricId;
 
-  @Schema(description = "Short description of what this metric calculates",
-      example = "Trailing total return over specified periods")
+  @Schema(description = "Short description of what this metric calculates", example = "Trailing total return over specified periods")
   private String description;
 }

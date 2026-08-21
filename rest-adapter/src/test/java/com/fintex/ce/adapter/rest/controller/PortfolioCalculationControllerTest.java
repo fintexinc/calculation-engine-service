@@ -210,7 +210,7 @@ class PortfolioCalculationControllerTest {
         objectMapper.readValue(responseBody, MetricInfo[].class));
 
     // Verify that all CalculationMetric enum values are included
-    assertThat(metrics).hasSizeGreaterThanOrEqual(CalculationMetric.values().length);
+    assertThat(metrics).hasSizeGreaterThanOrEqualTo(CalculationMetric.values().length);
 
     // Extract the metric IDs from the response
     List<String> responseMetricIds = metrics.stream()
