@@ -39,7 +39,7 @@
     "start": [
       "sh",
       "-c",
-      "java -jar bootstrap/target/*.jar"
+      "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; java -jar bootstrap/target/*.jar"
     ],
     "image": "eclipse-temurin:21-jdk",
     "artifact_glob": "bootstrap/target/*.jar",
