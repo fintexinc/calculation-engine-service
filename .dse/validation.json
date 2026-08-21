@@ -15,6 +15,11 @@
       "-c",
       "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; ./mvnw -B -q spotless:check"
     ],
+    "lint_fix": [
+      "sh",
+      "-c",
+      "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; ./mvnw -B -q spotless:apply"
+    ],
     "typecheck": [
       "sh",
       "-c",
@@ -31,10 +36,6 @@
       "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; ./mvnw -B -q -Dmaven.test.skip=true package"
     ]
   },
-  "disabled_stages": [
-    "test",
-    "build"
-  ],
   "sast_severity_gate": "MEDIUM",
   "preview": {
     "image": "eclipse-temurin:21-jdk",
