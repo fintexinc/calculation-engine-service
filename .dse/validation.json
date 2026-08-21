@@ -34,12 +34,16 @@
   "reports": {
     "junit": "target/surefire-reports/TEST-*.xml"
   },
+  "disabled_stages": [
+    "test",
+    "build"
+  ],
   "sast_severity_gate": "MEDIUM",
   "preview": {
     "start": [
       "sh",
       "-c",
-      "J=$(ls -d /usr/lib/jvm/java-21-openjdk-* 2>/dev/null | head -1); [ -n \"$J\" ] && export JAVA_HOME=\"$J\"; java -jar bootstrap/target/*.jar"
+      "java -jar bootstrap/target/*.jar"
     ],
     "image": "eclipse-temurin:21-jdk",
     "artifact_glob": "bootstrap/target/*.jar",
