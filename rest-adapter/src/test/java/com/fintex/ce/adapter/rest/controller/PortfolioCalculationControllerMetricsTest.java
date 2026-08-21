@@ -1,28 +1,29 @@
 package com.fintex.ce.adapter.rest.controller;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
-import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
-import com.fintex.ce.application.config.DefaultDataProperties;
+import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.port.observability.CalculationObservability;
-import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import jakarta.validation.Validator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,19 +42,16 @@ class PortfolioCalculationControllerMetricsTest {
   private ObjectMapper objectMapper;
 
   @Mock
-  private MetricCalculationOrchestrator calculationOrchestrator;
+  private CalculationOrchestrator calculationOrchestrator;
 
   @Mock
   private RequestValidationFacade requestValidationFacade;
 
   @Mock
-  private SecurityAttributesFetcher securityAttributesFetcher;
-
-  @Mock
   private CalculationObservability calculationObservability;
 
   @Mock
-  private DefaultDataProperties defaultDataProperties;
+  private Validator validator;
 
   @BeforeEach
   void setUp() {
@@ -65,9 +63,8 @@ class PortfolioCalculationControllerMetricsTest {
     PortfolioCalculationController controller = new PortfolioCalculationController(
         calculationOrchestrator,
         requestValidationFacade,
-        securityAttributesFetcher,
         calculationObservability,
-        defaultDataProperties);
+        validator);
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
