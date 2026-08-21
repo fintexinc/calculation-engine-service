@@ -1,9 +1,9 @@
 package com.fintex.ce.adapter.rest.controller;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.Getter;
 
