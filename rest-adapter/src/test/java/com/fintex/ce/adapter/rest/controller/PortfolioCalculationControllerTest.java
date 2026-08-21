@@ -9,6 +9,7 @@ import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator;
 import com.fintex.ce.adapter.rest.validation.validators.StandardDeviationPeriodsReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.TrailingPeriodsReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.TwelveMonthMinimumPeriodsReqValidator;
+import com.fintex.ce.adapter.rest.controller.MetricInfo;
 import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.calculation.CalculationOrchestrator;
@@ -71,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationController.BASE_PATH;
@@ -82,6 +84,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -150,6 +153,37 @@ class PortfolioCalculationControllerTest {
         .usingRecursiveComparison()
         .ignoringCollectionOrder()
         .isEqualTo(serviceResult);
+  }
+
+  @Test
+  void shouldReturnAllMetrics_whenMetricsEndpointRequested() throws Exception {
+    MvcResult mvcResult = mockMvc.perform(get(BASE_PATH + "/metrics"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andReturn();
+
+    String responseBody = mvcResult.getResponse().getContentAsString();
+    MetricInfo[] metrics = objectMapper.readValue(responseBody, MetricInfo[].class);
+
+    // Verify response contains all CalculationMetric values
+    Set<String> metricIdentifiers = Arrays.stream(metrics)
+        .map(MetricInfo::getIdentifier)
+        .collect(Collectors.toSet());
+
+    Set<String> expectedIdentifiers = Arrays.stream(CalculationMetric.values())
+        .map(CalculationMetric::getValue)
+        .collect(Collectors.toSet());
+
+    assertThat(metricIdentifiers)
+        .as("response should contain every CalculationMetric identifier")
+        .isEqualTo(expectedIdentifiers);
+
+    // Verify each metric has a non-empty description
+    for (MetricInfo metric : metrics) {
+      assertThat(metric.getDescription())
+          .as("metric '%s' should have a description", metric.getIdentifier())
+          .isNotBlank();
+    }
   }
 
   @Test
