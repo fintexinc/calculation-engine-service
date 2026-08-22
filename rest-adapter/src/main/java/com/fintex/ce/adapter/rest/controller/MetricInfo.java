@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "Information about a supported calculation metric")
 public record MetricInfo(
-    @Schema(description = "Metric identifier accepted by the portfolio calculations endpoint")
-    String metricId,
-    @Schema(description = "Description of the metric's purpose and calculation method")
-    String description) {
+    @Schema(description = "Metric identifier accepted by the portfolio calculations endpoint") String metricId,
+    @Schema(description = "Description of the metric's purpose and calculation method") String description) {
 }
