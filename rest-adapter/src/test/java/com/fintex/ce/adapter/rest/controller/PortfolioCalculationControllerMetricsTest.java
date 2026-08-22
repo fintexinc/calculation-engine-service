@@ -79,7 +79,8 @@ class PortfolioCalculationControllerMetricsTest {
     SecurityAttributesFetcher fetcher = mock(SecurityAttributesFetcher.class);
     lenient().when(fetcher.fetch(any(), anyCollection(), any())).thenReturn(
         com.fintex.ce.model.domain.security.SecurityData.EMPTY);
-    lenient().when(fetcher.fetch(any(), any(com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute.class), any()))
+    lenient().when(fetcher.fetch(any(), any(com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute.class),
+        any()))
         .thenReturn(Map.of());
 
     CalculationOrchestrator orchestrator = new MetricCalculationOrchestrator(
