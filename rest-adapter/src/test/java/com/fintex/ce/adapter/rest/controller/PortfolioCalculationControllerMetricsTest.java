@@ -1,39 +1,101 @@
 package com.fintex.ce.adapter.rest.controller;
 
+import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
+import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
+import com.fintex.ce.application.config.DefaultDataProperties;
+import com.fintex.ce.calculation.CalculationOrchestrator;
+import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.port.observability.CalculationDurationRecorder;
+import com.fintex.ce.port.observability.CalculationObservability;
+import com.fintex.ce.port.webclient.sm.SecurityAttributesFetcher;
+import com.fintex.wm.commons.domain.DataProvider;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PortfolioCalculationController.class)
+@ExtendWith(MockitoExtension.class)
 class PortfolioCalculationControllerMetricsTest {
 
-  @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
   private ObjectMapper objectMapper;
 
   @BeforeEach
   void setUp() {
+    objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    // Create mock services for all metrics
+    List<CalculationService<?, ?, ?>> mockServices = Arrays.stream(CalculationMetric.values())
+        .<CalculationService<?, ?, ?>>map(this::createMockService)
+        .toList();
+
+    // Create the controller with all necessary dependencies
+    var controller = createController(mockServices);
+
+    // Set up MockMvc with standalone setup
+    mockMvc = MockMvcBuilders.standaloneSetup(controller)
+        .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+        .build();
+  }
+
+  private CalculationService<?, ?, ?> createMockService(CalculationMetric metric) {
+    CalculationService<?, ?, ?> mock = mock(CalculationService.class);
+    lenient().when(mock.getMetric()).thenReturn(metric);
+    lenient().when(mock.requiredAttributes()).thenReturn(List.of());
+    return mock;
+  }
+
+  private PortfolioCalculationController createController(List<CalculationService<?, ?, ?>> services) {
+    SecurityAttributesFetcher fetcher = mock(SecurityAttributesFetcher.class);
+    lenient().when(fetcher.fetch(any(), anyCollection(), any())).thenReturn(
+        com.fintex.ce.model.domain.security.SecurityData.EMPTY);
+    lenient().when(fetcher.fetch(any(), any(com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute.class), any()))
+        .thenReturn(Map.of());
+
+    CalculationOrchestrator orchestrator = new MetricCalculationOrchestrator(
+        services,
+        fetcher,
+        new DefaultDataProperties(List.of(DataProvider.MORNINGSTAR, DataProvider.FMP)),
+        CalculationDurationRecorder.NO_OP);
+
+    LocalValidatorFactoryBean beanValidator = new LocalValidatorFactoryBean();
+    beanValidator.afterPropertiesSet();
+
+    return new PortfolioCalculationController(
+        orchestrator,
+        new RequestValidationFacade(List.of()),
+        mock(CalculationObservability.class),
+        beanValidator);
   }
 
   @Test
