@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +81,8 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -221,5 +224,25 @@ public class PortfolioCalculationController {
       throw new ConstraintViolationException(violations);
     }
     validationFacade.validate(command);
+  }
+
+  @Operation(summary = "List all supported calculation metrics", description = "Returns metadata about every supported portfolio calculation metric, including its identifier and description.")
+  @ApiResponse(responseCode = "200", description = "List of supported metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MetricInfo.class, type = "array")))
+  @GetMapping("/metrics")
+  public List<MetricInfo> listMetrics() {
+    return Arrays.stream(CalculationMetric.values())
+        .map(metric -> new MetricInfo(metric.getValue(), extractMetricDescription(metric)))
+        .collect(Collectors.toList());
+  }
+
+  private String extractMetricDescription(CalculationMetric metric) {
+    try {
+      Field field = CalculationMetric.class.getDeclaredField(metric.name());
+      Schema schema = field.getAnnotation(Schema.class);
+      return schema != null ? schema.description() : "";
+    } catch (NoSuchFieldException e) {
+      log.warn("Could not find field for metric {}", metric.name(), e);
+      return "";
+    }
   }
 }
