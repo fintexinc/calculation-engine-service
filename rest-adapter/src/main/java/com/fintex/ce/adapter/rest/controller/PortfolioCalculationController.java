@@ -242,7 +242,8 @@ public class PortfolioCalculationController {
   /**
    * Extracts the @Schema description annotation from a CalculationMetric enum value.
    *
-   * @param metric the metric enum value
+   * @param metric
+   *          the metric enum value
    * @return the description from the @Schema annotation, or an empty string if not found
    */
   private String extractSchemaDescription(CalculationMetric metric) {
