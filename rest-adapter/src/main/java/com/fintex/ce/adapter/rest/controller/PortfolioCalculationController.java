@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,6 +72,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -80,6 +82,8 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -181,6 +185,18 @@ public class PortfolioCalculationController {
         () -> calculationOrchestrator.calculateAll(commands));
   }
 
+  @Operation(summary = "List supported calculation metrics", description = "Returns all supported portfolio calculation metrics with their identifiers and descriptions.")
+  @ApiResponse(responseCode = "200", description = "Array of supported metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = MetricInfo.class))))
+  @GetMapping("/metrics")
+  public List<MetricInfo> listMetrics() {
+    return Arrays.stream(CalculationMetric.values())
+        .map(metric -> MetricInfo.builder()
+            .identifier(metric.getValue())
+            .description(extractSchemaDescription(metric))
+            .build())
+        .collect(Collectors.toList());
+  }
+
   private void requireMetric(CalculationCommand command) {
     if (command == null || command.getMetric() == null) {
       throw ErrorCode.METRIC_REQUIRED.toException();
@@ -221,5 +237,24 @@ public class PortfolioCalculationController {
       throw new ConstraintViolationException(violations);
     }
     validationFacade.validate(command);
+  }
+
+  /**
+   * Extracts the @Schema description annotation from a CalculationMetric enum value.
+   *
+   * @param metric the metric enum value
+   * @return the description from the @Schema annotation, or an empty string if not found
+   */
+  private String extractSchemaDescription(CalculationMetric metric) {
+    try {
+      Field field = CalculationMetric.class.getDeclaredField(metric.name());
+      Schema schema = field.getAnnotation(Schema.class);
+      if (schema != null && schema.description() != null && !schema.description().isEmpty()) {
+        return schema.description();
+      }
+    } catch (NoSuchFieldException e) {
+      log.warn("Could not find field for metric: {}", metric.name(), e);
+    }
+    return "";
   }
 }
