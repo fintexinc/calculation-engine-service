@@ -1,17 +1,25 @@
 package com.fintex.ce.adapter.rest.controller;
 
+import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
+import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.port.observability.CalculationObservability;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,21 +27,35 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PortfolioCalculationController.class)
+@ExtendWith(MockitoExtension.class)
 class PortfolioCalculationControllerMetricsEndpointTest {
 
-  @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
   private ObjectMapper objectMapper;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws Exception {
+    objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    LocalValidatorFactoryBean beanValidator = new LocalValidatorFactoryBean();
+    beanValidator.afterPropertiesSet();
+
+    var controller = new PortfolioCalculationController(
+        mock(CalculationOrchestrator.class),
+        new RequestValidationFacade(List.of()),
+        mock(CalculationObservability.class),
+        beanValidator);
+
+    mockMvc = MockMvcBuilders.standaloneSetup(controller)
+        .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+        .build();
   }
 
   @Test
