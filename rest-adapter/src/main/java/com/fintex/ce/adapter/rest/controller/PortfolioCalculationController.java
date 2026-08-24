@@ -203,8 +203,8 @@ public class PortfolioCalculationController {
   }
 
   /**
-   * Extracts the description from the @Schema annotation on the CalculationMetric enum constant.
-   * Falls back to a generic label if the annotation is not present or description is empty.
+   * Extracts the description from the @Schema annotation on the CalculationMetric enum constant. Falls back to a
+   * generic label if the annotation is not present or description is empty.
    */
   private String getMetricDescription(CalculationMetric metric) {
     try {
