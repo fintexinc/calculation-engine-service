@@ -3,10 +3,10 @@ package com.fintex.ce.adapter.rest.controller;
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
 import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.port.observability.CalculationDurationRecorder;
 import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
+import jakarta.validation.Validator;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -46,7 +46,7 @@ class PortfolioCalculationControllerTest {
   private CalculationObservability calculationObservability;
 
   @Mock
-  private CalculationDurationRecorder durationRecorder;
+  private Validator validator;
 
   @BeforeEach
   void setUp() {
@@ -54,7 +54,8 @@ class PortfolioCalculationControllerTest {
     PortfolioCalculationController controller = new PortfolioCalculationController(
         calculationOrchestrator,
         requestValidationFacade,
-        calculationObservability);
+        calculationObservability,
+        validator);
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
         .build();
