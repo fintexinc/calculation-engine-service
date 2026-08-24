@@ -18,13 +18,6 @@ cache:
       enabled: true
       refresh-after: 24h
 
-observability:
-  azure-monitor:
-    enabled: ${AZURE_MONITOR_ENABLED:true}
-    connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:}
-    live-metrics:
-      enabled: ${AZURE_MONITOR_LIVE_METRICS_ENABLED:true}
-
 external-services:
   bank-of-canada:
     base-url: https://www.bankofcanada.ca/valet
@@ -241,7 +234,7 @@ management:
     sampling:
       probability: 1.0
     # Adopt a parent service's trace id whether it sends W3C traceparent or either B3 form, and emit W3C downstream.
-    # Mirrors `otel.propagators` so inbound correlation behaves the same with and without the Azure Monitor exporter.
+    # Keeps incoming trace-context formats aligned with the outgoing W3C trace context.
     propagation:
       consume: w3c,b3,b3_multi
       produce: w3c
