@@ -6,7 +6,6 @@ import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
-import jakarta.validation.Validator;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -19,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.validation.Validator;
 
 import java.util.HashSet;
 import java.util.Set;
