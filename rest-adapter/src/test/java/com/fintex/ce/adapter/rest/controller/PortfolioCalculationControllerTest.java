@@ -82,6 +82,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -193,6 +194,33 @@ class PortfolioCalculationControllerTest {
             .contentType(MediaType.TEXT_PLAIN)
             .content("not json"))
         .andExpect(status().isUnsupportedMediaType());
+  }
+
+  @Test
+  void shouldReturnAllMetrics_whenListMetricsRequested() throws Exception {
+    MvcResult mvcResult = mockMvc.perform(
+        get(BASE_PATH + "/metrics")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andReturn();
+
+    String responseBody = mvcResult.getResponse().getContentAsString();
+    MetricInfo[] metrics = objectMapper.readValue(responseBody, MetricInfo[].class);
+
+    // Verify we have exactly as many metrics as enum values
+    assertThat(metrics)
+        .hasSize(CalculationMetric.values().length)
+        .extracting(MetricInfo::getId)
+        .containsExactlyInAnyOrder(
+            Arrays.stream(CalculationMetric.values())
+                .map(CalculationMetric::getValue)
+                .toArray(String[]::new));
+
+    // Verify each metric has a description
+    assertThat(metrics)
+        .allMatch(m -> m.getDescription() != null && !m.getDescription().isEmpty(),
+            "Every metric must have a non-empty description");
   }
 
   private CalculationService<?, ?, ?> createMockService(CalculationMetric metric) {
