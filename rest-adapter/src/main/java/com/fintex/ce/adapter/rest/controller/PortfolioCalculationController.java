@@ -15,7 +15,9 @@ import com.fintex.ce.model.domain.result.exposure.CountryExposureResult;
 import com.fintex.ce.model.domain.result.exposure.EquityCountryExposureResult;
 import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.domain.result.fee.AverageMerResult;
+import com.fintex.ce.model.domain.result.fee.FeesResult;
 import com.fintex.ce.model.domain.result.fee.ManagementFeeResult;
+import com.fintex.ce.model.domain.result.fee.MerComparisonResult;
 import com.fintex.ce.model.domain.result.holding.NumberOfUniqueHoldingsResult;
 import com.fintex.ce.model.domain.result.holding.TopCommonHoldingsResult;
 import com.fintex.ce.model.domain.result.returns.AnnualReturnResult;
@@ -92,8 +94,9 @@ public class PortfolioCalculationController {
       StandardDeviationResult.class, SharpeRatioResult.class, MaxDrawdownResult.class, AssetAllocationResult.class,
       AssetAllocationEMResult.class, EquitySectorResult.class, ConsolidatedSectorExposureResult.class,
       EquityCountryExposureResult.class, GeographicExposureResult.class, CountryExposureResult.class,
-      FixedIncomeSectorResult.class, AverageMerResult.class, ManagementFeeResult.class,
-      CommonPerformanceDatesResult.class, TopCommonHoldingsResult.class, NumberOfUniqueHoldingsResult.class
+      FixedIncomeSectorResult.class, AverageMerResult.class, ManagementFeeResult.class, FeesResult.class,
+      MerComparisonResult.class, CommonPerformanceDatesResult.class, TopCommonHoldingsResult.class,
+      NumberOfUniqueHoldingsResult.class
   })))
   @PostMapping("/{metricName}")
   public BaseCalculationResult calculate(

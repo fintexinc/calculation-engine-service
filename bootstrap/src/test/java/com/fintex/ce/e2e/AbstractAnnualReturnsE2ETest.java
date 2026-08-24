@@ -78,7 +78,7 @@ abstract class AbstractAnnualReturnsE2ETest extends AbstractReturnCommandE2ETest
 
   @Override
   protected void assertPositiveResponseBody(String responseBody) {
-    AnnualReturnResult<?> result = readJson(responseBody, AnnualReturnResult.class);
+    AnnualReturnResult result = readJson(responseBody, AnnualReturnResult.class);
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 1, 31));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));

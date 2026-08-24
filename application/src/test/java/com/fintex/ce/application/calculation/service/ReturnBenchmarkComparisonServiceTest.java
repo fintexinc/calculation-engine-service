@@ -62,7 +62,7 @@ class ReturnBenchmarkComparisonServiceTest {
         new CpsdCpedScaleParams(command.getCustomPsd(), command.getCustomPed(), ReturnFactorScale.SCALE_OF_TWO)))
         .thenReturn(weightedAverage);
     Notification warning = mock(Notification.class);
-    AnnualReturnResult<Integer> benchmarkResult = new AnnualReturnResult<>();
+    AnnualReturnResult benchmarkResult = new AnnualReturnResult();
     benchmarkResult.setAnnualReturns(List.of(
         new KeyValueResult<>(2022, new BigDecimal("0.05")),
         new KeyValueResult<>(2023, BigDecimal.ZERO)));
@@ -78,7 +78,7 @@ class ReturnBenchmarkComparisonServiceTest {
         portfolioReturns,
         benchmarkWeightedAverage,
         ignored -> benchmarkResult,
-        AnnualReturnResult<Integer>::getAnnualReturns));
+        AnnualReturnResult::getAnnualReturns));
 
     assertThat(outcome.comparison()).hasSize(3);
     assertThat(outcome.comparison().get(0).period()).isEqualTo(2022);
@@ -117,7 +117,9 @@ class ReturnBenchmarkComparisonServiceTest {
         ignored -> {
           throw new AssertionError("Benchmark calculation must not run without benchmark returns");
         },
-        AnnualReturnResult<String>::getAnnualReturns));
+        result -> {
+          throw new AssertionError("Benchmark returns must not be extracted without benchmark returns");
+        }));
 
     assertThat(outcome.comparison()).singleElement().satisfies(comparison -> {
       assertThat(comparison.period()).isEqualTo("ONE_MTH");

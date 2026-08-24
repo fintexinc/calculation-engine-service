@@ -83,7 +83,7 @@ class AnnualReturnsWithFxE2ETest extends AbstractAnnualReturnsE2ETest {
         usEtf(SPY, "18765.43")))));
 
     assertThat(response.status().value()).isEqualTo(200);
-    AnnualReturnResult<?> result = readJson(response.responseBody(), AnnualReturnResult.class);
+    AnnualReturnResult result = readJson(response.responseBody(), AnnualReturnResult.class);
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 1, 31));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));

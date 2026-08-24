@@ -5,6 +5,7 @@ import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ public class PeriodCommand extends PortfolioBenchmarkCommand implements CustomPe
   @Schema(description = "Custom performance end date")
   @JsonProperty("customPerformanceEndDate")
   private LocalDate customPed;
-  @Schema(description = "Time interval periods in months", example = "[\"1\", \"3\", \"12\", \"36\", \"60\", \"120\", \"240\"]")
+  @ArraySchema(uniqueItems = true, schema = @Schema(implementation = TimePeriod.class), arraySchema = @Schema(description = "Time interval periods in months", example = "[\"1\", \"3\", \"12\", \"36\", \"60\", \"120\", \"240\"]"))
   @JsonProperty("timeIntervalPeriods")
   private Set<TimePeriod> periods;
 }

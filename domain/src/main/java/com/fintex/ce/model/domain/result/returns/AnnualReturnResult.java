@@ -21,12 +21,12 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Response for annual-return metric. Contains calendar-year annual returns.")
-public class AnnualReturnResult<T> extends DatesResult {
+public class AnnualReturnResult extends DatesResult {
 
-  @Schema(description = "Annual returns by calendar year")
-  private List<KeyValueResult<T>> annualReturns;
+  @Schema(description = "Annual returns keyed by calendar year")
+  private List<KeyValueResult<Integer>> annualReturns;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @Schema(description = "Portfolio-versus-benchmark annual return comparison by calendar year")
-  private List<ReturnComparison<T>> comparison;
+  private List<ReturnComparison<Integer>> comparison;
 }

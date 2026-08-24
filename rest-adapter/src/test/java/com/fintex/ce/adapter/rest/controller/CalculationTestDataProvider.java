@@ -200,8 +200,8 @@ class CalculationTestDataProvider {
     return cmd;
   }
 
-  private static AnnualReturnResult<Integer> annualReturnResult() {
-    AnnualReturnResult<Integer> result = new AnnualReturnResult<>();
+  private static AnnualReturnResult annualReturnResult() {
+    AnnualReturnResult result = new AnnualReturnResult();
     result.setPerformanceEndDate(PED);
     result.setPerformanceStartDate(PSD);
     return result;
