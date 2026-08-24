@@ -1,5 +1,7 @@
 package com.fintex.ce.adapter.rest.controller;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.Builder;
@@ -19,4 +21,14 @@ public class MetricInfo {
 
   @Schema(description = "Human-readable description of the metric", example = "Trailing total return over specified periods")
   private final String description;
+
+  @JsonCreator
+  public static MetricInfo of(
+      @JsonProperty("id") String id,
+      @JsonProperty("description") String description) {
+    return MetricInfo.builder()
+        .id(id)
+        .description(description)
+        .build();
+  }
 }
