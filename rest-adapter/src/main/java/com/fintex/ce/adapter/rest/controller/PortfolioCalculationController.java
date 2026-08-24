@@ -63,6 +63,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +81,8 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -179,6 +182,41 @@ public class PortfolioCalculationController {
     commands.forEach(this::validateCommand);
     return calculationObservability.observeComposite(commands,
         () -> calculationOrchestrator.calculateAll(commands));
+  }
+
+  @Operation(summary = "List supported calculation metrics", description = """
+      Returns all supported portfolio calculation metrics with their identifiers and descriptions.
+
+      Each metric identifier can be used as the metricName path parameter in POST requests or as the
+      metric discriminator in composite calculation commands. The descriptions are sourced from the
+      OpenAPI schema annotations on the CalculationMetric enum.
+      """)
+  @ApiResponse(responseCode = "200", description = "List of all supported metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(type = "array", implementation = MetricInfo.class)))
+  @GetMapping("/metrics")
+  public List<MetricInfo> listMetrics() {
+    return Arrays.stream(CalculationMetric.values())
+        .map(metric -> MetricInfo.builder()
+            .id(metric.getValue())
+            .description(getMetricDescription(metric))
+            .build())
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Extracts the description from the @Schema annotation on the CalculationMetric enum constant. Falls back to a
+   * generic label if the annotation is not present or description is empty.
+   */
+  private String getMetricDescription(CalculationMetric metric) {
+    try {
+      Field field = CalculationMetric.class.getDeclaredField(metric.name());
+      Schema schema = field.getAnnotation(Schema.class);
+      if (schema != null && !schema.description().isEmpty()) {
+        return schema.description();
+      }
+    } catch (NoSuchFieldException e) {
+      log.warn("Could not find field for metric {}", metric.name());
+    }
+    return metric.getUserFriendlyName();
   }
 
   private void requireMetric(CalculationCommand command) {
