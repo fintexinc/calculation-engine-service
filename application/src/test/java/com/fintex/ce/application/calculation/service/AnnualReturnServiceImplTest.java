@@ -109,7 +109,7 @@ class AnnualReturnServiceImplTest {
       }
     }
 
-    AnnualReturnResult<Integer> result = buildAnnualReturnResult(portfolioReturns, List.<Notification>of());
+    AnnualReturnResult result = buildAnnualReturnResult(portfolioReturns, List.<Notification>of());
 
     assertThat(result.getAnnualReturns()).hasSize(5);
     assertThat(result.getPerformanceStartDate()).isEqualTo(toLastDayOfMonth(LocalDate.of(2020, 1, 1)));
@@ -125,7 +125,7 @@ class AnnualReturnServiceImplTest {
     }
     Notification warning = mock(Notification.class);
 
-    AnnualReturnResult<Integer> result = buildAnnualReturnResult(portfolioReturns, List.of(warning));
+    AnnualReturnResult result = buildAnnualReturnResult(portfolioReturns, List.of(warning));
 
     assertThat(result.getWarnings()).containsExactly(warning);
   }

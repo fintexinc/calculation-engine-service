@@ -2,6 +2,7 @@ package com.fintex.ce.adapter.rest.config;
 
 import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
+import com.fintex.ce.model.dto.command.CalculationCommand;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,13 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.Discriminator;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.servers.Server;
 
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,12 +34,17 @@ import java.util.stream.Collectors;
 public class OpenAPIConfig {
 
   private static final String CALCULATION_METRIC_SCHEMA = "CalculationMetric";
+  private static final String CALCULATION_COMMAND_SCHEMA = CalculationCommand.class.getSimpleName();
+  private static final String SCHEMA_REF_PREFIX = "#/components/schemas/";
   private static final String METRIC_NAME_PARAMETER = "metricName";
   private static final String METRIC_PROPERTY = "metric";
 
   @Bean
   public OpenAPI pcsOpenApi() {
     return new OpenAPI()
+        .servers(List.of(new Server()
+            .url("/")
+            .description("The host this document was served from")))
         .info(new Info()
             .title("Portfolio Calculation Engine API")
             .description("Portfolio analytics and risk measurement engine. "
@@ -62,6 +72,7 @@ public class OpenAPIConfig {
     return openApi -> {
       retainEnabledMetricsInSchemas(openApi, enabledMetrics);
       retainEnabledMetricsInParameters(openApi, enabledMetrics);
+      describeCommandPolymorphism(openApi, enabledMetrics);
     };
   }
 
@@ -103,11 +114,49 @@ public class OpenAPIConfig {
         .forEach(schema -> retainEnabledValues(schema, enabledMetrics));
   }
 
+  /**
+   * Makes the {@code metric} discriminator of {@link CalculationCommand} usable: it maps every metric value to the
+   * command schema that metric deserializes into, and narrows the {@code metric} enum of each of those schemas to the
+   * metrics it actually serves, so validating a payload against one alternative rejects the metrics that belong to
+   * another. Both are derived from {@link CalculationMetric#getCommandType()} - the same source Jackson resolves the
+   * subtype from - and limited to the enabled metrics, so nothing the service cannot execute is advertised.
+   */
+  @SuppressWarnings("rawtypes")
+  private static void describeCommandPolymorphism(OpenAPI openApi, Set<String> enabledMetrics) {
+    Map<String, Schema> schemas = Optional.ofNullable(openApi.getComponents())
+        .map(Components::getSchemas)
+        .orElseGet(Map::of);
+    Map<String, List<String>> metricsByCommandSchema = Arrays.stream(CalculationMetric.values())
+        .filter(metric -> enabledMetrics.contains(metric.getValue()))
+        .collect(Collectors.groupingBy(metric -> metric.getCommandType().getSimpleName(), LinkedHashMap::new,
+            Collectors.mapping(CalculationMetric::getValue, Collectors.toList())));
+
+    metricsByCommandSchema.forEach((schemaName, metrics) -> Optional.ofNullable(schemas.get(schemaName))
+        .map(Schema::getProperties)
+        .map(properties -> properties.get(METRIC_PROPERTY))
+        .filter(Schema.class::isInstance)
+        .map(Schema.class::cast)
+        .ifPresent(schema -> schema.setEnum(List.copyOf(metrics))));
+
+    Schema commandSchema = schemas.get(CALCULATION_COMMAND_SCHEMA);
+    if (commandSchema == null) {
+      return;
+    }
+    Map<String, String> mapping = Arrays.stream(CalculationMetric.values())
+        .filter(metric -> enabledMetrics.contains(metric.getValue()))
+        .collect(Collectors.toMap(CalculationMetric::getValue,
+            metric -> SCHEMA_REF_PREFIX + metric.getCommandType().getSimpleName(),
+            (first, second) -> first, LinkedHashMap::new));
+    Discriminator discriminator = Optional.ofNullable(commandSchema.getDiscriminator())
+        .orElseGet(() -> new Discriminator().propertyName(METRIC_PROPERTY));
+    commandSchema.setDiscriminator(discriminator.mapping(mapping));
+  }
+
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static void retainEnabledValues(Schema schema, Set<String> enabledMetrics) {
     List<Object> filtered = ((List<Object>) schema.getEnum()).stream()
         .filter(value -> enabledMetrics.contains(String.valueOf(value)))
-        .collect(Collectors.toList());
+        .toList();
     schema.setEnum(filtered);
   }
 }

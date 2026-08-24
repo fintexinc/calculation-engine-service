@@ -5,6 +5,7 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -31,7 +32,7 @@ public class CompositeCalculationRequest {
   @Schema(description = "Portfolio holdings shared by all commands; a command may override with its own holdings")
   private List<PortfolioHolding> holdings;
 
-  @Schema(description = "Data providers shared by all commands; configured defaults apply when absent", example = "[\"MORNINGSTAR\"]")
+  @ArraySchema(arraySchema = @Schema(description = "Data providers shared by all commands; configured defaults apply when absent", example = "[\"MORNINGSTAR\"]"), schema = @Schema(implementation = DataProvider.class))
   private List<DataProvider> dataProviders;
 
   @Schema(description = "Target currency shared by all currency-aware commands", example = "CAD")

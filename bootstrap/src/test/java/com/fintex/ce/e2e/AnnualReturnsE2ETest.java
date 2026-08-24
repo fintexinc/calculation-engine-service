@@ -74,7 +74,7 @@ class AnnualReturnsE2ETest extends AbstractAnnualReturnsE2ETest {
     HttpResponse response = postCalculation(writeJson(command));
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
-    AnnualReturnResult<?> result = readJson(response.responseBody(), AnnualReturnResult.class);
+    AnnualReturnResult result = readJson(response.responseBody(), AnnualReturnResult.class);
     assertThat(result.getWarnings()).isEmpty();
     assertThat(result.getAnnualReturns()).singleElement().satisfies(annualReturn -> {
       assertThat(annualReturn.key()).isEqualTo(2024);

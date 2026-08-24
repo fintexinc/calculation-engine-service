@@ -5,6 +5,7 @@ import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -18,13 +19,13 @@ import lombok.ToString;
 @ToString(callSuper = true)
 @Schema(description = "Command for fee ratio calculations. Supports metrics: mer, management-fee, fees")
 public class AverageMerCommand extends PortfolioHoldingsCommand {
-  @Schema(description = "Fee aggregation modes to calculate. Wire values map to FeeAggregationMode: "
+  @ArraySchema(schema = @Schema(implementation = FeeAggregationMode.class), arraySchema = @Schema(description = "Fee aggregation modes to calculate. Wire values map to FeeAggregationMode: "
       + "'scaled' = FUNDS_ONLY (fund holdings only, weights normalised within the fund subset); "
       + "'absolute' = WHOLE_PORTFOLIO (all holdings; non-fund holdings contribute 0% but their market value is in the "
       + "denominator); "
       + "'forceReportFee' = FUNDS_ONLY_STRICT (same set as FUNDS_ONLY, but returns null if any included holding fell "
       + "back to a secondary fee field). "
-      + "Defaults to ['scaled', 'absolute'] when omitted.", example = "[\"scaled\", \"absolute\", \"forceReportFee\"]")
+      + "Defaults to ['scaled', 'absolute'] when omitted.", example = "[\"scaled\", \"absolute\", \"forceReportFee\"]"))
   private List<FeeAggregationMode> parameterTypes;
 
   @Schema(description = "Currency to report money amounts in. Every holding's market value is FX-converted into it "
@@ -32,10 +33,10 @@ public class AverageMerCommand extends PortfolioHoldingsCommand {
       + "service's configured reporting currency (CAD).", example = "CAD")
   private Currency targetCurrency;
 
-  @Schema(description = "Periods to project fee amounts over, named or given as a length in months. ONE_MTH reproduces "
+  @ArraySchema(uniqueItems = true, schema = @Schema(implementation = TimePeriod.class), arraySchema = @Schema(description = "Periods to project fee amounts over, named or given as a length in months. ONE_MTH reproduces "
       + "the monthly fee and ONE_YR the annual one. Applies only to the metrics that report projected amounts — "
       + "'fees' and 'mer-benchmark-comparison'. 'mer' and 'management-fee' report rates, which have no length, and "
-      + "ignore it. Omit to use the service's configured periods.", example = "[\"ONE_MTH\", \"ONE_YR\", \"FIVE_YR\", \"TEN_YR\", \"TWENTY_YR\"]")
+      + "ignore it. Omit to use the service's configured periods.", example = "[\"ONE_MTH\", \"ONE_YR\", \"FIVE_YR\", \"TEN_YR\", \"TWENTY_YR\"]"))
   private Set<TimePeriod> projectionPeriods;
 
   /**

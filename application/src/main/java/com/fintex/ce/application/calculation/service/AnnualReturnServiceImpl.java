@@ -33,7 +33,7 @@ import static java.math.BigDecimal.ONE;
 @Service
 public class AnnualReturnServiceImpl
     extends
-      WeightedAverageWithCpsdAndCpedAbstractService<ReturnCommand, AnnualReturnResult<Integer>> {
+      WeightedAverageWithCpsdAndCpedAbstractService<ReturnCommand, AnnualReturnResult> {
 
   private final ReturnBenchmarkComparisonService returnBenchmarkComparisonService;
 
@@ -51,10 +51,10 @@ public class AnnualReturnServiceImpl
   }
 
   @Override
-  public AnnualReturnResult<Integer> perform(ReturnCommand command,
+  public AnnualReturnResult perform(ReturnCommand command,
       PortfolioBenchmarkReturns returnsData) {
     PeriodCalculationInput context = buildPeriodCalculationInput(command, SCALE_OF_TWO, returnsData);
-    AnnualReturnResult<Integer> result = buildAnnualReturnResult(context.getWeightedAveragePortfolioReturns(),
+    AnnualReturnResult result = buildAnnualReturnResult(context.getWeightedAveragePortfolioReturns(),
         context.getWarnings());
     if (CollectionUtils.isEmpty(command.getBenchmarkHoldings())) {
       return result;
@@ -73,7 +73,7 @@ public class AnnualReturnServiceImpl
     return result;
   }
 
-  static AnnualReturnResult<Integer> buildAnnualReturnResult(NavigableMap<LocalDate, BigDecimal> portfolioReturns,
+  static AnnualReturnResult buildAnnualReturnResult(NavigableMap<LocalDate, BigDecimal> portfolioReturns,
       List<Notification> warnings) {
     TreeMap<LocalDate, BigDecimal> sortedReturns = new TreeMap<>(portfolioReturns);
     Set<Integer> years = sortedReturns.keySet().stream().map(LocalDate::getYear).collect(Collectors.toSet());
@@ -81,7 +81,7 @@ public class AnnualReturnServiceImpl
     if (annualReturns.isEmpty() && !sortedReturns.isEmpty()) {
       throw ErrorCode.NO_COMPLETE_CALENDAR_YEAR.toException(sortedReturns.firstKey(), sortedReturns.lastKey());
     }
-    AnnualReturnResult<Integer> result = new AnnualReturnResult<>();
+    AnnualReturnResult result = new AnnualReturnResult();
     result.setAnnualReturns(annualReturns.entrySet().stream()
         .map(entry -> new KeyValueResult<>(entry.getKey(), entry.getValue())).toList());
     result.setPerformanceStartDate(sortedReturns.firstKey());
