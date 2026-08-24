@@ -15,6 +15,7 @@ class ActuatorExposureConfigurationTest {
   private static final String APPLICATION_YAML = "application.yml";
   private static final String ACTUATOR_EXPOSURE_INCLUDE = "management.endpoints.web.exposure.include";
   private static final String HEALTH_STATUS_ORDER = "management.endpoint.health.status.order";
+  private static final String CALCULATION_PERCENTILES = "management.metrics.distribution.percentiles.portfolio.calculation";
   private static final String HTTP_EXCHANGES_ENDPOINT = "httpexchanges";
   private static final String METRICS_ENDPOINT = "metrics";
   private static final String CALCULATION_STATISTICS_ENDPOINT = "calculationstats";
@@ -61,6 +62,15 @@ class ActuatorExposureConfigurationTest {
           assertThat(statuses).containsSubsequence("DOWN", "OUT_OF_SERVICE", CIRCUIT_OPEN_STATUS,
               CIRCUIT_HALF_OPEN_STATUS, "UP", "UNKNOWN");
         });
+  }
+
+  @Test
+  void shouldRetainCalculationPercentiles_whenAzureMonitorConfigurationIsRemoved() throws IOException {
+    assertThat(property(CALCULATION_PERCENTILES))
+        .isInstanceOfSatisfying(String.class, percentiles -> assertThat(Arrays.stream(percentiles.split(","))
+            .map(String::trim)
+            .toList())
+            .containsExactly("0.5", "0.95", "0.99"));
   }
 
   private static Object property(String name) throws IOException {

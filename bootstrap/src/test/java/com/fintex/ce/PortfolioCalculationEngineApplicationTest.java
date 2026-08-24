@@ -1,5 +1,7 @@
 package com.fintex.ce;
 
+import com.fintex.ce.port.observability.CalculationObservability;
+import com.fintex.ce.port.observability.CalculationStatisticsProvider;
 import com.fintex.ce.port.webclient.mic.SecurityAttributesFetcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,10 @@ class PortfolioCalculationEngineApplicationTest {
   private ObservationRegistry observationRegistry;
   @Autowired
   private Tracer tracer;
+  @Autowired
+  private CalculationObservability calculationObservability;
+  @Autowired
+  private CalculationStatisticsProvider calculationStatisticsProvider;
 
   @Test
   void shouldStartApplication_whenApplicationContextIsBuilt() {
@@ -39,5 +45,7 @@ class PortfolioCalculationEngineApplicationTest {
     assertThat(meterRegistry).isNotNull();
     assertThat(observationRegistry).isNotNull();
     assertThat(tracer).isNotNull();
+    assertThat(calculationObservability).isNotNull();
+    assertThat(calculationStatisticsProvider).isNotNull();
   }
 }

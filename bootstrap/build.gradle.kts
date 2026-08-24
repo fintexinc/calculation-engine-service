@@ -15,7 +15,6 @@ dependencies {
 
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.micrometer.tracing.bridge.otel)
-    implementation(libs.azure.monitor.opentelemetry.autoconfigure)
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.resilience4j.spring.boot3)

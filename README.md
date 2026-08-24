@@ -160,21 +160,9 @@ and mean durations are all derivable from the timers by a metrics backend and ar
 time as gauges.
 
 **Lifetime:** these counters live in the in-process meter registry. They reset on restart and are not currently shipped
-to an external metrics backend — no exporting `MeterRegistry` is on the classpath. Distributed traces *are* exported to
-Azure Application Insights (see below), so cross-service latency and failures are available there; per-metric counters
-are local to the instance.
+to an external metrics backend — no exporting `MeterRegistry` is on the classpath.
 
 #### Tracing
-
-Spans are exported to Azure Application Insights when a connection string is present, wired by
-`AzureMonitorOpenTelemetryConfiguration`.
-
-| Property | Default | Purpose |
-|----------|---------|---------|
-| `observability.azure-monitor.enabled` | `true` | Master switch |
-| `observability.azure-monitor.connection-string` | `${APPLICATIONINSIGHTS_CONNECTION_STRING:}` | Blank disables export; the SDK bean is then not created at all |
-| `observability.azure-monitor.live-metrics.enabled` | `true` | Application Insights live metrics stream |
-| `otel.propagators` | `tracecontext,baggage,b3` | Accepted/emitted trace context formats |
 
 Every log line carries `traceId`, `spanId` and `requestId`. `requestId` is taken from the inbound `X-Request-ID` header
 (generated when absent), echoed back on the response, and forwarded to Market Investment Catalogue, so one identifier ties a client
