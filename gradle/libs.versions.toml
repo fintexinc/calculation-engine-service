@@ -27,7 +27,7 @@ okhttp-mockwebserver = "4.12.0"
 commons-math3 = "3.6.1"
 
 [libraries]
-catalog-investment-commons = { module = "com.fintex.wm:catalog-investment-commons", version.ref = "cic" }
+catalogue-investment-commons = { module = "com.fintex.wm:catalogue-investment-commons", version.ref = "cic" }
 
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
