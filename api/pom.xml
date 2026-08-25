@@ -27,7 +27,7 @@
         <!-- Catalog Investment Commons (ExternalWebService, shared provider vocabulary) -->
         <dependency>
             <groupId>com.fintex.wm</groupId>
-            <artifactId>catalog-investment-commons</artifactId>
+            <artifactId>catalogue-investment-commons</artifactId>
         </dependency>
 
         <!-- Jackson for DTOs -->
