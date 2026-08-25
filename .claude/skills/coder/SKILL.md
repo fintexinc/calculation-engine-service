@@ -38,8 +38,8 @@ mvn jib:build                              # Build Docker image
 
 If the build reports unresolved/broken classes from `com.fintex.wm` or the Spring
 `ApplicationContext` fails to load (e.g. bean-wiring errors, `401 Unauthorized` fetching
-`catalog-investment-commons` metadata from Azure Artifacts), the local `catalog-investment-commons`
-is stale or missing. Update the `catalog-investment-commons` project and install it into the local
+`catalogue-investment-commons` metadata from Azure Artifacts), the local `catalogue-investment-commons`
+is stale or missing. Update the `catalogue-investment-commons` project and install it into the local
 Maven repo (`mvn clean install` in that project) so `~/.m2` has the current SNAPSHOT, then rebuild.
 
 ---
