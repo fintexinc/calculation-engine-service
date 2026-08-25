@@ -148,7 +148,7 @@ default:
   # MORNINGSTAR_ID is chosen due to the best availability of the data
   holdings-identifier-type: MORNINGSTAR_ID
   periods:
-    # Values are TimePeriod members (catalog-investment-commons), given either by name or by their length in months.
+    # Values are TimePeriod members (catalogue-investment-commons), given either by name or by their length in months.
     # YTD = year to date, SI = since inception — both resolve their length from the data rather than carrying one.
     trailing-total-returns: "1,3,6,12,36,60,120,240,YTD,SI"
     risk-calculations: "12,36,60,120,240"

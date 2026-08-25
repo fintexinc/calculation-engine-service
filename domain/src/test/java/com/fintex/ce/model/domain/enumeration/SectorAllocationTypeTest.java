@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Guards the consolidated sector taxonomy the {@code sector-exposure} metric reports on. The enum itself lives in
- * catalog-investment-commons, which has no test infrastructure of its own, and this service is its consumer of record —
- * so the totality of the two translations is pinned here rather than nowhere.
+ * catalogue-investment-commons, which has no test infrastructure of its own, and this service is its consumer of record
+ * — so the totality of the two translations is pinned here rather than nowhere.
  *
  * <p>
  * The tests enumerate the source taxonomies rather than sampling them: a constant added upstream fails here instead of
