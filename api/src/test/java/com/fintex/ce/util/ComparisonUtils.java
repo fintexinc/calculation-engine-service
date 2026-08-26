@@ -8,14 +8,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@UtilityClass
 public class ComparisonUtils {
-  private static final double DIFF_8x = 0.000_000_01;
-
-  private ComparisonUtils() {
-  }
+  private static final double DIFF_8X = 0.000_000_01;
 
   public static <K, V> void compareMaps(final Map<K, V> expected, final Map<K, V> actual) {
     if (expected == null && actual == null) {
@@ -46,7 +45,7 @@ public class ComparisonUtils {
     }
     Assertions.assertNotNull(expected);
     Assertions.assertNotNull(actual);
-    Assertions.assertTrue(Precision.equals(actual.doubleValue(), expected.doubleValue(), DIFF_8x), message);
+    Assertions.assertTrue(Precision.equals(actual.doubleValue(), expected.doubleValue(), DIFF_8X), message);
   }
 
   public static <K> void compareCollections(final Collection<K> expectedData, final Collection<K> actualData) {

@@ -63,8 +63,9 @@ class HoldingsValidatorTest {
   @Test
   void shouldThrow_whenCountryIsNotInConfiguredSupportedSet() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
+    List<PortfolioHolding> holdings = List.of(fund(Country.USA));
 
-    assertThatThrownBy(() -> validator.validate(List.of(fund(Country.USA))))
+    assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -81,8 +82,9 @@ class HoldingsValidatorTest {
     PortfolioHolding holding = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND,
         new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    List<PortfolioHolding> holdings = List.of(holding);
 
-    assertThatThrownBy(() -> validator.validate(List.of(holding)))
+    assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -95,8 +97,9 @@ class HoldingsValidatorTest {
   @Test
   void shouldThrow_whenExchangeIdIsMissingForTickerMicIdentifier() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
+    List<PortfolioHolding> holdings = List.of(tickerMicStock(null));
 
-    assertThatThrownBy(() -> validator.validate(List.of(tickerMicStock(null))))
+    assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -110,8 +113,9 @@ class HoldingsValidatorTest {
   @Test
   void shouldThrow_whenExchangeIdIsBlankForTickerMicIdentifier() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
+    List<PortfolioHolding> holdings = List.of(tickerMicStock("   "));
 
-    assertThatThrownBy(() -> validator.validate(List.of(tickerMicStock("   "))))
+    assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -135,8 +139,9 @@ class HoldingsValidatorTest {
     PortfolioHolding holding = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.STOCK, Country.CANADA,
         new SecurityIdentifier("CNQ", FiIdentifierType.TICKER_MIC));
+    List<PortfolioHolding> holdings = List.of(holding);
 
-    assertThatThrownBy(() -> validator.validate(List.of(holding)))
+    assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -158,8 +163,9 @@ class HoldingsValidatorTest {
   @Test
   void shouldThrow_whenNonTickerMicEquityIdentifierHasBlankId() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
+    List<PortfolioHolding> holdings = List.of(equityStock("", FiIdentifierType.TICKER, null));
 
-    assertThatThrownBy(() -> validator.validate(List.of(equityStock("", FiIdentifierType.TICKER, null))))
+    assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -183,8 +189,9 @@ class HoldingsValidatorTest {
     PortfolioHolding holding = new PortfolioHolding(
         BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.USA,
         new SecurityIdentifier("", FiIdentifierType.TICKER));
+    List<PortfolioHolding> holdings = List.of(holding);
 
-    assertThatThrownBy(() -> validator.validate(List.of(holding)))
+    assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
