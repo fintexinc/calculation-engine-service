@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import static ca.tangerine.pce.e2e.MicFeeResponses.merRow;
 import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
 import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
@@ -273,14 +274,9 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
   }
 
   private static String feeResponse(Fee... fees) {
-    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
-    return writeJson(Arrays.stream(fees)
-        .map(fee -> new MicSecurityDataResponse(
-            new SecurityIdentifier(fee.ticker(), FiIdentifierType.TICKER),
-            new MicFeeData(
-                new MicDatapoint(new BigDecimal(fee.merPercent()), providers),
-                new MicCurrencyDatapoint(Currency.CAD, providers))))
-        .toList());
+    return MicFeeResponses.body(Arrays.stream(fees)
+        .map(fee -> merRow(fee.ticker(), FiIdentifierType.TICKER, fee.merPercent(), Currency.CAD))
+        .toArray(MicFeeResponses.FeeRow[]::new));
   }
 
   /**
@@ -292,17 +288,6 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
   private record Fee(String ticker, String merPercent) {
   }
 
-  private record MicSecurityDataResponse(SecurityIdentifier identifier, MicFeeData data) {
-  }
-
-  private record MicFeeData(MicDatapoint managementExpenseRatio, MicCurrencyDatapoint currency) {
-  }
-
-  private record MicDatapoint(BigDecimal value, List<DataProvider> dataProviders) {
-  }
-
   // wm-commons CurrencyDatapoint stores the value in a field literally named "type", so the JSON must say
   // {"type": "CAD"} for the engine to receive it.
-  private record MicCurrencyDatapoint(Currency type, List<DataProvider> dataProviders) {
-  }
 }
