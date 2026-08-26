@@ -2,8 +2,6 @@ package com.fintex.ce.application.calculation.service.allocation;
 
 import com.fintex.ce.model.domain.calculation.allocation.GeographicExposureData;
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
-import com.fintex.ce.model.domain.holding.CashHolding;
-import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
@@ -13,10 +11,7 @@ import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.financial.Geography;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.domain.reference.CountryDatapoint;
 
 import java.math.BigDecimal;
@@ -32,13 +27,6 @@ import static org.mockito.Mockito.when;
 
 /**
  * Holding / geography fixtures and per-region assertions shared by every geographic exposure test.
- *
- * <p>
- * Exists as a superclass rather than a static-import utility because the concrete tests call these builders unqualified
- * and static imports are not inherited: keeping them inheritable lets both the per-sleeve hierarchy
- * ({@link AbstractGeographicExposureServiceTest}) and the consolidated {@link GeographicExposureServiceTest} — which
- * stays outside that hierarchy because it excludes no security type, so the hierarchy's excluded-holding contract does
- * not apply — share one set of fixtures instead of two copies that drift.
  */
 abstract class GeographicExposureFixtures {
 
@@ -104,73 +92,6 @@ abstract class GeographicExposureFixtures {
     Geography geography = geography(null, currency);
     geography.setRegion(new RegionDatapoint(region));
     return geography;
-  }
-
-  protected static PortfolioHolding canadaMutualFund(String id, long value) {
-    return PortfolioHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND).country(Country.CANADA)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.MORNINGSTAR_ID))
-        .build();
-  }
-
-  protected static PortfolioHolding usEtf(String ticker, long value) {
-    return PortfolioHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.ETF).country(Country.USA)
-        .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
-        .build();
-  }
-
-  protected static PortfolioHolding canadaEtf(String ticker, long value) {
-    return PortfolioHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.ETF).country(Country.CANADA)
-        .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
-        .build();
-  }
-
-  protected static PortfolioHolding usStock(String ticker, long value) {
-    return PortfolioHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.STOCK).country(Country.USA)
-        .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
-        .build();
-  }
-
-  protected static PortfolioHolding canadaStock(String ticker, long value) {
-    return PortfolioHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.STOCK).country(Country.CANADA)
-        .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
-        .build();
-  }
-
-  protected static PortfolioHolding fixedIncome(String id, long value) {
-    return PortfolioHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.FIXED_INCOME)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.MORNINGSTAR_ID))
-        .build();
-  }
-
-  protected static CashHolding cash(Currency currency, long value) {
-    return CashHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.CASH)
-        .securityIdentifier(new SecurityIdentifier("CASH-" + currency, FiIdentifierType.MORNINGSTAR_ID))
-        .currency(currency)
-        .build();
-  }
-
-  protected static GicHolding gic(Currency currency, long value) {
-    return GicHolding.builder()
-        .value(BigDecimal.valueOf(value))
-        .holdingType(FinancialInstrumentType.GIC)
-        .securityIdentifier(new SecurityIdentifier("GIC-" + currency, FiIdentifierType.MORNINGSTAR_ID))
-        .currency(currency)
-        .term(BigDecimal.valueOf(365))
-        .build();
   }
 
   protected static GeographicExposureData data(Map<PortfolioHolding, HoldingGeographicAllocation> fundAllocations,

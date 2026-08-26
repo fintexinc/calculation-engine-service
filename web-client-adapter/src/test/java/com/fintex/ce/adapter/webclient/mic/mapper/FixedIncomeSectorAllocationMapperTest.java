@@ -10,7 +10,6 @@ import com.fintex.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCu
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FixedIncomeSectorAllocationMapperTest {
@@ -47,7 +47,7 @@ class FixedIncomeSectorAllocationMapperTest {
         .toList();
     FixedIncomeSectorAllocationWithCurrency micResponse = response(values, DataProvider.MORNINGSTAR);
 
-    PortfolioHolding holding = createHolding("AGG", FinancialInstrumentType.ETF);
+    PortfolioHolding holding = holdingWithoutCountry("AGG", null, FinancialInstrumentType.ETF, (BigDecimal) null);
 
     FixedIncomeBondSector result = mapper.map(micResponse, holding);
 
@@ -62,7 +62,7 @@ class FixedIncomeSectorAllocationMapperTest {
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyAllocations_whenResponseIsNullOrHasNoAllocation(
       FixedIncomeSectorAllocationWithCurrency micResponse) {
-    PortfolioHolding holding = createHolding("TEST.ID", FinancialInstrumentType.FUND);
+    PortfolioHolding holding = holdingWithoutCountry("TEST.ID", null, FinancialInstrumentType.FUND, (BigDecimal) null);
 
     FixedIncomeBondSector result = mapper.map(micResponse, holding);
 
@@ -89,8 +89,8 @@ class FixedIncomeSectorAllocationMapperTest {
         new FixedIncomeSectorAllocationTypeValue(null, BigDecimal.valueOf(5.0), null, null),
         new FixedIncomeSectorAllocationTypeValue(FixedIncomeSectorAllocationType.ST_INVESTMENTS, null, null, null)));
 
-    FixedIncomeBondSector result = mapper.map(micResponse, createHolding("TEST.ID",
-        FinancialInstrumentType.ETF));
+    FixedIncomeBondSector result = mapper.map(micResponse, holdingWithoutCountry("TEST.ID", null,
+        FinancialInstrumentType.ETF, (BigDecimal) null));
 
     assertThat(result.getFixedIncomeBondSectors()).hasSize(1);
     assertThat(result.getFixedIncomeBondSectors()).containsKey(FixedIncomeSectorAllocationType.OTHER_BONDS);
@@ -102,7 +102,8 @@ class FixedIncomeSectorAllocationMapperTest {
         entry(FixedIncomeSectorAllocationType.CORPORATE_BONDS, "30.0"),
         entry(FixedIncomeSectorAllocationType.CORPORATE_BONDS, "10.0")));
 
-    FixedIncomeBondSector result = mapper.map(micResponse, createHolding("TEST.ID", FinancialInstrumentType.ETF));
+    FixedIncomeBondSector result = mapper.map(micResponse, holdingWithoutCountry("TEST.ID", null,
+        FinancialInstrumentType.ETF, (BigDecimal) null));
 
     assertThat(result.getFixedIncomeBondSectors()).hasSize(1);
     assertThat(result.getFixedIncomeBondSectors().get(FixedIncomeSectorAllocationType.CORPORATE_BONDS))
@@ -117,7 +118,8 @@ class FixedIncomeSectorAllocationMapperTest {
     currency.setValue(Currency.USD);
     micResponse.setCurrency(currency);
 
-    FixedIncomeBondSector result = mapper.map(micResponse, createHolding("AGG", FinancialInstrumentType.ETF));
+    FixedIncomeBondSector result = mapper.map(micResponse, holdingWithoutCountry("AGG", null,
+        FinancialInstrumentType.ETF, (BigDecimal) null));
 
     assertThat(result.getCurrency()).isEqualTo(Currency.USD);
   }
@@ -126,7 +128,7 @@ class FixedIncomeSectorAllocationMapperTest {
   void shouldMapNullCurrency_whenResponseHasNoCurrency() {
     FixedIncomeBondSector result = mapper.map(response(List.of(
         entry(FixedIncomeSectorAllocationType.CORPORATE_BONDS, "30.0"))),
-        createHolding("AGG", FinancialInstrumentType.ETF));
+        holdingWithoutCountry("AGG", null, FinancialInstrumentType.ETF, (BigDecimal) null));
 
     assertThat(result.getCurrency()).isNull();
   }
@@ -145,11 +147,5 @@ class FixedIncomeSectorAllocationMapperTest {
 
   private FixedIncomeSectorAllocationTypeValue entry(FixedIncomeSectorAllocationType type, String value) {
     return new FixedIncomeSectorAllocationTypeValue(type, new BigDecimal(value), null, null);
-  }
-
-  private PortfolioHolding createHolding(String securityId, FinancialInstrumentType holdingType) {
-    var identifier = new SecurityIdentifier();
-    identifier.setId(securityId);
-    return new PortfolioHolding(null, holdingType, identifier);
   }
 }

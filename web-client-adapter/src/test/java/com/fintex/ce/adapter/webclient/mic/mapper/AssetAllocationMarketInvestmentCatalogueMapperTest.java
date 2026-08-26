@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.mic.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.AssetAllocation;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationRegionType;
@@ -9,10 +8,6 @@ import com.fintex.wm.commons.domain.allocation.AssetAllocationValue;
 import com.fintex.wm.commons.domain.allocation.AssetAllocationWithCurrency;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
-import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.TreeSet;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AssetAllocationMarketInvestmentCatalogueMapperTest {
@@ -34,7 +30,7 @@ class AssetAllocationMarketInvestmentCatalogueMapperTest {
         new AssetAllocationValue(AssetAllocationRegionType.CASH, new BigDecimal("9.5"), new TreeSet<>())),
         Currency.USD, DataProvider.MORNINGSTAR);
 
-    HoldingAssetAllocation result = mapper.map(micResponse, createHolding("SEC-001"));
+    HoldingAssetAllocation result = mapper.map(micResponse, etfCa("SEC-001"));
 
     assertThat(result.getAllocations()).hasSize(3);
     assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("60.5"));
@@ -46,7 +42,7 @@ class AssetAllocationMarketInvestmentCatalogueMapperTest {
 
   @Test
   void shouldReturnEmptyAllocationsAndProvidersAndNullCurrency_whenResponseIsNull() {
-    HoldingAssetAllocation result = mapper.map(null, createHolding("SEC-002"));
+    HoldingAssetAllocation result = mapper.map(null, etfCa("SEC-002"));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -59,7 +55,7 @@ class AssetAllocationMarketInvestmentCatalogueMapperTest {
         List.of(new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE, new TreeSet<>())),
         null, null);
 
-    HoldingAssetAllocation result = mapper.map(micResponse, createHolding("SEC-003"));
+    HoldingAssetAllocation result = mapper.map(micResponse, etfCa("SEC-003"));
 
     assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, BigDecimal.ONE);
     assertThat(result.getProviders()).isEmpty();
@@ -73,7 +69,7 @@ class AssetAllocationMarketInvestmentCatalogueMapperTest {
         new AssetAllocationValue(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("20.0"), new TreeSet<>())),
         Currency.CAD, null);
 
-    HoldingAssetAllocation result = mapper.map(micResponse, createHolding("SEC-004"));
+    HoldingAssetAllocation result = mapper.map(micResponse, etfCa("SEC-004"));
 
     assertThat(result.getAllocations()).containsEntry(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("30.0"));
     assertThat(result.getCurrency()).isEqualTo(Currency.CAD);
@@ -87,7 +83,7 @@ class AssetAllocationMarketInvestmentCatalogueMapperTest {
         new AssetAllocationValue(AssetAllocationRegionType.FIXED_INCOME, BigDecimal.TEN, new TreeSet<>())),
         null, null);
 
-    HoldingAssetAllocation result = mapper.map(micResponse, createHolding("SEC-005"));
+    HoldingAssetAllocation result = mapper.map(micResponse, etfCa("SEC-005"));
 
     assertThat(result.getAllocations()).containsOnly(
         org.assertj.core.api.Assertions.entry(AssetAllocationRegionType.FIXED_INCOME, BigDecimal.TEN));
@@ -107,10 +103,5 @@ class AssetAllocationMarketInvestmentCatalogueMapperTest {
       wrapper.setCurrency(dp);
     }
     return wrapper;
-  }
-
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, FiIdentifierType.TICKER));
   }
 }

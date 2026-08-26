@@ -5,7 +5,6 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.EquitySecurityIdentifier;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
@@ -21,6 +20,9 @@ import static com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator
 import static com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator.USER_FORMATTED_COUNTRY_FIELD;
 import static com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator.USER_FORMATTED_SECURITY_IDENTIFIER_EXCHANGE_ID_FIELD;
 import static com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator.USER_FORMATTED_SECURITY_IDENTIFIER_ID_FIELD;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.equity;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,39 +35,21 @@ class HoldingsValidatorTest {
     return new HoldingsValidator(properties);
   }
 
-  private PortfolioHolding fund(Country country) {
-    return new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, country,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-  }
-
-  private PortfolioHolding tickerMicStock(String exchangeId) {
-    return equityStock("CNQ", FiIdentifierType.TICKER_MIC, exchangeId);
-  }
-
-  private PortfolioHolding equityStock(String id, FiIdentifierType idType, String exchangeId) {
-    return new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.STOCK, Country.CANADA,
-        EquitySecurityIdentifier.builder()
-            .id(id)
-            .idType(idType)
-            .exchangeId(exchangeId)
-            .build());
-  }
-
   @Test
   void shouldNotThrow_whenCountryIsSupported() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA, Country.USA);
 
-    assertThatCode(() -> validator.validate(List.of(fund(Country.USA)))).doesNotThrowAnyException();
+    assertThatCode(() -> validator.validate(List.of(
+        holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.USA, BigDecimal.TEN))))
+        .doesNotThrowAnyException();
   }
 
   @Test
   void shouldThrow_whenCountryIsNotInConfiguredSupportedSet() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
-    List<PortfolioHolding> holdings = List.of(fund(Country.USA));
 
-    assertThatThrownBy(() -> validator.validate(holdings))
+    assertThatThrownBy(() -> validator.validate(List.of(
+        holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.USA, BigDecimal.TEN))))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -79,12 +63,10 @@ class HoldingsValidatorTest {
   @Test
   void shouldThrow_whenCountryIsMissing() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA, Country.USA);
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
-    List<PortfolioHolding> holdings = List.of(holding);
+    PortfolioHolding holding = holdingWithoutCountry(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, BigDecimal.TEN);
 
-    assertThatThrownBy(() -> validator.validate(holdings))
+    assertThatThrownBy(() -> validator.validate(List.of(holding)))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -97,7 +79,8 @@ class HoldingsValidatorTest {
   @Test
   void shouldThrow_whenExchangeIdIsMissingForTickerMicIdentifier() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
-    List<PortfolioHolding> holdings = List.of(tickerMicStock(null));
+    List<PortfolioHolding> holdings = List.of(
+        equity("CNQ", null, FinancialInstrumentType.STOCK, Country.CANADA, BigDecimal.TEN));
 
     assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
@@ -113,7 +96,8 @@ class HoldingsValidatorTest {
   @Test
   void shouldThrow_whenExchangeIdIsBlankForTickerMicIdentifier() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
-    List<PortfolioHolding> holdings = List.of(tickerMicStock("   "));
+    List<PortfolioHolding> holdings = List.of(
+        equity("CNQ", "   ", FinancialInstrumentType.STOCK, Country.CANADA, BigDecimal.TEN));
 
     assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
@@ -130,18 +114,18 @@ class HoldingsValidatorTest {
   void shouldNotThrow_whenExchangeIdIsPresentForTickerMicIdentifier() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
 
-    assertThatCode(() -> validator.validate(List.of(tickerMicStock("XTSE")))).doesNotThrowAnyException();
+    assertThatCode(() -> validator.validate(List.of(
+        equity("CNQ", "XTSE", FinancialInstrumentType.STOCK, Country.CANADA, BigDecimal.TEN))))
+        .doesNotThrowAnyException();
   }
 
   @Test
   void shouldThrow_whenTickerMicIdentifierIsNotEquitySecurityIdentifier() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.STOCK, Country.CANADA,
-        new SecurityIdentifier("CNQ", FiIdentifierType.TICKER_MIC));
-    List<PortfolioHolding> holdings = List.of(holding);
+    PortfolioHolding holding = holding(new SecurityIdentifier("CNQ", FiIdentifierType.TICKER_MIC),
+        FinancialInstrumentType.STOCK, Country.CANADA, BigDecimal.TEN);
 
-    assertThatThrownBy(() -> validator.validate(holdings))
+    assertThatThrownBy(() -> validator.validate(List.of(holding)))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;
@@ -156,14 +140,18 @@ class HoldingsValidatorTest {
   void shouldNotThrow_whenExchangeIdIsMissingForNonTickerMicEquityIdentifier() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
 
-    assertThatCode(() -> validator.validate(List.of(equityStock("CNQ", FiIdentifierType.TICKER, null))))
+    assertThatCode(() -> validator.validate(List.of(
+        holding(new SecurityIdentifier("CNQ", FiIdentifierType.TICKER), FinancialInstrumentType.STOCK,
+            Country.CANADA, BigDecimal.TEN))))
         .doesNotThrowAnyException();
   }
 
   @Test
   void shouldThrow_whenNonTickerMicEquityIdentifierHasBlankId() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA);
-    List<PortfolioHolding> holdings = List.of(equityStock("", FiIdentifierType.TICKER, null));
+    List<PortfolioHolding> holdings = List.of(
+        holding(new SecurityIdentifier("", FiIdentifierType.TICKER), FinancialInstrumentType.STOCK,
+            Country.CANADA, BigDecimal.TEN));
 
     assertThatThrownBy(() -> validator.validate(holdings))
         .isInstanceOf(ValidationException.class)
@@ -180,18 +168,18 @@ class HoldingsValidatorTest {
   void shouldNotThrow_whenNonEquityIdentifierIsNotTickerMic() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA, Country.USA);
 
-    assertThatCode(() -> validator.validate(List.of(fund(Country.USA)))).doesNotThrowAnyException();
+    assertThatCode(() -> validator.validate(List.of(
+        holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.USA, BigDecimal.TEN))))
+        .doesNotThrowAnyException();
   }
 
   @Test
   void shouldThrow_whenSecurityIdentifierIdIsBlank() {
     HoldingsValidator validator = validatorWithSupportedCountries(Country.CANADA, Country.USA);
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.USA,
-        new SecurityIdentifier("", FiIdentifierType.TICKER));
-    List<PortfolioHolding> holdings = List.of(holding);
+    PortfolioHolding holding = holding(new SecurityIdentifier("", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.USA, BigDecimal.TEN);
 
-    assertThatThrownBy(() -> validator.validate(holdings))
+    assertThatThrownBy(() -> validator.validate(List.of(holding)))
         .isInstanceOf(ValidationException.class)
         .satisfies(ex -> {
           ValidationException validationException = (ValidationException) ex;

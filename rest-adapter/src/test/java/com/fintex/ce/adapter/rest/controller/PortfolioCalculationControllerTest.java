@@ -36,7 +36,6 @@ import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -71,6 +70,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.adapter.rest.controller.PortfolioCalculationController.BASE_PATH;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -482,7 +482,9 @@ class PortfolioCalculationControllerTest {
       PeriodCommand command = new PeriodCommand();
       command.setMetric(CalculationMetric.STANDARD_DEVIATION);
       command.setCurrency(Currency.CAD);
-      command.setHoldings(List.of(dummyHolding()));
+      command.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND,
+          Country.CANADA,
+          BigDecimal.ONE)));
       command.setPeriods(Set.of(TimePeriod.SIX_MTH));
       StandardDeviationResult result = new StandardDeviationResult(Set.of(new TimeIntervalResult(TimePeriod.SIX_MTH
           .name(),
@@ -511,7 +513,9 @@ class PortfolioCalculationControllerTest {
       PeriodCommand command = new PeriodCommand();
       command.setMetric(CalculationMetric.STANDARD_DEVIATION);
       command.setCurrency(Currency.CAD);
-      command.setHoldings(List.of(dummyHolding()));
+      command.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND,
+          Country.CANADA,
+          BigDecimal.ONE)));
       command.setPeriods(Set.of(TimePeriod.YTD));
 
       validatingMockMvc.perform(
@@ -538,7 +542,9 @@ class PortfolioCalculationControllerTest {
       PeriodCommand rejected = new PeriodCommand();
       rejected.setMetric(CalculationMetric.STANDARD_DEVIATION);
       rejected.setCurrency(Currency.CAD);
-      rejected.setHoldings(List.of(dummyHolding()));
+      rejected.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND,
+          Country.CANADA,
+          BigDecimal.ONE)));
       rejected.setPeriods(Set.of(TimePeriod.YTD));
 
       validatingMockMvc.perform(
@@ -554,7 +560,9 @@ class PortfolioCalculationControllerTest {
       PeriodCommand dispatched = new PeriodCommand();
       dispatched.setMetric(CalculationMetric.SHARPE_RATIO);
       dispatched.setCurrency(Currency.CAD);
-      dispatched.setHoldings(List.of(dummyHolding()));
+      dispatched.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND,
+          Country.CANADA,
+          BigDecimal.ONE)));
       dispatched.setPeriods(Set.of(TimePeriod.ONE_YR));
       doThrow(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE.toException("Market Investment Catalogue"))
           .when(calculationServices.get(CalculationMetric.SHARPE_RATIO)).perform(any(), any());
@@ -599,7 +607,9 @@ class PortfolioCalculationControllerTest {
       PeriodCommand command = new PeriodCommand();
       command.setMetric(CalculationMetric.STANDARD_DEVIATION);
       command.setCurrency(Currency.CAD);
-      command.setHoldings(List.of(dummyHolding()));
+      command.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND,
+          Country.CANADA,
+          BigDecimal.ONE)));
       command.setPeriods(Set.of(TimePeriod.ONE_YR));
       command.setCustomIntervalPsd(cipsd);
       doThrow(ErrorCode.CIPSD_OUTSIDE_DATA_RANGE_ERROR.toException(cipsd, performanceStartDate, performanceEndDate))
@@ -639,12 +649,6 @@ class PortfolioCalculationControllerTest {
               .contentType(MediaType.APPLICATION_JSON)
               .content(om.writeValueAsString(cmd)))
           .andExpect(status().isBadRequest());
-    }
-
-    private static PortfolioHolding dummyHolding() {
-      return new PortfolioHolding(
-          BigDecimal.ONE, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-          new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER));
     }
 
     @Test

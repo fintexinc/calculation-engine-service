@@ -12,11 +12,15 @@ import com.fintex.ce.model.domain.holding.GicHolding;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.exposure.ConsolidatedGeographicExposureResult;
 import com.fintex.ce.model.error.ErrorCode;
+import com.fintex.ce.test.PortfolioHoldingBuildHelper;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
+import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
+import com.fintex.wm.commons.domain.id.FiIdentifierType;
+import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 import com.fintex.wm.commons.error.Notification;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +32,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.fundCa;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,7 +93,7 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldReportTheRegionBreakdownAsGiven_whenFundCarriesOne() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 100);
+    PortfolioHolding fund = fundCa("RBF605", 100);
     GeographicExposureData data = data(
         Map.of(fund, allocation(Map.of(
             GeographicRegionType.US, new BigDecimal("0.50"),
@@ -111,9 +120,11 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldCombineEquityAndBondBearingHoldingsIntoOneDistribution_whenPortfolioIsMixed() {
-    PortfolioHolding balancedFund = canadaMutualFund("BALANCED", 400);
-    PortfolioHolding bond = fixedIncome("BOND", 400);
-    PortfolioHolding stock = canadaStock("RY", 200);
+    PortfolioHolding balancedFund = fundCa("BALANCED", 400);
+    PortfolioHolding bond = holdingWithoutCountry(new SecurityIdentifier("BOND", FiIdentifierType.MORNINGSTAR_ID),
+        FinancialInstrumentType.FIXED_INCOME, BigDecimal.valueOf(400));
+    PortfolioHolding stock = holding(new SecurityIdentifier("RY", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.CANADA, 200);
 
     GeographicExposureData data = data(
         Map.of(
@@ -139,9 +150,11 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldExcludeCashAndGicAndStillTotalOneHundredPercent_whenPortfolioHoldsThem() {
-    PortfolioHolding fund = canadaMutualFund("RBF605", 250);
-    CashHolding cash = cash(Currency.CAD, 500);
-    GicHolding gic = gic(Currency.CAD, 250);
+    PortfolioHolding fund = fundCa("RBF605", 250);
+    CashHolding cash = cash("CASH-" + Currency.CAD, FiIdentifierType.MORNINGSTAR_ID, Currency.CAD, 500);
+    GicHolding gic = PortfolioHoldingBuildHelper.gic(
+        new SecurityIdentifier("GIC-" + Currency.CAD, FiIdentifierType.MORNINGSTAR_ID), Currency.CAD,
+        BigDecimal.valueOf(250), BigDecimal.valueOf(365));
 
     GeographicExposureData data = data(
         Map.of(fund, allocation(Map.of(
@@ -166,8 +179,8 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldWeightByFxConvertedValues_whenPortfolioMixesCurrencies() {
-    PortfolioHolding cadFund = canadaMutualFund("CAD-FUND", 100);
-    PortfolioHolding usdEtf = usEtf("USD-ETF", 100);
+    PortfolioHolding cadFund = fundCa("CAD-FUND", 100);
+    PortfolioHolding usdEtf = etf("USD-ETF", Country.USA, 100);
 
     GeographicExposureData data = data(
         Map.of(
@@ -187,8 +200,8 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
 
   @Test
   void shouldUseRawValuesAndWarn_whenFxRateIsUnavailable() {
-    PortfolioHolding cadFund = canadaMutualFund("CAD-FUND", 100);
-    PortfolioHolding usdEtf = usEtf("USD-ETF", 100);
+    PortfolioHolding cadFund = fundCa("CAD-FUND", 100);
+    PortfolioHolding usdEtf = etf("USD-ETF", Country.USA, 100);
 
     GeographicExposureData data = data(
         Map.of(
@@ -223,8 +236,8 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldReportTheSamePercentages_whetherOrNotForeignCurrencyCashIsHeld() {
-    PortfolioHolding cadFund = canadaMutualFund("CAD-FUND", 100);
-    PortfolioHolding usdEtf = usEtf("USD-ETF", 100);
+    PortfolioHolding cadFund = fundCa("CAD-FUND", 100);
+    PortfolioHolding usdEtf = etf("USD-ETF", Country.USA, 100);
 
     GeographicExposureData data = data(
         Map.of(
@@ -236,7 +249,10 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
 
     ConsolidatedGeographicExposureResult withoutCash = service.perform(command(cadFund, usdEtf), data);
     ConsolidatedGeographicExposureResult withCash = service.perform(
-        command(cadFund, usdEtf, cash(Currency.USD, 1_000), gic(Currency.USD, 500)), data);
+        command(cadFund, usdEtf, cash("CASH-" + Currency.USD, FiIdentifierType.MORNINGSTAR_ID, Currency.USD, 1_000),
+            PortfolioHoldingBuildHelper.gic(
+                new SecurityIdentifier("GIC-" + Currency.USD, FiIdentifierType.MORNINGSTAR_ID), Currency.USD,
+                BigDecimal.valueOf(500), BigDecimal.valueOf(365))), data);
 
     Map<GeographicRegionType, BigDecimal> expected = distribution(Map.of(
         GeographicRegionType.CANADA, new BigDecimal("0.4"),
@@ -252,8 +268,8 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldStillReportExposureOnRawWeights_whenAllocationCarriesNoCurrency() {
-    PortfolioHolding withCurrency = canadaMutualFund("WITH-CCY", 100);
-    PortfolioHolding withoutCurrency = usEtf("NO-CCY", 100);
+    PortfolioHolding withCurrency = fundCa("WITH-CCY", 100);
+    PortfolioHolding withoutCurrency = etf("NO-CCY", Country.USA, 100);
 
     GeographicExposureData data = data(
         Map.of(
@@ -278,8 +294,10 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldAttributeStockToItsBusinessCountryRegion_whenHoldingIsSingleStock() {
-    PortfolioHolding usStock = usStock("AAPL", 100);
-    PortfolioHolding canadaStock = canadaStock("RY", 100);
+    PortfolioHolding usStock = holding(new SecurityIdentifier("AAPL", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
+    PortfolioHolding canadaStock = holding(new SecurityIdentifier("RY", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.CANADA, 100);
 
     GeographicExposureData data = data(Map.of(), Map.of(
         usStock, geography(Country.USA, Currency.USD),
@@ -295,7 +313,8 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
 
   @Test
   void shouldFallBackToSecurityRegion_whenStockHasNoBusinessCountry() {
-    PortfolioHolding stock = usStock("NO-COUNTRY", 100);
+    PortfolioHolding stock = holding(new SecurityIdentifier("NO-COUNTRY", FiIdentifierType.TICKER),
+        FinancialInstrumentType.STOCK, Country.USA, 100);
 
     GeographicExposureData data = data(Map.of(),
         Map.of(stock, geographyWithRegionOnly(SecurityRegion.EMERGING_MARKETS, Currency.USD)));
@@ -308,8 +327,8 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
 
   @Test
   void shouldReportUnknownAndWarnDistinctly_whenSecurityIsUnresolvedVersusAllocationEmpty() {
-    PortfolioHolding notFoundBySm = canadaMutualFund("NOT-FOUND", 100);
-    PortfolioHolding resolvedButEmpty = canadaMutualFund("EMPTY", 100);
+    PortfolioHolding notFoundBySm = fundCa("NOT-FOUND", 100);
+    PortfolioHolding resolvedButEmpty = fundCa("EMPTY", 100);
 
     GeographicExposureData data = data(
         Map.of(resolvedButEmpty, allocation(Map.of(), Currency.CAD)),
@@ -333,7 +352,7 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
 
   @Test
   void shouldReportUnknownAndWarn_whenAllocationMapIsNull() {
-    PortfolioHolding fund = canadaMutualFund("NULL-ALLOCATIONS", 100);
+    PortfolioHolding fund = fundCa("NULL-ALLOCATIONS", 100);
 
     GeographicExposureData data = data(
         Map.of(fund, HoldingGeographicAllocation.builder().allocations(null).currency(Currency.CAD).build()),
@@ -356,8 +375,8 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldKeepUnresolvedHoldingWeightInUnknown_whenOnlySomeHoldingsResolve() {
-    PortfolioHolding resolved = canadaMutualFund("RESOLVED", 300);
-    PortfolioHolding unresolved = canadaMutualFund("UNRESOLVED", 100);
+    PortfolioHolding resolved = fundCa("RESOLVED", 300);
+    PortfolioHolding unresolved = fundCa("UNRESOLVED", 100);
 
     GeographicExposureData data = data(
         Map.of(resolved, allocation(Map.of(GeographicRegionType.US, ONE), Currency.CAD)),
@@ -375,7 +394,10 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
   void shouldReturnNullBuckets_whenPortfolioIsEmptyOrHoldsOnlyCashAndGic() {
     ConsolidatedGeographicExposureResult empty = service.perform(command(), data(Map.of(), Map.of()));
     ConsolidatedGeographicExposureResult cashOnly = service.perform(
-        command(cash(Currency.CAD, 1000), gic(Currency.USD, 500)), data(Map.of(), Map.of()));
+        command(cash("CASH-" + Currency.CAD, FiIdentifierType.MORNINGSTAR_ID, Currency.CAD, 1000),
+            PortfolioHoldingBuildHelper.gic(
+                new SecurityIdentifier("GIC-" + Currency.USD, FiIdentifierType.MORNINGSTAR_ID), Currency.USD,
+                BigDecimal.valueOf(500), BigDecimal.valueOf(365))), data(Map.of(), Map.of()));
 
     assertNullExposure(empty);
     assertThat(empty.getWarnings()).isEmpty();
@@ -390,7 +412,7 @@ class GeographicExposureServiceTest extends GeographicExposureFixtures {
    */
   @Test
   void shouldRescaleToOneHundredPercent_whenValuesArePercentagesRatherThanFractions() {
-    PortfolioHolding fund = canadaMutualFund("PERCENT-SCALE", 100);
+    PortfolioHolding fund = fundCa("PERCENT-SCALE", 100);
     GeographicExposureData data = data(
         Map.of(fund, allocation(Map.of(
             GeographicRegionType.US, new BigDecimal("80"),

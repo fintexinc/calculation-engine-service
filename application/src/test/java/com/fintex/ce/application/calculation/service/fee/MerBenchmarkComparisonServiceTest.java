@@ -19,7 +19,6 @@ import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +33,7 @@ import static com.fintex.ce.application.calculation.service.fee.MerBenchmarkComp
 import static com.fintex.ce.application.calculation.service.fee.MerBenchmarkComparisonService.NO_PORTFOLIO_RATE;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.FIVE_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static com.fintex.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
@@ -74,8 +74,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldComparePortfolioRateToBenchmarkRate_whenSeveralViewsAreRequested() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     MerComparisonResult result = service.perform(command(portfolioFund, benchmark, FUNDS_ONLY, WHOLE_PORTFOLIO),
         data(Map.of(portfolioFund, fee("0.02")), Map.of(benchmark, fee("0.01"))));
@@ -98,8 +100,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldReportZeroSavings_whenPortfolioRateIsIdenticalToBenchmarkRate() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     MerComparisonResult result = service.perform(command(portfolioFund, benchmark, FUNDS_ONLY),
         data(Map.of(portfolioFund, fee("0.015")), Map.of(benchmark, fee("0.015"))));
@@ -115,8 +119,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldReportNegativeSavings_whenTheBenchmarkIsDearerThanThePortfolio() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "200");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "200");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     MerComparisonResult result = service.perform(command(portfolioFund, benchmark, WHOLE_PORTFOLIO),
         data(Map.of(portfolioFund, fee("0.01")), Map.of(benchmark, fee("0.02"))));
@@ -133,9 +139,12 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldScopeTheProjectionBasePerView_whenPortfolioMixesFundsAndNonFundHoldings() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding stock = stock("RY.TO", "300");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding stock = holding("RY.TO", FiIdentifierType.TICKER,
+        FinancialInstrumentType.STOCK, Country.CANADA, "300");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     MerComparisonResult result = service.perform(
         command(List.of(portfolioFund, stock), benchmark, FUNDS_ONLY, WHOLE_PORTFOLIO),
@@ -158,8 +167,10 @@ class MerBenchmarkComparisonServiceTest {
     when(fxRateService.spotRates(anySet(), any(), any()))
         .thenReturn(Map.of(Currency.USD, new BigDecimal("1.25"), Currency.CAD, BigDecimal.ONE));
 
-    PortfolioHolding usdFund = fund("TDB952", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding usdFund = holding("TDB952", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     MerComparisonResult result = service.perform(command(usdFund, benchmark, WHOLE_PORTFOLIO),
         data(Map.of(usdFund, fee("0.02", null, Currency.USD)), Map.of(benchmark, fee("0.01"))));
@@ -175,8 +186,10 @@ class MerBenchmarkComparisonServiceTest {
     when(fxRateService.spotRates(anySet(), any(), any()))
         .thenReturn(Map.of(Currency.CAD, new BigDecimal("0.80"), Currency.USD, BigDecimal.ONE));
 
-    PortfolioHolding cadFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding cadFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     var command = command(cadFund, benchmark, WHOLE_PORTFOLIO);
     command.setTargetCurrency(Currency.USD);
@@ -192,8 +205,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldCompoundTheBalanceButNotTheFee_whenAGrowthRateIsConfigured() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     MerComparisonResult result = serviceWithGrowthRate("0.06").perform(
         command(portfolioFund, benchmark, FUNDS_ONLY),
@@ -216,8 +231,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldReportTheRequestedHorizons_whenTheCommandSuppliesThem() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     MerComparisonCommand command = command(portfolioFund, benchmark, FUNDS_ONLY);
     command.setProjectionPeriods(new LinkedHashSet<>(List.of(THREE_YR, FIVE_YR)));
 
@@ -233,8 +250,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldPreferTheRequestedHorizons_whenTheyDisagreeWithTheConfiguredOnes() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var narrowedByConfig = new MerBenchmarkComparisonService(merService, projection("0", Set.of(FIVE_YR)));
     MerComparisonCommand command = command(portfolioFund, benchmark, FUNDS_ONLY);
     command.setProjectionPeriods(Set.of(THREE_YR));
@@ -248,8 +267,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldReportOnlyTheConfiguredHorizons_whenTheHorizonListIsNarrowed() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     var narrowed = new MerBenchmarkComparisonService(merService, projection("0", Set.of(FIVE_YR)));
 
     MerComparisonResult result = narrowed.perform(command(portfolioFund, benchmark, FUNDS_ONLY),
@@ -265,8 +286,10 @@ class MerBenchmarkComparisonServiceTest {
    */
   @Test
   void shouldFail_whenTheViewHasNoPortfolioRateToCompare() {
-    PortfolioHolding stock = stock("RY.TO", "300");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding stock = holding("RY.TO", FiIdentifierType.TICKER,
+        FinancialInstrumentType.STOCK, Country.CANADA, "300");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
     MerComparisonCommand command = command(List.of(stock), benchmark, FUNDS_ONLY);
     MerComparisonData data = data(Map.of(), Map.of(benchmark, fee("0.01")));
 
@@ -285,8 +308,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldFail_whenTheBenchmarkHasNoRateToCompareAgainst() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmarkStock = stock("RY.TO", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmarkStock = holding("RY.TO", FiIdentifierType.TICKER,
+        FinancialInstrumentType.STOCK, Country.CANADA, "100");
     MerComparisonCommand command = command(List.of(portfolioFund), List.of(benchmarkStock), FUNDS_ONLY);
     MerComparisonData data = data(Map.of(portfolioFund, fee("0.02")), Map.of());
 
@@ -303,9 +328,12 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldWeightTheBenchmarkRateByHoldingValue_whenBenchmarkHasSeveralHoldings() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding cheap = fund("TDB622", "300");
-    PortfolioHolding pricey = fund("RBF556", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding cheap = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "300");
+    PortfolioHolding pricey = holding("RBF556", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     MerComparisonResult result = service.perform(
         command(List.of(portfolioFund), List.of(cheap, pricey), FUNDS_ONLY),
@@ -319,9 +347,14 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldWeightBenchmarkHoldingsEqually_whenNoBenchmarkHoldingCarriesAValue() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding cheap = fund("TDB622", null);
-    PortfolioHolding pricey = fund("RBF556", null);
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding cheap = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        (BigDecimal) null);
+    PortfolioHolding pricey = holding("RBF556", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        (BigDecimal) null);
 
     MerComparisonResult result = service.perform(
         command(List.of(portfolioFund), List.of(cheap, pricey), FUNDS_ONLY),
@@ -333,8 +366,11 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldUseTheFundsOwnRate_whenBenchmarkIsASingleFundWithoutAValue() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", null);
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
+        (BigDecimal) null);
 
     MerComparisonResult result = service.perform(command(portfolioFund, benchmark, FUNDS_ONLY),
         data(Map.of(portfolioFund, fee("0.02")), Map.of(benchmark, fee("0.01"))));
@@ -344,8 +380,10 @@ class MerBenchmarkComparisonServiceTest {
 
   @Test
   void shouldCarryBenchmarkWarnings_whenBenchmarkFallsBackToManagementFee() {
-    PortfolioHolding portfolioFund = fund("CIG1101", "100");
-    PortfolioHolding benchmark = fund("TDB622", "100");
+    PortfolioHolding portfolioFund = holding("CIG1101", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
+    PortfolioHolding benchmark = holding("TDB622", FiIdentifierType.FUNDSERV,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "100");
 
     MerComparisonResult result = service.perform(command(portfolioFund, benchmark, FUNDS_ONLY),
         data(Map.of(portfolioFund, fee("0.02")), Map.of(benchmark, fee(null, "0.0075"))));
@@ -399,24 +437,6 @@ class MerBenchmarkComparisonServiceTest {
   private static MerComparisonData data(Map<PortfolioHolding, FeeData> portfolioFees,
       Map<PortfolioHolding, FeeData> benchmarkFees) {
     return new MerComparisonData(portfolioFees, benchmarkFees);
-  }
-
-  private static PortfolioHolding fund(String id, String value) {
-    return PortfolioHolding.builder()
-        .value(value == null ? null : new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.MUTUAL_FUND)
-        .country(Country.CANADA)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.FUNDSERV))
-        .build();
-  }
-
-  private static PortfolioHolding stock(String id, String value) {
-    return PortfolioHolding.builder()
-        .value(new BigDecimal(value))
-        .holdingType(FinancialInstrumentType.STOCK)
-        .country(Country.CANADA)
-        .securityIdentifier(new SecurityIdentifier(id, FiIdentifierType.TICKER))
-        .build();
   }
 
   private static FeeData fee(String mer) {

@@ -2,11 +2,8 @@ package com.fintex.ce.adapter.webclient.mic.mapper;
 
 import com.fintex.ce.model.domain.calculation.holding.CommonHolding;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.currency.Currency;
-import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.holding.Holdings;
 import com.fintex.wm.commons.domain.holding.SecurityHolding;
@@ -20,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCaByMorningstarId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -36,7 +34,7 @@ class LimitedHoldingsMapperTest {
         securityHolding("NVIDIA Corp", "8.87516", FiIdentifierType.MORNINGSTAR_ID, "0P000003RE"),
         securityHolding("Microsoft Corp", "7.54319", FiIdentifierType.MORNINGSTAR_ID, "0P00000203"));
 
-    CommonTopHoldings result = mapper.map(response, createHolding("F00001S8IG"));
+    CommonTopHoldings result = mapper.map(response, etfCaByMorningstarId("F00001S8IG"));
 
     assertThat(result.getCurrency()).isEqualTo(Currency.CAD);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -57,7 +55,8 @@ class LimitedHoldingsMapperTest {
     var holding = securityHolding("Royal Bank of Canada", "5", null, null);
     holding.setMarketValue(BigDecimal.valueOf(50000));
 
-    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), createHolding("SEC-001")).getHoldings().get(0);
+    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), etfCaByMorningstarId("SEC-001")).getHoldings()
+        .get(0);
 
     assertThat(mapped.getValue()).isEqualByComparingTo("50000");
     assertThat(mapped.getWeight()).isEqualByComparingTo("0.05");
@@ -71,7 +70,7 @@ class LimitedHoldingsMapperTest {
   void shouldLeaveUnderlyingHoldingsEmpty_whenAllocationIsFlat() {
     var response = holdings(Currency.USD, securityHolding("Amazon.com Inc", "4.49273", null, null));
 
-    CommonTopHoldings result = mapper.map(response, createHolding("F00001S8IH"));
+    CommonTopHoldings result = mapper.map(response, etfCaByMorningstarId("F00001S8IH"));
 
     assertThat(result.getHoldings()).singleElement()
         .satisfies(holding -> assertThat(holding.getUnderlyingHoldings()).isEmpty());
@@ -83,7 +82,7 @@ class LimitedHoldingsMapperTest {
     var parent = securityHolding("Parent Fund", "0.10", null, null);
     parent.setUnderlyingHoldings(List.of(underlying));
 
-    CommonTopHoldings result = mapper.map(holdings(Currency.CAD, parent), createHolding("SEC-006"));
+    CommonTopHoldings result = mapper.map(holdings(Currency.CAD, parent), etfCaByMorningstarId("SEC-006"));
 
     assertThat(result.getHoldings()).hasSize(1);
     CommonHolding parentHolding = result.getHoldings().get(0);
@@ -99,7 +98,8 @@ class LimitedHoldingsMapperTest {
         identifier(FiIdentifierType.TICKER, "RY.TO"),
         identifier(FiIdentifierType.MORNINGSTAR_ID, "F0CAN05NHL"));
 
-    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), createHolding("SEC-007")).getHoldings().get(0);
+    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), etfCaByMorningstarId("SEC-007")).getHoldings()
+        .get(0);
 
     assertThat(mapped.getPrimaryIdentifier().getIdType()).isEqualTo(FiIdentifierType.MORNINGSTAR_ID);
     assertThat(mapped.getPrimaryIdentifier().getId()).isEqualTo("F0CAN05NHL");
@@ -112,7 +112,8 @@ class LimitedHoldingsMapperTest {
         identifier(FiIdentifierType.TICKER, "RY.TO"),
         identifier(FiIdentifierType.FUNDSERV, "RBF1234"));
 
-    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), createHolding("SEC-010")).getHoldings().get(0);
+    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), etfCaByMorningstarId("SEC-010")).getHoldings()
+        .get(0);
 
     assertThat(mapped.getPrimaryIdentifier().getIdType()).isEqualTo(FiIdentifierType.FUNDSERV);
     assertThat(mapped.getPrimaryIdentifier().getId()).isEqualTo("RBF1234");
@@ -124,7 +125,8 @@ class LimitedHoldingsMapperTest {
         identifier(FiIdentifierType.TICKER, "RY.TO"),
         identifier(FiIdentifierType.EXCHANGE_ID, "TSX"));
 
-    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), createHolding("SEC-002")).getHoldings().get(0);
+    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), etfCaByMorningstarId("SEC-002")).getHoldings()
+        .get(0);
 
     assertThat(mapped.getPrimaryIdentifier().getIdType()).isEqualTo(FiIdentifierType.TICKER);
     assertThat(mapped.getPrimaryIdentifier().getId()).isEqualTo("RY.TO");
@@ -134,14 +136,15 @@ class LimitedHoldingsMapperTest {
   void shouldReturnNullPrimaryIdentifier_whenTheHoldingHasNoIdentifiers() {
     var holding = securityHolding("Bond Holding", "1.00", null, null);
 
-    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), createHolding("SEC-009")).getHoldings().get(0);
+    CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), etfCaByMorningstarId("SEC-009")).getHoldings()
+        .get(0);
 
     assertThat(mapped.getPrimaryIdentifier()).isNull();
   }
 
   @Test
   void shouldReturnEmptyHoldings_whenResponseIsNull() {
-    CommonTopHoldings result = mapper.map(null, createHolding("F00000MBXT"));
+    CommonTopHoldings result = mapper.map(null, etfCaByMorningstarId("F00000MBXT"));
 
     assertThat(result.getCurrency()).isNull();
     assertThat(result.getProviders()).isEmpty();
@@ -153,7 +156,7 @@ class LimitedHoldingsMapperTest {
     var response = new Holdings();
     response.setCurrency(Currency.CAD);
 
-    CommonTopHoldings result = mapper.map(response, createHolding("F00000MBXT"));
+    CommonTopHoldings result = mapper.map(response, etfCaByMorningstarId("F00000MBXT"));
 
     assertThat(result.getCurrency()).isEqualTo(Currency.CAD);
     assertThat(result.getHoldings()).isEmpty();
@@ -165,7 +168,7 @@ class LimitedHoldingsMapperTest {
     response.setAllocation(List.of());
     response.setDataProviders(null);
 
-    CommonTopHoldings result = mapper.map(response, createHolding("SEC-005"));
+    CommonTopHoldings result = mapper.map(response, etfCaByMorningstarId("SEC-005"));
 
     assertThat(result.getProviders()).isEmpty();
   }
@@ -207,10 +210,5 @@ class LimitedHoldingsMapperTest {
     securityIdentifier.setIdType(type);
     securityIdentifier.setId(id);
     return securityIdentifier;
-  }
-
-  private static PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, FiIdentifierType.MORNINGSTAR_ID));
   }
 }

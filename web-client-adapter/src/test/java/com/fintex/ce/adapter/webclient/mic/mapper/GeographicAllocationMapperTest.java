@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.mic.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.HoldingGeographicAllocation;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.GeographicAllocation;
 import com.fintex.wm.commons.domain.allocation.GeographicAllocationValue;
@@ -9,10 +8,6 @@ import com.fintex.wm.commons.domain.allocation.GeographicAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
-import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.TreeSet;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GeographicAllocationMapperTest {
@@ -34,7 +30,7 @@ class GeographicAllocationMapperTest {
         new GeographicAllocationValue(GeographicRegionType.ASIA, new BigDecimal("9.5"), new TreeSet<>())),
         Currency.USD, DataProvider.MORNINGSTAR);
 
-    HoldingGeographicAllocation result = mapper.map(micResponse, createHolding("SEC-001"));
+    HoldingGeographicAllocation result = mapper.map(micResponse, etfCa("SEC-001"));
 
     assertThat(result.getAllocations()).hasSize(3);
     assertThat(result.getAllocations()).containsEntry(GeographicRegionType.US, new BigDecimal("60.5"));
@@ -46,7 +42,7 @@ class GeographicAllocationMapperTest {
 
   @Test
   void shouldReturnEmptyAllocationsAndProvidersAndNullCurrency_whenResponseIsNull() {
-    HoldingGeographicAllocation result = mapper.map(null, createHolding("SEC-002"));
+    HoldingGeographicAllocation result = mapper.map(null, etfCa("SEC-002"));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -59,7 +55,7 @@ class GeographicAllocationMapperTest {
         List.of(new GeographicAllocationValue(GeographicRegionType.US, BigDecimal.ONE, new TreeSet<>())),
         null, null);
 
-    HoldingGeographicAllocation result = mapper.map(micResponse, createHolding("SEC-003"));
+    HoldingGeographicAllocation result = mapper.map(micResponse, etfCa("SEC-003"));
 
     assertThat(result.getAllocations()).containsEntry(GeographicRegionType.US, BigDecimal.ONE);
     assertThat(result.getProviders()).isEmpty();
@@ -73,7 +69,7 @@ class GeographicAllocationMapperTest {
         new GeographicAllocationValue(GeographicRegionType.US, new BigDecimal("20.0"), new TreeSet<>())),
         Currency.CAD, null);
 
-    HoldingGeographicAllocation result = mapper.map(micResponse, createHolding("SEC-004"));
+    HoldingGeographicAllocation result = mapper.map(micResponse, etfCa("SEC-004"));
 
     assertThat(result.getAllocations()).containsEntry(GeographicRegionType.US, new BigDecimal("30.0"));
     assertThat(result.getCurrency()).isEqualTo(Currency.CAD);
@@ -87,7 +83,7 @@ class GeographicAllocationMapperTest {
         new GeographicAllocationValue(GeographicRegionType.EUROPE, BigDecimal.TEN, new TreeSet<>())),
         null, null);
 
-    HoldingGeographicAllocation result = mapper.map(micResponse, createHolding("SEC-005"));
+    HoldingGeographicAllocation result = mapper.map(micResponse, etfCa("SEC-005"));
 
     assertThat(result.getAllocations()).containsOnly(
         org.assertj.core.api.Assertions.entry(GeographicRegionType.EUROPE, BigDecimal.TEN));
@@ -107,10 +103,5 @@ class GeographicAllocationMapperTest {
       wrapper.setCurrency(dp);
     }
     return wrapper;
-  }
-
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(BigDecimal.ONE, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, FiIdentifierType.TICKER));
   }
 }

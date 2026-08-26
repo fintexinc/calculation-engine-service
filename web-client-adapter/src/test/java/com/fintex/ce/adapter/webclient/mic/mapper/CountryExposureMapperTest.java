@@ -1,19 +1,18 @@
 package com.fintex.ce.adapter.webclient.mic.mapper;
 
 import com.fintex.ce.model.domain.calculation.exposure.CountryExposure;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.CountryAllocation;
 import com.fintex.wm.commons.domain.allocation.CountryAllocationValue;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CountryExposureMapperTest {
@@ -29,7 +28,8 @@ class CountryExposureMapperTest {
     micResponse.setAllocations(List.of(canada, usa));
     micResponse.setDataProviders(List.of(DataProvider.MORNINGSTAR));
 
-    CountryExposure result = mapper.map(micResponse, createHolding("SEC-001"));
+    CountryExposure result = mapper.map(micResponse, holding("SEC-001", null, FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getHoldingType()).isEqualTo(FinancialInstrumentType.ETF);
     assertThat(result.getProviders()).containsExactly(DataProvider.MORNINGSTAR);
@@ -40,7 +40,8 @@ class CountryExposureMapperTest {
 
   @Test
   void shouldReturnEmptyAllocations_whenResponseIsNull() {
-    CountryExposure result = mapper.map(null, createHolding("SEC-002"));
+    CountryExposure result = mapper.map(null, holding("SEC-002", null, FinancialInstrumentType.ETF, Country.CANADA,
+        (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
     assertThat(result.getAllocations()).isEmpty();
@@ -51,7 +52,8 @@ class CountryExposureMapperTest {
     var micResponse = new CountryAllocation();
     micResponse.setAllocations(null);
 
-    CountryExposure result = mapper.map(micResponse, createHolding("SEC-003"));
+    CountryExposure result = mapper.map(micResponse, holding("SEC-003", null, FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getProviders()).isEmpty();
@@ -63,7 +65,8 @@ class CountryExposureMapperTest {
     micResponse.setAllocations(List.of());
     micResponse.setDataProviders(null);
 
-    CountryExposure result = mapper.map(micResponse, createHolding("SEC-004"));
+    CountryExposure result = mapper.map(micResponse, holding("SEC-004", null, FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getProviders()).isEmpty();
   }
@@ -83,7 +86,8 @@ class CountryExposureMapperTest {
     var micResponse = new CountryAllocation();
     micResponse.setAllocations(List.of(valid, nullIso, nullValue));
 
-    CountryExposure result = mapper.map(micResponse, createHolding("SEC-005"));
+    CountryExposure result = mapper.map(micResponse, holding("SEC-005", null, FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).hasSize(1);
     assertThat(result.getAllocations()).containsEntry(Country.CANADA, BigDecimal.valueOf(0.65));
@@ -97,7 +101,8 @@ class CountryExposureMapperTest {
     var micResponse = new CountryAllocation();
     micResponse.setAllocations(List.of(can1, can2));
 
-    CountryExposure result = mapper.map(micResponse, createHolding("SEC-006"));
+    CountryExposure result = mapper.map(micResponse, holding("SEC-006", null, FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).hasSize(1);
     assertThat(result.getAllocations().get(Country.CANADA)).isEqualByComparingTo("0.65");
@@ -108,10 +113,5 @@ class CountryExposureMapperTest {
     cv.setType(country);
     cv.setValue(new BigDecimal(value));
     return cv;
-  }
-
-  private PortfolioHolding createHolding(String securityId) {
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(securityId, null));
   }
 }

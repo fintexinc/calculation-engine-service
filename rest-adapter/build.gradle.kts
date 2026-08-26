@@ -7,5 +7,6 @@ dependencies {
     api(libs.spring.boot.starter.actuator)
     api(libs.springdoc.openapi.starter.webmvc.ui)
 
+    testImplementation(testFixtures(project(":api")))
     testImplementation(libs.spring.boot.starter.test)
 }

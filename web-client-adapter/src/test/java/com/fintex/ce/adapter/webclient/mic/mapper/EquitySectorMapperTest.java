@@ -1,7 +1,6 @@
 package com.fintex.ce.adapter.webclient.mic.mapper;
 
 import com.fintex.ce.model.domain.calculation.allocation.EquitySector;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.wm.commons.domain.DataProvider;
 import com.fintex.wm.commons.domain.allocation.EquitySectorAllocationType;
 import com.fintex.wm.commons.domain.allocation.EquitySectorDatapoint;
@@ -11,7 +10,6 @@ import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EquitySectorMapperTest {
@@ -27,7 +26,9 @@ class EquitySectorMapperTest {
 
   @Test
   void shouldWidenTheSectorToOneFullBucket_whenTheSecurityHasOne() {
-    EquitySector result = mapper.map(response(EquitySectorAllocationType.ENERGY, Currency.USD), holding("XOM"));
+    EquitySector result = mapper.map(response(EquitySectorAllocationType.ENERGY, Currency.USD), holding("XOM",
+        FiIdentifierType.TICKER, FinancialInstrumentType.STOCK, Country.USA,
+        new BigDecimal("100")));
 
     assertThat(result.getAllocations()).containsExactly(
         Map.entry(EquitySectorAllocationType.ENERGY, BigDecimal.ONE));
@@ -41,7 +42,9 @@ class EquitySectorMapperTest {
    */
   @Test
   void shouldMapToNoBuckets_whenTheSecurityHasNoSector() {
-    EquitySector result = mapper.map(response(null, Currency.CAD), holding("XOM"));
+    EquitySector result = mapper.map(response(null, Currency.CAD), holding("XOM", FiIdentifierType.TICKER,
+        FinancialInstrumentType.STOCK, Country.USA,
+        new BigDecimal("100")));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getCurrency()).isEqualTo(Currency.CAD);
@@ -50,7 +53,9 @@ class EquitySectorMapperTest {
 
   @Test
   void shouldMapToNoBucketsAndNoCurrency_whenMarketInvestmentCatalogueReturnedNothing() {
-    EquitySector result = mapper.map(null, holding("XOM"));
+    EquitySector result = mapper.map(null, holding("XOM", FiIdentifierType.TICKER, FinancialInstrumentType.STOCK,
+        Country.USA,
+        new BigDecimal("100")));
 
     assertThat(result.getAllocations()).isEmpty();
     assertThat(result.getCurrency()).isNull();
@@ -69,14 +74,5 @@ class EquitySectorMapperTest {
     currencyDatapoint.setType(currency);
     response.setCurrency(currencyDatapoint);
     return response;
-  }
-
-  private static PortfolioHolding holding(String ticker) {
-    return PortfolioHolding.builder()
-        .value(new BigDecimal("100"))
-        .holdingType(FinancialInstrumentType.STOCK)
-        .country(Country.USA)
-        .securityIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER))
-        .build();
   }
 }

@@ -64,6 +64,9 @@ Red flags — STOP and investigate the production code instead of the test:
   behavior the product does not expose.
 - [ ] **[test-quality] Behavior-preserving refactor?** Add a test for the specific pre-existing behavior you intend
   to keep, so a regression turns a test red instead of shipping silently.
+- [ ] **[test-quality] Introducing a shared fixture builder?** Delete local factories that only pass arguments or
+  constants through to it; otherwise the duplication remains hidden behind one-line wrappers and future tests keep
+  extending the wrong abstraction.
 - [ ] **[test-quality] Does each assertion fail when the named behavior is broken?** Trace the exercised path and
   exclude incidental causes such as deserialization filters, empty defaults, or earlier short-circuits that can make
   the expected value appear without reaching the behavior under test.

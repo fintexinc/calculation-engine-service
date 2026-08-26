@@ -1,3 +1,7 @@
+plugins {
+    `java-test-fixtures`
+}
+
 description = "Port interfaces (input and output)"
 
 dependencies {

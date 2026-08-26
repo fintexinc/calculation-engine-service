@@ -1,17 +1,13 @@
 package com.fintex.ce.adapter.observability.calculation;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
-import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,12 +16,12 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -166,17 +162,9 @@ class MicrometerCalculationObservabilityTest {
     command.setMetric(metric);
     command.setCurrency(Currency.CAD);
     command.setPeriods(Set.of(TimePeriod.ONE_YR));
-    command.setHoldings(List.of(holding("XIU.TO"), holding("VFV.TO")));
-    command.setBenchmarkHoldings(List.of(holding("SPY")));
+    command.setHoldings(List.of(etf("XIU.TO", Country.CANADA, 1), etf("VFV.TO", Country.CANADA, 1)));
+    command.setBenchmarkHoldings(List.of(etf("SPY", Country.CANADA, 1)));
     return command;
-  }
-
-  private static PortfolioHolding holding(String id) {
-    return new PortfolioHolding(
-        BigDecimal.ONE,
-        FinancialInstrumentType.ETF,
-        Country.CANADA,
-        new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 
   private static class CapturingObservationHandler implements ObservationHandler<Observation.Context> {

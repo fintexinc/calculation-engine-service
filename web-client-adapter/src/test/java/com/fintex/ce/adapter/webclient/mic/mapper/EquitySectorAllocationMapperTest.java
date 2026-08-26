@@ -11,7 +11,6 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EquitySectorAllocationMapperTest {
@@ -36,7 +36,7 @@ class EquitySectorAllocationMapperTest {
         createEntry(EquitySectorAllocationType.ENERGY, "8.7")),
         DataProvider.MORNINGSTAR);
 
-    PortfolioHolding holding = createHolding("XIU.TO");
+    PortfolioHolding holding = holding("XIU.TO", null, FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null);
 
     EquitySector result = mapper.map(micResponse, holding);
 
@@ -55,7 +55,8 @@ class EquitySectorAllocationMapperTest {
     currency.setValue(Currency.USD);
     micResponse.setCurrency(currency);
 
-    EquitySector result = mapper.map(micResponse, createHolding("XIU.TO"));
+    EquitySector result = mapper.map(micResponse, holding("XIU.TO", null, FinancialInstrumentType.ETF, Country.CANADA,
+        (BigDecimal) null));
 
     assertThat(result.getCurrency()).isEqualTo(Currency.USD);
   }
@@ -63,7 +64,8 @@ class EquitySectorAllocationMapperTest {
   @Test
   void shouldMapNullCurrency_whenResponseHasNoCurrency() {
     EquitySector result = mapper.map(response(List.of(
-        createEntry(EquitySectorAllocationType.TECHNOLOGY, "28.5"))), createHolding("XIU.TO"));
+        createEntry(EquitySectorAllocationType.TECHNOLOGY, "28.5"))), holding("XIU.TO", null,
+            FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getCurrency()).isNull();
   }
@@ -72,7 +74,7 @@ class EquitySectorAllocationMapperTest {
   @MethodSource("nullAndEmptyResponses")
   void shouldReturnEmptyAllocations_whenResponseIsNullOrHasNoAllocation(
       EquitySectorAllocationWithCurrency micResponse) {
-    PortfolioHolding holding = createHolding("TEST.ID");
+    PortfolioHolding holding = holding("TEST.ID", null, FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null);
 
     EquitySector result = mapper.map(micResponse, holding);
 
@@ -98,7 +100,8 @@ class EquitySectorAllocationMapperTest {
     nullTypeEntry.setType(null);
     nullTypeEntry.setValue(BigDecimal.valueOf(5.0));
 
-    EquitySector result = mapper.map(response(List.of(validEntry, nullTypeEntry)), createHolding("TEST.ID"));
+    EquitySector result = mapper.map(response(List.of(validEntry, nullTypeEntry)), holding("TEST.ID", null,
+        FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).hasSize(1);
     assertThat(result.getAllocations()).containsKey(EquitySectorAllocationType.INDUSTRIALS);
@@ -120,7 +123,8 @@ class EquitySectorAllocationMapperTest {
         createEntry(EquitySectorAllocationType.TECHNOLOGY, "15.0"),
         createEntry(EquitySectorAllocationType.UTILITIES, "4.0"));
 
-    EquitySector result = mapper.map(response(entries), createHolding("FULL.TEST"));
+    EquitySector result = mapper.map(response(entries), holding("FULL.TEST", null, FinancialInstrumentType.ETF,
+        Country.CANADA, (BigDecimal) null));
 
     assertThat(result.getAllocations()).hasSize(11);
     assertThat(result.getAllocations().get(EquitySectorAllocationType.BASIC_MATERIALS)).isEqualByComparingTo("5.0");
@@ -155,11 +159,5 @@ class EquitySectorAllocationMapperTest {
     entry.setType(type);
     entry.setValue(new BigDecimal(value));
     return entry;
-  }
-
-  private PortfolioHolding createHolding(String securityId) {
-    var identifier = new SecurityIdentifier();
-    identifier.setId(securityId);
-    return new PortfolioHolding(null, FinancialInstrumentType.ETF, Country.CANADA, identifier);
   }
 }

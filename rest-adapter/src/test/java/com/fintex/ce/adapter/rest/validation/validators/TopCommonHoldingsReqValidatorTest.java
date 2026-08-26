@@ -8,7 +8,6 @@ import com.fintex.ce.model.error.exceptions.ValidationException;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,7 +34,8 @@ class TopCommonHoldingsReqValidatorTest {
         .collect(Collectors.toSet());
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
-    command.setHoldings(List.of(createHolding("ID1")));
+    command.setHoldings(List.of(holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA, BigDecimal.TEN)));
     command.setAccumulateHoldingTypes(thirteenTypes);
 
     assertThatThrownBy(() -> validator.validate(command))
@@ -65,11 +66,8 @@ class TopCommonHoldingsReqValidatorTest {
 
   @Test
   void shouldThrow_whenAnyHoldingHasNullValue() {
-    PortfolioHolding nullValueHolding = new PortfolioHolding(
-        null,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding nullValueHolding = holding("ID1", FiIdentifierType.TICKER,
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, (BigDecimal) null);
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
     command.setHoldings(List.of(nullValueHolding));
@@ -91,17 +89,12 @@ class TopCommonHoldingsReqValidatorTest {
         .build();
 
     TopCommonHoldingsCommand command = new TopCommonHoldingsCommand();
-    command.setHoldings(List.of(createHolding("ID1"), createHolding("ID2"), gicHolding));
+    command.setHoldings(List.of(
+        holding("ID1", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN),
+        holding("ID2", FiIdentifierType.TICKER, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN),
+        gicHolding));
     command.setAccumulateHoldingTypes(Set.of("TYPE_1", "TYPE_2"));
 
     assertThatCode(() -> validator.validate(command)).doesNotThrowAnyException();
-  }
-
-  private PortfolioHolding createHolding(String id) {
-    return new PortfolioHolding(
-        BigDecimal.TEN,
-        FinancialInstrumentType.MUTUAL_FUND,
-        Country.CANADA,
-        new SecurityIdentifier(id, FiIdentifierType.TICKER));
   }
 }

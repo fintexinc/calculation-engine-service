@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -55,9 +56,8 @@ abstract class AbstractGicFieldReqValidatorTest {
 
   @Test
   void shouldNotThrow_whenNoGicHoldings() {
-    PortfolioHolding holding = new PortfolioHolding(
-        BigDecimal.TEN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
-        new SecurityIdentifier("ID1", FiIdentifierType.TICKER));
+    PortfolioHolding holding = holding(new SecurityIdentifier("ID1", FiIdentifierType.TICKER),
+        FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.TEN);
 
     var cmd = new PortfolioHoldingsCommand();
     cmd.setHoldings(List.of(holding));

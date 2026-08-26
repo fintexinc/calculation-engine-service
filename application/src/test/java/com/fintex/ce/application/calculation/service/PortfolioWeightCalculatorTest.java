@@ -4,10 +4,6 @@ import com.fintex.ce.application.config.FxProperties;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.currency.Currency;
-import com.fintex.wm.commons.domain.enumeration.Country;
-import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.domain.id.FiIdentifierType;
-import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,8 +29,8 @@ class PortfolioWeightCalculatorTest {
 
   @Test
   void shouldWeightConvertedValues_whenPortfolioContainsMultipleCurrencies() {
-    PortfolioHolding cadHolding = holding("CAD", "100");
-    PortfolioHolding usdHolding = holding("USD", "100");
+    PortfolioHolding cadHolding = etfCa("CAD", 100);
+    PortfolioHolding usdHolding = etfCa("USD", 100);
     when(fxRateService.spotRates(eq(Set.of(Currency.CAD, Currency.USD)), eq(Currency.CAD), any(LocalDate.class)))
         .thenReturn(Map.of(Currency.CAD, BigDecimal.ONE, Currency.USD, new BigDecimal("1.5")));
 
@@ -48,8 +45,8 @@ class PortfolioWeightCalculatorTest {
 
   @Test
   void shouldUseRawValueAndAddWarning_whenFxRateIsUnavailable() {
-    PortfolioHolding cadHolding = holding("CAD", "100");
-    PortfolioHolding usdHolding = holding("USD", "100");
+    PortfolioHolding cadHolding = etfCa("CAD", 100);
+    PortfolioHolding usdHolding = etfCa("USD", 100);
     Map<Currency, BigDecimal> rates = new EnumMap<>(Currency.class);
     rates.put(Currency.CAD, BigDecimal.ONE);
     rates.put(Currency.USD, null);
@@ -73,8 +70,4 @@ class PortfolioWeightCalculatorTest {
     });
   }
 
-  private static PortfolioHolding holding(String id, String value) {
-    return new PortfolioHolding(new BigDecimal(value), FinancialInstrumentType.ETF, Country.CANADA,
-        new SecurityIdentifier(id, FiIdentifierType.TICKER));
-  }
 }
