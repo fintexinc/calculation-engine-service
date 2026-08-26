@@ -28,14 +28,17 @@ public interface ExternalCallObservability {
 
     @Override
     public void completed(int itemCount) {
+      // Empty by design: this implementation publishes nothing, see the NO_OP contract on the enclosing interface.
     }
 
     @Override
     public void failed(Throwable cause) {
+      // Empty by design: this implementation publishes nothing, see the NO_OP contract on the enclosing interface.
     }
 
     @Override
     public void httpFailed(int statusCode, Throwable cause) {
+      // Empty by design: this implementation publishes nothing, see the NO_OP contract on the enclosing interface.
     }
   };
 

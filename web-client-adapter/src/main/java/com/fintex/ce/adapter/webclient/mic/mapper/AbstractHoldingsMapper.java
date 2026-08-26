@@ -45,7 +45,7 @@ public abstract class AbstractHoldingsMapper<R extends DatapointMetadata>
       FiIdentifierType.CUSIP,
       FiIdentifierType.TICKER);
 
-  protected abstract List<? extends SecurityHolding> allocationOf(R micResponse);
+  protected abstract List<SecurityHolding> allocationOf(R micResponse);
 
   protected abstract Currency currencyOf(R micResponse);
 
