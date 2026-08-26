@@ -17,6 +17,7 @@ import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
 import com.fintex.wm.commons.domain.financial.Fees;
 import com.fintex.wm.commons.domain.financial.ManagementFeeDatapoint;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.holding.Holdings;
 import com.fintex.wm.commons.domain.holding.SecurityHolding;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -471,7 +472,7 @@ class SecurityAttributesFetcherIntegrationTest {
     SecurityHolding holding = new SecurityHolding();
     holding.setName(List.of(new MultilingualString(LanguageCode.EN, name)));
     holding.setCompanyName(name);
-    holding.setType("E");
+    holding.setType(HoldingType.E);
     holding.setWeighting(weighting == null ? null : new BigDecimal(weighting));
     if (identifier != null) {
       IdentifiersDatapoint identifiers = new IdentifiersDatapoint();

@@ -83,6 +83,9 @@ Red flags — STOP and investigate the production code instead of the test:
   constant-value happy path. Provide enough elements and month-to-month variation (multiple items,
   non-constant/negative values, boundary cases) to actually exercise the logic, rather than a
   degenerate constant repeated N times.
+- [ ] **[test-quality] Mocking an upstream numeric field converted at the adapter boundary?** Use the same unit and
+  scale as the imported source data; ratio-looking percentage fixtures can pass ordering assertions while exercising
+  values one hundred times smaller than production.
 - [ ] **[test-quality] Positive-scenario test (a successful result)?** Assert the *complete* payload with exact
   values — every returned period/value, the result-set size, the performance window, and that
   warnings are empty — not just `isNotNull()` or a subset of periods. Derive expected values
