@@ -10,6 +10,7 @@ import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.enumeration.LanguageCode;
+import com.fintex.wm.commons.domain.holding.HoldingType;
 import com.fintex.wm.commons.domain.holding.Holdings;
 import com.fintex.wm.commons.domain.holding.SecurityHolding;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
@@ -64,23 +65,23 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
         securityAttributeResult(
             new SecurityIdentifier("AAA_PARENT", FiIdentifierType.TICKER),
             holdings(
-                allocation("Alpha Corp", "E", "0.20", "50000"),
-                allocation("Bravo Corp", "E", "0.18", "45000"),
-                allocation("Charlie Corp", "E", "0.16", "40000"),
-                allocation("Delta Corp", "E", "0.14", "35000"),
-                allocation("Echo Corp", "E", "0.12", "30000"),
-                allocation("Foxtrot Corp", "E", "0.10", "25000"))),
+                allocation("Alpha Corp", HoldingType.E, "20.0", "50000"),
+                allocation("Bravo Corp", HoldingType.E, "18.0", "45000"),
+                allocation("Charlie Corp", HoldingType.E, "16.0", "40000"),
+                allocation("Delta Corp", HoldingType.E, "14.0", "35000"),
+                allocation("Echo Corp", HoldingType.E, "12.0", "30000"),
+                allocation("Foxtrot Corp", HoldingType.E, "10.0", "25000"))),
         securityAttributeResult(
             new SecurityIdentifier("BBB_PARENT", FiIdentifierType.FUNDSERV),
             holdings(
-                allocation("Alpha Corp", "E", "0.25", "60000"),
-                allocation("Bravo Corp", "E", "0.20", "48000"),
-                allocation("Golf Corp", "E", "0.15", "36000"),
-                allocation("Hotel Corp", "E", "0.12", "28800"),
-                allocation("India Corp", "E", "0.10", "24000"),
-                allocation("Juliet Corp", "E", "0.08", "19200"),
-                allocation("Kilo Corp", "E", "0.06", "14400"),
-                allocation("Lima Corp", "E", "0.04", "9600"))));
+                allocation("Alpha Corp", HoldingType.E, "25.0", "60000"),
+                allocation("Bravo Corp", HoldingType.E, "20.0", "48000"),
+                allocation("Golf Corp", HoldingType.E, "15.0", "36000"),
+                allocation("Hotel Corp", HoldingType.E, "12.0", "28800"),
+                allocation("India Corp", HoldingType.E, "10.0", "24000"),
+                allocation("Juliet Corp", HoldingType.E, "8.0", "19200"),
+                allocation("Kilo Corp", HoldingType.E, "6.0", "14400"),
+                allocation("Lima Corp", HoldingType.E, "4.0", "9600"))));
 
     return writeJson(response);
   }
@@ -151,7 +152,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
     for (int i = 1; i <= 25; i++) {
       parentBHoldings.add(allocation(
           "Filler Corp " + i,
-          "E",
+          HoldingType.E,
           weights[i - 1],
           "10000"));
     }
@@ -159,7 +160,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
     // Shared Corp is the 26th holding in Parent B.
     parentBHoldings.add(allocation(
         "Shared Corp",
-        "E",
+        HoldingType.E,
         "1.0",
         "5000"));
 
@@ -169,7 +170,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
             holdings(
                 allocation(
                     "Shared Corp",
-                    "E",
+                    HoldingType.E,
                     "20.0",
                     "50000"))),
         securityAttributeResult(
@@ -240,7 +241,7 @@ class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   private static SecurityHolding allocation(
       String companyName,
-      String type,
+      HoldingType type,
       String weighting,
       String marketValue) {
     var a = new SecurityHolding();

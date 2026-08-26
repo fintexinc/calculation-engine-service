@@ -142,17 +142,17 @@ class LimitedHoldingsMapperTest {
     assertThat(mapped.getPrimaryIdentifier().getId()).isEqualTo("RY.TO");
   }
 
-  /** The vendor's code set is wider than the vocabulary, so an unmapped code must arrive untyped, not fail the row. */
+  /** A missing optional holding type must remain null without dropping the row. */
   @Test
-  void shouldLeaveTypeNull_whenSmsSendsACodeOutsideTheVocabulary() {
-    var holding = securityHolding("Unmapped Code", "1.00", null, null);
-    holding.setType("??");
+  void shouldLeaveTypeNull_whenSmsHoldingTypeIsNull() {
+    var holding = securityHolding("Missing Type", "1.00", null, null);
+    holding.setType(null);
 
     CommonHolding mapped = mapper.map(holdings(Currency.CAD, holding), holding(new SecurityIdentifier("SEC-011",
         FiIdentifierType.MORNINGSTAR_ID), FinancialInstrumentType.ETF, Country.CANADA, (BigDecimal) null)).getHoldings()
         .get(0);
 
-    assertThat(mapped.getName()).isEqualTo("Unmapped Code");
+    assertThat(mapped.getName()).isEqualTo("Missing Type");
     assertThat(mapped.getType()).isNull();
     assertThat(mapped.getWeight()).isEqualByComparingTo("0.01");
   }
@@ -214,7 +214,7 @@ class LimitedHoldingsMapperTest {
     var holding = new SecurityHolding();
     holding.setName(List.of(new MultilingualString(LanguageCode.EN, name)));
     holding.setCompanyName(name);
-    holding.setType("E");
+    holding.setType(HoldingType.E);
     holding.setWeighting(new BigDecimal(weighting));
     if (idType != null) {
       holding.setIdentifiers(identifiersOf(new SecurityIdentifier(id, idType)));
