@@ -47,6 +47,7 @@ spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-star
 micrometer-core = { module = "io.micrometer:micrometer-core" }
 micrometer-observation = { module = "io.micrometer:micrometer-observation" }
 micrometer-tracing-bridge-otel = { module = "io.micrometer:micrometer-tracing-bridge-otel" }
+micrometer-context-propagation = { module = "io.micrometer:context-propagation" }
 
 resilience4j-circuitbreaker = { module = "io.github.resilience4j:resilience4j-circuitbreaker", version.ref = "resilience4j" }
 resilience4j-retry = { module = "io.github.resilience4j:resilience4j-retry", version.ref = "resilience4j" }
