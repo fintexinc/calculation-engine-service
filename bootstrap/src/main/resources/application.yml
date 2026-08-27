@@ -1,6 +1,8 @@
 spring:
   application:
     name: calculation-engine
+  reactor:
+    context-propagation: auto
     config:
       fail-fast: true
       enabled: false
