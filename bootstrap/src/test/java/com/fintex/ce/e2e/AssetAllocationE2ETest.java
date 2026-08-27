@@ -1,5 +1,6 @@
 package com.fintex.ce.e2e;
 
+import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaProperties;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
@@ -32,7 +33,6 @@ import org.springframework.test.context.TestPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -73,21 +73,11 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
   private static final BigDecimal TOLERANCE = new BigDecimal("0.0001");
   private static final List<DataProvider> MORNINGSTAR_ONLY = List.of(DataProvider.MORNINGSTAR);
 
-  private static MockWebServer bocMockServer;
-
-  @BeforeAll
-  static void startBocMockServer() throws IOException {
-    bocMockServer = new MockWebServer();
-    bocMockServer.setDispatcher(BocMockResponses.dailyUsdCadDispatcher());
-    bocMockServer.start();
-  }
+  private static final MockWebServer bocMockServer = MockWebServers.started(BocMockResponses.dailyUsdCadDispatcher());
 
   @AfterAll
   static void shutdownBocMockServer() throws IOException {
-    if (bocMockServer != null) {
-      bocMockServer.shutdown();
-      bocMockServer = null;
-    }
+    bocMockServer.shutdown();
   }
 
   @AfterEach
@@ -97,8 +87,8 @@ class AssetAllocationE2ETest extends AbstractPortfolioCalculationE2ETest {
 
   @DynamicPropertySource
   static void registerBocBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.bank-of-canada.base-url",
-        () -> bocMockServer.url("/").toString().replaceAll("/$", ""));
+    registry.add(BankOfCanadaProperties.BASE_URL_PROPERTY,
+        () -> MockWebServers.baseUrl(bocMockServer));
   }
 
   @Override

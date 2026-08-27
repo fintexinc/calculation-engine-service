@@ -1,6 +1,7 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.PortfolioCalculationEngineApplication;
+import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterRestProperties;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
@@ -30,14 +31,12 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,29 +78,14 @@ class CalculationStatisticsEndpointE2ETest {
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
 
-  private static MockWebServer smsMockServer;
+  private static final MockWebServer smsMockServer = MockWebServers.started();
 
   @Autowired
   private WebTestClient webTestClient;
 
-  @BeforeAll
-  static void startSmsMockServer() throws IOException {
-    if (smsMockServer == null) {
-      smsMockServer = new MockWebServer();
-      smsMockServer.start();
-    }
-  }
-
   @DynamicPropertySource
   static void registerSecurityMasterBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.security-master.rest.base-url", () -> {
-      try {
-        startSmsMockServer();
-        return smsMockServer.url("/").toString().replaceAll("/$", "");
-      } catch (IOException e) {
-        throw new IllegalStateException(e);
-      }
-    });
+    registry.add(SecurityMasterRestProperties.BASE_URL_PROPERTY, () -> MockWebServers.baseUrl(smsMockServer));
   }
 
   @Test

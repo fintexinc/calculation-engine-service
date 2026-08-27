@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import static com.fintex.ce.e2e.SmsFeeResponses.merRow;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
 import static com.fintex.ce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
@@ -268,14 +269,9 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
   }
 
   private static String feeResponse(Fee... fees) {
-    List<DataProvider> providers = List.of(DataProvider.MORNINGSTAR);
-    return writeJson(Arrays.stream(fees)
-        .map(fee -> new SmsSecurityDataResponse(
-            new SecurityIdentifier(fee.ticker(), FiIdentifierType.TICKER),
-            new SmsFeeData(
-                new SmsDatapoint(new BigDecimal(fee.merPercent()), providers),
-                new SmsCurrencyDatapoint(Currency.CAD, providers))))
-        .toList());
+    return SmsFeeResponses.body(Arrays.stream(fees)
+        .map(fee -> merRow(fee.ticker(), FiIdentifierType.TICKER, fee.merPercent(), Currency.CAD))
+        .toArray(SmsFeeResponses.FeeRow[]::new));
   }
 
   /**
@@ -287,17 +283,4 @@ class MerBenchmarkComparisonE2ETest extends AbstractPortfolioCalculationE2ETest 
   private record Fee(String ticker, String merPercent) {
   }
 
-  private record SmsSecurityDataResponse(SecurityIdentifier identifier, SmsFeeData data) {
-  }
-
-  private record SmsFeeData(SmsDatapoint managementExpenseRatio, SmsCurrencyDatapoint currency) {
-  }
-
-  private record SmsDatapoint(BigDecimal value, List<DataProvider> dataProviders) {
-  }
-
-  // wm-commons CurrencyDatapoint stores the value in a field literally named "type", so the JSON must say
-  // {"type": "CAD"} for the engine to receive it.
-  private record SmsCurrencyDatapoint(Currency type, List<DataProvider> dataProviders) {
-  }
 }

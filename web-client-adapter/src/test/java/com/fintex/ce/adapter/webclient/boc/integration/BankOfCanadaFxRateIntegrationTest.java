@@ -1,5 +1,6 @@
 package com.fintex.ce.adapter.webclient.boc.integration;
 
+import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaProperties;
 import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaWebClientConfig;
 import com.fintex.ce.adapter.webclient.resilience.ExternalCallResilienceConfig;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
@@ -83,7 +84,7 @@ class BankOfCanadaFxRateIntegrationTest {
 
   @DynamicPropertySource
   static void registerBankOfCanadaBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.bank-of-canada.base-url",
+    registry.add(BankOfCanadaProperties.BASE_URL_PROPERTY,
         BankOfCanadaFxRateIntegrationTest::bankOfCanadaMockBaseUrl);
   }
 

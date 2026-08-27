@@ -3,6 +3,7 @@ package com.fintex.ce.e2e;
 import com.fintex.ce.PortfolioCalculationEngineApplication;
 import com.fintex.ce.adapter.cache.fx.CachingFxRatesFetcher;
 import com.fintex.ce.adapter.cache.fx.FxRatesCache;
+import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaProperties;
 import com.fintex.ce.model.domain.CurrencyExchangePair;
 import com.fintex.ce.model.domain.calculation.DateRange;
 import com.fintex.ce.port.webclient.boc.FxRatesFetcher;
@@ -15,7 +16,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,7 @@ import okhttp3.mockwebserver.MockWebServer;
 })
 class FxRatesCachingEnabledE2ETest {
 
-  private static MockWebServer bocMockServer;
+  private static final MockWebServer bocMockServer = MockWebServers.started(BocMockResponses.dailyUsdCadDispatcher());
 
   @Autowired
   private FxRatesFetcher fxRatesFetcher;
@@ -48,25 +48,15 @@ class FxRatesCachingEnabledE2ETest {
   @Autowired
   private FxRatesCache fxRatesCache;
 
-  @BeforeAll
-  static void startBocMockServer() throws IOException {
-    bocMockServer = new MockWebServer();
-    bocMockServer.setDispatcher(BocMockResponses.dailyUsdCadDispatcher());
-    bocMockServer.start();
-  }
-
   @AfterAll
   static void shutdownBocMockServer() throws IOException {
-    if (bocMockServer != null) {
-      bocMockServer.shutdown();
-      bocMockServer = null;
-    }
+    bocMockServer.shutdown();
   }
 
   @DynamicPropertySource
   static void registerBocBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.bank-of-canada.base-url",
-        () -> bocMockServer.url("/").toString().replaceAll("/$", ""));
+    registry.add(BankOfCanadaProperties.BASE_URL_PROPERTY,
+        () -> MockWebServers.baseUrl(bocMockServer));
   }
 
   @Test

@@ -7,38 +7,34 @@ import com.fintex.ce.model.domain.result.exposure.GeographicExposureResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.dto.command.PortfolioHoldingsCommand;
 import com.fintex.ce.model.error.ErrorCode;
-import com.fintex.wm.commons.domain.DataProvider;
-import com.fintex.wm.commons.domain.allocation.GeographicAllocation;
-import com.fintex.wm.commons.domain.allocation.GeographicAllocationValue;
 import com.fintex.wm.commons.domain.allocation.GeographicAllocationWithCurrency;
 import com.fintex.wm.commons.domain.allocation.GeographicRegionType;
-import com.fintex.wm.commons.domain.allocation.RegionDatapoint;
 import com.fintex.wm.commons.domain.allocation.SecurityRegion;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.currency.Currency;
-import com.fintex.wm.commons.domain.currency.CurrencyDatapoint;
 import com.fintex.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.financial.Geography;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
-import com.fintex.wm.commons.domain.reference.CountryDatapoint;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeSet;
 
+import static com.fintex.ce.e2e.SmsAttributeResponses.compositeDispatcher;
+import static com.fintex.ce.e2e.SmsAttributeResponses.geographicAllocationRow;
+import static com.fintex.ce.e2e.SmsAttributeResponses.geographyRow;
+import static com.fintex.ce.e2e.SmsAttributeResponses.morningstarOnly;
+import static com.fintex.ce.e2e.SmsAttributeResponses.regionValue;
 import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
 import static com.fintex.ce.test.PortfolioHoldingBuildHelper.etfCa;
 import static com.fintex.ce.test.PortfolioHoldingBuildHelper.fundCa;
@@ -48,8 +44,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
 import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.RecordedRequest;
 
 /**
  * End-to-end coverage for the consolidated {@code /geographic-exposure} endpoint. Exercises the full stack on
@@ -61,9 +55,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 @Tag("e2e")
 class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
 
-  private static final String ATTRIBUTES_PATH = "/api/v1/wealth/securities/attributes";
   private static final BigDecimal TOLERANCE = new BigDecimal("0.0001");
-  private static final List<DataProvider> MORNINGSTAR_ONLY = List.of(DataProvider.MORNINGSTAR);
 
   @Override
   protected String metricPath() {
@@ -109,22 +101,22 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
     return writeJson(Map.of(
         CompositeSecurityAttribute.GEOGRAPHIC_ALLOCATION,
         List.of(
-            allocationRow("F00000ZJN3", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
+            geographicAllocationRow("F00000ZJN3", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
                 regionValue(GeographicRegionType.US, "0.50"),
                 regionValue(GeographicRegionType.CANADA, "0.30"),
                 regionValue(GeographicRegionType.EUROPE, "0.20")),
-            allocationRow("F00000ZJN4", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
+            geographicAllocationRow("F00000ZJN4", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
                 regionValue(GeographicRegionType.CANADA, "1.00")),
-            allocationRow("XAW", FiIdentifierType.TICKER, Currency.CAD,
+            geographicAllocationRow("XAW", FiIdentifierType.TICKER, Currency.CAD,
                 regionValue(GeographicRegionType.ASIA, "0.60"),
                 regionValue(GeographicRegionType.EUROPE, "0.40"))),
         CompositeSecurityAttribute.GEOGRAPHY,
         List.of(
-            geographyRow("F00000ZJN3", FiIdentifierType.MORNINGSTAR_ID, null, Currency.CAD),
-            geographyRow("F00000ZJN4", FiIdentifierType.MORNINGSTAR_ID, null, Currency.CAD),
-            geographyRow("XAW", FiIdentifierType.TICKER, null, Currency.CAD),
-            businessCountryRow("RY.TO", FiIdentifierType.TICKER_MIC, Country.CANADA, Currency.CAD),
-            geographyRow("AAPL", FiIdentifierType.TICKER_MIC, SecurityRegion.USA, Currency.CAD))));
+            geographyRow("F00000ZJN3", FiIdentifierType.MORNINGSTAR_ID, null, null, Currency.CAD),
+            geographyRow("F00000ZJN4", FiIdentifierType.MORNINGSTAR_ID, null, null, Currency.CAD),
+            geographyRow("XAW", FiIdentifierType.TICKER, null, null, Currency.CAD),
+            geographyRow("RY.TO", FiIdentifierType.TICKER_MIC, Country.CANADA, null, Currency.CAD),
+            geographyRow("AAPL", FiIdentifierType.TICKER_MIC, null, SecurityRegion.USA, Currency.CAD))));
   }
 
   /**
@@ -134,7 +126,7 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
    */
   @Override
   protected void enqueueForPositiveSmsScenario() {
-    smsMockServer.setDispatcher(attributesDispatcher(smsPositiveResponseBody()));
+    smsMockServer.setDispatcher(SmsAttributeResponses.attributesDispatcher(smsPositiveResponseBody()));
   }
 
   @Override
@@ -178,12 +170,12 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   void shouldStillTotalOneHundredPercent_whenPortfolioWeightsDoNotTerminate() {
     smsMockServer.setDispatcher(routingDispatcher(
         List.of(
-            allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
+            geographicAllocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
                 regionValue(GeographicRegionType.US, "0.50"),
                 regionValue(GeographicRegionType.CANADA, "0.50"))),
         List.of(
-            geographyRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, null, Currency.CAD),
-            geographyRow("RY.TO", FiIdentifierType.TICKER_MIC, SecurityRegion.CANADA, Currency.CAD))));
+            geographyRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, null, null, Currency.CAD),
+            geographyRow("RY.TO", FiIdentifierType.TICKER_MIC, null, SecurityRegion.CANADA, Currency.CAD))));
 
     var response = postCalculation(writeJson(exposureCommand(
         fundCa("F0CAN999", 50_000),
@@ -208,10 +200,10 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   void shouldKeepUnattributableExposureInOther_whenSecurityMasterBucketedItThere() {
     smsMockServer.setDispatcher(routingDispatcher(
         List.of(
-            allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
+            geographicAllocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
                 regionValue(GeographicRegionType.CANADA, "0.70"),
                 regionValue(GeographicRegionType.OTHER, "0.30", "Supranational"))),
-        List.of(geographyRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, null, Currency.CAD))));
+        List.of(geographyRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, null, null, Currency.CAD))));
 
     var response = postCalculation(writeJson(exposureCommand(fundCa("F0CAN999", 50_000))));
 
@@ -226,11 +218,11 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
   @Test
   void shouldReportUnknownAndWarn_whenSecurityMasterHasNoGeographicAllocationForFund() {
     smsMockServer.setDispatcher(routingDispatcher(
-        List.of(allocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
+        List.of(geographicAllocationRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, Currency.CAD,
             regionValue(GeographicRegionType.US, "1.0"))),
         List.of(
-            geographyRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, null, Currency.CAD),
-            geographyRow("F0CAN-GHOST", FiIdentifierType.MORNINGSTAR_ID, null, Currency.CAD))));
+            geographyRow("F0CAN999", FiIdentifierType.MORNINGSTAR_ID, null, null, Currency.CAD),
+            geographyRow("F0CAN-GHOST", FiIdentifierType.MORNINGSTAR_ID, null, null, Currency.CAD))));
 
     var response = postCalculation(writeJson(exposureCommand(
         fundCa("F0CAN999", 50_000),
@@ -253,97 +245,16 @@ class GeographicExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
     return PortfolioHoldingsCommand.builder()
         .metric(CalculationMetric.GEOGRAPHIC_EXPOSURE)
         .holdings(List.of(holdings))
-        .dataProviders(MORNINGSTAR_ONLY)
+        .dataProviders(morningstarOnly())
         .build();
   }
 
   private static Dispatcher routingDispatcher(
       List<SecurityAttributeResult<GeographicAllocationWithCurrency>> allocationRows,
       List<SecurityAttributeResult<Geography>> geographyRows) {
-    return attributesDispatcher(writeJson(Map.of(
+    return compositeDispatcher(Map.of(
         CompositeSecurityAttribute.GEOGRAPHIC_ALLOCATION, allocationRows,
-        CompositeSecurityAttribute.GEOGRAPHY, geographyRows)));
-  }
-
-  private static Dispatcher attributesDispatcher(String compositeBody) {
-    return new Dispatcher() {
-      @Override
-      public MockResponse dispatch(RecordedRequest request) {
-        String path = request.getPath();
-        if (path != null && path.contains(ATTRIBUTES_PATH)) {
-          return new MockResponse()
-              .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-              .setBody(compositeBody);
-        }
-        return new MockResponse().setResponseCode(404);
-      }
-    };
-  }
-
-  /**
-   * The whole-security attribute row as Security Master serves it: the region breakdown paired with the currency the
-   * security's values are denominated in, which is why this metric needs no second attribute to weight across
-   * currencies.
-   */
-  private static SecurityAttributeResult<GeographicAllocationWithCurrency> allocationRow(String id,
-      FiIdentifierType idType, Currency currency, GeographicAllocationValue... values) {
-    GeographicAllocation allocation = new GeographicAllocation();
-    allocation.setAllocations(new ArrayList<>(List.of(values)));
-    allocation.setDataProviders(MORNINGSTAR_ONLY);
-
-    CurrencyDatapoint currencyDp = new CurrencyDatapoint();
-    currencyDp.setValue(currency);
-
-    GeographicAllocationWithCurrency row = GeographicAllocationWithCurrency.builder()
-        .geographicAllocation(allocation)
-        .currency(currencyDp)
-        .build();
-    row.setDataProviders(MORNINGSTAR_ONLY);
-    return attributeResult(id, idType, row);
-  }
-
-  private static GeographicAllocationValue regionValue(GeographicRegionType region, String value,
-      String... originalTypeNames) {
-    return new GeographicAllocationValue(region, new BigDecimal(value), new TreeSet<>(List.of(originalTypeNames)));
-  }
-
-  /**
-   * A geography row carrying the business country — the stock branch's primary resolution path, which maps onto the
-   * full eight-value region scale. The {@link #geographyRow} variant carries only the coarse {@link SecurityRegion}, so
-   * the two together exercise both the primary path and the fallback in one scenario.
-   */
-  private static SecurityAttributeResult<Geography> businessCountryRow(String id, FiIdentifierType idType,
-      Country businessCountry, Currency currency) {
-    SecurityAttributeResult<Geography> row = geographyRow(id, idType, null, currency);
-    row.getData().setBusinessCountry(new CountryDatapoint(businessCountry));
-    return row;
-  }
-
-  private static SecurityAttributeResult<Geography> geographyRow(String id, FiIdentifierType idType,
-      SecurityRegion region, Currency currency) {
-    Geography geography = new Geography();
-    if (region != null) {
-      RegionDatapoint regionDp = new RegionDatapoint();
-      regionDp.setValue(region);
-      geography.setRegion(regionDp);
-    }
-    if (currency != null) {
-      CurrencyDatapoint currencyDp = new CurrencyDatapoint();
-      currencyDp.setValue(currency);
-      geography.setCurrency(currencyDp);
-    }
-    geography.setDataProviders(MORNINGSTAR_ONLY);
-    return attributeResult(id, idType, geography);
-  }
-
-  private static <T> SecurityAttributeResult<T> attributeResult(String id, FiIdentifierType idType, T data) {
-    SecurityIdentifier identifier = new SecurityIdentifier();
-    identifier.setId(id);
-    identifier.setIdType(idType);
-    SecurityAttributeResult<T> result = new SecurityAttributeResult<>();
-    result.setIdentifier(identifier);
-    result.setData(data);
-    return result;
+        CompositeSecurityAttribute.GEOGRAPHY, geographyRows));
   }
 
   private static void assertZero(GeographicExposureResult result, GeographicRegionType... regions) {

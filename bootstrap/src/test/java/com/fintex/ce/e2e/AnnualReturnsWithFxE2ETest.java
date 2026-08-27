@@ -1,5 +1,6 @@
 package com.fintex.ce.e2e;
 
+import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaProperties;
 import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse;
 import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
 import com.fintex.ce.model.domain.result.KeyValueResult;
@@ -13,7 +14,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -48,26 +48,17 @@ class AnnualReturnsWithFxE2ETest extends AbstractAnnualReturnsE2ETest {
       "2023-12-31", "2024-01-31", "2024-02-29", "2024-03-31", "2024-04-30", "2024-05-31", "2024-06-30",
       "2024-07-31", "2024-08-31", "2024-09-30", "2024-10-31", "2024-11-30", "2024-12-31");
 
-  private static MockWebServer bocMockServer;
-
-  @BeforeAll
-  static void startBocMockServer() throws IOException {
-    bocMockServer = new MockWebServer();
-    bocMockServer.start();
-  }
+  private static final MockWebServer bocMockServer = MockWebServers.started();
 
   @AfterAll
   static void shutdownBocMockServer() throws IOException {
-    if (bocMockServer != null) {
-      bocMockServer.shutdown();
-      bocMockServer = null;
-    }
+    bocMockServer.shutdown();
   }
 
   @DynamicPropertySource
   static void registerBocBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.bank-of-canada.base-url",
-        () -> bocMockServer.url("/").toString().replaceAll("/$", ""));
+    registry.add(BankOfCanadaProperties.BASE_URL_PROPERTY,
+        () -> MockWebServers.baseUrl(bocMockServer));
   }
 
   @BeforeEach
