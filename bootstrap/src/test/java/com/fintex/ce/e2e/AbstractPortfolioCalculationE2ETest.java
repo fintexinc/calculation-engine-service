@@ -1,6 +1,7 @@
 package com.fintex.ce.e2e;
 
 import com.fintex.ce.PortfolioCalculationEngineApplication;
+import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterRestProperties;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.attribute.SecurityAttributeResult;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
@@ -20,7 +21,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,6 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -62,7 +60,13 @@ abstract class AbstractPortfolioCalculationE2ETest {
    */
   private static final int SMS_RETRY_MAX_ATTEMPTS = 3;
 
-  protected static MockWebServer smsMockServer;
+  /**
+   * This module runs e2e tests with {@code reuseForks=false} (see {@code bootstrap/pom.xml}), so each test class gets
+   * its own JVM and therefore its own instance of this static server — classes never share it. That isolation is what
+   * prevents mock state from leaking or racing across classes. No {@code @AfterAll} shutdown is needed: the server is
+   * reclaimed when the per-class JVM exits.
+   */
+  protected static final MockWebServer smsMockServer = MockWebServers.started();
 
   protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
 
@@ -122,18 +126,6 @@ abstract class AbstractPortfolioCalculationE2ETest {
         .build();
   }
 
-  private static void ensureSmsMockServerStarted() throws IOException {
-    if (smsMockServer == null) {
-      smsMockServer = new MockWebServer();
-      smsMockServer.start();
-    }
-  }
-
-  @BeforeAll
-  static void startSmsMockServerBeforeAll() throws IOException {
-    ensureSmsMockServerStarted();
-  }
-
   /**
    * Reset this class's {@link #smsMockServer} queue before every test so a response enqueued by one test can never leak
    * into the next test in the same class (the server is shared by all tests within a class). Cross-class isolation is
@@ -144,25 +136,9 @@ abstract class AbstractPortfolioCalculationE2ETest {
     smsMockServer.setDispatcher(new QueueDispatcher());
   }
 
-  /**
-   * This module runs e2e tests with {@code reuseForks=false} (see {@code bootstrap/pom.xml}), so each test class gets
-   * its own JVM and therefore its own instance of this static server — classes never share it. That isolation is what
-   * prevents mock state from leaking or racing across classes. No {@code @AfterAll} shutdown is needed: the server is
-   * reclaimed when the per-class JVM exits.
-   */
-  private static String smsMockBaseUrl() {
-    try {
-      ensureSmsMockServerStarted();
-      return smsMockServer.url("/").toString().replaceAll("/$", "");
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
   @DynamicPropertySource
   static void registerSecurityMasterBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.security-master.rest.base-url",
-        AbstractPortfolioCalculationE2ETest::smsMockBaseUrl);
+    registry.add(SecurityMasterRestProperties.BASE_URL_PROPERTY, () -> MockWebServers.baseUrl(smsMockServer));
   }
 
   @Test

@@ -1,5 +1,7 @@
 package com.fintex.ce.adapter.webclient.sm.client;
 
+import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaProperties;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Getter;
@@ -7,8 +9,17 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "external-services.security-master.rest")
+@ConfigurationProperties(prefix = SecurityMasterRestProperties.PREFIX)
 public class SecurityMasterRestProperties {
+
+  /** Prefix this client's configuration is bound from, and the root of {@link #BASE_URL_PROPERTY}. */
+  public static final String PREFIX = "external-services.security-master.rest";
+
+  /**
+   * Full name of the endpoint property. See {@link BankOfCanadaProperties#BASE_URL_PROPERTY} for why the key is named
+   * beside the field it binds to rather than repeated in every test that redirects the client at a mock server.
+   */
+  public static final String BASE_URL_PROPERTY = PREFIX + ".base-url";
 
   private static final int BYTES_PER_MEGABYTE = 1024 * 1024;
 

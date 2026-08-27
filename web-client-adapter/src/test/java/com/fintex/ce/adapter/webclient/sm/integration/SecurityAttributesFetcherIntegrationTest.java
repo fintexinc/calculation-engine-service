@@ -1,5 +1,6 @@
 package com.fintex.ce.adapter.webclient.sm.integration;
 
+import com.fintex.ce.adapter.webclient.sm.client.SecurityMasterRestProperties;
 import com.fintex.ce.model.domain.calculation.fee.FeeData;
 import com.fintex.ce.model.domain.calculation.holding.CommonHolding;
 import com.fintex.ce.model.domain.calculation.holding.CommonTopHoldings;
@@ -128,7 +129,7 @@ class SecurityAttributesFetcherIntegrationTest {
 
   @DynamicPropertySource
   static void registerSecurityMasterBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.security-master.rest.base-url",
+    registry.add(SecurityMasterRestProperties.BASE_URL_PROPERTY,
         SecurityAttributesFetcherIntegrationTest::smsMockBaseUrl);
   }
 

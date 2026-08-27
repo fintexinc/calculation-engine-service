@@ -18,9 +18,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
 
 /**
- * Shared helpers for stubbing Bank of Canada responses in bootstrap-level integration tests. Produces a dispatcher that
- * answers every request with a synthetic daily USD/CAD observation per month covering 2020–2026, which is enough data
- * for any test range used by the FX caching E2E tests.
+ * Shared dispatchers for stubbing the Bank of Canada in bootstrap-level integration tests: a constant spot rate, or a
+ * synthetic daily USD/CAD observation per month covering 2020–2026, which is enough data for any test range used by the
+ * FX caching E2E tests.
  */
 @UtilityClass
 final class BocMockResponses {

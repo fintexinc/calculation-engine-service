@@ -1,5 +1,6 @@
 package com.fintex.ce.e2e;
 
+import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaProperties;
 import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse;
 import com.fintex.ce.adapter.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
@@ -13,7 +14,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -39,27 +39,17 @@ class Growth10kWithFxE2ETest extends AbstractGrowthOf10kE2ETest {
 
   private static final String FX_USD_CAD = "FXUSDCAD";
 
-  private static MockWebServer bocMockServer;
-
-  @BeforeAll
-  static void startBocMockServer() throws IOException {
-    bocMockServer = new MockWebServer();
-    bocMockServer.setDispatcher(stepFunctionUsdCadDispatcher());
-    bocMockServer.start();
-  }
+  private static final MockWebServer bocMockServer = MockWebServers.started(stepFunctionUsdCadDispatcher());
 
   @AfterAll
   static void shutdownBocMockServer() throws IOException {
-    if (bocMockServer != null) {
-      bocMockServer.shutdown();
-      bocMockServer = null;
-    }
+    bocMockServer.shutdown();
   }
 
   @DynamicPropertySource
   static void registerBocBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.bank-of-canada.base-url",
-        () -> bocMockServer.url("/").toString().replaceAll("/$", ""));
+    registry.add(BankOfCanadaProperties.BASE_URL_PROPERTY,
+        () -> MockWebServers.baseUrl(bocMockServer));
   }
 
   @Test

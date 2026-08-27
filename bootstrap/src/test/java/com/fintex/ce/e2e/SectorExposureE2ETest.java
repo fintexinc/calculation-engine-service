@@ -1,5 +1,6 @@
 package com.fintex.ce.e2e;
 
+import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaProperties;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.allocation.ConsolidatedSectorExposureResult;
@@ -31,7 +32,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -84,32 +84,23 @@ class SectorExposureE2ETest extends AbstractPortfolioCalculationE2ETest {
    */
   private static final PortfolioHolding STOCK = stockCa("RY.TO", "TSX", 15_000);
 
-  private static MockWebServer bocMockServer;
-
   /**
    * The USD holdings in the positive scenario are converted through this server rather than through the live Bank of
    * Canada endpoint, at one constant rate, so the expected percentages are a property of the request instead of a
    * function of the rate of the day.
    */
-  @BeforeAll
-  static void startBocMockServer() throws IOException {
-    bocMockServer = new MockWebServer();
-    bocMockServer.setDispatcher(BocMockResponses.constantUsdCadRateDispatcher(USD_CAD_RATE));
-    bocMockServer.start();
-  }
+  private static final MockWebServer bocMockServer = MockWebServers.started(BocMockResponses
+      .constantUsdCadRateDispatcher(USD_CAD_RATE));
 
   @AfterAll
   static void shutdownBocMockServer() throws IOException {
-    if (bocMockServer != null) {
-      bocMockServer.shutdown();
-      bocMockServer = null;
-    }
+    bocMockServer.shutdown();
   }
 
   @DynamicPropertySource
   static void registerBocBaseUrl(DynamicPropertyRegistry registry) {
-    registry.add("external-services.bank-of-canada.base-url",
-        () -> bocMockServer.url("/").toString().replaceAll("/$", ""));
+    registry.add(BankOfCanadaProperties.BASE_URL_PROPERTY,
+        () -> MockWebServers.baseUrl(bocMockServer));
   }
 
   @Override
