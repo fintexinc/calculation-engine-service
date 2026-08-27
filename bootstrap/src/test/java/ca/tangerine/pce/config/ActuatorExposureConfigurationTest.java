@@ -18,7 +18,7 @@ class ActuatorExposureConfigurationTest {
   private static final String CALCULATION_PERCENTILES = "management.metrics.distribution.percentiles.portfolio.calculation";
   private static final String HTTP_EXCHANGES_ENDPOINT = "httpexchanges";
   private static final String METRICS_ENDPOINT = "metrics";
-  private static final String CALCULATION_STATISTICS_ENDPOINT = "calculationstats";
+  private static final String CALCULATION_STATISTICS_ENDPOINT = "calculation-stats";
   private static final String CIRCUIT_BREAKERS_ENDPOINT = "circuitbreakers";
   private static final String RETRIES_ENDPOINT = "retries";
   private static final String CIRCUIT_BREAKER_EVENTS_ENDPOINT = "circuitbreakerevents";
@@ -30,7 +30,7 @@ class ActuatorExposureConfigurationTest {
    * {@code httpexchanges} replays request and response bodies, and {@code metrics} enumerates every meter name and tag
    * value the process holds. Neither is fit to serve over the application port, no matter how useful it is while
    * debugging. The {@code *events} resilience endpoints replay a rolling buffer of upstream exception messages and fall
-   * in the same category. The curated {@code calculationstats} read model and the bounded {@code circuitbreakers} and
+   * in the same category. The curated {@code calculation-stats} read model and the bounded {@code circuitbreakers} and
    * {@code retries} state endpoints are the sanctioned way to read this over HTTP, so this pins them open as
    * deliberately as it pins the others shut.
    */

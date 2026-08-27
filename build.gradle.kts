@@ -102,6 +102,9 @@ subprojects {
         }
         // Extensions are registered through ServiceLoader rather than @ExtendWith in some tests.
         systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+        // `-Dopenapi.update=true` reaches Gradle's own JVM, not the forked test one, so the documented
+        // re-export command silently did nothing without this. Forwarded only when set.
+        providers.systemProperty("openapi.update").orNull?.let { systemProperty("openapi.update", it) }
         jvmArgs("-XX:+EnableDynamicAgentLoading")
         jvmArgumentProviders.add(CommandLineArgumentProvider {
             listOf("-javaagent:${mockitoAgent.singleFile.absolutePath}")

@@ -4,18 +4,35 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Masks sensitive data in HTTP requests before logging. Handles headers, query parameters, and JSON body content.
+ *
+ * <p>
+ * Field, parameter and header names are matched on their letters and digits alone, ignoring case and any {@code _} or
+ * {@code -} between words, so one configured {@code clientSecret} covers {@code client_secret} and
+ * {@code client-secret} as well. The configuration names the <em>data</em> that must never reach a log, and that does
+ * not change when the wire format spells its properties differently. A literal match keeps passing its own tests while
+ * quietly masking nothing the moment a payload arrives under the other spelling.
+ */
 @Component
 public class SensitiveDataMasker {
 
+  /** Any JSON field and its scalar value. Which of them is sensitive is decided per match, by name. */
+  private static final Pattern JSON_FIELD = Pattern.compile(
+      "\"([A-Za-z0-9_-]+)\"\\s*:\\s*(\"[^\"]*\"|\\d+|true|false|null)");
+
+  private static final Pattern NAME_SEPARATORS = Pattern.compile("[^A-Za-z0-9]");
+
   private final HttpLoggingProperties properties;
   private final List<Pattern> compiledPatterns;
-  private final Pattern jsonFieldPattern;
+  private final Set<String> sensitiveJsonFields;
   private final Pattern emailPattern;
 
   public SensitiveDataMasker(HttpLoggingProperties properties) {
@@ -23,21 +40,24 @@ public class SensitiveDataMasker {
     this.compiledPatterns = properties.getSensitivePatterns().stream()
         .map(Pattern::compile)
         .toList();
-    this.jsonFieldPattern = buildJsonFieldPattern(properties.getSensitiveJsonFields());
+    this.sensitiveJsonFields = canonicalize(properties.getSensitiveJsonFields());
     this.emailPattern = properties.getEmailPattern() == null || properties.getEmailPattern().isBlank()
         ? null
         : Pattern.compile(properties.getEmailPattern());
   }
 
-  private Pattern buildJsonFieldPattern(Set<String> fields) {
-    if (fields == null || fields.isEmpty()) {
-      return null;
-    }
-    String fieldGroup = fields.stream()
-        .map(Pattern::quote)
-        .collect(Collectors.joining("|"));
-    String regex = "\"(" + fieldGroup + ")\"\\s*:\\s*(\"[^\"]*\"|\\d+|true|false|null)";
-    return Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+  /**
+   * The comparable form of a field, parameter or header name: letters and digits, lower case. Drops the separators that
+   * distinguish {@code clientSecret} from {@code client_secret} without distinguishing the data they carry.
+   */
+  private static String canonicalName(String name) {
+    return NAME_SEPARATORS.matcher(name).replaceAll("").toLowerCase(Locale.ROOT);
+  }
+
+  private static Set<String> canonicalize(Set<String> names) {
+    return names == null
+        ? Set.of()
+        : names.stream().map(SensitiveDataMasker::canonicalName).collect(Collectors.toUnmodifiableSet());
   }
 
   public String maskHeaders(Map<String, String> headers) {
@@ -94,24 +114,19 @@ public class SensitiveDataMasker {
     if (body == null || body.isEmpty()) {
       return body;
     }
-    String masked = body;
-    if (jsonFieldPattern != null) {
-      masked = maskJsonFields(masked);
-    }
-    masked = applyPatternMasking(masked);
-    return masked;
+    String masked = sensitiveJsonFields.isEmpty() ? body : maskJsonFields(body);
+    return applyPatternMasking(masked);
   }
 
   private String maskJsonFields(String json) {
-    if (jsonFieldPattern == null) {
-      return json;
-    }
-    Matcher matcher = jsonFieldPattern.matcher(json);
+    Matcher matcher = JSON_FIELD.matcher(json);
     StringBuilder result = new StringBuilder();
     while (matcher.find()) {
       String fieldName = matcher.group(1);
-      String replacement = "\"" + fieldName + "\": \"" + properties.getMaskValue() + "\"";
-      matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+      if (sensitiveJsonFields.contains(canonicalName(fieldName))) {
+        String replacement = "\"" + fieldName + "\": \"" + properties.getMaskValue() + "\"";
+        matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+      }
     }
     matcher.appendTail(result);
     return result.toString();
@@ -129,13 +144,19 @@ public class SensitiveDataMasker {
   }
 
   private boolean isSensitiveHeader(String headerName) {
-    return properties.getSensitiveHeaders().stream()
-        .anyMatch(sensitive -> sensitive.equalsIgnoreCase(headerName));
+    return matchesAnyName(properties.getSensitiveHeaders(), headerName);
   }
 
   private boolean isSensitiveParameter(String paramName) {
-    return properties.getSensitiveParameters().stream()
-        .anyMatch(sensitive -> sensitive.equalsIgnoreCase(paramName));
+    return matchesAnyName(properties.getSensitiveParameters(), paramName);
+  }
+
+  private static boolean matchesAnyName(Set<String> configured, String name) {
+    if (configured == null || name == null) {
+      return false;
+    }
+    String canonical = canonicalName(name);
+    return configured.stream().anyMatch(sensitive -> canonicalName(sensitive).equals(canonical));
   }
 
   public String truncate(String content, int maxLength) {

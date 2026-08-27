@@ -247,7 +247,7 @@ management:
   metrics:
     distribution:
       # Client-side percentiles: the registry computes p50/p95/p99 itself, so they are readable from
-      # /actuator/calculationstats and from whatever the meters are exported to. Prefixes match by dot-separated
+      # /actuator/calculation-stats and from whatever the meters are exported to. Prefixes match by dot-separated
       # segment, so `external` covers external.provider.request and `portfolio.calculation` covers both
       # portfolio.calculation.request and portfolio.calculation.duration. This is the only place that decides which
       # percentiles are published.
@@ -261,7 +261,7 @@ management:
       # provider traffic is bursty, so a few minutes would read 0 almost always; a day keeps the last burst legible.
       # Inbound request traffic is continuous, so a short window there stays both populated and current.
       #
-      # `portfolio.calculation` is deliberately absent: /actuator/calculationstats reports cumulative counts beside
+      # `portfolio.calculation` is deliberately absent: /actuator/calculation-stats reports cumulative counts beside
       # these percentiles, and an expiry would have it serve a p95 of zero next to a live sample count.
       expiry:
         external: 24h
@@ -288,14 +288,14 @@ management:
     web:
       exposure:
         # `metrics` stays unexposed: it enumerates every meter name and tag value, which is why
-        # ActuatorExposureConfigurationTest pins it shut. `calculationstats` is the curated read model over the same
+        # ActuatorExposureConfigurationTest pins it shut. `calculation-stats` is the curated read model over the same
         # meters and is safe to serve; read raw meters through the exporter, not over HTTP.
         #
         # `circuitbreakers` and `retries` serve the current state of each resilience instance, which is bounded and safe
         # to read. The matching `*events` endpoints stay shut for the same reason as `metrics`: they replay a rolling
         # buffer carrying the upstream exception messages of individual calls, which belongs in the logs and the
         # exporter.
-        include: health, info, calculationstats, circuitbreakers, retries
+        include: health, info, calculation-stats, circuitbreakers, retries
   endpoint:
     health:
       show-details: never
@@ -339,6 +339,6 @@ springdoc:
     version: openapi_3_0
   swagger-ui:
     path: /api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/swagger-ui
-  # Documents the exposed actuator endpoints (health, info, calculationstats) in the same OpenAPI document, so the
+  # Documents the exposed actuator endpoints (health, info, calculation-stats) in the same OpenAPI document, so the
   # observability surface is discoverable from Swagger UI. Only endpoints in the exposure list above appear here.
   show-actuator: true

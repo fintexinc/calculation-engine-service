@@ -98,9 +98,9 @@ public class PortfolioCalculationController {
       MerComparisonResult.class, CommonPerformanceDatesResult.class, TopCommonHoldingsResult.class,
       NumberOfUniqueHoldingsResult.class
   })))
-  @PostMapping("/{metricName}")
+  @PostMapping("/{metric-name}")
   public BaseCalculationResult calculate(
-      @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable String metricName,
+      @Parameter(description = "Calculation metric to execute", required = true, schema = @Schema(implementation = CalculationMetric.class)) @PathVariable("metric-name") String metricName,
       @RequestBody @Valid CalculationCommand command) {
     CalculationMetric metric = CalculationMetric.from(metricName);
     if (command.getMetric() != null && command.getMetric() != metric) {

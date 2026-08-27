@@ -30,7 +30,7 @@ import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
 @Configuration
 public class CalculationStatisticsOpenApiConfig {
 
-  private static final String ENDPOINT_PATH = "/actuator/calculationstats";
+  private static final String ENDPOINT_PATH = "/actuator/calculation-stats";
   private static final String SCHEMA_NAME = "CalculationStatisticsReport";
   private static final String SCHEMA_REF = "#/components/schemas/" + SCHEMA_NAME;
   private static final String OK = "200";

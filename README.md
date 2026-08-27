@@ -70,14 +70,14 @@ full response schema there, so it can be called with *Try it out*.
 
 | Endpoint | Purpose |
 |----------|---------|
-| `GET /actuator/calculationstats` | Ranked per-metric calculation statistics — start here |
+| `GET /actuator/calculation-stats` | Ranked per-metric calculation statistics — start here |
 
-Exposure is controlled by `management.endpoints.web.exposure.include` (`health, info, calculationstats`).
+Exposure is controlled by `management.endpoints.web.exposure.include` (`health, info, calculation-stats`).
 `/actuator/metrics` is deliberately **not** exposed — it enumerates every meter name and tag value in the process, and
 `ActuatorExposureConfigurationTest` pins it shut alongside `httpexchanges`. Read raw meters through a metrics exporter,
 or expose the endpoint temporarily on a locally-run instance.
 
-#### `/actuator/calculationstats` — the one to look at
+#### `/actuator/calculation-stats` — the one to look at
 
 Everything is keyed by the **calculation metric that actually ran**. A composite request is decomposed into its member
 commands, so each member contributes its own row and the endpoint a client happened to call leaves no trace in the
@@ -106,7 +106,7 @@ What to read, in order of usefulness:
 
 #### Underlying meters
 
-What `/actuator/calculationstats` is built from, and what a metrics exporter would ship.
+What `/actuator/calculation-stats` is built from, and what a metrics exporter would ship.
 
 | Meter | Type | Tags |
 |-------|------|------|
@@ -148,13 +148,13 @@ the transport cannot see: whether the payload carried usable data, how many item
 `portfolio.calculation.duration`, which the orchestrator records around each individual metric.
 
 p50/p95/p99 are computed client-side, configured in exactly one place —
-`management.metrics.distribution.percentiles` — so they are readable directly from `calculationstats`. Micrometer does
+`management.metrics.distribution.percentiles` — so they are readable directly from `calculation-stats`. Micrometer does
 not track a minimum for timers or distributions — `p50` serves that role; the one exception is
 `portfolio.calculation.warnings.min`, which is a purpose-built gauge.
 
 Counts, totals and means are cumulative; `max` and the percentiles come from the registry's rolling distribution window
 and so describe recent traffic. `management.metrics.distribution.expiry` widens that window for the bursty outbound
-prefixes, and deliberately leaves `portfolio.calculation` alone: `calculationstats` serves cumulative counts beside those
+prefixes, and deliberately leaves `portfolio.calculation` alone: `calculation-stats` serves cumulative counts beside those
 percentiles, so an expiry there would report a decaying `p95` next to a live `samples` count. Run counts, failure ratios
 and mean durations are all derivable from the timers by a metrics backend and are deliberately not published a second
 time as gauges.

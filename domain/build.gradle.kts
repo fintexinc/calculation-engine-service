@@ -3,6 +3,8 @@ description = "Pure domain models and calculation logic with no framework depend
 dependencies {
     api(libs.catalogue.investment.commons)
     api(libs.jackson.annotations)
+    // MetricTypeIdResolver uses databind directly; it only ever arrived here transitively.
+    api(libs.jackson.databind)
     api(libs.swagger.annotations.jakarta)
     api(libs.guava)
 
