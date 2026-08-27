@@ -73,7 +73,8 @@ public final class ExternalCallResilience {
     return call
         .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
         .transformDeferred(RetryOperator.of(retry))
-        .transformDeferred(TimeLimiterOperator.of(timeLimiter));
+        .transformDeferred(TimeLimiterOperator.of(timeLimiter))
+        .contextCapture();
   }
 
   private static void logStateTransitions(CircuitBreaker circuitBreaker) {

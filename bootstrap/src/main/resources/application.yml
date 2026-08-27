@@ -8,6 +8,8 @@ spring:
       client:
         composite-indicator:
           enabled: false
+  reactor:
+    context-propagation: auto
 
 cache:
   data:

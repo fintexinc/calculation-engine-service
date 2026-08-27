@@ -10,6 +10,7 @@ dependencies {
     api(libs.resilience4j.reactor)
     implementation(libs.resilience4j.spring.boot3)
     implementation(libs.resilience4j.micrometer)
+    implementation(libs.micrometer.context.propagation)
 
     testImplementation(testFixtures(project(":api")))
     testImplementation(libs.spring.boot.starter.test)
