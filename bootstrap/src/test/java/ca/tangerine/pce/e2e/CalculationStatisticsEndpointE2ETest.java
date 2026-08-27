@@ -53,7 +53,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 
 /**
  * End-to-end coverage of the business metrics: real traffic over the HTTP boundary, then the statistics read back from
- * {@code /actuator/calculationstats}.
+ * {@code /actuator/calculation-stats}.
  *
  * <p>
  * One test drives every branch that matters, because the meters accumulate across a request and separate test methods
@@ -72,7 +72,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 class CalculationStatisticsEndpointE2ETest {
 
   private static final String CALCULATIONS_PATH = "/api/v1/portfolio/calculations";
-  private static final String STATISTICS_PATH = "/actuator/calculationstats";
+  private static final String STATISTICS_PATH = "/actuator/calculation-stats";
   private static final String ALLOCATIONS = CalculationMetric.ASSET_ALLOCATIONS.getValue();
   private static final String EQUITY_SECTOR = CalculationMetric.EQUITY_SECTOR.getValue();
 

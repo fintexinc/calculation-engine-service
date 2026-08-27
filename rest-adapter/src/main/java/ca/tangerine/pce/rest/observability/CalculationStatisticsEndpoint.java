@@ -10,7 +10,7 @@ import ca.tangerine.pce.port.observability.CalculationStatisticsProvider;
 import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
 
 /**
- * Serves the per-metric calculation statistics at {@code /actuator/calculationstats}, once the id is added to
+ * Serves the per-metric calculation statistics at {@code /actuator/calculation-stats}, once the id is added to
  * {@code management.endpoints.web.exposure.include}.
  *
  * <p>
@@ -20,7 +20,7 @@ import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
  */
 @Component
 @RequiredArgsConstructor
-@Endpoint(id = "calculationstats")
+@Endpoint(id = "calculation-stats")
 public class CalculationStatisticsEndpoint {
 
   private final CalculationStatisticsProvider statisticsProvider;

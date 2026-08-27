@@ -8,7 +8,7 @@ description: Review REST API contracts for HTTP semantics, versioning, backward 
 Audit the REST contract for correctness, consistency, and backward compatibility.
 
 ## This repo's shape (read before reviewing)
-There is **one controller** — `PortfolioCalculationController` — serving `POST /api/v1/portfolio/calculations/{metricName}` (already versioned). Metrics are dispatched by the **Strategy pattern**: `CalculationMetric` enum (kebab-case) → command DTO → a `CalculationService<Command, Result>` bean. **Adding/changing a metric never touches the controller or adds an endpoint.** So "API contract" here almost always means the **command (request) and result (response) DTOs, validation, status codes, and JSON backward compatibility** — not URL/verb design. Keep generic REST advice below in reserve for when genuinely new HTTP surface is added.
+There is **one controller** — `PortfolioCalculationController` — serving `POST /api/v1/portfolio/calculations/{metric-name}` (already versioned). Metrics are dispatched by the **Strategy pattern**: `CalculationMetric` enum (kebab-case) → command DTO → a `CalculationService<Command, Result>` bean. **Adding/changing a metric never touches the controller or adds an endpoint.** So "API contract" here almost always means the **command (request) and result (response) DTOs, validation, status codes, and JSON backward compatibility** — not URL/verb design. Keep generic REST advice below in reserve for when genuinely new HTTP surface is added.
 
 ## When to Use
 - Reviewing a PR that adds/changes a metric's command or result DTO

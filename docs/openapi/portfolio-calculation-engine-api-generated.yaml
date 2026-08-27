@@ -1,0 +1,2615 @@
+openapi: 3.0.1
+info:
+  title: Portfolio Calculation Engine API
+  description: "Portfolio analytics and risk measurement engine. Calculates returns,\
+    \ risk metrics, risk-adjusted ratios, portfolio composition, fees, and forecasts."
+  contact:
+    name: Digital Wealth Team
+    email: kparamsothy@tangerine.ca
+  license:
+    name: Portfolio Calculation Engine
+  version: 1.0.0
+servers:
+- url: /
+  description: The host this document was served from
+tags:
+- name: Portfolio Calculations
+  description: "Unified endpoint for all portfolio calculation metrics: returns, risk,\
+    \ benchmark comparison, allocations, fees, and income"
+- name: Actuator
+  description: Monitor and interact
+  externalDocs:
+    description: Spring Boot Actuator Web API Documentation
+    url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
+paths:
+  /api/v1/portfolio/calculations:
+    post:
+      tags:
+      - Portfolio Calculations
+      summary: Execute several portfolio calculations in one request
+      description: |
+        Performs any combination of calculation metrics in a single request.
+
+        Portfolio holdings, data providers and target currency are declared once at the top level and shared by every
+        nested command; a nested command may still override them with its own values. Each command carries its 'metric'
+        discriminator plus metric-specific parameters and may appear at most once. The Market Investment Catalogue attributes
+        required by the requested metrics are fetched together in as few round trips as possible before the individual
+        calculations run. Successful metrics are returned under 'results'; metrics whose calculation failed are returned
+        under 'failures' with the corresponding notifications, so one failing metric does not discard the other results.
+      operationId: calculateComposite
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompositeCalculationRequest"
+        required: true
+      responses:
+        "200":
+          description: Per-metric calculation results and failures
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompositeCalculationResult"
+  /api/v1/portfolio/calculations/{metric-name}:
+    post:
+      tags:
+      - Portfolio Calculations
+      summary: Execute a portfolio calculation
+      description: "Performs the specified calculation metric on the provided portfolio\
+        \ holdings. The request body schema depends on the metric — period-based metrics\
+        \ require time intervals, breakdown metrics require holdings, and fee metrics\
+        \ require parameter types."
+      operationId: calculate
+      parameters:
+      - name: metric-name
+        in: path
+        description: Calculation metric to execute
+        required: true
+        schema:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - trailing-total-returns
+          - annual-returns
+          - growth-of-10k
+          - standard-deviation
+          - sharpe-ratio
+          - max-drawdown
+          - asset-allocations
+          - asset-allocations-em
+          - equity-sector
+          - sector-exposure
+          - equity-country-exposure
+          - equity-geographic-exposure
+          - geographic-exposure
+          - fixed-income-country-exposure
+          - fixed-income-geographic-exposure
+          - fixed-income-bond-sector
+          - mer
+          - management-fee
+          - fees
+          - mer-benchmark-comparison
+          - common-performance-dates
+          - top-common-holdings
+          - number-of-unique-holdings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalculationCommand"
+        required: true
+      responses:
+        "200":
+          description: Calculation result
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/TrailingTotalReturnsResult"
+                - $ref: "#/components/schemas/AnnualReturnResult"
+                - $ref: "#/components/schemas/Growth10KResult"
+                - $ref: "#/components/schemas/StandardDeviationResult"
+                - $ref: "#/components/schemas/SharpeRatioResult"
+                - $ref: "#/components/schemas/MaxDrawdownResult"
+                - $ref: "#/components/schemas/AssetAllocationResult"
+                - $ref: "#/components/schemas/AssetAllocationEMResult"
+                - $ref: "#/components/schemas/EquitySectorResult"
+                - $ref: "#/components/schemas/ConsolidatedSectorExposureResult"
+                - $ref: "#/components/schemas/EquityCountryExposureResult"
+                - $ref: "#/components/schemas/GeographicExposureResult"
+                - $ref: "#/components/schemas/CountryExposureResult"
+                - $ref: "#/components/schemas/FixedIncomeSectorResult"
+                - $ref: "#/components/schemas/AverageMerResult"
+                - $ref: "#/components/schemas/ManagementFeeResult"
+                - $ref: "#/components/schemas/FeesResult"
+                - $ref: "#/components/schemas/MerComparisonResult"
+                - $ref: "#/components/schemas/CommonPerformanceDatesResult"
+                - $ref: "#/components/schemas/TopCommonHoldingsResult"
+                - $ref: "#/components/schemas/NumberOfUniqueHoldingsResult"
+  /actuator/circuitbreakers/{name}:
+    post:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'circuitbreakers-name'
+      operationId: updateCircuitBreakerState
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              enum:
+              - CLOSE
+              - FORCE_OPEN
+              - DISABLE
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+  /actuator:
+    get:
+      tags:
+      - Actuator
+      summary: Actuator root web endpoint
+      operationId: links
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    $ref: "#/components/schemas/Link"
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    $ref: "#/components/schemas/Link"
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    $ref: "#/components/schemas/Link"
+  /actuator/retries:
+    get:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'retries'
+      operationId: getAllRetries
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+  /actuator/info:
+    get:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'info'
+      operationId: info
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+  /actuator/health:
+    get:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'health'
+      operationId: health
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+  /actuator/circuitbreakers:
+    get:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'circuitbreakers'
+      operationId: getAllCircuitBreakers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+  /actuator/calculation-stats:
+    get:
+      tags:
+      - Actuator
+      summary: Per-metric calculation statistics
+      description: |
+        Ranked statistics for every calculation metric that has been executed since the service started, plus an
+        aggregate across all of them.
+
+        Rows in `metrics` are ordered most-problematic first - by absolute failure count, then by failure ratio - so the
+        head of the list is where to look. Per metric: execution counts split by outcome, `failureRatePercent`,
+        calculation latency of successful runs (mean / max / p50 / p95 / p99, in milliseconds), the warning count
+        distribution (total / min / mean / max), and the most frequent error and warning codes.
+
+        A composite request is decomposed into its member metrics, so every row describes one metric regardless of which
+        endpoint the client called. A request rejected before dispatch - unknown metric, metric mismatch, a failed
+        validation rule - never reached a calculator and is counted nowhere here, so `failureRatePercent` measures the
+        service rather than its callers.
+
+        The code rankings under `overall` are merged from the complete per-metric tallies, so a code that sits just below
+        the cut-off for every metric individually still shows up when it is the most frequent code service-wide.
+
+        Everything here is held in memory and lost when the instance restarts. Counts, totals and `meanMillis` are
+        cumulative since startup; `maxMillis` and the percentiles come from the registry's rolling distribution window, so
+        after a quiet period they read low or zero while `samples` stays where it was.
+      operationId: statistics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                $ref: "#/components/schemas/CalculationStatisticsReport"
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                $ref: "#/components/schemas/CalculationStatisticsReport"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculationStatisticsReport"
+components:
+  schemas:
+    AverageMerCommand:
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - mer
+          - management-fee
+          - fees
+        dataProviders:
+          type: array
+          description: Data providers to use for fetching security data; configured
+            defaults apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+        holdings:
+          minItems: 1
+          type: array
+          description: Portfolio holdings to analyze; in a composite request they
+            may come from the shared top level
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+        parameterTypes:
+          type: array
+          description: "Fee aggregation modes to calculate. Wire values map to FeeAggregationMode:\
+            \ 'scaled' = FUNDS_ONLY (fund holdings only, weights normalised within\
+            \ the fund subset); 'absolute' = WHOLE_PORTFOLIO (all holdings; non-fund\
+            \ holdings contribute 0% but their market value is in the denominator);\
+            \ 'forceReportFee' = FUNDS_ONLY_STRICT (same set as FUNDS_ONLY, but returns\
+            \ null if any included holding fell back to a secondary fee field). Defaults\
+            \ to ['scaled', 'absolute'] when omitted."
+          example:
+          - scaled
+          - absolute
+          - forceReportFee
+          items:
+            type: string
+            enum:
+            - scaled
+            - absolute
+            - forceReportFee
+        targetCurrency:
+          type: string
+          description: "Currency to report money amounts in. Every holding's market\
+            \ value is FX-converted into it before weighting or summing, so weights\
+            \ stay comparable across a multi-currency portfolio. Omit to use the service's\
+            \ configured reporting currency (CAD)."
+          example: CAD
+          enum:
+          - CAD
+          - CAD_HEDGED
+          - USD
+          - MXN
+          - EUR
+          - AUD
+          - HKD
+          - GBP
+          - JPY
+          - CHF
+          - CNY
+          - SEK
+          - NOK
+          - DKK
+          - SGD
+          - NZD
+          - INR
+          - KRW
+          - TWD
+          - IDR
+          - MYR
+          - PHP
+          - PKR
+          - BRL
+          - CLP
+          - COP
+          - PEN
+          - PLN
+          - CZK
+          - ZAR
+          - RUB
+        projectionPeriods:
+          uniqueItems: true
+          type: array
+          description: "Periods to project fee amounts over, named or given as a length\
+            \ in months. ONE_MTH reproduces the monthly fee and ONE_YR the annual\
+            \ one. Applies only to the metrics that report projected amounts — 'fees'\
+            \ and 'mer-benchmark-comparison'. 'mer' and 'management-fee' report rates,\
+            \ which have no length, and ignore it. Omit to use the service's configured\
+            \ periods."
+          example:
+          - ONE_MTH
+          - ONE_YR
+          - FIVE_YR
+          - TEN_YR
+          - TWENTY_YR
+          items:
+            type: string
+            enum:
+            - YTD
+            - ONE_MTH
+            - TWO_MTH
+            - THREE_MTH
+            - FOUR_MTH
+            - FIVE_MTH
+            - SIX_MTH
+            - SEVEN_MTH
+            - EIGHT_MTH
+            - NINE_MTH
+            - TEN_MTH
+            - ELEVEN_MTH
+            - ONE_YR
+            - TWO_YR
+            - THREE_YR
+            - FOUR_YR
+            - FIVE_YR
+            - SIX_YR
+            - SEVEN_YR
+            - EIGHT_YR
+            - NINE_YR
+            - TEN_YR
+            - ELEVEN_YR
+            - TWELVE_YR
+            - THIRTEEN_YR
+            - FOURTEEN_YR
+            - FIFTEEN_YR
+            - TWENTY_YR
+            - TWENTY_FIVE_YR
+            - THIRTY_YR
+            - SI
+            - QTD
+            - OVERALL
+            - ITD
+            - CIPSD
+      description: "Command for fee ratio calculations. Supports metrics: mer, management-fee,\
+        \ fees"
+    CalculationCommand:
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - trailing-total-returns
+          - annual-returns
+          - growth-of-10k
+          - standard-deviation
+          - sharpe-ratio
+          - max-drawdown
+          - asset-allocations
+          - asset-allocations-em
+          - equity-sector
+          - sector-exposure
+          - equity-country-exposure
+          - equity-geographic-exposure
+          - geographic-exposure
+          - fixed-income-country-exposure
+          - fixed-income-geographic-exposure
+          - fixed-income-bond-sector
+          - mer
+          - management-fee
+          - fees
+          - mer-benchmark-comparison
+          - common-performance-dates
+          - top-common-holdings
+          - number-of-unique-holdings
+        dataProviders:
+          type: array
+          description: Data providers to use for fetching security data; configured
+            defaults apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+      description: "Calculation command: the 'metric' discriminator selects which\
+        \ of the alternatives below the rest of the payload has to satisfy"
+      discriminator:
+        propertyName: metric
+        mapping:
+          trailing-total-returns: "#/components/schemas/PeriodCommand"
+          annual-returns: "#/components/schemas/ReturnCommand"
+          growth-of-10k: "#/components/schemas/ReturnCommand"
+          standard-deviation: "#/components/schemas/PeriodCommand"
+          sharpe-ratio: "#/components/schemas/PeriodCommand"
+          max-drawdown: "#/components/schemas/PeriodCommand"
+          asset-allocations: "#/components/schemas/PortfolioHoldingsCommand"
+          asset-allocations-em: "#/components/schemas/PortfolioHoldingsCommand"
+          equity-sector: "#/components/schemas/PortfolioHoldingsCommand"
+          sector-exposure: "#/components/schemas/PortfolioHoldingsCommand"
+          equity-country-exposure: "#/components/schemas/PortfolioHoldingsCommand"
+          equity-geographic-exposure: "#/components/schemas/PortfolioHoldingsCommand"
+          geographic-exposure: "#/components/schemas/PortfolioHoldingsCommand"
+          fixed-income-country-exposure: "#/components/schemas/PortfolioHoldingsCommand"
+          fixed-income-geographic-exposure: "#/components/schemas/PortfolioHoldingsCommand"
+          fixed-income-bond-sector: "#/components/schemas/PortfolioHoldingsCommand"
+          mer: "#/components/schemas/AverageMerCommand"
+          management-fee: "#/components/schemas/AverageMerCommand"
+          fees: "#/components/schemas/AverageMerCommand"
+          mer-benchmark-comparison: "#/components/schemas/MerComparisonCommand"
+          common-performance-dates: "#/components/schemas/MultiplePortfoliosCommand"
+          top-common-holdings: "#/components/schemas/TopCommonHoldingsCommand"
+          number-of-unique-holdings: "#/components/schemas/PortfolioHoldingsCommand"
+      oneOf:
+      - $ref: "#/components/schemas/PeriodCommand"
+      - $ref: "#/components/schemas/ReturnCommand"
+      - $ref: "#/components/schemas/PortfolioHoldingsCommand"
+      - $ref: "#/components/schemas/TopCommonHoldingsCommand"
+      - $ref: "#/components/schemas/AverageMerCommand"
+      - $ref: "#/components/schemas/MerComparisonCommand"
+      - $ref: "#/components/schemas/MultiplePortfoliosCommand"
+    CashHolding:
+      required:
+      - holdingType
+      - securityIdentifier
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/PortfolioHolding"
+      - type: object
+        properties:
+          currency:
+            type: string
+            enum:
+            - CAD
+            - CAD_HEDGED
+            - USD
+            - MXN
+            - EUR
+            - AUD
+            - HKD
+            - GBP
+            - JPY
+            - CHF
+            - CNY
+            - SEK
+            - NOK
+            - DKK
+            - SGD
+            - NZD
+            - INR
+            - KRW
+            - TWD
+            - IDR
+            - MYR
+            - PHP
+            - PKR
+            - BRL
+            - CLP
+            - COP
+            - PEN
+            - PLN
+            - CZK
+            - ZAR
+            - RUB
+          investmentDate:
+            type: string
+            format: date
+          clientIntRate:
+            type: number
+          interestFreq:
+            type: string
+            enum:
+            - ANNUAL
+            - SEMI_ANNUAL
+            - QUARTERLY
+            - BI_MONTHLY
+            - MONTHLY
+            - BI_WEEKLY
+            - WEEKLY
+            - DAILY
+    CompositeCalculationRequest:
+      type: object
+      properties:
+        holdings:
+          type: array
+          description: Portfolio holdings shared by all commands; a command may override
+            with its own holdings
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+        dataProviders:
+          type: array
+          description: Data providers shared by all commands; configured defaults
+            apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+        currency:
+          type: string
+          description: Target currency shared by all currency-aware commands
+          example: CAD
+          enum:
+          - CAD
+          - CAD_HEDGED
+          - USD
+          - MXN
+          - EUR
+          - AUD
+          - HKD
+          - GBP
+          - JPY
+          - CHF
+          - CNY
+          - SEK
+          - NOK
+          - DKK
+          - SGD
+          - NZD
+          - INR
+          - KRW
+          - TWD
+          - IDR
+          - MYR
+          - PHP
+          - PKR
+          - BRL
+          - CLP
+          - COP
+          - PEN
+          - PLN
+          - CZK
+          - ZAR
+          - RUB
+        commands:
+          minItems: 1
+          type: array
+          description: "Commands to execute, each carrying its metric and metric-specific\
+            \ parameters"
+          items:
+            $ref: "#/components/schemas/CalculationCommand"
+      description: Composite calculation request with shared portfolio inputs and
+        one command per metric
+    DataProvider:
+      type: string
+      description: Data provider sources for security information
+      enum:
+      - MORNINGSTAR
+      - FMP
+      - BOC
+    EquitySecurityIdentifier:
+      required:
+      - exchangeId
+      - id
+      - idType
+      type: object
+      description: Extended security identifier for equities requiring exchange disambiguation.
+        Used when idType is TICKER_MIC.
+      allOf:
+      - $ref: "#/components/schemas/SecurityIdentifier"
+      - type: object
+        properties:
+          exchangeId:
+            minLength: 1
+            type: string
+            description: Market Identifier Code (MIC) to disambiguate the exchange
+            example: XNAS
+    FiIdentifierType:
+      type: string
+      description: Types of financial instrument identifiers
+      example: TICKER
+      enum:
+      - TICKER
+      - TICKER_MIC
+      - CUSIP
+      - ISIN
+      - SEDOL
+      - FUNDSERV
+      - MORNINGSTAR_ID
+      - HOLDER_MORNINGSTAR_ID
+      - EXCHANGE_ID
+      - CIK
+    FinancialInstrumentType:
+      type: string
+      description: Types of financial instruments. Country is modelled as an orthogonal
+        dimension (see Country) rather than being encoded in the type. Parent-child
+        relationships express type inheritance for attribute lookups.
+      enum:
+      - ETF
+      - STOCK
+      - BENCHMARK_INDEX
+      - CASH
+      - FUND
+      - MUTUAL_FUND
+      - SEGREGATED_FUND
+      - POOLED_FUND
+      - HEDGE_FUND
+      - SEPARATELY_MANAGED_ACCOUNT
+      - GIC
+      - UNKNOWN_BROADRIDGE
+      - FIXED_INCOME
+      - HOLDING
+      - SECURITY_HOLDING
+      - INDEX_HOLDING
+      - ETF_HOLDING
+      - FUND_HOLDING
+      - INDEX_BROAD_HOLDING
+      - SEPARATELY_MANAGED_ACCOUNT_HOLDING
+    GicHolding:
+      required:
+      - holdingType
+      - securityIdentifier
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/PortfolioHolding"
+      - type: object
+        properties:
+          uuid:
+            type: string
+            format: uuid
+          currency:
+            type: string
+            enum:
+            - CAD
+            - CAD_HEDGED
+            - USD
+            - MXN
+            - EUR
+            - AUD
+            - HKD
+            - GBP
+            - JPY
+            - CHF
+            - CNY
+            - SEK
+            - NOK
+            - DKK
+            - SGD
+            - NZD
+            - INR
+            - KRW
+            - TWD
+            - IDR
+            - MYR
+            - PHP
+            - PKR
+            - BRL
+            - CLP
+            - COP
+            - PEN
+            - PLN
+            - CZK
+            - ZAR
+            - RUB
+          investmentDate:
+            type: string
+            format: date
+          clientIntRate:
+            type: number
+          interestFreq:
+            type: string
+            enum:
+            - ANNUAL
+            - SEMI_ANNUAL
+            - QUARTERLY
+            - BI_MONTHLY
+            - MONTHLY
+            - BI_WEEKLY
+            - WEEKLY
+            - DAILY
+          term:
+            type: number
+          name:
+            type: string
+    MerComparisonCommand:
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - mer-benchmark-comparison
+        dataProviders:
+          type: array
+          description: Data providers to use for fetching security data; configured
+            defaults apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+        holdings:
+          minItems: 1
+          type: array
+          description: Portfolio holdings to analyze; in a composite request they
+            may come from the shared top level
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+        parameterTypes:
+          type: array
+          description: "Fee aggregation modes to calculate. Wire values map to FeeAggregationMode:\
+            \ 'scaled' = FUNDS_ONLY (fund holdings only, weights normalised within\
+            \ the fund subset); 'absolute' = WHOLE_PORTFOLIO (all holdings; non-fund\
+            \ holdings contribute 0% but their market value is in the denominator);\
+            \ 'forceReportFee' = FUNDS_ONLY_STRICT (same set as FUNDS_ONLY, but returns\
+            \ null if any included holding fell back to a secondary fee field). Defaults\
+            \ to ['scaled', 'absolute'] when omitted."
+          example:
+          - scaled
+          - absolute
+          - forceReportFee
+          items:
+            type: string
+            enum:
+            - scaled
+            - absolute
+            - forceReportFee
+        targetCurrency:
+          type: string
+          description: "Currency to report money amounts in. Every holding's market\
+            \ value is FX-converted into it before weighting or summing, so weights\
+            \ stay comparable across a multi-currency portfolio. Omit to use the service's\
+            \ configured reporting currency (CAD)."
+          example: CAD
+          enum:
+          - CAD
+          - CAD_HEDGED
+          - USD
+          - MXN
+          - EUR
+          - AUD
+          - HKD
+          - GBP
+          - JPY
+          - CHF
+          - CNY
+          - SEK
+          - NOK
+          - DKK
+          - SGD
+          - NZD
+          - INR
+          - KRW
+          - TWD
+          - IDR
+          - MYR
+          - PHP
+          - PKR
+          - BRL
+          - CLP
+          - COP
+          - PEN
+          - PLN
+          - CZK
+          - ZAR
+          - RUB
+        projectionPeriods:
+          uniqueItems: true
+          type: array
+          description: "Periods to project fee amounts over, named or given as a length\
+            \ in months. ONE_MTH reproduces the monthly fee and ONE_YR the annual\
+            \ one. Applies only to the metrics that report projected amounts — 'fees'\
+            \ and 'mer-benchmark-comparison'. 'mer' and 'management-fee' report rates,\
+            \ which have no length, and ignore it. Omit to use the service's configured\
+            \ periods."
+          example:
+          - ONE_MTH
+          - ONE_YR
+          - FIVE_YR
+          - TEN_YR
+          - TWENTY_YR
+          items:
+            type: string
+            enum:
+            - YTD
+            - ONE_MTH
+            - TWO_MTH
+            - THREE_MTH
+            - FOUR_MTH
+            - FIVE_MTH
+            - SIX_MTH
+            - SEVEN_MTH
+            - EIGHT_MTH
+            - NINE_MTH
+            - TEN_MTH
+            - ELEVEN_MTH
+            - ONE_YR
+            - TWO_YR
+            - THREE_YR
+            - FOUR_YR
+            - FIVE_YR
+            - SIX_YR
+            - SEVEN_YR
+            - EIGHT_YR
+            - NINE_YR
+            - TEN_YR
+            - ELEVEN_YR
+            - TWELVE_YR
+            - THIRTEEN_YR
+            - FOURTEEN_YR
+            - FIFTEEN_YR
+            - TWENTY_YR
+            - TWENTY_FIVE_YR
+            - THIRTY_YR
+            - SI
+            - QTD
+            - OVERALL
+            - ITD
+            - CIPSD
+        benchmarkHoldings:
+          type: array
+          description: "The benchmark to compare against — one fund for a single-fund\
+            \ benchmark, several for a benchmark portfolio. Holding values are the\
+            \ weights of the benchmark's average MER; when none are supplied the holdings\
+            \ are weighted equally."
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+      description: "Command for the mer-benchmark-comparison metric: portfolio holdings\
+        \ compared against a benchmark"
+    MultiplePortfoliosCommand:
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - common-performance-dates
+        dataProviders:
+          type: array
+          description: Data providers to use for fetching security data; configured
+            defaults apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+        portfolios:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: Set of portfolios to compare
+          items:
+            $ref: "#/components/schemas/Portfolio"
+        benchmarkHoldings:
+          type: array
+          description: Benchmark holdings for comparison
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+      description: "Command for cross-portfolio analysis with multiple portfolios.\
+        \ Supports metric: common-performance-dates"
+    PeriodCommand:
+      required:
+      - currency
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - trailing-total-returns
+          - standard-deviation
+          - sharpe-ratio
+          - max-drawdown
+        dataProviders:
+          type: array
+          description: Data providers to use for fetching security data; configured
+            defaults apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+        holdings:
+          minItems: 1
+          type: array
+          description: Portfolio holdings to analyze; in a composite request they
+            may come from the shared top level
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+        benchmarkHoldings:
+          type: array
+          description: Benchmark holdings for relative performance calculations
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+        currency:
+          type: string
+          description: Target currency for the calculation
+          example: CAD
+          enum:
+          - CAD
+          - CAD_HEDGED
+          - USD
+          - MXN
+          - EUR
+          - AUD
+          - HKD
+          - GBP
+          - JPY
+          - CHF
+          - CNY
+          - SEK
+          - NOK
+          - DKK
+          - SGD
+          - NZD
+          - INR
+          - KRW
+          - TWD
+          - IDR
+          - MYR
+          - PHP
+          - PKR
+          - BRL
+          - CLP
+          - COP
+          - PEN
+          - PLN
+          - CZK
+          - ZAR
+          - RUB
+        customIntervalPerformanceStartDate:
+          type: string
+          description: Custom interval performance start date
+          format: date
+        customPerformanceEndDate:
+          type: string
+          description: Custom performance end date
+          format: date
+        timeIntervalPeriods:
+          uniqueItems: true
+          type: array
+          description: Time interval periods in months
+          example:
+          - "1"
+          - "3"
+          - "12"
+          - "36"
+          - "60"
+          - "120"
+          - "240"
+          items:
+            type: string
+            enum:
+            - YTD
+            - ONE_MTH
+            - TWO_MTH
+            - THREE_MTH
+            - FOUR_MTH
+            - FIVE_MTH
+            - SIX_MTH
+            - SEVEN_MTH
+            - EIGHT_MTH
+            - NINE_MTH
+            - TEN_MTH
+            - ELEVEN_MTH
+            - ONE_YR
+            - TWO_YR
+            - THREE_YR
+            - FOUR_YR
+            - FIVE_YR
+            - SIX_YR
+            - SEVEN_YR
+            - EIGHT_YR
+            - NINE_YR
+            - TEN_YR
+            - ELEVEN_YR
+            - TWELVE_YR
+            - THIRTEEN_YR
+            - FOURTEEN_YR
+            - FIFTEEN_YR
+            - TWENTY_YR
+            - TWENTY_FIVE_YR
+            - THIRTY_YR
+            - SI
+            - QTD
+            - OVERALL
+            - ITD
+            - CIPSD
+      description: "Command for period-based calculations. Supports metrics: trailing-total-return,\
+        \ excess-returns, standard-deviation, mean, sharpe-ratio, sortino-ratio, max-drawdown,\
+        \ downside-deviation, mar-ratio, treynor-ratio, information-ratio, tracking-error,\
+        \ alpha, beta, rsquared, upside-capture, downside-capture"
+    Portfolio:
+      type: object
+      properties:
+        holdings:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+      description: Set of portfolios to compare
+    PortfolioHolding:
+      required:
+      - holdingType
+      - securityIdentifier
+      type: object
+      properties:
+        value:
+          type: number
+        holdingType:
+          $ref: "#/components/schemas/FinancialInstrumentType"
+        country:
+          type: string
+          enum:
+          - USA
+          - CANADA
+          - UKRAINE
+          - UNITED_KINGDOM
+          - GERMANY
+          - FRANCE
+          - ITALY
+          - SPAIN
+          - NETHERLANDS
+          - BELGIUM
+          - SWITZERLAND
+          - SWEDEN
+          - NORWAY
+          - DENMARK
+          - FINLAND
+          - IRELAND
+          - AUSTRIA
+          - PORTUGAL
+          - POLAND
+          - CZECH_REPUBLIC
+          - HUNGARY
+          - GREECE
+          - LUXEMBOURG
+          - RUSSIA
+          - ICELAND
+          - LIECHTENSTEIN
+          - LITHUANIA
+          - ROMANIA
+          - GUERNSEY
+          - JERSEY
+          - JAPAN
+          - AUSTRALIA
+          - NEW_ZEALAND
+          - MARSHALL_ISLANDS
+          - HONG_KONG
+          - SINGAPORE
+          - SOUTH_KOREA
+          - TAIWAN
+          - CHINA
+          - INDIA
+          - INDONESIA
+          - THAILAND
+          - MALAYSIA
+          - PHILIPPINES
+          - VIETNAM
+          - TURKEY
+          - ISRAEL
+          - IRAQ
+          - KUWAIT
+          - QATAR
+          - BAHRAIN
+          - UAE
+          - SAUDI_ARABIA
+          - BRAZIL
+          - MEXICO
+          - ARGENTINA
+          - CHILE
+          - COLOMBIA
+          - PERU
+          - GUATEMALA
+          - PUERTO_RICO
+          - CAYMAN_ISLANDS
+          - BERMUDA
+          - SOUTH_AFRICA
+          - EGYPT
+          - CAMEROON
+          - MAURITIUS
+          - ZIMBABWE
+          - ANGOLA
+          - AZERBAIJAN
+          - BULGARIA
+          - BOLIVIA_PLURINATIONAL_STATE_OF
+          - BARBADOS
+          - COTE_D_IVOIRE
+          - CONGO_THE_DEMOCRATIC_REPUBLIC_OF_THE
+          - COSTA_RICA
+          - CYPRUS
+          - DOMINICAN_REPUBLIC
+          - ECUADOR
+          - ESTONIA
+          - GHANA
+          - GIBRALTAR
+          - CROATIA
+          - ISLE_OF_MAN
+          - JAMAICA
+          - JORDAN
+          - KAZAKHSTAN
+          - KENYA
+          - LEBANON
+          - LIBERIA
+          - SRI_LANKA
+          - LATVIA
+          - MACAO
+          - MOROCCO
+          - MALTA
+          - NIGERIA
+          - OMAN
+          - PAKISTAN
+          - PANAMA
+          - PAPUA_NEW_GUINEA
+          - PARAGUAY
+          - SENEGAL
+          - EL_SALVADOR
+          - SERBIA
+          - SLOVAKIA
+          - SLOVENIA
+          - URUGUAY
+          - ZAMBIA
+          - SUPRANATIONAL
+        securityIdentifier:
+          oneOf:
+          - $ref: "#/components/schemas/SecurityIdentifier"
+          - $ref: "#/components/schemas/EquitySecurityIdentifier"
+        idsString:
+          type: string
+      description: Benchmark holdings for comparison
+      discriminator:
+        propertyName: holdingType
+    PortfolioHoldingsCommand:
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - asset-allocations
+          - asset-allocations-em
+          - equity-sector
+          - sector-exposure
+          - equity-country-exposure
+          - equity-geographic-exposure
+          - geographic-exposure
+          - fixed-income-country-exposure
+          - fixed-income-geographic-exposure
+          - fixed-income-bond-sector
+          - number-of-unique-holdings
+        dataProviders:
+          type: array
+          description: Data providers to use for fetching security data; configured
+            defaults apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+        holdings:
+          minItems: 1
+          type: array
+          description: Portfolio holdings to analyze; in a composite request they
+            may come from the shared top level
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+      description: "Command for portfolio breakdown and allocation calculations. Supports\
+        \ metrics: asset-allocations, asset-allocations-em, equity-sector, equity-country-exposure,\
+        \ equity-stylebox-exposure, equity-geographic-exposure, equity-market-capitalization,\
+        \ fixed-income-country-exposure, fixed-income-geographic-exposure, fixed-income-bond-sector,\
+        \ fixed-income-stylebox-exposure, maturity-allocation, classification-allocation,\
+        \ sales-charge, fixed-income-credit-quality"
+    ReturnCommand:
+      required:
+      - currency
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - annual-returns
+          - growth-of-10k
+        dataProviders:
+          type: array
+          description: Data providers to use for fetching security data; configured
+            defaults apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+        holdings:
+          minItems: 1
+          type: array
+          description: Portfolio holdings to analyze; in a composite request they
+            may come from the shared top level
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+        benchmarkHoldings:
+          type: array
+          description: Benchmark holdings for relative performance calculations
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+        currency:
+          type: string
+          description: Target currency for the calculation
+          example: CAD
+          enum:
+          - CAD
+          - CAD_HEDGED
+          - USD
+          - MXN
+          - EUR
+          - AUD
+          - HKD
+          - GBP
+          - JPY
+          - CHF
+          - CNY
+          - SEK
+          - NOK
+          - DKK
+          - SGD
+          - NZD
+          - INR
+          - KRW
+          - TWD
+          - IDR
+          - MYR
+          - PHP
+          - PKR
+          - BRL
+          - CLP
+          - COP
+          - PEN
+          - PLN
+          - CZK
+          - ZAR
+          - RUB
+        customPsd:
+          type: string
+          description: Custom performance start date
+          format: date
+        customPed:
+          type: string
+          description: Custom performance end date
+          format: date
+      description: "Command for return-based calculations with custom date range.\
+        \ Supports metrics: annual-return, growth-of-10k"
+    SecurityIdentifier:
+      required:
+      - id
+      - idType
+      type: object
+      properties:
+        id:
+          minLength: 1
+          type: string
+          description: The identifier value
+          example: HEWJ
+        idType:
+          $ref: "#/components/schemas/FiIdentifierType"
+      description: "Identifies a security using a specific identifier type. For equity\
+        \ securities requiring exchange disambiguation, use EquitySecurityIdentifier\
+        \ with TICKER_MIC type."
+      discriminator:
+        propertyName: idType
+        mapping:
+          TICKER_MIC: "#/components/schemas/EquitySecurityIdentifier"
+    TopCommonHoldingsCommand:
+      type: object
+      properties:
+        metric:
+          type: string
+          description: Available portfolio calculation metrics
+          enum:
+          - top-common-holdings
+        dataProviders:
+          type: array
+          description: Data providers to use for fetching security data; configured
+            defaults apply when absent
+          example:
+          - MORNINGSTAR
+          items:
+            $ref: "#/components/schemas/DataProvider"
+        holdings:
+          minItems: 1
+          type: array
+          description: Portfolio holdings to analyze; in a composite request they
+            may come from the shared top level
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/PortfolioHolding"
+            - $ref: "#/components/schemas/CashHolding"
+            - $ref: "#/components/schemas/GicHolding"
+        numOfTopCommonHoldings:
+          type: integer
+          description: Maximum number of top common holdings to return
+          format: int32
+        accumulateHoldingTypes:
+          uniqueItems: true
+          type: array
+          description: Holding types to accumulate in the analysis; defaults to the
+            configured set when absent
+          items:
+            type: string
+            description: Holding types to accumulate in the analysis; defaults to
+              the configured set when absent
+            enum:
+            - FC
+            - FE
+            - FH
+            - FM
+            - FO
+            - FS
+            - FV
+            - EX
+            - AI
+            - AM
+            - AP
+            - AR
+            - B
+            - BB
+            - BC
+            - BD
+            - BG
+            - BH
+            - BL
+            - BM
+            - BO
+            - BQ
+            - BR
+            - BT
+            - BU
+            - BW
+            - BY
+            - BZ
+            - C
+            - CA
+            - CC
+            - CD
+            - CH
+            - CL
+            - CN
+            - CO
+            - CP
+            - CQ
+            - CR
+            - CS
+            - CT
+            - CU
+            - CV
+            - CY
+            - CZ
+            - DA
+            - DB
+            - DC
+            - DD
+            - DE
+            - DG
+            - DH
+            - DI
+            - DJ
+            - DM
+            - DO
+            - DP
+            - DS
+            - E
+            - EC
+            - EL
+            - EP
+            - EQ
+            - ER
+            - EU
+            - EV
+            - EW
+            - FD
+            - GC
+            - GM
+            - GS
+            - IP
+            - IS
+            - IT
+            - LO
+            - NB
+            - NC
+            - ND
+            - NE
+            - NR
+            - OO
+            - OS
+            - OT
+            - P
+            - PC
+            - PP
+            - PS
+            - Q
+            - QQ
+            - RS
+            - SC
+            - SD
+            - SE
+            - SF
+            - SI
+            - SJ
+            - SK
+            - SN
+            - SQ
+            - SR
+            - ST
+            - SU
+            - SV
+            - SW
+            - SX
+            - SY
+            - TF
+            - TG
+            - TP
+            - WR
+            - YO
+            - TYPE_0
+            - TYPE_1
+            - TYPE_12
+            - TYPE_13
+            - TYPE_14
+      description: "Command for finding top common holdings across portfolio funds.\
+        \ Supports metric: top-common-holdings"
+    AnnualReturnResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        performanceEndDate:
+          type: string
+          format: date
+        performanceStartDate:
+          type: string
+          format: date
+        annualReturns:
+          type: array
+          description: Annual returns keyed by calendar year
+          items:
+            $ref: "#/components/schemas/KeyValueResultInteger"
+        comparison:
+          type: array
+          description: Portfolio-versus-benchmark annual return comparison by calendar
+            year
+          items:
+            $ref: "#/components/schemas/ReturnComparisonInteger"
+      description: Response for annual-return metric. Contains calendar-year annual
+        returns.
+    AssetAllocationEMResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        assetAllocationEmergingMarkets:
+          type: object
+          additionalProperties:
+            type: number
+            description: Asset allocation percentages by emerging markets region
+          description: Asset allocation percentages by emerging markets region
+      description: Response for asset-allocations-em metric. Contains portfolio asset
+        allocation breakdown by emerging markets region.
+    AssetAllocationResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        assetAllocation:
+          type: object
+          additionalProperties:
+            type: number
+            description: Asset allocation percentages by type
+          description: Asset allocation percentages by type
+      description: Response for asset-allocations metric. Contains portfolio asset
+        allocation breakdown by region.
+    AverageMerResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        managementExpenseRatio:
+          type: object
+          additionalProperties:
+            type: number
+            description: Management expense ratio by parameter type (scaled/absolute)
+          description: Management expense ratio by parameter type (scaled/absolute)
+      description: Response for mer metric. Contains weighted average management expense
+        ratio (MER) by parameter type.
+    BaseCalculationResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+      description: Base response for all calculation metrics. Carries optional warnings
+        produced during the calculation. The concrete shape is the one the requested
+        metric returns.
+      oneOf:
+      - $ref: "#/components/schemas/TrailingTotalReturnsResult"
+      - $ref: "#/components/schemas/AnnualReturnResult"
+      - $ref: "#/components/schemas/Growth10KResult"
+      - $ref: "#/components/schemas/StandardDeviationResult"
+      - $ref: "#/components/schemas/SharpeRatioResult"
+      - $ref: "#/components/schemas/MaxDrawdownResult"
+      - $ref: "#/components/schemas/AssetAllocationResult"
+      - $ref: "#/components/schemas/AssetAllocationEMResult"
+      - $ref: "#/components/schemas/EquitySectorResult"
+      - $ref: "#/components/schemas/ConsolidatedSectorExposureResult"
+      - $ref: "#/components/schemas/EquityCountryExposureResult"
+      - $ref: "#/components/schemas/GeographicExposureResult"
+      - $ref: "#/components/schemas/CountryExposureResult"
+      - $ref: "#/components/schemas/FixedIncomeSectorResult"
+      - $ref: "#/components/schemas/AverageMerResult"
+      - $ref: "#/components/schemas/ManagementFeeResult"
+      - $ref: "#/components/schemas/FeesResult"
+      - $ref: "#/components/schemas/MerComparisonResult"
+      - $ref: "#/components/schemas/CommonPerformanceDatesResult"
+      - $ref: "#/components/schemas/TopCommonHoldingsResult"
+      - $ref: "#/components/schemas/NumberOfUniqueHoldingsResult"
+    CommonPerformanceDatesResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        commonPerformanceStartDatePf:
+          type: string
+          description: Common performance start date across portfolios
+          format: date
+        commonPerformanceEndDatePf:
+          type: string
+          description: Common performance end date across portfolios
+          format: date
+        commonPerformanceStartDateBm:
+          type: string
+          description: Common performance start date across benchmarks
+          format: date
+        commonPerformanceEndDateBm:
+          type: string
+          description: Common performance end date across benchmarks
+          format: date
+      description: Response for common-performance-dates metric. Contains common performance
+        start and end dates across portfolios.
+    CompositeCalculationResult:
+      type: object
+      properties:
+        results:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/BaseCalculationResult"
+          description: Successfully calculated results keyed by metric
+        failures:
+          type: object
+          additionalProperties:
+            type: array
+            description: "Notifications for metrics whose calculation failed, keyed\
+              \ by metric"
+            items:
+              $ref: "#/components/schemas/Notification"
+          description: "Notifications for metrics whose calculation failed, keyed\
+            \ by metric"
+      description: Aggregated results of a composite calculation request
+    ConsolidatedSectorExposureResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        sectorExposure:
+          type: object
+          additionalProperties:
+            type: number
+            description: "Portfolio proportion held in each sector, as a fraction\
+              \ of the whole portfolio (the buckets sum to 1). Exposure the provider\
+              \ classifies as neither equity nor fixed income is reported under OTHER;\
+              \ holdings the data source has no record of, and sleeves it resolved\
+              \ without a sector breakdown, under UNKNOWN."
+          description: "Portfolio proportion held in each sector, as a fraction of\
+            \ the whole portfolio (the buckets sum to 1). Exposure the provider classifies\
+            \ as neither equity nor fixed income is reported under OTHER; holdings\
+            \ the data source has no record of, and sleeves it resolved without a\
+            \ sector breakdown, under UNKNOWN."
+      description: "Response for sector-exposure metric. Contains the consolidated\
+        \ sector breakdown of the whole portfolio, equity and fixed income together."
+    CountryExposureResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        countryExposure:
+          type: object
+          additionalProperties:
+            type: number
+            description: Fixed income country exposure percentages
+          description: Fixed income country exposure percentages
+      description: Response for fixed-income-country-exposure metric. Contains fixed
+        income country exposure breakdown.
+    EquityCountryExposureResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        equityCountryExposure:
+          type: object
+          additionalProperties:
+            type: number
+            description: Equity exposure percentages by country
+          description: Equity exposure percentages by country
+      description: Response for equity-country-exposure metric. Contains equity country
+        exposure breakdown.
+    EquitySectorResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        equitySector:
+          type: object
+          additionalProperties:
+            type: number
+            description: "Equity allocation percentages by sector. Holdings the data\
+              \ source has no record of at all, or resolved but did not return a sector\
+              \ breakdown for, are counted under EquitySectorAllocationType.UNKNOWN."
+          description: "Equity allocation percentages by sector. Holdings the data\
+            \ source has no record of at all, or resolved but did not return a sector\
+            \ breakdown for, are counted under EquitySectorAllocationType.UNKNOWN."
+      description: Response for equity-sector metric. Contains equity sector allocation
+        breakdown.
+    FeeComparison:
+      type: object
+      properties:
+        feeRate:
+          $ref: "#/components/schemas/FeeRateComparison"
+        spend:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FeeSpendComparison"
+          description: "Projected fee amounts for both sides and the resulting saving,\
+            \ keyed by period. Holding values are FX-converted into the request's\
+            \ targetCurrency — or into calculation.fx.default-target-currency (CAD\
+            \ unless overridden) when the request omits it — before weighting. ONE_YR\
+            \ is the annual figure."
+      description: "Portfolio-vs-benchmark fee comparison for one aggregation view,\
+        \ separated into rates and amounts"
+    FeeRateComparison:
+      type: object
+      properties:
+        portfolio:
+          type: number
+          description: "The portfolio's weighted-average fee rate for this view, as\
+            \ a ratio (0.021 = 2.1%)"
+        benchmark:
+          type: number
+          description: "The benchmark's weighted-average fee rate, as a ratio"
+        percentDifference:
+          type: number
+          description: "Percent difference of the portfolio rate relative to the benchmark\
+            \ rate: (portfolio - benchmark) / benchmark * 100. Positive means the\
+            \ portfolio costs more. Null when the benchmark rate is zero, which would\
+            \ make the difference undefined."
+        equal:
+          type: boolean
+          description: True only when the two rates are identical
+      description: Portfolio-vs-benchmark fee rates for one aggregation view. Rates
+        only — no amounts.
+    FeeSpendComparison:
+      type: object
+      properties:
+        portfolio:
+          type: number
+          description: Fee the portfolio is projected to pay over this horizon
+        benchmark:
+          type: number
+          description: Fee the benchmark / recommended fund would cost over the same
+            horizon and asset base
+        savings:
+          type: number
+          description: portfolio − benchmark. Positive means switching saves money;
+            negative means the benchmark is dearer. Never clamped to zero.
+      description: "Projected fee amounts for the portfolio and the benchmark over\
+        \ one horizon, plus the saving. Amounts only — no rates."
+    FeesResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        annualFee:
+          type: object
+          additionalProperties:
+            type: number
+            description: "Annual fee amount by aggregation mode, in the request's\
+              \ targetCurrency or the configured default when it is omitted"
+          description: "Annual fee amount by aggregation mode, in the request's targetCurrency\
+            \ or the configured default when it is omitted"
+        monthlyFee:
+          type: object
+          additionalProperties:
+            type: number
+            description: "Monthly fee amount by aggregation mode (annual / 12), in\
+              \ the request's targetCurrency or the configured default when it is\
+              \ omitted"
+          description: "Monthly fee amount by aggregation mode (annual / 12), in the\
+            \ request's targetCurrency or the configured default when it is omitted"
+        projectedSpend:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: number
+              description: "Projected total fee amount by aggregation mode, keyed\
+                \ by period, in the request's targetCurrency or the configured default\
+                \ when it is omitted. Assumes the balance grows at the configured\
+                \ annual growth rate and the fee is charged on it each year; the fee\
+                \ is not compounded as a drag on the balance. ONE_YR equals annualFee,\
+                \ ONE_MTH equals monthlyFee."
+            description: "Projected total fee amount by aggregation mode, keyed by\
+              \ period, in the request's targetCurrency or the configured default\
+              \ when it is omitted. Assumes the balance grows at the configured annual\
+              \ growth rate and the fee is charged on it each year; the fee is not\
+              \ compounded as a drag on the balance. ONE_YR equals annualFee, ONE_MTH\
+              \ equals monthlyFee."
+          description: "Projected total fee amount by aggregation mode, keyed by period,\
+            \ in the request's targetCurrency or the configured default when it is\
+            \ omitted. Assumes the balance grows at the configured annual growth rate\
+            \ and the fee is charged on it each year; the fee is not compounded as\
+            \ a drag on the balance. ONE_YR equals annualFee, ONE_MTH equals monthlyFee."
+      description: "Annual, monthly and multi-year projected portfolio fee amounts,\
+        \ in the request's targetCurrency — or calculation.fx.default-target-currency\
+        \ (CAD unless overridden) when the request omits it. Amounts only — the rates\
+        \ behind them are reported by the 'mer' metric. Each map is keyed by aggregation\
+        \ mode (scaled / absolute / forceReportFee). Annual = Σ (holding value × resolved\
+        \ fee rate); Monthly = Annual ÷ 12."
+    FixedIncomeSectorResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        fixedIncomeSector:
+          type: object
+          additionalProperties:
+            type: number
+            description: "Fixed income allocation percentages by bond sector. Holdings\
+              \ the data source has no record of at all, or resolved but did not return\
+              \ a bond sector breakdown for, are counted under FixedIncomeSectorAllocationType.UNKNOWN."
+          description: "Fixed income allocation percentages by bond sector. Holdings\
+            \ the data source has no record of at all, or resolved but did not return\
+            \ a bond sector breakdown for, are counted under FixedIncomeSectorAllocationType.UNKNOWN."
+      description: Response for fixed-income-bond-sector metric. Contains fixed income
+        bond sector allocation breakdown.
+    GeographicExposureResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        geographicExposure:
+          type: object
+          additionalProperties:
+            type: number
+            description: "Geographic exposure percentages by region. Holdings the\
+              \ data source has no record of at all, or resolved but did not return\
+              \ a geographic breakdown for, are counted under GeographicRegionType.UNKNOWN."
+          description: "Geographic exposure percentages by region. Holdings the data\
+            \ source has no record of at all, or resolved but did not return a geographic\
+            \ breakdown for, are counted under GeographicRegionType.UNKNOWN."
+      description: Response for equity-geographic-exposure and fixed-income-geographic-exposure
+        metrics. Contains geographic exposure breakdown by region.
+    Growth10KResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        performanceEndDate:
+          type: string
+          description: Performance end date
+          format: date
+        performanceStartDate:
+          type: string
+          description: Performance start date
+          format: date
+        growth10k:
+          type: array
+          description: Growth of $10K data points over time
+          items:
+            $ref: "#/components/schemas/KeyValueResultLocalDate"
+        comparison:
+          type: array
+          description: Portfolio-versus-benchmark growth-of-10k comparison by valuation
+            date
+          items:
+            $ref: "#/components/schemas/ReturnComparisonLocalDate"
+      description: "Response for growth-of-10k metric. Contains growth of a hypothetical\
+        \ $10,000 investment over time."
+    HoldingsKeyResult:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/FinancialInstrumentType"
+        securityIdentifier:
+          oneOf:
+          - $ref: "#/components/schemas/SecurityIdentifier"
+          - $ref: "#/components/schemas/EquitySecurityIdentifier"
+        key:
+          type: string
+        allocation:
+          type: number
+        name:
+          type: string
+        currency:
+          type: string
+          enum:
+          - CAD
+          - CAD_HEDGED
+          - USD
+          - MXN
+          - EUR
+          - AUD
+          - HKD
+          - GBP
+          - JPY
+          - CHF
+          - CNY
+          - SEK
+          - NOK
+          - DKK
+          - SGD
+          - NZD
+          - INR
+          - KRW
+          - TWD
+          - IDR
+          - MYR
+          - PHP
+          - PKR
+          - BRL
+          - CLP
+          - COP
+          - PEN
+          - PLN
+          - CZK
+          - ZAR
+          - RUB
+    KeyValueResultInteger:
+      type: object
+      properties:
+        key:
+          type: integer
+          format: int32
+        value:
+          type: number
+      description: Annual returns keyed by calendar year
+    KeyValueResultLocalDate:
+      type: object
+      properties:
+        key:
+          type: string
+          format: date
+        value:
+          type: number
+      description: Growth of $10K data points over time
+    ManagementFeeResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        managementFee:
+          type: object
+          additionalProperties:
+            type: number
+            description: Management fee by parameter type (scaled/absolute)
+          description: Management fee by parameter type (scaled/absolute)
+      description: Response for management-fee metric. Contains weighted average management
+        fee by parameter type.
+    MaxDrawdownEntry:
+      type: object
+      properties:
+        period:
+          type: string
+        value:
+          type: number
+        drawdownStartDate:
+          type: string
+          format: date
+        drawdownTroughDate:
+          type: string
+          format: date
+        recoveryTime:
+          type: integer
+          format: int32
+      description: Maximum drawdown entries per time interval period
+    MaxDrawdownResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        performanceEndDate:
+          type: string
+          description: Performance end date
+          format: date
+        performanceStartDate:
+          type: string
+          description: Performance start date
+          format: date
+        customIntervalPerformanceStartDate:
+          type: string
+          description: Custom interval performance start date
+          format: date
+        maxDrawdown:
+          type: array
+          description: Maximum drawdown entries per time interval period
+          items:
+            $ref: "#/components/schemas/MaxDrawdownEntry"
+      description: Response for max-drawdown metric. Contains maximum peak-to-trough
+        drawdown per time interval period.
+    MerComparisonResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        comparison:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FeeComparison"
+          description: Comparison by aggregation view (scaled/absolute/forceReportFee)
+      description: "Response for mer-benchmark-comparison: portfolio fee rate vs benchmark\
+        \ fee rate, and the projected spend of each, by aggregation view"
+    Notification:
+      required:
+      - action
+      - code
+      - description
+      - severity
+      - timestamp
+      - uuid
+      type: object
+      properties:
+        category:
+          type: string
+          description: Category of this notification as a Http status
+          example: BAD_REQUEST
+        code:
+          type: string
+          description: Notification code identifying the specific error type
+          example: VAL-001
+        message:
+          type: string
+          description: Description of the error or information notification
+          example: Something is invalid
+        description:
+          type: string
+          description: Message which explains the notification.
+        action:
+          type: string
+          description: A suggested action following this notification.
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+        uuid:
+          type: string
+          description: Unique identifier for this notification
+          example: aadde-ddddee-eeee-dd-eeeeddd
+        timestamp:
+          type: string
+          description: Timestamp of the notification.
+          format: date-time
+          example: 2017-10-12T20:38:45.408Z
+        severity:
+          type: string
+          description: "Severity of the notification (ERROR, WARNING, INFO, UNSPECIFIED)"
+          enum:
+          - ERROR
+          - WARNING
+          - INFO
+          - UNSPECIFIED
+        fieldName:
+          type: string
+          description: The field name to which this notification belongs.
+          example: client_id
+      description: List of warnings encountered during the calculation
+    NumberOfUniqueHoldingsResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        numberOfUniqueHoldings:
+          type: integer
+          description: Count of unique underlying holdings across all portfolio securities.
+            Holdings without a resolvable identifier are each counted individually;
+            check the warnings list for details.
+          format: int64
+      description: Response for number-of-unique-holdings metric. Contains the count
+        of unique underlying holding IDs across all portfolio securities.
+    ReturnComparisonInteger:
+      type: object
+      properties:
+        period:
+          type: integer
+          description: "Time period, calendar year, or valuation date"
+          format: int32
+        portfolio:
+          type: number
+          description: Portfolio metric value
+        benchmark:
+          type: number
+          description: Benchmark metric value
+        percentDifference:
+          type: number
+          description: "Percent difference of the portfolio value relative to the\
+            \ benchmark value: (portfolio - benchmark) / benchmark * 100. Null when\
+            \ either value is unavailable or the benchmark value is zero, which would\
+            \ make the difference undefined."
+      description: Portfolio-versus-benchmark comparison for one return metric observation
+    ReturnComparisonLocalDate:
+      type: object
+      properties:
+        period:
+          type: string
+          description: "Time period, calendar year, or valuation date"
+          format: date
+        portfolio:
+          type: number
+          description: Portfolio metric value
+        benchmark:
+          type: number
+          description: Benchmark metric value
+        percentDifference:
+          type: number
+          description: "Percent difference of the portfolio value relative to the\
+            \ benchmark value: (portfolio - benchmark) / benchmark * 100. Null when\
+            \ either value is unavailable or the benchmark value is zero, which would\
+            \ make the difference undefined."
+      description: Portfolio-versus-benchmark comparison for one return metric observation
+    ReturnComparisonTimePeriod:
+      type: object
+      properties:
+        period:
+          type: string
+          description: "Time period, calendar year, or valuation date"
+          enum:
+          - YTD
+          - ONE_MTH
+          - TWO_MTH
+          - THREE_MTH
+          - FOUR_MTH
+          - FIVE_MTH
+          - SIX_MTH
+          - SEVEN_MTH
+          - EIGHT_MTH
+          - NINE_MTH
+          - TEN_MTH
+          - ELEVEN_MTH
+          - ONE_YR
+          - TWO_YR
+          - THREE_YR
+          - FOUR_YR
+          - FIVE_YR
+          - SIX_YR
+          - SEVEN_YR
+          - EIGHT_YR
+          - NINE_YR
+          - TEN_YR
+          - ELEVEN_YR
+          - TWELVE_YR
+          - THIRTEEN_YR
+          - FOURTEEN_YR
+          - FIFTEEN_YR
+          - TWENTY_YR
+          - TWENTY_FIVE_YR
+          - THIRTY_YR
+          - SI
+          - QTD
+          - OVERALL
+          - ITD
+          - CIPSD
+        portfolio:
+          type: number
+          description: Portfolio metric value
+        benchmark:
+          type: number
+          description: Benchmark metric value
+        percentDifference:
+          type: number
+          description: "Percent difference of the portfolio value relative to the\
+            \ benchmark value: (portfolio - benchmark) / benchmark * 100. Null when\
+            \ either value is unavailable or the benchmark value is zero, which would\
+            \ make the difference undefined."
+      description: Portfolio-versus-benchmark comparison for one return metric observation
+    SharpeRatioResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        performanceEndDate:
+          type: string
+          description: Performance end date
+          format: date
+        performanceStartDate:
+          type: string
+          description: Performance start date
+          format: date
+        customIntervalPerformanceStartDate:
+          type: string
+          description: Custom interval performance start date
+          format: date
+        sharpeRatio:
+          uniqueItems: true
+          type: array
+          description: Sharpe ratio per time interval period
+          items:
+            $ref: "#/components/schemas/TimeIntervalResult"
+      description: Response for sharpe-ratio metric. Contains Sharpe ratio (risk-adjusted
+        return) per time interval period.
+    StandardDeviationResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        performanceEndDate:
+          type: string
+          description: Performance end date
+          format: date
+        performanceStartDate:
+          type: string
+          description: Performance start date
+          format: date
+        customIntervalPerformanceStartDate:
+          type: string
+          description: Custom interval performance start date
+          format: date
+        standardDeviation:
+          uniqueItems: true
+          type: array
+          description: Annualized standard deviation per time interval period
+          items:
+            $ref: "#/components/schemas/TimeIntervalResult"
+      description: Response for standard-deviation metric. Contains annualized standard
+        deviation per time interval period.
+    TimeIntervalResult:
+      type: object
+      properties:
+        period:
+          type: string
+        value:
+          type: number
+      description: Sharpe ratio per time interval period
+    TopCommonHoldingData:
+      type: object
+      properties:
+        name:
+          type: string
+        identifier:
+          oneOf:
+          - $ref: "#/components/schemas/SecurityIdentifier"
+          - $ref: "#/components/schemas/EquitySecurityIdentifier"
+        holdingType:
+          type: string
+          enum:
+          - FC
+          - FE
+          - FH
+          - FM
+          - FO
+          - FS
+          - FV
+          - EX
+          - AI
+          - AM
+          - AP
+          - AR
+          - B
+          - BB
+          - BC
+          - BD
+          - BG
+          - BH
+          - BL
+          - BM
+          - BO
+          - BQ
+          - BR
+          - BT
+          - BU
+          - BW
+          - BY
+          - BZ
+          - C
+          - CA
+          - CC
+          - CD
+          - CH
+          - CL
+          - CN
+          - CO
+          - CP
+          - CQ
+          - CR
+          - CS
+          - CT
+          - CU
+          - CV
+          - CY
+          - CZ
+          - DA
+          - DB
+          - DC
+          - DD
+          - DE
+          - DG
+          - DH
+          - DI
+          - DJ
+          - DM
+          - DO
+          - DP
+          - DS
+          - E
+          - EC
+          - EL
+          - EP
+          - EQ
+          - ER
+          - EU
+          - EV
+          - EW
+          - FD
+          - GC
+          - GM
+          - GS
+          - IP
+          - IS
+          - IT
+          - LO
+          - NB
+          - NC
+          - ND
+          - NE
+          - NR
+          - OO
+          - OS
+          - OT
+          - P
+          - PC
+          - PP
+          - PS
+          - Q
+          - QQ
+          - RS
+          - SC
+          - SD
+          - SE
+          - SF
+          - SI
+          - SJ
+          - SK
+          - SN
+          - SQ
+          - SR
+          - ST
+          - SU
+          - SV
+          - SW
+          - SX
+          - SY
+          - TF
+          - TG
+          - TP
+          - WR
+          - YO
+          - TYPE_0
+          - TYPE_1
+          - TYPE_12
+          - TYPE_13
+          - TYPE_14
+        allocation:
+          type: number
+        numOfFunds:
+          type: integer
+          format: int32
+        parentHolding:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: "#/components/schemas/HoldingsKeyResult"
+      description: Top common holdings shared across portfolio funds
+    TopCommonHoldingsResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        commonHoldings:
+          type: array
+          description: Top common holdings shared across portfolio funds
+          items:
+            $ref: "#/components/schemas/TopCommonHoldingData"
+      description: Response for top-common-holdings metric. Contains top common holdings
+        shared across portfolio funds.
+    TrailingTotalReturnsResult:
+      type: object
+      properties:
+        warnings:
+          type: array
+          description: List of warnings encountered during the calculation
+          items:
+            $ref: "#/components/schemas/Notification"
+        performanceEndDate:
+          type: string
+          description: Performance end date
+          format: date
+        performanceStartDate:
+          type: string
+          description: Performance start date
+          format: date
+        customIntervalPerformanceStartDate:
+          type: string
+          description: Custom interval performance start date
+          format: date
+        trailingTotalReturn:
+          type: array
+          description: Trailing total returns per time interval period
+          items:
+            $ref: "#/components/schemas/TimeIntervalResult"
+        comparison:
+          type: array
+          description: Portfolio-versus-benchmark return comparison per time interval
+            period
+          items:
+            $ref: "#/components/schemas/ReturnComparisonTimePeriod"
+      description: Response for trailing-total-return metric. Contains trailing total
+        returns per time interval period.
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+        templated:
+          type: boolean
+    CalculationStatisticsReport:
+      type: object
+      properties:
+        overall:
+          $ref: "#/components/schemas/Overall"
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricStatistics"
+    CodeFrequency:
+      type: object
+      properties:
+        code:
+          type: string
+        count:
+          type: integer
+          format: int64
+    DurationStatistics:
+      type: object
+      properties:
+        samples:
+          type: integer
+          format: int64
+        meanMillis:
+          type: number
+          format: double
+        maxMillis:
+          type: number
+          format: double
+        p50Millis:
+          type: number
+          format: double
+        p95Millis:
+          type: number
+          format: double
+        p99Millis:
+          type: number
+          format: double
+    MetricStatistics:
+      type: object
+      properties:
+        metric:
+          type: string
+        executions:
+          type: integer
+          format: int64
+        successes:
+          type: integer
+          format: int64
+        failures:
+          type: integer
+          format: int64
+        failureRatePercent:
+          type: number
+          format: double
+        duration:
+          $ref: "#/components/schemas/DurationStatistics"
+        warnings:
+          $ref: "#/components/schemas/WarningStatistics"
+        topErrorCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CodeFrequency"
+        topWarningCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CodeFrequency"
+    Overall:
+      type: object
+      properties:
+        executions:
+          type: integer
+          format: int64
+        successes:
+          type: integer
+          format: int64
+        failures:
+          type: integer
+          format: int64
+        failureRatePercent:
+          type: number
+          format: double
+        warnings:
+          type: integer
+          format: int64
+        topErrorCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CodeFrequency"
+        topWarningCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CodeFrequency"
+    WarningStatistics:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        min:
+          type: integer
+          format: int64
+        mean:
+          type: number
+          format: double
+        max:
+          type: integer
+          format: int64

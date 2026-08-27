@@ -37,7 +37,7 @@ import ca.tangerine.pce.PortfolioCalculationEngineApplication;
 class ObservabilityApiDocsE2ETest {
 
   private static final String API_DOCS = "/api/v1/c7f3e2a1-9b4d-4e8f-a6c2-1d5e7f9b3a2c/api-docs";
-  private static final String STATISTICS_PATH = "/actuator/calculationstats";
+  private static final String STATISTICS_PATH = "/actuator/calculation-stats";
   private static final String HEALTH_PATH = "/actuator/health";
   private static final String METRICS_PATH = "/actuator/metrics";
   private static final String REPORT_SCHEMA = "CalculationStatisticsReport";
