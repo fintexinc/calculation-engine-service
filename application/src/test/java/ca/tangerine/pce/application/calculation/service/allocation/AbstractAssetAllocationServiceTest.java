@@ -1,0 +1,414 @@
+package ca.tangerine.pce.application.calculation.service.allocation;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.cash;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etf;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.gic;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.mutualFund;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.stock;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import ca.tangerine.pce.application.calculation.service.FxRateService;
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
+import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
+import ca.tangerine.pce.application.config.FxProperties;
+import ca.tangerine.pce.model.domain.calculation.allocation.AssetAllocationData;
+import ca.tangerine.pce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import ca.tangerine.pce.model.domain.holding.CashHolding;
+import ca.tangerine.pce.model.domain.holding.GicHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.allocation.AssetAllocationRegionType;
+import ca.tangerine.wm.commons.domain.allocation.RegionDatapoint;
+import ca.tangerine.wm.commons.domain.allocation.SecurityRegion;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
+import ca.tangerine.wm.commons.domain.financial.Geography;
+import ca.tangerine.wm.commons.error.Notification;
+
+/**
+ * Shared assertions for asset-allocation breakdown services. Mirrors the service hierarchy: every behaviour driven by
+ * {@link AbstractAssetAllocationService} is exercised once here, and the concrete tests only declare the per-service
+ * expected distributions (where the regular AA collapses {@code EM_EQUITIES} into {@code INTERNATIONAL_EQUITIES} and
+ * the EM variant keeps them separate). Each test asserts the full per-region distribution via
+ * {@link #assertAllocationEquals} — every emitted bucket is checked, not just the headline non-zero ones.
+ */
+abstract class AbstractAssetAllocationServiceTest<R extends BaseCalculationResult> {
+
+  protected static final BigDecimal TOLERANCE = new BigDecimal("0.0000000001");
+  protected static final BigDecimal HALF = new BigDecimal("0.5");
+
+  protected final FxRateService fxRateService = mock(FxRateService.class);
+  protected final HoldingCurrencyConverter currencyConverter = new HoldingCurrencyConverter(
+      fxRateService, new FxProperties());
+  protected final PortfolioWeightCalculator portfolioWeightCalculator = new PortfolioWeightCalculator(
+      currencyConverter);
+
+  protected AbstractAssetAllocationService<R> service;
+
+  @BeforeEach
+  void setUp() {
+    when(fxRateService.spotRates(anySet(), any(), any())).thenAnswer(invocation -> {
+      Set<Currency> sources = invocation.getArgument(0);
+      Map<Currency, BigDecimal> identity = new EnumMap<>(Currency.class);
+      for (Currency c : sources) {
+        identity.put(c, ONE);
+      }
+      return identity;
+    });
+    service = createService();
+  }
+
+  protected abstract AbstractAssetAllocationService<R> createService();
+
+  protected abstract Map<AssetAllocationRegionType, BigDecimal> getAllocation(R result);
+
+  protected abstract List<Notification> getWarnings(R result);
+
+  /**
+   * The set of region types this service emits. The regular AA omits {@code EM_EQUITIES} (collapsed into
+   * {@code INTERNATIONAL_EQUITIES}); the EM-aware variant emits the full enum.
+   */
+  protected abstract Set<AssetAllocationRegionType> emittedTypes();
+
+  protected abstract Map<AssetAllocationRegionType, BigDecimal> expectedForEmergingMarketStockAlone();
+
+  protected abstract Map<AssetAllocationRegionType, BigDecimal> expectedForCashHalfPlusEmStockHalf();
+
+  protected abstract Map<AssetAllocationRegionType, BigDecimal> expectedForSamsungPlusEmEtf();
+
+  protected abstract Map<AssetAllocationRegionType, BigDecimal> expectedForCalculateOnSingleEmEquity();
+
+  protected Map<AssetAllocationRegionType, BigDecimal> baseline() {
+    Map<AssetAllocationRegionType, BigDecimal> map = new EnumMap<>(AssetAllocationRegionType.class);
+    emittedTypes().forEach(type -> map.put(type, ZERO));
+    return map;
+  }
+
+  protected Map<AssetAllocationRegionType, BigDecimal> singleBucket(AssetAllocationRegionType type, BigDecimal value) {
+    Map<AssetAllocationRegionType, BigDecimal> map = baseline();
+    map.put(type, value);
+    return map;
+  }
+
+  protected void assertAllocationEquals(R result, Map<AssetAllocationRegionType, BigDecimal> expected) {
+    Map<AssetAllocationRegionType, BigDecimal> actual = getAllocation(result);
+    assertThat(actual).containsOnlyKeys(expected.keySet());
+    expected.forEach((key, expectedValue) -> assertThat(actual.get(key))
+        .as("region %s", key)
+        .isCloseTo(expectedValue, within(TOLERANCE)));
+  }
+
+  protected static AssetAllocationData data(Map<PortfolioHolding, HoldingAssetAllocation> fundAllocations,
+      Map<PortfolioHolding, Geography> stockGeographies) {
+    return new AssetAllocationData(fundAllocations, stockGeographies);
+  }
+
+  @Test
+  void cashHolding_classifiedAs100PercentCash() {
+    CashHolding cash = cash(null, BigDecimal.TEN);
+
+    R result = service.perform(command(cash), data(Map.of(), Map.of()));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.CASH, ONE));
+    assertThat(getWarnings(result)).isEmpty();
+  }
+
+  @Test
+  void gicHolding_longTerm_classifiedAsFixedIncome() {
+    GicHolding gic = gic(null, null, BigDecimal.TEN, BigDecimal.valueOf(365));
+
+    R result = service.perform(command(gic), data(Map.of(), Map.of()));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.FIXED_INCOME, ONE));
+  }
+
+  @Test
+  void gicHolding_shortTerm_classifiedAsCash() {
+    GicHolding gic = gic(null, null, BigDecimal.TEN, BigDecimal.valueOf(100));
+
+    R result = service.perform(command(gic), data(Map.of(), Map.of()));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.CASH, ONE));
+  }
+
+  @Test
+  void usStock_mappedToUsEquities() {
+    PortfolioHolding stock = stock("AAPL");
+    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.USA)).build();
+
+    R result = service.perform(command(stock), data(Map.of(), Map.of(stock, geography)));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.US_EQUITIES, ONE));
+    assertThat(getWarnings(result)).isEmpty();
+  }
+
+  @Test
+  void canadianStock_mappedToCanadianEquities() {
+    PortfolioHolding stock = stock("RY");
+    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.CANADA)).build();
+
+    R result = service.perform(command(stock), data(Map.of(), Map.of(stock, geography)));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.CANADIAN_EQUITIES, ONE));
+  }
+
+  @Test
+  void developedNonNorthAmericanStock_mappedToInternationalEquities() {
+    PortfolioHolding stock = stock("SAP");
+    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.OTHER)).build();
+
+    R result = service.perform(command(stock), data(Map.of(), Map.of(stock, geography)));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.INTERNATIONAL_EQUITIES, ONE));
+  }
+
+  @Test
+  void emergingMarketStock_classifiedPerServiceConvention() {
+    PortfolioHolding samsung = stock("005930");
+    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.EMERGING_MARKETS)).build();
+
+    R result = service.perform(command(samsung), data(Map.of(), Map.of(samsung, geography)));
+
+    assertAllocationEquals(result, expectedForEmergingMarketStockAlone());
+  }
+
+  @Test
+  void stockWithoutGeography_addsWarningAndIsUnclassified() {
+    PortfolioHolding stock = stock("XYZ");
+
+    R result = service.perform(command(stock), data(Map.of(), Map.of()));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.UNCLASSIFIED, ONE));
+    assertThat(getWarnings(result)).hasSize(1);
+    assertThat(getWarnings(result)).first().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC);
+      assertThat(warning.getMessage()).isEqualTo(
+          "Security information not found by the data source for " + service.getMetric().getUserFriendlyName());
+      assertThat(warning.getMetadata()).containsEntry("holdingId", stock.getIdsString());
+    });
+  }
+
+  @Test
+  void fundHolding_usesAllocationsFromMic() {
+    PortfolioHolding fund = mutualFund("RBF605");
+    HoldingAssetAllocation allocation = HoldingAssetAllocation.builder()
+        .allocations(Map.of(
+            AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.6"),
+            AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("0.4")))
+        .build();
+
+    R result = service.perform(command(fund), data(Map.of(fund, allocation), Map.of()));
+
+    Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
+    expected.put(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.6"));
+    expected.put(AssetAllocationRegionType.FIXED_INCOME, new BigDecimal("0.4"));
+    assertAllocationEquals(result, expected);
+  }
+
+  @Test
+  void fundHoldingWithoutAllocations_addsWarningAndIsUnclassified() {
+    PortfolioHolding fund = mutualFund("RBF605");
+    HoldingAssetAllocation allocation = HoldingAssetAllocation.builder().allocations(Map.of()).build();
+
+    R result = service.perform(command(fund), data(Map.of(fund, allocation), Map.of()));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.UNCLASSIFIED, ONE));
+    assertThat(getWarnings(result)).hasSize(1);
+    assertThat(getWarnings(result)).first().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.MISSING_ASSET_ALLOCATION);
+      assertThat(warning.getMessage()).isEqualTo(
+          "The holding " + fund.getIdsString() + " is missing values for Asset Allocation");
+      assertThat(warning.getMetadata()).containsEntry("holdingId", fund.getIdsString());
+    });
+  }
+
+  @Test
+  void fundHoldingNotFoundBySm_addsSecurityNotFoundWarningAndIsUnclassified() {
+    PortfolioHolding fund = mutualFund("RBF605");
+
+    R result = service.perform(command(fund), data(Map.of(), Map.of()));
+
+    assertAllocationEquals(result, singleBucket(AssetAllocationRegionType.UNCLASSIFIED, ONE));
+    assertThat(getWarnings(result)).hasSize(1);
+    assertThat(getWarnings(result)).first().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.SECURITY_NOT_FOUND_FOR_METRIC);
+      assertThat(warning.getMessage()).isEqualTo(
+          "Security information not found by the data source for " + service.getMetric().getUserFriendlyName());
+      assertThat(warning.getMetadata()).containsEntry("holdingId", fund.getIdsString());
+    });
+  }
+
+  @Test
+  void mixedPortfolio_cashAndUsStock_weightedAggregate() {
+    CashHolding cash = cash(null, BigDecimal.valueOf(50));
+    PortfolioHolding stock = stock("AAPL", BigDecimal.valueOf(50));
+
+    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.USA)).build();
+
+    R result = service.perform(command(cash, stock), data(Map.of(), Map.of(stock, geography)));
+
+    Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
+    expected.put(AssetAllocationRegionType.CASH, HALF);
+    expected.put(AssetAllocationRegionType.US_EQUITIES, HALF);
+    assertAllocationEquals(result, expected);
+  }
+
+  @Test
+  void mixedPortfolio_cashAndEmergingMarketStock_weightedAggregate() {
+    CashHolding cash = cash(null, BigDecimal.valueOf(50));
+    PortfolioHolding emStock = stock("BABA", BigDecimal.valueOf(50));
+
+    Geography geography = Geography.builder().region(regionDatapoint(SecurityRegion.EMERGING_MARKETS)).build();
+
+    R result = service.perform(command(cash, emStock), data(Map.of(), Map.of(emStock, geography)));
+
+    assertAllocationEquals(result, expectedForCashHalfPlusEmStockHalf());
+  }
+
+  @Test
+  void samsungPlusEmEtf_aggregatesPerServiceConvention() {
+    PortfolioHolding samsung = stock("005930", BigDecimal.valueOf(50));
+    PortfolioHolding emEtf = etf("CSEMAS", BigDecimal.valueOf(50));
+
+    Geography koreaGeography = Geography.builder().region(regionDatapoint(SecurityRegion.EMERGING_MARKETS)).build();
+
+    HoldingAssetAllocation emEtfAllocation = HoldingAssetAllocation.builder()
+        .allocations(Map.of(
+            AssetAllocationRegionType.EM_EQUITIES, new BigDecimal("0.95"),
+            AssetAllocationRegionType.CASH, new BigDecimal("0.05")))
+        .build();
+
+    R result = service.perform(command(samsung, emEtf),
+        data(Map.of(emEtf, emEtfAllocation), Map.of(samsung, koreaGeography)));
+
+    assertAllocationEquals(result, expectedForSamsungPlusEmEtf());
+  }
+
+  @Test
+  void micNoise_inOtherBucketIsClampedToZero() {
+    PortfolioHolding fund = mutualFund("RBF999");
+    HoldingAssetAllocation noisyAllocation = HoldingAssetAllocation.builder()
+        .allocations(Map.of(
+            AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.9999948939"),
+            AssetAllocationRegionType.OTHER, new BigDecimal("-0.0000051061")))
+        .build();
+
+    R result = service.perform(command(fund), data(Map.of(fund, noisyAllocation), Map.of()));
+
+    Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
+    expected.put(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.9999948939"));
+    assertAllocationEquals(result, expected);
+  }
+
+  @Test
+  void micNoise_realAllocationsAboveThresholdSurvive() {
+    PortfolioHolding fund = mutualFund("RBF999");
+    HoldingAssetAllocation allocation = HoldingAssetAllocation.builder()
+        .allocations(Map.of(
+            AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.95"),
+            AssetAllocationRegionType.OTHER, new BigDecimal("0.0001")))
+        .build();
+
+    R result = service.perform(command(fund), data(Map.of(fund, allocation), Map.of()));
+
+    Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
+    expected.put(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.95"));
+    expected.put(AssetAllocationRegionType.OTHER, new BigDecimal("0.0001"));
+    assertAllocationEquals(result, expected);
+  }
+
+  @Test
+  void currencyAdjustedWeights_usdHoldingsConvertedToCadBeforeWeighting() {
+    CashHolding cadCash = cash(Currency.CAD, BigDecimal.valueOf(100));
+    PortfolioHolding usStock = stock("AAPL", BigDecimal.valueOf(100));
+
+    Geography usGeography = Geography.builder()
+        .region(regionDatapoint(SecurityRegion.USA))
+        .currency(currencyDatapoint(Currency.USD))
+        .build();
+    when(fxRateService.spotRates(anySet(), any(), any())).thenReturn(Map.of(Currency.USD, new BigDecimal("1.5")));
+
+    R result = service.perform(command(cadCash, usStock), data(Map.of(), Map.of(usStock, usGeography)));
+
+    Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
+    expected.put(AssetAllocationRegionType.CASH, new BigDecimal("0.4"));
+    expected.put(AssetAllocationRegionType.US_EQUITIES, new BigDecimal("0.6"));
+    assertAllocationEquals(result, expected);
+    assertThat(getWarnings(result)).isEmpty();
+  }
+
+  @Test
+  void missingFxRate_fallsBackToOriginalValuesAndAddsWarning() {
+    CashHolding cadCash = cash(Currency.CAD, BigDecimal.valueOf(100));
+    PortfolioHolding usStock = stock("AAPL", BigDecimal.valueOf(100));
+
+    Geography usGeography = Geography.builder()
+        .region(regionDatapoint(SecurityRegion.USA))
+        .currency(currencyDatapoint(Currency.USD))
+        .build();
+    Map<Currency, BigDecimal> noRate = new EnumMap<>(Currency.class);
+    noRate.put(Currency.USD, null);
+    when(fxRateService.spotRates(anySet(), any(), any())).thenReturn(noRate);
+
+    R result = service.perform(command(cadCash, usStock), data(Map.of(), Map.of(usStock, usGeography)));
+
+    Map<AssetAllocationRegionType, BigDecimal> expected = baseline();
+    expected.put(AssetAllocationRegionType.CASH, HALF);
+    expected.put(AssetAllocationRegionType.US_EQUITIES, HALF);
+    assertAllocationEquals(result, expected);
+    assertThat(getWarnings(result)).hasSize(1);
+    assertThat(getWarnings(result)).first().satisfies(warning -> {
+      assertThat(warning.getCode()).isEqualTo(ErrorCode.Codes.FX_RATES_UNAVAILABLE);
+      assertThat(warning.getMessage()).contains("FX rates unavailable for holding " + usStock.getIdsString());
+      assertThat(warning.getMetadata()).containsEntry("holdingId", usStock.getIdsString());
+    });
+  }
+
+  @Test
+  void singleEmEquitiesExposure_handlesPerServiceConvention() {
+    PortfolioHolding emEtf = etf("CSEMAS");
+    HoldingAssetAllocation emAllocation = HoldingAssetAllocation.builder()
+        .allocations(Map.of(AssetAllocationRegionType.EM_EQUITIES, ONE))
+        .build();
+
+    R result = service.perform(command(emEtf), data(Map.of(emEtf, emAllocation), Map.of()));
+
+    assertAllocationEquals(result, expectedForCalculateOnSingleEmEquity());
+  }
+
+  protected static PortfolioHoldingsCommand command(PortfolioHolding... holdings) {
+    PortfolioHoldingsCommand command = mock(PortfolioHoldingsCommand.class);
+    when(command.getHoldings()).thenReturn(List.of(holdings));
+    return command;
+  }
+
+  protected static RegionDatapoint regionDatapoint(SecurityRegion region) {
+    RegionDatapoint dp = new RegionDatapoint();
+    dp.setValue(region);
+    return dp;
+  }
+
+  protected static CurrencyDatapoint currencyDatapoint(Currency currency) {
+    CurrencyDatapoint dp = new CurrencyDatapoint();
+    dp.setValue(currency);
+    return dp;
+  }
+}

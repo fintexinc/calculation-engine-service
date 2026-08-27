@@ -5,6 +5,7 @@ dependencies {
     api(libs.spring.context)
     api(libs.spring.boot)
 
+    testImplementation(testFixtures(project(":api")))
     testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.mockito.junit.jupiter)
 }

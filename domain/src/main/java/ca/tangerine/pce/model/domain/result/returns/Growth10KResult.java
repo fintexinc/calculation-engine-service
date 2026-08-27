@@ -1,0 +1,38 @@
+package ca.tangerine.pce.model.domain.result.returns;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.LocalDate;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.domain.result.KeyValueResult;
+
+@SuperBuilder
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Schema(description = "Response for growth-of-10k metric. Contains growth of a hypothetical $10,000 investment over time.")
+public class Growth10KResult extends BaseCalculationResult {
+
+  @Schema(description = "Performance end date")
+  private LocalDate performanceEndDate;
+  @Schema(description = "Performance start date")
+  private LocalDate performanceStartDate;
+  @Schema(description = "Growth of $10K data points over time")
+  private List<KeyValueResult<LocalDate>> growth10k;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Schema(description = "Portfolio-versus-benchmark growth-of-10k comparison by valuation date")
+  private List<ReturnComparison<LocalDate>> comparison;
+}

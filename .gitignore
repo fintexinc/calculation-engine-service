@@ -37,3 +37,4 @@ nul
 /.claude/settings.local.json
 /.claude/worktrees/
 /CLAUDE.md
+.env

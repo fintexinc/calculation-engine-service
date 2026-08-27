@@ -102,7 +102,7 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND",
+      "holdingType": "POOLED_FUND",
       "country": "CANADA",
       "value": 9200.00,
       "securityIdentifier": {
@@ -111,7 +111,7 @@
       }
     },
     {
-      "holdingType": "MUTUAL_FUND",
+      "holdingType": "SEPARATELY_MANAGED_ACCOUNT",
       "country": "USA",
       "value": 7400.00,
       "securityIdentifier": {

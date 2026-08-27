@@ -36,7 +36,7 @@ mvn jib:build                              # Build Docker image
 
 ### Troubleshooting: broken classes / ApplicationContext fails to load
 
-If the build reports unresolved/broken classes from `com.fintex.wm` or the Spring
+If the build reports unresolved/broken classes from `ca.tangerine.wm` or the Spring
 `ApplicationContext` fails to load (e.g. bean-wiring errors, `401 Unauthorized` fetching
 `catalogue-investment-commons` metadata from Azure Artifacts), the local `catalogue-investment-commons`
 is stale or missing. Update the `catalogue-investment-commons` project and install it into the local

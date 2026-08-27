@@ -6,5 +6,6 @@ dependencies {
     api(libs.micrometer.core)
     api(libs.spring.context)
 
+    testImplementation(testFixtures(project(":api")))
     testImplementation(libs.junit.jupiter.params)
 }

@@ -1,0 +1,30 @@
+package ca.tangerine.pce.model.dto.command;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.LocalDate;
+import java.util.Set;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import ca.tangerine.pce.model.dto.command.contract.CustomPedProvider;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@Schema(description = "Command for period-based calculations. Supports metrics: trailing-total-return, excess-returns, standard-deviation, mean, sharpe-ratio, sortino-ratio, max-drawdown, downside-deviation, mar-ratio, treynor-ratio, information-ratio, tracking-error, alpha, beta, rsquared, upside-capture, downside-capture")
+public class PeriodCommand extends PortfolioBenchmarkCommand implements CustomPedProvider {
+  @Schema(description = "Custom interval performance start date")
+  @JsonProperty("customIntervalPerformanceStartDate")
+  private LocalDate customIntervalPsd;
+  @Schema(description = "Custom performance end date")
+  @JsonProperty("customPerformanceEndDate")
+  private LocalDate customPed;
+  @ArraySchema(uniqueItems = true, schema = @Schema(implementation = TimePeriod.class), arraySchema = @Schema(description = "Time interval periods in months", example = "[\"1\", \"3\", \"12\", \"36\", \"60\", \"120\", \"240\"]"))
+  @JsonProperty("timeIntervalPeriods")
+  private Set<TimePeriod> periods;
+}

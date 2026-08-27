@@ -26,8 +26,8 @@ subprojects {
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "com.diffplug.spotless")
 
-    group = "com.fintex"
-    version = "1.0.0-tangerine-SNAPSHOT"
+    group = "ca.tangerine"
+    version = "2.0.0-tangerine-SNAPSHOT"
 
     repositories {
         mavenLocal()

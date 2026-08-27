@@ -1,3 +1,7 @@
+plugins {
+    `java-test-fixtures`
+}
+
 description = "Port interfaces (input and output)"
 
 dependencies {
@@ -8,6 +12,9 @@ dependencies {
     api(libs.guava)
     api(libs.commons.lang3)
 
+    testFixturesImplementation(libs.junit.jupiter.api)
+    testFixturesImplementation(libs.commons.math3)
+    testFixturesImplementation(libs.slf4j.api)
+
     testImplementation(libs.junit.jupiter.params)
-    testImplementation(libs.commons.math3)
 }

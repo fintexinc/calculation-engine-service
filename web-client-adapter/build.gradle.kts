@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.resilience4j.spring.boot3)
     implementation(libs.resilience4j.micrometer)
 
+    testImplementation(testFixtures(project(":api")))
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.okhttp.mockwebserver)
 }

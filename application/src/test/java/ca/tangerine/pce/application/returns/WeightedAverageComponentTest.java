@@ -1,0 +1,96 @@
+package ca.tangerine.pce.application.returns;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.stream.Stream;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etfCa;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import ca.tangerine.pce.application.util.ReturnFactorScale;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
+class WeightedAverageComponentTest {
+
+  private static final LocalDate DECEMBER = LocalDate.parse("2023-12-31");
+  private static final LocalDate JANUARY = LocalDate.parse("2024-01-31");
+  private static final LocalDate FEBRUARY = LocalDate.parse("2024-02-29");
+
+  private final WeightedAverageComponent component = new WeightedAverageComponent();
+
+  @Test
+  void shouldCalculateValueWeightedReturns_whenHoldingsHaveDifferentValuesAndReturns() {
+    PortfolioHolding firstHolding = etfCa("FIRST", 100);
+    PortfolioHolding secondHolding = etfCa("SECOND", 300);
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
+        firstHolding, returns("10", "20"),
+        secondHolding, returns("30", "40"));
+
+    NavigableMap<LocalDate, BigDecimal> result = component.calculateWeightedAverage(returns, ReturnFactorScale.AS_IS);
+
+    assertThat(result).hasSize(2);
+    assertThat(result.get(JANUARY)).isEqualByComparingTo("25");
+    assertThat(result.get(FEBRUARY)).isEqualByComparingTo("35");
+  }
+
+  @Test
+  void shouldApplyRequestedScale_whenReturnsArePercentageValues() {
+    PortfolioHolding holding = etfCa("ONLY", 100);
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
+        holding, returns("10", "-20"));
+
+    NavigableMap<LocalDate, BigDecimal> result = component.calculateWeightedAverage(
+        returns, ReturnFactorScale.SCALE_OF_TWO);
+
+    assertThat(result).containsOnlyKeys(JANUARY, FEBRUARY);
+    assertThat(result.get(JANUARY)).isEqualByComparingTo("1.1");
+    assertThat(result.get(FEBRUARY)).isEqualByComparingTo("0.8");
+  }
+
+  @Test
+  void shouldCalculateInitialValueWeights_whenEndingWeightsAreRequested() {
+    PortfolioHolding firstHolding = etfCa("FIRST", 100);
+    PortfolioHolding secondHolding = etfCa("SECOND", 300);
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns = Map.of(
+        firstHolding, returns("10", "20"),
+        secondHolding, returns("30", "40"));
+
+    Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> result = component.calculateEndingPortfolioWeight(returns);
+
+    assertThat(result).containsOnlyKeys(firstHolding, secondHolding);
+    assertWeightSeries(result.get(firstHolding), "0.25");
+    assertWeightSeries(result.get(secondHolding), "0.75");
+  }
+
+  @ParameterizedTest
+  @MethodSource("unavailableReturns")
+  void shouldReturnEmptySeries_whenNoHoldingReturnsAreProvided(
+      Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>> returns) {
+    NavigableMap<LocalDate, BigDecimal> result = component.calculateWeightedAverage(
+        returns, ReturnFactorScale.AS_IS);
+
+    assertThat(result).isEmpty();
+  }
+
+  private static TreeMap<LocalDate, BigDecimal> returns(String january, String february) {
+    return new TreeMap<>(Map.of(
+        JANUARY, new BigDecimal(january),
+        FEBRUARY, new BigDecimal(february)));
+  }
+
+  private static Stream<Map<PortfolioHolding, TreeMap<LocalDate, BigDecimal>>> unavailableReturns() {
+    return Stream.of(null, Map.of());
+  }
+
+  private static void assertWeightSeries(TreeMap<LocalDate, BigDecimal> weights, String expectedWeight) {
+    assertThat(weights).containsOnlyKeys(DECEMBER, JANUARY, FEBRUARY);
+    assertThat(weights.values()).allSatisfy(weight -> assertThat(weight).isEqualByComparingTo(expectedWeight));
+  }
+}
