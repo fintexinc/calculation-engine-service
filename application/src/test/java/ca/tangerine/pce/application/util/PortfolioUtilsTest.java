@@ -1,0 +1,148 @@
+package ca.tangerine.pce.application.util;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Set;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.cash;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
+import static ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType.BASIC_MATERIALS;
+import static ca.tangerine.wm.commons.domain.currency.Currency.CAD;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.TEN;
+import static java.math.BigDecimal.ZERO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.util.ComparisonUtils;
+import ca.tangerine.wm.commons.domain.allocation.EquityMarketCapitalizationType;
+import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+class PortfolioUtilsTest {
+
+  @Test
+  void calculateInitialPortfolioWeight_test() {
+    final PortfolioHolding h1 = holding(null, FinancialInstrumentType.ETF, Country.USA, TEN);
+    final PortfolioHolding h2 = holdingWithoutCountry(null, null, TEN);
+    final Set<PortfolioHolding> holdings = Set.of(h1, h2);
+
+    final Map<PortfolioHolding, BigDecimal> actual = PortfolioUtils.calculateInitialPortfolioWeight(holdings);
+
+    Assertions.assertNotNull(actual);
+    ComparisonUtils.compareMaps(Map.of(h1, new BigDecimal("0.500000000000000"), h2, new BigDecimal(
+        "0.500000000000000")), actual);
+  }
+
+  @Test
+  void areAllValuesInMapEmpty_checkResultWhenAllValuesInMapAreEmpty() {
+    final Map<PortfolioHolding, Map<EquitySectorAllocationType, BigDecimal>> map = Map.of(
+        holdingWithoutCountry(null, null, null), Map.of());
+    final boolean actual = PortfolioUtils.areAllValuesInMapEmpty(map);
+
+    assertTrue(actual);
+  }
+
+  @Test
+  void areAllValuesInMapEmpty_checkResultWhenNotAllValuesInMapAreEmpty() {
+    final Map<PortfolioHolding, Map<EquitySectorAllocationType, BigDecimal>> map = Map.of(
+        holdingWithoutCountry(null, null, null), Map.of(),
+        holding(null, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, ONE), Map.of(BASIC_MATERIALS,
+            ONE));
+    final boolean actual = PortfolioUtils.areAllValuesInMapEmpty(map);
+
+    assertFalse(actual);
+  }
+
+  @Test
+  void areAllValuesZerosInMap_checkResultWhenAllValuesInMapAreZeros() {
+    final Map<PortfolioHolding, Map<EquityMarketCapitalizationType, BigDecimal>> map = Map.of(
+        holdingWithoutCountry(null, null, null), Map.of(
+            EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO));
+    final boolean actual = PortfolioUtils.areAllValuesZerosInMap(map);
+
+    assertTrue(actual);
+  }
+
+  @Test
+  void areAllValuesZerosInMap_checkResultWhenNotAllValuesInMapAreZeros() {
+    final Map<PortfolioHolding, Map<EquityMarketCapitalizationType, BigDecimal>> map = Map.of(
+        holdingWithoutCountry(null, null, null), Map.of(
+            EquityMarketCapitalizationType.GIANT, ZERO, EquityMarketCapitalizationType.SMALL, ZERO,
+            EquityMarketCapitalizationType.LARGE, ONE));
+    final boolean actual = PortfolioUtils.areAllValuesZerosInMap(map);
+
+    assertFalse(actual);
+  }
+
+  @Test
+  void createKey_checkResultWhenHoldingTypeCash() {
+    final String actual = PortfolioUtils.createKey(cash(CAD, (BigDecimal) null));
+
+    assertEquals("CASH_CAD", actual);
+  }
+
+  @Test
+  void createKey_checkResultWhenHoldingTypeUsEtf() {
+    final String result = PortfolioUtils.createKey(holding(
+        new SecurityIdentifier("TICKER", FiIdentifierType.TICKER), FinancialInstrumentType.ETF, Country.USA,
+        (BigDecimal) null));
+
+    assertEquals(FinancialInstrumentType.ETF.name() + "_" + "TICKER", result);
+  }
+
+  @Test
+  void createKey_checkResultWhenHoldingTypeCanadaEtf() {
+    final String result = PortfolioUtils.createKey(holding(
+        new SecurityIdentifier("TICKER", FiIdentifierType.TICKER), FinancialInstrumentType.ETF, Country.CANADA,
+        (BigDecimal) null));
+
+    assertEquals(FinancialInstrumentType.ETF.name() + "_" + "TICKER", result);
+  }
+
+  @Test
+  void createKey_checkResultWhenHoldingTypeUsStock() {
+    final EquitySecurityIdentifier securityIdentifier = mock(EquitySecurityIdentifier.class);
+    when(securityIdentifier.getId()).thenReturn("TICKER");
+    when(securityIdentifier.getExchangeId()).thenReturn("EXCHANGE_CODE");
+
+    final String result = PortfolioUtils.createKey(holding(
+        securityIdentifier, FinancialInstrumentType.STOCK, Country.USA, (BigDecimal) null));
+
+    assertEquals(FinancialInstrumentType.STOCK.name() + "_" + "TICKER" + "_" + "EXCHANGE_CODE", result);
+  }
+
+  @Test
+  void createKey_checkResultWhenHoldingTypeCadStock() {
+    final EquitySecurityIdentifier securityIdentifier = mock(EquitySecurityIdentifier.class);
+    when(securityIdentifier.getId()).thenReturn("TICKER");
+    when(securityIdentifier.getExchangeId()).thenReturn("EXCHANGE_CODE");
+
+    final String result = PortfolioUtils.createKey(holding(
+        securityIdentifier, FinancialInstrumentType.STOCK, Country.CANADA, (BigDecimal) null));
+
+    assertEquals(FinancialInstrumentType.STOCK.name() + "_" + "TICKER" + "_" + "EXCHANGE_CODE", result);
+  }
+
+  @Test
+  void createKey_checkResultWhenHoldingTypeMutualFund() {
+    final String result = PortfolioUtils.createKey(holding(
+        new SecurityIdentifier("FUND_SERVE_CODE", FiIdentifierType.FUNDSERV), FinancialInstrumentType.MUTUAL_FUND,
+        Country.CANADA, (BigDecimal) null));
+
+    assertEquals(FinancialInstrumentType.MUTUAL_FUND.name() + "_" + "FUND_SERVE_CODE", result);
+  }
+
+}

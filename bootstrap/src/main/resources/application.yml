@@ -1,6 +1,6 @@
 spring:
   application:
-    name: calculation-engine
+    name: portfolio-calculation-engine
     config:
       fail-fast: true
       enabled: false
@@ -177,7 +177,7 @@ resilience4j:
         exponential-backoff-multiplier: 2
         enable-randomized-wait: true
         randomized-wait-factor: 0.5
-        retry-exception-predicate: com.fintex.ce.adapter.webclient.resilience.TransientCallFailures
+        retry-exception-predicate: ca.tangerine.pce.webclient.resilience.TransientCallFailures
     instances:
       MARKET_INVESTMENT_CATALOGUE:
         base-config: default
@@ -203,7 +203,7 @@ resilience4j:
         # Recovery without any caller having to arrive first, so a quiet period while the breaker was open does not
         # leave it open for the next calculation to discover.
         automatic-transition-from-open-to-half-open-enabled: true
-        record-failure-predicate: com.fintex.ce.adapter.webclient.resilience.TransientCallFailures
+        record-failure-predicate: ca.tangerine.pce.webclient.resilience.TransientCallFailures
         register-health-indicator: true
     instances:
       MARKET_INVESTMENT_CATALOGUE:
@@ -327,7 +327,7 @@ logging:
     level: "%5p [traceId=%X{traceId:-}, spanId=%X{spanId:-}, requestId=%X{requestId:-}]"
   level:
     root: INFO
-    com.fintex.ce: DEBUG
+    ca.tangerine.pce: DEBUG
   http:
     # Defaults for headers/query/payload logging are intentionally `false`
     # (see HttpLoggingProperties). Override per environment to opt in.

@@ -1,4 +1,4 @@
-rootProject.name = "calculation-engine-service"
+rootProject.name = "portfolio-calculation-engine"
 
 include(
     "domain",

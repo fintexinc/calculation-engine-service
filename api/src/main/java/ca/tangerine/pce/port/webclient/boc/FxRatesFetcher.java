@@ -1,0 +1,28 @@
+package ca.tangerine.pce.port.webclient.boc;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.NavigableMap;
+
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+
+public interface FxRatesFetcher {
+
+  /**
+   * Returns FX rates whose dates are within the inclusive bounds of {@code dateRange}. A {@code null} range or bound is
+   * open; implementations must not return dates outside any non-null bound.
+   */
+  NavigableMap<LocalDate, BigDecimal> fetch(CurrencyExchangePair currencyPair, DateRange dateRange);
+
+  /**
+   * Returns the direction in which the underlying provider publishes {@code pair} natively. The default returns the
+   * pair as-is — implementations that internally fall back to fetching the inverse direction and inverting (e.g.
+   * because only one direction is configured upstream) should override this so callers can request the canonical
+   * direction directly. This lets caching layers store the exact upstream value rather than a doubly-inverted
+   * approximation.
+   */
+  default CurrencyExchangePair canonicalDirection(CurrencyExchangePair pair) {
+    return pair;
+  }
+}

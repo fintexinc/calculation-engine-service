@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.micrometer.tracing.bridge.otel)
 
+    testImplementation(testFixtures(project(":api")))
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.resilience4j.spring.boot3)
     testImplementation(libs.okhttp.mockwebserver)

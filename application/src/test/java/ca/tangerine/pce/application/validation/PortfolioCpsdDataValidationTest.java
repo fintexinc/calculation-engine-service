@@ -1,0 +1,31 @@
+package ca.tangerine.pce.application.validation;
+
+import java.util.List;
+
+import ca.tangerine.pce.application.returns.ProcessingCase;
+import ca.tangerine.pce.model.error.ErrorCode;
+
+class PortfolioCpsdDataValidationTest extends AbstractCpsdDataValidationTest {
+
+  private final PortfolioCpsdDataValidation validation = new PortfolioCpsdDataValidation();
+
+  @Override
+  protected CpsdDataValidation validator() {
+    return validation;
+  }
+
+  @Override
+  protected ErrorCode expectedAfterPedCode() {
+    return ErrorCode.CPSD_AFTER_PORTFOLIO_PED;
+  }
+
+  @Override
+  protected ErrorCode expectedBeforePsdCode() {
+    return ErrorCode.CPSD_BEFORE_PORTFOLIO_PSD;
+  }
+
+  @Override
+  protected List<ProcessingCase> expectedApplicableCases() {
+    return List.of(ProcessingCase.PORTFOLIO_WEIGHTED_AVERAGE_WITH_CPSD_AND_CPED);
+  }
+}

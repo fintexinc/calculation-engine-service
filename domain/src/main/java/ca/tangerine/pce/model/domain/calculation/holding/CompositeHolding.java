@@ -1,0 +1,22 @@
+package ca.tangerine.pce.model.domain.calculation.holding;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Stream;
+
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
+/**
+ * Composite role of the Composite pattern: an internal (fund-like) node of the expanded underlying-holdings tree that
+ * carries its own effective weight and source while delegating leaf extraction to its {@code children}. Keeping it
+ * separate from the MIC-mapped {@link CommonHolding} prevents the recursion from mutating the mapped tree as a side
+ * effect, mirroring {@link LeafHolding}.
+ */
+public record CompositeHolding(PortfolioHolding holding, BigDecimal weight, CommonHolding source,
+    List<HoldingComponent> children) implements HoldingComponent {
+
+  @Override
+  public Stream<LeafHolding> leaves() {
+    return children.stream().flatMap(HoldingComponent::leaves);
+  }
+}

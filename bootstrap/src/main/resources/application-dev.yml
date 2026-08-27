@@ -10,7 +10,7 @@ external-services:
 logging:
   level:
     reactor.netty.http.client.HttpClient: TRACE
-    com.fintex.ce.adapter.rest.logging: TRACE
+    ca.tangerine.pce.rest.logging: TRACE
   http:
     include-headers: true
     include-query-string: true

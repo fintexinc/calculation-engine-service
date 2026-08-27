@@ -1,0 +1,30 @@
+package ca.tangerine.pce.model.domain.result.exposure;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.math.BigDecimal;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.wm.commons.domain.allocation.GeographicRegionType;
+
+@SuperBuilder
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Schema(description = "Response for equity-geographic-exposure and fixed-income-geographic-exposure metrics. Contains geographic exposure breakdown by region.")
+public class GeographicExposureResult extends BaseCalculationResult {
+
+  @Schema(description = "Geographic exposure percentages by region. Holdings the data source has no record of at "
+      + "all, or resolved but did not return a geographic breakdown for, are counted under "
+      + "GeographicRegionType.UNKNOWN.")
+  private Map<GeographicRegionType, BigDecimal> geographicExposure;
+}
