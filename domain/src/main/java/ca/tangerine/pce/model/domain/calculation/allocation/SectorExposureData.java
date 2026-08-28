@@ -1,8 +1,8 @@
 package ca.tangerine.pce.model.domain.calculation.allocation;
 
-import java.util.Map;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
+import java.util.Map;
 
 /**
  * Typed data consumed by the consolidated sector exposure service: the per-holding distribution Market Investment

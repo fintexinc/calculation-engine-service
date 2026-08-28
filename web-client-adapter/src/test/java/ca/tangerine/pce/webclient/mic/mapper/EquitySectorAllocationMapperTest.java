@@ -1,17 +1,5 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.calculation.allocation.EquitySector;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.wm.commons.domain.DataProvider;
@@ -24,6 +12,18 @@ import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
 import ca.tangerine.wm.commons.domain.enumeration.Country;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class EquitySectorAllocationMapperTest {
 

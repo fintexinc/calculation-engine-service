@@ -1,5 +1,9 @@
 package ca.tangerine.pce.model.dto.command;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
+import ca.tangerine.pce.model.error.ErrorCode;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -10,10 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
-import ca.tangerine.pce.model.error.ErrorCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Schema(description = "Command for cross-portfolio analysis with multiple portfolios. Supports metric: common-performance-dates")

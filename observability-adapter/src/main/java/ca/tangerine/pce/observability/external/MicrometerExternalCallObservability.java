@@ -1,5 +1,8 @@
 package ca.tangerine.pce.observability.external;
 
+import ca.tangerine.pce.port.observability.ExternalCallObservability;
+import ca.tangerine.wm.commons.domain.ExternalWebService;
+
 import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.DistributionSummary;
@@ -11,9 +14,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import ca.tangerine.pce.port.observability.ExternalCallObservability;
-import ca.tangerine.wm.commons.domain.ExternalWebService;
 
 /**
  * Micrometer implementation of {@link ExternalCallObservability}, publishing provider-level metrics for outbound calls

@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -16,11 +21,6 @@ import java.util.stream.Stream;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.CIPSD;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.SI;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.YTD;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * Reports an unusable {@link TimePeriod} in a request as a bad request naming the offending value and listing what

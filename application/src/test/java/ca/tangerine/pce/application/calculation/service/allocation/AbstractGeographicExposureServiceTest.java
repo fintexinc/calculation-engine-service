@@ -1,5 +1,25 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
+import ca.tangerine.pce.application.calculation.service.FxRateService;
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
+import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
+import ca.tangerine.pce.application.config.FxProperties;
+import ca.tangerine.pce.model.domain.calculation.allocation.GeographicExposureData;
+import ca.tangerine.pce.model.domain.calculation.allocation.HoldingGeographicAllocation;
+import ca.tangerine.pce.model.domain.holding.CashHolding;
+import ca.tangerine.pce.model.domain.holding.GicHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.exposure.GeographicExposureResult;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.util.PortfolioHoldingBuildHelper;
+import ca.tangerine.wm.commons.domain.allocation.GeographicRegionType;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.financial.Geography;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,26 +41,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.calculation.service.FxRateService;
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
-import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
-import ca.tangerine.pce.application.config.FxProperties;
-import ca.tangerine.pce.model.domain.calculation.allocation.GeographicExposureData;
-import ca.tangerine.pce.model.domain.calculation.allocation.HoldingGeographicAllocation;
-import ca.tangerine.pce.model.domain.holding.CashHolding;
-import ca.tangerine.pce.model.domain.holding.GicHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.exposure.GeographicExposureResult;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.util.PortfolioHoldingBuildHelper;
-import ca.tangerine.wm.commons.domain.allocation.GeographicRegionType;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.financial.Geography;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Shared assertions for geographic exposure breakdown services. Mirrors the service hierarchy: every behaviour driven

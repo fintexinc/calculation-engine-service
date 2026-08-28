@@ -1,5 +1,17 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.holding.CashHolding;
+import ca.tangerine.pce.model.domain.holding.MonthlyReturnGeneratableHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.ValidationException;
+import ca.tangerine.pce.util.DateTimeUtils;
+import ca.tangerine.pce.util.FilterUtils;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -12,18 +24,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
 import static ca.tangerine.wm.commons.domain.id.FiIdentifierType.TICKER_MIC;
-
-import ca.tangerine.pce.model.domain.holding.CashHolding;
-import ca.tangerine.pce.model.domain.holding.MonthlyReturnGeneratableHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.ValidationException;
-import ca.tangerine.pce.util.DateTimeUtils;
-import ca.tangerine.pce.util.FilterUtils;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 /**
  * Holding-level request validation shared by the portfolio, benchmark and multi-portfolio request validators. Applies

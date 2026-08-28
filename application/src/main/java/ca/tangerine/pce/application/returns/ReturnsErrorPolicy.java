@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
+
 import java.util.List;
 import java.util.Set;
 
@@ -7,11 +12,6 @@ import static ca.tangerine.pce.model.error.ErrorCode.CPED_AFTER_PORTFOLIO_PED;
 import static ca.tangerine.pce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC;
 import static ca.tangerine.pce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static ca.tangerine.pce.model.error.ErrorCode.MISSING_MONTHLY_RETURNS;
-
-import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
-import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
 
 /**
  * Stateless utility encoding which accumulated errors are recoverable warnings and which are fatal — i.e. which cause

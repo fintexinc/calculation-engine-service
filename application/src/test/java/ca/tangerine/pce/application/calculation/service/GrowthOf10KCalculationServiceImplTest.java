@@ -1,19 +1,5 @@
 package ca.tangerine.pce.application.calculation.service;
 
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-
-import static ca.tangerine.pce.model.util.BigDecimalConstants.TEN_THOUSAND;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import ca.tangerine.pce.application.returns.MonthlyReturnsContext;
 import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import ca.tangerine.pce.application.returns.ReturnsSnapshot;
@@ -28,6 +14,20 @@ import ca.tangerine.pce.model.domain.result.returns.Growth10KResult;
 import ca.tangerine.pce.model.dto.command.ReturnCommand;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+
+import static ca.tangerine.pce.model.util.BigDecimalConstants.TEN_THOUSAND;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class GrowthOf10KCalculationServiceImplTest {
 

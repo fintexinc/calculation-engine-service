@@ -1,16 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.Map;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.fundCa;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
-import static java.math.BigDecimal.ONE;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.calculation.allocation.GeographicExposureData;
 import ca.tangerine.pce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
@@ -23,6 +12,17 @@ import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.financial.Geography;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.Map;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.fundCa;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
+import static java.math.BigDecimal.ONE;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class EquityGeographicExposureServiceTest
     extends

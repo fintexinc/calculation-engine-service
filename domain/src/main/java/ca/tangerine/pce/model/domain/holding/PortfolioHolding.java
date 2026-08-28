@@ -1,5 +1,10 @@
 package ca.tangerine.pce.model.domain.holding;
 
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -15,11 +20,6 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import static ca.tangerine.pce.model.error.ErrorCode.Codes.FIELD_NOT_NULL;
-
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "holdingType", visible = true, defaultImpl = PortfolioHolding.class)
 @JsonSubTypes({

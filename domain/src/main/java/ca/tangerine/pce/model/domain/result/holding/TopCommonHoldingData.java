@@ -1,15 +1,15 @@
 package ca.tangerine.pce.model.domain.result.holding;
 
+import ca.tangerine.pce.model.domain.result.correlation.HoldingsKeyResult;
+import ca.tangerine.wm.commons.domain.holding.HoldingType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import java.math.BigDecimal;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import ca.tangerine.pce.model.domain.result.correlation.HoldingsKeyResult;
-import ca.tangerine.wm.commons.domain.holding.HoldingType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 @Builder
 @Data

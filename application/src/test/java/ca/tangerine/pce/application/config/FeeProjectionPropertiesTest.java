@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -17,8 +19,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * Typing the periods removed two of the cases this used to cover — a horizon below one year, and a null one — because

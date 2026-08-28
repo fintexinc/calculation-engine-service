@@ -1,11 +1,11 @@
 package ca.tangerine.pce.port.observability;
 
-import java.util.List;
-import java.util.function.Supplier;
-
 import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
 import ca.tangerine.pce.model.domain.result.composite.CompositeCalculationResult;
 import ca.tangerine.pce.model.dto.command.CalculationCommand;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Observes the dispatch of a calculation: the caller hands over the work, and whatever telemetry the deployment

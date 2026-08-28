@@ -1,5 +1,22 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
+import ca.tangerine.pce.application.calculation.service.FxRateService;
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
+import ca.tangerine.pce.application.config.FeeProjectionProperties;
+import ca.tangerine.pce.application.config.FxProperties;
+import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
+import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.fee.FeesResult;
+import ca.tangerine.pce.model.dto.command.AverageMerCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -25,23 +42,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.calculation.service.FxRateService;
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
-import ca.tangerine.pce.application.config.FeeProjectionProperties;
-import ca.tangerine.pce.application.config.FxProperties;
-import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
-import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.fee.FeesResult;
-import ca.tangerine.pce.model.dto.command.AverageMerCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 
 class FeesCalculationServiceImplTest {
 

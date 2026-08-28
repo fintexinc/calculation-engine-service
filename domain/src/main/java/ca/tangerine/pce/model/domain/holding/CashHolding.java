@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.holding;
 
+import ca.tangerine.pce.model.domain.enumeration.InterestFreq;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -8,9 +11,6 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
-
-import ca.tangerine.pce.model.domain.enumeration.InterestFreq;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 @Getter
 @ToString(callSuper = true)

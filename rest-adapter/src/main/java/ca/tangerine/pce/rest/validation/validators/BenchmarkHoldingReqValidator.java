@@ -1,12 +1,12 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
 
 /**
  * Requires and validates {@code benchmarkHoldings} for every metric that compares a portfolio against a benchmark — the

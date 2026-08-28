@@ -1,12 +1,12 @@
 package ca.tangerine.pce.rest.config;
 
+import ca.tangerine.pce.rest.controller.PortfolioCalculationController;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.UrlHandlerFilter;
-
-import ca.tangerine.pce.rest.controller.PortfolioCalculationController;
 
 /**
  * Makes a trailing slash carry no semantics, as the Tangerine API guidelines require: Spring Boot 3 stopped matching

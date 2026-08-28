@@ -1,14 +1,5 @@
 package ca.tangerine.pce.application.calculation.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import ca.tangerine.pce.application.returns.ReturnsSnapshot;
 import ca.tangerine.pce.calculation.ReturnsBasedCalculationService;
 import ca.tangerine.pce.model.domain.calculation.DateRange;
@@ -22,6 +13,15 @@ import ca.tangerine.pce.model.dto.command.MultiplePortfoliosCommand;
 import ca.tangerine.pce.model.error.PceExceptionCollector;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Service
 public class CommonPerformanceDateServiceImpl

@@ -1,5 +1,7 @@
 package ca.tangerine.pce.rest.observability;
 
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,8 +20,6 @@ import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 
 import java.util.Map;
-
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
 
 /**
  * Describes the calculation-statistics actuator endpoint in the OpenAPI document. {@code springdoc.show-actuator} alone

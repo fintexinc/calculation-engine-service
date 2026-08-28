@@ -1,5 +1,21 @@
 package ca.tangerine.pce.application.returns.pipeline;
 
+import ca.tangerine.pce.application.returns.FxContext;
+import ca.tangerine.pce.application.returns.MonthlyReturnsContext;
+import ca.tangerine.pce.application.returns.ProcessingCase;
+import ca.tangerine.pce.application.returns.ProcessingContext;
+import ca.tangerine.pce.application.returns.ProcessorsRunner;
+import ca.tangerine.pce.application.returns.ReturnsRole;
+import ca.tangerine.pce.application.returns.ReturnsSnapshot;
+import ca.tangerine.pce.application.returns.WeightedAverageComponent;
+import ca.tangerine.pce.application.returns.WeightedAverageResult;
+import ca.tangerine.pce.application.returns.processor.ReturnsProcessor;
+import ca.tangerine.pce.application.util.ReturnFactorScale;
+import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -16,22 +32,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.returns.FxContext;
-import ca.tangerine.pce.application.returns.MonthlyReturnsContext;
-import ca.tangerine.pce.application.returns.ProcessingCase;
-import ca.tangerine.pce.application.returns.ProcessingContext;
-import ca.tangerine.pce.application.returns.ProcessorsRunner;
-import ca.tangerine.pce.application.returns.ReturnsRole;
-import ca.tangerine.pce.application.returns.ReturnsSnapshot;
-import ca.tangerine.pce.application.returns.WeightedAverageComponent;
-import ca.tangerine.pce.application.returns.WeightedAverageResult;
-import ca.tangerine.pce.application.returns.processor.ReturnsProcessor;
-import ca.tangerine.pce.application.util.ReturnFactorScale;
-import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
 
 /**
  * End-to-end checks against the per-case pipeline strategies: each one must run applicable processors via the runner,

@@ -1,8 +1,8 @@
 package ca.tangerine.pce.model.domain.calculation.allocation;
 
-import lombok.Getter;
-
 import ca.tangerine.pce.model.error.ErrorCode;
+
+import lombok.Getter;
 
 @Getter
 public enum CountryRegionType {

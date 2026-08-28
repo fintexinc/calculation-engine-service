@@ -1,5 +1,21 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationEMResult;
+import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationResult;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
+import ca.tangerine.wm.commons.domain.allocation.AssetAllocation;
+import ca.tangerine.wm.commons.domain.allocation.AssetAllocationRegionType;
+import ca.tangerine.wm.commons.domain.allocation.AssetAllocationValue;
+import ca.tangerine.wm.commons.domain.allocation.AssetAllocationWithCurrency;
+import ca.tangerine.wm.commons.domain.allocation.SecurityRegion;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -25,22 +41,6 @@ import static ca.tangerine.pce.e2e.MicAttributeResponses.currencyDatapoint;
 import static ca.tangerine.pce.e2e.MicAttributeResponses.geographyRow;
 import static ca.tangerine.pce.e2e.MicAttributeResponses.morningstarOnly;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationEMResult;
-import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationResult;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
-import ca.tangerine.wm.commons.domain.allocation.AssetAllocation;
-import ca.tangerine.wm.commons.domain.allocation.AssetAllocationRegionType;
-import ca.tangerine.wm.commons.domain.allocation.AssetAllocationValue;
-import ca.tangerine.wm.commons.domain.allocation.AssetAllocationWithCurrency;
-import ca.tangerine.wm.commons.domain.allocation.SecurityRegion;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 
 /**
  * End-to-end coverage for the {@code /asset-allocations-em} endpoint. It is the asset-allocation breakdown with one

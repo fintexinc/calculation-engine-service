@@ -1,10 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.wm.commons.domain.allocation.GeographicRegionType;
@@ -14,6 +9,11 @@ import ca.tangerine.wm.commons.domain.enumeration.Country;
 import ca.tangerine.wm.commons.domain.financial.Geography;
 import ca.tangerine.wm.commons.domain.reference.CountryDatapoint;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Resolves the single geographic region of an individual stock from the {@code GEOGRAPHY} attribute.

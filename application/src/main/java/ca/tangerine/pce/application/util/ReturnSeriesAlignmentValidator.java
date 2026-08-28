@@ -1,5 +1,8 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.util.DateTimeUtils;
+
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -13,9 +16,6 @@ import lombok.experimental.UtilityClass;
 
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.util.stream.Collectors.joining;
-
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.util.DateTimeUtils;
 
 @UtilityClass
 public class ReturnSeriesAlignmentValidator {

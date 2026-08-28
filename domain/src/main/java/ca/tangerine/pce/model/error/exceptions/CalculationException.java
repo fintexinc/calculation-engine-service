@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.error.exceptions;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+
 import java.io.Serial;
 import java.util.Map;
 import lombok.EqualsAndHashCode;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
 
 /**
  * Runtime exception thrown by calculation services and related components when a calculation step fails due to missing

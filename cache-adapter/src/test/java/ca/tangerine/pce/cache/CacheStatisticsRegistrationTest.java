@@ -1,5 +1,15 @@
 package ca.tangerine.pce.cache;
 
+import ca.tangerine.pce.cache.config.CacheDataProperties.FxRatesCacheProperties;
+import ca.tangerine.pce.cache.fx.CaffeineFxRatesCache;
+import ca.tangerine.pce.cache.tbills.CachingTreasuryBillsFetcher;
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.port.observability.CacheObservability;
+import ca.tangerine.pce.port.observability.CacheStatistics;
+import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,16 +28,6 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.cache.config.CacheDataProperties.FxRatesCacheProperties;
-import ca.tangerine.pce.cache.fx.CaffeineFxRatesCache;
-import ca.tangerine.pce.cache.tbills.CachingTreasuryBillsFetcher;
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.port.observability.CacheObservability;
-import ca.tangerine.pce.port.observability.CacheStatistics;
-import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 /**
  * Both Caffeine caches make their effectiveness reportable by registering a live statistics view under their own name,

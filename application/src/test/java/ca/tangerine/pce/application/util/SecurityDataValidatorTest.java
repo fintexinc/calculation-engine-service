@@ -1,5 +1,11 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -9,12 +15,6 @@ import java.util.Map;
 import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 class SecurityDataValidatorTest {
 

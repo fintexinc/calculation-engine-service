@@ -1,13 +1,13 @@
 package ca.tangerine.pce.model.domain.calculation.holding;
 
+import ca.tangerine.wm.commons.domain.holding.HoldingType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import ca.tangerine.wm.commons.domain.holding.HoldingType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 @Data
 @AllArgsConstructor

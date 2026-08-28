@@ -1,12 +1,5 @@
 package ca.tangerine.pce.webclient.boc.client;
 
-import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import ca.tangerine.pce.model.error.exceptions.ExternalServiceBadResponseException;
 import ca.tangerine.pce.model.error.exceptions.ExternalServiceUnavailableException;
 import ca.tangerine.pce.port.observability.ExternalCallObservability;
@@ -15,6 +8,13 @@ import ca.tangerine.pce.webclient.observability.ResponseItemCount;
 import ca.tangerine.pce.webclient.resilience.ExternalCallErrorMapper;
 import ca.tangerine.pce.webclient.resilience.ExternalCallResilience;
 import ca.tangerine.wm.commons.domain.ExternalWebService;
+
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * WebClient for Bank of Canada API calls. Every call runs through {@link ExternalCallResilience}: transient failures —

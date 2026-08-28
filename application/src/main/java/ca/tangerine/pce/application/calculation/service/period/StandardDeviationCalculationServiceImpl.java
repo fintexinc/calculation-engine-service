@@ -1,12 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.period;
 
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-
-import static ca.tangerine.pce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
-import static ca.tangerine.pce.model.util.BigDecimalConstants.OUTPUT_SCALE;
-
 import ca.tangerine.pce.application.calculation.metric.StandardDeviationCalculation;
 import ca.tangerine.pce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
 import ca.tangerine.pce.application.config.PeriodProperties;
@@ -21,6 +14,13 @@ import ca.tangerine.pce.model.domain.result.risk.StandardDeviationResult;
 import ca.tangerine.pce.model.dto.command.PeriodCommand;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.model.error.exceptions.CalculationException;
+
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+
+import static ca.tangerine.pce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
+import static ca.tangerine.pce.model.util.BigDecimalConstants.OUTPUT_SCALE;
 
 @Service
 public class StandardDeviationCalculationServiceImpl

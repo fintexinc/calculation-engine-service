@@ -1,15 +1,5 @@
 package ca.tangerine.pce.model.domain.result;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.util.ArrayList;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-
 import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationEMResult;
 import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationResult;
 import ca.tangerine.pce.model.domain.result.allocation.ConsolidatedSectorExposureResult;
@@ -31,6 +21,16 @@ import ca.tangerine.pce.model.domain.result.risk.MaxDrawdownResult;
 import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
 import ca.tangerine.pce.model.domain.result.risk.StandardDeviationResult;
 import ca.tangerine.wm.commons.error.Notification;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Base of every calculation result: the warnings a calculation may produce alongside its numbers. The concrete results

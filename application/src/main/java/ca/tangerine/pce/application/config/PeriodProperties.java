@@ -1,5 +1,8 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -12,9 +15,6 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * The default period sets each metric family reports when a request names none. One typed bean in place of the

@@ -1,12 +1,12 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.error.ErrorCode;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.SortedMap;
 import lombok.experimental.UtilityClass;
-
-import ca.tangerine.pce.model.error.ErrorCode;
 
 /**
  * Single source of truth for the per-date T-Bill coverage precondition. Throws {@link ErrorCode#MISSING_TBILL_RATE}

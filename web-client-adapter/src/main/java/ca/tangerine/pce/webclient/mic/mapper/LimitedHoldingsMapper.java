@@ -1,12 +1,12 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-
 import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.holding.Holdings;
 import ca.tangerine.wm.commons.domain.holding.SecurityHolding;
+
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Maps the {@code LIMITED_HOLDINGS} payload — the holdings table decomposed through nested funds and aggregated per

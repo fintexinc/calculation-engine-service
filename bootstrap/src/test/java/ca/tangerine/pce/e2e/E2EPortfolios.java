@@ -1,8 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import java.math.BigDecimal;
-import lombok.experimental.UtilityClass;
-
 import ca.tangerine.pce.model.domain.holding.CashHolding;
 import ca.tangerine.pce.model.domain.holding.GicHolding;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
@@ -12,6 +9,9 @@ import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import java.math.BigDecimal;
+import lombok.experimental.UtilityClass;
 
 /**
  * Holding builders shared by the bootstrap-level e2e tests. Which identifier type a holding is addressed by is a

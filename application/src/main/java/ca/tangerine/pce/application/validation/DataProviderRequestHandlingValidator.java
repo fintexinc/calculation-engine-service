@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.validation;
 
+import ca.tangerine.wm.commons.domain.DataProvider;
+
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
@@ -7,8 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import ca.tangerine.wm.commons.domain.DataProvider;
 
 public class DataProviderRequestHandlingValidator {
 

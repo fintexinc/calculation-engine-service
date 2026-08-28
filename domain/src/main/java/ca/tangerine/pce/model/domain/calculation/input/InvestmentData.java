@@ -1,5 +1,7 @@
 package ca.tangerine.pce.model.domain.calculation.input;
 
+import ca.tangerine.pce.model.domain.enumeration.Frequency;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -9,8 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import static ca.tangerine.pce.model.util.BigDecimalConstants.TEN_THOUSAND;
-
-import ca.tangerine.pce.model.domain.enumeration.Frequency;
 
 @Data
 @AllArgsConstructor

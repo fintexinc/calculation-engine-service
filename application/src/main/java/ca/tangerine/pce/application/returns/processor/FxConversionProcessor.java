@@ -1,5 +1,18 @@
 package ca.tangerine.pce.application.returns.processor;
 
+import ca.tangerine.pce.application.calculation.service.FxRateService;
+import ca.tangerine.pce.application.returns.PerformancePeriodCalculator;
+import ca.tangerine.pce.application.returns.ProcessingCase;
+import ca.tangerine.pce.application.returns.ProcessingContext;
+import ca.tangerine.pce.application.returns.ReturnsErrorPolicy;
+import ca.tangerine.pce.application.returns.ReturnsSnapshot;
+import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -14,19 +27,6 @@ import lombok.RequiredArgsConstructor;
 
 import static ca.tangerine.pce.application.util.CollectorUtils.toMap;
 import static ca.tangerine.pce.model.error.ErrorParams.HOLDING_ID;
-
-import ca.tangerine.pce.application.calculation.service.FxRateService;
-import ca.tangerine.pce.application.returns.PerformancePeriodCalculator;
-import ca.tangerine.pce.application.returns.ProcessingCase;
-import ca.tangerine.pce.application.returns.ProcessingContext;
-import ca.tangerine.pce.application.returns.ReturnsErrorPolicy;
-import ca.tangerine.pce.application.returns.ReturnsSnapshot;
-import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Converts each holding's returns from its source currency into the request's target currency. Per the FX contract

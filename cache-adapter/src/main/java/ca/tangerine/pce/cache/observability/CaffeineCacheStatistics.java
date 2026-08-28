@@ -1,8 +1,8 @@
 package ca.tangerine.pce.cache.observability;
 
-import com.github.benmanes.caffeine.cache.Cache;
-
 import ca.tangerine.pce.port.observability.CacheStatistics;
+
+import com.github.benmanes.caffeine.cache.Cache;
 
 /**
  * Exposes a Caffeine cache as a {@link CacheStatistics}, which is the only place in this module that knows the caching

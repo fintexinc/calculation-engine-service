@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -7,11 +12,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
-import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
 
 class ReturnsErrorPolicyTest {
 

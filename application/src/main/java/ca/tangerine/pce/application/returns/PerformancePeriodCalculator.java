@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -13,8 +15,6 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 /**
  * Stateless utilities for the performance window (PSD / PED) and for trimming a per-holding returns map by date.
  *

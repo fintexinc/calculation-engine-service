@@ -1,5 +1,9 @@
 package ca.tangerine.pce.model.dto.command;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.dto.command.contract.HoldingsProvider;
+import ca.tangerine.pce.model.error.ErrorCode;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -11,10 +15,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.dto.command.contract.HoldingsProvider;
-import ca.tangerine.pce.model.error.ErrorCode;
 @Data
 @SuperBuilder
 @NoArgsConstructor

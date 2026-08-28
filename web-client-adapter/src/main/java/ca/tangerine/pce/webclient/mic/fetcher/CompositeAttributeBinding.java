@@ -1,16 +1,16 @@
 package ca.tangerine.pce.webclient.mic.fetcher;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.webclient.mic.mapper.MarketInvestmentCatalogueResponseMapper;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.webclient.mic.mapper.MarketInvestmentCatalogueResponseMapper;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 
 /**
  * Associates a {@link CompositeSecurityAttribute} with the MIC response type it deserializes into, the CE domain type

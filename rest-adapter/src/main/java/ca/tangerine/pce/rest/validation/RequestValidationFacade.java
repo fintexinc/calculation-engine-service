@@ -1,15 +1,15 @@
 package ca.tangerine.pce.rest.validation;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.error.PceExceptionCollector;
+
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.error.PceExceptionCollector;
 
 /**
  * Aggregates all {@link RequestValidator}s by supported metric. All violations found by the metric's validators are

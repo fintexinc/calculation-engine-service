@@ -1,5 +1,26 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
+import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
+import ca.tangerine.wm.commons.domain.rates.DateRateValue;
+import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
+import ca.tangerine.wm.commons.error.ErrorResponse;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -22,26 +43,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
-import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
-import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
-import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
-import ca.tangerine.wm.commons.domain.rates.DateRateValue;
-import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
-import ca.tangerine.wm.commons.error.ErrorResponse;
-import ca.tangerine.wm.commons.error.Notification;
 import okhttp3.mockwebserver.MockWebServer;
 
 /**

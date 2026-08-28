@@ -1,5 +1,13 @@
 package ca.tangerine.pce.observability.calculation;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport.MetricStatistics;
+import ca.tangerine.wm.commons.error.Notification;
+import ca.tangerine.wm.commons.error.Severity;
+
 import org.junit.jupiter.api.Test;
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -8,14 +16,6 @@ import java.time.Duration;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport.MetricStatistics;
-import ca.tangerine.wm.commons.error.Notification;
-import ca.tangerine.wm.commons.error.Severity;
 
 class MeterCalculationStatisticsProviderTest {
 

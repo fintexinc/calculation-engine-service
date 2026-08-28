@@ -1,5 +1,16 @@
 package ca.tangerine.pce.webclient.mic.fetcher;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.security.SecurityData;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.port.webclient.mic.SecurityAttributesFetcher;
+import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClient;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.dto.request.CompositeAttributesRequest;
+import ca.tangerine.wm.commons.dto.request.IdsAndDataProvidersRequest;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.CollectionUtils;
 
@@ -13,17 +24,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.security.SecurityData;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.port.webclient.mic.SecurityAttributesFetcher;
-import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClient;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.dto.request.CompositeAttributesRequest;
-import ca.tangerine.wm.commons.dto.request.IdsAndDataProvidersRequest;
 
 /**
  * Generic Market Investment Catalogue client that fetches any combination of composite security attributes in a single

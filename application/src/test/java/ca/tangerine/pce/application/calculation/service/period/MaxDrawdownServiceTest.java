@@ -1,5 +1,23 @@
 package ca.tangerine.pce.application.calculation.service.period;
 
+import ca.tangerine.pce.application.config.PeriodProperties;
+import ca.tangerine.pce.application.returns.MonthlyReturnsContext;
+import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import ca.tangerine.pce.application.returns.ReturnsSnapshot;
+import ca.tangerine.pce.application.returns.WeightedAverageResult;
+import ca.tangerine.pce.application.returns.pipeline.CpedScaleParams;
+import ca.tangerine.pce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
+import ca.tangerine.pce.application.util.Growth10KHelper;
+import ca.tangerine.pce.application.util.ReturnFactorScale;
+import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
+import ca.tangerine.pce.model.domain.result.MaxDrawdownEntry;
+import ca.tangerine.pce.model.domain.result.risk.MaxDrawdownResult;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.pce.model.util.BigDecimalConstants;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,24 +54,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.config.PeriodProperties;
-import ca.tangerine.pce.application.returns.MonthlyReturnsContext;
-import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
-import ca.tangerine.pce.application.returns.ReturnsSnapshot;
-import ca.tangerine.pce.application.returns.WeightedAverageResult;
-import ca.tangerine.pce.application.returns.pipeline.CpedScaleParams;
-import ca.tangerine.pce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
-import ca.tangerine.pce.application.util.Growth10KHelper;
-import ca.tangerine.pce.application.util.ReturnFactorScale;
-import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
-import ca.tangerine.pce.model.domain.result.MaxDrawdownEntry;
-import ca.tangerine.pce.model.domain.result.risk.MaxDrawdownResult;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.pce.model.util.BigDecimalConstants;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 class MaxDrawdownServiceTest {
 

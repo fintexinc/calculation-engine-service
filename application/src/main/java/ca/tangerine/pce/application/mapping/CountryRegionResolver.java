@@ -1,5 +1,11 @@
 package ca.tangerine.pce.application.mapping;
 
+import ca.tangerine.pce.application.util.JacksonUtil;
+import ca.tangerine.pce.model.domain.calculation.allocation.CountryAllocation;
+import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -8,12 +14,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import ca.tangerine.pce.application.util.JacksonUtil;
-import ca.tangerine.pce.model.domain.calculation.allocation.CountryAllocation;
-import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
 
 /**
  * Resolves a {@link Country} to its {@link CountryRegionType} bucket using the {@code country-allocation-mapping.json}

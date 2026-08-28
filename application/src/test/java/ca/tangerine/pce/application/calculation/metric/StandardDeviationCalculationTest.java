@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.calculation.metric;
 
+import ca.tangerine.pce.application.util.CalculationUtils;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
+import ca.tangerine.pce.model.domain.result.risk.StandardDeviationResult;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,11 +38,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
-import ca.tangerine.pce.application.util.CalculationUtils;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
-import ca.tangerine.pce.model.domain.result.risk.StandardDeviationResult;
 
 class StandardDeviationCalculationTest {
 

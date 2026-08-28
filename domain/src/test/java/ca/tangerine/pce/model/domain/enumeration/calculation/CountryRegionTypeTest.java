@@ -1,14 +1,14 @@
 package ca.tangerine.pce.model.domain.enumeration.calculation;
 
+import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType.CANADA;
 import static ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType.INTERNATIONAL_DEVELOPED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
 
 class CountryRegionTypeTest {
 

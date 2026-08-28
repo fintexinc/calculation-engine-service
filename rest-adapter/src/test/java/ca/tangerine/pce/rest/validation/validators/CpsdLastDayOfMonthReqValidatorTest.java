@@ -1,11 +1,11 @@
 package ca.tangerine.pce.rest.validation.validators;
 
-import java.time.LocalDate;
-
 import ca.tangerine.pce.model.dto.command.CalculationCommand;
 import ca.tangerine.pce.model.dto.command.ReturnCommand;
 import ca.tangerine.pce.rest.validation.RequestValidator;
 import ca.tangerine.wm.commons.domain.currency.Currency;
+
+import java.time.LocalDate;
 
 class CpsdLastDayOfMonthReqValidatorTest extends AbstractLastDayOfMonthReqValidatorTest {
 

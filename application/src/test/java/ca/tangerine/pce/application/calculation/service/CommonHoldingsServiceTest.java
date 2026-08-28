@@ -1,5 +1,22 @@
 package ca.tangerine.pce.application.calculation.service;
 
+import ca.tangerine.pce.application.config.FxProperties;
+import ca.tangerine.pce.application.config.TopHoldingsProperties;
+import ca.tangerine.pce.model.domain.calculation.holding.CommonHolding;
+import ca.tangerine.pce.model.domain.calculation.holding.CommonTopHoldings;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.holding.TopCommonHoldingData;
+import ca.tangerine.pce.model.domain.result.holding.TopCommonHoldingsResult;
+import ca.tangerine.pce.model.dto.command.TopCommonHoldingsCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.ErrorParams;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.holding.HoldingType;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,23 +42,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.config.FxProperties;
-import ca.tangerine.pce.application.config.TopHoldingsProperties;
-import ca.tangerine.pce.model.domain.calculation.holding.CommonHolding;
-import ca.tangerine.pce.model.domain.calculation.holding.CommonTopHoldings;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.holding.TopCommonHoldingData;
-import ca.tangerine.pce.model.domain.result.holding.TopCommonHoldingsResult;
-import ca.tangerine.pce.model.dto.command.TopCommonHoldingsCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.ErrorParams;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.holding.HoldingType;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 class CommonHoldingsServiceTest {
 

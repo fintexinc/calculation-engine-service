@@ -1,12 +1,5 @@
 package ca.tangerine.pce.application.returns;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import lombok.extern.slf4j.Slf4j;
-
 import ca.tangerine.pce.application.calculation.service.FxRateService;
 import ca.tangerine.pce.application.calculation.service.MonthlyReturnsService;
 import ca.tangerine.pce.model.domain.CurrencyExchangePair;
@@ -14,6 +7,13 @@ import ca.tangerine.pce.model.domain.calculation.DateRange;
 import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.wm.commons.domain.currency.Currency;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Builds a role-tagged {@link MonthlyReturnsContext} from a list of holdings + a target currency: pulls the monthly

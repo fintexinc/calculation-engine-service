@@ -1,5 +1,15 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
+import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
+import ca.tangerine.pce.application.util.AllocationHelper;
+import ca.tangerine.pce.application.util.PortfolioUtils;
+import ca.tangerine.pce.calculation.CalculationService;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -12,16 +22,6 @@ import static ca.tangerine.pce.application.util.CalculationUtils.reScale;
 import static ca.tangerine.pce.application.util.DecimalUtils.toUserScale;
 import static ca.tangerine.pce.util.FilterUtils.CASH_PREDICATE;
 import static ca.tangerine.pce.util.FilterUtils.GIC_PREDICATE;
-
-import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
-import ca.tangerine.pce.application.util.AllocationHelper;
-import ca.tangerine.pce.application.util.PortfolioUtils;
-import ca.tangerine.pce.calculation.CalculationService;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Single template for every breakdown allocation / exposure metric. All of these metrics are computed the same way and

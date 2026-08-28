@@ -1,20 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static ca.tangerine.pce.application.constant.HoldingTypeGroup.MER_BEARING_TYPES;
-import static ca.tangerine.pce.application.util.DecimalUtils.divide;
-import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
-import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
-import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
-import static ca.tangerine.pce.model.util.BigDecimalConstants.TWELVE;
-
 import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
 import ca.tangerine.pce.application.config.FeeProjectionProperties;
 import ca.tangerine.pce.application.util.FeeProjectionUtils;
@@ -30,6 +15,21 @@ import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static ca.tangerine.pce.application.constant.HoldingTypeGroup.MER_BEARING_TYPES;
+import static ca.tangerine.pce.application.util.DecimalUtils.divide;
+import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
+import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
+import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
+import static ca.tangerine.pce.model.util.BigDecimalConstants.TWELVE;
 
 /**
  * Annual / Monthly / multi-year projected fee dollar amounts in the configured default target currency (default CAD).

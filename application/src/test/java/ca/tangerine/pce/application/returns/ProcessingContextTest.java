@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 class ProcessingContextTest {
 

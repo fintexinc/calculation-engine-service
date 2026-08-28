@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 /**
  * FX-related configuration. {@code defaultTargetCurrency} is the reporting currency that money-value calculations

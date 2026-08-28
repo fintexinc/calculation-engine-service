@@ -1,8 +1,8 @@
 package ca.tangerine.pce.model.domain.calculation;
 
-import java.util.Map;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
+import java.util.Map;
 
 /**
  * Prepared per-holding Market Investment Catalogue data for a calculation that has both a portfolio side and a

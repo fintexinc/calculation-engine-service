@@ -1,16 +1,16 @@
 package ca.tangerine.pce.rest.validation.validators;
 
-import java.util.List;
-import java.util.function.Function;
-
-import static java.util.Objects.isNull;
-
 import ca.tangerine.pce.model.domain.holding.GicHolding;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.dto.command.CalculationCommand;
 import ca.tangerine.pce.model.dto.command.contract.HoldingsProvider;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.rest.validation.RequestValidator;
+
+import java.util.List;
+import java.util.function.Function;
+
+import static java.util.Objects.isNull;
 
 /**
  * Base validator that ensures a required field on every {@link GicHolding} in the command's holdings list is non-null.

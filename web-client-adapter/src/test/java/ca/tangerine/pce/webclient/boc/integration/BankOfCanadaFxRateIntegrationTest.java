@@ -1,5 +1,13 @@
 package ca.tangerine.pce.webclient.boc.integration;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.port.observability.ExternalCallObservability;
+import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaWebClientConfig;
+import ca.tangerine.pce.webclient.resilience.ExternalCallResilienceConfig;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,13 +38,6 @@ import java.util.NavigableMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.port.observability.ExternalCallObservability;
-import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaWebClientConfig;
-import ca.tangerine.pce.webclient.resilience.ExternalCallResilienceConfig;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;

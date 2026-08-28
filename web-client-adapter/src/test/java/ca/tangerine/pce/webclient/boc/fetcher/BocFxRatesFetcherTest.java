@@ -1,5 +1,15 @@
 package ca.tangerine.pce.webclient.boc.fetcher;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties;
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties.CurrencyPairConfig;
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaWebClient;
+import ca.tangerine.pce.webclient.boc.client.FxRateSource;
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
+import ca.tangerine.pce.webclient.boc.mapper.BankOfCanadaFxRateMapper;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,16 +33,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties;
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties.CurrencyPairConfig;
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaWebClient;
-import ca.tangerine.pce.webclient.boc.client.FxRateSource;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
-import ca.tangerine.pce.webclient.boc.mapper.BankOfCanadaFxRateMapper;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 @ExtendWith(MockitoExtension.class)
 class BocFxRatesFetcherTest {

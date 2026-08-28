@@ -1,9 +1,5 @@
 package ca.tangerine.pce.model.domain.result.correlation;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-import java.math.BigDecimal;
-
 import ca.tangerine.pce.model.domain.holding.CashHolding;
 import ca.tangerine.pce.model.domain.holding.GicHolding;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
@@ -11,6 +7,10 @@ import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.math.BigDecimal;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record HoldingsKeyResult(

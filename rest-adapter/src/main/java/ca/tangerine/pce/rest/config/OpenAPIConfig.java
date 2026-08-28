@@ -1,5 +1,9 @@
 package ca.tangerine.pce.rest.config;
 
+import ca.tangerine.pce.calculation.CalculationService;
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
@@ -25,10 +29,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import ca.tangerine.pce.calculation.CalculationService;
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
 
 @Configuration
 public class OpenAPIConfig {

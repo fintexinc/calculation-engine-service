@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.mapping;
 
+import ca.tangerine.pce.model.domain.calculation.allocation.CountryAllocation;
+import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -16,11 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.model.domain.calculation.allocation.CountryAllocation;
-import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
 
 class CountryRegionResolverTest {
 

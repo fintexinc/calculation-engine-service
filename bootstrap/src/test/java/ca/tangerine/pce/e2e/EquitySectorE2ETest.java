@@ -1,22 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.equity;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static java.math.BigDecimal.ZERO;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.domain.result.allocation.EquitySectorResult;
@@ -37,6 +20,24 @@ import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.error.ErrorResponse;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.equity;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static java.math.BigDecimal.ZERO;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;

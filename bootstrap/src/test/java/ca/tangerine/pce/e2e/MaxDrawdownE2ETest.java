@@ -1,5 +1,21 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.result.MaxDrawdownEntry;
+import ca.tangerine.pce.model.domain.result.risk.MaxDrawdownResult;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
+import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
+
 import org.springframework.http.HttpStatus;
 
 import org.junit.jupiter.api.Test;
@@ -16,22 +32,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.SIX_MTH;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.THREE_MTH;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.THREE_YR;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.result.MaxDrawdownEntry;
-import ca.tangerine.pce.model.domain.result.risk.MaxDrawdownResult;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
-import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
-import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
 
 /**
  * End-to-end HTTP-boundary coverage for the {@code max-drawdown} metric. Uses two CAD holdings of different instrument

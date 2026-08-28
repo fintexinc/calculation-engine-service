@@ -1,21 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import org.springframework.http.HttpStatus;
-
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
 import ca.tangerine.pce.model.domain.result.risk.StandardDeviationResult;
@@ -35,6 +19,22 @@ import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
 import ca.tangerine.wm.commons.error.ErrorResponse;
 import ca.tangerine.wm.commons.error.Notification;
 import ca.tangerine.wm.commons.error.Severity;
+
+import org.springframework.http.HttpStatus;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 @Tag("e2e")
 class StandardDeviationE2ETest extends AbstractPortfolioCalculationE2ETest {

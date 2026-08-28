@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.dto.command;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 
 /**
  * Resolves the concrete {@link CalculationCommand} subtype from the {@code metric} discriminator using the canonical

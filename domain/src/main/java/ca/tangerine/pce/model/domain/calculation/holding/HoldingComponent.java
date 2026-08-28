@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.domain.calculation.holding;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.domain.holding.HoldingType;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.domain.holding.HoldingType;
 
 /**
  * Component role of the Composite pattern for the expanded underlying-holdings tree. Both the terminal

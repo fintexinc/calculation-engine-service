@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.application.config.DefaultDataProperties;
+import ca.tangerine.pce.util.DateTimeUtils;
+import ca.tangerine.wm.commons.domain.DataProvider;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.experimental.UtilityClass;
-
-import ca.tangerine.pce.application.config.DefaultDataProperties;
-import ca.tangerine.pce.util.DateTimeUtils;
-import ca.tangerine.wm.commons.domain.DataProvider;
 
 @UtilityClass
 public class TestConstants {

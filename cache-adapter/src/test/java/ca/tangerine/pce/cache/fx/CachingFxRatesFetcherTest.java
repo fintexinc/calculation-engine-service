@@ -1,5 +1,12 @@
 package ca.tangerine.pce.cache.fx;
 
+import ca.tangerine.pce.cache.config.CacheDataProperties.FxRatesCacheProperties;
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.port.observability.CacheObservability;
+import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,13 +30,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.cache.config.CacheDataProperties.FxRatesCacheProperties;
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.port.observability.CacheObservability;
-import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 @ExtendWith(MockitoExtension.class)
 class CachingFxRatesFetcherTest {

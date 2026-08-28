@@ -1,5 +1,9 @@
 package ca.tangerine.pce.config;
 
+import ca.tangerine.pce.webclient.resilience.ExternalCallResilience;
+import ca.tangerine.pce.webclient.resilience.ExternalCallResilienceConfig;
+import ca.tangerine.wm.commons.domain.ExternalWebService;
+
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
@@ -27,10 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.webclient.resilience.ExternalCallResilience;
-import ca.tangerine.pce.webclient.resilience.ExternalCallResilienceConfig;
-import ca.tangerine.wm.commons.domain.ExternalWebService;
 
 /**
  * Pins the retry and circuit breaker configuration in {@code application.yml} against the instance names the clients

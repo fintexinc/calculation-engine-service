@@ -1,5 +1,13 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.error.Notification;
+import ca.tangerine.wm.commons.error.Severity;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,14 +27,6 @@ import static ca.tangerine.pce.model.error.ErrorCode.CPED_AFTER_PORTFOLIO_PED;
 import static ca.tangerine.pce.model.error.ErrorCode.HOLDING_MISSING_CURRENCY_FROM_MIC;
 import static ca.tangerine.pce.model.error.ErrorCode.HOLDING_PSD_OUT_OF_RANGE;
 import static ca.tangerine.pce.model.error.ErrorParams.HOLDING_ID;
-
-import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.error.Notification;
-import ca.tangerine.wm.commons.error.Severity;
 
 /**
  * Immutable snapshot of returns data at a single point in a calculation pipeline.

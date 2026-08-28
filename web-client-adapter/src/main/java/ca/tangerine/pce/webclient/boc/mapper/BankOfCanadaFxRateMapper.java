@@ -1,5 +1,10 @@
 package ca.tangerine.pce.webclient.boc.mapper;
 
+import ca.tangerine.pce.webclient.boc.client.FxRateSource.Frequency;
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.SeriesValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -12,11 +17,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
-
-import ca.tangerine.pce.webclient.boc.client.FxRateSource.Frequency;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.SeriesValue;
 
 @Component
 public class BankOfCanadaFxRateMapper {

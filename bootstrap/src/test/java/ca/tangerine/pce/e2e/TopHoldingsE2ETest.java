@@ -1,20 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import org.springframework.http.HttpStatus;
-
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.result.holding.TopCommonHoldingData;
 import ca.tangerine.pce.model.domain.result.holding.TopCommonHoldingsResult;
@@ -31,6 +16,21 @@ import ca.tangerine.wm.commons.domain.holding.SecurityHolding;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.domain.value.MultilingualString;
+
+import org.springframework.http.HttpStatus;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("e2e")
 class TopHoldingsE2ETest extends AbstractPortfolioCalculationE2ETest {

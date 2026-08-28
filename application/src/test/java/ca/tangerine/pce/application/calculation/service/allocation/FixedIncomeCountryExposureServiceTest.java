@@ -1,20 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
-import static ca.tangerine.pce.model.error.ErrorCode.MISSING_BOND_COUNTRY_EXPOSURE;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import ca.tangerine.pce.application.calculation.service.FxRateService;
 import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
 import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
@@ -29,6 +14,21 @@ import ca.tangerine.wm.commons.domain.enumeration.Country;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import static ca.tangerine.pce.model.error.ErrorCode.MISSING_BOND_COUNTRY_EXPOSURE;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class FixedIncomeCountryExposureServiceTest {
 

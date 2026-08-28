@@ -1,15 +1,15 @@
 package ca.tangerine.pce.webclient.mic.integration;
 
+import ca.tangerine.pce.port.observability.ExternalCallObservability;
+import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClientConfig;
+import ca.tangerine.pce.webclient.mic.fetcher.SecurityAttributeFetcherConfig;
+import ca.tangerine.pce.webclient.resilience.ExternalCallResilienceConfig;
+
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-
-import ca.tangerine.pce.port.observability.ExternalCallObservability;
-import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClientConfig;
-import ca.tangerine.pce.webclient.mic.fetcher.SecurityAttributeFetcherConfig;
-import ca.tangerine.pce.webclient.resilience.ExternalCallResilienceConfig;
 
 /**
  * Minimal Spring context for MIC REST integration tests in this module. The full CE application lives in {@code

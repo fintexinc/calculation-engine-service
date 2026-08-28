@@ -1,5 +1,7 @@
 package ca.tangerine.pce.actuator;
 
+import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueRestProperties;
+
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.http.ResponseEntity;
@@ -7,8 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import lombok.extern.slf4j.Slf4j;
-
-import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueRestProperties;
 
 /**
  * Reports the availability of the downstream Market Investment Catalogue Service by calling its actuator health

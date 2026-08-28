@@ -1,12 +1,5 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import static ca.tangerine.pce.model.util.BigDecimalUtils.percentageToRatio;
-
 import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.util.BigDecimalUtils;
@@ -16,6 +9,13 @@ import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
 import ca.tangerine.wm.commons.domain.datapoint.DatapointMetadata;
 import ca.tangerine.wm.commons.domain.datapoint.FloatDatapoint;
 import ca.tangerine.wm.commons.domain.financial.Fees;
+
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static ca.tangerine.pce.model.util.BigDecimalUtils.percentageToRatio;
 
 /**
  * Maps the Market Investment Catalogue {@link Fees} response to the engine-side {@link FeeData} model.

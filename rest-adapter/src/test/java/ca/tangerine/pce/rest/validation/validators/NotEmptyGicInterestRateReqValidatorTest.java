@@ -1,5 +1,9 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.holding.GicHolding;
+import ca.tangerine.pce.rest.validation.RequestValidator;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -8,10 +12,6 @@ import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.ANNUAL
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.GROWTH_OF_10K;
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.TRAILING_TOTAL_RETURNS;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.holding.GicHolding;
-import ca.tangerine.pce.rest.validation.RequestValidator;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 class NotEmptyGicInterestRateReqValidatorTest extends AbstractGicFieldReqValidatorTest {
 

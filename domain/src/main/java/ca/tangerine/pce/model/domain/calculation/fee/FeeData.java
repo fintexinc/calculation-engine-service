@@ -1,5 +1,10 @@
 package ca.tangerine.pce.model.domain.calculation.fee;
 
+import ca.tangerine.pce.model.domain.calculation.BaseCalculationData;
+import ca.tangerine.pce.model.util.BigDecimalUtils;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +12,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import ca.tangerine.pce.model.domain.calculation.BaseCalculationData;
-import ca.tangerine.pce.model.util.BigDecimalUtils;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 /**
  * Combined fee data: management expense ratio, expense ratios, and management fee. Maps from the MIC /fees response.
  *

@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.result.fee;
 
+import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.EnumMap;
@@ -11,9 +14,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
 
 /**
  * Response for the {@code mer-benchmark-comparison} metric: one {@link FeeComparison} per requested aggregation view

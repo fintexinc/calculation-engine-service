@@ -1,20 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import org.springframework.http.HttpStatus;
-
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static ca.tangerine.pce.e2e.E2EPortfolios.etf;
-import static ca.tangerine.pce.e2e.E2EPortfolios.fund;
-import static ca.tangerine.pce.e2e.MicAttributeResponses.attributeResult;
-import static ca.tangerine.pce.e2e.MicAttributeResponses.morningstarOnly;
-import static ca.tangerine.pce.e2e.MicAttributeResponses.singleAttributeDispatcher;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.domain.result.holding.NumberOfUniqueHoldingsResult;
@@ -29,6 +14,21 @@ import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.error.Notification;
 import ca.tangerine.wm.commons.error.Severity;
+
+import org.springframework.http.HttpStatus;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static ca.tangerine.pce.e2e.E2EPortfolios.etf;
+import static ca.tangerine.pce.e2e.E2EPortfolios.fund;
+import static ca.tangerine.pce.e2e.MicAttributeResponses.attributeResult;
+import static ca.tangerine.pce.e2e.MicAttributeResponses.morningstarOnly;
+import static ca.tangerine.pce.e2e.MicAttributeResponses.singleAttributeDispatcher;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * End-to-end coverage for the {@code /number-of-unique-holdings} endpoint. It counts the distinct underlying holdings

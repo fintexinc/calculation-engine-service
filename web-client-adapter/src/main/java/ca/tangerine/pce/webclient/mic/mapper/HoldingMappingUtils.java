@@ -1,9 +1,9 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import lombok.experimental.UtilityClass;
-
 import ca.tangerine.pce.util.FilterUtils;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public final class HoldingMappingUtils {

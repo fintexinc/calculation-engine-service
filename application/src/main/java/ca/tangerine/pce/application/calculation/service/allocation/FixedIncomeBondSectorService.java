@@ -1,5 +1,15 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
+import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
+import ca.tangerine.pce.model.domain.calculation.allocation.FixedIncomeBondSector;
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.allocation.FixedIncomeSectorResult;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -12,16 +22,6 @@ import java.util.stream.Collectors;
 
 import static ca.tangerine.pce.model.error.ErrorCode.MISSING_FIXED_INCOME_BOND_SECTOR;
 import static ca.tangerine.pce.model.error.ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC;
-
-import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
-import ca.tangerine.pce.model.domain.calculation.allocation.FixedIncomeBondSector;
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.allocation.FixedIncomeSectorResult;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Fixed-income bond-sector breakdown. Only the bond-sector specifics live here; the weighting, aggregation,

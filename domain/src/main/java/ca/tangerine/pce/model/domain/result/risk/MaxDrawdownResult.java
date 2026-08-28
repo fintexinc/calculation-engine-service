@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.result.risk;
 
+import ca.tangerine.pce.model.domain.result.MaxDrawdownEntry;
+import ca.tangerine.pce.model.domain.result.PeriodResult;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -9,9 +12,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import ca.tangerine.pce.model.domain.result.MaxDrawdownEntry;
-import ca.tangerine.pce.model.domain.result.PeriodResult;
 @SuperBuilder
 @Data
 @ToString(callSuper = true)

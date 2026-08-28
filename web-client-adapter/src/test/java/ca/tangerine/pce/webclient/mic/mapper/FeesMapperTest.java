@@ -1,13 +1,5 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
 import ca.tangerine.wm.commons.domain.DataProvider;
 import ca.tangerine.wm.commons.domain.datapoint.FloatDatapoint;
@@ -16,6 +8,14 @@ import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.financial.Fees;
 import ca.tangerine.wm.commons.domain.financial.ManagementFeeDatapoint;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * MIC returns fee fields in percentage form (e.g. {@code 1.51} meaning 1.51%). The mapper must convert to ratio form

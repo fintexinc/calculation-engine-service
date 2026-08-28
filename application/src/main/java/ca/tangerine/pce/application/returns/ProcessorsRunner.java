@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.application.returns.processor.ReturnsProcessor;
+import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
+
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-
-import ca.tangerine.pce.application.returns.processor.ReturnsProcessor;
-import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
 
 /**
  * Runs the ordered {@link ReturnsProcessor} chain for a given {@link ProcessingCase}. The case → ordered-processors map

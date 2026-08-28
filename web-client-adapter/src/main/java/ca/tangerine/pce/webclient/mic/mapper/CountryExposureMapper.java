@@ -1,5 +1,12 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
+import ca.tangerine.pce.model.domain.calculation.exposure.CountryExposure;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.allocation.CountryAllocation;
+import ca.tangerine.wm.commons.domain.allocation.CountryAllocationValue;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -7,13 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import ca.tangerine.pce.model.domain.calculation.exposure.CountryExposure;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.allocation.CountryAllocation;
-import ca.tangerine.wm.commons.domain.allocation.CountryAllocationValue;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
 
 /**
  * Maps Market Investment Catalogue CountryAllocation response to CountryExposure domain model.

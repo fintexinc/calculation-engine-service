@@ -1,5 +1,12 @@
 package ca.tangerine.pce.model.error;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.pce.model.error.exceptions.ValidationException;
+import ca.tangerine.wm.commons.error.HttpStatus;
+import ca.tangerine.wm.commons.error.Notification;
+import ca.tangerine.wm.commons.error.Severity;
+
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -13,13 +20,6 @@ import static ca.tangerine.pce.model.error.ErrorParams.HOLDING_ID;
 import static ca.tangerine.pce.model.error.ErrorParams.holdingId;
 import static ca.tangerine.pce.model.error.ErrorParams.paramMetadata;
 import static ca.tangerine.pce.model.error.ErrorParams.prepend;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.pce.model.error.exceptions.ValidationException;
-import ca.tangerine.wm.commons.error.HttpStatus;
-import ca.tangerine.wm.commons.error.Notification;
-import ca.tangerine.wm.commons.error.Severity;
 
 /**
  * Catalog of every error and warning produced by the calculation engine. Each constant carries the code, human-readable

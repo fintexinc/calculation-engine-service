@@ -1,5 +1,21 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
+import ca.tangerine.pce.application.calculation.service.FxRateService;
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
+import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
+import ca.tangerine.pce.application.config.FxProperties;
+import ca.tangerine.pce.model.domain.calculation.allocation.EquitySector;
+import ca.tangerine.pce.model.domain.calculation.allocation.EquitySectorData;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.security.SecurityData;
+import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
+import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,22 +43,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.calculation.service.FxRateService;
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
-import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
-import ca.tangerine.pce.application.config.FxProperties;
-import ca.tangerine.pce.model.domain.calculation.allocation.EquitySector;
-import ca.tangerine.pce.model.domain.calculation.allocation.EquitySectorData;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.security.SecurityData;
-import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
-import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 
 class EquitySectorExposureServiceTest {
 

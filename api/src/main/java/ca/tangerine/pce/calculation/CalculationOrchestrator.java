@@ -1,10 +1,10 @@
 package ca.tangerine.pce.calculation;
 
-import java.util.List;
-
 import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
 import ca.tangerine.pce.model.domain.result.composite.CompositeCalculationResult;
 import ca.tangerine.pce.model.dto.command.CalculationCommand;
+
+import java.util.List;
 
 /**
  * Entry point for executing portfolio calculations on already-validated commands. The orchestrator resolves the

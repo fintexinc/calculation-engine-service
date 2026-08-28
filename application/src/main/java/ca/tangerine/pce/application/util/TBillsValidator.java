@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import lombok.experimental.UtilityClass;
-
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 /**
  * Pre-condition checks for T-Bill series consumed by metric services. The {@code TreasuryBillsFetcher} pre-populates

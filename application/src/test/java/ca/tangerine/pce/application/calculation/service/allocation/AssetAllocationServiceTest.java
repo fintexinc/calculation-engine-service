@@ -1,5 +1,9 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
+import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationResult;
+import ca.tangerine.wm.commons.domain.allocation.AssetAllocationRegionType;
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.List;
@@ -7,10 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.math.BigDecimal.ONE;
-
-import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationResult;
-import ca.tangerine.wm.commons.domain.allocation.AssetAllocationRegionType;
-import ca.tangerine.wm.commons.error.Notification;
 
 class AssetAllocationServiceTest extends AbstractAssetAllocationServiceTest<AssetAllocationResult> {
 

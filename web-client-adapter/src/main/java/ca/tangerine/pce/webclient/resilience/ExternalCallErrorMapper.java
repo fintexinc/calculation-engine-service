@@ -1,5 +1,10 @@
 package ca.tangerine.pce.webclient.resilience;
 
+import ca.tangerine.pce.model.error.exceptions.ExternalServiceBadResponseException;
+import ca.tangerine.pce.model.error.exceptions.ExternalServiceUnavailableException;
+import ca.tangerine.pce.port.observability.ExternalCallObservability.ExternalCall;
+import ca.tangerine.wm.commons.domain.ExternalWebService;
+
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -7,10 +12,6 @@ import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import ca.tangerine.pce.model.error.exceptions.ExternalServiceBadResponseException;
-import ca.tangerine.pce.model.error.exceptions.ExternalServiceUnavailableException;
-import ca.tangerine.pce.port.observability.ExternalCallObservability.ExternalCall;
-import ca.tangerine.wm.commons.domain.ExternalWebService;
 import reactor.core.Exceptions;
 
 /**

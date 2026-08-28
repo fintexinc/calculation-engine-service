@@ -1,29 +1,5 @@
 package ca.tangerine.pce.application.calculation.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import com.google.common.base.Strings;
-
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-
-import static ca.tangerine.pce.application.util.CollectorUtils.toLinkedHashMap;
-import static ca.tangerine.pce.application.util.DecimalUtils.toUserScale;
-import static ca.tangerine.pce.application.util.PortfolioUtils.calculateInitialPortfolioWeightFromValues;
-import static ca.tangerine.pce.model.util.BigDecimalConstants.MATH_CONTEXT;
-import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-
 import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.Conversion;
 import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
 import ca.tangerine.pce.application.config.TopHoldingsProperties;
@@ -52,6 +28,30 @@ import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.holding.HoldingType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import com.google.common.base.Strings;
+
+import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+
+import static ca.tangerine.pce.application.util.CollectorUtils.toLinkedHashMap;
+import static ca.tangerine.pce.application.util.DecimalUtils.toUserScale;
+import static ca.tangerine.pce.application.util.PortfolioUtils.calculateInitialPortfolioWeightFromValues;
+import static ca.tangerine.pce.model.util.BigDecimalConstants.MATH_CONTEXT;
+import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 @RequiredArgsConstructor

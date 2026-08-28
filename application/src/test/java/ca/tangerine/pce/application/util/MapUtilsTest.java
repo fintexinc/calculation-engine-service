@@ -1,5 +1,9 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.util.ComparisonUtils;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,10 +15,6 @@ import static ca.tangerine.pce.application.util.TestConstants.LOCAL_DATE_NOW;
 import static java.math.BigDecimal.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.util.ComparisonUtils;
 
 class MapUtilsTest {
 

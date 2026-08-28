@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Supplier;
-
-import ca.tangerine.pce.model.domain.calculation.DateRange;
 
 public class MapUtils {
 

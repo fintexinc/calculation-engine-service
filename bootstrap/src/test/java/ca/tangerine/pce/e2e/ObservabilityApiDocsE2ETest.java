@@ -1,5 +1,7 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.PortfolioCalculationEngineApplication;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.PortfolioCalculationEngineApplication;
 
 /**
  * The statistics endpoint is only usable from Swagger UI if the OpenAPI document describes its real response shape,

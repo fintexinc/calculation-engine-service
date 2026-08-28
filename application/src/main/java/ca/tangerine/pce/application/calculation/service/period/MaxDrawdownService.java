@@ -1,5 +1,22 @@
 package ca.tangerine.pce.application.calculation.service.period;
 
+import ca.tangerine.pce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
+import ca.tangerine.pce.application.config.PeriodProperties;
+import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import ca.tangerine.pce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
+import ca.tangerine.pce.application.util.DecimalUtils;
+import ca.tangerine.pce.application.util.Growth10KHelper;
+import ca.tangerine.pce.application.util.ReturnFactorScale;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.result.MaxDrawdownEntry;
+import ca.tangerine.pce.model.domain.result.risk.MaxDrawdownResult;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -24,23 +41,6 @@ import static ca.tangerine.pce.util.DateTimeUtils.getMonthsBetweenDates;
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
-
-import ca.tangerine.pce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
-import ca.tangerine.pce.application.config.PeriodProperties;
-import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
-import ca.tangerine.pce.application.returns.pipeline.PortfolioWeightedAverageWithCpedPipeline;
-import ca.tangerine.pce.application.util.DecimalUtils;
-import ca.tangerine.pce.application.util.Growth10KHelper;
-import ca.tangerine.pce.application.util.ReturnFactorScale;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.result.MaxDrawdownEntry;
-import ca.tangerine.pce.model.domain.result.risk.MaxDrawdownResult;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
-import ca.tangerine.wm.commons.error.Notification;
 
 @Service
 public class MaxDrawdownService extends WeightedAverageWithCpedAbstractService<PeriodCommand, MaxDrawdownResult> {

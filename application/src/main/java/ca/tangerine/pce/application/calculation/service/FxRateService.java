@@ -1,5 +1,14 @@
 package ca.tangerine.pce.application.calculation.service;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,15 +30,6 @@ import static ca.tangerine.pce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
 import static ca.tangerine.pce.model.util.BigDecimalConstants.HUNDRED;
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
-
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
-import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Single application-layer entry point for FX rate fetching and conversion. Wraps the {@link FxRatesFetcher} port so

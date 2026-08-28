@@ -1,5 +1,7 @@
 package ca.tangerine.pce.webclient.boc.dto;
 
+import ca.tangerine.pce.webclient.observability.CountedResponse;
+
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import ca.tangerine.pce.webclient.observability.CountedResponse;
 
 @Data
 @NoArgsConstructor

@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.calculation.service;
 
+import ca.tangerine.pce.application.config.FxProperties;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -15,11 +20,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.config.FxProperties;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 class PortfolioWeightCalculatorTest {
 

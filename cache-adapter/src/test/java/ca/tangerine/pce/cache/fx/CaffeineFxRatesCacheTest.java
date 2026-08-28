@@ -1,5 +1,11 @@
 package ca.tangerine.pce.cache.fx;
 
+import ca.tangerine.pce.cache.config.CacheDataProperties.FxRatesCacheProperties;
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.port.observability.CacheObservability;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,12 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.cache.config.CacheDataProperties.FxRatesCacheProperties;
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.port.observability.CacheObservability;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 class CaffeineFxRatesCacheTest {
 

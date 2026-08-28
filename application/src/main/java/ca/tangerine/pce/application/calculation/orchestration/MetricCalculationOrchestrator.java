@@ -1,22 +1,5 @@
 package ca.tangerine.pce.application.calculation.orchestration;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.time.Duration;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-
-import static java.util.stream.Collectors.groupingBy;
-
 import ca.tangerine.pce.application.config.DefaultDataProperties;
 import ca.tangerine.pce.calculation.CalculationOrchestrator;
 import ca.tangerine.pce.calculation.CalculationService;
@@ -38,6 +21,23 @@ import ca.tangerine.pce.util.FilterUtils;
 import ca.tangerine.wm.commons.domain.DataProvider;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.time.Duration;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Entry point for executing already-validated portfolio calculations. For every request — one command or a composite of

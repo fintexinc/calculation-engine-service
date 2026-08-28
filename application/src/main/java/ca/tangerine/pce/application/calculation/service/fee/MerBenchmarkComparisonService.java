@@ -1,24 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import lombok.RequiredArgsConstructor;
-
-import static ca.tangerine.pce.application.util.DecimalUtils.divide;
-import static ca.tangerine.pce.application.util.DecimalUtils.toUserScale;
-import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
-import static ca.tangerine.pce.model.util.BigDecimalConstants.HUNDRED;
-import static java.math.BigDecimal.ZERO;
-
 import ca.tangerine.pce.application.config.FeeProjectionProperties;
 import ca.tangerine.pce.application.util.FeeProjectionUtils;
 import ca.tangerine.pce.calculation.CalculationService;
@@ -40,6 +21,25 @@ import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
+
+import static ca.tangerine.pce.application.util.DecimalUtils.divide;
+import static ca.tangerine.pce.application.util.DecimalUtils.toUserScale;
+import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
+import static ca.tangerine.pce.model.util.BigDecimalConstants.HUNDRED;
+import static java.math.BigDecimal.ZERO;
 
 /**
  * {@code mer-benchmark-comparison} metric (TMI-543 / TMI-545): compares the portfolio's weighted-average fee rate to

@@ -1,5 +1,23 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.Conversion;
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
+import ca.tangerine.pce.application.constant.HoldingTypeGroup;
+import ca.tangerine.pce.calculation.SingleAttributeCalculationService;
+import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
+import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
+import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.dto.command.AverageMerCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.util.FilterUtils;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.math.BigDecimal;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -25,24 +43,6 @@ import static ca.tangerine.pce.model.error.ErrorCode.HOLDING_TYPE_NOT_LEAF;
 import static ca.tangerine.pce.model.error.ErrorCode.PORTFOLIO_MISSING_CURRENCY;
 import static ca.tangerine.pce.util.FilterUtils.getSpecifiedIfEmpty;
 import static java.math.BigDecimal.ZERO;
-
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.Conversion;
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
-import ca.tangerine.pce.application.constant.HoldingTypeGroup;
-import ca.tangerine.pce.calculation.SingleAttributeCalculationService;
-import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
-import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
-import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.pce.model.dto.command.AverageMerCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.util.FilterUtils;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Shared template for portfolio fee calculations. Owns the pipeline that the three concrete metrics — Average MER,

@@ -1,5 +1,16 @@
 package ca.tangerine.pce.application.calculation.service.period;
 
+import ca.tangerine.pce.application.calculation.metric.SharpeRatioCalculation;
+import ca.tangerine.pce.application.config.PeriodProperties;
+import ca.tangerine.pce.application.util.ReturnFactorScale;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -16,17 +27,6 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
-import ca.tangerine.pce.application.calculation.metric.SharpeRatioCalculation;
-import ca.tangerine.pce.application.config.PeriodProperties;
-import ca.tangerine.pce.application.util.ReturnFactorScale;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 class SharpeRatioCalculationServiceImplTest {
 

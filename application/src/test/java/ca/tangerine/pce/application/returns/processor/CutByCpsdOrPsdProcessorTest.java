@@ -1,5 +1,15 @@
 package ca.tangerine.pce.application.returns.processor;
 
+import ca.tangerine.pce.application.returns.FxContext;
+import ca.tangerine.pce.application.returns.ProcessingCase;
+import ca.tangerine.pce.application.returns.ProcessingContext;
+import ca.tangerine.pce.application.returns.ReturnsSnapshot;
+import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -11,16 +21,6 @@ import java.util.TreeMap;
 
 import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.application.returns.FxContext;
-import ca.tangerine.pce.application.returns.ProcessingCase;
-import ca.tangerine.pce.application.returns.ProcessingContext;
-import ca.tangerine.pce.application.returns.ReturnsSnapshot;
-import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 class CutByCpsdOrPsdProcessorTest {
 

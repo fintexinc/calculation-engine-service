@@ -1,10 +1,10 @@
 package ca.tangerine.pce.model.domain.calculation.holding;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 
 /**
  * Leaf role of the Composite pattern: the immutable result of expanding one branch of the underlying-holdings tree down

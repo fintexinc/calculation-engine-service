@@ -1,14 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-
-import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
-import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
-import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
-
 import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
 import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
@@ -19,6 +10,15 @@ import ca.tangerine.pce.model.domain.result.fee.AverageMerResult;
 import ca.tangerine.pce.model.dto.command.AverageMerCommand;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY;
+import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS_ONLY_STRICT;
+import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
 
 @Service
 public class MERCalculationServiceImpl extends AbstractFeeCalculationService<AverageMerResult> {

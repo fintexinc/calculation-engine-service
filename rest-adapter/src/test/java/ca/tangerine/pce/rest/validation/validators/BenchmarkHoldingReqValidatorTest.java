@@ -1,18 +1,5 @@
 package ca.tangerine.pce.rest.validation.validators;
 
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.cash;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.holding.CashHolding;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
@@ -25,6 +12,19 @@ import ca.tangerine.wm.commons.domain.enumeration.Country;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.cash;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BenchmarkHoldingReqValidatorTest {
 

@@ -1,5 +1,10 @@
 package ca.tangerine.pce.cache.tbills;
 
+import ca.tangerine.pce.cache.observability.CaffeineCacheStatistics;
+import ca.tangerine.pce.port.observability.CacheObservability;
+import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
@@ -8,11 +13,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import lombok.extern.slf4j.Slf4j;
-
-import ca.tangerine.pce.cache.observability.CaffeineCacheStatistics;
-import ca.tangerine.pce.port.observability.CacheObservability;
-import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 /**
  * Caching decorator over {@link TreasuryBillsFetcher}. Holds one entry per {@link Currency}; each entry is the full

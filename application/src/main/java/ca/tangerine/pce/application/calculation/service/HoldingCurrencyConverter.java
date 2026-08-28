@@ -1,5 +1,11 @@
 package ca.tangerine.pce.application.calculation.service;
 
+import ca.tangerine.pce.application.config.FxProperties;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,12 +23,6 @@ import lombok.RequiredArgsConstructor;
 
 import static ca.tangerine.pce.model.error.ErrorCode.FX_RATES_UNAVAILABLE;
 import static java.math.BigDecimal.ONE;
-
-import ca.tangerine.pce.application.config.FxProperties;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Converts per-holding money values from their source currency into a single target currency using spot FX rates, so

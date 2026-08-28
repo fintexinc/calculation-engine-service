@@ -1,5 +1,13 @@
 package ca.tangerine.pce.observability.calculation;
 
+import ca.tangerine.pce.port.observability.CalculationStatisticsProvider;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport.CodeFrequency;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport.DurationStatistics;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport.MetricStatistics;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport.Overall;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport.WarningStatistics;
+
 import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.Counter;
@@ -19,14 +27,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-
-import ca.tangerine.pce.port.observability.CalculationStatisticsProvider;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport.CodeFrequency;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport.DurationStatistics;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport.MetricStatistics;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport.Overall;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport.WarningStatistics;
 
 /**
  * Turns the per-metric calculation meters back into a ranked summary, so the most problematic calculation metrics can

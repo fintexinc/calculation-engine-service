@@ -1,11 +1,11 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Immutable result of allocation mapping, containing both the mapped allocations and any warnings produced during the

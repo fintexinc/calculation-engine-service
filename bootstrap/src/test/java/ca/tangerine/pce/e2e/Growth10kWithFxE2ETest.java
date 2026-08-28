@@ -1,5 +1,13 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.model.domain.result.returns.Growth10KResult;
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -17,13 +25,6 @@ import java.util.Map;
 import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.tangerine.pce.model.domain.result.returns.Growth10KResult;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

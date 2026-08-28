@@ -1,15 +1,15 @@
 package ca.tangerine.pce.model.domain.result.composite;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.wm.commons.error.Notification;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Aggregate response of a composite calculation request. Successful metrics land in {@code results} keyed by metric;

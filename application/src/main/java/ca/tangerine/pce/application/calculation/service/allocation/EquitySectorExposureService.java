@@ -1,17 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static ca.tangerine.pce.model.error.ErrorCode.MISSING_EQUITY_SECTOR_ALLOCATION;
-import static ca.tangerine.pce.model.error.ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC;
-
 import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
 import ca.tangerine.pce.application.util.PortfolioUtils;
 import ca.tangerine.pce.model.domain.calculation.allocation.EquitySector;
@@ -24,6 +12,18 @@ import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
 import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static ca.tangerine.pce.model.error.ErrorCode.MISSING_EQUITY_SECTOR_ALLOCATION;
+import static ca.tangerine.pce.model.error.ErrorCode.SECURITY_NOT_FOUND_FOR_METRIC;
 
 /**
  * Equity-sector breakdown. Only the equity-sector specifics live here; the weighting, aggregation, normalization and

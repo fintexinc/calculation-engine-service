@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,8 +22,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.THREE_YR;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 class FeeProjectionUtilsTest {
 

@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static ca.tangerine.pce.model.error.ErrorCode.MISSING_NER_AND_GER;
-
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
 
 /**
  * US fund chain: NER → GER. NER (net) is the after-waiver US operating-expense ratio; GER (gross) is pre-waiver. MER is

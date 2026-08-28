@@ -1,8 +1,8 @@
 package ca.tangerine.pce.model.dto.command.contract;
 
-import java.util.List;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
+import java.util.List;
 
 public interface HoldingsProvider {
 

@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.calculation;
 
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -10,9 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Base class for all PCE calculation data models that carry provider and validation information. Errors accumulated

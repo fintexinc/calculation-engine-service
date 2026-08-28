@@ -1,17 +1,5 @@
 package ca.tangerine.pce.rest.validation.validators;
 
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.holding.CashHolding;
 import ca.tangerine.pce.model.domain.holding.GicHolding;
@@ -23,6 +11,18 @@ import ca.tangerine.pce.model.dto.command.contract.HoldingsProvider;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.rest.validation.RequestValidator;
 import ca.tangerine.wm.commons.domain.currency.Currency;
+
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Validates that every holdings list in a calculation command contains only unique holdings: at most one cash holding

@@ -1,5 +1,9 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.error.exceptions.ValidationException;
+import ca.tangerine.pce.rest.validation.RequestValidator;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -7,10 +11,6 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.error.exceptions.ValidationException;
-import ca.tangerine.pce.rest.validation.RequestValidator;
 
 abstract class AbstractLastDayOfMonthReqValidatorTest {
 

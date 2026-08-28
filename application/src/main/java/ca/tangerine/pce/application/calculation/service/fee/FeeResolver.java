@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
-import java.util.List;
-import java.util.Map;
-
 import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
 import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.error.Notification;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Strategy abstraction for per-holding fee resolution. Implementations decide which fee fields are read from

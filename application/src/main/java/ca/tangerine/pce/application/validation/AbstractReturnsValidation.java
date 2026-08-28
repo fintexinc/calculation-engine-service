@@ -1,12 +1,12 @@
 package ca.tangerine.pce.application.validation;
 
-import java.util.List;
-
 import ca.tangerine.pce.application.returns.ProcessingContext;
 import ca.tangerine.pce.application.returns.ReturnsSnapshot;
 import ca.tangerine.pce.application.returns.processor.ReturnsProcessor;
 import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
 import ca.tangerine.pce.model.error.exceptions.BasePceException;
+
+import java.util.List;
 
 /**
  * Common base for {@link ReturnsProcessor} implementations whose only effect on a snapshot is to layer additional

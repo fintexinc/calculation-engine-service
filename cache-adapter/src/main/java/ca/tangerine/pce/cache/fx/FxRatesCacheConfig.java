@@ -1,15 +1,15 @@
 package ca.tangerine.pce.cache.fx;
 
+import ca.tangerine.pce.cache.config.CacheDataProperties;
+import ca.tangerine.pce.port.observability.CacheObservability;
+import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-
-import ca.tangerine.pce.cache.config.CacheDataProperties;
-import ca.tangerine.pce.port.observability.CacheObservability;
-import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
 
 /**
  * Registers the caching proxy around {@link FxRatesFetcher} when {@code cache.data.fx-rates.enabled=true}. The proxy is

@@ -1,5 +1,15 @@
 package ca.tangerine.pce.webclient.boc.fetcher;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties;
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties.CurrencyPairConfig;
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaWebClient;
+import ca.tangerine.pce.webclient.boc.client.FxRateSource;
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
+import ca.tangerine.pce.webclient.boc.mapper.BankOfCanadaFxRateMapper;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -15,16 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static ca.tangerine.pce.model.util.BigDecimalUtils.invert;
-
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties;
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties.CurrencyPairConfig;
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaWebClient;
-import ca.tangerine.pce.webclient.boc.client.FxRateSource;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
-import ca.tangerine.pce.webclient.boc.mapper.BankOfCanadaFxRateMapper;
 
 /**
  * Fetches historical FX rates from the Bank of Canada Valet API. Implements the {@link FxRatesFetcher} port — the

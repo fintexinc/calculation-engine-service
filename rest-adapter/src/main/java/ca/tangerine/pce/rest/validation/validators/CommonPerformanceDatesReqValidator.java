@@ -1,5 +1,11 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.dto.command.MultiplePortfoliosCommand;
+import ca.tangerine.pce.rest.validation.RequestValidator;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -8,12 +14,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.COMMON_PERFORMANCE_DATES;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.dto.command.MultiplePortfoliosCommand;
-import ca.tangerine.pce.rest.validation.RequestValidator;
 
 @Component
 @Order(400)
