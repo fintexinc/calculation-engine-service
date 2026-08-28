@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.calculation.holding;
 
+import ca.tangerine.pce.model.domain.calculation.BaseCalculationData;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import ca.tangerine.pce.model.domain.calculation.BaseCalculationData;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 @Data
 @SuperBuilder
 @AllArgsConstructor

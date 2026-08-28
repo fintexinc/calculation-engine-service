@@ -1,13 +1,13 @@
 package ca.tangerine.pce.model.domain.calculation.input;
 
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NavigableMap;
 import lombok.Builder;
 import lombok.Data;
-
-import ca.tangerine.wm.commons.error.Notification;
 @Builder
 @Data
 public class PeriodCalculationInput {

@@ -1,9 +1,9 @@
 package ca.tangerine.pce.application.returns;
 
-import org.springframework.stereotype.Component;
-
 import ca.tangerine.pce.application.calculation.service.FxRateService;
 import ca.tangerine.pce.application.calculation.service.MonthlyReturnsService;
+
+import org.springframework.stereotype.Component;
 
 @Component
 public class PortfolioMonthlyReturnsContextProvider extends MonthlyReturnsContextProvider {

@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.util.BigDecimalConstants;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -8,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import static ca.tangerine.pce.application.util.DecimalUtils.divide;
-
-import ca.tangerine.pce.model.util.BigDecimalConstants;
 
 @Getter
 @AllArgsConstructor

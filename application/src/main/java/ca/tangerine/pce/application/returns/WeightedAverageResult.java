@@ -1,12 +1,12 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NavigableMap;
-
-import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Output of a weighted-average pipeline run. Bundles the computed time series with the post-pipeline snapshot so

@@ -1,9 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
 import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
 import ca.tangerine.pce.application.util.PortfolioUtils;
 import ca.tangerine.pce.calculation.SingleAttributeCalculationService;
@@ -12,6 +8,10 @@ import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
 import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
 import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.error.Notification;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link AbstractBreakdownService} specialised for the common case of a metric backed by exactly ONE Market Investment

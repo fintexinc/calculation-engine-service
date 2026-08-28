@@ -1,5 +1,8 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.dto.command.contract.HoldingsProvider;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +12,6 @@ import java.util.Set;
 
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.COMMON_PERFORMANCE_DATES;
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.NUMBER_OF_UNIQUE_HOLDINGS;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.dto.command.contract.HoldingsProvider;
 
 @Component
 @Order(410)

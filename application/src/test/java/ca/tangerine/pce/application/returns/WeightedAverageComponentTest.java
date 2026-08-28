@@ -1,5 +1,8 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.application.util.ReturnFactorScale;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,9 +16,6 @@ import java.util.stream.Stream;
 
 import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etfCa;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.application.util.ReturnFactorScale;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 
 class WeightedAverageComponentTest {
 

@@ -1,17 +1,17 @@
 package ca.tangerine.pce.model.error;
 
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.error.Notification;
 import ca.tangerine.wm.commons.error.Severity;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Covers the contract every holding-scoped message depends on: the holding id reaches both the rendered message and the

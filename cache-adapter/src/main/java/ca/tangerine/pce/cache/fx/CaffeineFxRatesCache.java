@@ -1,5 +1,11 @@
 package ca.tangerine.pce.cache.fx;
 
+import ca.tangerine.pce.cache.config.CacheDataProperties.FxRatesCacheProperties;
+import ca.tangerine.pce.cache.observability.CaffeineCacheStatistics;
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.port.observability.CacheObservability;
+
 import org.apache.commons.collections4.MapUtils;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -13,12 +19,6 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-
-import ca.tangerine.pce.cache.config.CacheDataProperties.FxRatesCacheProperties;
-import ca.tangerine.pce.cache.observability.CaffeineCacheStatistics;
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.port.observability.CacheObservability;
 
 /**
  * Caffeine-backed {@link FxRatesCache} keyed by {@code (pair, date)}.

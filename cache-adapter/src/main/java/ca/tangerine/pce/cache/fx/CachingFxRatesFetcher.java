@@ -1,5 +1,11 @@
 package ca.tangerine.pce.cache.fx;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.model.util.BigDecimalConstants;
+import ca.tangerine.pce.model.util.BigDecimalUtils;
+import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
@@ -8,12 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import static ca.tangerine.pce.model.util.BigDecimalUtils.invert;
-
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.model.util.BigDecimalConstants;
-import ca.tangerine.pce.model.util.BigDecimalUtils;
-import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
 
 /**
  * Caching decorator over {@link FxRatesFetcher}. On each call the cache determines which sub-ranges are already loaded

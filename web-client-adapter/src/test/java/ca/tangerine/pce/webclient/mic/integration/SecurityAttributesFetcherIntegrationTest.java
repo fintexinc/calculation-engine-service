@@ -1,34 +1,5 @@
 package ca.tangerine.pce.webclient.mic.integration;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etf;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
 import ca.tangerine.pce.model.domain.calculation.holding.CommonHolding;
 import ca.tangerine.pce.model.domain.calculation.holding.CommonTopHoldings;
@@ -58,6 +29,36 @@ import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
 import ca.tangerine.wm.commons.domain.value.MultilingualString;
 import ca.tangerine.wm.commons.dto.request.CompositeAttributesRequest;
 import ca.tangerine.wm.commons.dto.search.TypedIdentifiers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etf;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;

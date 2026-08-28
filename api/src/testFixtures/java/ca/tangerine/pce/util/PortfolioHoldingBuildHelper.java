@@ -1,9 +1,5 @@
 package ca.tangerine.pce.util;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import lombok.experimental.UtilityClass;
-
 import ca.tangerine.pce.model.domain.enumeration.InterestFreq;
 import ca.tangerine.pce.model.domain.holding.CashHolding;
 import ca.tangerine.pce.model.domain.holding.GicHolding;
@@ -14,6 +10,10 @@ import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class PortfolioHoldingBuildHelper {

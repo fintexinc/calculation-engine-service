@@ -1,5 +1,10 @@
 package ca.tangerine.pce.webclient.mic.fetcher;
 
+import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
+import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClient;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.rates.DateRateValue;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
@@ -13,11 +18,6 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-
-import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
-import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClient;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.rates.DateRateValue;
 
 /**
  * Fetches the historical risk-free rate (T-Bill) monthly return series from Market Investment Catalogue for a single

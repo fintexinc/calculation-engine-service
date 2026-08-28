@@ -1,10 +1,5 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-import java.util.Optional;
-
 import ca.tangerine.pce.model.domain.calculation.holding.CommonHolding;
 import ca.tangerine.pce.model.domain.calculation.holding.CommonTopHoldings;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
@@ -19,6 +14,11 @@ import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.IdentifiersDatapoint;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.domain.value.MultilingualString;
+
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Maps an MIC holdings payload to {@link CommonTopHoldings}. Every payload variant carries the same three things — an

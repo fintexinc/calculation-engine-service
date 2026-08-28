@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.calculation.returns;
 
+import ca.tangerine.pce.model.domain.calculation.BaseCalculationData;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,9 +12,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import ca.tangerine.pce.model.domain.calculation.BaseCalculationData;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

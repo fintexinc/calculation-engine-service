@@ -1,5 +1,7 @@
 package ca.tangerine.pce.model.domain.enumeration;
 
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,8 +22,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.THREE_YR;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.TWO_YR;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.YTD;
-
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * Which {@link TimePeriod} values each kind of request may name.

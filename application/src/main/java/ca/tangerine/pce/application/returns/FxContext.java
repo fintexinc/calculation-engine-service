@@ -1,12 +1,12 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.NavigableMap;
-
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 /**
  * Immutable bundle of FX inputs needed by {@code FxConversionProcessor}.

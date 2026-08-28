@@ -1,13 +1,13 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;
 import java.util.Set;
 import lombok.Data;
-
-import ca.tangerine.wm.commons.domain.enumeration.Country;
 
 /**
  * Configuration for holding-level request validation. Currently exposes the set of countries whose securities the

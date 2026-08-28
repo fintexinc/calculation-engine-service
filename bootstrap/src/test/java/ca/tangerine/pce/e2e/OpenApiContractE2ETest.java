@@ -1,5 +1,7 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.PortfolioCalculationEngineApplication;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.PortfolioCalculationEngineApplication;
 
 /**
  * Keeps the published contract in {@code docs/openapi} equal to the document the running service actually serves.

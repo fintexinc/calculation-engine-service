@@ -1,17 +1,5 @@
 package ca.tangerine.pce.application.calculation.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import static ca.tangerine.pce.application.util.ReturnSeriesAlignmentValidator.findMissingCalendarMonthEnds;
-import static java.util.stream.Collectors.joining;
-
 import ca.tangerine.pce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import ca.tangerine.pce.application.returns.CashMonthlyReturnsGenerator;
 import ca.tangerine.pce.application.returns.MonthlyReturnsContext;
@@ -26,6 +14,18 @@ import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.util.FilterUtils;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import static ca.tangerine.pce.application.util.ReturnSeriesAlignmentValidator.findMissingCalendarMonthEnds;
+import static java.util.stream.Collectors.joining;
 
 /**
  * Application-layer entry point for monthly-returns data sourcing. Consumes the pre-fetched monthly-returns map

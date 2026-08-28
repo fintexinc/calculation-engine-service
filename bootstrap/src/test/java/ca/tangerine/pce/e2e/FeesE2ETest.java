@@ -1,5 +1,19 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.fee.FeesResult;
+import ca.tangerine.pce.model.dto.command.AverageMerCommand;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.error.ErrorResponse;
+import ca.tangerine.wm.commons.error.Notification;
+import ca.tangerine.wm.commons.error.Severity;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -23,19 +37,6 @@ import static ca.tangerine.pce.e2e.MicFeeResponses.feesDispatcher;
 import static ca.tangerine.pce.e2e.MicFeeResponses.merRow;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.fee.FeesResult;
-import ca.tangerine.pce.model.dto.command.AverageMerCommand;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.error.ErrorResponse;
-import ca.tangerine.wm.commons.error.Notification;
-import ca.tangerine.wm.commons.error.Severity;
 import okhttp3.mockwebserver.MockWebServer;
 
 /**

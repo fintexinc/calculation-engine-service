@@ -1,14 +1,14 @@
 package ca.tangerine.pce.model.error;
 
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
-import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
 
 /**
  * Aggregates {@link BasePceException} instances (both {@code CalculationException} and {@code ValidationException})

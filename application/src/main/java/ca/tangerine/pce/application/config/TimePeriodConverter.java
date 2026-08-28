@@ -1,10 +1,10 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * Lets {@code application.yml} keep stating a period as its length in months.

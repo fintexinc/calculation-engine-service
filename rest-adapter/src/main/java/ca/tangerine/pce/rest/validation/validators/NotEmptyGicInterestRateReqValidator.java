@@ -1,5 +1,9 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.GicHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -9,10 +13,6 @@ import java.util.List;
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.ANNUAL_RETURNS;
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.GROWTH_OF_10K;
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.TRAILING_TOTAL_RETURNS;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.GicHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
 
 @Component
 @Order(421)

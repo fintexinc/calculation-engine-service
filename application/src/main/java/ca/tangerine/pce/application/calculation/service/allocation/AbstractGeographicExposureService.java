@@ -1,14 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import static ca.tangerine.pce.util.FilterUtils.STOCK_PREDICATE;
-
 import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
 import ca.tangerine.pce.model.domain.calculation.allocation.GeographicExposureData;
 import ca.tangerine.pce.model.domain.calculation.allocation.HoldingGeographicAllocation;
@@ -22,6 +13,15 @@ import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import ca.tangerine.wm.commons.domain.financial.Geography;
 import ca.tangerine.wm.commons.error.Notification;
+
+import java.math.BigDecimal;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
+
+import static ca.tangerine.pce.util.FilterUtils.STOCK_PREDICATE;
 
 /**
  * Shared base for the geographic exposure services, on the {@link AbstractBreakdownService} template. Resolves each

@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.domain.calculation.fee;
 
-import java.util.Map;
-
 import ca.tangerine.pce.model.domain.calculation.PortfolioBenchmarkData;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.domain.security.SecurityData;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+
+import java.util.Map;
 
 /**
  * Prepared Market Investment Catalogue fee data for the {@code mer-benchmark-comparison} metric: the portfolio

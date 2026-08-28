@@ -1,14 +1,5 @@
 package ca.tangerine.pce.webclient.mic.fetcher;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.List;
-
 import ca.tangerine.pce.model.domain.calculation.allocation.EquityCountryAllocation;
 import ca.tangerine.pce.model.domain.calculation.allocation.EquitySector;
 import ca.tangerine.pce.model.domain.calculation.allocation.FixedIncomeBondSector;
@@ -45,6 +36,15 @@ import ca.tangerine.wm.commons.domain.financial.Geography;
 import ca.tangerine.wm.commons.domain.holding.HoldingIdentifiers;
 import ca.tangerine.wm.commons.domain.holding.Holdings;
 import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.List;
 
 /**
  * Wiring for the generic Market Investment Catalogue attributes fetcher. The single {@code attributeBindings} bean is

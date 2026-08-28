@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.domain.calculation.returns;
 
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.TreeMap;
-
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Domain interface for returns data used in calculations. Implemented by MonthlyReturns, HistoricalNavPrices, etc.

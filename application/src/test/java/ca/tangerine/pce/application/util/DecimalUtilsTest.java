@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.util.BigDecimalConstants;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +17,6 @@ import static ca.tangerine.pce.model.util.BigDecimalConstants.INTERNAL_SCALE;
 import static ca.tangerine.pce.model.util.BigDecimalConstants.ROUNDING_MODE;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
-
-import ca.tangerine.pce.model.util.BigDecimalConstants;
 
 class DecimalUtilsTest {
 

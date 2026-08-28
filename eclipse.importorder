@@ -1,6 +1,6 @@
 #Organize Import Order
 #Internal first, then frameworks, libs, other libs, java core, static last
-0=com.fintex
+0=ca.tangerine
 1=org.springframework
 2=org
 3=com

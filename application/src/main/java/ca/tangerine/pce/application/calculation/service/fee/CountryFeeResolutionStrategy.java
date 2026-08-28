@@ -1,11 +1,11 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+
 import java.util.List;
 
 import static ca.tangerine.pce.model.error.ErrorCode.MISSING_FUND_FEE_DATA;
-
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
 
 /**
  * Strategy: per-country fee resolution policy. Each implementation declares which {@link FeeSource}s apply to its

@@ -1,14 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.cash;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.gic;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.enumeration.InterestFreq;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
@@ -24,6 +15,15 @@ import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
 import ca.tangerine.wm.commons.domain.rates.DateRateValue;
 import ca.tangerine.wm.commons.error.Notification;
 import ca.tangerine.wm.commons.error.Severity;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.cash;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.gic;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Shared e2e infrastructure for the {@code growth-of-10k} metric. Named {@code AbstractGrowthOf10kE2ETest} because

@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.validation;
 
+import ca.tangerine.wm.commons.domain.DataProvider;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -9,8 +11,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-
-import ca.tangerine.wm.commons.domain.DataProvider;
 
 class DataProviderRequestHandlingValidatorTest {
 

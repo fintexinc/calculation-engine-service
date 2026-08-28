@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.result.returns;
 
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.domain.result.KeyValueResult;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,9 +15,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.pce.model.domain.result.KeyValueResult;
 
 @SuperBuilder
 @Data

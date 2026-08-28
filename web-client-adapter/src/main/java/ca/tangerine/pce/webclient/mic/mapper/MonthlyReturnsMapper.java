@@ -1,5 +1,14 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
+import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
+import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -13,15 +22,6 @@ import java.util.stream.Collectors;
 
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.util.stream.Collectors.joining;
-
-import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
-import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
 
 @Component
 public class MonthlyReturnsMapper

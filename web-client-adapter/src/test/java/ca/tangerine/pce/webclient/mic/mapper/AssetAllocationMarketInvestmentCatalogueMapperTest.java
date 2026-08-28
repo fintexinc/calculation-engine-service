@@ -1,14 +1,5 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.TreeSet;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etf;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.calculation.allocation.HoldingAssetAllocation;
 import ca.tangerine.wm.commons.domain.DataProvider;
 import ca.tangerine.wm.commons.domain.allocation.AssetAllocation;
@@ -18,6 +9,15 @@ import ca.tangerine.wm.commons.domain.allocation.AssetAllocationWithCurrency;
 import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
 import ca.tangerine.wm.commons.domain.enumeration.Country;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.TreeSet;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etf;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AssetAllocationMarketInvestmentCatalogueMapperTest {
 

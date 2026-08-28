@@ -1,5 +1,8 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -12,9 +15,6 @@ import java.util.TreeMap;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
 
 class RiskFreeWindowValidatorTest {
 

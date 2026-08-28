@@ -1,5 +1,12 @@
 package ca.tangerine.pce.application.mapping;
 
+import ca.tangerine.pce.application.util.ExposureDataHolder;
+import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -12,13 +19,6 @@ import java.util.Optional;
 
 import static ca.tangerine.pce.application.util.CollectorUtils.toMap;
 import static ca.tangerine.pce.model.error.ErrorCode.UNKNOWN_TYPE_FROM_DATA_POINT;
-
-import ca.tangerine.pce.application.util.ExposureDataHolder;
-import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.error.Notification;
 
 @Service
 public class CountryAllocationMappingService {

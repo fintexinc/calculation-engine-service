@@ -1,5 +1,15 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.util.ComparisonUtils;
+import ca.tangerine.wm.commons.domain.allocation.EquityMarketCapitalizationType;
+import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,16 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.util.ComparisonUtils;
-import ca.tangerine.wm.commons.domain.allocation.EquityMarketCapitalizationType;
-import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 class PortfolioUtilsTest {
 

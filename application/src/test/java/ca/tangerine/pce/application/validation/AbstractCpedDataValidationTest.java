@@ -1,13 +1,5 @@
 package ca.tangerine.pce.application.validation;
 
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.application.returns.FxContext;
 import ca.tangerine.pce.application.returns.ProcessingCase;
 import ca.tangerine.pce.application.returns.ProcessingContext;
@@ -15,6 +7,14 @@ import ca.tangerine.pce.application.returns.ReturnsSnapshot;
 import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.model.error.exceptions.BasePceException;
+
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 abstract class AbstractCpedDataValidationTest {
 

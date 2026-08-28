@@ -1,18 +1,18 @@
 package ca.tangerine.pce.rest.validation.validators;
 
-import org.springframework.util.CollectionUtils;
-
-import java.util.Comparator;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
 import ca.tangerine.pce.model.dto.command.CalculationCommand;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.rest.validation.RequestValidator;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
+import org.springframework.util.CollectionUtils;
+
+import java.util.Comparator;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Rejects a requested period the metric family cannot answer, naming it and listing what it would have accepted.

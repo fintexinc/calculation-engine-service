@@ -1,5 +1,14 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.ValidationException;
+import ca.tangerine.pce.rest.validation.RequestValidator;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,15 +32,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.YTD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.ValidationException;
-import ca.tangerine.pce.rest.validation.RequestValidator;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * The period contracts, tested through the validators that declare them rather than one class at a time: the rule is

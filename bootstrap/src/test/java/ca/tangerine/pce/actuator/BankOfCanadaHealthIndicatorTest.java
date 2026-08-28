@@ -1,5 +1,7 @@
 package ca.tangerine.pce.actuator;
 
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties;
+
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.web.client.RestClient;
@@ -13,7 +15,6 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;

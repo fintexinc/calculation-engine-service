@@ -1,5 +1,14 @@
 package ca.tangerine.pce.application.calculation.metric;
 
+import ca.tangerine.pce.application.calculation.metric.core.PeriodCalculationAbstract;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
+import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.pce.model.util.BigDecimalConstants;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,15 +44,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.calculation.metric.core.PeriodCalculationAbstract;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
-import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.pce.model.util.BigDecimalConstants;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 class SharpeRatioCalculationTest {
 

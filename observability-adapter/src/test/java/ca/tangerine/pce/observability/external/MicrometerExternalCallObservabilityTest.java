@@ -1,5 +1,8 @@
 package ca.tangerine.pce.observability.external;
 
+import ca.tangerine.pce.port.observability.ExternalCallObservability.ExternalCall;
+import ca.tangerine.wm.commons.domain.ExternalWebService;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -10,9 +13,6 @@ import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.port.observability.ExternalCallObservability.ExternalCall;
-import ca.tangerine.wm.commons.domain.ExternalWebService;
 
 class MicrometerExternalCallObservabilityTest {
 

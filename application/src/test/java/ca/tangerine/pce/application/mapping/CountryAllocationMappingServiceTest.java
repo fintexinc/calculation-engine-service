@@ -1,5 +1,12 @@
 package ca.tangerine.pce.application.mapping;
 
+import ca.tangerine.pce.application.util.ExposureDataHolder;
+import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -15,13 +22,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.util.ExposureDataHolder;
-import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.error.Notification;
 
 class CountryAllocationMappingServiceTest {
 

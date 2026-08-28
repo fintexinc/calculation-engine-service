@@ -1,5 +1,15 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.model.domain.enumeration.InterestFreq;
+import ca.tangerine.pce.model.domain.result.returns.AnnualReturnResult;
+import ca.tangerine.pce.model.dto.command.ReturnCommand;
+import ca.tangerine.pce.model.error.ErrorParams;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.error.ErrorResponse;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.http.HttpStatus;
 
 import org.junit.jupiter.api.Tag;
@@ -12,16 +22,6 @@ import java.util.List;
 import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.gic;
 import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.enumeration.InterestFreq;
-import ca.tangerine.pce.model.domain.result.returns.AnnualReturnResult;
-import ca.tangerine.pce.model.dto.command.ReturnCommand;
-import ca.tangerine.pce.model.error.ErrorParams;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.error.ErrorResponse;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * CAD annual-returns scenarios (mixed holdings, validation inherited from {@link AbstractAnnualReturnsE2ETest} and

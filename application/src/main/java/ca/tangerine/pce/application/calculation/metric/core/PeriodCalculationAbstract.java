@@ -1,5 +1,13 @@
 package ca.tangerine.pce.application.calculation.metric.core;
 
+import ca.tangerine.pce.application.util.DecimalUtils;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.result.PeriodResult;
+import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.util.CollectionUtils;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,14 +39,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.SI;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.YTD;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
-
-import ca.tangerine.pce.application.util.DecimalUtils;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.result.PeriodResult;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * V - type of calculated value. e.g If calculation returns BigDecimal value for period, then V -> BigDecimal.

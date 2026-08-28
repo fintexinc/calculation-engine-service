@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.error.exceptions;
 
+import ca.tangerine.pce.model.error.PceExceptionCollector;
+
 import java.io.Serial;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
-
-import ca.tangerine.pce.model.error.PceExceptionCollector;
 
 /**
  * Aggregate runtime exception carrying a list of {@link BasePceException} instances collected during one or more

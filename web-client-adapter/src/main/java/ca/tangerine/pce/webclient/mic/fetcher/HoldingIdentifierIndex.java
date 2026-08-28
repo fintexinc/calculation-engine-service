@@ -1,5 +1,12 @@
 package ca.tangerine.pce.webclient.mic.fetcher;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.webclient.mic.mapper.HoldingMappingUtils;
+import ca.tangerine.pce.webclient.mic.mapper.MarketInvestmentCatalogueResponseMapper;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+import ca.tangerine.wm.commons.dto.search.TypedIdentifiers;
+
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
@@ -10,13 +17,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import static java.util.stream.Collectors.groupingBy;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.webclient.mic.mapper.HoldingMappingUtils;
-import ca.tangerine.pce.webclient.mic.mapper.MarketInvestmentCatalogueResponseMapper;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
-import ca.tangerine.wm.commons.dto.search.TypedIdentifiers;
 
 /**
  * Index over a list of portfolio holdings prepared for a Market Investment Catalogue request. Groups holdings by

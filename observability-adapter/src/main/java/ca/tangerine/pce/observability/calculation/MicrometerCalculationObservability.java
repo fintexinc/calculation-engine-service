@@ -1,5 +1,12 @@
 package ca.tangerine.pce.observability.calculation;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.domain.result.composite.CompositeCalculationResult;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.dto.command.CompositeCalculationRequest;
+import ca.tangerine.pce.port.observability.CalculationObservability;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -12,13 +19,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.pce.model.domain.result.composite.CompositeCalculationResult;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.dto.command.CompositeCalculationRequest;
-import ca.tangerine.pce.port.observability.CalculationObservability;
 
 /**
  * Micrometer implementation of {@link CalculationObservability}: traces every calculation request as one observation

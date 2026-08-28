@@ -1,5 +1,14 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.PortfolioCalculationEngineApplication;
+import ca.tangerine.pce.cache.fx.CachingFxRatesFetcher;
+import ca.tangerine.pce.cache.fx.FxRatesCache;
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
+import ca.tangerine.pce.webclient.boc.fetcher.BocFxRatesFetcher;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -17,14 +26,6 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.tangerine.pce.PortfolioCalculationEngineApplication;
-import ca.tangerine.pce.cache.fx.CachingFxRatesFetcher;
-import ca.tangerine.pce.cache.fx.FxRatesCache;
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.port.webclient.boc.FxRatesFetcher;
-import ca.tangerine.pce.webclient.boc.fetcher.BocFxRatesFetcher;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 import okhttp3.mockwebserver.MockWebServer;
 
 /**

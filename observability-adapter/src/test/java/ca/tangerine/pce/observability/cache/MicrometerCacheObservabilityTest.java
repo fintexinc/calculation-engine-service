@@ -1,13 +1,13 @@
 package ca.tangerine.pce.observability.cache;
 
+import ca.tangerine.pce.port.observability.CacheStatistics;
+
 import org.junit.jupiter.api.Test;
 
 import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.port.observability.CacheStatistics;
 
 class MicrometerCacheObservabilityTest {
 

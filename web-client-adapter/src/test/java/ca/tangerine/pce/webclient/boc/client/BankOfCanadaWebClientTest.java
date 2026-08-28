@@ -1,5 +1,12 @@
 package ca.tangerine.pce.webclient.boc.client;
 
+import ca.tangerine.pce.model.error.exceptions.ExternalServiceBadResponseException;
+import ca.tangerine.pce.model.error.exceptions.ExternalServiceUnavailableException;
+import ca.tangerine.pce.port.observability.ExternalCallObservability;
+import ca.tangerine.pce.webclient.resilience.ExternalCallResilience;
+import ca.tangerine.pce.webclient.resilience.TransientCallFailures;
+import ca.tangerine.wm.commons.domain.ExternalWebService;
+
 import org.springframework.web.reactive.function.client.WebClient;
 
 import org.junit.jupiter.api.AfterEach;
@@ -23,12 +30,6 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import ca.tangerine.pce.model.error.exceptions.ExternalServiceBadResponseException;
-import ca.tangerine.pce.model.error.exceptions.ExternalServiceUnavailableException;
-import ca.tangerine.pce.port.observability.ExternalCallObservability;
-import ca.tangerine.pce.webclient.resilience.ExternalCallResilience;
-import ca.tangerine.pce.webclient.resilience.TransientCallFailures;
-import ca.tangerine.wm.commons.domain.ExternalWebService;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 

@@ -1,5 +1,11 @@
 package ca.tangerine.pce.model.domain.calculation.input;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+import ca.tangerine.pce.model.domain.enumeration.Rebalanced;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -9,12 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
-import ca.tangerine.pce.model.domain.enumeration.Rebalanced;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 @Data
 @Builder
 @AllArgsConstructor

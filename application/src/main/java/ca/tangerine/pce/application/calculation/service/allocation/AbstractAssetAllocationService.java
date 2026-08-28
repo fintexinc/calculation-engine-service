@@ -1,15 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static ca.tangerine.pce.util.FilterUtils.CASH_PREDICATE;
-import static ca.tangerine.pce.util.FilterUtils.GIC_PREDICATE;
-import static ca.tangerine.pce.util.FilterUtils.STOCK_PREDICATE;
-
 import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
 import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
 import ca.tangerine.pce.application.config.FxProperties;
@@ -29,6 +19,16 @@ import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import ca.tangerine.wm.commons.domain.financial.Geography;
 import ca.tangerine.wm.commons.error.Notification;
+
+import java.math.BigDecimal;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static ca.tangerine.pce.util.FilterUtils.CASH_PREDICATE;
+import static ca.tangerine.pce.util.FilterUtils.GIC_PREDICATE;
+import static ca.tangerine.pce.util.FilterUtils.STOCK_PREDICATE;
 
 /**
  * Shared implementation for asset-allocation breakdown services, on the {@link AbstractBreakdownService} template. Cash

@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.application.calculation.metric.formula.SumProduct;
+import ca.tangerine.pce.application.util.PortfolioUtils;
+import ca.tangerine.pce.application.util.ReturnFactorScale;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -16,11 +21,6 @@ import static ca.tangerine.pce.application.util.CollectorUtils.toMap;
 import static ca.tangerine.pce.application.util.CollectorUtils.toTreeMap;
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ZERO;
-
-import ca.tangerine.pce.application.calculation.metric.formula.SumProduct;
-import ca.tangerine.pce.application.util.PortfolioUtils;
-import ca.tangerine.pce.application.util.ReturnFactorScale;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 
 /**
  * Stateless component that computes the portfolio-level weighted-average return time series for a per-holding returns

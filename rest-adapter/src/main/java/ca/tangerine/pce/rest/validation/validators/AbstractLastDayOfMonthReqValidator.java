@@ -1,13 +1,13 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.rest.validation.RequestValidator;
+
 import java.time.LocalDate;
 import java.util.function.Function;
 
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
-
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.rest.validation.RequestValidator;
 
 /**
  * Base validator that verifies a single {@link LocalDate} extracted from the command matches the last day of its month.

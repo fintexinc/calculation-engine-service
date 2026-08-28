@@ -1,5 +1,17 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
+import ca.tangerine.pce.model.domain.calculation.allocation.FixedIncomeBondSector;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,18 +25,6 @@ import java.util.stream.Stream;
 
 import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.calculation.allocation.FixedIncomeBondSector;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 class FixedIncomeSectorAllocationMapperTest {
 

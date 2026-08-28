@@ -1,5 +1,9 @@
 package ca.tangerine.pce;
 
+import ca.tangerine.pce.port.observability.CalculationObservability;
+import ca.tangerine.pce.port.observability.CalculationStatisticsProvider;
+import ca.tangerine.pce.port.webclient.mic.SecurityAttributesFetcher;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -14,10 +18,6 @@ import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.port.observability.CalculationObservability;
-import ca.tangerine.pce.port.observability.CalculationStatisticsProvider;
-import ca.tangerine.pce.port.webclient.mic.SecurityAttributesFetcher;
 
 @Tag("integration")
 @ActiveProfiles("test")

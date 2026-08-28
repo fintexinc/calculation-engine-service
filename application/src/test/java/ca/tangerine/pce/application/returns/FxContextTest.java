@@ -1,5 +1,8 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -10,9 +13,6 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 class FxContextTest {
 

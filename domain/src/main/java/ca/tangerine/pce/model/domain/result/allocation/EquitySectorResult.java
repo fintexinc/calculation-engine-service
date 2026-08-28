@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.result.allocation;
 
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -10,9 +13,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
 @SuperBuilder
 @Data
 @ToString(callSuper = true)

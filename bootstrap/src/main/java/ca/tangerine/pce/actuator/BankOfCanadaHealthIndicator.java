@@ -1,5 +1,7 @@
 package ca.tangerine.pce.actuator;
 
+import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties;
+
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.http.ResponseEntity;
@@ -7,8 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import lombok.extern.slf4j.Slf4j;
-
-import ca.tangerine.pce.webclient.boc.client.BankOfCanadaProperties;
 
 /**
  * Reports the availability of the Bank of Canada Valet API. Informational only — BoC outages degrade FX conversion for

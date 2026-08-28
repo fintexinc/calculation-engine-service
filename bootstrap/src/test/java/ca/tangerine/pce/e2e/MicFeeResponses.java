@@ -1,14 +1,15 @@
 package ca.tangerine.pce.e2e;
 
-import java.math.BigDecimal;
-import java.util.List;
-import lombok.experimental.UtilityClass;
-
 import ca.tangerine.wm.commons.domain.DataProvider;
 import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import java.math.BigDecimal;
+import java.util.List;
+import lombok.experimental.UtilityClass;
+
 import okhttp3.mockwebserver.Dispatcher;
 
 /**

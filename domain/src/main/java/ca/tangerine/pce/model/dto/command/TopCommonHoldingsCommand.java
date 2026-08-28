@@ -1,13 +1,13 @@
 package ca.tangerine.pce.model.dto.command;
 
+import ca.tangerine.wm.commons.domain.holding.HoldingType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import ca.tangerine.wm.commons.domain.holding.HoldingType;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)

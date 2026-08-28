@@ -1,5 +1,8 @@
 package ca.tangerine.pce.webclient.boc.mapper;
 
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
+import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -10,9 +13,6 @@ import java.util.Map;
 import static ca.tangerine.pce.webclient.boc.client.FxRateSource.Frequency.DAILY;
 import static ca.tangerine.pce.webclient.boc.client.FxRateSource.Frequency.MONTHLY;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
 
 class BankOfCanadaFxRateMapperTest {
 

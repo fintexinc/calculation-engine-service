@@ -1,14 +1,5 @@
 package ca.tangerine.pce.application.calculation.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-
 import ca.tangerine.pce.application.calculation.service.period.core.WeightedAverageWithCpsdAndCpedAbstractService;
 import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import ca.tangerine.pce.application.returns.WeightedAverageResult;
@@ -21,6 +12,15 @@ import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.result.KeyValueResult;
 import ca.tangerine.pce.model.domain.result.returns.Growth10KResult;
 import ca.tangerine.pce.model.dto.command.ReturnCommand;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
 
 @Service
 public class GrowthOf10KCalculationServiceImpl

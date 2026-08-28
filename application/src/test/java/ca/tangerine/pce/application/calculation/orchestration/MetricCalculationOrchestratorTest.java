@@ -1,5 +1,25 @@
 package ca.tangerine.pce.application.calculation.orchestration;
 
+import ca.tangerine.pce.application.config.DefaultDataProperties;
+import ca.tangerine.pce.calculation.CalculationService;
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.domain.result.composite.CompositeCalculationResult;
+import ca.tangerine.pce.model.domain.security.SecurityData;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.pce.model.error.exceptions.ExternalServiceUnavailableException;
+import ca.tangerine.pce.port.observability.CalculationDurationRecorder;
+import ca.tangerine.pce.port.webclient.mic.SecurityAttributesFetcher;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,26 +52,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.config.DefaultDataProperties;
-import ca.tangerine.pce.calculation.CalculationService;
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.pce.model.domain.result.composite.CompositeCalculationResult;
-import ca.tangerine.pce.model.domain.security.SecurityData;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.pce.model.error.exceptions.ExternalServiceUnavailableException;
-import ca.tangerine.pce.port.observability.CalculationDurationRecorder;
-import ca.tangerine.pce.port.webclient.mic.SecurityAttributesFetcher;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 
 @ExtendWith(MockitoExtension.class)
 class MetricCalculationOrchestratorTest {

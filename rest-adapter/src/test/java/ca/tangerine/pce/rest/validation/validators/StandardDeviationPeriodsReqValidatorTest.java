@@ -1,5 +1,10 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.ValidationException;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -7,11 +12,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.ValidationException;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 class StandardDeviationPeriodsReqValidatorTest {
 

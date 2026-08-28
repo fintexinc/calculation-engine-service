@@ -1,5 +1,13 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.PortfolioCalculationEngineApplication;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+import ca.tangerine.wm.commons.error.ErrorResponse;
+import ca.tangerine.wm.commons.error.Notification;
+import ca.tangerine.wm.commons.error.Severity;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,13 +33,6 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.tangerine.pce.PortfolioCalculationEngineApplication;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
-import ca.tangerine.wm.commons.error.ErrorResponse;
-import ca.tangerine.wm.commons.error.Notification;
-import ca.tangerine.wm.commons.error.Severity;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.QueueDispatcher;

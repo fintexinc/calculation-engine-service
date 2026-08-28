@@ -1,5 +1,16 @@
 package ca.tangerine.pce.application.calculation.metric.core;
 
+import ca.tangerine.pce.application.calculation.metric.StandardDeviationCalculation;
+import ca.tangerine.pce.application.calculation.metric.TrailingTotalReturnsCalculation;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.calculation.input.WeightedAverageInput;
+import ca.tangerine.pce.model.domain.result.PeriodResult;
+import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
+import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.pce.util.ComparisonUtils;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,17 +63,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
-import ca.tangerine.pce.application.calculation.metric.StandardDeviationCalculation;
-import ca.tangerine.pce.application.calculation.metric.TrailingTotalReturnsCalculation;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.calculation.input.WeightedAverageInput;
-import ca.tangerine.pce.model.domain.result.PeriodResult;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
-import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.pce.util.ComparisonUtils;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 class PeriodCalculationAbstractTest {
 

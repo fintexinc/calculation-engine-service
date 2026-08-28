@@ -1,5 +1,9 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.pce.application.util.FeeProjectionUtils;
+import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -16,10 +20,6 @@ import lombok.Setter;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.ONE_YR;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
-
-import ca.tangerine.pce.application.util.FeeProjectionUtils;
-import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * Assumptions behind the projected fee figures reported by the {@code fees} and {@code mer-benchmark-comparison}

@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.springframework.boot.context.properties.bind.BindException;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -31,8 +33,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.YTD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * Typing the sets as {@link TimePeriod} splits what used to be one failure mode into two, and they are tested

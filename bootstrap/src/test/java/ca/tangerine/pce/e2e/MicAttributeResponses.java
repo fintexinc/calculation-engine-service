@@ -1,14 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import org.springframework.http.MediaType;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-import lombok.experimental.UtilityClass;
-
 import ca.tangerine.wm.commons.domain.DataProvider;
 import ca.tangerine.wm.commons.domain.allocation.GeographicAllocation;
 import ca.tangerine.wm.commons.domain.allocation.GeographicAllocationValue;
@@ -25,6 +16,16 @@ import ca.tangerine.wm.commons.domain.financial.Geography;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.domain.reference.CountryDatapoint;
+
+import org.springframework.http.MediaType;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import lombok.experimental.UtilityClass;
+
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;

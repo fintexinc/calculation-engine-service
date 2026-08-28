@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
+import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.error.Notification;
+
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.function.Function;
@@ -7,11 +12,6 @@ import java.util.function.Function;
 import static ca.tangerine.pce.model.error.ErrorCode.MISSING_GROSS_EXPENSE_RATIO;
 import static ca.tangerine.pce.model.error.ErrorCode.MISSING_MANAGEMENT_EXPENSE_RATIO;
 import static ca.tangerine.pce.model.error.ErrorCode.MISSING_NET_EXPENSE_RATIO;
-
-import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Per-holding fee data source. Each value pairs an extractor (how to read a fee field from

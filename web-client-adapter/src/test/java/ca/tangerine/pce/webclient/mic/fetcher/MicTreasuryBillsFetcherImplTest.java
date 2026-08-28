@@ -1,5 +1,9 @@
 package ca.tangerine.pce.webclient.mic.fetcher;
 
+import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClient;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.rates.DateRateValue;
+
 import org.springframework.core.ParameterizedTypeReference;
 
 import org.junit.jupiter.api.Test;
@@ -16,10 +20,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClient;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.rates.DateRateValue;
 
 class MicTreasuryBillsFetcherImplTest {
 

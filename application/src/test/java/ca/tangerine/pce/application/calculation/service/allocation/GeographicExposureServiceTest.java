@@ -1,27 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.cash;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etf;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.fundCa;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.ZERO;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import ca.tangerine.pce.application.calculation.service.FxRateService;
 import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
 import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
@@ -44,6 +22,28 @@ import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.cash;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.etf;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.fundCa;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holdingWithoutCountry;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Behaviour of the consolidated geographic exposure metric. Deliberately not part of the

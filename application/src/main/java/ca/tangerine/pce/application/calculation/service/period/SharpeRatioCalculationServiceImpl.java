@@ -1,7 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.period;
 
-import org.springframework.stereotype.Service;
-
 import ca.tangerine.pce.application.calculation.metric.SharpeRatioCalculation;
 import ca.tangerine.pce.application.calculation.metric.StandardDeviationCalculation;
 import ca.tangerine.pce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
@@ -16,6 +14,8 @@ import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
 import ca.tangerine.pce.model.dto.command.PeriodCommand;
 import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
+
+import org.springframework.stereotype.Service;
 
 @Service
 public class SharpeRatioCalculationServiceImpl

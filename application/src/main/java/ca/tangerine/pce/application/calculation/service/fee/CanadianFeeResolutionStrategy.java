@@ -1,10 +1,10 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-import ca.tangerine.wm.commons.domain.enumeration.Country;
 
 /**
  * Canadian fund chain: MER → Management Fee. NER and GER are US regulatory metrics and are intentionally excluded —

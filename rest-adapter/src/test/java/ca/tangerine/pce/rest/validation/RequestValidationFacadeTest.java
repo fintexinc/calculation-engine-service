@@ -1,5 +1,12 @@
 package ca.tangerine.pce.rest.validation;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
+import ca.tangerine.pce.model.error.exceptions.ValidationException;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,13 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
-import ca.tangerine.pce.model.error.exceptions.ValidationException;
 
 class RequestValidationFacadeTest {
 

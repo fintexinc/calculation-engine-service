@@ -1,5 +1,13 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.GicHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.dto.command.TopCommonHoldingsCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.rest.validation.RequestValidator;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -10,14 +18,6 @@ import lombok.RequiredArgsConstructor;
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.TOP_COMMON_HOLDINGS;
 import static ca.tangerine.pce.util.FilterUtils.GIC_PREDICATE;
 import static ca.tangerine.pce.util.FilterUtils.filterHoldings;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.GicHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.dto.command.TopCommonHoldingsCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.rest.validation.RequestValidator;
 
 @Component
 @Order(500)

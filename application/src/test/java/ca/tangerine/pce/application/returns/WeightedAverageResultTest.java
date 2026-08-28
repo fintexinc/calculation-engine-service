@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -8,11 +13,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
-import ca.tangerine.wm.commons.error.Notification;
 
 class WeightedAverageResultTest {
 

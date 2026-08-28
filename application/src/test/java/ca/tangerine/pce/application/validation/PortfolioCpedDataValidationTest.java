@@ -1,9 +1,9 @@
 package ca.tangerine.pce.application.validation;
 
-import java.util.List;
-
 import ca.tangerine.pce.application.returns.ProcessingCase;
 import ca.tangerine.pce.model.error.ErrorCode;
+
+import java.util.List;
 
 class PortfolioCpedDataValidationTest extends AbstractCpedDataValidationTest {
 

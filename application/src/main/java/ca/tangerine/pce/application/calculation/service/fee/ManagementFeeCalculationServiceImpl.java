@@ -1,5 +1,16 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
+import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
+import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.fee.ManagementFeeResult;
+import ca.tangerine.pce.model.dto.command.AverageMerCommand;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,17 +25,6 @@ import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.FUNDS
 import static ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode.WHOLE_PORTFOLIO;
 import static ca.tangerine.pce.model.error.ErrorCode.MISSING_MANAGEMENT_FEE;
 import static java.math.BigDecimal.ZERO;
-
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
-import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
-import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.fee.ManagementFeeResult;
-import ca.tangerine.pce.model.dto.command.AverageMerCommand;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.error.Notification;
 
 @Service
 public class ManagementFeeCalculationServiceImpl

@@ -1,5 +1,10 @@
 package ca.tangerine.pce.model.dto.command;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -10,11 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 /**
  * Request for calculating several metrics in one call. Portfolio holdings, data providers and target currency are

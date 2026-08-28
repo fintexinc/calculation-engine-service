@@ -1,5 +1,11 @@
 package ca.tangerine.pce.application.calculation.metric;
 
+import ca.tangerine.pce.application.calculation.metric.core.PeriodCalculationAbstract;
+import ca.tangerine.pce.application.util.RiskFreeWindowValidator;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
@@ -12,12 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import static ca.tangerine.pce.application.util.DecimalUtils.divide;
 import static ca.tangerine.pce.model.util.BigDecimalConstants.TWELVE;
 import static java.math.BigDecimal.ZERO;
-
-import ca.tangerine.pce.application.calculation.metric.core.PeriodCalculationAbstract;
-import ca.tangerine.pce.application.util.RiskFreeWindowValidator;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 @Slf4j
 public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRatioResult, BigDecimal> {

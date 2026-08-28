@@ -1,8 +1,8 @@
 package ca.tangerine.pce.port.observability;
 
-import java.time.Duration;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+
+import java.time.Duration;
 
 /**
  * Reports how long one metric took to calculate. Implemented by the observability adapter and called by the

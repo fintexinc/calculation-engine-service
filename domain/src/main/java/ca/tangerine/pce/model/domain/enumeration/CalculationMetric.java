@@ -1,5 +1,15 @@
 package ca.tangerine.pce.model.domain.enumeration;
 
+import ca.tangerine.pce.model.dto.command.AverageMerCommand;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.dto.command.MerComparisonCommand;
+import ca.tangerine.pce.model.dto.command.MultiplePortfoliosCommand;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
+import ca.tangerine.pce.model.dto.command.ReturnCommand;
+import ca.tangerine.pce.model.dto.command.TopCommonHoldingsCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -12,16 +22,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import ca.tangerine.pce.model.dto.command.AverageMerCommand;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.dto.command.MerComparisonCommand;
-import ca.tangerine.pce.model.dto.command.MultiplePortfoliosCommand;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
-import ca.tangerine.pce.model.dto.command.ReturnCommand;
-import ca.tangerine.pce.model.dto.command.TopCommonHoldingsCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
 
 @Schema(description = "Available portfolio calculation metrics")
 @Getter

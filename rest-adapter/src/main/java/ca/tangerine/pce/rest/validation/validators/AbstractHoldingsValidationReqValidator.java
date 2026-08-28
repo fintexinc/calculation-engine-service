@@ -1,15 +1,15 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.rest.validation.RequestValidator;
+
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.rest.validation.RequestValidator;
 
 public abstract class AbstractHoldingsValidationReqValidator<T> implements RequestValidator {
 

@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.domain.calculation.returns;
 
-import java.util.Map;
-
 import ca.tangerine.pce.model.domain.calculation.PortfolioBenchmarkData;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.domain.security.SecurityData;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+
+import java.util.Map;
 
 /**
  * Per-holding return series consumed by the returns-based calculation services.

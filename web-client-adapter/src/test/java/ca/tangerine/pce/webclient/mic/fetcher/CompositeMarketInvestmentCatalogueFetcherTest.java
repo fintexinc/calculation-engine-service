@@ -1,5 +1,17 @@
 package ca.tangerine.pce.webclient.mic.fetcher;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.security.SecurityData;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClient;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+import ca.tangerine.wm.commons.dto.request.CompositeAttributesRequest;
+
 import org.springframework.core.ParameterizedTypeReference;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,18 +36,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.security.SecurityData;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueWebClient;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
-import ca.tangerine.wm.commons.dto.request.CompositeAttributesRequest;
 
 @ExtendWith(MockitoExtension.class)
 class CompositeMarketInvestmentCatalogueFetcherTest {

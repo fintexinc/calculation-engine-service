@@ -1,13 +1,13 @@
 package ca.tangerine.pce.rest.observability;
 
+import ca.tangerine.pce.port.observability.CalculationStatisticsProvider;
+import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
+
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
-
-import ca.tangerine.pce.port.observability.CalculationStatisticsProvider;
-import ca.tangerine.pce.port.observability.CalculationStatisticsReport;
 
 /**
  * Serves the per-metric calculation statistics at {@code /actuator/calculation-stats}, once the id is added to

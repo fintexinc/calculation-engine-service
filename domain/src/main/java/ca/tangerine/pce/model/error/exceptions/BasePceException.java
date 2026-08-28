@@ -1,15 +1,15 @@
 package ca.tangerine.pce.model.error.exceptions;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.ErrorParams;
+
 import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SequencedMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.ErrorParams;
 
 /**
  * Shared runtime exception used by the calculation engine. Carries an {@link ErrorCode}, the formatted message derived

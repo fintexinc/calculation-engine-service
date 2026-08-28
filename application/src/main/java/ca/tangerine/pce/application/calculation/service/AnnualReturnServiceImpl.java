@@ -1,5 +1,18 @@
 package ca.tangerine.pce.application.calculation.service;
 
+import ca.tangerine.pce.application.calculation.service.period.core.WeightedAverageWithCpsdAndCpedAbstractService;
+import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
+import ca.tangerine.pce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
+import ca.tangerine.pce.application.util.DecimalUtils;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.result.KeyValueResult;
+import ca.tangerine.pce.model.domain.result.returns.AnnualReturnResult;
+import ca.tangerine.pce.model.dto.command.ReturnCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -16,19 +29,6 @@ import static ca.tangerine.pce.application.util.CalculationUtils.product;
 import static ca.tangerine.pce.application.util.ReturnFactorScale.SCALE_OF_TWO;
 import static ca.tangerine.pce.util.DateTimeUtils.toLastDayOfMonth;
 import static java.math.BigDecimal.ONE;
-
-import ca.tangerine.pce.application.calculation.service.period.core.WeightedAverageWithCpsdAndCpedAbstractService;
-import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
-import ca.tangerine.pce.application.returns.pipeline.PortfolioWeightedAverageWithCpsdAndCpedPipeline;
-import ca.tangerine.pce.application.util.DecimalUtils;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.result.KeyValueResult;
-import ca.tangerine.pce.model.domain.result.returns.AnnualReturnResult;
-import ca.tangerine.pce.model.dto.command.ReturnCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.error.Notification;
 
 @Service
 public class AnnualReturnServiceImpl

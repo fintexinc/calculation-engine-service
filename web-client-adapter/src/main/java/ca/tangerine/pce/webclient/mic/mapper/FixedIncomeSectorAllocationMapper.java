@@ -1,14 +1,5 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import ca.tangerine.pce.model.domain.calculation.allocation.FixedIncomeBondSector;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.wm.commons.domain.DataProvider;
@@ -18,6 +9,15 @@ import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType
 import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
 import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
+
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Maps MIC {@link FixedIncomeSectorAllocationWithCurrency} (whose nested {@link FixedIncomeSectorAllocation} is keyed

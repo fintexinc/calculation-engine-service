@@ -1,13 +1,13 @@
 package ca.tangerine.pce.calculation;
 
-import java.util.List;
-import java.util.Map;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
 import ca.tangerine.pce.model.domain.security.SecurityData;
 import ca.tangerine.pce.model.dto.command.CalculationCommand;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Calculation service depending on exactly one Market Investment Catalogue attribute. Implementations declare the

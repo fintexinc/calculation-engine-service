@@ -1,5 +1,9 @@
 package ca.tangerine.pce.model.domain.enumeration;
 
+import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
+import ca.tangerine.wm.commons.domain.allocation.SectorAllocationType;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -7,10 +11,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.wm.commons.domain.allocation.EquitySectorAllocationType;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
-import ca.tangerine.wm.commons.domain.allocation.SectorAllocationType;
 
 /**
  * Guards the consolidated sector taxonomy the {@code sector-exposure} metric reports on. The enum itself lives in

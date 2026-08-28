@@ -1,5 +1,8 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.application.config.FeeProjectionProperties;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -11,9 +14,6 @@ import static ca.tangerine.pce.application.util.DecimalUtils.toUserScale;
 import static ca.tangerine.pce.model.util.BigDecimalConstants.MATH_CONTEXT;
 import static ca.tangerine.pce.model.util.BigDecimalConstants.ONE;
 import static ca.tangerine.pce.model.util.BigDecimalConstants.TWELVE;
-
-import ca.tangerine.pce.application.config.FeeProjectionProperties;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * Projects an annual fee amount forward over a {@link TimePeriod}, under the assumptions held in

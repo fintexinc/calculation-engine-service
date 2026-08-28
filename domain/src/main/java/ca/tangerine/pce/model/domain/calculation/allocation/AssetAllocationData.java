@@ -1,9 +1,9 @@
 package ca.tangerine.pce.model.domain.calculation.allocation;
 
-import java.util.Map;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.wm.commons.domain.financial.Geography;
+
+import java.util.Map;
 
 /**
  * Typed data consumed by the asset-allocation breakdown services: per-holding asset allocations (funds) and geographies

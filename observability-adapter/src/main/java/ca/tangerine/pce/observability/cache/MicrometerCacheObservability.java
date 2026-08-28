@@ -1,5 +1,8 @@
 package ca.tangerine.pce.observability.cache;
 
+import ca.tangerine.pce.port.observability.CacheObservability;
+import ca.tangerine.pce.port.observability.CacheStatistics;
+
 import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.FunctionCounter;
@@ -9,9 +12,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.ToDoubleFunction;
-
-import ca.tangerine.pce.port.observability.CacheObservability;
-import ca.tangerine.pce.port.observability.CacheStatistics;
 
 /**
  * Publishes a cache's counters under the conventional {@code cache.*} meter names, tagged with the cache it describes.

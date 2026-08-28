@@ -1,10 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.period;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-
 import ca.tangerine.pce.application.calculation.metric.TrailingTotalReturnsCalculation;
 import ca.tangerine.pce.application.calculation.service.ReturnBenchmarkComparisonService;
 import ca.tangerine.pce.application.calculation.service.period.core.WeightedAverageWithCpedAbstractService;
@@ -21,6 +16,11 @@ import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
 import ca.tangerine.pce.model.dto.command.PeriodCommand;
 import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 @Service
 public class TrailingTotalReturnsCalculationServiceImpl

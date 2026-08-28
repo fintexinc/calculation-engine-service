@@ -1,14 +1,14 @@
 package ca.tangerine.pce.observability.calculation;
 
-import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.dto.command.CalculationCommand;
 import ca.tangerine.pce.model.dto.command.MultiplePortfoliosCommand;
 import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
 import ca.tangerine.pce.model.dto.command.contract.HoldingsProvider;
+
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * Portfolio and benchmark holding counts carried by one calculation command. The counts are resolved through the

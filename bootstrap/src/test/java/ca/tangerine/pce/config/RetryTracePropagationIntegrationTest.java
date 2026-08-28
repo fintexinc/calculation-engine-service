@@ -1,5 +1,8 @@
 package ca.tangerine.pce.config;
 
+import ca.tangerine.pce.PortfolioCalculationEngineApplication;
+import ca.tangerine.pce.webclient.resilience.ExternalCallResilience;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,8 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.tangerine.pce.PortfolioCalculationEngineApplication;
-import ca.tangerine.pce.webclient.resilience.ExternalCallResilience;
 import reactor.core.publisher.Mono;
 
 @Tag("integration")

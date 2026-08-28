@@ -1,18 +1,5 @@
 package ca.tangerine.pce.rest.controller;
 
-import org.junit.jupiter.params.provider.Arguments;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import lombok.experimental.UtilityClass;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-
 import ca.tangerine.pce.model.domain.calculation.allocation.CountryRegionType;
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
@@ -60,6 +47,19 @@ import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
+import org.junit.jupiter.params.provider.Arguments;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import lombok.experimental.UtilityClass;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
 
 @UtilityClass
 class CalculationTestDataProvider {

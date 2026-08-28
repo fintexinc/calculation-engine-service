@@ -1,11 +1,5 @@
 package ca.tangerine.pce.application.returns.pipeline;
 
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.NavigableMap;
-
 import ca.tangerine.pce.application.returns.FxContext;
 import ca.tangerine.pce.application.returns.ProcessingCase;
 import ca.tangerine.pce.application.returns.ProcessingContext;
@@ -14,6 +8,12 @@ import ca.tangerine.pce.application.returns.ReturnsSnapshot;
 import ca.tangerine.pce.application.returns.WeightedAverageComponent;
 import ca.tangerine.pce.application.returns.WeightedAverageResult;
 import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.NavigableMap;
 
 /** Runs the portfolio pipeline with CPED only (no CPSD trim) and collapses to a weighted-average series. */
 @Component

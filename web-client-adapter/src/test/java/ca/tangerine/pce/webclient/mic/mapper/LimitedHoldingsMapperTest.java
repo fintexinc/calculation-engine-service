@@ -1,13 +1,5 @@
 package ca.tangerine.pce.webclient.mic.mapper;
 
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.calculation.holding.CommonHolding;
 import ca.tangerine.pce.model.domain.calculation.holding.CommonTopHoldings;
 import ca.tangerine.wm.commons.domain.DataProvider;
@@ -22,6 +14,14 @@ import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.IdentifiersDatapoint;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.domain.value.MultilingualString;
+
+import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Covers the {@code LIMITED_HOLDINGS} payload and, through it, the conversion shared by every holdings mapper — field

@@ -1,5 +1,13 @@
 package ca.tangerine.pce.application.calculation.metric;
 
+import ca.tangerine.pce.application.calculation.metric.core.PeriodCalculationAbstract;
+import ca.tangerine.pce.application.util.CalculationUtils;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.result.PeriodResult;
+import ca.tangerine.pce.model.domain.result.risk.StandardDeviationResult;
+import ca.tangerine.pce.model.util.BigDecimalConstants;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
@@ -19,14 +27,6 @@ import static ca.tangerine.pce.application.util.DecimalUtils.toScale;
 import static ca.tangerine.pce.model.util.BigDecimalConstants.INTERNAL_SCALE;
 import static ca.tangerine.pce.model.util.BigDecimalConstants.TWELVE;
 import static java.math.BigDecimal.ZERO;
-
-import ca.tangerine.pce.application.calculation.metric.core.PeriodCalculationAbstract;
-import ca.tangerine.pce.application.util.CalculationUtils;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.result.PeriodResult;
-import ca.tangerine.pce.model.domain.result.risk.StandardDeviationResult;
-import ca.tangerine.pce.model.util.BigDecimalConstants;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 @EqualsAndHashCode
 public class StandardDeviationCalculation<T extends PeriodResult> extends PeriodCalculationAbstract<T, BigDecimal> {

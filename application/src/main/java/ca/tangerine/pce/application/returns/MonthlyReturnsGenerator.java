@@ -1,5 +1,11 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import ca.tangerine.pce.model.domain.holding.MonthlyReturnGeneratableHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -14,12 +20,6 @@ import static ca.tangerine.pce.application.util.DecimalUtils.pow;
 import static ca.tangerine.pce.util.DateTimeUtils.rangeWithLastDayOfMonth;
 import static ca.tangerine.pce.util.FilterUtils.GIC_PREDICATE;
 import static ca.tangerine.pce.util.FilterUtils.filterHoldings;
-
-import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import ca.tangerine.pce.model.domain.holding.MonthlyReturnGeneratableHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 @Component
 public class MonthlyReturnsGenerator {

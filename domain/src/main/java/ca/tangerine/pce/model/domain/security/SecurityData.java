@@ -1,13 +1,13 @@
 package ca.tangerine.pce.model.domain.security;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 
 /**
  * Immutable per-holding Market Investment Catalogue data passed into calculation services. Portfolio and benchmark data

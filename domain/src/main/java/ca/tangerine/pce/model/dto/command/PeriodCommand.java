@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.dto.command;
 
+import ca.tangerine.pce.model.dto.command.contract.CustomPedProvider;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -10,9 +13,6 @@ import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import ca.tangerine.pce.model.dto.command.contract.CustomPedProvider;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)

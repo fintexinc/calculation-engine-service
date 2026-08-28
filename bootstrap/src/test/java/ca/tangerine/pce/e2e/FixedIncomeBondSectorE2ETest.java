@@ -1,5 +1,22 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.allocation.FixedIncomeSectorResult;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
+import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
+import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.error.Notification;
+import ca.tangerine.wm.commons.error.Severity;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -26,22 +43,6 @@ import static ca.tangerine.pce.e2e.MicAttributeResponses.morningstarOnly;
 import static ca.tangerine.pce.e2e.MicAttributeResponses.singleAttributeDispatcher;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.allocation.FixedIncomeSectorResult;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocation;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationType;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationTypeValue;
-import ca.tangerine.wm.commons.domain.allocation.FixedIncomeSectorAllocationWithCurrency;
-import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.error.Notification;
-import ca.tangerine.wm.commons.error.Severity;
 import okhttp3.mockwebserver.MockWebServer;
 
 /**

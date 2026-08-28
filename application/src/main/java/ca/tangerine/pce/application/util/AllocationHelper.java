@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +11,6 @@ import lombok.experimental.UtilityClass;
 import static ca.tangerine.pce.application.util.CalculationUtils.sumProduct;
 import static ca.tangerine.pce.application.util.CollectorUtils.toMap;
 import static ca.tangerine.pce.application.util.PortfolioUtils.calculateInitialPortfolioWeight;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 
 /**
  * Static helpers for breakdown-style allocation calculations. Aggregates per-holding exposures into per-type net

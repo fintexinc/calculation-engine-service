@@ -1,10 +1,10 @@
 package ca.tangerine.pce.port.webclient.mic;
 
+import ca.tangerine.wm.commons.domain.currency.Currency;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
-
-import ca.tangerine.wm.commons.domain.currency.Currency;
 
 /**
  * Port returning the historical risk-free (Treasury bill) monthly return series for one {@link Currency}. The upstream

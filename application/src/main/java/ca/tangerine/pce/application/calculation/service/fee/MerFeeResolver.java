@@ -1,5 +1,13 @@
 package ca.tangerine.pce.application.calculation.service.fee;
 
+import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
+import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,14 +22,6 @@ import static ca.tangerine.pce.application.constant.HoldingTypeGroup.MER_BEARING
 import static ca.tangerine.pce.application.constant.HoldingTypeGroup.ZERO_MER_TYPES;
 import static ca.tangerine.pce.model.error.ErrorCode.COUNTRY_NOT_SUPPORTED;
 import static java.math.BigDecimal.ZERO;
-
-import ca.tangerine.pce.model.domain.calculation.fee.AverageManagementExpenseCalculation;
-import ca.tangerine.pce.model.domain.calculation.fee.FeeData;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Default {@link FeeResolver} implementation. Dispatches per holding type group:

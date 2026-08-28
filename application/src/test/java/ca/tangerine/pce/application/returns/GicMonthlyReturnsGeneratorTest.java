@@ -1,5 +1,12 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import ca.tangerine.pce.model.domain.enumeration.InterestFreq;
+import ca.tangerine.pce.model.domain.holding.GicHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.util.PortfolioHoldingBuildHelper;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -11,13 +18,6 @@ import java.util.TreeMap;
 
 import static ca.tangerine.pce.util.DateTimeUtils.rangeWithLastDayOfMonth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import ca.tangerine.pce.model.domain.enumeration.InterestFreq;
-import ca.tangerine.pce.model.domain.holding.GicHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.util.PortfolioHoldingBuildHelper;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 class GicMonthlyReturnsGeneratorTest {
 

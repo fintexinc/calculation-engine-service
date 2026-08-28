@@ -1,12 +1,12 @@
 package ca.tangerine.pce.calculation;
 
-import java.util.List;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
 import ca.tangerine.pce.model.domain.security.SecurityData;
 import ca.tangerine.pce.model.dto.command.CalculationCommand;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+
+import java.util.List;
 
 /**
  * Base interface for all calculation services. A service is a pure consumer of Market Investment Catalogue data: it

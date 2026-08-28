@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.ValidationException;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -11,11 +16,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.ValidationException;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 class TimePeriodJacksonModuleTest {
 

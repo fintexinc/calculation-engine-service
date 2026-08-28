@@ -1,5 +1,7 @@
 package ca.tangerine.pce.model.domain.result.fee;
 
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Map;
@@ -7,8 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 /**
  * A single aggregation view's fee comparison, in two parts: the rates, and what those rates cost.

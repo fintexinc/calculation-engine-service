@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.domain.result.holding;
 
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.wm.commons.error.Notification;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,9 +13,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.wm.commons.error.Notification;
 
 @Data
 @ToString(callSuper = true)

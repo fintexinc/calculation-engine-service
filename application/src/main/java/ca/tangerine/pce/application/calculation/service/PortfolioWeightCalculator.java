@@ -1,5 +1,12 @@
 package ca.tangerine.pce.application.calculation.service;
 
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.Conversion;
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
+import ca.tangerine.pce.application.util.DecimalUtils;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -11,13 +18,6 @@ import lombok.RequiredArgsConstructor;
 
 import static ca.tangerine.pce.application.util.PortfolioUtils.calculateInitialPortfolioWeight;
 import static java.math.BigDecimal.ZERO;
-
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.Conversion;
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter.CurrencyValue;
-import ca.tangerine.pce.application.util.DecimalUtils;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Computes per-holding portfolio weights normalized to the default target currency. Holding values denominated in

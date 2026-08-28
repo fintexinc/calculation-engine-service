@@ -1,5 +1,13 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.domain.holding.CashHolding;
+import ca.tangerine.pce.model.domain.holding.GicHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.util.FilterUtils;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
@@ -9,14 +17,6 @@ import java.util.function.Function;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toMap;
-
-import ca.tangerine.pce.model.domain.holding.CashHolding;
-import ca.tangerine.pce.model.domain.holding.GicHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.util.FilterUtils;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.id.EquitySecurityIdentifier;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 public class PortfolioUtils {
 

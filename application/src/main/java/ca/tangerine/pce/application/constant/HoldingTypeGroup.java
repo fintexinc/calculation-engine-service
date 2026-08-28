@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.constant;
 
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -7,8 +9,6 @@ import lombok.experimental.UtilityClass;
 
 import static ca.tangerine.wm.commons.domain.utils.FinancialInstrumentTypeUtils.getChildren;
 import static ca.tangerine.wm.commons.domain.utils.FinancialInstrumentTypeUtils.getSelfAndChildren;
-
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 @UtilityClass
 public class HoldingTypeGroup {

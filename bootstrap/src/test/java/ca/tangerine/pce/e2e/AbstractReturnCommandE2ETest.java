@@ -1,10 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.dto.command.ReturnCommand;
@@ -15,6 +10,11 @@ import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
 import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Shared e2e infrastructure for {@link ReturnCommand}-based metrics (growth-of-10k, annual-returns). Both metrics use

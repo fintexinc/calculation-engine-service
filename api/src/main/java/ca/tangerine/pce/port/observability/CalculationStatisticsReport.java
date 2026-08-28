@@ -1,8 +1,8 @@
 package ca.tangerine.pce.port.observability;
 
-import java.util.List;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+
+import java.util.List;
 
 /**
  * Read model of the per-metric calculation statistics: one row per {@link CalculationMetric} that has been executed at

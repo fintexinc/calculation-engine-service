@@ -1,23 +1,5 @@
 package ca.tangerine.pce.application.calculation.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-
-import static ca.tangerine.pce.application.util.DecimalUtils.divide;
-import static ca.tangerine.pce.application.util.DecimalUtils.toUserScale;
-import static ca.tangerine.pce.model.util.BigDecimalConstants.HUNDRED;
-
 import ca.tangerine.pce.application.returns.BenchmarkMonthlyReturnsContextProvider;
 import ca.tangerine.pce.application.returns.MonthlyReturnsContext;
 import ca.tangerine.pce.application.returns.ReturnsSnapshot;
@@ -37,6 +19,24 @@ import ca.tangerine.pce.model.dto.command.ReturnCommand;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.model.error.exceptions.CalculationException;
 import ca.tangerine.wm.commons.error.Notification;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+
+import static ca.tangerine.pce.application.util.DecimalUtils.divide;
+import static ca.tangerine.pce.application.util.DecimalUtils.toUserScale;
+import static ca.tangerine.pce.model.util.BigDecimalConstants.HUNDRED;
 
 @Service
 @RequiredArgsConstructor

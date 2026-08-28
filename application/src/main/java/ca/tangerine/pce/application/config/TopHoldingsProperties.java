@@ -1,5 +1,7 @@
 package ca.tangerine.pce.application.config;
 
+import ca.tangerine.wm.commons.domain.holding.HoldingType;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -8,8 +10,6 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import ca.tangerine.wm.commons.domain.holding.HoldingType;
 
 /**
  * Top Holdings calculation configuration. {@code accumulateTypes} are the MIC holding-type codes counted as candidates

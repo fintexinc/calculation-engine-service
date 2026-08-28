@@ -1,5 +1,12 @@
 package ca.tangerine.pce.application.returns.processor;
 
+import ca.tangerine.pce.application.returns.PerformancePeriodCalculator;
+import ca.tangerine.pce.application.returns.ProcessingCase;
+import ca.tangerine.pce.application.returns.ProcessingContext;
+import ca.tangerine.pce.application.returns.ReturnsSnapshot;
+import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -7,13 +14,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.TreeMap;
-
-import ca.tangerine.pce.application.returns.PerformancePeriodCalculator;
-import ca.tangerine.pce.application.returns.ProcessingCase;
-import ca.tangerine.pce.application.returns.ProcessingContext;
-import ca.tangerine.pce.application.returns.ReturnsSnapshot;
-import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 
 /**
  * Trims each holding's returns to entries on or before the earlier of the user's {@code cped} and the snapshot's

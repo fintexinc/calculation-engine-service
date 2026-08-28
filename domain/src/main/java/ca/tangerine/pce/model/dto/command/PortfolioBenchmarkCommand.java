@@ -1,5 +1,12 @@
 package ca.tangerine.pce.model.dto.command;
 
+import ca.tangerine.pce.model.domain.holding.CashHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,13 +17,6 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import ca.tangerine.pce.model.domain.holding.CashHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

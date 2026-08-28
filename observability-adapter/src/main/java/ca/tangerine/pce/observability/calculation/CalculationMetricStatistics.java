@@ -1,5 +1,16 @@
 package ca.tangerine.pce.observability.calculation;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.domain.result.composite.CompositeCalculationResult;
+import ca.tangerine.pce.model.dto.command.CalculationCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
+import ca.tangerine.pce.port.observability.CalculationDurationRecorder;
+import ca.tangerine.wm.commons.error.Notification;
+import ca.tangerine.wm.commons.error.Severity;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -16,17 +27,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.pce.model.domain.result.composite.CompositeCalculationResult;
-import ca.tangerine.pce.model.dto.command.CalculationCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
-import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
-import ca.tangerine.pce.port.observability.CalculationDurationRecorder;
-import ca.tangerine.wm.commons.error.Notification;
-import ca.tangerine.wm.commons.error.Severity;
 
 /**
  * Statistics for every {@link CalculationMetric} the service calculates, always keyed by the metric that actually ran.

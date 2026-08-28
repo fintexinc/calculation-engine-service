@@ -1,5 +1,22 @@
 package ca.tangerine.pce.e2e;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
+import ca.tangerine.pce.model.domain.result.fee.FeeComparison;
+import ca.tangerine.pce.model.domain.result.fee.FeeSpendComparison;
+import ca.tangerine.pce.model.domain.result.fee.MerComparisonResult;
+import ca.tangerine.pce.model.dto.command.MerComparisonCommand;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.DataProvider;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.Country;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.http.HttpStatus;
 
 import org.junit.jupiter.api.Tag;
@@ -22,23 +39,6 @@ import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.TEN_YR;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.THREE_YR;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.TWENTY_YR;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.enumeration.FeeAggregationMode;
-import ca.tangerine.pce.model.domain.result.fee.FeeComparison;
-import ca.tangerine.pce.model.domain.result.fee.FeeSpendComparison;
-import ca.tangerine.pce.model.domain.result.fee.MerComparisonResult;
-import ca.tangerine.pce.model.dto.command.MerComparisonCommand;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.DataProvider;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.Country;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
-import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Boundary coverage for the fee comparison and its per-horizon projections. Amounts assume the shipped

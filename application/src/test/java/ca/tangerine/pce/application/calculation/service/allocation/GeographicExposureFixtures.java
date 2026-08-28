@@ -1,16 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
-import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.math.BigDecimal.ZERO;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import ca.tangerine.pce.model.domain.calculation.allocation.GeographicExposureData;
 import ca.tangerine.pce.model.domain.calculation.allocation.HoldingGeographicAllocation;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
@@ -24,6 +13,17 @@ import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
 import ca.tangerine.wm.commons.domain.enumeration.Country;
 import ca.tangerine.wm.commons.domain.financial.Geography;
 import ca.tangerine.wm.commons.domain.reference.CountryDatapoint;
+
+import java.math.BigDecimal;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.math.BigDecimal.ZERO;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Holding / geography fixtures and per-region assertions shared by every geographic exposure test.

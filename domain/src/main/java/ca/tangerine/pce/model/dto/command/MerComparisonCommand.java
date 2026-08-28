@@ -1,5 +1,8 @@
 package ca.tangerine.pce.model.dto.command;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,9 +12,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.dto.command.contract.BenchmarkHoldingsProvider;
 
 /**
  * Command for the {@code mer-benchmark-comparison} metric. Carries the portfolio holdings and fee-aggregation modes

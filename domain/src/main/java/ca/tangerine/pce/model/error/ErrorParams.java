@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.error;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.experimental.UtilityClass;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
 
 /**
  * Shared helpers for assembling error/notification context. Centralises the param-1, param-2, ... metadata convention

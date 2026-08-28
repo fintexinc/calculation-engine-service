@@ -1,5 +1,9 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -7,10 +11,6 @@ import java.util.List;
 
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.MAX_DRAWDOWN;
 import static ca.tangerine.pce.model.domain.enumeration.CalculationMetric.TRAILING_TOTAL_RETURNS;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
 
 /**
  * The period metrics that look back from the latest return and are not bound by the twelve-month minimum, and so accept

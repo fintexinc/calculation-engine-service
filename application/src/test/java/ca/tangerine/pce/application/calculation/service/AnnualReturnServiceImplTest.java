@@ -1,5 +1,10 @@
 package ca.tangerine.pce.application.calculation.service;
 
+import ca.tangerine.pce.model.domain.result.returns.AnnualReturnResult;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -17,11 +22,6 @@ import static java.math.BigDecimal.TEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-
-import ca.tangerine.pce.model.domain.result.returns.AnnualReturnResult;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.error.Notification;
 
 class AnnualReturnServiceImplTest {
 

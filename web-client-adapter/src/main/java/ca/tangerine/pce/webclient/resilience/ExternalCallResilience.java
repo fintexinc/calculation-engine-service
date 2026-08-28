@@ -1,5 +1,7 @@
 package ca.tangerine.pce.webclient.resilience;
 
+import ca.tangerine.wm.commons.domain.ExternalWebService;
+
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
@@ -12,7 +14,6 @@ import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 
 import lombok.extern.slf4j.Slf4j;
 
-import ca.tangerine.wm.commons.domain.ExternalWebService;
 import reactor.core.publisher.Mono;
 
 /**

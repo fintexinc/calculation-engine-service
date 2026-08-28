@@ -1,5 +1,25 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
+import ca.tangerine.pce.application.calculation.service.FxRateService;
+import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
+import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
+import ca.tangerine.pce.application.config.FxProperties;
+import ca.tangerine.pce.model.domain.calculation.allocation.AssetAllocationData;
+import ca.tangerine.pce.model.domain.calculation.allocation.HoldingAssetAllocation;
+import ca.tangerine.pce.model.domain.holding.CashHolding;
+import ca.tangerine.pce.model.domain.holding.GicHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
+import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.allocation.AssetAllocationRegionType;
+import ca.tangerine.wm.commons.domain.allocation.RegionDatapoint;
+import ca.tangerine.wm.commons.domain.allocation.SecurityRegion;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
+import ca.tangerine.wm.commons.domain.financial.Geography;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,26 +42,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.application.calculation.service.FxRateService;
-import ca.tangerine.pce.application.calculation.service.HoldingCurrencyConverter;
-import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
-import ca.tangerine.pce.application.config.FxProperties;
-import ca.tangerine.pce.model.domain.calculation.allocation.AssetAllocationData;
-import ca.tangerine.pce.model.domain.calculation.allocation.HoldingAssetAllocation;
-import ca.tangerine.pce.model.domain.holding.CashHolding;
-import ca.tangerine.pce.model.domain.holding.GicHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
-import ca.tangerine.pce.model.dto.command.PortfolioHoldingsCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.allocation.AssetAllocationRegionType;
-import ca.tangerine.wm.commons.domain.allocation.RegionDatapoint;
-import ca.tangerine.wm.commons.domain.allocation.SecurityRegion;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.currency.CurrencyDatapoint;
-import ca.tangerine.wm.commons.domain.financial.Geography;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Shared assertions for asset-allocation breakdown services. Mirrors the service hierarchy: every behaviour driven by

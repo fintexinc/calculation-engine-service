@@ -1,13 +1,13 @@
 package ca.tangerine.pce.port.webclient.mic;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.domain.security.SecurityData;
 import ca.tangerine.wm.commons.domain.DataProvider;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generic port for fetching Market Investment Catalogue attributes for the supplied holdings. A single attribute is

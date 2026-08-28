@@ -1,13 +1,5 @@
 package ca.tangerine.pce.e2e;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.domain.result.KeyValueResult;
@@ -19,6 +11,14 @@ import ca.tangerine.wm.commons.domain.enumeration.Country;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 import ca.tangerine.wm.commons.domain.performance.MonthlyReturns;
 import ca.tangerine.wm.commons.domain.value.DateBigDecimalValue;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Shared e2e infrastructure for the {@code annual-returns} metric. Common {@link ReturnCommand} fixtures live in

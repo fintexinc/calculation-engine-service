@@ -1,5 +1,12 @@
 package ca.tangerine.pce.rest.controller;
 
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.BasePceException;
+import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
+import ca.tangerine.wm.commons.error.ErrorResponse;
+import ca.tangerine.wm.commons.error.Notification;
+import ca.tangerine.wm.commons.error.Severity;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -27,13 +34,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.BasePceException;
-import ca.tangerine.pce.model.error.exceptions.CalculationsFailedException;
-import ca.tangerine.wm.commons.error.ErrorResponse;
-import ca.tangerine.wm.commons.error.Notification;
-import ca.tangerine.wm.commons.error.Severity;
 
 /**
  * Central REST exception handler. Every exception thrown by the calculation pipeline or the HTTP machinery is

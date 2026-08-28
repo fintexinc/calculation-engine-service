@@ -1,5 +1,14 @@
 package ca.tangerine.pce.application.calculation.service.allocation;
 
+import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.domain.result.exposure.ConsolidatedGeographicExposureResult;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.allocation.GeographicRegionType;
+import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -9,15 +18,6 @@ import java.util.function.Predicate;
 
 import static ca.tangerine.pce.util.FilterUtils.CASH_PREDICATE;
 import static ca.tangerine.pce.util.FilterUtils.GIC_PREDICATE;
-
-import ca.tangerine.pce.application.calculation.service.PortfolioWeightCalculator;
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.exposure.ConsolidatedGeographicExposureResult;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.allocation.GeographicRegionType;
-import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
-import ca.tangerine.wm.commons.error.Notification;
 
 /**
  * Consolidated geographic exposure: the region distribution of the portfolio <em>as a whole</em>, equity and fixed

@@ -1,12 +1,12 @@
 package ca.tangerine.pce.cache.fx;
 
+import ca.tangerine.pce.model.domain.CurrencyExchangePair;
+import ca.tangerine.pce.model.domain.calculation.DateRange;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.NavigableMap;
 import java.util.function.Function;
-
-import ca.tangerine.pce.model.domain.CurrencyExchangePair;
-import ca.tangerine.pce.model.domain.calculation.DateRange;
 
 /**
  * Range-aware cache over historical FX rates. Implementations track which date ranges have already been loaded per

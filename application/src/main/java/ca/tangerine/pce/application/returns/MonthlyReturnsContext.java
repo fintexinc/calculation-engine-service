@@ -1,8 +1,8 @@
 package ca.tangerine.pce.application.returns;
 
-import java.time.LocalDate;
-
 import ca.tangerine.pce.model.domain.calculation.returns.ReturnsData;
+
+import java.time.LocalDate;
 
 /**
  * Bundle of the snapshot, FX inputs, and role produced by the build phase of {@code MonthlyReturnsService}. Passed into

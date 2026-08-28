@@ -1,13 +1,13 @@
 package ca.tangerine.pce.rest.validation.validators;
 
+import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
+import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
+import ca.tangerine.pce.model.dto.command.AverageMerCommand;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.enumeration.SupportedPeriods;
-import ca.tangerine.pce.model.dto.command.AverageMerCommand;
 
 /**
  * Fee projections: the agreed reporting ladder, and nothing without a length.

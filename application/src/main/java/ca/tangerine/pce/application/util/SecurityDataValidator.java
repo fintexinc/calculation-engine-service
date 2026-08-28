@@ -1,5 +1,9 @@
 package ca.tangerine.pce.application.util;
 
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -9,10 +13,6 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 
 import static ca.tangerine.pce.model.error.ErrorCode.NO_SECURITY_DATA_FOR_HOLDING;
-
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 /**
  * Pre-condition checks on security-data fetcher responses. Fee / income / returns endpoints all share the same failure

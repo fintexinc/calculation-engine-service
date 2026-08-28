@@ -1,13 +1,13 @@
 package ca.tangerine.pce.webclient.resilience;
 
+import ca.tangerine.wm.commons.domain.ExternalWebService;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
-
-import ca.tangerine.wm.commons.domain.ExternalWebService;
 
 /**
  * Resolves one {@link ExternalCallResilience} per {@link ExternalWebService} from the Resilience4j registries, so the

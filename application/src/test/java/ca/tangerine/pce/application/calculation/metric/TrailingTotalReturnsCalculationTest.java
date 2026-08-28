@@ -1,5 +1,14 @@
 package ca.tangerine.pce.application.calculation.metric;
 
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
+import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+import ca.tangerine.wm.commons.error.Notification;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 
@@ -31,15 +40,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
-import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
-import ca.tangerine.wm.commons.error.Notification;
 
 class TrailingTotalReturnsCalculationTest {
 

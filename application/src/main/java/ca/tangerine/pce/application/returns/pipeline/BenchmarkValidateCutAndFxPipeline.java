@@ -1,13 +1,13 @@
 package ca.tangerine.pce.application.returns.pipeline;
 
-import org.springframework.stereotype.Component;
-
 import ca.tangerine.pce.application.returns.FxContext;
 import ca.tangerine.pce.application.returns.ProcessingCase;
 import ca.tangerine.pce.application.returns.ProcessingContext;
 import ca.tangerine.pce.application.returns.ProcessorsRunner;
 import ca.tangerine.pce.application.returns.ReturnsSnapshot;
 import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+
+import org.springframework.stereotype.Component;
 
 /** Benchmark equivalent of {@link PortfolioValidateCutAndFxPipeline}. */
 @Component

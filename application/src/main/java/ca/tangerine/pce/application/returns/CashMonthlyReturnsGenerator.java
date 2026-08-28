@@ -1,5 +1,13 @@
 package ca.tangerine.pce.application.returns;
 
+import ca.tangerine.pce.application.util.TBillsValidator;
+import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
+import ca.tangerine.pce.model.domain.holding.CashHolding;
+import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
+import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -14,14 +22,6 @@ import lombok.RequiredArgsConstructor;
 
 import static ca.tangerine.pce.util.FilterUtils.CASH_PREDICATE;
 import static ca.tangerine.pce.util.FilterUtils.filterHoldings;
-
-import ca.tangerine.pce.application.util.TBillsValidator;
-import ca.tangerine.pce.model.domain.calculation.returns.HoldingMonthlyReturns;
-import ca.tangerine.pce.model.domain.holding.CashHolding;
-import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.port.webclient.mic.TreasuryBillsFetcher;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 
 /**
  * Sources the monthly-return series of CASH holdings from the Treasury Bill series of their currency.

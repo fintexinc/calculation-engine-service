@@ -1,5 +1,18 @@
 package ca.tangerine.pce.application.calculation.service.period;
 
+import ca.tangerine.pce.application.calculation.metric.StandardDeviationCalculation;
+import ca.tangerine.pce.application.config.PeriodProperties;
+import ca.tangerine.pce.application.returns.ReturnsSnapshot;
+import ca.tangerine.pce.application.returns.WeightedAverageResult;
+import ca.tangerine.pce.application.util.ReturnFactorScale;
+import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
+import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
+import ca.tangerine.pce.model.dto.command.PeriodCommand;
+import ca.tangerine.pce.model.error.ErrorCode;
+import ca.tangerine.pce.model.error.exceptions.CalculationException;
+import ca.tangerine.wm.commons.domain.currency.Currency;
+import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -31,19 +44,6 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-
-import ca.tangerine.pce.application.calculation.metric.StandardDeviationCalculation;
-import ca.tangerine.pce.application.config.PeriodProperties;
-import ca.tangerine.pce.application.returns.ReturnsSnapshot;
-import ca.tangerine.pce.application.returns.WeightedAverageResult;
-import ca.tangerine.pce.application.util.ReturnFactorScale;
-import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
-import ca.tangerine.pce.model.dto.command.PeriodCommand;
-import ca.tangerine.pce.model.error.ErrorCode;
-import ca.tangerine.pce.model.error.exceptions.CalculationException;
-import ca.tangerine.wm.commons.domain.currency.Currency;
-import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 class StandardDeviationCalculationServiceImplTest {
 

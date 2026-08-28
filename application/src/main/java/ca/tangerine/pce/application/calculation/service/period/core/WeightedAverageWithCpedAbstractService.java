@@ -1,8 +1,5 @@
 package ca.tangerine.pce.application.calculation.service.period.core;
 
-import java.util.List;
-import java.util.Set;
-
 import ca.tangerine.pce.application.returns.MonthlyReturnsContext;
 import ca.tangerine.pce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import ca.tangerine.pce.application.returns.WeightedAverageResult;
@@ -18,6 +15,9 @@ import ca.tangerine.pce.model.domain.security.SecurityData;
 import ca.tangerine.pce.model.dto.command.PeriodCommand;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Base class for services whose pipeline contract is the portfolio-side weighted-average with CPED only (no per-holding
