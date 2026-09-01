@@ -2,8 +2,9 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.dto.MetricInfo;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
