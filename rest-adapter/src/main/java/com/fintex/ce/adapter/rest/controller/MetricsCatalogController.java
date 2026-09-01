@@ -18,8 +18,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 /**
- * REST endpoint for the metrics catalog. Provides discovery of all available metrics that the
- * calculation engine supports.
+ * REST endpoint for the metrics catalog. Provides discovery of all available metrics that the calculation engine
+ * supports.
  */
 @RestController
 @RequiredArgsConstructor
