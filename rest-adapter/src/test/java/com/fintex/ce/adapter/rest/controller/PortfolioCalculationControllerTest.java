@@ -9,6 +9,7 @@ import com.fintex.ce.adapter.rest.validation.validators.HoldingsValidator;
 import com.fintex.ce.adapter.rest.validation.validators.StandardDeviationPeriodsReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.TrailingPeriodsReqValidator;
 import com.fintex.ce.adapter.rest.validation.validators.TwelveMonthMinimumPeriodsReqValidator;
+import com.fintex.ce.application.calculation.metric.MetricCatalogService;
 import com.fintex.ce.application.calculation.orchestration.MetricCalculationOrchestrator;
 import com.fintex.ce.application.config.DefaultDataProperties;
 import com.fintex.ce.calculation.CalculationOrchestrator;
@@ -21,6 +22,7 @@ import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.domain.security.SecurityData;
+import com.fintex.ce.model.dto.MetricInfo;
 import com.fintex.ce.model.dto.command.BestWorstPeriodsCommand;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.DistributionOfReturnsCommand;
@@ -82,6 +84,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -195,6 +198,31 @@ class PortfolioCalculationControllerTest {
         .andExpect(status().isUnsupportedMediaType());
   }
 
+  @Test
+  void shouldReturnMetricCatalog_whenCatalogEndpointRequested() throws Exception {
+    MvcResult mvcResult = mockMvc.perform(
+        get(BASE_PATH + "/catalog")
+            .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andReturn();
+
+    String responseBody = mvcResult.getResponse().getContentAsString();
+    // Parse as an array of MetricInfo
+    MetricInfo[] metrics = objectMapper.readValue(responseBody, MetricInfo[].class);
+
+    // Verify catalog is populated
+    assertThat(metrics)
+        .isNotEmpty()
+        .hasSizeGreaterThanOrEqualTo(CalculationMetric.values().length);
+
+    // Verify all metrics are present with proper structure
+    assertThat(metrics)
+        .allMatch(metric -> metric.id() != null && !metric.id().isEmpty())
+        .allMatch(metric -> metric.name() != null && !metric.name().isEmpty())
+        .allMatch(metric -> metric.category() != null && !metric.category().isEmpty());
+  }
+
   private CalculationService<?, ?, ?> createMockService(CalculationMetric metric) {
     CalculationService<?, ?, ?> mock = mock(CalculationService.class);
     lenient().when(mock.getMetric()).thenReturn(metric);
@@ -220,7 +248,9 @@ class PortfolioCalculationControllerTest {
         CalculationDurationRecorder.NO_OP);
     LocalValidatorFactoryBean beanValidator = new LocalValidatorFactoryBean();
     beanValidator.afterPropertiesSet();
-    return new PortfolioCalculationController(orchestrator, validationFacade, observability, beanValidator);
+    MetricCatalogService catalogService = new MetricCatalogService();
+    return new PortfolioCalculationController(orchestrator, validationFacade, observability, beanValidator,
+        catalogService);
   }
 
   /**
