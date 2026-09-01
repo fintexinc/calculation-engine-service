@@ -1,6 +1,7 @@
 package com.fintex.ce.adapter.rest.controller;
 
 import com.fintex.ce.adapter.rest.validation.RequestValidationFacade;
+import com.fintex.ce.application.calculation.metric.MetricCatalogService;
 import com.fintex.ce.calculation.CalculationOrchestrator;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
@@ -54,6 +55,7 @@ import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
 import com.fintex.ce.model.domain.result.rolling.RollingSharpeRatioResult;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
+import com.fintex.ce.model.dto.MetricInfo;
 import com.fintex.ce.model.dto.command.CalculationCommand;
 import com.fintex.ce.model.dto.command.CompositeCalculationRequest;
 import com.fintex.ce.model.dto.command.PortfolioBenchmarkCommand;
@@ -63,6 +65,7 @@ import com.fintex.ce.port.observability.CalculationObservability;
 
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -113,6 +116,7 @@ public class PortfolioCalculationController {
   private final RequestValidationFacade validationFacade;
   private final CalculationObservability calculationObservability;
   private final Validator validator;
+  private final MetricCatalogService metricCatalogService;
 
   @Operation(summary = "Execute a portfolio calculation", description = "Performs the specified calculation metric on the provided portfolio holdings. "
       + "The request body schema depends on the metric — period-based metrics require time intervals, "
@@ -179,6 +183,13 @@ public class PortfolioCalculationController {
     commands.forEach(this::validateCommand);
     return calculationObservability.observeComposite(commands,
         () -> calculationOrchestrator.calculateAll(commands));
+  }
+
+  @Operation(summary = "List all available metrics", description = "Returns a catalog of every metric this engine supports, including metric ID, human-readable name, and category.")
+  @ApiResponse(responseCode = "200", description = "Catalog of available metrics", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = MetricInfo.class)))
+  @GetMapping("/catalog")
+  public List<MetricInfo> listMetrics() {
+    return metricCatalogService.getCatalog();
   }
 
   private void requireMetric(CalculationCommand command) {
