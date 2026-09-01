@@ -12,7 +12,6 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.calculation.returns.PortfolioBenchmarkReturns;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
@@ -21,17 +20,15 @@ import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.util.CollectionUtils;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.util.DecimalUtils.abs;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWELVE;
@@ -78,26 +75,27 @@ public class MarRatioCalculationService
     Set<TimePeriod> initialPeriods = CollectionUtils.isEmpty(command.getPeriods())
         ? defaultPeriods
         : command.getPeriods();
-    Set<Pair<String, BigDecimal>> rawResults = new HashSet<>();
+    Map<String, BigDecimal> rawResults = new LinkedHashMap<>();
 
     initialPeriods.stream()
         .filter(p -> p != TimePeriod.CIPSD)
         .forEach(p -> {
           int months = getNumberOfMonthsFor(portfolioReturns, p);
-          rawResults.add(Pair.of(p.name(), calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr)));
+          rawResults.put(p.name(), calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr));
         });
 
     if (isCipsdValid(cipsd, portfolioReturns)) {
       int months = getMonthsBetweenDates(cipsd, portfolioReturns.lastKey(), firstDayOfMonth());
-      rawResults.add(Pair.of(TimePeriod.CIPSD.name(),
-          calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr)));
+      rawResults.put(TimePeriod.CIPSD.name(),
+          calculateMarRatioPeriod(months, portfolioReturns, growth10K, ttr));
     } else if (cipsd != null || initialPeriods.contains(TimePeriod.CIPSD)) {
-      rawResults.add(Pair.of(TimePeriod.CIPSD.name(), null));
+      rawResults.put(TimePeriod.CIPSD.name(), null);
     }
 
-    Set<Pair<String, BigDecimal>> periodsResult = rawResults.stream()
-        .map(p -> Pair.of(p.getKey(), p.getValue() != null ? DecimalUtils.toUserScale(p.getValue()) : null))
-        .collect(Collectors.toSet());
+    Map<String, BigDecimal> periodsResult = new LinkedHashMap<>();
+    rawResults.forEach((period, value) -> periodsResult.put(period, value != null
+        ? DecimalUtils.toUserScale(value)
+        : null));
 
     MarRatioResult result = buildResult(periodsResult);
     result.setCustomIntervalPerformanceStartDate(cipsd);
@@ -125,35 +123,32 @@ public class MarRatioCalculationService
     return DecimalUtils.divide(trailingTRValue, abs(maxDrawdown.value()));
   }
 
-  MarRatioResult buildResult(final Set<Pair<String, BigDecimal>> periodsResult) {
+  MarRatioResult buildResult(final Map<String, BigDecimal> periodsResult) {
     MarRatioResult result = new MarRatioResult();
-    Set<TimeIntervalResult> timeIntervals = periodsResult.stream()
-        .map(e -> new TimeIntervalResult(e.getKey(), e.getValue()))
-        .collect(Collectors.toSet());
-    result.setMarRatio(timeIntervals);
+    result.setMarRatio(periodsResult);
     return result;
   }
 
   // Private helpers
 
   private void addWarnings(final MarRatioResult result,
-      final Set<Pair<String, BigDecimal>> periodsResult,
+      final Map<String, BigDecimal> periodsResult,
       final NavigableMap<LocalDate, BigDecimal> portfolioReturns,
       final LocalDate cipsd) {
     int availableMonths = portfolioReturns.size();
     List<Notification> warnings = new ArrayList<>(result.getWarnings());
 
-    periodsResult.stream()
-        .filter(pair -> pair.getValue() == null)
-        .filter(pair -> !TimePeriod.CIPSD.name().equals(pair.getKey()))
-        .filter(pair -> getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(pair.getKey())) > availableMonths)
-        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(
-            getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(pair.getKey())), availableMonths))
+    periodsResult.entrySet().stream()
+        .filter(entry -> entry.getValue() == null)
+        .filter(entry -> !TimePeriod.CIPSD.name().equals(entry.getKey()))
+        .filter(entry -> getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(entry.getKey())) > availableMonths)
+        .map(entry -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(
+            getNumberOfMonthsFor(portfolioReturns, TimePeriod.valueOf(entry.getKey())), availableMonths))
         .forEach(warnings::add);
 
-    boolean sinceCipsdRequestedAndNull = periodsResult.stream()
-        .anyMatch(pair -> TimePeriod.CIPSD.name()
-            .equalsIgnoreCase(pair.getKey()) && pair.getValue() == null);
+    boolean sinceCipsdRequestedAndNull = periodsResult.entrySet().stream()
+        .anyMatch(entry -> TimePeriod.CIPSD.name()
+            .equalsIgnoreCase(entry.getKey()) && entry.getValue() == null);
     if (cipsd != null && !portfolioReturns.isEmpty() && !isCipsdValid(cipsd, portfolioReturns)
         && sinceCipsdRequestedAndNull) {
       warnings.add(ErrorCode.CIPSD_OUTSIDE_DATA_RANGE.asNotification(

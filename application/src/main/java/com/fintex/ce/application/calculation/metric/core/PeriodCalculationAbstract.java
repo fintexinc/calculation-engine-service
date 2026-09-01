@@ -3,26 +3,23 @@ package com.fintex.ce.application.calculation.metric.core;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.util.CollectionUtils;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.stream.Collectors;
 import lombok.Getter;
 
 import static com.fintex.ce.application.util.CalculationUtils.product;
@@ -77,31 +74,26 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          entered periods
    * @return calculated periods
    */
-  public Set<Pair<String, V>> calculatePeriods(Set<TimePeriod> periods) {
+  public Map<String, V> calculatePeriods(Set<TimePeriod> periods) {
     Set<TimePeriod> initialPeriods = getInitialPeriods(periods);
-    Set<Pair<String, V>> result = initialPeriods.stream()
+    Map<String, V> result = new LinkedHashMap<>();
+    initialPeriods.stream()
         .filter(period -> period != CIPSD)
-        .map(this::calculateForPeriod).collect(Collectors.toSet());
+        .forEach(period -> result.put(period.name(), calculateForPeriod(period)));
     addSinceCustomIntervalPerformanceStartDate(result, initialPeriods);
     return result;
   }
 
   /**
-   * Calculates a single period.
-   *
-   * <p>
-   * The returned pair keeps the period as its name rather than as the enum: this is the one point where the typed
-   * vocabulary meets the response DTOs, which are string-keyed throughout ({@link TimeIntervalResult}). The name is
-   * what the enum serializes as anyway, so the wire format is the same either way.
+   * Calculates a single period. The period is keyed by its enum name, which is what the response maps are keyed by.
    *
    * @param period
    *          period
-   * @return result for a single period
+   * @return result for a single period (may be {@code null} when there is not enough data)
    */
-  public Pair<String, V> calculateForPeriod(TimePeriod period) {
+  public V calculateForPeriod(TimePeriod period) {
     int months = getNumberOfMonthsFor(portfolioTotalReturns, Objects.requireNonNull(period));
-    V result = calculatePeriodForNumberOfMonths(months);
-    return Pair.of(period.name(), toUserFormat(result));
+    return toUserFormat(calculatePeriodForNumberOfMonths(months));
   }
 
   /**
@@ -133,18 +125,17 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
   /**
    * Appends CIPSD (custom since interval performance start date) (if valid) to the result
    *
-   * @param resultSet
-   *          result set (pre-calculated the rest of the periods)
+   * @param result
+   *          result map (pre-calculated the rest of the periods)
    * @param periods
    *          requested periods
    */
-  public void addSinceCustomIntervalPerformanceStartDate(Set<Pair<String, V>> resultSet,
+  public void addSinceCustomIntervalPerformanceStartDate(Map<String, V> result,
       Set<TimePeriod> periods) {
     if (isSinceCustomIntervalPerformanceStartDateValid()) {
-      V periodValue = calculatePeriodForCustomIntervalStartDate();
-      resultSet.add(Pair.of(CIPSD.name(), toUserFormat(periodValue)));
+      result.put(CIPSD.name(), toUserFormat(calculatePeriodForCustomIntervalStartDate()));
     } else if (cipsd != null || periods.contains(CIPSD)) {
-      resultSet.add(Pair.of(CIPSD.name(), null));
+      result.put(CIPSD.name(), null);
     }
   }
 
@@ -259,7 +250,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * @return final result
    */
   public T calculate(Set<TimePeriod> periods) {
-    Set<Pair<String, V>> periodsResult = calculatePeriods(periods);
+    Map<String, V> periodsResult = calculatePeriods(periods);
     T result = defineResponseType(periodsResult);
     result.setWarnings(new ArrayList<>(inputWarnings));
     populateBasicDetails(result);
@@ -276,21 +267,21 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    * {@link ErrorCode#CIPSD_OUTSIDE_DATA_RANGE} warning so callers can tell why the value is null. Lets API consumers
    * distinguish "no result, not enough data" from a generic null without overriding the spec's null contract.
    */
-  public void addInsufficientDataWarnings(T result, Set<Pair<String, V>> periodsResult) {
+  public void addInsufficientDataWarnings(T result, Map<String, V> periodsResult) {
     int availableMonths = availableMonths();
     List<Notification> warnings = new ArrayList<>(result.getWarnings());
-    periodsResult.stream()
-        .filter(pair -> pair.getValue() == null)
-        .filter(pair -> !CIPSD.name().equals(pair.getKey()))
-        .filter(pair -> requiresInsufficientDataWarning(pair.getKey(), availableMonths))
-        .map(pair -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(
-            getNumberOfMonthsFor(portfolioTotalReturns, TimePeriod.valueOf(pair.getKey())), availableMonths))
+    periodsResult.entrySet().stream()
+        .filter(entry -> entry.getValue() == null)
+        .filter(entry -> !CIPSD.name().equals(entry.getKey()))
+        .filter(entry -> requiresInsufficientDataWarning(entry.getKey(), availableMonths))
+        .map(entry -> ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.asNotification(
+            getNumberOfMonthsFor(portfolioTotalReturns, TimePeriod.valueOf(entry.getKey())), availableMonths))
         .forEach(warnings::add);
 
     // CIPSD lies outside [firstKey, lastKey] → SINCE_CIPSD is silently null. Without this warning the caller
     // has no signal whether the cause was an out-of-range CIPSD vs missing data vs anything else.
-    boolean sinceCipsdRequestedAndNull = periodsResult.stream().anyMatch(
-        pair -> CIPSD.name().equals(pair.getKey()) && pair.getValue() == null);
+    boolean sinceCipsdRequestedAndNull = periodsResult.containsKey(CIPSD.name())
+        && periodsResult.get(CIPSD.name()) == null;
     if (cipsd != null && !portfolioTotalReturns.isEmpty()
         && !isSinceCustomIntervalPerformanceStartDateValid()
         && sinceCipsdRequestedAndNull) {
@@ -298,10 +289,10 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
           cipsd, portfolioTotalReturns.firstKey(), portfolioTotalReturns.lastKey()));
     }
 
-    periodsResult.stream()
-        .filter(pair -> pair.getValue() == null)
-        .filter(pair -> requiresUnavailablePeriodWarning(pair.getKey(), availableMonths))
-        .map(pair -> unavailablePeriodWarning(pair.getKey()))
+    periodsResult.entrySet().stream()
+        .filter(entry -> entry.getValue() == null)
+        .filter(entry -> requiresUnavailablePeriodWarning(entry.getKey(), availableMonths))
+        .map(entry -> unavailablePeriodWarning(entry.getKey()))
         .forEach(warnings::add);
 
     result.setWarnings(warnings);
@@ -335,7 +326,7 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
    *          calculated value per requested period
    * @return populated period-based result object
    */
-  public abstract T defineResponseType(Set<Pair<String, V>> periodValues);
+  public abstract T defineResponseType(Map<String, V> periodValues);
 
   /**
    * returns period start date by number of months. Last date in returns map minus (numberOfMonths - 1)
@@ -378,20 +369,6 @@ public abstract class PeriodCalculationAbstract<T extends PeriodResult, V> {
         .stream()
         .filter(entry -> tBills.containsKey(entry.getKey()))
         .collect(toTreeMap(Map.Entry::getKey, e -> e.getValue().subtract(tBills.get(e.getKey()))));
-  }
-
-  /**
-   * Returns mapped values from Set<Pair<String, BigDecimal>> to Set<TimeIntervalResult>.
-   * <p>
-   * TimeIntervalResult is the final view of the result.
-   *
-   * @param result
-   *          final result.
-   * @return result as TimeIntervalResult object.
-   */
-  public Set<TimeIntervalResult> formTimeIntervalResult(Set<Pair<String, BigDecimal>> result) {
-    return result.stream().map(e -> new TimeIntervalResult(e.getKey(), e.getValue()))
-        .collect(Collectors.toSet());
   }
 
   /**

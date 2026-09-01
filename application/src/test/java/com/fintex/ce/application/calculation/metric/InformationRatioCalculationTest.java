@@ -1,13 +1,11 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.util.DateTimeUtils;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -30,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -188,12 +188,10 @@ class InformationRatioCalculationTest {
         TWO_YR),
         trailingTotalReturnsCalculation, trackingErrorCalculation));
 
-    Set<Pair<String, BigDecimal>> periodAndInformationRatio = mock(Set.class);
-    Set<TimeIntervalResult> informationRatio = mock(Set.class);
-    var expected = new InformationRatioResult(informationRatio);
-    when(calculation.formTimeIntervalResult(periodAndInformationRatio)).thenReturn(informationRatio);
+    Map<String, BigDecimal> periodAndInformationRatio = mock(Map.class);
+    var expected = new InformationRatioResult(periodAndInformationRatio);
 
-    doCallRealMethod().when(calculation).defineResponseType(any());
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
     var actual = calculation.defineResponseType(periodAndInformationRatio);
 
     assertEquals(expected, actual);

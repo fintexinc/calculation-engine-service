@@ -3,15 +3,13 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.BenchmarkWeightedAverageCalculation;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.InformationRatioResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
@@ -61,10 +59,9 @@ public class InformationRatioCalculation
   }
 
   @Override
-  public InformationRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodAndInformationRatio) {
+  public InformationRatioResult defineResponseType(final Map<String, BigDecimal> periodAndInformationRatio) {
     var result = new InformationRatioResult();
-    Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodAndInformationRatio);
-    result.setInformationRatio(timeIntervals);
+    result.setInformationRatio(periodAndInformationRatio);
     return result;
   }
 }

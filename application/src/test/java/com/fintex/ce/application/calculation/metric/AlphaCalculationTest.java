@@ -1,16 +1,14 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.AlphaResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.Map;
 import java.util.TreeMap;
 
 import static com.fintex.ce.model.util.BigDecimalConstants.HUNDRED;
@@ -21,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -35,35 +33,15 @@ class AlphaCalculationTest {
   final int TWELVE = 12;
 
   @Test
-  void shouldDelegateToFormTimeIntervalResult_whenDefiningResponseType() {
-    AlphaCalculation alpha = mock(AlphaCalculation.class);
-
-    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
-        BigDecimal.ONE));
-
-    Set<TimeIntervalResult> timeIntervals = Set.of(new TimeIntervalResult("2000-01-12", ONE));
-    when(alpha.formTimeIntervalResult(anySet())).thenReturn(timeIntervals);
-
-    doCallRealMethod().when(alpha).defineResponseType(anySet());
-    alpha.defineResponseType(pairs);
-
-    verify(alpha).formTimeIntervalResult(pairs);
-  }
-
-  @Test
   void shouldReturnAlphaResultWithMappedIntervals_whenDefiningResponseType() {
     AlphaCalculation alpha = mock(AlphaCalculation.class);
 
-    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2020-01-05", BigDecimal.ONE), Pair.of("2000-01-12",
-        ZERO));
+    Map<String, BigDecimal> periods = Map.of("2020-01-05", BigDecimal.ONE, "2000-01-12", ZERO);
 
-    Set<TimeIntervalResult> expected = Set.of(
-        new TimeIntervalResult("2000-01-12", ZERO),
-        new TimeIntervalResult("2020-01-05", BigDecimal.ONE));
-    when(alpha.formTimeIntervalResult(anySet())).thenReturn(expected);
+    Map<String, BigDecimal> expected = Map.of("2000-01-12", ZERO, "2020-01-05", BigDecimal.ONE);
 
-    doCallRealMethod().when(alpha).defineResponseType(anySet());
-    AlphaResult actual = alpha.defineResponseType(pairs);
+    doCallRealMethod().when(alpha).defineResponseType(anyMap());
+    AlphaResult actual = alpha.defineResponseType(periods);
 
     assertEquals(expected, actual.getAlpha());
   }

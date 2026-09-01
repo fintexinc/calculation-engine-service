@@ -8,10 +8,9 @@ import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.Set;
@@ -98,8 +97,8 @@ public class StandardDeviationCalculation<T extends PeriodResult> extends Period
   }
 
   @Override
-  public T defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    return (T) new StandardDeviationResult(formTimeIntervalResult(periodValues));
+  public T defineResponseType(final Map<String, BigDecimal> periodValues) {
+    return (T) new StandardDeviationResult(periodValues);
   }
 
 }

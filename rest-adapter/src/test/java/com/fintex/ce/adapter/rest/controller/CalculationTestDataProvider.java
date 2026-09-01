@@ -9,10 +9,8 @@ import com.fintex.ce.model.domain.enumeration.FeeAggregationMode;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
 import com.fintex.ce.model.domain.result.CommonPerformanceDatesResult;
-import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationEMResult;
 import com.fintex.ce.model.domain.result.allocation.AssetAllocationResult;
 import com.fintex.ce.model.domain.result.allocation.ClassificationAllocationResult;
@@ -115,19 +113,19 @@ class CalculationTestDataProvider {
       new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
       BigDecimal.ONE);
 
-  static final Set<TimeIntervalResult> TIME_INTERVALS = Set.of(
-      new TimeIntervalResult("12M", BigDecimal.valueOf(8.56)),
-      new TimeIntervalResult("36M", BigDecimal.valueOf(6.23)));
+  static final Map<String, BigDecimal> TIME_INTERVALS = Map.of(
+      "12M", BigDecimal.valueOf(8.56),
+      "36M", BigDecimal.valueOf(6.23));
 
   static final Set<RollingIntervalResult> ROLLING_INTERVALS = Set.of(
-      new RollingIntervalResult("12M", Set.of(
-          new IntervalResult(LocalDate.of(2024, 6, 30), BigDecimal.valueOf(5.12)),
-          new IntervalResult(LocalDate.of(2024, 12, 31), BigDecimal.valueOf(7.89)))));
+      new RollingIntervalResult("12M", Map.of(
+          LocalDate.of(2024, 6, 30), BigDecimal.valueOf(5.12),
+          LocalDate.of(2024, 12, 31), BigDecimal.valueOf(7.89))));
 
   static Stream<Arguments> calculationMetricArguments() {
     return Stream.of(
         period(CalculationMetric.TRAILING_TOTAL_RETURNS, init(new TrailingTotalReturnsResult(), r -> r
-            .setTrailingTotalReturn(List.copyOf(TIME_INTERVALS))), TrailingTotalReturnsResult.class),
+            .setTrailingTotalReturn(TIME_INTERVALS)), TrailingTotalReturnsResult.class),
         period(CalculationMetric.LEADING_TOTAL_RETURNS, init(new LeadingTotalReturnsResult(), r -> r
             .setLeadingTotalReturn(TIME_INTERVALS)), LeadingTotalReturnsResult.class),
         period(CalculationMetric.EXCESS_RETURNS, init(new ExcessReturnsResult(), r -> r.setExcessReturns(

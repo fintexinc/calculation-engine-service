@@ -5,10 +5,9 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -30,7 +29,7 @@ public class RollingTotalReturnsCalculation extends RollingAbstractCalculation<R
 
   @Override
   public RollingTotalReturnsResult defineResponseType(
-      final Set<Pair<String, NavigableMap<LocalDate, BigDecimal>>> periodValues) {
+      final Map<String, NavigableMap<LocalDate, BigDecimal>> periodValues) {
     final var result = new RollingTotalReturnsResult();
     final var rollingIntervalResultS = getRollingIntervalResults(periodValues);
     result.setRollingTotalReturns(rollingIntervalResultS);

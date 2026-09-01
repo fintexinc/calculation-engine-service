@@ -1,11 +1,11 @@
 package com.fintex.ce.model.domain.result.risk;
 
 import com.fintex.ce.model.domain.result.PeriodResult;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,5 +22,5 @@ import lombok.experimental.SuperBuilder;
 public class SortinoRatioResult extends PeriodResult {
 
   @Schema(description = "Sortino ratio per time interval period")
-  private Set<TimeIntervalResult> sortinoRatio;
+  private Map<String, BigDecimal> sortinoRatio;
 }

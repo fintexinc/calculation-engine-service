@@ -10,12 +10,13 @@ import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Set;
 import java.util.SortedMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,16 +55,13 @@ class MeanCalculationTest {
   @Test
   void shouldMapIntervalsToMeanResult_whenDefineResponseTypeIsCalled() {
     final MeanCalculation<MeanResult> calculation = mock(MeanCalculation.class);
-    final var results = mock(Set.class);
-    final var timeIntervals = mock(Set.class);
+    final Map<String, BigDecimal> results = Map.of("ONE_YR", BigDecimal.ONE);
 
-    when(calculation.formTimeIntervalResult(results)).thenReturn(timeIntervals);
-
-    doCallRealMethod().when(calculation).defineResponseType(any());
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
 
     final MeanResult result = calculation.defineResponseType(results);
 
-    Assertions.assertEquals(timeIntervals, result.getMean());
+    Assertions.assertEquals(results, result.getMean());
 
   }
 

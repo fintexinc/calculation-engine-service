@@ -1,15 +1,12 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Set;
 import java.util.TreeMap;
 
 import static java.math.BigDecimal.ONE;
@@ -17,7 +14,7 @@ import static java.math.BigDecimal.TEN;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
@@ -30,33 +27,15 @@ import static org.mockito.Mockito.when;
 class LeadingTotalReturnsCalculationTest {
 
   @Test
-  void shouldDelegateToFormTimeIntervalResult_whenDefiningResponseType() {
-    final var calculation = mock(LeadingTotalReturnsCalculation.class);
-
-    final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", BigDecimal.ONE));
-
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    calculation.defineResponseType(pairs);
-
-    verify(calculation).formTimeIntervalResult(pairs);
-  }
-
-  @Test
   void shouldReturnLeadingTotalReturn_whenDefiningResponseType() {
     final var calculation = mock(LeadingTotalReturnsCalculation.class);
 
-    final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
+    final Map<String, BigDecimal> input = Map.of("2000-01-12", ZERO, "2020-01-05", ONE);
 
-    final var expected = Set.of(
-        new TimeIntervalResult("2000-01-12", ZERO),
-        new TimeIntervalResult("2020-01-05", BigDecimal.ONE));
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
+    final var actual = calculation.defineResponseType(input);
 
-    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
-
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    final var actual = calculation.defineResponseType(pairs);
-
-    assertEquals(expected, actual.getLeadingTotalReturn());
+    assertEquals(input, actual.getLeadingTotalReturn());
   }
 
   @Test

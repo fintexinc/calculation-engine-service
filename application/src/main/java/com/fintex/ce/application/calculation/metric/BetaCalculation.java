@@ -5,10 +5,9 @@ import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationIn
 import com.fintex.ce.model.domain.result.risk.BetaResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import lombok.Getter;
@@ -24,8 +23,8 @@ public class BetaCalculation extends AlphaBetaCalculationAbstract<BetaResult> {
   }
 
   @Override
-  public BetaResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    return new BetaResult(formTimeIntervalResult(periodValues));
+  public BetaResult defineResponseType(final Map<String, BigDecimal> periodValues) {
+    return new BetaResult(periodValues);
   }
 
 }

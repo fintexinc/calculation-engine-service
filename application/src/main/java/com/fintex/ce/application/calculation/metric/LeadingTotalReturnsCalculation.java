@@ -5,10 +5,9 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.returns.LeadingTotalReturnsResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -39,10 +38,9 @@ public class LeadingTotalReturnsCalculation extends PeriodCalculationAbstract<Le
   }
 
   @Override
-  public LeadingTotalReturnsResult defineResponseType(final Set<Pair<String, BigDecimal>> periodAndLeadingReturn) {
+  public LeadingTotalReturnsResult defineResponseType(final Map<String, BigDecimal> periodAndLeadingReturn) {
     final var result = new LeadingTotalReturnsResult();
-    final var timeIntervals = formTimeIntervalResult(periodAndLeadingReturn);
-    result.setLeadingTotalReturn(timeIntervals);
+    result.setLeadingTotalReturn(periodAndLeadingReturn);
     return result;
   }
 

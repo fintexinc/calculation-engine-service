@@ -3,7 +3,6 @@ package com.fintex.ce.e2e;
 import com.fintex.ce.adapter.webclient.boc.client.BankOfCanadaProperties;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.ce.model.dto.command.PeriodCommand;
 import com.fintex.ce.model.error.ErrorCode;
@@ -130,7 +129,7 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 1, 31));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
     assertThat(result.getSharpeRatio()).hasSize(1);
-    assertThat(findPeriod(result, ONE_YR.name()).value())
+    assertThat(findPeriod(result, ONE_YR.name()))
         .isCloseTo(new BigDecimal("3.0056605434"), within(TOLERANCE));
   }
 
@@ -151,11 +150,8 @@ class SharpeRatioE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(notification.getMetadata()).hasSize(1).containsEntry("param-1", "2024-07-31");
   }
 
-  private static TimeIntervalResult findPeriod(SharpeRatioResult result, String period) {
-    return result.getSharpeRatio().stream()
-        .filter(entry -> period.equals(entry.period()))
-        .findFirst()
-        .orElseThrow(() -> new AssertionError("Missing period " + period));
+  private static BigDecimal findPeriod(SharpeRatioResult result, String period) {
+    return result.getSharpeRatio().get(period);
   }
 
   private static List<PortfolioHolding> richPortfolioHoldings() {

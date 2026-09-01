@@ -1,7 +1,10 @@
 package com.fintex.ce.model.domain.result.period;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,11 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BestWorstPeriodData {
 
-  private List<PeriodValueResult> bestPeriodPct = new ArrayList<>();
-  private List<PeriodValueResult> worstPeriodPct = new ArrayList<>();
-  private List<PeriodValueResult> average = new ArrayList<>();
-  private List<PeriodValueResult> numberOfPeriods = new ArrayList<>();
-  private List<PeriodValueResult> pctPositive = new ArrayList<>();
+  private Map<Long, BigDecimal> bestPeriodPct = new LinkedHashMap<>();
+  private Map<Long, BigDecimal> worstPeriodPct = new LinkedHashMap<>();
+  private Map<Long, BigDecimal> average = new LinkedHashMap<>();
+  private Map<Long, BigDecimal> numberOfPeriods = new LinkedHashMap<>();
+  private Map<Long, BigDecimal> pctPositive = new LinkedHashMap<>();
   private List<PeriodDateResult> bestPeriodDate = new ArrayList<>();
   private List<PeriodDateResult> worstPeriodDate = new ArrayList<>();
 }

@@ -6,10 +6,9 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -49,8 +48,8 @@ public class SortinoRatioCalculation extends PeriodCalculationAbstract<SortinoRa
   }
 
   @Override
-  public SortinoRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    return new SortinoRatioResult(formTimeIntervalResult(periodValues));
+  public SortinoRatioResult defineResponseType(final Map<String, BigDecimal> periodValues) {
+    return new SortinoRatioResult(periodValues);
   }
 
   /**

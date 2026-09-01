@@ -1,10 +1,8 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.util.DecimalUtils;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.returns.ExcessReturnsResult;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import static com.fintex.ce.util.DateTimeUtils.toLastDayOfMonth;
@@ -22,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -33,19 +30,6 @@ import static org.mockito.Mockito.when;
 class ExcessReturnsCalculationTest {
 
   final int TWELVE = 12;
-
-  @Test
-  void shouldDefineResponseType_whenVerifyFormTimeIntervalResult() {
-    ExcessReturnsCalculation alpha = mock(ExcessReturnsCalculation.class);
-
-    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
-        BigDecimal.ONE));
-
-    doCallRealMethod().when(alpha).defineResponseType(anySet());
-    alpha.defineResponseType(pairs);
-
-    verify(alpha).formTimeIntervalResult(pairs);
-  }
 
   @Test
   void shouldCalculatePeriodForNumberOfMonths_whenVerifyCalculateAnnualizedReturnsByPeriod() {
@@ -184,17 +168,12 @@ class ExcessReturnsCalculationTest {
   void shouldDefineResponseType_whenCheckResult() {
     ExcessReturnsCalculation excessReturnsCalculation = mock(ExcessReturnsCalculation.class);
 
-    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
+    Map<String, BigDecimal> input = Map.of("2000-01-12", ZERO, "2020-01-05", ONE);
 
-    Set<TimeIntervalResult> expected = Set.of(
-        new TimeIntervalResult("2000-01-12", ZERO),
-        new TimeIntervalResult("2020-01-05", BigDecimal.ONE));
-    when(excessReturnsCalculation.formTimeIntervalResult(anySet())).thenReturn(expected);
+    doCallRealMethod().when(excessReturnsCalculation).defineResponseType(anyMap());
+    ExcessReturnsResult actual = excessReturnsCalculation.defineResponseType(input);
 
-    doCallRealMethod().when(excessReturnsCalculation).defineResponseType(anySet());
-    ExcessReturnsResult actual = excessReturnsCalculation.defineResponseType(pairs);
-
-    assertEquals(expected, actual.getExcessReturns());
+    assertEquals(input, actual.getExcessReturns());
   }
 
   private TreeMap<LocalDate, BigDecimal> getPortfolioReturns() {

@@ -2,10 +2,8 @@ package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -196,7 +196,9 @@ class StandardDeviationCalculationTest {
 
     final StandardDeviationResult actual = calculation.calculate(Set.of(SIX_MTH));
 
-    assertEquals(Set.of(new TimeIntervalResult(SIX_MTH.name(), null)), actual.getStandardDeviation());
+    final Map<String, BigDecimal> expected = new LinkedHashMap<>();
+    expected.put(SIX_MTH.name(), null);
+    assertEquals(expected, actual.getStandardDeviation());
     assertEquals(map.firstKey(), actual.getPerformanceStartDate());
     assertEquals(map.lastKey(), actual.getPerformanceEndDate());
     assertNull(actual.getCustomIntervalPerformanceStartDate());
@@ -251,15 +253,11 @@ class StandardDeviationCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var calculation = mock(StandardDeviationCalculation.class);
-    final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
-    final var interval1 = new TimeIntervalResult("2000-01-12", ZERO);
-    final var interval2 = new TimeIntervalResult("2020-01-05", ONE);
-    final var expected = Set.of(interval1, interval2);
+    final Map<String, BigDecimal> periods = Map.of("2000-01-12", ZERO, "2020-01-05", ONE);
+    final Map<String, BigDecimal> expected = Map.of("2000-01-12", ZERO, "2020-01-05", ONE);
 
-    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
-
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    final StandardDeviationResult actual = (StandardDeviationResult) calculation.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
+    final StandardDeviationResult actual = (StandardDeviationResult) calculation.defineResponseType(periods);
 
     assertEquals(expected, actual.getStandardDeviation());
   }

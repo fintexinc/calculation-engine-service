@@ -6,10 +6,9 @@ import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.result.risk.SharpeRatioResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
@@ -90,8 +89,8 @@ public class SharpeRatioCalculation extends PeriodCalculationAbstract<SharpeRati
   }
 
   @Override
-  public SharpeRatioResult defineResponseType(Set<Pair<String, BigDecimal>> periodValues) {
-    return new SharpeRatioResult(formTimeIntervalResult(periodValues));
+  public SharpeRatioResult defineResponseType(Map<String, BigDecimal> periodValues) {
+    return new SharpeRatioResult(periodValues);
   }
 
 }

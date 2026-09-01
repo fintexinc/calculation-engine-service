@@ -1,18 +1,17 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TrackingErrorResult;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.ce.util.DateTimeUtils;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -29,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.argThat;
@@ -45,16 +44,12 @@ class TrackingErrorCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     var calculation = mock(TrackingErrorCalculation.class);
-    var pairs = Set.of(
-        Pair.of("2010-01-01", ONE),
-        Pair.of("2020-01-01", TEN));
+    Map<String, BigDecimal> periods = Map.of("2010-01-01", ONE, "2020-01-01", TEN);
 
-    var interval1 = new TimeIntervalResult("2010-01-01", ONE);
-    var interval2 = new TimeIntervalResult("2020-01-01", TEN);
-    var expected = Set.of(interval2, interval1);
+    Map<String, BigDecimal> expected = Map.of("2010-01-01", ONE, "2020-01-01", TEN);
 
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    TrackingErrorResult actual = calculation.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
+    TrackingErrorResult actual = calculation.defineResponseType(periods);
 
     assertEquals(expected, actual.getTrackingError());
   }

@@ -9,9 +9,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.fintex.ce.application.util.DecimalUtils.divide;
@@ -26,7 +26,7 @@ public class SalesChargeCalculation {
   private final Map<PortfolioHolding, SalesCharge> salesCharges;
 
   public static final SalesChargeResult.SalesChargeEntry DEFAULT_SALES_CHARGE_DTO = new SalesChargeResult.SalesChargeEntry(
-      ZERO, ZERO, Set.of());
+      ZERO, ZERO, Map.of());
   protected static final Map<SalesChargeCategory, SalesChargeResult.SalesChargeEntry> DEFAULT_MAP = new EnumMap<>(
       SalesChargeCategory.class);
 
@@ -66,7 +66,7 @@ public class SalesChargeCalculation {
     groupedHoldingsBySalesCharge.forEach((salesCharge, holdingSet) -> {
       final BigDecimal allocation = calculateAllocation(holdingSet, categorizedMarketValues);
       final BigDecimal value = getSumOfMarketValues(holdingSet);
-      final Set<SalesChargeResult.SalesChargeHoldingEntry> salesChargeHoldingResDtos = getSalesChargeHoldingResDtos(
+      final Map<String, BigDecimal> salesChargeHoldingResDtos = getSalesChargeHoldingResDtos(
           holdingSet, categorizedMarketValues);
 
       result.put(salesCharge, new SalesChargeResult.SalesChargeEntry(allocation, value, salesChargeHoldingResDtos));
@@ -79,13 +79,13 @@ public class SalesChargeCalculation {
     return toUserScale(divide(getSumOfMarketValues(holdingSet), totalMarketValues));
   }
 
-  private Set<SalesChargeResult.SalesChargeHoldingEntry> getSalesChargeHoldingResDtos(
+  private Map<String, BigDecimal> getSalesChargeHoldingResDtos(
       final Set<PortfolioHolding> holdingSet,
       final BigDecimal totalMarketValues) {
     return holdingSet.stream()
-        .map(holding -> new SalesChargeResult.SalesChargeHoldingEntry(holding.getIdsString(),
-            getMutualFundAllocation(holding, totalMarketValues)))
-        .collect(Collectors.toSet());
+        .collect(LinkedHashMap::new,
+            (map, holding) -> map.put(holding.getIdsString(), getMutualFundAllocation(holding, totalMarketValues)),
+            Map::putAll);
   }
 
   private BigDecimal getMutualFundAllocation(final PortfolioHolding holding, final BigDecimal totalMarketValues) {

@@ -1,12 +1,10 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.DownsideDeviationResult;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -165,14 +163,11 @@ class DownsideDeviationCalculationTest {
   @Test
   void shouldMapIntervalResults_whenDefiningResponseType() {
     final var calculation = mock(DownsideDeviationCalculation.class);
-    final var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", BigDecimal.ONE));
-    final var interval1 = new TimeIntervalResult("2000-01-12", ZERO);
-    final var interval2 = new TimeIntervalResult("2020-01-05", BigDecimal.ONE);
-    final var expected = Set.of(interval1, interval2);
-    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
+    final Map<String, BigDecimal> periods = Map.of("2000-01-12", ZERO, "2020-01-05", BigDecimal.ONE);
+    final Map<String, BigDecimal> expected = Map.of("2000-01-12", ZERO, "2020-01-05", BigDecimal.ONE);
 
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    final DownsideDeviationResult actual = (DownsideDeviationResult) calculation.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
+    final DownsideDeviationResult actual = (DownsideDeviationResult) calculation.defineResponseType(periods);
     assertEquals(expected, actual.getDownsideDeviation());
   }
 }

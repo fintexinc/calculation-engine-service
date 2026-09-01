@@ -5,7 +5,6 @@ import com.fintex.ce.model.domain.result.period.BestWorstPeriodData;
 import com.fintex.ce.model.domain.result.period.BestWorstPeriodsResult;
 import com.fintex.ce.model.domain.result.period.IntervalResult;
 import com.fintex.ce.model.domain.result.period.PeriodDateResult;
-import com.fintex.ce.model.domain.result.period.PeriodValueResult;
 
 import org.springframework.util.CollectionUtils;
 
@@ -71,19 +70,19 @@ public class BestWorstPeriodCalculation {
   }
 
   public void addDefaultValues(final Long period) {
-    bestWorstPeriodData.getNumberOfPeriods().add(new PeriodValueResult(period, ZERO));
-    bestWorstPeriodData.getAverage().add(new PeriodValueResult(period, null));
-    bestWorstPeriodData.getBestPeriodPct().add(new PeriodValueResult(period, null));
+    bestWorstPeriodData.getNumberOfPeriods().put(period, ZERO);
+    bestWorstPeriodData.getAverage().put(period, null);
+    bestWorstPeriodData.getBestPeriodPct().put(period, null);
     bestWorstPeriodData.getBestPeriodDate().add(new PeriodDateResult(period, null));
-    bestWorstPeriodData.getWorstPeriodPct().add(new PeriodValueResult(period, null));
+    bestWorstPeriodData.getWorstPeriodPct().put(period, null);
     bestWorstPeriodData.getWorstPeriodDate().add(new PeriodDateResult(period, null));
-    bestWorstPeriodData.getPctPositive().add(new PeriodValueResult(period, null));
+    bestWorstPeriodData.getPctPositive().put(period, null);
   }
 
   public void calculateNumberOfPeriods(final Long period,
       final TreeMap<LocalDate, BigDecimal> subMapRollingCumulativeReturns) {
     final int numOfPeriods = subMapRollingCumulativeReturns.size();
-    bestWorstPeriodData.getNumberOfPeriods().add(new PeriodValueResult(period, BigDecimal.valueOf(numOfPeriods)));
+    bestWorstPeriodData.getNumberOfPeriods().put(period, BigDecimal.valueOf(numOfPeriods));
   }
 
   public void calculatePositive(final Long period,
@@ -91,23 +90,22 @@ public class BestWorstPeriodCalculation {
     final long numberOfPositiveValues = subMapRollingCumulativeReturns.values().stream().filter(v -> v.compareTo(
         ZERO) > 0).count();
     final BigDecimal positive = DecimalUtils.divide(BigDecimal.valueOf(numberOfPositiveValues),
-        getNumberOfPeriodsByPeriod(period).value());
-    bestWorstPeriodData.getPctPositive().add(new PeriodValueResult(period, DecimalUtils.toUserScale(positive)));
+        getNumberOfPeriodsByPeriod(period));
+    bestWorstPeriodData.getPctPositive().put(period, DecimalUtils.toUserScale(positive));
   }
 
   public void calculateAverage(final Long period, final TreeMap<LocalDate, BigDecimal> subMapRollingCumulativeReturns) {
     final BigDecimal rollingComulativeReturtsSum = subMapRollingCumulativeReturns.values().stream().reduce(ZERO,
         BigDecimal::add);
     final BigDecimal average = DecimalUtils.divide(rollingComulativeReturtsSum, subMapRollingCumulativeReturns.size());
-    bestWorstPeriodData.getAverage().add(new PeriodValueResult(period, annualize(average, period)));
+    bestWorstPeriodData.getAverage().put(period, annualize(average, period));
   }
 
   public void calculateBestPeriodValue(final Long period,
       final TreeMap<LocalDate, BigDecimal> rollingCumulativeReturns) {
     final LocalDate bestPeriodDate = rollingCumulativeReturns.entrySet().stream().sorted(Map.Entry.comparingByValue())
         .map(Map.Entry::getKey).toList().get(rollingCumulativeReturns.size() - ONE);
-    bestWorstPeriodData.getBestPeriodPct().add(new PeriodValueResult(period, annualize(rollingCumulativeReturns.get(
-        bestPeriodDate), period)));
+    bestWorstPeriodData.getBestPeriodPct().put(period, annualize(rollingCumulativeReturns.get(bestPeriodDate), period));
     bestWorstPeriodData.getBestPeriodDate().add(new PeriodDateResult(period, new IntervalResult(getStartDate(period,
         bestPeriodDate), bestPeriodDate)));
   }
@@ -117,8 +115,8 @@ public class BestWorstPeriodCalculation {
     final LocalDate worstPeriodDate = rollingCumulativeReturns.entrySet().stream().sorted(Map.Entry
         .<LocalDate, BigDecimal>comparingByValue().reversed()).map(Map.Entry::getKey).toList().get(
             rollingCumulativeReturns.size() - ONE);
-    bestWorstPeriodData.getWorstPeriodPct().add(new PeriodValueResult(period, annualize(rollingCumulativeReturns.get(
-        worstPeriodDate), period)));
+    bestWorstPeriodData.getWorstPeriodPct().put(period,
+        annualize(rollingCumulativeReturns.get(worstPeriodDate), period));
     bestWorstPeriodData.getWorstPeriodDate().add(new PeriodDateResult(period, new IntervalResult(getStartDate(period,
         worstPeriodDate), worstPeriodDate)));
   }
@@ -168,11 +166,10 @@ public class BestWorstPeriodCalculation {
    *
    * @param period
    *          - number of months
-   * @return PeriodValueResult with value for the current period
+   * @return number of periods value for the current period
    */
-  public PeriodValueResult getNumberOfPeriodsByPeriod(final Long period) {
-    return bestWorstPeriodData.getNumberOfPeriods().stream().filter(n -> n.period().equals(period)).findFirst()
-        .orElseThrow();
+  public BigDecimal getNumberOfPeriodsByPeriod(final Long period) {
+    return bestWorstPeriodData.getNumberOfPeriods().get(period);
   }
 
   /**
