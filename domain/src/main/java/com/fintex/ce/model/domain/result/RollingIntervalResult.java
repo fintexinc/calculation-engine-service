@@ -1,6 +1,8 @@
 package com.fintex.ce.model.domain.result;
 
-import java.util.Set;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Map;
 
-public record RollingIntervalResult(String period, Set<IntervalResult> values) {
+public record RollingIntervalResult(String period, Map<LocalDate, BigDecimal> values) {
 }

@@ -1,11 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingTotalReturnsResult;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -24,7 +22,7 @@ import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
 import static com.fintex.ce.model.util.BigDecimalConstants.TEN_THOUSAND;
 import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static java.math.BigDecimal.TEN;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -74,7 +72,7 @@ class RollingTotalReturnsCalculationTest {
   @Test
   void shouldDefineResponseType_whenVerifyGetRollingIntervalResultS() {
     final var calculation = mock(RollingTotalReturnsCalculation.class);
-    final var result = Set.of(Pair.of("12", portfolioReturns));
+    final Map<String, NavigableMap<LocalDate, BigDecimal>> result = Map.of("12", portfolioReturns);
 
     doCallRealMethod().when(calculation).defineResponseType(result);
     calculation.defineResponseType(result);
@@ -85,14 +83,13 @@ class RollingTotalReturnsCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var calculation = mock(RollingTotalReturnsCalculation.class);
-    final var periodValues = Set.of(Pair.of("12", portfolioReturns));
+    final Map<String, NavigableMap<LocalDate, BigDecimal>> periodValues = Map.of("12", portfolioReturns);
 
-    final LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
-    res.add(new IntervalResult(LocalDate.now().minusMonths(3), TEN));
-    final var intervalResult = new RollingIntervalResult("12", res);
+    final Map<LocalDate, BigDecimal> values = Map.of(LocalDate.now().minusMonths(3), TEN);
+    final var intervalResult = new RollingIntervalResult("12", values);
     final var expected = new RollingTotalReturnsResult(Set.of(intervalResult));
 
-    when(calculation.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
+    when(calculation.getRollingIntervalResults(anyMap())).thenReturn(Set.of(intervalResult));
 
     doCallRealMethod().when(calculation).defineResponseType(periodValues);
     final RollingTotalReturnsResult actual = calculation.defineResponseType(periodValues);

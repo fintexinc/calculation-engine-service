@@ -1,53 +1,32 @@
 package com.fintex.ce.application.calculation.metric;
 
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.RSquaredResult;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.Map;
 
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @Disabled("metric unsupported")
 class RSquaredCalculationTest {
 
   @Test
-  void shouldDefineResponseType_whenVerifyFormTimeIntervalResult() {
-    final RSquaredCalculation alpha = mock(RSquaredCalculation.class);
-
-    final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
-        BigDecimal.ONE));
-
-    doCallRealMethod().when(alpha).defineResponseType(anySet());
-    alpha.defineResponseType(pairs);
-
-    verify(alpha).formTimeIntervalResult(pairs);
-  }
-
-  @Test
   void shouldDefineResponseType_whenCheckResult() {
     final RSquaredCalculation rSquaredCalculation = mock(RSquaredCalculation.class);
 
-    final Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2020-01-05", BigDecimal.ONE), Pair.of("2000-01-12",
-        ZERO));
+    final Map<String, BigDecimal> periods = Map.of("2020-01-05", BigDecimal.ONE, "2000-01-12", ZERO);
 
-    final Set<TimeIntervalResult> expected = Set.of(
-        new TimeIntervalResult("2000-01-12", ZERO),
-        new TimeIntervalResult("2020-01-05", BigDecimal.ONE));
-    when(rSquaredCalculation.formTimeIntervalResult(anySet())).thenReturn(expected);
+    final Map<String, BigDecimal> expected = Map.of("2000-01-12", ZERO, "2020-01-05", BigDecimal.ONE);
 
-    doCallRealMethod().when(rSquaredCalculation).defineResponseType(anySet());
-    final RSquaredResult actual = rSquaredCalculation.defineResponseType(pairs);
+    doCallRealMethod().when(rSquaredCalculation).defineResponseType(anyMap());
+    final RSquaredResult actual = rSquaredCalculation.defineResponseType(periods);
 
     assertEquals(expected, actual.getRSquared());
   }

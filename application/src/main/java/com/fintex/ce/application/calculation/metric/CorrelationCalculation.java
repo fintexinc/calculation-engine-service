@@ -4,7 +4,6 @@ import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstra
 import com.fintex.ce.application.util.CalculationUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
 import com.fintex.ce.model.domain.result.correlation.HoldingsKeyResult;
@@ -12,10 +11,9 @@ import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
 import org.springframework.util.CollectionUtils;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,17 +74,17 @@ public class CorrelationCalculation
         .map(dto -> CollectionUtils.isEmpty(dto.correlations())
             ? dto
             : new CorrelationPeriodResult(dto.period(), dto.key(),
-                dto.correlations().stream()
-                    .map(e -> new CorrelationKeyValueResult(e.correlationKey(), toUserScale(e.value())))
-                    .toList()))
+                dto.correlations().entrySet().stream()
+                    .collect(LinkedHashMap::new, (map, e) -> map.put(e.getKey(), toUserScale(e.getValue())),
+                        Map::putAll)))
         .toList();
   }
 
   @Override
-  public CorrelationResult defineResponseType(final Set<Pair<String, List<CorrelationPeriodResult>>> periodValues) {
-    List<CorrelationPeriodResult> correlationPeriods = periodValues.stream()
-        .filter(v -> Objects.nonNull(v.getValue()))
-        .flatMap(l -> setPeriod(l.getKey(), l.getValue()).stream())
+  public CorrelationResult defineResponseType(final Map<String, List<CorrelationPeriodResult>> periodValues) {
+    List<CorrelationPeriodResult> correlationPeriods = periodValues.entrySet().stream()
+        .filter(e -> Objects.nonNull(e.getValue()))
+        .flatMap(e -> setPeriod(e.getKey(), e.getValue()).stream())
         .toList();
     List<HoldingsKeyResult> holdingsKeys = portfolioBaseTotalReturn.keySet().stream()
         .map(HoldingsKeyResult::buildHoldingsKeyResult)
@@ -170,8 +168,7 @@ public class CorrelationCalculation
         String.valueOf(numberOfMonths),
         createKey(keyHolding),
         correlations.entrySet().stream()
-            .map(c -> new CorrelationKeyValueResult(createKey(c.getKey()), c.getValue()))
-            .toList());
+            .collect(LinkedHashMap::new, (map, c) -> map.put(createKey(c.getKey()), c.getValue()), Map::putAll));
   }
 
   /**

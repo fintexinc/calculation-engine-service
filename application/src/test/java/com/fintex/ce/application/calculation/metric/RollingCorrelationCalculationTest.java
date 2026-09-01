@@ -1,11 +1,9 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -31,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -320,7 +317,7 @@ class RollingCorrelationCalculationTest {
     var calculation = mock(RollingCorrelationCalculation.class);
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
     returns.put(LocalDate.now().minusMonths(3), TEN);
-    var result = Set.of(Pair.of("12", returns));
+    Map<String, NavigableMap<LocalDate, BigDecimal>> result = Map.of("12", returns);
 
     doCallRealMethod().when(calculation).defineResponseType(result);
     calculation.defineResponseType(result);
@@ -333,14 +330,13 @@ class RollingCorrelationCalculationTest {
     var calculation = mock(RollingCorrelationCalculation.class);
     NavigableMap<LocalDate, BigDecimal> returns = new TreeMap<>();
     returns.put(LocalDate.now().minusMonths(3), TEN);
-    var periodValues = Set.of(Pair.of("12", returns));
+    Map<String, NavigableMap<LocalDate, BigDecimal>> periodValues = Map.of("12", returns);
 
-    LinkedHashSet<IntervalResult> res = new LinkedHashSet<>();
-    res.add(new IntervalResult(LocalDate.now().minusMonths(3), TEN));
-    var intervalResult = new RollingIntervalResult("12", res);
+    Map<LocalDate, BigDecimal> values = Map.of(LocalDate.now().minusMonths(3), TEN);
+    var intervalResult = new RollingIntervalResult("12", values);
     var expected = new RollingCorrelationResult(Set.of(intervalResult));
 
-    when(calculation.getRollingIntervalResults(anySet())).thenReturn(Set.of(intervalResult));
+    when(calculation.getRollingIntervalResults(anyMap())).thenReturn(Set.of(intervalResult));
 
     doCallRealMethod().when(calculation).defineResponseType(periodValues);
     RollingCorrelationResult actual = calculation.defineResponseType(periodValues);

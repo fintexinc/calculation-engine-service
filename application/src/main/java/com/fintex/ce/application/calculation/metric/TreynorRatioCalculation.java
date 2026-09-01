@@ -3,14 +3,12 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.PeriodCalculationAbstract;
 import com.fintex.ce.application.util.RiskFreeWindowValidator;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TreynorRatioResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
@@ -59,10 +57,9 @@ public class TreynorRatioCalculation extends PeriodCalculationAbstract<TreynorRa
   }
 
   @Override
-  public TreynorRatioResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+  public TreynorRatioResult defineResponseType(final Map<String, BigDecimal> periodValues) {
     var result = new TreynorRatioResult();
-    Set<TimeIntervalResult> timeIntervals = formTimeIntervalResult(periodValues);
-    result.setTreynorRatio(timeIntervals);
+    result.setTreynorRatio(periodValues);
     return result;
   }
 

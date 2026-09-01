@@ -5,8 +5,6 @@ import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationIn
 import com.fintex.ce.model.domain.result.risk.UpsideCaptureResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -22,8 +20,8 @@ public class UpsideCaptureCalculation extends UpDownSideCalculationAbstract<Upsi
   }
 
   @Override
-  public UpsideCaptureResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    return new UpsideCaptureResult(formTimeIntervalResult(periodValues));
+  public UpsideCaptureResult defineResponseType(final Map<String, BigDecimal> periodValues) {
+    return new UpsideCaptureResult(periodValues);
   }
 
   @Override

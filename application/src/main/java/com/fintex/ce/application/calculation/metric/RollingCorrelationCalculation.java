@@ -6,10 +6,9 @@ import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.ce.model.domain.result.rolling.RollingCorrelationResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -112,7 +111,7 @@ public class RollingCorrelationCalculation extends RollingAbstractCalculation<Ro
 
   @Override
   public RollingCorrelationResult defineResponseType(
-      final Set<Pair<String, NavigableMap<LocalDate, BigDecimal>>> result) {
+      final Map<String, NavigableMap<LocalDate, BigDecimal>> result) {
     final var rollingCorrelationResult = new RollingCorrelationResult();
     final Set<RollingIntervalResult> rollingIntervalResultS = getRollingIntervalResults(result);
     rollingCorrelationResult.setRollingCorrelation(rollingIntervalResultS);

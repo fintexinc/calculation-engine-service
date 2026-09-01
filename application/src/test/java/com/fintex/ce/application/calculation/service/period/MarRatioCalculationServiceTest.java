@@ -4,24 +4,21 @@ import com.fintex.ce.application.calculation.metric.TrailingTotalReturnsCalculat
 import com.fintex.ce.application.config.PeriodProperties;
 import com.fintex.ce.application.returns.PortfolioMonthlyReturnsContextProvider;
 import com.fintex.ce.model.domain.result.MaxDrawdownEntry;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.MarRatioResult;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -86,17 +83,14 @@ class MarRatioCalculationServiceTest {
   @Test
   void shouldBuildResult_whenMappingPeriodPairsToTimeIntervals() {
     final var service = mockService(mock(MaxDrawdownService.class));
-    final var result = Set.of(
-        Pair.of("2000-01-12", ZERO),
-        Pair.of("2020-01-05", BigDecimal.ONE));
+    final Map<String, BigDecimal> input = Map.of(
+        "2000-01-12", ZERO,
+        "2020-01-05", BigDecimal.ONE);
 
-    doCallRealMethod().when(service).buildResult(anySet());
-    final MarRatioResult actual = service.buildResult(result);
+    doCallRealMethod().when(service).buildResult(anyMap());
+    final MarRatioResult actual = service.buildResult(input);
 
-    final Set<TimeIntervalResult> expected = result.stream()
-        .map(e -> new TimeIntervalResult(e.getKey(), e.getValue()))
-        .collect(Collectors.toSet());
-    assertEquals(expected, actual.getMarRatio());
+    assertEquals(input, actual.getMarRatio());
   }
 
   @Test

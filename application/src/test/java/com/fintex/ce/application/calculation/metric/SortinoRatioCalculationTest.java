@@ -1,12 +1,10 @@
 package com.fintex.ce.application.calculation.metric;
 
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.SortinoRatioResult;
 import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +23,9 @@ import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -163,16 +161,11 @@ class SortinoRatioCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     final var calculation = mock(SortinoRatioCalculation.class);
-    final var pairs = Set.of(Pair.of("2015-01-01", ZERO), Pair.of("2018-02-02", ONE));
+    final Map<String, BigDecimal> periods = Map.of("2015-01-01", ZERO, "2018-02-02", ONE);
+    final Map<String, BigDecimal> expected = Map.of("2015-01-01", ZERO, "2018-02-02", ONE);
 
-    final var interval1 = new TimeIntervalResult("2015-01-01", ZERO);
-    final var interval2 = new TimeIntervalResult("2018-02-02", ONE);
-    final var expected = Set.of(interval1, interval2);
-
-    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
-
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    final SortinoRatioResult result = calculation.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
+    final SortinoRatioResult result = calculation.defineResponseType(periods);
 
     assertEquals(expected, result.getSortinoRatio());
   }

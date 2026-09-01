@@ -1,12 +1,9 @@
 package com.fintex.ce.application.calculation.metric.core;
 
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -88,19 +85,9 @@ public abstract class RollingAbstractCalculation<T extends PeriodResult>
   }
 
   public Set<RollingIntervalResult> getRollingIntervalResults(
-      final Set<Pair<String, NavigableMap<LocalDate, BigDecimal>>> result) {
-    return result
-        .stream()
-        .map(e -> new RollingIntervalResult(e.getKey(), mapRollingReturn(e)))
-        .collect(Collectors.toSet());
-  }
-
-  public Set<IntervalResult> mapRollingReturn(final Pair<String, NavigableMap<LocalDate, BigDecimal>> result) {
-    if (Objects.isNull(result.getValue())) {
-      return null;
-    }
-    return result.getValue().entrySet().stream()
-        .map(e -> new IntervalResult(e.getKey(), e.getValue()))
+      final Map<String, NavigableMap<LocalDate, BigDecimal>> result) {
+    return result.entrySet().stream()
+        .map(e -> new RollingIntervalResult(e.getKey(), e.getValue()))
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 

@@ -16,7 +16,6 @@ import com.fintex.ce.calculation.CalculationService;
 import com.fintex.ce.model.domain.enumeration.CalculationMetric;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
 import com.fintex.ce.model.domain.result.BaseCalculationResult;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.composite.CompositeCalculationResult;
 import com.fintex.ce.model.domain.result.risk.StandardDeviationResult;
 import com.fintex.ce.model.domain.security.SecurityData;
@@ -68,6 +67,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -548,9 +548,9 @@ class PortfolioCalculationControllerTest {
       command.setHoldings(List.of(holding("DUMMY", FiIdentifierType.TICKER,
           FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, BigDecimal.ONE)));
       command.setPeriods(Set.of(TimePeriod.SIX_MTH));
-      StandardDeviationResult result = new StandardDeviationResult(Set.of(new TimeIntervalResult(TimePeriod.SIX_MTH
-          .name(),
-          null)));
+      Map<String, BigDecimal> standardDeviation = new LinkedHashMap<>();
+      standardDeviation.put(TimePeriod.SIX_MTH.name(), null);
+      StandardDeviationResult result = new StandardDeviationResult(standardDeviation);
       stubCalculationResult(calculationServices.get(CalculationMetric.STANDARD_DEVIATION), result);
 
       MvcResult mvcResult = validatingMockMvc.perform(
@@ -565,7 +565,8 @@ class PortfolioCalculationControllerTest {
           StandardDeviationResult.class);
 
       assertThat(actual.getStandardDeviation())
-          .containsExactlyInAnyOrder(new TimeIntervalResult(TimePeriod.SIX_MTH.name(), null));
+          .containsOnlyKeys(TimePeriod.SIX_MTH.name())
+          .containsEntry(TimePeriod.SIX_MTH.name(), null);
 
       verify(calculationServices.get(CalculationMetric.STANDARD_DEVIATION)).perform(any(), any());
     }

@@ -6,10 +6,9 @@ import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.rolling.RollingStandardDeviationResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -31,7 +30,7 @@ public class RollingStandardDeviationCalculation extends RollingAbstractCalculat
 
   @Override
   public RollingStandardDeviationResult defineResponseType(
-      final Set<Pair<String, NavigableMap<LocalDate, BigDecimal>>> result) {
+      final Map<String, NavigableMap<LocalDate, BigDecimal>> result) {
     final var rollingStandardDeviationResult = new RollingStandardDeviationResult();
     final var rollingIntervalResultS = getRollingIntervalResults(result);
     rollingStandardDeviationResult.setRollingStandardDeviation(rollingIntervalResultS);

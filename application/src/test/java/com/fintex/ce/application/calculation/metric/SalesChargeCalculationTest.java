@@ -68,13 +68,12 @@ class SalesChargeTypeCalculationTest {
 
     final var calculation = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf605 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF605", scaled(0.10));
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF606", scaled(0.20));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF607", scaled(0.70));
-
-    final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.10), BigDecimal.valueOf(10_000), Set.of(rbf605));
-    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.20), BigDecimal.valueOf(20_000), Set.of(rbf606));
-    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.70), BigDecimal.valueOf(70_000), Set.of(rbf607));
+    final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.10), BigDecimal.valueOf(10_000),
+        Map.of("MUTUAL_FUND-RBF605", scaled(0.10)));
+    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.20), BigDecimal.valueOf(20_000),
+        Map.of("MUTUAL_FUND-RBF606", scaled(0.20)));
+    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.70), BigDecimal.valueOf(70_000),
+        Map.of("MUTUAL_FUND-RBF607", scaled(0.70)));
     final var expected = new SalesChargeResult(Map.of(
         SalesChargeCategory.DEFERRED_SALES_CHARGE, s1,
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s2,
@@ -99,11 +98,10 @@ class SalesChargeTypeCalculationTest {
 
     final var calculation = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF606", scaled(0.51));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF607", scaled(0.49));
-
-    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.51), BigDecimal.valueOf(51_000), Set.of(rbf606));
-    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.49), BigDecimal.valueOf(49_000), Set.of(rbf607));
+    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.51), BigDecimal.valueOf(51_000),
+        Map.of("MUTUAL_FUND-RBF606", scaled(0.51)));
+    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.49), BigDecimal.valueOf(49_000),
+        Map.of("MUTUAL_FUND-RBF607", scaled(0.49)));
     final var expected = new SalesChargeResult(Map.of(
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s2,
@@ -125,18 +123,13 @@ class SalesChargeTypeCalculationTest {
 
     final var calculation = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF606", scaled(0.10));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF607", scaled(0.15));
-    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF608", scaled(0.17));
-    final var rbf609 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF609", scaled(0.13));
-    final var rbf610 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF610", scaled(0.25));
-    final var rbf611 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF611", scaled(0.20));
-
-    final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.42), BigDecimal.valueOf(42_000), Set.of(rbf606,
-        rbf607, rbf608));
-    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.13), BigDecimal.valueOf(13_000), Set.of(rbf609));
-    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.45), BigDecimal.valueOf(45_000), Set.of(rbf610,
-        rbf611));
+    final var s1 = new SalesChargeResult.SalesChargeEntry(scaled(0.42), BigDecimal.valueOf(42_000),
+        Map.of("MUTUAL_FUND-RBF606", scaled(0.10), "MUTUAL_FUND-RBF607", scaled(0.15), "MUTUAL_FUND-RBF608",
+            scaled(0.17)));
+    final var s2 = new SalesChargeResult.SalesChargeEntry(scaled(0.13), BigDecimal.valueOf(13_000),
+        Map.of("MUTUAL_FUND-RBF609", scaled(0.13)));
+    final var s3 = new SalesChargeResult.SalesChargeEntry(scaled(0.45), BigDecimal.valueOf(45_000),
+        Map.of("MUTUAL_FUND-RBF610", scaled(0.25), "MUTUAL_FUND-RBF611", scaled(0.20)));
     final var expected = new SalesChargeResult(Map.of(
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, s2,
@@ -167,15 +160,9 @@ class SalesChargeTypeCalculationTest {
 
     final var calculation = new SalesChargeCalculation(dataFromFds);
 
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF606", BigDecimal.valueOf(
-        0.3333333333));
-    final var rbf607 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF607", BigDecimal.valueOf(
-        0.3333333333));
-    final var rbf608 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF608", BigDecimal.valueOf(
-        0.3333333333));
-
     final var s1 = new SalesChargeResult.SalesChargeEntry(BigDecimal.valueOf(1), BigDecimal.valueOf(150_000),
-        Set.of(rbf606, rbf607, rbf608));
+        Map.of("MUTUAL_FUND-RBF606", BigDecimal.valueOf(0.3333333333), "MUTUAL_FUND-RBF607", BigDecimal.valueOf(
+            0.3333333333), "MUTUAL_FUND-RBF608", BigDecimal.valueOf(0.3333333333)));
     final var expected = new SalesChargeResult(Map.of(
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,
@@ -191,11 +178,9 @@ class SalesChargeTypeCalculationTest {
     addHoldingAndRSalesCharge(dataFromFds, "RBF606", 150_000, FRONT_END_CHARGE);
 
     final var calculation = new SalesChargeCalculation(dataFromFds);
-    final var rbf606 = new SalesChargeResult.SalesChargeHoldingEntry("MUTUAL_FUND-RBF606", BigDecimal.valueOf(
-        1));
 
     final var s1 = new SalesChargeResult.SalesChargeEntry(BigDecimal.valueOf(1), BigDecimal.valueOf(150_000),
-        Set.of(rbf606));
+        Map.of("MUTUAL_FUND-RBF606", BigDecimal.valueOf(1)));
     final var expected = new SalesChargeResult(Map.of(
         SalesChargeCategory.NO_LOAD_INITIAL_SALES_CHARGE, s1,
         SalesChargeCategory.LOW_LOAD_SALES_CHARGE, DEFAULT_SALES_CHARGE_DTO,

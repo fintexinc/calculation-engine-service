@@ -7,10 +7,9 @@ import com.fintex.ce.model.domain.result.PeriodResult;
 import com.fintex.ce.model.domain.result.returns.MeanResult;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.Set;
@@ -72,8 +71,8 @@ public class MeanCalculation<T extends PeriodResult> extends PeriodCalculationAb
   }
 
   @Override
-  public T defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
-    return (T) new MeanResult(formTimeIntervalResult(periodValues));
+  public T defineResponseType(final Map<String, BigDecimal> periodValues) {
+    return (T) new MeanResult(periodValues);
   }
 
 }

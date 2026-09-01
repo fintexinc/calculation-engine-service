@@ -3,7 +3,6 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
 import com.fintex.ce.model.domain.holding.PortfolioHolding;
-import com.fintex.ce.model.domain.result.correlation.CorrelationKeyValueResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationPeriodResult;
 import com.fintex.ce.model.domain.result.correlation.CorrelationResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
@@ -12,13 +11,13 @@ import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
 import com.fintex.wm.commons.domain.id.FiIdentifierType;
 import com.fintex.wm.commons.domain.id.SecurityIdentifier;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +34,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -422,8 +420,8 @@ class CorrelationCalculationTest {
     assertEquals(String.valueOf(TWELVE), correlationPeriod.period());
     assertEquals("ETF_TEST", correlationPeriod.key());
     assertEquals(1, correlationPeriod.correlations().size());
-    assertEquals("MUTUAL_FUND_TEST", correlationPeriod.correlations().get(0).correlationKey());
-    assertEquals(BigDecimal.valueOf(TWELVE), correlationPeriod.correlations().get(0).value());
+    assertEquals("MUTUAL_FUND_TEST", correlationPeriod.correlations().keySet().iterator().next());
+    assertEquals(BigDecimal.valueOf(TWELVE), correlationPeriod.correlations().get("MUTUAL_FUND_TEST"));
   }
 
   @Test
@@ -436,11 +434,11 @@ class CorrelationCalculationTest {
         .useConstructor(context, portfolioBaseTotalReturn, Set.of()));
 
     var listMock = List.of(new CorrelationPeriodResult(null, null, null));
-    var pairs = Set.of(Pair.of("2000-01-12", listMock), Pair.of("2020-01-05", listMock));
+    var input = Map.of("2000-01-12", listMock, "2020-01-05", listMock);
     when(calculation.setPeriod(anyString(), anyList())).thenReturn(listMock);
 
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    CorrelationResult result = calculation.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
+    CorrelationResult result = calculation.defineResponseType(input);
 
     assertEquals(2, result.getCorrelationPeriods().size());
     Assertions.assertEquals(listMock.get(0), result.getCorrelationPeriods().get(0));
@@ -474,10 +472,10 @@ class CorrelationCalculationTest {
   void shouldKeepValuesUnchanged_whenFormattingAlreadyScaledCorrelationPeriods() {
     var calculation = mock(CorrelationCalculation.class);
 
-    var correlationPeriod = new CorrelationPeriodResult(null, null, List.of());
+    var correlationPeriod = new CorrelationPeriodResult(null, null, Map.of());
     var argument = List.of(correlationPeriod);
 
-    var correlationPeriodDtoExpected = new CorrelationPeriodResult(null, null, List.of());
+    var correlationPeriodDtoExpected = new CorrelationPeriodResult(null, null, Map.of());
     var expected = List.of(correlationPeriodDtoExpected);
 
     doCallRealMethod().when(calculation).toUserFormat(any());
@@ -490,13 +488,14 @@ class CorrelationCalculationTest {
   void shouldRoundCorrelationValues_whenFormattingCorrelationPeriods() {
     var calculation = mock(CorrelationCalculation.class);
 
-    var correlationKeyValueResult = new CorrelationKeyValueResult(null, new BigDecimal("0.123456789112345"));
-    var correlationPeriod = new CorrelationPeriodResult(null, null, List.of(correlationKeyValueResult));
+    var argumentCorrelations = new LinkedHashMap<String, BigDecimal>();
+    argumentCorrelations.put(null, new BigDecimal("0.123456789112345"));
+    var correlationPeriod = new CorrelationPeriodResult(null, null, argumentCorrelations);
     var argument = List.of(correlationPeriod);
 
-    var correlationKeyValueResultExpected = new CorrelationKeyValueResult(null, new BigDecimal("0.1234567891"));
-    var correlationPeriodDtoExpected = new CorrelationPeriodResult(null, null,
-        List.of(correlationKeyValueResultExpected));
+    var expectedCorrelations = new LinkedHashMap<String, BigDecimal>();
+    expectedCorrelations.put(null, new BigDecimal("0.1234567891"));
+    var correlationPeriodDtoExpected = new CorrelationPeriodResult(null, null, expectedCorrelations);
     var expected = List.of(correlationPeriodDtoExpected);
 
     doCallRealMethod().when(calculation).toUserFormat(any());

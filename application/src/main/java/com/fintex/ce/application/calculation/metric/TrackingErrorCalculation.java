@@ -3,12 +3,9 @@ package com.fintex.ce.application.calculation.metric;
 import com.fintex.ce.application.calculation.metric.core.BenchmarkWeightedAverageCalculation;
 import com.fintex.ce.application.util.DecimalUtils;
 import com.fintex.ce.model.domain.calculation.input.BenchmarkPeriodCalculationInput;
-import com.fintex.ce.model.domain.result.TimeIntervalResult;
 import com.fintex.ce.model.domain.result.risk.TrackingErrorResult;
 import com.fintex.ce.model.util.BigDecimalConstants;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,7 +14,6 @@ import java.util.NavigableMap;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import static com.fintex.ce.application.util.CalculationUtils.sum;
 import static com.fintex.ce.application.util.CollectorUtils.toTreeMap;
@@ -39,12 +35,9 @@ public class TrackingErrorCalculation extends BenchmarkWeightedAverageCalculatio
   }
 
   @Override
-  public TrackingErrorResult defineResponseType(final Set<Pair<String, BigDecimal>> periodValues) {
+  public TrackingErrorResult defineResponseType(final Map<String, BigDecimal> periodValues) {
     TrackingErrorResult result = new TrackingErrorResult();
-    Set<TimeIntervalResult> timeIntervals = periodValues.stream().map(e -> new TimeIntervalResult(e.getKey(), e
-        .getValue()))
-        .collect(Collectors.toSet());
-    result.setTrackingError(timeIntervals);
+    result.setTrackingError(periodValues);
     return result;
   }
 

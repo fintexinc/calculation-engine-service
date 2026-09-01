@@ -7,10 +7,9 @@ import com.fintex.ce.model.error.ErrorCode;
 import com.fintex.ce.model.error.exceptions.CalculationException;
 import com.fintex.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
@@ -45,7 +44,7 @@ public class RollingSharpeRatioCalculation extends RollingAbstractCalculation<Ro
 
   @Override
   public RollingSharpeRatioResult defineResponseType(
-      final Set<Pair<String, NavigableMap<LocalDate, BigDecimal>>> result) {
+      final Map<String, NavigableMap<LocalDate, BigDecimal>> result) {
     final var rollingSharpeRatioResult = new RollingSharpeRatioResult();
     final var rollingIntervalResultS = getRollingIntervalResults(result);
     rollingSharpeRatioResult.setRollingSharpeRatio(rollingIntervalResultS);

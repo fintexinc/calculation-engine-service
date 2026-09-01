@@ -2,10 +2,8 @@ package com.fintex.ce.application.calculation.metric.core;
 
 import com.fintex.ce.application.util.ComparisonUtils;
 import com.fintex.ce.model.domain.calculation.input.PeriodCalculationInput;
-import com.fintex.ce.model.domain.result.IntervalResult;
 import com.fintex.ce.model.domain.result.RollingIntervalResult;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,20 +12,17 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.AbstractMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
 import static com.fintex.ce.model.util.BigDecimalConstants.ONE;
-import static com.fintex.ce.model.util.BigDecimalConstants.TWO;
 import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
@@ -207,46 +202,13 @@ class RollingAbstractCalculationTest {
         PeriodCalculationInput.class),
         Set
             .of()));
-    final var result = Set.of(Pair.of("12", totalPortfolioReturns));
-    final LinkedHashSet<IntervalResult> intervalRestDtos = new LinkedHashSet<>();
-    intervalRestDtos.add(new IntervalResult(NOW, TWO));
+    final Map<String, NavigableMap<LocalDate, BigDecimal>> result = Map.of("12", totalPortfolioReturns);
 
-    when(calculation.mapRollingReturn(any())).thenReturn(intervalRestDtos);
-
-    doCallRealMethod().when(calculation).getRollingIntervalResults(anySet());
+    doCallRealMethod().when(calculation).getRollingIntervalResults(anyMap());
     final Set<RollingIntervalResult> actual = calculation.getRollingIntervalResults(result);
 
     assertEquals("12", actual.stream().findFirst().get().period());
-    assertEquals(intervalRestDtos, actual.stream().findFirst().get().values());
-  }
-
-  @Test
-  void shouldReturnNull_whenMappingRollingReturnWithNullValues() {
-    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
-        PeriodCalculationInput.class),
-        Set
-            .of()));
-    final var result = Pair.of("12", null);
-
-    doCallRealMethod().when(calculation).mapRollingReturn(any());
-    final Set actual = calculation.mapRollingReturn(result);
-
-    assertNull(actual);
-  }
-
-  @Test
-  void shouldMapEntriesToIntervalResults_whenRollingReturnContainsValues() {
-    final var calculation = mock(RollingAbstractCalculation.class, withSettings().useConstructor(mock(
-        PeriodCalculationInput.class),
-        Set
-            .of()));
-    final Pair<String, NavigableMap<LocalDate, BigDecimal>> result = Pair.of("12", totalPortfolioReturns);
-
-    doCallRealMethod().when(calculation).mapRollingReturn(any());
-    final Set<IntervalResult> actual = calculation.mapRollingReturn(result);
-
-    assertEquals(NOW.plusMonths(1), actual.stream().findFirst().get().key());
-    assertEquals(ONE, actual.stream().findFirst().get().value());
+    assertEquals(totalPortfolioReturns, actual.stream().findFirst().get().values());
   }
 
   @AfterAll
