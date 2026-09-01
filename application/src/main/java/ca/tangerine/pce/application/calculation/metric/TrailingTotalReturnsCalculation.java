@@ -6,10 +6,9 @@ import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
 import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Set;
@@ -66,8 +65,8 @@ public class TrailingTotalReturnsCalculation extends PeriodCalculationAbstract<T
   }
 
   @Override
-  public TrailingTotalReturnsResult defineResponseType(Set<Pair<String, BigDecimal>> periodValues) {
-    return new TrailingTotalReturnsResult(formTimeIntervalResult(periodValues));
+  public TrailingTotalReturnsResult defineResponseType(Map<String, BigDecimal> periodValues) {
+    return new TrailingTotalReturnsResult(periodValues);
   }
 
 }

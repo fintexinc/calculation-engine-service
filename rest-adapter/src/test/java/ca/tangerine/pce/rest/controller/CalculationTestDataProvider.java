@@ -7,7 +7,6 @@ import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
 import ca.tangerine.pce.model.domain.result.BaseCalculationResult;
 import ca.tangerine.pce.model.domain.result.CommonPerformanceDatesResult;
 import ca.tangerine.pce.model.domain.result.PeriodResult;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
 import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationEMResult;
 import ca.tangerine.pce.model.domain.result.allocation.AssetAllocationResult;
 import ca.tangerine.pce.model.domain.result.allocation.ConsolidatedSectorExposureResult;
@@ -72,14 +71,14 @@ class CalculationTestDataProvider {
       new SecurityIdentifier("DUMMY", FiIdentifierType.TICKER), FinancialInstrumentType.MUTUAL_FUND, Country.CANADA,
       BigDecimal.ONE);
 
-  static final Set<TimeIntervalResult> TIME_INTERVALS = Set.of(
-      new TimeIntervalResult("12M", BigDecimal.valueOf(8.56)),
-      new TimeIntervalResult("36M", BigDecimal.valueOf(6.23)));
+  static final Map<String, BigDecimal> TIME_INTERVALS = Map.of(
+      "12M", BigDecimal.valueOf(8.56),
+      "36M", BigDecimal.valueOf(6.23));
 
   static Stream<Arguments> calculationMetricArguments() {
     return Stream.of(
         period(CalculationMetric.TRAILING_TOTAL_RETURNS, init(new TrailingTotalReturnsResult(), r -> r
-            .setTrailingTotalReturn(List.copyOf(TIME_INTERVALS))), TrailingTotalReturnsResult.class),
+            .setTrailingTotalReturn(TIME_INTERVALS)), TrailingTotalReturnsResult.class),
         period(CalculationMetric.STANDARD_DEVIATION, init(new StandardDeviationResult(), r -> r.setStandardDeviation(
             TIME_INTERVALS)),
             StandardDeviationResult.class),

@@ -1,7 +1,6 @@
 package ca.tangerine.pce.application.calculation.metric;
 
 import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
 import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.model.error.exceptions.CalculationException;
@@ -9,7 +8,6 @@ import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 import ca.tangerine.wm.commons.error.Notification;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -34,26 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class TrailingTotalReturnsCalculationTest {
-
-  @Test
-  void shouldDelegateToFormTimeIntervalResult_whenDefiningResponseType() {
-    var calculation = mock(TrailingTotalReturnsCalculation.class);
-
-    var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", BigDecimal.ONE));
-
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    calculation.defineResponseType(pairs);
-
-    verify(calculation).formTimeIntervalResult(pairs);
-  }
 
   @Test
   void shouldReturnNull_whenPeriodExceedsPortfolioSize() {
@@ -147,12 +132,11 @@ class TrailingTotalReturnsCalculationTest {
         .isEqualTo(LocalDate.of(2005, 1, 31));
     assertThat(result.getPerformanceEndDate())
         .isEqualTo(LocalDate.of(2005, 12, 31));
-    assertThat(result.getTrailingTotalReturn()).hasSize(1);
+    assertThat(result.getTrailingTotalReturn())
+        .hasSize(1)
+        .containsKey(TimePeriod.SI.name());
 
-    TimeIntervalResult interval = period(result, TimePeriod.SI);
-
-    assertThat(interval.period()).isEqualTo(TimePeriod.SI.name());
-    assertThat(interval.value())
+    assertThat(period(result, TimePeriod.SI))
         .isEqualByComparingTo("0.1268250301");
   }
 
@@ -173,12 +157,11 @@ class TrailingTotalReturnsCalculationTest {
         .isEqualTo(LocalDate.of(2005, 1, 31));
     assertThat(result.getPerformanceEndDate())
         .isEqualTo(LocalDate.of(2005, 12, 31));
-    assertThat(result.getTrailingTotalReturn()).hasSize(1);
+    assertThat(result.getTrailingTotalReturn())
+        .hasSize(1)
+        .containsKey(TimePeriod.CIPSD.name());
 
-    TimeIntervalResult interval = period(result, TimePeriod.CIPSD);
-
-    assertThat(interval.period()).isEqualTo(TimePeriod.CIPSD.name());
-    assertThat(interval.value())
+    assertThat(period(result, TimePeriod.CIPSD))
         .isEqualByComparingTo("0.0721353521");
   }
 
@@ -249,10 +232,9 @@ class TrailingTotalReturnsCalculationTest {
     TrailingTotalReturnsResult result = calculation.calculate(Set.of());
 
     assertThat(result.getTrailingTotalReturn())
-        .extracting(TimeIntervalResult::period)
-        .contains(TEN_YR.name(), TWENTY_YR.name());
+        .containsKeys(TEN_YR.name(), TWENTY_YR.name());
     // A constant 1.01 factor annualized over any window collapses to 1.01^12 - 1 (user-scaled), window-independent.
-    assertThat(period(result, TWENTY_YR).value()).isEqualByComparingTo("0.1268250301");
+    assertThat(period(result, TWENTY_YR)).isEqualByComparingTo("0.1268250301");
     assertThat(result.getWarnings()).isEmpty();
   }
 
@@ -264,8 +246,8 @@ class TrailingTotalReturnsCalculationTest {
 
     TrailingTotalReturnsResult result = calculation.calculate(Set.of(ONE_YR, TWENTY_YR));
 
-    assertThat(period(result, TWENTY_YR).value()).isNull();
-    assertThat(period(result, ONE_YR).value()).isNotNull();
+    assertThat(period(result, TWENTY_YR)).isNull();
+    assertThat(period(result, ONE_YR)).isNotNull();
     assertThat(result.getWarnings()).singleElement().satisfies(warning -> {
       assertThat(warning.getCode()).isEqualTo(ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.getCode());
       assertThat(warning.getMessage())
@@ -274,11 +256,8 @@ class TrailingTotalReturnsCalculationTest {
     });
   }
 
-  private static TimeIntervalResult period(TrailingTotalReturnsResult result, TimePeriod period) {
-    return result.getTrailingTotalReturn().stream()
-        .filter(interval -> period.name().equals(interval.period()))
-        .findFirst()
-        .orElseThrow(() -> new AssertionError("Missing period " + period));
+  private static BigDecimal period(TrailingTotalReturnsResult result, TimePeriod period) {
+    return result.getTrailingTotalReturn().get(period.name());
   }
 
   private static NavigableMap<LocalDate, BigDecimal> constantFactorReturns(int count) {
@@ -295,17 +274,12 @@ class TrailingTotalReturnsCalculationTest {
   void shouldMapIntervalResults_whenDefiningResponseType() {
     var calculation = mock(TrailingTotalReturnsCalculation.class);
 
-    var pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05", ONE));
+    Map<String, BigDecimal> input = Map.of("2000-01-12", ZERO, "2020-01-05", ONE);
 
-    var expected = Set.of(
-        new TimeIntervalResult("2000-01-12", ZERO),
-        new TimeIntervalResult("2020-01-05", BigDecimal.ONE));
-    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
+    TrailingTotalReturnsResult actual = calculation.defineResponseType(input);
 
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    TrailingTotalReturnsResult actual = calculation.defineResponseType(pairs);
-
-    assertThat(actual.getTrailingTotalReturn()).containsExactlyInAnyOrderElementsOf(expected);
+    assertThat(actual.getTrailingTotalReturn()).containsExactlyInAnyOrderEntriesOf(input);
   }
 
   @Test
@@ -319,10 +293,10 @@ class TrailingTotalReturnsCalculationTest {
     TrailingTotalReturnsResult result = calculation.calculate(Set.of(TimePeriod.ONE_MTH));
 
     assertThat(result.getWarnings()).containsExactly(warning);
-    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(interval -> {
-      assertThat(interval.period()).isEqualTo(TimePeriod.ONE_MTH.name());
-      assertThat(interval.value()).isEqualByComparingTo("0.01");
-    });
+    assertThat(result.getTrailingTotalReturn())
+        .containsOnlyKeys(TimePeriod.ONE_MTH.name());
+    assertThat(result.getTrailingTotalReturn().get(TimePeriod.ONE_MTH.name()))
+        .isEqualByComparingTo("0.01");
     assertEquals(date, result.getPerformanceStartDate());
     assertEquals(date, result.getPerformanceEndDate());
   }

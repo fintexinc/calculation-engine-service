@@ -2,14 +2,12 @@ package ca.tangerine.pce.application.calculation.metric;
 
 import ca.tangerine.pce.application.calculation.metric.core.PeriodCalculationAbstract;
 import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
 import ca.tangerine.pce.model.domain.result.risk.SharpeRatioResult;
 import ca.tangerine.pce.model.error.ErrorCode;
 import ca.tangerine.pce.model.error.exceptions.CalculationException;
 import ca.tangerine.pce.model.util.BigDecimalConstants;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -38,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.anySet;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -288,15 +286,11 @@ class SharpeRatioCalculationTest {
   @Test
   void shouldDefineResponseType_whenCheckResult() {
     var calculation = mock(SharpeRatioCalculation.class);
-    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ZERO), Pair.of("2020-01-05",
-        BigDecimal.ONE));
-    TimeIntervalResult interval1 = new TimeIntervalResult("2000-01-12", ZERO);
-    TimeIntervalResult interval2 = new TimeIntervalResult("2020-01-05", BigDecimal.ONE);
-    Set<TimeIntervalResult> expected = Set.of(interval1, interval2);
-    when(calculation.formTimeIntervalResult(anySet())).thenReturn(expected);
+    Map<String, BigDecimal> periods = Map.of("2000-01-12", ZERO, "2020-01-05", BigDecimal.ONE);
+    Map<String, BigDecimal> expected = Map.of("2000-01-12", ZERO, "2020-01-05", BigDecimal.ONE);
 
-    doCallRealMethod().when(calculation).defineResponseType(anySet());
-    SharpeRatioResult result = calculation.defineResponseType(pairs);
+    doCallRealMethod().when(calculation).defineResponseType(anyMap());
+    SharpeRatioResult result = calculation.defineResponseType(periods);
 
     assertEquals(expected, result.getSharpeRatio());
   }
@@ -359,7 +353,7 @@ class SharpeRatioCalculationTest {
     assertThat(result.getPerformanceStartDate()).isEqualTo(returns.firstKey());
     assertThat(result.getPerformanceEndDate()).isEqualTo(returns.lastKey());
     assertThat(result.getSharpeRatio()).hasSize(1);
-    assertThat(period(result, TWENTY_YR).value()).isNotNull().isPositive();
+    assertThat(period(result, TWENTY_YR)).isNotNull().isPositive();
   }
 
   @Test
@@ -369,10 +363,9 @@ class SharpeRatioCalculationTest {
 
     SharpeRatioResult result = calculation.calculate(Set.of());
 
-    assertThat(result.getSharpeRatio())
-        .extracting(TimeIntervalResult::period)
+    assertThat(result.getSharpeRatio().keySet())
         .contains(TEN_YR.name(), TWENTY_YR.name());
-    assertThat(period(result, TWENTY_YR).value()).isNotNull();
+    assertThat(period(result, TWENTY_YR)).isNotNull();
   }
 
   @Test
@@ -382,8 +375,8 @@ class SharpeRatioCalculationTest {
 
     SharpeRatioResult result = calculation.calculate(Set.of(ONE_YR, TWENTY_YR));
 
-    assertThat(period(result, TWENTY_YR).value()).isNull();
-    assertThat(period(result, ONE_YR).value()).isNotNull();
+    assertThat(period(result, TWENTY_YR)).isNull();
+    assertThat(period(result, ONE_YR)).isNotNull();
     assertThat(result.getWarnings()).singleElement().satisfies(warning -> {
       assertThat(warning.getCode()).isEqualTo(ErrorCode.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD.getCode());
       assertThat(warning.getMessage())
@@ -413,11 +406,8 @@ class SharpeRatioCalculationTest {
     return returns;
   }
 
-  private static TimeIntervalResult period(SharpeRatioResult result, TimePeriod period) {
-    return result.getSharpeRatio().stream()
-        .filter(interval -> period.name().equals(interval.period()))
-        .findFirst()
-        .orElseThrow(() -> new AssertionError("Missing period " + period));
+  private static BigDecimal period(SharpeRatioResult result, TimePeriod period) {
+    return result.getSharpeRatio().get(period.name());
   }
 
 }

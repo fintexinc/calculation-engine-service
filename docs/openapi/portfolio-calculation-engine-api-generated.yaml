@@ -2268,11 +2268,11 @@ components:
           description: Custom interval performance start date
           format: date
         sharpeRatio:
-          uniqueItems: true
-          type: array
+          type: object
+          additionalProperties:
+            type: number
+            description: Sharpe ratio per time interval period
           description: Sharpe ratio per time interval period
-          items:
-            $ref: "#/components/schemas/TimeIntervalResult"
       description: Response for sharpe-ratio metric. Contains Sharpe ratio (risk-adjusted
         return) per time interval period.
     StandardDeviationResult:
@@ -2296,21 +2296,13 @@ components:
           description: Custom interval performance start date
           format: date
         standardDeviation:
-          uniqueItems: true
-          type: array
+          type: object
+          additionalProperties:
+            type: number
+            description: Annualized standard deviation per time interval period
           description: Annualized standard deviation per time interval period
-          items:
-            $ref: "#/components/schemas/TimeIntervalResult"
       description: Response for standard-deviation metric. Contains annualized standard
         deviation per time interval period.
-    TimeIntervalResult:
-      type: object
-      properties:
-        period:
-          type: string
-        value:
-          type: number
-      description: Sharpe ratio per time interval period
     TopCommonHoldingData:
       type: object
       properties:
@@ -2486,10 +2478,11 @@ components:
           description: Custom interval performance start date
           format: date
         trailingTotalReturn:
-          type: array
+          type: object
+          additionalProperties:
+            type: number
+            description: Trailing total returns per time interval period
           description: Trailing total returns per time interval period
-          items:
-            $ref: "#/components/schemas/TimeIntervalResult"
         comparison:
           type: array
           description: Portfolio-versus-benchmark return comparison per time interval
