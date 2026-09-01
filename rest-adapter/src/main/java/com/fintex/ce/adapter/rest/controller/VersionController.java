@@ -18,8 +18,8 @@ import java.lang.management.RuntimeMXBean;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * REST endpoint for service version information. Provides metadata about the service including
- * the artifact ID, version, and JVM uptime.
+ * REST endpoint for service version information. Provides metadata about the service including the artifact ID,
+ * version, and JVM uptime.
  */
 @Slf4j
 @RestController
@@ -51,9 +51,9 @@ public class VersionController {
   }
 
   /**
-   * Resolves the service version from Spring Boot's BuildProperties, which reads from
-   * META-INF/build-info.properties. Falls back to the package manifest's Implementation-Version,
-   * and finally to "unknown" if the version cannot be determined.
+   * Resolves the service version from Spring Boot's BuildProperties, which reads from META-INF/build-info.properties.
+   * Falls back to the package manifest's Implementation-Version, and finally to "unknown" if the version cannot be
+   * determined.
    */
   private String resolveVersion() {
     try {
