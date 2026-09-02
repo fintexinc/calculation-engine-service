@@ -9,8 +9,8 @@ import ca.tangerine.wm.commons.error.Notification;
 import ca.tangerine.wm.commons.error.Severity;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -25,10 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +33,10 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.QueueDispatcher;
 import okhttp3.mockwebserver.SocketPolicy;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Shared scenarios every calculation endpoint must satisfy: the upstream being unavailable, answering with a server or
@@ -64,7 +64,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
 
   protected static MockWebServer micMockServer;
 
-  protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
+  protected static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().findAndAddModules().build();
 
   @Autowired
   protected WebTestClient webTestClient;
@@ -94,7 +94,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
   protected static String writeJson(Object value) {
     try {
       return OBJECT_MAPPER.writeValueAsString(value);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -102,7 +102,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
   protected static JsonNode parseJson(String body) {
     try {
       return OBJECT_MAPPER.readTree(body);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -110,7 +110,7 @@ abstract class AbstractPortfolioCalculationE2ETest {
   protected static <T> T readJson(String body, Class<T> type) {
     try {
       return OBJECT_MAPPER.readValue(body, type);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new IllegalStateException(e);
     }
   }

@@ -5,12 +5,12 @@ import ca.tangerine.pce.webclient.mic.mapper.MarketInvestmentCatalogueResponseMa
 import ca.tangerine.wm.commons.domain.attribute.SecurityAttributeResult;
 import ca.tangerine.wm.commons.domain.enumeration.CompositeSecurityAttribute;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Associates a {@link CompositeSecurityAttribute} with the MIC response type it deserializes into, the CE domain type

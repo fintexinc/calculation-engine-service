@@ -2,9 +2,9 @@ package ca.tangerine.pce.webclient.boc.dto;
 
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import tools.jackson.databind.ObjectMapper;
 
 class BankOfCanadaFxRateResponseTest {
 

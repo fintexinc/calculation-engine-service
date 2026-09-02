@@ -19,9 +19,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
@@ -34,6 +31,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Central REST exception handler. Every exception thrown by the calculation pipeline or the HTTP machinery is
@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(HandlerMethodValidationException.class)
   public ResponseEntity<ErrorResponse> handleHandlerMethodValidation(HandlerMethodValidationException e) {
     log.error(e.getMessage());
-    List<Notification> notifications = e.getAllValidationResults().stream()
+    List<Notification> notifications = e.getParameterValidationResults().stream()
         .flatMap(result -> result.getResolvableErrors().stream())
         .map(error -> error instanceof ObjectError oe
             ? toNotification(oe)
@@ -131,7 +131,7 @@ public class GlobalExceptionHandler {
    */
   private static String fieldPath(InvalidFormatException invalid) {
     return invalid.getPath().stream()
-        .map(JsonMappingException.Reference::getFieldName)
+        .map(JacksonException.Reference::getPropertyName)
         .filter(Objects::nonNull)
         .collect(Collectors.joining("."));
   }

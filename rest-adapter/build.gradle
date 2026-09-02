@@ -1,0 +1,12 @@
+description = 'Exposes REST API TO external consumers (Primary/Driving Adapter)'
+
+dependencies {
+    api project(':application')
+    api libs.spring.boot.starter.web
+    api libs.spring.boot.starter.validation
+    api libs.spring.boot.starter.actuator
+    api libs.springdoc.openapi.starter.webmvc.ui
+
+    testImplementation testFixtures(project(':api'))
+    testImplementation libs.spring.boot.starter.test
+}

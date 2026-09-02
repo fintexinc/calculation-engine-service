@@ -42,6 +42,17 @@ final class BocMockResponses {
         LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2026, Month.DECEMBER, 1)));
   }
 
+  /**
+   * Answers every request with one USD/CAD observation per {@code date -> rate} entry, for a test that needs specific
+   * rates on specific dates rather than the generated series above. Iteration order is irrelevant: the client groups
+   * observations by their parsed date.
+   */
+  static Dispatcher usdCadRateDispatcher(Map<String, String> ratesByDate) {
+    return constantBodyDispatcher(new Observations(ratesByDate.entrySet().stream()
+        .map(entry -> new Observation(LocalDate.parse(entry.getKey()), USD_CAD_SERIES, entry.getValue()))
+        .toList()));
+  }
+
   private static Dispatcher constantBodyDispatcher(Observations observations) {
     String body = AbstractPortfolioCalculationE2ETest.writeJson(observations);
     return new Dispatcher() {

@@ -1,14 +1,11 @@
 package ca.tangerine.pce.e2e;
 
 import ca.tangerine.pce.model.domain.result.returns.Growth10KResult;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
 import ca.tangerine.wm.commons.domain.DataProvider;
 import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.enumeration.Country;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 
-import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -26,9 +23,7 @@ import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 
 /**
  * FX path for growth-of-10k: USD ETFs are requested in CAD and monthly returns are converted via BoC rates before
@@ -36,8 +31,6 @@ import okhttp3.mockwebserver.RecordedRequest;
  */
 @Tag("e2e")
 class Growth10kWithFxE2ETest extends AbstractGrowthOf10kE2ETest {
-
-  private static final String FX_USD_CAD = "FXUSDCAD";
 
   private static MockWebServer bocMockServer;
 
@@ -97,28 +90,12 @@ class Growth10kWithFxE2ETest extends AbstractGrowthOf10kE2ETest {
     assertGrowthPoint(result.getGrowth10k().get(2), "2024-02-29", "20532.7824327645");
   }
 
+  /** A rate that doubles between December and January, so the FX effect on each month is unmistakable. */
   private static Dispatcher stepFunctionUsdCadDispatcher() {
-    BankOfCanadaFxRateResponse response = new BankOfCanadaFxRateResponse();
-    response.setObservations(List.of(
-        bocObservation("2023-11-30", "1.0"),
-        bocObservation("2023-12-31", "1.0"),
-        bocObservation("2024-01-31", "2.0"),
-        bocObservation("2024-02-29", "2.0")));
-    String body = writeJson(response);
-    return new Dispatcher() {
-      @Override
-      public MockResponse dispatch(RecordedRequest request) {
-        return new MockResponse()
-            .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .setBody(body);
-      }
-    };
-  }
-
-  private static Observation bocObservation(String date, String rate) {
-    Observation observation = new Observation();
-    observation.setDate(date);
-    observation.setDynamicProperty(FX_USD_CAD, Map.of("v", rate));
-    return observation;
+    return BocMockResponses.usdCadRateDispatcher(Map.of(
+        "2023-11-30", "1.0",
+        "2023-12-31", "1.0",
+        "2024-01-31", "2.0",
+        "2024-02-29", "2.0"));
   }
 }

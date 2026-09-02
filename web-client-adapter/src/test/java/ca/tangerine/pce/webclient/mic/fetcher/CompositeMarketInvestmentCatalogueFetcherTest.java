@@ -21,10 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.TextNode;
-
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +32,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.StringNode;
 
 @ExtendWith(MockitoExtension.class)
 class CompositeMarketInvestmentCatalogueFetcherTest {
@@ -172,7 +172,7 @@ class CompositeMarketInvestmentCatalogueFetcherTest {
   private static SecurityAttributeResult<JsonNode> attributeResult(String ticker, String payload) {
     SecurityAttributeResult<JsonNode> result = new SecurityAttributeResult<>();
     result.setIdentifier(new SecurityIdentifier(ticker, FiIdentifierType.TICKER));
-    result.setData(TextNode.valueOf(payload));
+    result.setData(StringNode.valueOf(payload));
     return result;
   }
 

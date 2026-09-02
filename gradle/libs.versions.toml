@@ -1,5 +1,5 @@
 [versions]
-spring-boot = "3.5.8"
+spring-boot = "4.1.0"
 spring-dependency-management = "1.1.7"
 spotless = "8.10.0"
 jib = "3.4.4"
@@ -12,17 +12,18 @@ git-properties = "4.0.1"
 cic = "0.1.0-tangerine-SNAPSHOT"
 
 # External dependencies whose versions the Spring Boot BOM does not manage.
-springdoc = "2.8.6"
-swagger-annotations = "2.2.29"
+springdoc = "3.1.0"
+swagger-annotations = "2.2.52"
 commons-lang3 = "3.20.0"
 guava = "32.1.3-jre"
 # One ref for every resilience4j artifact, which is what importing resilience4j-bom bought in Maven:
-# they release together, and resilience4j-spring-boot3 is outside the bom yet has to match it.
-resilience4j = "2.3.0"
+# they release together, and resilience4j-spring-boot4 is outside the bom yet has to match it.
+resilience4j = "2.4.0"
 
-# Test dependencies. Mockito and AssertJ are pinned above the BOM, as they were in the Maven build.
-mockito = "5.18.0"
-assertj = "3.27.3"
+# Test dependencies. Mockito and AssertJ stay pinned, as they were in the Maven build; the values track the
+# Boot 4.1 BOM so the pins no longer silently downgrade what the BOM would have picked.
+mockito = "5.23.0"
+assertj = "3.27.7"
 okhttp-mockwebserver = "4.12.0"
 commons-math3 = "3.6.1"
 
@@ -30,8 +31,7 @@ commons-math3 = "3.6.1"
 catalogue-investment-commons = { module = "ca.tangerine.sharedlibs:catalogue-investment-commons", version.ref = "cic" }
 
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+jackson-databind = { module = "tools.jackson.core:jackson-databind" }
 
 slf4j-api = { module = "org.slf4j:slf4j-api" }
 
@@ -40,13 +40,24 @@ spring-boot = { module = "org.springframework.boot:spring-boot" }
 spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-starter-webflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+# Boot 4 split WebClient support out of the webflux starter, which now carries only the reactive server.
+spring-boot-starter-webclient = { module = "org.springframework.boot:spring-boot-starter-webclient" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+# RestClient auto-configuration is its own module in Boot 4; starter-web no longer carries it, and the
+# health indicators inject the auto-configured RestClient.Builder.
+spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+# WebTestClient's test auto-configuration is its own module in Boot 4 and is not pulled by
+# spring-boot-starter-test; the webflux-test starter would also drag a reactive server into an MVC app.
+spring-boot-webtestclient = { module = "org.springframework.boot:spring-boot-webtestclient" }
 
 micrometer-core = { module = "io.micrometer:micrometer-core" }
 micrometer-observation = { module = "io.micrometer:micrometer-observation" }
 micrometer-tracing-bridge-otel = { module = "io.micrometer:micrometer-tracing-bridge-otel" }
+# Boot 4 moved the tracing auto-configuration out of actuator into per-bridge modules; this one contributes
+# the Tracer bean over the OpenTelemetry bridge above.
+spring-boot-micrometer-tracing-opentelemetry = { module = "org.springframework.boot:spring-boot-micrometer-tracing-opentelemetry" }
 micrometer-context-propagation = { module = "io.micrometer:context-propagation" }
 
 resilience4j-circuitbreaker = { module = "io.github.resilience4j:resilience4j-circuitbreaker", version.ref = "resilience4j" }
@@ -54,7 +65,7 @@ resilience4j-retry = { module = "io.github.resilience4j:resilience4j-retry", ver
 resilience4j-timelimiter = { module = "io.github.resilience4j:resilience4j-timelimiter", version.ref = "resilience4j" }
 resilience4j-reactor = { module = "io.github.resilience4j:resilience4j-reactor", version.ref = "resilience4j" }
 resilience4j-micrometer = { module = "io.github.resilience4j:resilience4j-micrometer", version.ref = "resilience4j" }
-resilience4j-spring-boot3 = { module = "io.github.resilience4j:resilience4j-spring-boot3", version.ref = "resilience4j" }
+resilience4j-spring-boot4 = { module = "io.github.resilience4j:resilience4j-spring-boot4", version.ref = "resilience4j" }
 
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }

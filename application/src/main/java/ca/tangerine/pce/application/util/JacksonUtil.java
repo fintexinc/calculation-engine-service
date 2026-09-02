@@ -1,31 +1,30 @@
 package ca.tangerine.pce.application.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-import java.io.IOException;
 import java.io.InputStream;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @SuppressWarnings("Duplicates")
 public class JacksonUtil {
 
   private static final String CAN_NOT_DESERIALIZE = "Can't deserialize";
 
-  public static final ObjectMapper MAPPER = new ObjectMapper();
-
-  static {
-    MAPPER.registerModule(new JavaTimeModule());
-    MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    MAPPER.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-    MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    SimpleModule simpleModule = new SimpleModule();
-    MAPPER.registerModule(simpleModule);
-  }
+  /**
+   * A Jackson 3 mapper is immutable, so every feature is set on the builder rather than on the built instance.
+   * {@code java.time} support is part of databind now and registers itself, so no module is added for it; the
+   * date-shape switch it used to bring moved from {@code SerializationFeature} to {@link DateTimeFeature}.
+   */
+  public static final ObjectMapper MAPPER = JsonMapper.builder()
+      .configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+      .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
+      .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+      .build();
 
   private JacksonUtil() {
   }
@@ -36,8 +35,8 @@ public class JacksonUtil {
     } else {
       try {
         return MAPPER.readValue(json, clazz);
-      } catch (IOException var3) {
-        throw new IllegalStateException(CAN_NOT_DESERIALIZE, var3);
+      } catch (JacksonException exception) {
+        throw new IllegalStateException(CAN_NOT_DESERIALIZE, exception);
       }
     }
   }
@@ -48,8 +47,8 @@ public class JacksonUtil {
     } else {
       try {
         return MAPPER.readValue(in, type);
-      } catch (IOException var3) {
-        throw new IllegalStateException(CAN_NOT_DESERIALIZE, var3);
+      } catch (JacksonException exception) {
+        throw new IllegalStateException(CAN_NOT_DESERIALIZE, exception);
       }
     }
   }
@@ -60,8 +59,8 @@ public class JacksonUtil {
     } else {
       try {
         return MAPPER.readValue(json, type);
-      } catch (IOException var3) {
-        throw new IllegalStateException(CAN_NOT_DESERIALIZE, var3);
+      } catch (JacksonException exception) {
+        throw new IllegalStateException(CAN_NOT_DESERIALIZE, exception);
       }
     }
   }
@@ -72,8 +71,8 @@ public class JacksonUtil {
     } else {
       try {
         return MAPPER.writeValueAsString(object);
-      } catch (JsonProcessingException var2) {
-        throw new IllegalStateException(CAN_NOT_DESERIALIZE, var2);
+      } catch (JacksonException exception) {
+        throw new IllegalStateException(CAN_NOT_DESERIALIZE, exception);
       }
     }
   }

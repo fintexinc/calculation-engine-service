@@ -77,7 +77,7 @@ class CachedBodyHttpServletRequestTest {
   @Test
   void fallsBackToUtf8_whenNoCharacterEncoding() throws IOException {
     MockHttpServletRequest mockRequest = new MockHttpServletRequest();
-    mockRequest.setCharacterEncoding(null);
+    mockRequest.setCharacterEncoding((String) null);
     mockRequest.setContent("hello".getBytes(StandardCharsets.UTF_8));
 
     CachedBodyHttpServletRequest cached = new CachedBodyHttpServletRequest(mockRequest);

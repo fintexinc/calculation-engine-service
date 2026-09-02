@@ -1,0 +1,123 @@
+plugins {
+    id 'java'
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.spring.dependency.management) apply false
+    alias(libs.plugins.spotless) apply false
+    alias(libs.plugins.lombok) apply false
+    alias(libs.plugins.jib) apply false
+    alias(libs.plugins.git.properties) apply false
+}
+
+// Resolved here rather than inside `subprojects`: the version-catalog accessors are generated for this
+// script's own scope, so a subproject block cannot reach `libs` directly.
+def springBootVersion = libs.versions.spring.boot.get()
+def slf4jApiDep = libs.slf4j.api.get()
+def junitJupiterApiDep = libs.junit.jupiter.api.get()
+def junitJupiterEngineDep = libs.junit.jupiter.engine.get()
+def mockitoCoreDep = libs.mockito.core.get()
+def assertjCoreDep = libs.assertj.core.get()
+def mockitoCoreCoord = mockitoCoreDep.toString()
+
+// The tag a test run is limited to, e.g. `./gradlew test -Ptag=e2e`. Absent, everything runs — the same
+// default the Maven build had, where `includeTags` was fed an unset `-Dtag` property.
+def includedTag = findProperty('tag')
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'io.freefair.lombok'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'com.diffplug.spotless'
+
+    group = 'ca.tangerine'
+    version = '2.0.0-tangerine-SNAPSHOT'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            name = 'fintexincorporated'
+            url = 'https://pkgs.dev.azure.com/fintexincorporated/_packaging/fintexincorporated/maven/v1'
+            // Gradle validates a repository's credentials as soon as any resolution consults it, so declaring
+            // them unconditionally makes every task that resolves anything — spotless included, whose tools
+            // come from Central — fail for a developer who has not configured the feed. Declared only when
+            // present: without them the feed is anonymous and the internal artifact resolves from mavenLocal,
+            // which is where a locally published commons build lands anyway.
+            def feedUser = providers.gradleProperty('fintexincorporatedUsername').orNull
+            def feedPassword = providers.gradleProperty('fintexincorporatedPassword').orNull
+            if (feedUser != null && feedPassword != null) {
+                credentials {
+                    username = feedUser
+                    password = feedPassword
+                }
+                authentication {
+                    basic(BasicAuthentication)
+                }
+            }
+        }
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
+        }
+    }
+
+    // Mockito's inline mock maker has to be loaded as an agent: JDK 21 warns on self-attachment today and
+    // will refuse it outright, so the jar is resolved as its own configuration and passed to every test JVM
+    // rather than relying on dynamic loading. This is the Maven build's surefire argLine, minus the AspectJ
+    // weaver it also loaded — nothing in these sources is an @Aspect, so that agent was dead weight.
+    // Named differently from the configuration so it does not shadow the `mockitoAgent` dependency-handler
+    // method in the block below, which Groovy would then try to invoke as a closure.
+    def mockitoAgentConfiguration = configurations.create('mockitoAgent') {
+        transitive = false
+    }
+
+    dependencies {
+        implementation slf4jApiDep
+        testImplementation junitJupiterApiDep
+        testImplementation mockitoCoreDep
+        testImplementation assertjCoreDep
+        testRuntimeOnly junitJupiterEngineDep
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        mockitoAgent mockitoCoreCoord
+    }
+
+    spotless {
+        java {
+            importOrderFile(rootProject.file('eclipse.importorder'))
+            removeUnusedImports()
+            eclipse().configFile(rootProject.file('eclipse-java-formatter.xml'))
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs.add('-parameters')
+    }
+
+    tasks.withType(Test) {
+        useJUnitPlatform {
+            if (includedTag != null) {
+                includeTags includedTag.toString()
+            }
+        }
+        // Extensions are registered through ServiceLoader rather than @ExtendWith in some tests.
+        systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+        // `-Dopenapi.update=true` reaches Gradle's own JVM, not the forked test one, so the documented
+        // re-export command silently did nothing without this. Forwarded only when set.
+        def openapiUpdate = providers.systemProperty('openapi.update').orNull
+        if (openapiUpdate != null) {
+            systemProperty 'openapi.update', openapiUpdate
+        }
+        jvmArgs '-XX:+EnableDynamicAgentLoading'
+        jvmArgumentProviders.add({
+            ['-javaagent:' + mockitoAgentConfiguration.singleFile.absolutePath]
+        } as CommandLineArgumentProvider)
+        maxParallelForks = 8
+    }
+}

@@ -14,9 +14,6 @@ import ca.tangerine.wm.commons.dto.request.IdsAndDataProvidersRequest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
@@ -24,6 +21,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Generic Market Investment Catalogue client that fetches any combination of composite security attributes in a single

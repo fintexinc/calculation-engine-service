@@ -301,6 +301,8 @@ paths:
 components:
   schemas:
     AverageMerCommand:
+      required:
+      - holdings
       type: object
       properties:
         metric:
@@ -575,6 +577,8 @@ components:
             - WEEKLY
             - DAILY
     CompositeCalculationRequest:
+      required:
+      - commands
       type: object
       properties:
         holdings:
@@ -771,6 +775,8 @@ components:
           name:
             type: string
     MerComparisonCommand:
+      required:
+      - holdings
       type: object
       properties:
         metric:
@@ -921,6 +927,8 @@ components:
       description: "Command for the mer-benchmark-comparison metric: portfolio holdings\
         \ compared against a benchmark"
     MultiplePortfoliosCommand:
+      required:
+      - portfolios
       type: object
       properties:
         metric:
@@ -956,6 +964,7 @@ components:
     PeriodCommand:
       required:
       - currency
+      - holdings
       type: object
       properties:
         metric:
@@ -1233,6 +1242,8 @@ components:
       discriminator:
         propertyName: holdingType
     PortfolioHoldingsCommand:
+      required:
+      - holdings
       type: object
       properties:
         metric:
@@ -1277,6 +1288,7 @@ components:
     ReturnCommand:
       required:
       - currency
+      - holdings
       type: object
       properties:
         metric:
@@ -1378,6 +1390,8 @@ components:
         mapping:
           TICKER_MIC: "#/components/schemas/EquitySecurityIdentifier"
     TopCommonHoldingsCommand:
+      required:
+      - holdings
       type: object
       properties:
         metric:

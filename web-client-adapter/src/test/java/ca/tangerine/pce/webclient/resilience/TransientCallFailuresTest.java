@@ -11,9 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 
@@ -24,6 +21,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Pins the classification the retry and the circuit breaker share, because both wrong answers are damaging in opposite
@@ -93,11 +93,11 @@ class TransientCallFailuresTest {
         HttpHeaders.EMPTY, new byte[0], StandardCharsets.UTF_8);
   }
 
-  private static JsonProcessingException jsonParseFailure() {
+  private static JacksonException jsonParseFailure() {
     try {
       new ObjectMapper().readTree("{\"value\":");
       throw new AssertionError("expected malformed JSON to fail parsing");
-    } catch (JsonProcessingException expected) {
+    } catch (JacksonException expected) {
       return expected;
     }
   }

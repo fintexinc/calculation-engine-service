@@ -1,0 +1,12 @@
+rootProject.name = 'portfolio-calculation-engine'
+
+include(
+    'domain',
+    'api',
+    'application',
+    'observability-adapter',
+    'web-client-adapter',
+    'cache-adapter',
+    'rest-adapter',
+    'bootstrap'
+)

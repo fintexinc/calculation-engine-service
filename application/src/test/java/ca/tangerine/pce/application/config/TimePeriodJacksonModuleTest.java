@@ -10,16 +10,19 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+
 class TimePeriodJacksonModuleTest {
 
-  private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new TimePeriodJacksonModule());
+  private final ObjectMapper objectMapper = JsonMapper.builder()
+      .addModule(new TimePeriodJacksonModule())
+      .build();
 
   @ParameterizedTest
   @CsvSource({

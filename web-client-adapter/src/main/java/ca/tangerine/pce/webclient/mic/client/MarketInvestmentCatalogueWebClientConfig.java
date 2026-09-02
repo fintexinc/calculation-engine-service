@@ -68,7 +68,7 @@ public class MarketInvestmentCatalogueWebClientConfig {
   private ExchangeFilterFunction propagateRequestId() {
     return ExchangeFilterFunction.ofRequestProcessor(request -> {
       String requestId = MDC.get(REQUEST_ID_MDC_KEY);
-      if (requestId == null || requestId.isBlank() || request.headers().containsKey(REQUEST_ID_HEADER)) {
+      if (requestId == null || requestId.isBlank() || request.headers().containsHeader(REQUEST_ID_HEADER)) {
         return Mono.just(request);
       }
       return Mono.just(ClientRequest.from(request).header(REQUEST_ID_HEADER, requestId).build());

@@ -276,6 +276,13 @@ management:
         external: 60s
         http.client.requests: 60s
         portfolio.calculation: 120s
+      # A prefix also matches the `.active` long-task timer the observation handler opens alongside each timer, and a
+      # long-task timer's floor defaults to two minutes — above the ceilings below, which Micrometer rejects outright.
+      # 1ms is what a plain timer already defaults to, so this only lowers the floor of those long-task timers.
+      # `portfolio.calculation` needs no entry: its 120s ceiling already clears that default floor.
+      minimum-expected-value:
+        external: 1ms
+        http.client.requests: 1ms
   observations:
     key-values:
       application: ${spring.application.name}

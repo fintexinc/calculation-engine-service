@@ -2,8 +2,8 @@ package ca.tangerine.pce.actuator;
 
 import ca.tangerine.pce.webclient.mic.client.MarketInvestmentCatalogueRestProperties;
 
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
