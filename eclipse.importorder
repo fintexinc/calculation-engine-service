@@ -5,6 +5,7 @@
 2=org
 3=com
 4=io
-5=jakarta
-6=java|javax|lombok
-7=\#
+5=tools
+6=jakarta
+7=java|javax|lombok
+8=\#

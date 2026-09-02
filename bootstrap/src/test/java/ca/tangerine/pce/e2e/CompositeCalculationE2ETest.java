@@ -39,6 +39,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.databind.JsonNode;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -64,7 +66,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.QueueDispatcher;
-import tools.jackson.databind.JsonNode;
 
 /**
  * End-to-end coverage for the composite endpoint — {@code POST /api/v1/portfolio/calculations} with no metric in the

@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.exc.InvalidFormatException;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
@@ -31,9 +34,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Central REST exception handler. Every exception thrown by the calculation pipeline or the HTTP machinery is
