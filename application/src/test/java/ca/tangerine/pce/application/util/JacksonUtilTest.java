@@ -2,12 +2,12 @@ package ca.tangerine.pce.application.util;
 
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.core.type.TypeReference;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import tools.jackson.core.type.TypeReference;
 
 class JacksonUtilTest {
 

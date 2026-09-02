@@ -7,6 +7,11 @@ import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
 import org.springframework.stereotype.Component;
 
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.module.SimpleModule;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -15,11 +20,6 @@ import java.util.stream.Stream;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.CIPSD;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.SI;
 import static ca.tangerine.wm.commons.domain.enumeration.TimePeriod.YTD;
-
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.ValueDeserializer;
-import tools.jackson.databind.module.SimpleModule;
 
 /**
  * Reports an unusable {@link TimePeriod} in a request as a bad request naming the offending value and listing what

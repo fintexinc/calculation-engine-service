@@ -8,13 +8,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import tools.jackson.databind.annotation.JsonTypeIdResolver;
+
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import tools.jackson.databind.annotation.JsonTypeIdResolver;
 
 /**
  * Base of every calculation command: the {@code metric} discriminator and the inputs shared by all metrics. The
