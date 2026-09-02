@@ -42,9 +42,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
+
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Wiring for the generic Market Investment Catalogue attributes fetcher. The single {@code attributeBindings} bean is

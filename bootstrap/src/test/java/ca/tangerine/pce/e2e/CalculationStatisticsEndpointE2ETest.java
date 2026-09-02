@@ -21,8 +21,8 @@ import ca.tangerine.wm.commons.domain.id.FiIdentifierType;
 import ca.tangerine.wm.commons.domain.id.SecurityIdentifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,9 +33,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -51,6 +48,9 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * End-to-end coverage of the business metrics: real traffic over the HTTP boundary, then the statistics read back from
@@ -77,7 +77,7 @@ class CalculationStatisticsEndpointE2ETest {
   private static final String ALLOCATIONS = CalculationMetric.ASSET_ALLOCATIONS.getValue();
   private static final String EQUITY_SECTOR = CalculationMetric.EQUITY_SECTOR.getValue();
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
+  private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().findAndAddModules().build();
 
   private static MockWebServer micMockServer;
 
@@ -261,7 +261,7 @@ class CalculationStatisticsEndpointE2ETest {
   private static String writeJson(Object value) {
     try {
       return OBJECT_MAPPER.writeValueAsString(value);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new IllegalStateException(e);
     }
   }

@@ -2,13 +2,10 @@ package ca.tangerine.pce.e2e;
 
 import ca.tangerine.pce.model.domain.result.KeyValueResult;
 import ca.tangerine.pce.model.domain.result.returns.AnnualReturnResult;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse;
-import ca.tangerine.pce.webclient.boc.dto.BankOfCanadaFxRateResponse.Observation;
 import ca.tangerine.wm.commons.domain.currency.Currency;
 import ca.tangerine.wm.commons.domain.enumeration.Country;
 import ca.tangerine.wm.commons.domain.enumeration.FinancialInstrumentType;
 
-import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
@@ -22,16 +19,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static ca.tangerine.pce.util.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 
 /**
  * FX path for annual-returns: USD ETFs are requested in CAD and monthly returns are converted via BoC rates before the
@@ -39,8 +34,6 @@ import okhttp3.mockwebserver.RecordedRequest;
  */
 @Tag("e2e")
 class AnnualReturnsWithFxE2ETest extends AbstractAnnualReturnsE2ETest {
-
-  private static final String FX_USD_CAD = "FXUSDCAD";
 
   // Month-ends of the priced year plus the preceding December, so each month's converted return has both the current
   // and prior-month rate available.
@@ -96,26 +89,10 @@ class AnnualReturnsWithFxE2ETest extends AbstractAnnualReturnsE2ETest {
     assertThat(entry.value()).isEqualByComparingTo(new BigDecimal("0.1048520232"));
   }
 
+  /** A rate that climbs by one cent each month end, so every converted month differs from its neighbour. */
   private static Dispatcher usdCadDispatcher(List<String> monthEnds) {
-    BankOfCanadaFxRateResponse response = new BankOfCanadaFxRateResponse();
-    response.setObservations(IntStream.range(0, monthEnds.size())
-        .mapToObj(i -> bocObservation(monthEnds.get(i), BigDecimal.valueOf(130L + i, 2).toPlainString()))
-        .toList());
-    String body = writeJson(response);
-    return new Dispatcher() {
-      @Override
-      public MockResponse dispatch(RecordedRequest request) {
-        return new MockResponse()
-            .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-            .setBody(body);
-      }
-    };
-  }
-
-  private static Observation bocObservation(String date, String rate) {
-    Observation observation = new Observation();
-    observation.setDate(date);
-    observation.setDynamicProperty(FX_USD_CAD, Map.of("v", rate));
-    return observation;
+    return BocMockResponses.usdCadRateDispatcher(IntStream.range(0, monthEnds.size())
+        .boxed()
+        .collect(Collectors.toMap(monthEnds::get, i -> BigDecimal.valueOf(130L + i, 2).toPlainString())));
   }
 }

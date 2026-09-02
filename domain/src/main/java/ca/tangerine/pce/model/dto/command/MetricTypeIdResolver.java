@@ -3,9 +3,10 @@ package ca.tangerine.pce.model.dto.command;
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.DatabindContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
+
+import tools.jackson.databind.DatabindContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.jsontype.impl.TypeIdResolverBase;
 
 /**
  * Resolves the concrete {@link CalculationCommand} subtype from the {@code metric} discriminator using the canonical
@@ -16,12 +17,12 @@ import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 public class MetricTypeIdResolver extends TypeIdResolverBase {
 
   @Override
-  public String idFromValue(Object value) {
-    return idFromValueAndType(value, value == null ? null : value.getClass());
+  public String idFromValue(DatabindContext context, Object value) {
+    return idFromValueAndType(context, value, value == null ? null : value.getClass());
   }
 
   @Override
-  public String idFromValueAndType(Object value, Class<?> suggestedType) {
+  public String idFromValueAndType(DatabindContext context, Object value, Class<?> suggestedType) {
     if (value instanceof CalculationCommand command && command.getMetric() != null) {
       return command.getMetric().getValue();
     }

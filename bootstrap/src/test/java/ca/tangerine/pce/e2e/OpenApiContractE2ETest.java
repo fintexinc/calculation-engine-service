@@ -3,8 +3,8 @@ package ca.tangerine.pce.e2e;
 import ca.tangerine.pce.PortfolioCalculationEngineApplication;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -53,11 +53,11 @@ class OpenApiContractE2ETest {
    */
   private static Path repositoryRoot() {
     Path candidate = Path.of("").toAbsolutePath();
-    while (candidate != null && !Files.exists(candidate.resolve("settings.gradle.kts"))) {
+    while (candidate != null && !Files.exists(candidate.resolve("settings.gradle"))) {
       candidate = candidate.getParent();
     }
     if (candidate == null) {
-      throw new IllegalStateException("settings.gradle.kts not found above " + Path.of("").toAbsolutePath());
+      throw new IllegalStateException("settings.gradle not found above " + Path.of("").toAbsolutePath());
     }
     return candidate;
   }

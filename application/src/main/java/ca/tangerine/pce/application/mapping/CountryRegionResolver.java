@@ -8,12 +8,12 @@ import ca.tangerine.wm.commons.domain.enumeration.Country;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import tools.jackson.core.type.TypeReference;
 
 /**
  * Resolves a {@link Country} to its {@link CountryRegionType} bucket using the {@code country-allocation-mapping.json}

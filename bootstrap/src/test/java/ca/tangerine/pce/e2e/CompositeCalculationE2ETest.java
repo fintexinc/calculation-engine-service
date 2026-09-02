@@ -25,8 +25,8 @@ import ca.tangerine.wm.commons.error.Notification;
 import ca.tangerine.wm.commons.error.Severity;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,8 +38,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -66,6 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.QueueDispatcher;
+import tools.jackson.databind.JsonNode;
 
 /**
  * End-to-end coverage for the composite endpoint — {@code POST /api/v1/portfolio/calculations} with no metric in the
@@ -168,7 +167,7 @@ class CompositeCalculationE2ETest {
     assertThat(response.status()).isEqualTo(HttpStatus.OK.value());
     JsonNode body = parseJson(response.responseBody());
     assertThat(body.path("failures")).isEmpty();
-    assertThat(body.path("results").fieldNames()).toIterable().containsExactlyInAnyOrder(
+    assertThat(body.path("results").propertyNames()).containsExactlyInAnyOrder(
         CalculationMetric.GEOGRAPHIC_EXPOSURE.getValue(),
         CalculationMetric.MANAGEMENT_FEE.getValue(),
         CalculationMetric.STANDARD_DEVIATION.getValue());
@@ -220,9 +219,9 @@ class CompositeCalculationE2ETest {
 
     assertThat(response.status()).isEqualTo(HttpStatus.OK.value());
     JsonNode body = parseJson(response.responseBody());
-    assertThat(body.path("results").fieldNames()).toIterable()
+    assertThat(body.path("results").propertyNames())
         .containsExactly(CalculationMetric.GEOGRAPHIC_EXPOSURE.getValue());
-    assertThat(body.path("failures").fieldNames()).toIterable()
+    assertThat(body.path("failures").propertyNames())
         .containsExactly(CalculationMetric.MANAGEMENT_FEE.getValue());
 
     List<Notification> feeFailure = notificationsOf(body, CalculationMetric.MANAGEMENT_FEE);

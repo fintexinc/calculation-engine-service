@@ -40,7 +40,7 @@ import ca.tangerine.wm.commons.error.ErrorResponse;
 import ca.tangerine.wm.commons.error.Severity;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -54,11 +54,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -87,18 +82,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
+
 @ExtendWith(MockitoExtension.class)
 class PortfolioCalculationControllerTest {
 
   private MockMvc mockMvc;
-  private ObjectMapper objectMapper;
+  private JsonMapper objectMapper;
   private EnumMap<CalculationMetric, CalculationService<?, ?, ?>> mockServices;
 
   @BeforeEach
   void setUp() {
-    objectMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    objectMapper = JsonMapper.builder()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .build();
 
     mockServices = new EnumMap<>(CalculationMetric.class);
     List<CalculationService<?, ?, ?>> serviceList = Arrays.stream(CalculationMetric.values())
@@ -109,7 +108,7 @@ class PortfolioCalculationControllerTest {
         new RecordingCalculationObservability());
 
     mockMvc = MockMvcBuilders.standaloneSetup(controller)
-        .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+        .setMessageConverters(new JacksonJsonHttpMessageConverter(objectMapper))
         .build();
   }
 
@@ -405,16 +404,16 @@ class PortfolioCalculationControllerTest {
   class ValidationIntegration {
 
     private MockMvc validatingMockMvc;
-    private ObjectMapper om;
+    private JsonMapper om;
     private Map<CalculationMetric, CalculationService<?, ?, ?>> calculationServices;
     private RecordingCalculationObservability observability;
 
     @BeforeEach
     void setUp() {
-      om = new ObjectMapper()
-          .registerModule(new JavaTimeModule())
-          .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      om = JsonMapper.builder()
+          .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+          .build();
 
       List<RequestValidator> validators = List.of(
           new TwelveMonthMinimumPeriodsReqValidator(),
@@ -441,7 +440,7 @@ class PortfolioCalculationControllerTest {
       validator.afterPropertiesSet();
       validatingMockMvc = MockMvcBuilders.standaloneSetup(controller)
           .setControllerAdvice(new GlobalExceptionHandler())
-          .setMessageConverters(new MappingJackson2HttpMessageConverter(om))
+          .setMessageConverters(new JacksonJsonHttpMessageConverter(om))
           .setValidator(validator)
           .build();
     }

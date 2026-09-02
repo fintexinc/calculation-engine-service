@@ -4,7 +4,6 @@ import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.wm.commons.domain.DataProvider;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import tools.jackson.databind.annotation.JsonTypeIdResolver;
 
 /**
  * Base of every calculation command: the {@code metric} discriminator and the inputs shared by all metrics. The

@@ -43,8 +43,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -62,6 +60,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * HTTP-level test of the generic security-attributes fetcher against a mocked MIC endpoint, exercising the full round
