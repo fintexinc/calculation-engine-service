@@ -1,13 +1,10 @@
 package com.fintex.ce.e2e;
 
-import com.fintex.ce.model.domain.enumeration.InterestFreq;
 import com.fintex.ce.model.domain.result.returns.Growth10KResult;
 import com.fintex.ce.model.dto.command.ReturnCommand;
 import com.fintex.wm.commons.domain.currency.Currency;
 import com.fintex.wm.commons.domain.enumeration.Country;
 import com.fintex.wm.commons.domain.enumeration.FinancialInstrumentType;
-import com.fintex.wm.commons.error.ErrorResponse;
-import com.fintex.wm.commons.error.Notification;
 
 import org.springframework.http.HttpStatus;
 
@@ -18,33 +15,25 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.CCM4752;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.F0CAN999;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.VCNS;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.XBAL;
 import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * CAD growth-of-10k scenarios (mixed holdings, validation inherited from {@link AbstractGrowthOf10kE2ETest} and
- * {@link AbstractPortfolioCalculationE2ETest}). FX-specific coverage lives in {@link Growth10kWithFxE2ETest}.
+ * CAD growth-of-10k e2e scenarios. FX-specific coverage lives in {@link Growth10kWithFxE2ETest}.
  */
 @Tag("e2e")
 class GrowthOf10kE2ETest extends AbstractGrowthOf10kE2ETest {
 
   @Test
-  void shouldReturnBadRequest_whenGicHoldingOmitsInterestRate() {
-    ReturnCommand command = commandFor(Currency.CAD, List.of(
-        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
-        gic(null, Currency.CAD, new BigDecimal("25000.00"), new BigDecimal("365"), null,
-            InterestFreq.MONTHLY, LocalDate.of(2024, 1, 1))));
-
-    HttpResponse response = postCalculation(writeJson(command));
-
-    assertThat(response.status().value()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-    ErrorResponse error = readJson(response.responseBody(), ErrorResponse.class);
-    assertThat(error.getNotifications()).hasSize(1);
-    Notification notification = error.getNotifications().getFirst();
-    assertThat(notification.getCode()).isEqualTo("GIC-001");
-    assertThat(notification.getSeverity().name()).isEqualTo("ERROR");
-    assertThat(notification.getMessage()).isEqualTo("The gic holding is missing interest rate");
+  void shouldCalculateGrowthOf10kForMixedPortfolio_whenCustomPedIsAfterPortfolioPed() {
+    enqueueMixedPortfolioResponses();
+    HttpResponse response = postCalculation(mixedPortfolioRequestBody());
+    assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
+    assertMixedPortfolioResponse(response.responseBody());
   }
 
   @Test

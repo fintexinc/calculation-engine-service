@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
 
 /**
  * Drives the client through the failure modes the resilience layer exists for, against a real socket: a transient
@@ -109,6 +110,21 @@ class SecurityMasterWebClientTest {
     assertThat(observability.outcomes.getFirst())
         .as("the upstream status is filed once, for the final outcome, before the domain exception propagates")
         .isEqualTo("httpFailed:503");
+  }
+
+  @Test
+  void shouldThrowUnavailableAfterRetrying_whenTransportFails() {
+    for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AFTER_REQUEST));
+    }
+
+    assertThatThrownBy(() -> client.get(PATH, Map.class))
+        .isInstanceOf(ExternalServiceUnavailableException.class);
+
+    assertThat(server.getRequestCount())
+        .as("a transport failure is transient, so every configured attempt must reach the server")
+        .isEqualTo(MAX_ATTEMPTS);
+    assertThat(observability.outcomes.getFirst()).startsWith("failed:");
   }
 
   @Test
