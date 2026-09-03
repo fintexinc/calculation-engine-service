@@ -20,6 +20,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.fintex.ce.e2e.ReturnCommandFixtures.CCM4752;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.F0CAN999;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.RY_TO;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.VCNS;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.XBAL;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.monthlyReturns;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.returns;
 import static com.fintex.ce.test.PortfolioHoldingBuildHelper.cash;
 import static com.fintex.ce.test.PortfolioHoldingBuildHelper.gic;
 import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
@@ -28,37 +35,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Shared e2e infrastructure for the {@code growth-of-10k} metric. Named {@code AbstractGrowthOf10kE2ETest} because
  * {@code GrowthOf10KE2ETest} would collide on case-insensitive filesystems with {@link GrowthOf10kE2ETest}. Common
- * {@link ReturnCommand} fixtures (holding factories, monthly-returns builders, identifiers) live in
- * {@link AbstractReturnCommandE2ETest}.
+ * {@link ReturnCommand} fixtures live in {@link ReturnCommandFixtures}.
  */
-abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
+abstract class AbstractGrowthOf10kE2ETest extends AbstractPortfolioCalculationE2EBase {
 
   @Override
   protected String metricPath() {
     return CalculationMetric.GROWTH_OF_10K.getValue();
   }
 
-  @Override
-  protected String requestBodyForSmsUnavailableScenario() {
-    return writeJson(commandFor(Currency.CAD, List.of(
-        holding(XBAL, FinancialInstrumentType.ETF, Country.CANADA, "45234.67"),
-        holding(VCNS, FinancialInstrumentType.ETF, Country.CANADA, "18765.43"))));
-  }
-
-  @Override
-  protected String requestBodyForPositiveSmsScenario() {
+  protected String mixedPortfolioRequestBody() {
     ReturnCommand command = richPortfolioCommand();
     command.setCustomPed(LocalDate.of(2024, 12, 31));
     return writeJson(command);
   }
 
-  @Override
-  protected void enqueueForPositiveSmsScenario() {
+  protected void enqueueMixedPortfolioResponses() {
     enqueueSmsMockResponse(smsPositiveResponseBody());
     enqueueSmsMockResponse(writeJson(cadTreasuryRates()));
   }
 
-  @Override
   protected String smsPositiveResponseBody() {
     return writeJson(List.of(
         securityAttributeResult(XBAL, twoMonthReturns("5.0", "-2.0")),
@@ -68,15 +64,7 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
         securityAttributeResult(RY_TO, twoMonthReturns("6.0", "-3.0"))));
   }
 
-  @Override
-  protected String requestBodyForMismatchedMetricScenario() {
-    ReturnCommand command = richPortfolioCommand();
-    command.setMetric(CalculationMetric.SHARPE_RATIO);
-    return writeJson(command);
-  }
-
-  @Override
-  protected void assertPositiveResponseBody(String responseBody) {
+  protected void assertMixedPortfolioResponse(String responseBody) {
     Growth10KResult result = readJson(responseBody, Growth10KResult.class);
     assertThat(result.getWarnings()).extracting(Notification::getCode)
         .containsExactly(ErrorCode.CPED_AFTER_PORTFOLIO_PED.getCode());
@@ -105,7 +93,8 @@ abstract class AbstractGrowthOf10kE2ETest extends AbstractReturnCommandE2ETest {
   }
 
   protected static ReturnCommand commandFor(Currency currency, List<PortfolioHolding> holdings) {
-    return commandFor(CalculationMetric.GROWTH_OF_10K, currency, holdings);
+    return ReturnCommandFixtures.commandFor(
+        CalculationMetric.GROWTH_OF_10K, currency, holdings);
   }
 
   protected static void assertGrowthPoint(KeyValueResult<?> point, String expectedDate, String expectedValue) {

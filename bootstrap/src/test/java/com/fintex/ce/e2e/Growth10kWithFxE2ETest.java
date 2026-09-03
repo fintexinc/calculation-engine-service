@@ -22,6 +22,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static com.fintex.ce.e2e.ReturnCommandFixtures.SPY;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.VTI;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.monthlyReturns;
+import static com.fintex.ce.e2e.ReturnCommandFixtures.returns;
 import static com.fintex.ce.test.PortfolioHoldingBuildHelper.holding;
 import static org.assertj.core.api.Assertions.assertThat;
 
