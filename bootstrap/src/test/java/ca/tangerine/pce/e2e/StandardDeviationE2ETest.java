@@ -1,7 +1,6 @@
 package ca.tangerine.pce.e2e;
 
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
 import ca.tangerine.pce.model.domain.result.risk.StandardDeviationResult;
 import ca.tangerine.pce.model.dto.command.PeriodCommand;
 import ca.tangerine.pce.model.error.ErrorCode;
@@ -80,7 +79,7 @@ class StandardDeviationE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.parse("2024-01-31"));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.parse("2025-02-28"));
     assertThat(result.getStandardDeviation()).hasSize(1);
-    assertThat(findPeriod(result).value()).isCloseTo(new BigDecimal("0.0124899960"), within(TOLERANCE));
+    assertThat(findPeriod(result)).isCloseTo(new BigDecimal("0.0124899960"), within(TOLERANCE));
   }
 
   @Test
@@ -108,11 +107,8 @@ class StandardDeviationE2ETest extends AbstractPortfolioCalculationE2ETest {
         .containsEntry("param-2", "2024-11-30, 2024-12-31");
   }
 
-  private static TimeIntervalResult findPeriod(StandardDeviationResult result) {
-    return result.getStandardDeviation().stream()
-        .filter(entry -> TimePeriod.ONE_YR.name().equals(entry.period()))
-        .findFirst()
-        .orElseThrow(() -> new AssertionError("Missing period " + TimePeriod.ONE_YR.name()));
+  private static BigDecimal findPeriod(StandardDeviationResult result) {
+    return result.getStandardDeviation().get(TimePeriod.ONE_YR.name());
   }
 
   private static PeriodCommand standardDeviationCommand() {

@@ -126,10 +126,8 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
       BigDecimal benchmarkMonthlyReturn, BigDecimal expectedBenchmarkReturn, BigDecimal expectedPercentDifference) {
     TrailingTotalReturnsResult result = calculateBenchmarkComparison(benchmarkMonthlyReturn, List.of());
 
-    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(portfolio -> {
-      assertThat(portfolio.period()).isEqualTo(ONE_MTH.name());
-      assertThat(portfolio.value()).isEqualByComparingTo("0.1");
-    });
+    assertThat(result.getTrailingTotalReturn()).containsOnlyKeys(ONE_MTH.name());
+    assertThat(result.getTrailingTotalReturn().get(ONE_MTH.name())).isEqualByComparingTo("0.1");
     assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
       assertThat(comparison.period()).isEqualTo(ONE_MTH);
       assertThat(comparison.portfolio()).isEqualByComparingTo("0.1");
@@ -148,10 +146,8 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
     Notification benchmarkWarning = ErrorCode.MISSING_MONTHLY_RETURNS.asNotification();
     TrailingTotalReturnsResult result = calculateBenchmarkComparison(null, List.of(benchmarkWarning));
 
-    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(portfolio -> {
-      assertThat(portfolio.period()).isEqualTo(ONE_MTH.name());
-      assertThat(portfolio.value()).isEqualByComparingTo("0.1");
-    });
+    assertThat(result.getTrailingTotalReturn()).containsOnlyKeys(ONE_MTH.name());
+    assertThat(result.getTrailingTotalReturn().get(ONE_MTH.name())).isEqualByComparingTo("0.1");
     assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
       assertThat(comparison.period()).isEqualTo(ONE_MTH);
       assertThat(comparison.portfolio()).isEqualByComparingTo("0.1");
@@ -167,10 +163,8 @@ class TrailingTotalReturnsCalculationServiceImplImplTest {
     CalculationException exception = errorCode.toException("benchmark");
     TrailingTotalReturnsResult result = calculateUnavailableBenchmarkComparison(exception);
 
-    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(portfolio -> {
-      assertThat(portfolio.period()).isEqualTo(ONE_MTH.name());
-      assertThat(portfolio.value()).isEqualByComparingTo("0.1");
-    });
+    assertThat(result.getTrailingTotalReturn()).containsOnlyKeys(ONE_MTH.name());
+    assertThat(result.getTrailingTotalReturn().get(ONE_MTH.name())).isEqualByComparingTo("0.1");
     assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
       assertThat(comparison.period()).isEqualTo(ONE_MTH);
       assertThat(comparison.portfolio()).isEqualByComparingTo("0.1");

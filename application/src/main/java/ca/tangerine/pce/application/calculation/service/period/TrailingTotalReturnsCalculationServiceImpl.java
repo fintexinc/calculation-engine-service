@@ -81,9 +81,8 @@ public class TrailingTotalReturnsCalculationServiceImpl
   }
 
   private static List<KeyValueResult<TimePeriod>> comparisonValues(TrailingTotalReturnsResult result) {
-    return result.getTrailingTotalReturn().stream()
-        .map(trailingReturn -> new KeyValueResult<>(TimePeriod.valueOf(trailingReturn.period()), trailingReturn
-            .value()))
+    return result.getTrailingTotalReturn().entrySet().stream()
+        .map(entry -> new KeyValueResult<>(TimePeriod.valueOf(entry.getKey()), entry.getValue()))
         .toList();
   }
 }
