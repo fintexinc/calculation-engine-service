@@ -41,10 +41,11 @@ import static ca.tangerine.pce.e2e.MicAttributeResponses.singleAttributeDispatch
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * End-to-end coverage for the {@code /fixed-income-country-exposure} endpoint. It reads the whole-security
- * {@code COUNTRY_ALLOCATION} datapoint — the one issuer-country breakdown Market Investment Catalogue publishes per
- * security — and rolls it onto the five {@link CountryRegionType} buckets, so what this test pins over the wire is the
- * taxonomy the bond world needs and the equity one does not: an exposure with no country at all.
+ * End-to-end coverage for the {@code /fixed-income-country-exposure} endpoint. It reads the
+ * {@code FIXED_INCOME_COUNTRY_ALLOCATION} datapoint — the bond-sleeve issuer-country breakdown Market Investment
+ * Catalogue stores for a composite security — and rolls it onto the five {@link CountryRegionType} buckets, so what
+ * this test pins over the wire is the taxonomy the bond world needs and the equity one does not: an exposure with no
+ * country at all.
  *
  * <p>
  * Supranational issuers (the World Bank, the EIB) are routine in a bond portfolio and are not a data gap — they belong
@@ -100,13 +101,13 @@ class FixedIncomeCountryExposureE2ETest extends AbstractPortfolioCalculationE2ET
    * The shared positive scenario enqueues a single response, which suffices for one holding; this portfolio holds five
    * across two identifier types, and how many attribute calls the fetcher batches them into is an implementation
    * detail. The dispatcher answers all of them, and only on this metric's attribute path — which is what keeps the
-   * declared {@code requiredAttribute()} honest, and this metric reads the whole-security datapoint rather than a
-   * fixed-income-sleeve one of its own.
+   * declared {@code requiredAttribute()} honest: this metric reads the fixed-income-sleeve country datapoint, the only
+   * country allocation Market Investment Catalogue actually stores for a composite security.
    */
   @Override
   protected void enqueueForPositiveMicScenario() {
     micMockServer.setDispatcher(
-        singleAttributeDispatcher(CompositeSecurityAttribute.COUNTRY_ALLOCATION, positiveScenarioRows()));
+        singleAttributeDispatcher(CompositeSecurityAttribute.FIXED_INCOME_COUNTRY_ALLOCATION, positiveScenarioRows()));
   }
 
   @Override
@@ -145,18 +146,18 @@ class FixedIncomeCountryExposureE2ETest extends AbstractPortfolioCalculationE2ET
   }
 
   /**
-   * This metric asks for the whole-security country datapoint and does not scope itself to the bond-bearing holdings,
-   * so an individual stock in the portfolio is not excluded from the breakdown — it is carried into it and reported as
-   * a gap, because Market Investment Catalogue publishes the country breakdown for composite securities only. The
-   * client therefore gets a warning naming the stock rather than a silently smaller pie, and the fund that does carry
-   * data describes the whole of the reported distribution.
+   * This metric asks for the fixed-income country datapoint and does not scope itself to the bond-bearing holdings, so
+   * an individual stock in the portfolio is not excluded from the breakdown — it is carried into it and reported as a
+   * gap, because Market Investment Catalogue publishes the country breakdown for composite securities only. The client
+   * therefore gets a warning naming the stock rather than a silently smaller pie, and the fund that does carry data
+   * describes the whole of the reported distribution.
    */
   @Test
   void shouldWarnAndRescaleOverTheHole_whenTheHoldingHasNoCountryAllocation() {
     PortfolioHolding bondFund = fund(CANADIAN_BOND_FUND, FinancialInstrumentType.MUTUAL_FUND, 60_000);
     PortfolioHolding individualStock = stock("RY.TO", "TSX", 40_000);
     micMockServer.setDispatcher(
-        singleAttributeDispatcher(CompositeSecurityAttribute.COUNTRY_ALLOCATION, List.of(
+        singleAttributeDispatcher(CompositeSecurityAttribute.FIXED_INCOME_COUNTRY_ALLOCATION, List.of(
             countryRow(CANADIAN_BOND_FUND, FiIdentifierType.MORNINGSTAR_ID,
                 countryValue(Country.CANADA, "0.80"),
                 countryValue(Country.SUPRANATIONAL, "0.20")))));

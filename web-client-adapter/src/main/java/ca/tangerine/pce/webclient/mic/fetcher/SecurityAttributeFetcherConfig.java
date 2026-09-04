@@ -136,8 +136,9 @@ public class SecurityAttributeFetcherConfig {
   }
 
   @Bean
-  CompositeAttributeBinding<CountryExposure, CountryAllocation> countryExposureBinding(CountryExposureMapper mapper) {
-    return new CompositeAttributeBinding<>(CompositeSecurityAttribute.COUNTRY_ALLOCATION,
+  CompositeAttributeBinding<CountryExposure, CountryAllocation> fixedIncomeCountryExposureBinding(
+      CountryExposureMapper mapper) {
+    return new CompositeAttributeBinding<>(CompositeSecurityAttribute.FIXED_INCOME_COUNTRY_ALLOCATION,
         CountryAllocation.class, CountryExposure.class, mapper);
   }
 
