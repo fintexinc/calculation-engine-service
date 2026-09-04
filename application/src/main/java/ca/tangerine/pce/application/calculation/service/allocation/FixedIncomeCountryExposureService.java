@@ -44,7 +44,7 @@ public class FixedIncomeCountryExposureService
 
   @Override
   public CompositeSecurityAttribute requiredAttribute() {
-    return CompositeSecurityAttribute.COUNTRY_ALLOCATION;
+    return CompositeSecurityAttribute.FIXED_INCOME_COUNTRY_ALLOCATION;
   }
 
   // TODO: return the holding's currency so multi-currency portfolios weight comparable values. Returning null leaves
