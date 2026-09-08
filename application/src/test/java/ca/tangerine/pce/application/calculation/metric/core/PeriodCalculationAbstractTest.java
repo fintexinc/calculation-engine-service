@@ -5,13 +5,11 @@ import ca.tangerine.pce.application.calculation.metric.TrailingTotalReturnsCalcu
 import ca.tangerine.pce.model.domain.calculation.input.PeriodCalculationInput;
 import ca.tangerine.pce.model.domain.calculation.input.WeightedAverageInput;
 import ca.tangerine.pce.model.domain.result.PeriodResult;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
 import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
 import ca.tangerine.pce.model.error.exceptions.CalculationException;
 import ca.tangerine.pce.util.ComparisonUtils;
 import ca.tangerine.wm.commons.domain.enumeration.TimePeriod;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -21,7 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -54,7 +52,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anySet;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.eq;
@@ -74,7 +71,7 @@ class PeriodCalculationAbstractTest {
     when(w.getCipsd()).thenReturn(null);
     PeriodCalculationAbstract p = TrailingTotalReturnsCalculation.mathOnly(w, Set.of());
 
-    Set<Pair<String, BigDecimal>> results = new HashSet<>();
+    Map<String, BigDecimal> results = new HashMap<>();
     p.addSinceCustomIntervalPerformanceStartDate(results, Set.of());
 
     assertEquals(0, results.size());
@@ -87,7 +84,7 @@ class PeriodCalculationAbstractTest {
     when(calculation.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(false);
 
     doCallRealMethod().when(calculation).addSinceCustomIntervalPerformanceStartDate(any(), any());
-    Set<Pair<String, BigDecimal>> results = new HashSet<>();
+    Map<String, BigDecimal> results = new HashMap<>();
     calculation.addSinceCustomIntervalPerformanceStartDate(results, Set.of(SI, YTD, ONE_YR));
 
     assertEquals(0, results.size());
@@ -103,13 +100,12 @@ class PeriodCalculationAbstractTest {
     when(p.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(false);
 
     doCallRealMethod().when(p).addSinceCustomIntervalPerformanceStartDate(any(), any());
-    Set<Pair<String, BigDecimal>> results = new HashSet<>();
+    Map<String, BigDecimal> results = new HashMap<>();
     p.addSinceCustomIntervalPerformanceStartDate(results, Set.of(CIPSD));
 
     assertEquals(1, results.size());
-    Pair<String, BigDecimal> actual = results.stream().findFirst().orElseThrow();
-    assertEquals(CIPSD.name(), actual.getKey());
-    assertNull(actual.getValue());
+    assertTrue(results.containsKey(CIPSD.name()));
+    assertNull(results.get(CIPSD.name()));
   }
 
   @Test
@@ -119,7 +115,7 @@ class PeriodCalculationAbstractTest {
     when(p.isSinceCustomIntervalPerformanceStartDateValid()).thenReturn(true);
 
     doCallRealMethod().when(p).addSinceCustomIntervalPerformanceStartDate(any(), any());
-    p.addSinceCustomIntervalPerformanceStartDate(new HashSet<>(), Set.of(CIPSD));
+    p.addSinceCustomIntervalPerformanceStartDate(new HashMap<>(), Set.of(CIPSD));
 
     verify(p).calculatePeriodForCustomIntervalStartDate();
   }
@@ -135,10 +131,10 @@ class PeriodCalculationAbstractTest {
     when(p.toUserFormat(any())).thenReturn(one);
 
     doCallRealMethod().when(p).addSinceCustomIntervalPerformanceStartDate(any(), any());
-    HashSet<Pair<String, BigDecimal>> resultSet = new HashSet<>();
+    Map<String, BigDecimal> resultSet = new HashMap<>();
     p.addSinceCustomIntervalPerformanceStartDate(resultSet, Set.of(CIPSD));
 
-    assertEquals(Set.of(Pair.of(CIPSD.name(), one)), resultSet);
+    assertEquals(Map.of(CIPSD.name(), one), resultSet);
   }
 
   @Test
@@ -225,7 +221,7 @@ class PeriodCalculationAbstractTest {
   @Test
   void shouldDelegateToCalculatePeriods_whenCalculateIsCalled() {
     Set<TimePeriod> periods = Set.of(ONE_MTH);
-    Set<Pair<String, BigDecimal>> periodResults = Set.of();
+    Map<String, BigDecimal> periodResults = Map.of();
     PeriodResult result = mock(PeriodResult.class);
     PeriodCalculationAbstract p = calculationForCalculateTests(periodResults, result);
 
@@ -256,7 +252,7 @@ class PeriodCalculationAbstractTest {
   @Test
   void shouldDelegateToDefineResponseType_whenCalculateIsCalled() {
     Set<TimePeriod> periods = Set.of(ONE_MTH);
-    Set<Pair<String, BigDecimal>> periodResults = Set.of(Pair.of(ONE_MTH.name(), ONE));
+    Map<String, BigDecimal> periodResults = Map.of(ONE_MTH.name(), ONE);
     PeriodResult result = mock(PeriodResult.class);
     PeriodCalculationAbstract p = calculationForCalculateTests(periodResults, result);
 
@@ -349,7 +345,7 @@ class PeriodCalculationAbstractTest {
   @Test
   void shouldPopulateBasicDetails_whenCalculateIsCalled() {
     Set<TimePeriod> periods = Set.of(ONE_MTH);
-    Set<Pair<String, BigDecimal>> periodResults = Set.of();
+    Map<String, BigDecimal> periodResults = Map.of();
     PeriodResult result = mock(PeriodResult.class);
     PeriodCalculationAbstract p = calculationForCalculateTests(periodResults, result);
 
@@ -376,7 +372,7 @@ class PeriodCalculationAbstractTest {
   }
 
   private static PeriodCalculationAbstract calculationForCalculateTests(
-      Set<Pair<String, BigDecimal>> periodResults,
+      Map<String, BigDecimal> periodResults,
       PeriodResult result) {
     PeriodCalculationInput input = new PeriodCalculationInput(null, new TreeMap<>(), List.of());
     PeriodCalculationAbstract calculation = mock(PeriodCalculationAbstract.class,
@@ -407,16 +403,15 @@ class PeriodCalculationAbstractTest {
 
     TimePeriod period = TWO_MTH;
     Set<TimePeriod> periods = Set.of(period);
-    Pair<String, BigDecimal> pair = Pair.of(period.name(), ONE);
 
     when(p.getInitialPeriods(any())).thenReturn(periods);
-    when(p.calculateForPeriod(any())).thenReturn(pair);
+    when(p.calculateForPeriod(any())).thenReturn(ONE);
 
     doCallRealMethod().when(p).calculatePeriods(any());
-    Set actual = p.calculatePeriods(periods);
+    Map<String, BigDecimal> actual = p.calculatePeriods(periods);
 
-    verify(p).addSinceCustomIntervalPerformanceStartDate(Set.of(pair), periods);
-    assertEquals(Set.of(pair), actual);
+    verify(p).addSinceCustomIntervalPerformanceStartDate(Map.of(period.name(), ONE), periods);
+    assertEquals(Map.of(period.name(), ONE), actual);
   }
 
   /**
@@ -451,9 +446,12 @@ class PeriodCalculationAbstractTest {
     verify(p).calculatePeriodForNumberOfMonths(months);
   }
 
-  /** The pair is keyed by the period's name, which is the form the response DTOs and the wire both use. */
+  /**
+   * The calculation returns the user-formatted value for the period; keying by the period's name (the form the response
+   * DTOs and the wire both use) happens in {@code calculatePeriods}.
+   */
   @Test
-  void shouldReturnPeriodPair_whenCalculationSucceeds() {
+  void shouldReturnPeriodValue_whenCalculationSucceeds() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
 
     BigDecimal one = ONE;
@@ -462,9 +460,9 @@ class PeriodCalculationAbstractTest {
 
     when(p.toUserFormat(any())).thenReturn(one);
     doCallRealMethod().when(p).calculateForPeriod(any());
-    Pair actual = p.calculateForPeriod(period);
+    BigDecimal actual = (BigDecimal) p.calculateForPeriod(period);
 
-    assertEquals(Pair.of(period.name(), toUserScale(one)), actual);
+    assertEquals(toUserScale(one), actual);
   }
 
   @Test
@@ -613,20 +611,6 @@ class PeriodCalculationAbstractTest {
   }
 
   @Test
-  void shouldCreateTimeIntervalResults_whenFormattingPairs() {
-    PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
-
-    Set<TimeIntervalResult> expected = Set.of(new TimeIntervalResult("2000-01-12", ONE));
-
-    Set<Pair<String, BigDecimal>> pairs = Set.of(Pair.of("2000-01-12", ONE));
-
-    doCallRealMethod().when(p).formTimeIntervalResult(anySet());
-    Set actual = p.formTimeIntervalResult(pairs);
-
-    assertEquals(expected, actual);
-  }
-
-  @Test
   void shouldUseSubMapFromPeriodStartDate_whenCalculatingAverageArithmeticAnnualizedReturn() {
     PeriodCalculationAbstract p = mock(PeriodCalculationAbstract.class);
     TreeMap treeMap = mock(TreeMap.class);
@@ -715,7 +699,8 @@ class PeriodCalculationAbstractTest {
     }
     calculation.portfolioTotalReturns = returns;
     TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
-    Set<Pair<String, BigDecimal>> periodValues = Set.of(Pair.of(period, value));
+    Map<String, BigDecimal> periodValues = new LinkedHashMap<>();
+    periodValues.put(period, value);
 
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();
@@ -763,8 +748,8 @@ class PeriodCalculationAbstractTest {
     calculation.portfolioTotalReturns = returns;
     calculation.cipsd = LOCAL_DATE_NOW.minusMonths(24);
     TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
-    Set<Pair<String, BigDecimal>> periodValues = Set.of(
-        Pair.of(CIPSD.name(), null));
+    Map<String, BigDecimal> periodValues = new LinkedHashMap<>();
+    periodValues.put(CIPSD.name(), null);
 
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();
@@ -790,8 +775,8 @@ class PeriodCalculationAbstractTest {
     calculation.portfolioTotalReturns = returns;
     calculation.cipsd = LOCAL_DATE_NOW.plusMonths(6);
     TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
-    Set<Pair<String, BigDecimal>> periodValues = Set.of(
-        Pair.of(CIPSD.name(), null));
+    Map<String, BigDecimal> periodValues = new LinkedHashMap<>();
+    periodValues.put(CIPSD.name(), null);
 
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();
@@ -817,8 +802,8 @@ class PeriodCalculationAbstractTest {
     calculation.portfolioTotalReturns = returns;
     calculation.cipsd = LOCAL_DATE_NOW.minusMonths(1);
     TrailingTotalReturnsResult result = new TrailingTotalReturnsResult();
-    Set<Pair<String, BigDecimal>> periodValues = Set.of(
-        Pair.of(CIPSD.name(), null));
+    Map<String, BigDecimal> periodValues = new LinkedHashMap<>();
+    periodValues.put(CIPSD.name(), null);
 
     doCallRealMethod().when(calculation).addInsufficientDataWarnings(any(), any());
     doCallRealMethod().when(calculation).availableMonths();

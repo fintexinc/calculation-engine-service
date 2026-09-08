@@ -2,7 +2,6 @@ package ca.tangerine.pce.e2e;
 
 import ca.tangerine.pce.model.domain.enumeration.CalculationMetric;
 import ca.tangerine.pce.model.domain.holding.PortfolioHolding;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
 import ca.tangerine.pce.model.domain.result.returns.TrailingTotalReturnsResult;
 import ca.tangerine.pce.model.dto.command.PeriodCommand;
 import ca.tangerine.pce.model.error.ErrorCode;
@@ -152,13 +151,13 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
     assertThat(result.getTrailingTotalReturn()).hasSize(4);
 
-    assertThat(findPeriod(result, ONE_MTH.name()).value())
+    assertThat(findPeriod(result, ONE_MTH.name()))
         .isCloseTo(new BigDecimal("0.0176198704"), within(TOLERANCE));
-    assertThat(findPeriod(result, THREE_MTH.name()).value())
+    assertThat(findPeriod(result, THREE_MTH.name()))
         .isCloseTo(new BigDecimal("0.0475271907"), within(TOLERANCE));
-    assertThat(findPeriod(result, SIX_MTH.name()).value())
+    assertThat(findPeriod(result, SIX_MTH.name()))
         .isCloseTo(new BigDecimal("0.0832827785"), within(TOLERANCE));
-    assertThat(findPeriod(result, ONE_YR.name()).value())
+    assertThat(findPeriod(result, ONE_YR.name()))
         .isCloseTo(new BigDecimal("0.1503798415"), within(TOLERANCE));
   }
 
@@ -180,10 +179,9 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
     assertThat(result.getWarnings()).isEmpty();
-    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(portfolio -> {
-      assertThat(portfolio.period()).isEqualTo(ONE_MTH.name());
-      assertThat(portfolio.value()).isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
-    });
+    assertThat(result.getTrailingTotalReturn()).containsOnlyKeys(ONE_MTH.name());
+    assertThat(result.getTrailingTotalReturn().get(ONE_MTH.name())).isCloseTo(new BigDecimal("0.05"), within(
+        TOLERANCE));
     assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
       assertThat(comparison.period()).isEqualTo(ONE_MTH);
       assertThat(comparison.portfolio()).isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
@@ -216,7 +214,7 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
     TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
     assertThat(result.getPerformanceStartDate()).isEqualTo(LocalDate.of(2024, 10, 31));
     assertThat(result.getPerformanceEndDate()).isEqualTo(LocalDate.of(2024, 12, 31));
-    assertThat(findPeriod(result, THREE_MTH.name()).value())
+    assertThat(findPeriod(result, THREE_MTH.name()))
         .isCloseTo(new BigDecimal("0.061106"), within(TOLERANCE));
     assertThat(result.getWarnings()).extracting(Notification::getCode)
         .containsExactly(ErrorCode.Codes.INSUFFICIENT_MONTHLY_RETURNS_FOR_PERIOD);
@@ -244,10 +242,9 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
 
     assertThat(response.status().value()).isEqualTo(HttpStatus.OK.value());
     TrailingTotalReturnsResult result = readJson(response.responseBody(), TrailingTotalReturnsResult.class);
-    assertThat(result.getTrailingTotalReturn()).singleElement().satisfies(portfolio -> {
-      assertThat(portfolio.period()).isEqualTo(ONE_MTH.name());
-      assertThat(portfolio.value()).isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
-    });
+    assertThat(result.getTrailingTotalReturn()).containsOnlyKeys(ONE_MTH.name());
+    assertThat(result.getTrailingTotalReturn().get(ONE_MTH.name())).isCloseTo(new BigDecimal("0.05"), within(
+        TOLERANCE));
     assertThat(result.getComparison()).singleElement().satisfies(comparison -> {
       assertThat(comparison.period()).isEqualTo(ONE_MTH);
       assertThat(comparison.portfolio()).isCloseTo(new BigDecimal("0.05"), within(TOLERANCE));
@@ -293,9 +290,9 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         .containsEntry("param-2", Currency.USD.name())
         .containsEntry("param-3", Currency.CAD.name());
     assertThat(result.getTrailingTotalReturn()).hasSize(2);
-    assertThat(findPeriod(result, THREE_MTH.name()).value())
+    assertThat(findPeriod(result, THREE_MTH.name()))
         .isCloseTo(new BigDecimal("0.04252268"), within(TOLERANCE));
-    assertThat(findPeriod(result, SIX_MTH.name()).value()).isNull();
+    assertThat(findPeriod(result, SIX_MTH.name())).isNull();
   }
 
   @Test
@@ -374,11 +371,8 @@ class TrailingTotalReturnsE2ETest extends AbstractPortfolioCalculationE2ETest {
         holding(VANGUARD_ISIN, FinancialInstrumentType.MUTUAL_FUND, Country.CANADA, "9800.00"));
   }
 
-  private static TimeIntervalResult findPeriod(TrailingTotalReturnsResult result, String period) {
-    return result.getTrailingTotalReturn().stream()
-        .filter(entry -> period.equals(entry.period()))
-        .findFirst()
-        .orElseThrow(() -> new AssertionError("Missing period " + period));
+  private static BigDecimal findPeriod(TrailingTotalReturnsResult result, String period) {
+    return result.getTrailingTotalReturn().get(period);
   }
 
   private static PeriodCommand periodCommand(Set<TimePeriod> periods, LocalDate customPed,

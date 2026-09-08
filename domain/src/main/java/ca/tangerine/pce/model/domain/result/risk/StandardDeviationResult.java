@@ -1,11 +1,11 @@
 package ca.tangerine.pce.model.domain.result.risk;
 
 import ca.tangerine.pce.model.domain.result.PeriodResult;
-import ca.tangerine.pce.model.domain.result.TimeIntervalResult;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,5 +22,5 @@ import lombok.experimental.SuperBuilder;
 public class StandardDeviationResult extends PeriodResult {
 
   @Schema(description = "Annualized standard deviation per time interval period")
-  private Set<TimeIntervalResult> standardDeviation;
+  private Map<String, BigDecimal> standardDeviation;
 }
